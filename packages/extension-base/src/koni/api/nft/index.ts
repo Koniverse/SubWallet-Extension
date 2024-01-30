@@ -5,6 +5,7 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { AcalaNftApi } from '@subwallet/extension-base/koni/api/nft/acala_nft';
 import { BitCountryNftApi } from '@subwallet/extension-base/koni/api/nft/bit.country';
+import BitcoinInscriptionApi from '@subwallet/extension-base/koni/api/nft/bitcoin_inscription';
 import { EvmNftApi } from '@subwallet/extension-base/koni/api/nft/evm_nft';
 import { KaruraNftApi } from '@subwallet/extension-base/koni/api/nft/karura_nft';
 import { BaseNftApi } from '@subwallet/extension-base/koni/api/nft/nft';
@@ -16,7 +17,7 @@ import { VaraNftApi } from '@subwallet/extension-base/koni/api/nft/vara_nft';
 import { WasmNftApi } from '@subwallet/extension-base/koni/api/nft/wasm_nft';
 import { _NFT_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft, _isSupportOrdinal } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isBitcoinChain, _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft, _isSupportOrdinal } from '@subwallet/extension-base/services/chain-service/utils';
 import { categoryAddresses } from '@subwallet/extension-base/utils';
 
 import StatemintNftApi from './statemint_nft';
@@ -59,6 +60,11 @@ function createWeb3NftApi (chain: string, evmApi: _EvmApi | null, addresses: str
 
 const createOrdinalApi = (chain: string, subscanChain: string, addresses: string[]) => {
   return new OrdinalNftApi(addresses, chain, subscanChain);
+};
+
+// chain: bitcoin,
+const createBitcoinInscriptionApi = (chain: string, addresses: string[]) => {
+  return new BitcoinInscriptionApi(chain, addresses);
 };
 
 export class NftHandler {
@@ -167,6 +173,14 @@ export class NftHandler {
               if (handler && !this.handlers.includes(handler)) {
                 this.handlers.push(handler);
               }
+            }
+          }
+
+          if (_isBitcoinChain(chain)) {
+            const handler = createBitcoinInscriptionApi(chain, substrateAddresses);
+
+            if (handler && !this.handlers.includes(handler)) {
+              this.handlers.push(handler);
             }
           }
         });

@@ -11,6 +11,7 @@ import { ALL_ACCOUNT_KEY, ALL_GENESIS_HASH, MANTA_PAY_BALANCE_INTERVAL } from '@
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { BalanceMapImpl } from '@subwallet/extension-base/services/balance-service/BalanceMapImpl';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
+import { BitcoinService } from '@subwallet/extension-base/services/bitcoin-service';
 import BuyService from '@subwallet/extension-base/services/buy-service';
 import CampaignService from '@subwallet/extension-base/services/campaign-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -136,6 +137,7 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly buyService: BuyService;
+  readonly bitcoinService: BitcoinService;
 
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
@@ -155,6 +157,7 @@ export default class KoniState {
     this.settingService = new SettingService();
     this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
+    this.bitcoinService = new BitcoinService();
     this.balanceService = new BalanceService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
     this.mintCampaignService = new MintCampaignService(this);
@@ -323,6 +326,16 @@ export default class KoniState {
     await this.dbService.stores.crowdloan.removeEndedCrowdloans();
 
     await this.startSubscription();
+
+    // Use when implementing Bitcoin service
+    // await this.bitcoinService.getBalances('bc1p5zy5mrjfz00lr7nvy3vzvusdws85ldxzrqxacgajqwurc70wqsqsdx5ye6', (data: any) => {
+    //       console.log(data);
+    //   })
+    // console.log(await this.bitcoinService.getInscriptionContent("c08dba3e458a06b6aa0435f4761e728d329d7cb20f591029a8c9804290780660i0"));
+    // console.log(await this.bitcoinServizce.fetchInscriptions('bc1p5zy5mrjfz00lr7nvy3vzvusdws85ldxzrqxacgajqwurc70wqsqsdx5ye6'));
+    // await this.bitcoinService.getBRC20Balances('bc1pvhegcw7fk4r7uj9an3ha8ajpjm6a22q6su9cwngmmcvjt7mgumcsaxyygr', (data: any) => {
+    //   console.log(data);
+    // });
   }
 
   public async initMantaPay (password: string) {

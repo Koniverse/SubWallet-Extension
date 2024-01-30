@@ -193,7 +193,7 @@ export const subscribeAssetSettings = lazySubscribeMessage('pri(assetSetting.get
 // Features
 export const updatePrice = (data: PriceJson) => {
   store.dispatch({ type: 'price/updatePrice', payload: data });
-};
+};-
 
 export const subscribePrice = lazySubscribeMessage('pri(price.getSubscription)', null, updatePrice, updatePrice);
 

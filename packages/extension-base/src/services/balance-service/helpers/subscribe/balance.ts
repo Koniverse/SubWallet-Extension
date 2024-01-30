@@ -11,6 +11,7 @@ import { BalanceItem } from '@subwallet/extension-base/types';
 import { categoryAddresses } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
 
+import { fetchBRC20 } from './brc20';
 import { subscribeEVMBalance } from './evm';
 import { subscribeSubstrateBalance } from './substrate';
 
@@ -113,6 +114,23 @@ export function subscribeBalance (addresses: string[], chainInfoMap: Record<stri
       const nativeTokenInfo = state.getNativeTokenInfo(chainSlug);
 
       return subscribeEVMBalance(chainSlug, useAddresses, evmApiMap, callback, nativeTokenInfo);
+    }
+
+    if (chainInfo.slug === 'polkadot') { // change to bitcoin
+      const address = '5HbcGs2QXVAc6Q6eoTzLYNAJWpN17AkCFRLnWDaHCiGYXvNc';
+      const infos = fetchBRC20(address);
+      const items = (await infos).map((info) => {
+        return {
+          address,
+          tokenSlug: info.ticker,
+          free: info.available_balance,
+          locked: '0',
+          state: APIItemState.READY,
+          timestamp: new Date().getTime()
+        } as BalanceItem;
+      });
+
+      callback(items);
     }
 
     // if (!useAddresses || useAddresses.length === 0 || _PURE_EVM_CHAINS.indexOf(chainSlug) > -1) {
