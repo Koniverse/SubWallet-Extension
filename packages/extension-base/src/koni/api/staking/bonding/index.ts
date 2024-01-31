@@ -8,6 +8,7 @@ import { getAmplitudeBondingExtrinsic, getAmplitudeClaimRewardExtrinsic, getAmpl
 import { getAstarBondingExtrinsic, getAstarClaimRewardExtrinsic, getAstarDappsInfo, getAstarNominatorMetadata, getAstarStakingMetadata, getAstarUnbondingExtrinsic, getAstarWithdrawalExtrinsic, subscribeAstarStakingMetadata } from '@subwallet/extension-base/koni/api/staking/bonding/astar';
 import { getParaBondingExtrinsic, getParaCancelWithdrawalExtrinsic, getParachainCollatorsInfo, getParaChainNominatorMetadata, getParaChainStakingMetadata, getParaUnbondingExtrinsic, getParaWithdrawalExtrinsic, subscribeParaChainStakingMetadata, validateParaChainBondingCondition, validateParaChainUnbondingCondition } from '@subwallet/extension-base/koni/api/staking/bonding/paraChain';
 import { getPoolingClaimRewardExtrinsic, getPoolingWithdrawalExtrinsic, getRelayBondingExtrinsic, getRelayCancelWithdrawalExtrinsic, getRelayChainNominatorMetadata, getRelayChainStakingMetadata, getRelayPoolsInfo, getRelayUnbondingExtrinsic, getRelayValidatorsInfo, getRelayWithdrawalExtrinsic, subscribeRelayChainStakingMetadata, validateRelayBondingCondition, validateRelayUnbondingCondition } from '@subwallet/extension-base/koni/api/staking/bonding/relayChain';
+import { getTaoBondingExtrinsic, getTaoDelegateInfo, getTaoUnbondingExtrinsic, subscribeTaoStakingMetadata } from '@subwallet/extension-base/koni/api/staking/bonding/tao';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 
@@ -64,6 +65,8 @@ export async function getValidatorsInfo (networkKey: string, substrateApi: _Subs
     return getAstarDappsInfo(networkKey, substrateApi);
   } else if (_STAKING_CHAIN_GROUP.amplitude.includes(networkKey)) {
     return getAmplitudeCollatorsInfo(networkKey, substrateApi);
+  } else if (_STAKING_CHAIN_GROUP.bittensor.includes(networkKey)) {
+    return getTaoDelegateInfo(networkKey, substrateApi);
   }
 
   return getRelayValidatorsInfo(networkKey, substrateApi, decimals, chainStakingMetadata);
@@ -80,6 +83,8 @@ export async function getBondingExtrinsic (chainInfo: _ChainInfo, amount: string
     return getAstarBondingExtrinsic(substrateApi, amount, selectedValidators[0]);
   } else if (_STAKING_CHAIN_GROUP.amplitude.includes(chainInfo.slug)) {
     return getAmplitudeBondingExtrinsic(substrateApi, amount, selectedValidators[0], nominatorMetadata);
+  } else if (_STAKING_CHAIN_GROUP.bittensor.includes(chainInfo.slug)) {
+    return getTaoBondingExtrinsic(substrateApi, amount, selectedValidators[0]);
   }
 
   return getRelayBondingExtrinsic(substrateApi, amount, selectedValidators, chainInfo, address, nominatorMetadata);
@@ -92,6 +97,8 @@ export async function getUnbondingExtrinsic (nominatorMetadata: NominatorMetadat
     return getAstarUnbondingExtrinsic(substrateApi, amount, selectedValidator as string);
   } else if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {
     return getAmplitudeUnbondingExtrinsic(substrateApi, amount, nominatorMetadata, selectedValidator as string);
+  } else if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+    return getTaoUnbondingExtrinsic(substrateApi, amount, selectedValidator as string);
   }
 
   return getRelayUnbondingExtrinsic(substrateApi, amount, nominatorMetadata);
@@ -160,6 +167,11 @@ export function subscribeEssentialChainStakingMetadata (substrateApiMap: Record<
       unsubList.push(unsub);
     } else if (_STAKING_CHAIN_GROUP.relay.includes(chainInfo.slug)) {
       const unsub = await subscribeRelayChainStakingMetadata(chainInfo, substrateApi, callback);
+
+      // @ts-ignore
+      unsubList.push(unsub);
+    } else if (_STAKING_CHAIN_GROUP.bittensor.includes(chainInfo.slug)) {
+      const unsub = await subscribeTaoStakingMetadata(chainInfo.slug, substrateApi, callback);
 
       // @ts-ignore
       unsubList.push(unsub);

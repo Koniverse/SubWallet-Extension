@@ -3,7 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NominatorMetadata, StakingItem, StakingRewardItem } from '@subwallet/extension-base/background/KoniTypes';
-import { getAmplitudeStakingOnChain, getAstarStakingOnChain, getParaStakingOnChain } from '@subwallet/extension-base/koni/api/staking/paraChain';
+import { getAmplitudeStakingOnChain, getAstarStakingOnChain, getParaStakingOnChain, getTaoStakingOnChain } from '@subwallet/extension-base/koni/api/staking/paraChain';
 import { getNominationPoolReward, getRelayPoolingOnChain, getRelayStakingOnChain } from '@subwallet/extension-base/koni/api/staking/relayChain';
 import { getAllSubsquidStaking } from '@subwallet/extension-base/koni/api/staking/subsquidStaking';
 import { _PURE_EVM_CHAINS, _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -39,6 +39,10 @@ export function stakingOnChainApi (addresses: string[], substrateApiMap: Record<
       unsubList.push(unsub);
     } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
       const unsub = await getAstarStakingOnChain(parentApi, useAddresses, chainInfoMap, chain, stakingCallback, nominatorStateCallback);
+
+      unsubList.push(unsub);
+    } else if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+      const unsub = await getTaoStakingOnChain(parentApi, useAddresses, chainInfoMap, chain, stakingCallback, nominatorStateCallback);
 
       unsubList.push(unsub);
     } else if (_STAKING_CHAIN_GROUP.para.includes(chain)) {

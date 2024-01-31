@@ -66,7 +66,8 @@ export const _STAKING_CHAIN_GROUP = {
   nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet'],
   bifrost: ['bifrost', 'bifrost_testnet'],
   aleph: ['aleph', 'alephTest'], // A0 has distinct tokenomics
-  ternoa: ['ternoa', 'ternoa_alphanet']
+  ternoa: ['ternoa', 'ternoa_alphanet'],
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
 
 export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
