@@ -115,6 +115,7 @@ const Unstake = new LazyLoader('Unstake', () => import('@subwallet/extension-web
 const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/CancelUnstake'));
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw'));
+const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Swap'));
 
 // Wallet Connect
 const ConnectWalletConnect = new LazyLoader('ConnectWalletConnect', () => import('@subwallet/extension-web-ui/Popup/WalletConnect/ConnectWalletConnect'));
@@ -140,6 +141,8 @@ const CheckCrowdloanContributions = new LazyLoader('CrowdloanContributionsResult
 const CrowdloanContributionsResult = new LazyLoader('CrowdloanContributionsResult', () => import('@subwallet/extension-web-ui/Popup/CrowdloanUnlockCampaign/CrowdloanContributionsResult'));
 
 const MissionPool = new LazyLoader('MissionPool', () => import('@subwallet/extension-web-ui/Popup/MissionPool'));
+
+const Swap = new LazyLoader('Swap', () => import('@subwallet/extension-web-ui/Popup/Home/Swap'));
 
 /* 404 */
 
@@ -208,6 +211,7 @@ export const router = createBrowserRouter([
               EarningPositionDetail.generateRouterObject('position-detail')
             ]
           },
+          Swap.generateRouterObject('swap'),
           MissionPool.generateRouterObject('mission-pools'),
           History.generateRouterObject('history'),
           History.generateRouterObject('history/:address/:chain/:extrinsicHashOrId'),
@@ -224,6 +228,7 @@ export const router = createBrowserRouter([
           CancelUnstake.generateRouterObject('cancel-unstake'),
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
+          SwapTransaction.generateRouterObject('swap'),
           {
             path: 'compound',
             element: <Example />
