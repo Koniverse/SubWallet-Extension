@@ -10,7 +10,6 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
-import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, DEFAULT_SWAP_FIRST_STEP, getSwapAltToken, MOCK_SWAP_FEE, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPath, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -165,13 +164,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
           break;
 
-        case SwapProviderId.HYDRADX_TESTNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService);
-          break;
-
-        case SwapProviderId.HYDRADX_MAINNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, false);
-          break;
+        // case SwapProviderId.HYDRADX_TESTNET:
+        //   this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService);
+        //   break;
+        //
+        // case SwapProviderId.HYDRADX_MAINNET:
+        //   this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, false);
+        //   break;
 
         default:
           throw new Error('Unsupported provider');
