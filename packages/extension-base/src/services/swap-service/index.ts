@@ -8,9 +8,10 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { ServiceStatus, ServiceWithProcessInterface, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { SwapHandlerInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
+import { StellaswapHandler } from '@subwallet/extension-base/services/swap-service/handler/stellaswap-handler';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, DEFAULT_SWAP_FIRST_STEP, getSwapAltToken, MOCK_SWAP_FEE, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPath, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -21,7 +22,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   private eventService: EventService;
   private readonly chainService: ChainService;
   private swapPairSubject: BehaviorSubject<SwapPair[]> = new BehaviorSubject<SwapPair[]>([]);
-  private handlers: Record<string, SwapBaseInterface> = {};
+  private handlers: Record<string, SwapHandlerInterface> = {};
 
   startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
   stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
@@ -172,9 +173,14 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         case SwapProviderId.HYDRADX_MAINNET:
           this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, false);
           break;
-
+        case SwapProviderId.STELLASWAP_TESTNET:
+          this.handlers[providerId] = new StellaswapHandler(this.chainService, this.state.balanceService, this.state);
+          break;
+        case SwapProviderId.STELLASWAP:
+          this.handlers[providerId] = new StellaswapHandler(this.chainService, this.state.balanceService, this.state, false);
+          break;
         default:
-          throw new Error('Unsupported provider');
+          break;
       }
     });
   }

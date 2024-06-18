@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BigNumber } from '@ethersproject/bignumber';
+import { serialize as serializeTransaction, Transaction } from '@ethersproject/transactions';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, BasicTxErrorType, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
@@ -16,18 +18,13 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isSubstrateTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWTransaction, SWTransactionInput, SWTransactionInputWithCustom, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { Web3Transaction } from '@subwallet/extension-base/signers/types';
-import { LeavePoolAdditionalData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, reformatAddress } from '@subwallet/extension-base/utils';
-import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
-import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
+import { LeavePoolAdditionalData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { anyNumberToBN, isContractAddress, mergeTransactionAndSignature, parseContractInput, reformatAddress } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-base/utils/number';
 import keyring from '@subwallet/ui-keyring';
-import { addHexPrefix } from 'ethereumjs-util';
-import { ethers, TransactionLike } from 'ethers';
 import EventEmitter from 'eventemitter3';
 import { t } from 'i18next';
 import { BehaviorSubject, interval as rxjsInterval, Subscription } from 'rxjs';
@@ -142,8 +139,8 @@ export default class TransactionService {
   }
 
   private fillTransactionDefaultInfo (transaction: SWTransactionInput): SWTransaction {
-    const isInternal = !transaction.url;
-    const transactionId = getTransactionId(transaction.chainType, transaction.chain, isInternal, isWalletConnectRequest(transaction.id));
+    const isInternal = !transaction.url || transaction.url === EXTENSION_REQUEST_URL;
+    const transactionId = transaction.id || getTransactionId(transaction.chainType, transaction.chain, isInternal, isWalletConnectRequest(transaction.id));
 
     return {
       ...transaction,
@@ -184,6 +181,58 @@ export default class TransactionService {
       url: undefined,
       warnings: []
     };
+  }
+
+  public async handleTransactionWithPromise (_transactionInput: SWTransactionInputWithCustom): Promise<SWTransactionResponse> {
+    const { additionalValidator, eventsHandler, transaction, ...transactionInput } = _transactionInput;
+
+    // todo
+    const validationResponse: SWTransactionResponse = {
+      ...transactionInput,
+      status: undefined,
+      errors: transactionInput.errors || [],
+      warnings: transactionInput.warnings || []
+    };
+
+    const id = getTransactionId(transactionInput.chainType, transactionInput.chain, true, false);
+
+    validationResponse.id = id;
+
+    await new Promise<void>((resolve) => {
+      transaction?.(id, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: transactionInput.data,
+        chainType: transactionInput.chainType,
+        extrinsicType: transactionInput.extrinsicType
+      })
+        .then((result) => {
+          if (result instanceof Error) {
+            let error: TransactionError;
+
+            if (result.message === 'User Rejected Request') {
+              error = new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST);
+            } else {
+              error = new TransactionError(BasicTxErrorType.INTERNAL_ERROR, result.message);
+            }
+
+            error.stack = result.stack;
+            error.cause = result.cause;
+            validationResponse.errors.push(error);
+          } else {
+            validationResponse.extrinsicHash = result;
+          }
+
+          resolve();
+        })
+        .catch((e: Error) => {
+          const error = e instanceof TransactionError ? e : new TransactionError(BasicTxErrorType.INTERNAL_ERROR, e.message);
+
+          validationResponse.errors.push(error);
+          resolve();
+        });
+    });
+
+    return validationResponse;
   }
 
   public async handleTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
@@ -799,36 +848,36 @@ export default class TransactionService {
   public generateHashPayload (chain: string, transaction: TransactionConfig): HexString {
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 
-    let txObject: TransactionLike;
+    let txObject: Transaction;
 
     const max = anyNumberToBN(transaction.maxFeePerGas);
 
     if (max.gt(BN_ZERO)) {
       txObject = {
         nonce: transaction.nonce ?? 0,
-        maxFeePerGas: addHexPrefix(anyNumberToBN(transaction.maxFeePerGas).toString(16)),
-        maxPriorityFeePerGas: addHexPrefix(anyNumberToBN(transaction.maxPriorityFeePerGas).toString(16)),
-        gasLimit: addHexPrefix(anyNumberToBN(transaction.gas).toString(16)),
+        maxFeePerGas: BigNumber.from(transaction.maxFeePerGas),
+        maxPriorityFeePerGas: BigNumber.from(transaction.maxPriorityFeePerGas),
+        gasLimit: BigNumber.from(transaction.gas),
         to: transaction.to,
-        value: addHexPrefix(anyNumberToBN(transaction.value).toString(16)),
-        data: transaction.data,
-        chainId: _getEvmChainId(chainInfo),
+        value: BigNumber.from(transaction.value || 0),
+        data: transaction.data || '',
+        chainId: _getEvmChainId(chainInfo) || 1,
         type: 2
       };
     } else {
       txObject = {
         nonce: transaction.nonce ?? 0,
-        gasPrice: addHexPrefix(anyNumberToBN(transaction.gasPrice).toString(16)),
-        gasLimit: addHexPrefix(anyNumberToBN(transaction.gas).toString(16)),
+        gasPrice: BigNumber.from(transaction.gasPrice),
+        gasLimit: BigNumber.from(transaction.gas),
         to: transaction.to,
-        value: addHexPrefix(anyNumberToBN(transaction.value).toString(16)),
-        data: transaction.data,
-        chainId: _getEvmChainId(chainInfo),
+        value: BigNumber.from(transaction.value || 0),
+        data: transaction.data || '',
+        chainId: _getEvmChainId(chainInfo) || 1,
         type: 0
       };
     }
 
-    return ethers.Transaction.from(txObject).unsignedSerialized as HexString;
+    return serializeTransaction(txObject) as HexString;
   }
 
   private async signAndSendEvmTransaction ({ address,

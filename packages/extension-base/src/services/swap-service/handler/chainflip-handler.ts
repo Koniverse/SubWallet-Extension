@@ -13,7 +13,7 @@ import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/e
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getChainNativeTokenSlug, _getContractAddressOfToken, _isNativeToken, _isSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
-import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { SwapBaseHandler, SwapHandlerInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { calculateSwapRate, CHAIN_FLIP_SUPPORTED_MAINNET_ASSET_MAPPING, CHAIN_FLIP_SUPPORTED_MAINNET_MAPPING, CHAIN_FLIP_SUPPORTED_TESTNET_ASSET_MAPPING, CHAIN_FLIP_SUPPORTED_TESTNET_MAPPING, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { TransactionData } from '@subwallet/extension-base/types';
 import { BaseStepDetail } from '@subwallet/extension-base/types/service-base';
@@ -39,9 +39,9 @@ enum CHAINFLIP_QUOTE_ERROR {
   InsufficientIngress = 'amount is lower than estimated ingress fee',
 }
 
-export class ChainflipSwapHandler implements SwapBaseInterface {
+export class ChainflipSwapHandler implements SwapHandlerInterface {
   private swapSdk: SwapSDK;
-  private readonly isTestnet: boolean;
+  isTestnet: boolean;
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
 

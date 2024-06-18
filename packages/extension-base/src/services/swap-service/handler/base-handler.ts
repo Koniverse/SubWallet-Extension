@@ -15,9 +15,8 @@ import { formatNumber } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
 
-export interface SwapBaseInterface {
+export interface SwapHandlerInterface {
   providerSlug: SwapProviderId;
-
   getSwapQuote: (request: SwapRequest) => Promise<SwapQuote | SwapError>;
   generateOptimalProcess: (params: OptimalSwapPathParams) => Promise<OptimalSwapPath>;
 
@@ -29,8 +28,10 @@ export interface SwapBaseInterface {
   handleSwapProcess: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
   handleSubmitStep: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
 
+  isTestnet: boolean;
   isReady?: boolean;
   init?: () => Promise<void>;
+  chain?: () => string;
 }
 
 export interface SwapBaseHandlerInitParams {

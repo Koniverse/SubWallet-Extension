@@ -1,30 +1,43 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseRequestSign, ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { BaseRequestSign, ExtrinsicStatus, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { SwTransactionMetadata, TransactionDataPromise } from '@subwallet/extension-base/types';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>> {
+export interface SWTransaction extends ValidateTransactionResponse, SwTransactionMetadata, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>> {
   id: string;
   url?: string;
   isInternal: boolean,
   chain: string;
-  chainType: ChainType;
   address: string;
-  data: ExtrinsicDataTypeMap[ExtrinsicType];
   status: ExtrinsicStatus;
   extrinsicHash: string;
-  extrinsicType: ExtrinsicType;
   createdAt: number;
   updatedAt: number;
   estimateFee?: FeeData,
   transaction: SubmittableExtrinsic | TransactionConfig;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
+}
+
+export interface SWTransactionWithCustom extends Omit<SWTransaction, 'transaction'> {
+  transaction: TransactionDataPromise;
+}
+
+export interface SWTransactionInputWithCustom extends SwInputBase, Partial<Pick<SWTransactionWithCustom, 'estimateFee'>> {
+  id?: string;
+  transaction?: SWTransactionWithCustom['transaction'] | null;
+  warnings?: SWTransactionWithCustom['warnings'];
+  errors?: SWTransactionWithCustom['errors'];
+  edAsWarning?: boolean;
+  isTransferAll?: boolean;
+  resolveOnDone?: boolean;
+  skipFeeValidation?: boolean;
 }
 
 export type SWTransactionResult = Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler'>
