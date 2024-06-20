@@ -2,24 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainInfoMap } from '@subwallet/chain-list';
-import { _ChainStatus } from '@subwallet/chain-list/types';
+import { _ChainStatus, _SubstrateChainType } from '@subwallet/chain-list/types';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 
 import { ApiPromise } from '@polkadot/api';
 
 import { chainProvider, chainProviderBackup } from './constants';
-import { compareNativeAsset, getEvmNativeInfo, getSubstrateNativeInfo, handleEvmProvider, handleSubstrateProvider } from './utils';
+import { checkNativeAsset, getEvmNativeInfo, getSubstrateNativeInfo, handleEvmProvider, handleSubstrateProvider } from './utils';
 
 jest.setTimeout(3 * 60 * 60 * 1000);
 
-const ignoreChains: string[] = ['interlay', 'kintsugi', 'kintsugi_test'];
+const ignoreChains: string[] = ['interlay', 'kintsugi', 'kintsugi_test', 'avail_mainnet'];
+// const onlyChains: string[] = ['subsocial_x', 'crabParachain', 'pangolin', 'acala_testnet'];
 
 describe('test chain', () => {
   it('chain', async () => {
     const chainInfos = Object.values(ChainInfoMap).filter((info) =>
       info.chainStatus === _ChainStatus.ACTIVE
-      // && !['acala_testnet'].includes(info.slug)
-      // && ['imbue_network'].includes(info.slug)
+      && !ignoreChains.includes(info.slug)
+      // && onlyChains.includes(info.slug)
     );
     const errorChain: Record<string, string[]> = {};
 
@@ -50,7 +51,7 @@ describe('test chain', () => {
         if (!ignoreChains.includes(chain)) {
           const nativeToken = await getSubstrateNativeInfo(api);
 
-          compareNativeAsset(nativeToken, {
+          checkNativeAsset(nativeToken, {
             decimals: substrateInfo.decimals,
             existentialDeposit: substrateInfo.existentialDeposit,
             symbol: substrateInfo.symbol
@@ -64,6 +65,14 @@ describe('test chain', () => {
         if (paraChainId !== substrateInfo.paraId) {
           errors.push(`Wrong paraChainId: current - ${substrateInfo.paraId ?? 'null'}, onChain - ${paraChainId ?? 'null'}`);
         }
+
+        if (substrateInfo.paraId && substrateInfo.chainType !== _SubstrateChainType.PARACHAIN) {
+          errors.push(`Wrong chainType: current - ${substrateInfo.chainType ?? 'null'}, onChain - ${_SubstrateChainType.PARACHAIN ?? 'null'}`);
+        }
+
+        if (!substrateInfo.paraId && substrateInfo.chainType !== _SubstrateChainType.RELAYCHAIN) {
+          errors.push(`Wrong chainType: current - ${substrateInfo.chainType ?? 'null'}, onChain - ${_SubstrateChainType.RELAYCHAIN ?? 'null'}`);
+        }
       };
 
       const onSuccessEvm = async (api: _EvmApi) => {
@@ -71,7 +80,7 @@ describe('test chain', () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const evmInfo = chainInfo.evmInfo!;
 
-        compareNativeAsset(nativeToken, {
+        checkNativeAsset(nativeToken, {
           decimals: evmInfo.decimals,
           existentialDeposit: evmInfo.existentialDeposit,
           symbol: evmInfo.symbol
