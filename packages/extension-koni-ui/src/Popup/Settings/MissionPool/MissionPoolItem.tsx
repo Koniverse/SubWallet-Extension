@@ -59,47 +59,47 @@ function Component (props: Props): React.ReactElement<Props> {
     return {
       [TagType.FCFS]: {
         theme: 'yellow',
-        name: t('FCFS'),
+        name: t('common.Tag.FCFS'),
         slug: TagType.FCFS,
         icon: User
       },
       [TagType.POINTS]: {
         theme: 'success',
-        name: t('Points'),
+        name: t('common.Tag.points'),
         slug: TagType.POINTS,
         icon: Coin,
         iconWeight: 'fill'
       },
       [TagType.LUCKY_DRAW]: {
         theme: 'gold',
-        name: t('Lucky draw'),
+        name: t('common.Tag.luckyDraw'),
         slug: TagType.LUCKY_DRAW,
         icon: DiceSix,
         iconWeight: 'fill'
       },
       [TagType.MANUAL_SELECTION]: {
         theme: 'blue',
-        name: t('Manual selection'),
+        name: t('common.Tag.manualSelection'),
         slug: TagType.MANUAL_SELECTION,
         icon: SelectionBackground
       },
       [MissionCategoryType.UPCOMING]: {
         theme: 'gray',
-        name: t('Upcoming'),
+        name: t('common.Tag.upcoming'),
         slug: MissionCategoryType.UPCOMING,
         icon: MegaphoneSimple,
         iconWeight: 'fill'
       },
       [MissionCategoryType.LIVE]: {
         theme: 'success',
-        name: t('Live'),
+        name: t('common.Tag.live'),
         slug: MissionCategoryType.LIVE,
         icon: CheckCircle,
         iconWeight: 'fill'
       },
       [MissionCategoryType.ARCHIVED]: {
         theme: 'blue',
-        name: t('Archived'),
+        name: t('common.Tag.archived'),
         slug: MissionCategoryType.ARCHIVED,
         icon: Cube,
         iconWeight: 'fill'
@@ -188,7 +188,7 @@ function Component (props: Props): React.ReactElement<Props> {
           </div>
           <div className={'__item-timeline'}>{timeline}</div>
           <div className={'__item-rewards'}>
-            <div className='__item-label'>{t('Rewards')}:&nbsp;</div>
+            <div className='__item-label'>{t('common.Text.rewards')}:&nbsp;</div>
             <div className='__item-value'>
               {data.reward}
             </div>

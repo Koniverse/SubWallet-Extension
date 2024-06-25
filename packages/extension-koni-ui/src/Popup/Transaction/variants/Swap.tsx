@@ -645,7 +645,7 @@ const Component = () => {
           icon: CheckCircle
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('common.Button.cancel'),
           schema: 'secondary',
           onClick: closeAlert
         }

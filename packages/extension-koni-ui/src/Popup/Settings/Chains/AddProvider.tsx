@@ -235,7 +235,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             setProviderValidation({ status: 'error', message: t('Error validating this provider') });
           });
       } else {
-        reject(new Error(t('Provider URL is not valid')));
+        reject(new Error(t('settings.Screen.importNetwork.Input.providerUrl.ErrorTooltip.invalid')));
         setProviderValidation({ status: '' });
         setIsShowConnectionStatus(false);
       }
@@ -250,7 +250,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <Layout.Base
         leftFooterButton={{
           onClick: onCancel,
-          children: t('Cancel')
+          children: t('common.Button.cancel')
         }}
         onBack={onBack}
         rightFooterButton={{
@@ -274,7 +274,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       >
         <div className={'add_provider__container'}>
           <div className='description'>
-            {t('Currently support WSS provider for Substrate networks and HTTP provider for EVM network')}
+            {t('settings.Screen.manageNetworks.Modal.importNetwork.bodyTitle')}
           </div>
           <Form
             form={form}

@@ -235,7 +235,7 @@ function Component ({ className, request }: Props) {
               onClick={onCancel}
               schema={'secondary'}
             >
-              {t('Cancel')}
+              {t('common.Button.cancel')}
             </Button>
           )
         }
@@ -254,7 +254,7 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('common.Button.cancel')}
               </Button>
               <Button
                 disabled={!allowSubmit}
@@ -287,7 +287,7 @@ function Component ({ className, request }: Props) {
                   onClick={onCancel}
                   schema={'secondary'}
                 >
-                  {t('Cancel')}
+                  {t('common.Button.cancel')}
                 </Button>
                 <Button
                   disabled={loading}

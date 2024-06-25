@@ -171,7 +171,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            label={t('Contact name')}
+            label={t('settings.Modal.editContact.contactName')}
             prefix={(
               <Avatar
                 size={20}
@@ -184,7 +184,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Field
             className='address-input'
             content={toShort(address, 12, 12)}
-            label={t('Contact address')}
+            label={t('settings.Modal.editContact.contactAddress')}
             suffix={(
               <Button
                 className='copy-button'
@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('Cancel')}
+            {t('common.Button.cancel')}
           </Button>
           <Button
             block={true}

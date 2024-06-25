@@ -187,7 +187,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return _isCustomAsset(tokenInfo.slug)
       ? {
         onClick: goBackToSettingList,
-        children: t('Cancel')
+        children: t('common.Button.cancel')
       }
       : undefined;
   }, [goBackToSettingList, tokenInfo.slug, t]);

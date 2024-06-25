@@ -246,7 +246,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Crowdloan URL must be a valid URL')));
+        reject(new Error(t('settings.Screen.importNetwork.Input.crowdloan.Error.invalidURL')));
       }
     });
   }, [t]);
@@ -256,7 +256,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Block explorer must be a valid URL')));
+        reject(new Error(t('settings.Screen.importNetwork.Input.blockExplorer.Error.invalidURL')));
       }
     });
   }, [t]);
@@ -288,7 +288,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Network detail')}
+        title={t<string>('common.Text.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form
@@ -312,7 +312,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   : <Field
                     className={'chain_detail__provider_url'}
                     content={currentProviderUrl}
-                    placeholder={t('Provider URL')}
+                    placeholder={t('common.Text.providerUrl')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -328,7 +328,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={16}>
                   <Field
                     content={chainInfo.name}
-                    placeholder={t('Network name')}
+                    placeholder={t('common.Text.networkName')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -336,15 +336,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type={'phosphor'}
                       weight={'bold'}
                     />}
-                    tooltip={t('Network name')}
+                    tooltip={t('common.Text.networkName')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
                 <Col span={8}>
                   <Field
                     content={symbol}
-                    placeholder={t('Symbol')}
-                    tooltip={t('Symbol')}
+                    placeholder={t('common.Text.symbol')}
+                    tooltip={t('common.Text.symbol')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -354,8 +354,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={12}>
                   <Field
                     content={decimals}
-                    placeholder={t('Decimals')}
-                    tooltip={t('Decimals')}
+                    placeholder={t('common.Text.decimals')}
+                    tooltip={t('common.Text.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -373,8 +373,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       : (
                         <Field
                           content={chainId > -1 ? chainId : 'None'}
-                          placeholder={t('Chain ID')}
-                          tooltip={t('Chain ID')}
+                          placeholder={t('common.Text.chainId')}
+                          tooltip={t('common.Text.chainId')}
                           tooltipPlacement={'topLeft'}
                         />
                       )
@@ -388,8 +388,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Col span={12}>
                     <Field
                       content={addressPrefix.toString()}
-                      placeholder={t('Address prefix')}
-                      tooltip={t('Address prefix')}
+                      placeholder={t('common.Text.addressPrefix')}
+                      tooltip={t('common.Text.addressPrefix')}
                       tooltipPlacement={'topLeft'}
                     />
                   </Col>
@@ -398,8 +398,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={!isPureEvmChain ? 12 : 24}>
                   <Field
                     content={chainTypeString()}
-                    placeholder={t('Network type')}
-                    tooltip={t('Network type')}
+                    placeholder={t('common.Text.networkType')}
+                    tooltip={t('common.Text.networkType')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -411,8 +411,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={true}
               >
                 <Input
-                  placeholder={t('Block explorer')}
-                  tooltip={t('Block explorer')}
+                  placeholder={t('common.Text.blockExplorer')}
+                  tooltip={t('common.Text.blockExplorer')}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -424,8 +424,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   statusHelpAsTooltip={true}
                 >
                   <Input
-                    placeholder={t('Crowdloan URL')}
-                    tooltip={t('Crowdloan URL')}
+                    placeholder={t('common.Text.crowdloanUrl')}
+                    tooltip={t('common.Text.crowdloanUrl')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>

@@ -126,7 +126,7 @@ const Component: React.FC<Props> = (props: Props) => {
       id={modalId}
       maskClosable={!loading}
       onCancel={onCancel}
-      title={t('Add contact')}
+      title={t('settings.manageAddressBook.Modal.addContact.title')}
     >
       <Form
         className='form-space-sm'
@@ -147,7 +147,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            label={t('Contact name')}
+            label={t('settings.manageAddressBook.Modal.addContact.Input.name.label')}
             prefix={(
               <Avatar
                 size={20}
@@ -167,7 +167,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           <Input
             className='address-input'
-            label={t('Contact address')}
+            label={t('settings.manageAddressBook.Modal.addContact.Input.address.label')}
             prefix={
               address && isAddress(address) && (
                 <div className={'__overlay'}>
@@ -194,7 +194,7 @@ const Component: React.FC<Props> = (props: Props) => {
             )}
             loading={loading}
           >
-            {t('Add contact')}
+            {t('settings.manageAddressBook.Modal.addContact.title')}
           </Button>
         </Form.Item>
       </Form>
