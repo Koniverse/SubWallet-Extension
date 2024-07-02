@@ -24,8 +24,9 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
-import { CONFIRMATION_MODAL, TRANSACTION_STORAGES } from '../constants';
+import { CONFIRMATION_MODAL, CREATE_RETURN, TRANSACTION_STORAGES } from '../constants';
 import { WebUIContextProvider } from '../contexts/WebUIContext';
 
 changeHeaderLogo(<Logo2D />);
@@ -43,6 +44,7 @@ const createPasswordUrl = '/keyring/create-password';
 const migratePasswordUrl = '/keyring/migrate-password';
 const securityUrl = '/settings/security';
 const createDoneUrl = '/create-done';
+const earnTransactionUrl = '/transaction/earn';
 
 // Campaign
 const earningOptionsPreviewUrl = '/earning-preview';
@@ -92,6 +94,7 @@ function removeLoadingPlaceholder (animation: boolean): void {
 interface RedirectProps {
   redirect: string|null;
   modal: string|null;
+  state: { [key: string]: string }
 }
 
 function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactElement {
@@ -103,6 +106,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
   const [dataLoaded, setDataLoaded] = useState(false);
   const initDataRef = useRef<Promise<boolean>>(dataContext.awaitStores(['accountState', 'chainStore', 'assetRegistry', 'requestState', 'settings', 'mantaPay']));
   const firstRender = useRef(true);
+  const [returnPath] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
 
   useSubscribeLanguage();
 
@@ -172,7 +176,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
 
     const redirectHandlePage = pathName.startsWith('/redirect-handler');
 
-    const redirectObj: RedirectProps = { redirect: null, modal: null };
+    const redirectObj: RedirectProps = { redirect: null, modal: null, state: {} };
 
     if (pathName === '/wc') {
       window.location.replace('https://docs.subwallet.app/main/extension-user-guide/connect-dapps-and-manage-website-access/connect-dapp-with-walletconnect');
@@ -207,6 +211,9 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
       }
     } else if (hasConfirmations) {
       redirectObj.modal = `open:${CONFIRMATION_MODAL}`;
+    } else if (pathName === DEFAULT_ROUTER_PATH && returnPath === earnTransactionUrl) {
+      redirectObj.redirect = earnTransactionUrl;
+      redirectObj.state = { from: earnTransactionUrl };
     } else if (pathName === DEFAULT_ROUTER_PATH) {
       redirectObj.redirect = tokenUrl;
     } else if (pathName === loginUrl && !needUnlock) {
@@ -238,7 +245,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
     redirectObj.redirect = redirectObj.redirect !== pathName ? redirectObj.redirect : null;
 
     return redirectObj;
-  }, [location.pathname, dataLoaded, needMigrate, hasMasterPassword, needUnlock, isNoAccount, hasConfirmations, hasInternalConfirmations]);
+  }, [location.pathname, dataLoaded, needMigrate, hasMasterPassword, needUnlock, isNoAccount, hasConfirmations, returnPath, hasInternalConfirmations]);
 
   // Active or inactive confirmation modal
   useEffect(() => {
@@ -265,7 +272,10 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
   }, [currentAccount, initAccount]);
 
   if (rootLoading || redirectTarget.redirect) {
-    return <>{redirectTarget.redirect && <Navigate to={redirectTarget.redirect} />}</>;
+    return <>{redirectTarget.redirect && <Navigate
+      state={redirectTarget.state}
+      to={redirectTarget.redirect}
+    />}</>;
   } else {
     return <MainWrapper className={CN('main-page-container', `screen-size-${screenContext.screenType}`, { 'web-ui-enable': screenContext.isWebUI })}>
       {children}
