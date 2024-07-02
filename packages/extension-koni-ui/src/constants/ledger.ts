@@ -136,6 +136,17 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     slug: ChainInfoMap.polymesh.slug,
     isDevMode: true,
     isEthereum: false
+  },
+  {
+    accountName: 'Polkadex',
+    appName: 'Polkadex',
+    networkName: 'Polkadex network',
+    genesisHash: ChainInfoMap.polkadex.substrateInfo?.genesisHash || '0x3920bcb4960a1eef5580cd5367ff3f430eef052774f78468852f7b9cb39f8a3c',
+    icon: 'substrate',
+    network: 'polkadex',
+    slug: ChainInfoMap.polkadex.slug,
+    isDevMode: true,
+    isEthereum: false
   }
   // {
   //   displayName: 'Centrifuge',
@@ -156,14 +167,6 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
   //   genesisHash: '0xe61a41c53f5dcd0beb09df93b34402aada44cb05117b71059cce40a2723a4e97',
   //   icon: 'substrate',
   //   network: 'parallel',
-  //   isDevMode: true
-  // },
-  // {
-  //   displayName: 'Polkadex network',
-  //   genesisHash: ChainInfoMap.polkadex.substrateInfo?.genesisHash || '0x3920bcb4960a1eef5580cd5367ff3f430eef052774f78468852f7b9cb39f8a3c',
-  //   icon: 'substrate',
-  //   network: 'polkadex',
-  //   slug: ChainInfoMap.polkadex.slug,
   //   isDevMode: true
   // }
 ];
