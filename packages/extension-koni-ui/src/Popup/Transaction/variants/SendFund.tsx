@@ -893,6 +893,7 @@ const _SendFund = ({ className = '' }: Props): React.ReactElement<Props> => {
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
               tooltip={t('Amount')}
+              disabled={decimals === 0}
             />
           </Form.Item>
         </Form>
