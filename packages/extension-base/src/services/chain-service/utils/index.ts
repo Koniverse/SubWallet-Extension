@@ -112,6 +112,10 @@ export function _isTokenTransferredByEvm (tokenInfo: _ChainAsset) {
   return !!tokenInfo.metadata?.contractAddress || (_isNativeToken(tokenInfo) && _isNativeTokenTransferredByEvm(tokenInfo));
 }
 
+export function _isTokenTransferredByTon (tokenInfo: _ChainAsset) {
+  return (tokenInfo.metadata?.assetType === _AssetType.TEP74 && !!tokenInfo.metadata?.contractAddress) || _isNativeToken(tokenInfo); // todo: create util function check jetton token
+}
+
 export function _checkSmartContractSupportByChain (chainInfo: _ChainInfo, contractType: _AssetType) {
   // EVM chains support smart contract by default so just checking Substrate chains
   if (chainInfo.substrateInfo === null || (chainInfo.substrateInfo && chainInfo.substrateInfo.supportSmartContract === null)) {
@@ -280,15 +284,20 @@ export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicToke
     };
   }
 
-  if (chainInfo.substrateInfo !== null) { // substrate by default
+  if (chainInfo.substrateInfo) { // substrate by default
     return {
       symbol: chainInfo.substrateInfo.symbol,
       decimals: chainInfo.substrateInfo.decimals
     };
-  } else if (chainInfo.evmInfo !== null) {
+  } else if (chainInfo.evmInfo) {
     return {
       symbol: chainInfo.evmInfo.symbol,
       decimals: chainInfo.evmInfo.decimals
+    };
+  } else if (chainInfo.tonInfo) {
+    return {
+      symbol: chainInfo.tonInfo.symbol,
+      decimals: chainInfo.tonInfo.decimals
     };
   }
 
