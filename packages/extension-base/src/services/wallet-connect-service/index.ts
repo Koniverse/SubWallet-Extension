@@ -10,10 +10,11 @@ import { IKeyValueStorage } from '@walletconnect/keyvaluestorage';
 import SignClient from '@walletconnect/sign-client';
 import { EngineTypes, SessionTypes, SignClientTypes } from '@walletconnect/types';
 import { getInternalError, getSdkError } from '@walletconnect/utils';
+import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
-import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
+import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
 
@@ -85,7 +86,21 @@ export default class WalletConnectService {
     this.#removeListener();
 
     if (force || await this.haveData()) {
-      this.#client = await SignClient.init(this.#option);
+      try {
+        this.#client = await SignClient.init(this.#option);
+      } catch (e) {
+        if (this.#option.relayUrl === RELAY_URL) {
+          this.#option = { ...this.#option, relayUrl: RELAY_FALLBACK_URL };
+
+          try {
+            this.#client = await SignClient.init(this.#option);
+          } catch (e) {
+            throw this.convertWCErrorMessage(e as Error);
+          }
+        } else {
+          throw this.convertWCErrorMessage(e as Error);
+        }
+      }
     }
 
     this.#updateSessions();
@@ -220,7 +235,11 @@ export default class WalletConnectService {
 
     this.#checkClient();
 
-    await this.#client?.pair({ uri });
+    try {
+      await this.#client?.pair({ uri });
+    } catch (e) {
+      throw this.convertWCErrorMessage(e as Error, true);
+    }
   }
 
   public async approveSession (result: ResultApproveWalletConnectSession) {
@@ -309,6 +328,30 @@ export default class WalletConnectService {
     });
 
     this.#updateSessions();
+  }
+
+  public convertWCErrorMessage (e: Error, isConnect?: boolean) {
+    const message = e.message.toLowerCase();
+
+    console.error(e);
+
+    if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
+      return new Error(t('There is an issue with the WebSocket connection to WalletConnect. Please try again later.'));
+    }
+
+    if (message.includes('failed for host')) {
+      return new Error(t('The WebSocket has been blocked, or the number of socket connections has been limited, so a connection cannot be established.'));
+    }
+
+    if (message.includes('pairing already exists')) {
+      return new Error(t('Connection already exists'));
+    }
+
+    if (isConnect) {
+      return t('Fail to add connection');
+    }
+
+    return e;
   }
 
   private findMethodsMissing (methodRequire: (POLKADOT_SIGNING_METHODS | EIP155_SIGNING_METHODS) [], methods: string[]) {
