@@ -90,6 +90,7 @@ const Component = () => {
   const poolInfo = poolInfoMap[slug];
   const poolType = poolInfo?.type || '';
   const poolChain = poolInfo?.chain || '';
+  const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
 
   const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
@@ -917,6 +918,7 @@ const Component = () => {
                   name={'from'}
                 >
                   <AccountSelector
+                    addressPrefix={networkPrefix}
                     disabled={!isAllAccount}
                     doFilter={false}
                     externalAccounts={accountSelectorList}
