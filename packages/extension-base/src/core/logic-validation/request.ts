@@ -102,7 +102,7 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     payload.errorPosition = 'ui';
     payload.confirmationType = 'errorConnectNetwork';
     const [message, name] = convertErrorMessage(message_);
-    const error = new EvmProviderError(EvmProviderErrorType.CHAIN_DISCONNECTED, message, undefined, name);
+    const error = new EvmProviderError(EvmProviderErrorType.CHAIN_DISCONNECTED, `${message}_${name}`);
 
     console.error(error);
     errors.push(error);
@@ -196,7 +196,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     payload.errorPosition = 'ui';
     payload.confirmationType = 'evmWatchTransactionRequest';
     const [message, name] = convertErrorMessage(message_);
-    const error = new TransactionError(BasicTxErrorType.INVALID_PARAMS, message, undefined, name);
+    const error = new TransactionError(BasicTxErrorType.INVALID_PARAMS, `${message}_${name}`);
 
     console.error(error);
     errors.push(error);
@@ -369,10 +369,10 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
     payload_.errorPosition = 'ui';
     payload_.confirmationType = 'evmSignatureRequest';
     const [message, name] = convertErrorMessage(message_);
-    const error = new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message, undefined, name);
+    const error = new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, `${message}_${name}`);
 
     console.error(error);
-    errors.push(new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message, undefined, name));
+    errors.push(new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message));
   };
 
   if (address === '' || !payload) {
@@ -558,5 +558,5 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
     return [t('This sign method is not supported by SubWallet. Try again or contact support at agent@subwallet.app'), t('Method not supported')];
   }
 
-  return [message, name || ''];
+  return [message, name || 'Error'];
 }

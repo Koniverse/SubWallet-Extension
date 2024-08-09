@@ -42,7 +42,9 @@ function Component ({ className, request, type }: Props) {
 
   const errorMessage = useMemo(() => {
     if (errors && errors.length > 0) {
-      return errors[0].message.split('|');
+      const message = errors[0].message.split('_');
+
+      return [...message[0].split('|'), message[1]];
     }
 
     return [];
@@ -79,7 +81,7 @@ function Component ({ className, request, type }: Props) {
           errors && errors.length > 0 && (
             <AlertBox
               className={CN(className, 'alert-box')}
-              description={errorMessage.length > 1
+              description={errorMessage.length > 2
                 ? <Trans
                   components={{
                     highlight: (
@@ -92,8 +94,8 @@ function Component ({ className, request, type }: Props) {
                   }}
                   i18nKey={detectTranslate(`${errorMessage[0]}<highlight>${errorMessage[1]}</highlight>${errorMessage[3]}`)}
                 />
-                : errors[0].message}
-              title={errors[0].name}
+                : errorMessage[0]}
+              title={errorMessage[errorMessage.length - 1]}
               type={'error'}
             />
           )

@@ -74,6 +74,13 @@ const Component: React.FC<Props> = (props: Props) => {
   const [showQuoteExpired, setShowQuoteExpired] = useState<boolean>(false);
   const isMessage = isEvmMessage(payload);
   const isErrorTransaction = useMemo(() => errors && errors.length > 0, [errors]);
+  const errorValidate = useMemo(() => {
+    if (errors && errors.length > 0) {
+      return errors[0].message.split('_');
+    }
+
+    return ['', ''];
+  }, [errors]);
   const [loading, setLoading] = useState(false);
 
   const { error: ledgerError,
@@ -279,8 +286,8 @@ const Component: React.FC<Props> = (props: Props) => {
         isErrorTransaction && errors && (
           <AlertBox
             className={CN(className, 'alert-box')}
-            description={errors[0].message}
-            title={errors[0].name}
+            description={errorValidate[0]}
+            title={errorValidate[1]}
             type={'error'}
           />
         )

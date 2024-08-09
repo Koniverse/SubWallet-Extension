@@ -852,7 +852,7 @@ export default class KoniTabs {
         if (err) {
           let message = err.message.toLowerCase();
 
-          if (message.includes('method not found')) {
+          if (message.includes('method not found') || message.includes('not supported')) {
             message = 'This method is not supported by SubWallet. Try again or contact support at agent@subwallet.app';
           }
 
