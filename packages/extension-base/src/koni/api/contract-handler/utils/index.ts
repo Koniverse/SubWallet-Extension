@@ -22,6 +22,10 @@ export const _NEUROGUNS_PSP34_ABI: Record<string, any> = require('./neuroguns_ps
 export const _AZERO_DOMAIN_REGISTRY_ABI: Record<string, any> = require('./azero_domain_registry_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _SNOWBRIDGE_GATEWAY_ABI: Record<string, any> = require('./snowbridge_gateway_abi.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+// export const _ERC20_AVAIL_TOKEN_TURING_ABI = require('./.json'); // todo: Add ABI. Maybe not need
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const _AVAILBRIDGE_GATEWAY_ABI = require('./avail_bridge_abi.json'); // todo: Add ABI
 
 const SNOWBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS = '0x27ca963C279c93801941e1eB8799c23f407d68e7';
 const SNOWBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS = '0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd';
@@ -36,4 +40,19 @@ export function getSnowBridgeGatewayContract (chain: string) {
 
 export function isSnowBridgeGatewayContract (contractAddress: _Address) {
   return [SNOWBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS, SNOWBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS].includes(contractAddress);
+}
+
+const AVAILBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS = '';
+const AVAILBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS = '0x967F7DdC4ec508462231849AE81eeaa68Ad01389';
+
+export function getAvailBridgeGatewayContract (chain: string) {
+  if (chain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
+    return AVAILBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS;
+  }
+
+  return AVAILBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS;
+}
+
+export function isAvailBridgeGatewayContract (contractAddress: _Address) {
+  return [AVAILBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS, AVAILBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS].includes(contractAddress);
 }

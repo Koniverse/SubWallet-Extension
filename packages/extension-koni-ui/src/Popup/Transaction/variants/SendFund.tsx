@@ -7,7 +7,7 @@ import { TransactionWarning } from '@subwallet/extension-base/background/warning
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { _getXcmUnstableWarning, _isMythosFromHydrationToMythos, _isXcmTransferUnstable } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { getAvailBridgeGatewayContract, getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getContractAddressOfToken, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -37,6 +37,7 @@ import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { FreeBalance, TransactionContent, TransactionFooter } from '../parts';
+import {isAvailChainBridge} from "@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge";
 
 type WrapperProps = ThemeProps;
 
@@ -459,13 +460,15 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, []);
 
   // todo: must refactor later, temporary solution to support SnowBridge
-  const handleSnowBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
+  const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
+    const isAvailBridge = isAvailChainBridge(values.destChain);
+
     const tokenInfo = assetRegistry[values.asset];
 
     return approveSpending({
       amount: values.value,
       contractAddress: _getContractAddressOfToken(tokenInfo),
-      spenderAddress: getSnowBridgeGatewayContract(values.chain),
+      spenderAddress: isAvailBridge ? getAvailBridgeGatewayContract(values.chain) : getSnowBridgeGatewayContract(values.chain),
       chain: values.chain,
       owner: values.from
     });
@@ -502,7 +505,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           return await submitData(step + 1);
         } else {
           const stepType = processState.steps[step].type;
-          const submitPromise: Promise<SWTransactionResponse> | undefined = stepType === CommonStepType.TOKEN_APPROVAL ? handleSnowBridgeSpendingApproval(values) : handleBasicSubmit(values, options);
+          const submitPromise: Promise<SWTransactionResponse> | undefined = stepType === CommonStepType.TOKEN_APPROVAL ? handleBridgeSpendingApproval(values) : handleBasicSubmit(values, options);
 
           const rs = await submitPromise;
           const success = onSuccess(isLastStep, needRollback)(rs);
@@ -528,7 +531,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           setLoading(false);
         });
     }, 300);
-  }, [handleBasicSubmit, handleSnowBridgeSpendingApproval, isShowWarningOnSubmit, onError, onSuccess, processState]);
+  }, [handleBasicSubmit, handleBridgeSpendingApproval, isShowWarningOnSubmit, onError, onSuccess, processState]);
 
   const onSetMaxTransferable = useCallback((value: boolean) => {
     const bnMaxTransfer = new BN(maxTransfer);
