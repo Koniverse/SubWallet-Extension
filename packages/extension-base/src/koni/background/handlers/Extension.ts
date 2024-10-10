@@ -34,6 +34,7 @@ import { createSnowBridgeExtrinsic, createXcmExtrinsic, getXcmMockTxFee } from '
 import { _API_OPTIONS_CHAIN_GROUP, _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEvmCompatible, _isChainTonCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _NotificationInfo, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -46,6 +47,7 @@ import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountsStore } from '@subwallet/extension-base/stores';
 import { AccountJson, AccountProxyMap, AccountsWithCurrentAddress, BalanceJson, BasicTxErrorType, BasicTxWarningCode, BuyServiceInfo, BuyTokenInfo, EarningRewardJson, NominationPoolInfo, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, StakingTxErrorType, StorageDataInterface, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
+import { GetNotificationParams } from '@subwallet/extension-base/types/notification';
 import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, BN_ZERO, combineAllAccountProxy, createTransactionFromRLP, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
@@ -894,6 +896,12 @@ export default class KoniExtension {
 
   private setEnableChainPatrol ({ enable }: RequestChangeEnableChainPatrol) {
     this.#koniState.updateSetting('enableChainPatrol', enable);
+
+    return true;
+  }
+
+  private saveNotificationSetup (request: NotificationSetup) {
+    this.#koniState.updateSetting('notificationSetup', request);
 
     return true;
   }
@@ -3700,6 +3708,43 @@ export default class KoniExtension {
   }
   /* Swap service */
 
+  /* Notification service */
+  private async subscribeUnreadNotificationCountMap (id: string, port: chrome.runtime.Port): Promise<Record<string, number>> {
+    const cb = createSubscription<'pri(inappNotification.subscribeUnreadNotificationCountMap)'>(id, port);
+    let ready = false;
+
+    const callback = (rs: Record<string, number>) => {
+      if (ready) {
+        cb(rs);
+      }
+    };
+
+    const subscription = this.#koniState.inappNotificationService.subscribeUnreadNotificationsCountMap(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    ready = true;
+
+    return await this.#koniState.inappNotificationService.getUnreadNotificationsCountMap();
+  }
+
+  private markAllReadNotification (proxyId: string) {
+    return this.#koniState.inappNotificationService.markAllRead(proxyId);
+  }
+
+  private changeReadNotificationStatus (notification: _NotificationInfo) {
+    return this.#koniState.inappNotificationService.changeReadStatus(notification);
+  }
+
+  private async getInappNotifications (params: GetNotificationParams) {
+    return this.#koniState.inappNotificationService.getNotificationsByParams(params);
+  }
+  /* Notification service */
+
   /* Ledger */
 
   private async subscribeLedgerGenericAllowChains (id: string, port: chrome.runtime.Port): Promise<string[]> {
@@ -3814,6 +3859,8 @@ export default class KoniExtension {
         return this.setUnlockType(request as RequestUnlockType);
       case 'pri(settings.saveEnableChainPatrol)':
         return this.setEnableChainPatrol(request as RequestChangeEnableChainPatrol);
+      case 'pri(settings.saveNotificationSetup)':
+        return this.saveNotificationSetup(request as NotificationSetup);
       case 'pri(settings.saveShowZeroBalance)':
         return this.setShowZeroBalance(request as RequestChangeShowZeroBalance);
       case 'pri(settings.saveLanguage)':
@@ -4288,6 +4335,17 @@ export default class KoniExtension {
       case 'pri(swapService.handleSwapStep)':
         return this.handleSwapStep(request as SwapSubmitParams);
         /* Swap service */
+
+        /* Notification service */
+      case 'pri(inappNotification.subscribeUnreadNotificationCountMap)':
+        return await this.subscribeUnreadNotificationCountMap(id, port);
+      case 'pri(inappNotification.markAllReadNotification)':
+        return this.markAllReadNotification(request as string);
+      case 'pri(inappNotification.changeReadNotificationStatus)':
+        return this.changeReadNotificationStatus(request as _NotificationInfo);
+      case 'pri(inappNotification.getInappNotifications)':
+        return this.getInappNotifications(request as GetNotificationParams);
+        /* Notification service */
 
         /* Ledger */
       case 'pri(ledger.generic.allow)':

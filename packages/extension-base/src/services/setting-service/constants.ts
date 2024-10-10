@@ -15,6 +15,16 @@ export const DEFAULT_SHOW_ZERO_BALANCE = true;
 export const DEFAULT_SHOW_BALANCE = false;
 export const DEFAULT_ALL_LOGO = '';
 export const DEFAULT_CAMERA_ENABLE = false;
+export const DEFAULT_NOTIFICATION_SETUP = {
+  isEnabled: true,
+  notificationSetup: {
+    isHideSend: false,
+    isHideReceive: false,
+    isHideWithdraw: false, // todo: just for test, remove later
+    isHideMarketing: false,
+    isHideAnnouncement: false
+  }
+};
 
 export const DEFAULT_SETTING: UiSettings = {
   language: DEFAULT_LANGUAGE,
@@ -28,5 +38,6 @@ export const DEFAULT_SETTING: UiSettings = {
   camera: DEFAULT_CAMERA_ENABLE,
   timeAutoLock: DEFAULT_AUTO_LOCK_TIME,
   enableChainPatrol: DEFAULT_CHAIN_PATROL_ENABLE,
+  notificationSetup: DEFAULT_NOTIFICATION_SETUP,
   walletReference: ''
 };
