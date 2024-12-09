@@ -6281,12 +6281,12 @@ __metadata:
 
 "@subwallet/chain-list@file:../SubWallet-Chainlist/packages/chain-list/build/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.2.91
-  resolution: "@subwallet/chain-list@file:../SubWallet-Chainlist/packages/chain-list/build/#../SubWallet-Chainlist/packages/chain-list/build/::hash=109cff&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/chain-list@file:../SubWallet-Chainlist/packages/chain-list/build/#../SubWallet-Chainlist/packages/chain-list/build/::hash=57d075&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
-  checksum: 9b6770320833b872c092ea4bbdf767774e75dca9640bb27e67306a4518cb9226b9b4ab768cefada0aa1231303ed6d684b5b6b944221ad5658e1fd27d7841e518
+  checksum: e18946887ba58cb12bf25591aa61302436f3cb5845f5bc7131bf7021a2cf12b8405c60abbf810e3dd2187b7eb04aceb6ba496c59b2d815d03924516d90d7ab4b
   languageName: node
   linkType: hard
 
@@ -6298,6 +6298,7 @@ __metadata:
     "@apollo/client": ^3.7.14
     "@azns/resolver-core": ^1.4.0
     "@chainflip/sdk": ^1.6.0
+    "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@equilab/api": ~1.14.25
     "@ethereumjs/common": ^4.1.0
     "@ethereumjs/tx": ^5.1.0
@@ -6681,7 +6682,7 @@ __metadata:
 
 "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.7
-  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/#../SubWallet-Base/packages/keyring/build/::hash=2286f2&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/#../SubWallet-Base/packages/keyring/build/::hash=e8ecec&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
@@ -6702,7 +6703,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: 94fada10a79d18133296b18703b46d32f6158a31148bff94d9b711a642e291cec436a5d191d29cb113669c9462d073d94c070c1532f6eea34240890a692fa358
+  checksum: 56c3b6775359df5df83cafbdd79d9e446df23f159a226ff145d5b495fac9a9766c69ee3347a9296a3d9803fecbb70af6ec28ee630b201f997eb5f000155b11a2
   languageName: node
   linkType: hard
 
