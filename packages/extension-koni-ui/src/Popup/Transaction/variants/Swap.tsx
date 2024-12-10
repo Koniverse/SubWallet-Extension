@@ -11,7 +11,7 @@ import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { CHAINFLIP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
+import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AlertBox, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
@@ -345,7 +345,15 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [form]);
 
   const notSupportSlippageSelection = useMemo(() => {
-    if (currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_TESTNET || currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_MAINNET) {
+    if (currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_TESTNET || currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_MAINNET || currentQuote?.provider.id === SwapProviderId.SIMPLE_SWAP) {
+      return true;
+    }
+
+    return false;
+  }, [currentQuote?.provider.id]);
+
+  const isSimpleSwapSlippage = useMemo(() => {
+    if (currentQuote?.provider.id === SwapProviderId.SIMPLE_SWAP) {
       return true;
     }
 
@@ -370,6 +378,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setCurrentQuote(quote);
     setFeeOptions(quote.feeInfo.feeOptions);
     setCurrentFeeOption(quote.feeInfo.feeOptions?.[0]);
+
+    setCurrentQuoteRequest((oldRequest) => {
+      if (!oldRequest) {
+        return undefined;
+      }
+
+      return {
+        ...oldRequest,
+        currentQuote: quote.provider
+      };
+    });
   }, []);
 
   const onSelectFeeOption = useCallback((slug: string) => {
@@ -428,7 +447,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const feeTypeMap: Record<SwapFeeType, FeeItem> = {
       NETWORK_FEE: { label: 'Network fee', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.NETWORK_FEE },
       PLATFORM_FEE: { label: 'Protocol fee', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.PLATFORM_FEE },
-      WALLET_FEE: { label: 'Wallet commission', value: new BigN(0), suffix: '%', type: SwapFeeType.WALLET_FEE }
+      WALLET_FEE: { label: 'Wallet commission', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.WALLET_FEE }
     };
 
     currentQuote?.feeInfo.feeComponent.forEach((feeItem) => {
@@ -437,10 +456,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       feeTypeMap[feeType].value = feeTypeMap[feeType].value.plus(getConvertedBalance(feeItem));
     });
 
-    result.push(
-      feeTypeMap.NETWORK_FEE,
-      feeTypeMap.PLATFORM_FEE
-    );
+    Object.values(feeTypeMap).forEach((fee) => {
+      if (!fee.value.lte(new BigN(0))) {
+        result.push(fee);
+      }
+    });
 
     return result;
   }, [currencyData.isPrefix, currencyData.symbol, currentQuote?.feeInfo.feeComponent, getConvertedBalance]);
@@ -641,7 +661,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               currentStep: step,
               quote: latestOptimalQuote,
               address: from,
-              slippage: [SwapProviderId.CHAIN_FLIP_MAINNET, SwapProviderId.CHAIN_FLIP_TESTNET].includes(latestOptimalQuote.provider.id) ? CHAINFLIP_SLIPPAGE : currentSlippage.slippage.toNumber(),
+              slippage: [SwapProviderId.CHAIN_FLIP_MAINNET, SwapProviderId.CHAIN_FLIP_TESTNET].includes(latestOptimalQuote.provider.id)
+                ? CHAINFLIP_SLIPPAGE
+                : SwapProviderId.SIMPLE_SWAP.includes(latestOptimalQuote.provider.id)
+                  ? SIMPLE_SWAP_SLIPPAGE
+                  : currentSlippage.slippage.toNumber(),
               recipient
             });
 
@@ -746,19 +770,39 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           >
             {notSupportSlippageSelection
               ? (
-                <>
-                  <div className={'__slippage-title-wrapper'}>Slippage
-                    <Icon
-                      customSize={'16px'}
-                      iconColor={token.colorSuccess}
-                      phosphorIcon={Info}
-                      size='sm'
-                      weight='fill'
-                    />
-                    :
-                  </div>
-                  &nbsp;<span>{(CHAINFLIP_SLIPPAGE * 100).toString()}%</span>
-                </>
+                isSimpleSwapSlippage
+                  ? (
+                    <Tooltip
+                      placement={'topRight'}
+                      title='Slippage can be up to 5% due to market conditions'
+                    >
+                      <div className='__slippage-title-wrapper'>Slippage
+                        <Icon
+                          customSize='16px'
+                          iconColor={token.colorSuccess}
+                          phosphorIcon={Info}
+                          size='sm'
+                          weight='fill'
+                        />
+                          &nbsp;<span>≤ {(SIMPLE_SWAP_SLIPPAGE * 100).toString()}%</span>
+                      </div>
+                    </Tooltip>
+                  )
+                  : (
+                    <>
+                      <div className='__slippage-title-wrapper'>Slippage
+                        <Icon
+                          customSize='16px'
+                          iconColor={token.colorSuccess}
+                          phosphorIcon={Info}
+                          size='sm'
+                          weight='fill'
+                        />
+                        :
+                      </div>
+                        &nbsp;<span>{(CHAINFLIP_SLIPPAGE * 100).toString()}%</span>
+                    </>
+                  )
               )
               : (
                 <>
