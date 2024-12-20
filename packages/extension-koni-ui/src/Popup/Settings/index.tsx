@@ -154,6 +154,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick: () => {
             navigate('/settings/crowdloans', { state: true });
           }
+        },
+        {
+          key: 'migrate-account',
+          leftIcon: Rocket,
+          leftIconBgColor: token['cyan-5'],
+          rightIcon: CaretRight,
+          title: t('Migrate account'),
+          onClick: () => {
+            navigate('/migrate-account');
+          }
         }
       ]
     },

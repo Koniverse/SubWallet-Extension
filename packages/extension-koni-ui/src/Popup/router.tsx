@@ -122,6 +122,7 @@ const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/e
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
+const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
 
 // Earning
 
@@ -280,6 +281,9 @@ export const router = createHashRouter([
           AccountExport.generateRouterObject('export/:accountProxyId'),
           ExportAllDone.generateRouterObject('export-all-done')
         ]
+      },
+      {
+        ...MigrateAccount.generateRouterObject('migrate-account')
       },
       {
         path: 'wallet-connect',
