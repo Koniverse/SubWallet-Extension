@@ -1919,6 +1919,50 @@ export interface ResponseNftImport {
 
 /* Campaign */
 
+/* Migrate Unified Account */
+export interface ResponseHasAnyAccountForMigration {
+  hasAnyAccountForMigration: boolean;
+}
+
+export interface ResponseIsShowMigrationNotice {
+  isShowMigrationNotice: boolean;
+}
+
+export interface RequestUpdateMigrationAcknowledgedStatus {
+  isAcknowledgedMigration: boolean;
+}
+
+export interface RequestMigrateUnifiedAndFetchEligibleSoloAccounts {
+  password: string
+}
+
+export interface ResponseMigrateUnifiedAndFetchEligibleSoloAccounts {
+  migratedUnifiedAccountIds: string[],
+  soloAccounts: Record<string, SoloAccountToBeMigrated[]>
+  sessionId: string; // to keep linking to password in state
+}
+
+interface SoloAccountToBeMigrated {
+  upcomingProxyId: string,
+  address: string,
+  name: string,
+  chainType: string
+}
+
+export interface RequestMigrateSoloAccount {
+  soloAccounts: SoloAccountToBeMigrated[];
+  accountName: string;
+  sessionId: string;
+}
+
+export interface ResponseMigrateSoloAccount {
+  migratedUnifiedAccountId: string
+}
+
+export interface RequestPingSession {
+  sessionId: string;
+}
+
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
@@ -2325,6 +2369,14 @@ export interface KoniRequestSignatures {
 
   /* Ledger */
   'pri(ledger.generic.allow)': [null, string[], string[]];
+
+  /* Migrate Unified Account */
+  'pri(migrate.isShowMigrationNotice)': [null, ResponseIsShowMigrationNotice];
+  'pri(migrate.hasAnyAccountForMigration)': [null, ResponseHasAnyAccountForMigration];
+  'pri(migrate.updateMigrationAcknowledgedStatus)': [RequestUpdateMigrationAcknowledgedStatus, boolean];
+  'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
+  'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
+  'pri(migrate.pingSession)': [RequestPingSession, boolean];
 }
 
 export interface ApplicationMetadataType {
