@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { FeeDetail, FeeOption } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
+import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, ModalContext, Number } from '@subwallet/react-ui';
@@ -27,16 +29,18 @@ export type RenderFieldNodeParams = {
 }
 
 type Props = ThemeProps & {
-  onSelect?: () => void;
+  onSelect?: (option: FeeOption) => void;
   isLoading?: boolean;
   tokenSlug: string;
+  feeOptionsInfo?: FeeDetail;
+  estimateFee: string;
   renderFieldNode?: (params: RenderFieldNodeParams) => React.ReactNode;
 };
 
 // todo: will update dynamic later
 const modalId = 'FeeEditorModalId';
 
-const Component = ({ className, isLoading = false, onSelect, renderFieldNode, tokenSlug }: Props): React.ReactElement<Props> => {
+const Component = ({ className, estimateFee, feeOptionsInfo, isLoading = false, onSelect, renderFieldNode, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
@@ -50,6 +54,7 @@ const Component = ({ className, isLoading = false, onSelect, renderFieldNode, to
   const decimals = _getAssetDecimals(tokenAsset);
   // @ts-ignore
   const priceId = _getAssetPriceId(tokenAsset);
+  const priceValue = priceMap[priceId] || 0;
   const symbol = _getAssetSymbol(tokenAsset);
 
   const feeValue = useMemo(() => {
@@ -60,14 +65,21 @@ const Component = ({ className, isLoading = false, onSelect, renderFieldNode, to
     return BN_ZERO;
   }, []);
 
+  const convertedFeeValue = useMemo(() => {
+    return new BigN(estimateFee)
+      .dividedBy(BN_TEN.pow(decimals || 0))
+      .multipliedBy(priceValue)
+      .toNumber();
+  }, [decimals, estimateFee, priceValue]);
+
   const onClickEdit = useCallback(() => {
     setTimeout(() => {
       activeModal(modalId);
     }, 100);
   }, [activeModal]);
 
-  const onSelectOption = useCallback(() => {
-    onSelect?.();
+  const onSelectOption = useCallback((option: FeeOption) => {
+    onSelect?.(option);
   }, [onSelect]);
 
   const customFieldNode = useMemo(() => {
@@ -102,7 +114,7 @@ const Component = ({ className, isLoading = false, onSelect, renderFieldNode, to
                 className={'__fee-value'}
                 decimal={decimals}
                 suffix={symbol}
-                value={feeValue}
+                value={estimateFee}
               />
             </div>
             <div className='__field-right-part'>
@@ -114,7 +126,7 @@ const Component = ({ className, isLoading = false, onSelect, renderFieldNode, to
                   className={'__fee-price-value'}
                   decimal={0}
                   prefix={'~ $'}
-                  value={feePriceValue}
+                  value={convertedFeeValue}
                 />
 
                 <Icon
@@ -129,8 +141,13 @@ const Component = ({ className, isLoading = false, onSelect, renderFieldNode, to
       }
 
       <FeeEditorModal
+        decimals={decimals}
+        feeOptionsInfo={feeOptionsInfo}
         modalId={modalId}
         onSelectOption={onSelectOption}
+        priceValue={priceValue}
+        symbol={symbol}
+        tokenSlug={tokenSlug}
       />
     </>
   );

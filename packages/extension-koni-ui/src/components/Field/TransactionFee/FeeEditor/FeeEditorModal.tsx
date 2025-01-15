@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { EvmEIP1559FeeOption, FeeDefaultOption, FeeDetail, FeeOption, FeeOptionKey } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { BasicInputEvent, RadioGroup } from '@subwallet/extension-koni-ui/components';
-import { FeeOption, FeeOptionItem } from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/FeeOptionItem';
+import { FeeOptionItem } from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/FeeOptionItem';
 import { FormCallbacks, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Form, Input, ModalContext, Number, SwModal } from '@subwallet/react-ui';
+import { Button, Form, Input, Logo, ModalContext, Number, SwModal } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -15,7 +16,12 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   modalId: string;
-  onSelectOption: () => void
+  feeOptionsInfo?: FeeDetail;
+  onSelectOption: (option: FeeOption) => void;
+  symbol: string;
+  decimals: number;
+  tokenSlug: string;
+  priceValue: number;
 };
 
 enum ViewMode {
@@ -32,33 +38,13 @@ interface FormProps {
   customValue: string;
 }
 
-const OPTIONS: FeeOption[] = [
+const OPTIONS: FeeDefaultOption[] = [
   'slow',
   'average',
   'fast'
 ];
 
-type FeeInfo = {
-  time: number;
-  value: number;
-};
-
-const feeInfoMap: Record<FeeOption, FeeInfo> = {
-  slow: {
-    time: 60 * 1000 * 30,
-    value: 0.02
-  },
-  average: {
-    time: 60 * 1000 * 15,
-    value: 0.2
-  },
-  fast: {
-    time: 60 * 1000 * 5,
-    value: 1
-  }
-};
-
-const Component = ({ className, modalId, onSelectOption }: Props): React.ReactElement<Props> => {
+const Component = ({ className, decimals, feeOptionsInfo, modalId, onSelectOption, priceValue, symbol, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const [currentViewMode, setViewMode] = useState<ViewMode>(ViewMode.RECOMMENDED);
@@ -92,25 +78,50 @@ const Component = ({ className, modalId, onSelectOption }: Props): React.ReactEl
     inactiveModal(modalId);
   }, [inactiveModal, modalId]);
 
-  const _onSelectOption = useCallback(() => {
+  const _onSelectOption = useCallback((option: FeeOption) => {
     return () => {
-      onSelectOption();
+      onSelectOption(option);
       inactiveModal(modalId);
     };
   }, [inactiveModal, modalId, onSelectOption]);
 
-  const renderOption = (option: FeeOption) => {
+  const _onSelectCustomOption = useCallback(() => {
+    return () => {
+      onSelectOption('custom');
+      inactiveModal(modalId);
+    };
+  }, [inactiveModal, modalId, onSelectOption]);
+
+  const calculateEstimateFee = useCallback((optionKey: FeeOptionKey) => {
+    const optionValue = feeOptionsInfo?.options?.[optionKey] as EvmEIP1559FeeOption;
+
+    if (!optionValue) {
+      return null;
+    }
+
+    if (feeOptionsInfo && 'gasLimit' in feeOptionsInfo) {
+      return new BigN(optionValue.maxFeePerGas).multipliedBy(feeOptionsInfo.gasLimit).toFixed(0) || 0;
+    }
+
+    return 0;
+  }, [feeOptionsInfo]);
+
+  const renderOption = (option: FeeDefaultOption) => {
+    const optionValue = feeOptionsInfo?.options?.[option] as EvmEIP1559FeeOption;
+    const feeValue = calculateEstimateFee(option as FeeOptionKey);
+    const estimatedWaitTime = (optionValue?.maxWaitTimeEstimate + optionValue?.minWaitTimeEstimate) / 2 || 0;
+
     return (
       <FeeOptionItem
         className={'__fee-option-item'}
         feeValueInfo={{
-          value: feeInfoMap[option].value,
-          decimals: 0,
-          symbol: 'KSM'
+          value: feeValue || 0,
+          decimals: decimals,
+          symbol: symbol
         }}
         key={option}
-        onClick={_onSelectOption()}
-        time={feeInfoMap[option].time}
+        onClick={_onSelectOption(option)}
+        time={estimatedWaitTime}
         type={option}
       />
     );
@@ -126,7 +137,7 @@ const Component = ({ className, modalId, onSelectOption }: Props): React.ReactEl
 
   const onSubmitCustomValue: FormCallbacks<FormProps>['onFinish'] = useCallback(({ customValue }: FormProps) => {
     inactiveModal(modalId);
-    onSelectOption();
+    onSelectOption('custom');
   }, [inactiveModal, modalId, onSelectOption]);
 
   return (
@@ -136,6 +147,7 @@ const Component = ({ className, modalId, onSelectOption }: Props): React.ReactEl
         <Button
           block={true}
           className={'__approve-button'}
+          onClick={_onSelectCustomOption}
         >
           Approve
         </Button>
@@ -154,8 +166,18 @@ const Component = ({ className, modalId, onSelectOption }: Props): React.ReactEl
       </div>
 
       <div className={'__fee-token-selector-area'}>
-        <div className='__fee-token-selector-label'>
-          {t('Fee paid in')}
+        <div className={'__fee-token-selector-label'}>{t('Fee paid in')}</div>
+        <div
+          className={'__fee-paid-token'}
+        >
+          <Logo
+            className='token-logo'
+            isShowSubLogo={false}
+            shape='circle'
+            size={24}
+            token={tokenSlug.toLowerCase()}
+          />
+          <div className={'__fee-paid-token-symbol'}>{symbol}</div>
         </div>
       </div>
 
@@ -225,7 +247,20 @@ export const FeeEditorModal = styled(Component)<Props>(({ theme: { token } }: Pr
       padding: token.paddingSM,
       backgroundColor: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
-      marginBottom: token.marginXS
+      marginBottom: token.marginXS,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
+    },
+
+    '.__fee-paid-token': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.__fee-paid-token-symbol': {
+      paddingLeft: 8,
+      color: token.colorWhite
     },
 
     '.__fee-token-selector-label': {
