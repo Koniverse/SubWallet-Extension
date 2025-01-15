@@ -22,13 +22,15 @@ import { getBaseTransactionInfo, getTransactionId, isSubstrateTransaction, isTon
 import { SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BasicTxErrorType, BasicTxWarningCode, LeavePoolAdditionalData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, SubmitJoinNominationPool, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountJson, BasicTxErrorType, BasicTxWarningCode, EvmFeeInfo, LeavePoolAdditionalData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, SubmitJoinNominationPool, SubstrateTipInfo, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { BN_ZERO } from '@subwallet/extension-base/utils/number';
 import keyring from '@subwallet/ui-keyring';
 import { Cell } from '@ton/core';
+import BigN from 'bignumber.js';
 import { addHexPrefix } from 'ethereumjs-util';
 import { ethers, TransactionLike } from 'ethers';
 import EventEmitter from 'eventemitter3';
@@ -98,7 +100,7 @@ export default class TransactionService {
       errors: transactionInput.errors || [],
       warnings: transactionInput.warnings || []
     };
-    const { additionalValidator, address, chain, extrinsicType } = validationResponse;
+    const { additionalValidator, address, chain, extrinsicType, feeCustom, feeOption } = validationResponse;
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 
     const blockedConfigObjects = await fetchBlockedConfigObjects();
@@ -138,7 +140,10 @@ export default class TransactionService {
     }
 
     // Estimate fee for transaction
-    validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi);
+    const id = getId();
+    const feeInfo = await this.state.feeService.subscribeChainFee(id, chain, 'evm') as EvmFeeInfo;
+
+    validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, feeInfo);
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
@@ -228,17 +233,22 @@ export default class TransactionService {
 
     validatedTransaction.warnings = [];
 
+    console.log('12345_transaction', transaction);
+    console.log('12345_validatedTransaction', validatedTransaction);
+
     const emitter = await this.addTransaction(validatedTransaction);
 
     await new Promise<void>((resolve, reject) => {
       // TODO
       if (transaction.resolveOnDone) {
+        console.log('log - 0');
         emitter.on('success', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
           validatedTransaction.extrinsicHash = data.extrinsicHash;
           resolve();
         });
       } else {
+        console.log('log - 1');
         emitter.on('signed', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
           validatedTransaction.extrinsicHash = data.extrinsicHash;
@@ -247,6 +257,8 @@ export default class TransactionService {
       }
 
       emitter.on('error', (data: TransactionEventResponse) => {
+        console.log('log - 3');
+
         if (data.errors.length > 0) {
           validatedTransaction.errors.push(...data.errors);
           resolve();
@@ -269,28 +281,34 @@ export default class TransactionService {
     const { eventsHandler } = transaction;
 
     emitter.on('signed', (data: TransactionEventResponse) => {
+      console.log('log1');
       this.onSigned(data);
     });
 
     emitter.on('send', (data: TransactionEventResponse) => {
+      console.log('log2');
       this.onSend(data);
     });
 
     emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+      console.log('log3');
       this.onHasTransactionHash(data);
     });
 
     emitter.on('success', (data: TransactionEventResponse) => {
+      console.log('log4');
       this.handlePostProcessing(data.id);
       this.onSuccess(data);
     });
 
     emitter.on('error', (data: TransactionEventResponse) => {
+      console.log('log5');
       // this.handlePostProcessing(data.id); // might enable this later
       this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
     });
 
     emitter.on('timeout', (data: TransactionEventResponse) => {
+      console.log('log6');
       this.onTimeOut({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.TIMEOUT)] });
     });
 
@@ -870,6 +888,7 @@ export default class TransactionService {
   }
 
   private async signAndSendEvmTransaction ({ address, chain, id, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+    console.log('transaction', transaction);
     const payload = (transaction as EvmSendTransactionRequest);
     const evmApi = this.state.chainService.getEvmApi(chain);
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
@@ -923,6 +942,16 @@ export default class TransactionService {
     if (!payload.from) {
       payload.from = address;
     }
+    console.log('payload', payload);
+
+    if (!payload.estimateGas) {
+      console.log('xinchao');
+      if (payload.maxFeePerGas) {
+        // payload.estimateGas = new BigN(anyNumberToBN(payload.maxFeePerGas).toNumber()).multipliedBy(payload.gas || '0').toFixed(0);
+      } else {
+        // payload.estimateGas = new BigN(anyNumberToBN(payload.gasPrice).toNumber()).multipliedBy(payload.gas || '0').toFixed(0);
+      }
+    }
 
     const isExternal = !!account.isExternal;
     const isInjected = !!account.isInjected;
@@ -946,6 +975,8 @@ export default class TransactionService {
       data: payload.data,
       chainId: payload.chainId
     };
+
+    console.log('txObject', txObject);
 
     const eventData: TransactionEventResponse = {
       id,
@@ -1098,7 +1129,8 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendSubstrateTransaction ({ address, chain, id, transaction, url }: SWTransaction): TransactionEmitter {
+  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, transaction, url }: SWTransaction): TransactionEmitter {
+    const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const emitter = new EventEmitter<TransactionEventMap>();
     const eventData: TransactionEventResponse = {
       id,
@@ -1123,6 +1155,7 @@ export default class TransactionService {
           } as SignerResult;
         }
       } as Signer,
+      tip,
       withSignedTransaction: true
     };
 
