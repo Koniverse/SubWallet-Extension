@@ -29,11 +29,18 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   constructor (chainService: ChainService, balanceService: BalanceService, chain: string) {
     const chainInfo = chainService.getChainInfoByKey(chain);
-    const providerSlug = chain === 'statemint'
-      ? SwapProviderId.POLKADOT_ASSET_HUB
-      : chain === 'statemine'
-        ? SwapProviderId.KUSAMA_ASSET_HUB
-        : SwapProviderId.ROCOCO_ASSET_HUB;
+    const providerSlug: SwapProviderId = (function () {
+      switch (chain) {
+        case 'statemint':
+          return SwapProviderId.POLKADOT_ASSET_HUB;
+        case 'statemine':
+          return SwapProviderId.KUSAMA_ASSET_HUB;
+        case 'westend_assethub':
+          return SwapProviderId.WESTEND_ASSET_HUB;
+        default:
+          return SwapProviderId.ROCOCO_ASSET_HUB;
+      }
+    }());
 
     this.swapBaseHandler = new SwapBaseHandler({
       balanceService,

@@ -79,3 +79,7 @@ export const WARNING_LEDGER_RECEIVE_MODAL = 'warning-ledger-receive-modal';
 export const DERIVE_ACCOUNT_LIST_MODAL = 'derive-account-list-modal';
 export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 /* Derive */
+
+/* Process */
+export const TRANSACTION_PROGRESS_DETAIL_MODAL = 'transaction-progress-detail-modal';
+/* Process */

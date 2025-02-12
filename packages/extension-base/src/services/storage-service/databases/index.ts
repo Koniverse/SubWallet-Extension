@@ -4,7 +4,7 @@
 import { _AssetRef, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { CampaignData, ChainStakingMetadata, CrowdloanItem, MetadataItem, MetadataV15Item, NftCollection, NftItem, NominatorMetadata, PriceJson, StakingItem, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _NotificationInfo } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { BalanceItem, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BalanceItem, ProcessTransactionData, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import Dexie, { Table, Transaction } from 'dexie';
 
 export const DEFAULT_DATABASE = 'SubWalletDB_v2';
@@ -81,6 +81,8 @@ export default class KoniDatabase extends Dexie {
 
   public inappNotification!: Table<_NotificationInfo, object>;
 
+  public processTransactions!: Table<ProcessTransactionData, object>;
+
   private schemaVersion: number;
 
   public constructor (name = DEFAULT_DATABASE, schemaVersion = 11) {
@@ -132,6 +134,10 @@ export default class KoniDatabase extends Dexie {
 
     this.conditionalVersion(8, {
       metadataV15: 'genesisHash, chain'
+    });
+
+    this.conditionalVersion(9, {
+      processTransactions: 'id, address'
     });
   }
 

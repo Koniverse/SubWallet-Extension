@@ -1,0 +1,15 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { AccountSignMode } from '@subwallet/extension-base/types';
+
+import useGetAccountSignModeByAddress from './useGetAccountSignModeByAddress';
+
+const useOneSignProcess = (address: string): boolean => {
+  const signMode = useGetAccountSignModeByAddress(address);
+
+  // TODO: Add setting condition
+  return signMode === AccountSignMode.PASSWORD;
+};
+
+export default useOneSignProcess;

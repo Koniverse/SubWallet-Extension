@@ -4,6 +4,7 @@
 import { ConfirmationDefinitions, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
+import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -17,7 +18,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -86,9 +87,19 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
   }
 };
 
+const getProcessComponent = (processType: ProcessType): typeof BaseProcessConfirmation => {
+  switch (processType) {
+    case ProcessType.SWAP:
+      return SwapProcessConfirmation;
+    case ProcessType.EARNING:
+      return EarnProcessConfirmation;
+    default:
+      return BaseProcessConfirmation;
+  }
+};
+
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, closeAlert, confirmation: { item, type },
-    openAlert } = props;
+  const { className, closeAlert, confirmation: { item, type }, openAlert } = props;
   const { id } = item;
 
   const { t } = useTranslation();
@@ -101,7 +112,19 @@ const Component: React.FC<Props> = (props: Props) => {
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
 
   const renderContent = useCallback((transaction: SWTransactionResult): React.ReactNode => {
-    const { extrinsicType } = transaction;
+    const { extrinsicType, process } = transaction;
+
+    if (process) {
+      const Component = getProcessComponent(process.type);
+
+      return (
+        <Component
+          closeAlert={closeAlert}
+          openAlert={openAlert}
+          transaction={transaction}
+        />
+      );
+    }
 
     const Component = getTransactionComponent(extrinsicType);
 
@@ -121,10 +144,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
       return data.quote.aliveUntil;
     }
+
+    if (transaction.process && transaction.process.type === ProcessType.SWAP) {
+      const data = transaction.process.combineInfo as SwapBaseTxData;
+
+      return data.quote.aliveUntil;
+    }
     // todo: there might be more types of extrinsic
 
     return undefined;
-  }, [transaction.data, transaction.extrinsicType]);
+  }, [transaction.data, transaction.extrinsicType, transaction.process]);
 
   return (
     <>

@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-import { TransactionWarningType } from '@subwallet/extension-base/types';
+import { TransactionWarningType } from './warning';
 
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
@@ -16,6 +15,7 @@ export interface RequestBaseTransfer {
   value?: string;
   transferAll?: boolean;
   transferBounceable?: boolean;
+  isPassConfirmation?: boolean;
 }
 
 export interface RequestCheckTransfer extends RequestBaseTransfer {

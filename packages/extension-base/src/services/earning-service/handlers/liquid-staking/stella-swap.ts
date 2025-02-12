@@ -8,7 +8,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
-import { BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { TransactionConfig } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
 
@@ -248,9 +248,16 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     ]);
 
     if (!allowance || parseInt(allowance) <= 0) {
+      const metadata: ApproveStepMetadata = {
+        tokenApprove: inputTokenSlug,
+        contractAddress: _getContractAddressOfToken(inputTokenInfo),
+        spenderAddress: _getContractAddressOfToken(derivativeTokenInfo)
+      };
+
       const step: BaseYieldStepDetail = {
         name: 'Authorize token approval',
-        type: YieldStepType.TOKEN_APPROVAL
+        type: YieldStepType.TOKEN_APPROVAL,
+        metadata: metadata as unknown as Record<string, unknown>
       };
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access

@@ -101,7 +101,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock
-        data={data}
+        quote={data.quote}
       />
       <MetaInfo
         className={'__swap-confirmation-wrapper'}

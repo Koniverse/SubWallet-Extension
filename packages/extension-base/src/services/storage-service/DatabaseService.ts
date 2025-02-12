@@ -6,7 +6,7 @@ import { APIItemState, ChainStakingMetadata, CrowdloanItem, MantaPayConfig, NftC
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { _NotificationInfo } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import KoniDatabase, { IBalance, ICampaign, IChain, ICrowdloanItem, INft } from '@subwallet/extension-base/services/storage-service/databases';
-import { AssetStore, BalanceStore, ChainStore, CrowdloanStore, MetadataStore, MetadataV15Store, MigrationStore, NftCollectionStore, NftStore, PriceStore, StakingStore, TransactionStore } from '@subwallet/extension-base/services/storage-service/db-stores';
+import { AssetStore, BalanceStore, ChainStore, CrowdloanStore, MetadataStore, MetadataV15Store, MigrationStore, NftCollectionStore, NftStore, PriceStore, ProcessTransactionStore, StakingStore, TransactionStore } from '@subwallet/extension-base/services/storage-service/db-stores';
 import BaseStore from '@subwallet/extension-base/services/storage-service/db-stores/BaseStore';
 import CampaignStore from '@subwallet/extension-base/services/storage-service/db-stores/Campaign';
 import ChainStakingMetadataStore from '@subwallet/extension-base/services/storage-service/db-stores/ChainStakingMetadata';
@@ -16,7 +16,7 @@ import NominatorMetadataStore from '@subwallet/extension-base/services/storage-s
 import { HistoryQuery } from '@subwallet/extension-base/services/storage-service/db-stores/Transaction';
 import YieldPoolStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPoolStore';
 import YieldPositionStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPositionStore';
-import { BalanceItem, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BalanceItem, ProcessTransactionData, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { BN_ZERO, reformatAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
@@ -73,7 +73,10 @@ export default class DatabaseService {
       // assetRef: new AssetRefStore(this._db.assetRef)
 
       // inapp notification
-      inappNotification: new InappNotificationStore(this._db.inappNotification)
+      inappNotification: new InappNotificationStore(this._db.inappNotification),
+
+      // process transaction
+      processTransactions: new ProcessTransactionStore(this._db.processTransactions)
 
     };
   }
@@ -679,6 +682,28 @@ export default class DatabaseService {
 
   async getExportJson () {
     return JSON.parse(await this.exportDB()) as DexieExportJsonStructure;
+  }
+
+  public upsertProcessTransaction (processTransaction: ProcessTransactionData) {
+    console.debug('upsertProcessTransaction', processTransaction);
+
+    return this.stores.processTransactions.upsert(processTransaction);
+  }
+
+  public observableProcessTransactions () {
+    return this.stores.processTransactions.observableAll();
+  }
+
+  public getProcessTransactions () {
+    return this.stores.processTransactions.getAll();
+  }
+
+  public getProcessTransactionById (processId: string) {
+    return this.stores.processTransactions.getOne(processId);
+  }
+
+  public observableProcessTransactionById (processId: string) {
+    return this.stores.processTransactions.observableOne(processId);
   }
 
   // public setAssetRef (assetRef: Record<string, _AssetRef>) {
