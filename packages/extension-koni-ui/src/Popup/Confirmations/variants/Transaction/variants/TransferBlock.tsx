@@ -29,7 +29,8 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
     [chainInfoMap, transaction.chain]
   );
 
-  const { decimals: chainDecimals, symbol: chainSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const feeInfo = transaction.estimateFee;
 
   return (
     <>
@@ -84,10 +85,10 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         />
 
         <MetaInfo.Number
-          decimals={chainDecimals}
+          decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
           label={t('Estimated fee')}
-          suffix={chainSymbol}
-          value={transaction.estimateFee?.value || 0}
+          suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
+          value={feeInfo ? feeInfo.value : 0}
         />
       </MetaInfo>
       {

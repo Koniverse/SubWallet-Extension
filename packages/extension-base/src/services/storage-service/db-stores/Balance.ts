@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _AssetType } from '@subwallet/chain-list/types';
 import { BalanceItem } from '@subwallet/extension-base/types';
 
 import { IBalance } from '../databases';
@@ -9,6 +10,10 @@ import BaseStoreWithAddress from '../db-stores/BaseStoreWithAddress';
 export default class BalanceStore extends BaseStoreWithAddress<IBalance> {
   async getBalanceMapByAddresses (addresses: string): Promise<BalanceItem[]> {
     return this.table.where('address').anyOf(addresses).toArray();
+  }
+
+  async getBalanceHasAmountIgnoreNative (address: string, chain: string): Promise<BalanceItem[]> {
+    return this.table.filter((item) => item.address === address && item.free !== '0' && !item.tokenSlug.includes(_AssetType.NATIVE) && item.tokenSlug.startsWith(chain)).toArray();
   }
 
   async removeBySlugs (tokenSlugs: string[]) {

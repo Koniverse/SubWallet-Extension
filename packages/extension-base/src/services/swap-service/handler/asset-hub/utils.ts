@@ -37,6 +37,12 @@ export const getReserveForPool = async (api: ApiPromise, asset1: _ChainAsset, as
   }
 };
 
+export const calculateToAmountByReservePool = async (api: ApiPromise, fromToken: _ChainAsset, toToken: _ChainAsset, fromAmount: string): Promise<string> => {
+  const reserve = await getReserveForPool(api, fromToken, toToken);
+
+  return estimateTokensForPool(fromAmount, reserve);
+};
+
 export const getReserveForPath = async (api: ApiPromise, paths: _ChainAsset[]): Promise<Array<[string, string]>> => {
   const pairs: Array<[_ChainAsset, _ChainAsset]> = [];
 
@@ -51,7 +57,7 @@ export const getReserveForPath = async (api: ApiPromise, paths: _ChainAsset[]): 
 };
 
 export const estimateTokensForPool = (amount: string, reserves: [string, string]): string => {
-  if (amount === '0') {
+  if (!amount || amount === '0') {
     return '0';
   }
 
@@ -97,7 +103,7 @@ export const estimateActualRate = (amount: string, reserves: Array<[string, stri
   return result.toString();
 };
 
-export const estimateRateAfter = (amount: string, reserves: Array<[string, string]>): string => {
+export const estimateRateAfterForPath = (amount: string, reserves: Array<[string, string]>): string => {
   const m = new BigN(amount);
 
   const reserve = reserves[0];
