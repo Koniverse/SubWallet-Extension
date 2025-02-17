@@ -29,11 +29,18 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   constructor (chainService: ChainService, balanceService: BalanceService, chain: string) {
     const chainInfo = chainService.getChainInfoByKey(chain);
-    const providerSlug = chain === 'statemint'
-      ? SwapProviderId.POLKADOT_ASSET_HUB
-      : chain === 'statemine'
-        ? SwapProviderId.KUSAMA_ASSET_HUB
-        : SwapProviderId.ROCOCO_ASSET_HUB;
+    const providerSlug: SwapProviderId = (function () {
+      switch (chain) {
+        case 'statemint':
+          return SwapProviderId.POLKADOT_ASSET_HUB;
+        case 'statemine':
+          return SwapProviderId.KUSAMA_ASSET_HUB;
+        case 'westend_assethub':
+          return SwapProviderId.WESTEND_ASSET_HUB;
+        default:
+          return SwapProviderId.ROCOCO_ASSET_HUB;
+      }
+    }());
 
     this.swapBaseHandler = new SwapBaseHandler({
       balanceService,
@@ -110,21 +117,13 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     try {
       const alternativeChainInfo = this.chainService.getChainInfoByKey(alternativeAsset.originChain);
-      const step: BaseStepDetail = {
-        metadata: {
-          sendingValue: bnAmount.toString(),
-          originTokenInfo: alternativeAsset,
-          destinationTokenInfo: fromAsset
-        },
-        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
-        type: CommonStepType.XCM
-      };
 
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
+        // Mock sending value to get payment info
         sendingValue: bnAmount.toString(),
         recipient: params.request.address,
         chainInfoMap: this.chainService.getChainInfoMap(),
@@ -142,6 +141,24 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         }],
         defaultFeeToken: _getChainNativeTokenSlug(alternativeChainInfo),
         feeOptions: [_getChainNativeTokenSlug(alternativeChainInfo)]
+      };
+
+      let bnTransferAmount = bnAmount.minus(bnFromAssetBalance);
+
+      if (_isNativeToken(fromAsset)) {
+        const bnXcmFee = new BigN(fee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
+
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      }
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: alternativeAsset,
+          destinationTokenInfo: fromAsset
+        },
+        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
+        type: CommonStepType.XCM
       };
 
       return [step, fee];

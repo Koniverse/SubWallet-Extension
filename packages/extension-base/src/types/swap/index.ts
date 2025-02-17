@@ -4,9 +4,10 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { TransactionData } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
+
+import { BaseProcessRequestSign, TransactionData } from '../transaction';
 
 // core
 export type SwapRate = number;
@@ -68,6 +69,7 @@ export enum SwapProviderId {
   POLKADOT_ASSET_HUB = 'POLKADOT_ASSET_HUB',
   KUSAMA_ASSET_HUB = 'KUSAMA_ASSET_HUB',
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
+  WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP'
 }
 
@@ -79,6 +81,7 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
   SwapProviderId.ROCOCO_ASSET_HUB,
+  SwapProviderId.WESTEND_ASSET_HUB,
   SwapProviderId.SIMPLE_SWAP
 ];
 
@@ -175,7 +178,7 @@ export interface SwapQuoteResponse {
   error?: SwapError; // only if there's no available quote
 }
 
-export interface SwapSubmitParams {
+export interface SwapSubmitParams extends BaseProcessRequestSign {
   process: CommonOptimalPath;
   currentStep: number;
   quote: SwapQuote;

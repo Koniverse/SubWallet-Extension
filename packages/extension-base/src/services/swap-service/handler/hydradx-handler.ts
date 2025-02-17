@@ -121,21 +121,12 @@ export class HydradxHandler implements SwapBaseInterface {
 
     try {
       const alternativeChainInfo = this.chainService.getChainInfoByKey(alternativeAsset.originChain);
-      const step: BaseStepDetail = {
-        metadata: {
-          sendingValue: bnAmount.toString(),
-          originTokenInfo: alternativeAsset,
-          destinationTokenInfo: fromAsset
-        },
-        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
-        type: CommonStepType.XCM
-      };
-
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
+        // Mock sending value to get payment info
         sendingValue: bnAmount.toString(),
         recipient: params.request.address,
         chainInfoMap: this.chainService.getChainInfoMap(),
@@ -153,6 +144,24 @@ export class HydradxHandler implements SwapBaseInterface {
         }],
         defaultFeeToken: _getChainNativeTokenSlug(alternativeChainInfo),
         feeOptions: [_getChainNativeTokenSlug(alternativeChainInfo)]
+      };
+
+      let bnTransferAmount = bnAmount.minus(bnFromAssetBalance);
+
+      if (_isNativeToken(fromAsset)) {
+        const bnXcmFee = new BigNumber(fee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
+
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      }
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: alternativeAsset,
+          destinationTokenInfo: fromAsset
+        },
+        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
+        type: CommonStepType.XCM
       };
 
       return [step, fee];
