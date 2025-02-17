@@ -97,8 +97,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const poolInfo = poolInfoMap[slug];
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
 
-  const cachedNominations = useMemo(() => compound?.nominations || [], [compound]);
-  const [nominations, setNominations] = useState<NominationInfo[]>(compound?.nominations || []);
+  // const cachedNominations = useMemo(() => compound?.nominations || [], [compound]);
+
+  const [nominations] = useState<NominationInfo[]>(compound?.nominations || []); // Remove set Nomination
   const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(chain), [chain]);
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
@@ -314,28 +315,30 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     activeModal(id);
   }, [activeModal, id]);
 
-  useEffect(() => {
-    setNominations((old) => {
-      const sortNomination = (a: NominationInfo, b: NominationInfo) => {
-        if (a.validatorAddress > b.validatorAddress) {
-          return 1;
-        } else if (a.validatorAddress < b.validatorAddress) {
-          return -1;
-        }
+  // FIX BUG WHEN USE BITTENSOR API KEY
 
-        return 0;
-      };
+  // useEffect(() => {
+  //   setNominations((old) => {
+  //     const sortNomination = (a: NominationInfo, b: NominationInfo) => {
+  //       if (a.validatorAddress > b.validatorAddress) {
+  //         return 1;
+  //       } else if (a.validatorAddress < b.validatorAddress) {
+  //         return -1;
+  //       }
 
-      const oldSorted = old.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
-      const newSorted = cachedNominations.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
+  //       return 0;
+  //     };
 
-      if (oldSorted !== newSorted) {
-        return cachedNominations;
-      }
+  //     const oldSorted = old.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
+  //     const newSorted = cachedNominations.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
 
-      return old;
-    });
-  }, [cachedNominations]);
+  //     if (oldSorted !== newSorted) {
+  //       return cachedNominations;
+  //     }
+
+  //     return old;
+  //   });
+  // }, [cachedNominations]);
 
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
