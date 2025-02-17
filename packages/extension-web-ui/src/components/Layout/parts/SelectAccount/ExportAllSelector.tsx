@@ -1,15 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountItemWithName, BaseModal, BasicInputWrapper, FilterModal, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
+import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxySelectorAllItem, BaseModal, BasicInputWrapper, FilterModal, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import ExportAllSelectItem from '@subwallet/extension-web-ui/components/Layout/parts/SelectAccount/ExportAllSelectItem';
 import AccountExportPasswordModal from '@subwallet/extension-web-ui/components/Modal/Account/AccountExportPasswordModal';
 import { EXPORT_ACCOUNTS_PASSWORD_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useFilterModal, useGoBackSelectAccount, useSelectAccount } from '@subwallet/extension-web-ui/hooks';
 import { AccountSignMode, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getSignMode, isAccountAll, searchAccountFunction } from '@subwallet/extension-web-ui/utils';
+import { isAccountAll, searchAccountProxyFunction } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, InputRef, ModalContext, SwList, Tooltip } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
@@ -19,22 +19,26 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps, BasicInputWrapper {
-  items: AccountJson[];
+  items: AccountProxy[];
   isSingleSelect?: boolean;
 }
 
 const filterOptions = [
   {
-    label: 'Normal account',
-    value: AccountSignMode.PASSWORD
+    label: 'Unified account',
+    value: AccountProxyType.UNIFIED
+  },
+  {
+    label: 'Solo account',
+    value: AccountProxyType.SOLO
   },
   {
     label: 'QR signer account',
-    value: AccountSignMode.QR
+    value: AccountProxyType.QR
   },
   {
     label: 'Ledger account',
-    value: AccountSignMode.GENERIC_LEDGER
+    value: AccountProxyType.LEDGER
   },
   {
     label: 'Watch-only account',
@@ -60,22 +64,22 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const sectionRef = useRef<SwListSectionRef>(null);
 
-  const getAllAddress = useMemo(() => {
-    const addresses: string[] = [];
+  const getAllIdProxy = useMemo(() => {
+    const idProxies: string[] = [];
 
     items.forEach((obj) => {
-      addresses.push(obj.address);
+      idProxies.push(obj.id);
     });
 
-    return addresses;
+    return idProxies;
   }, [items]);
-  const { changeAccounts, onChangeSelectedAccounts } = useSelectAccount(getAllAddress, id, onChange, isSingleSelect);
+  const { changeAccounts, onChangeSelectedAccounts } = useSelectAccount(getAllIdProxy, id, onChange, isSingleSelect);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
-  const filterFunction = useMemo<(item: AccountJson) => boolean>(() => {
+  const filterFunction = useMemo<(item: AccountProxy) => boolean>(() => {
     return (item) => {
-      const signMode = getSignMode(item);
+      const accountType = item.accountType;
 
       if (!selectedFilters.length) {
         return true;
@@ -86,13 +90,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           return true;
         }
 
-        if (filter === AccountSignMode.GENERIC_LEDGER && (signMode === AccountSignMode.GENERIC_LEDGER || signMode === AccountSignMode.LEGACY_LEDGER)) {
+        if (filter === AccountProxyType.UNIFIED && accountType === AccountProxyType.UNIFIED) {
           return true;
-        } else if (filter === AccountSignMode.QR && signMode === AccountSignMode.QR) {
+        } else if (filter === AccountProxyType.SOLO && accountType === AccountProxyType.SOLO) {
           return true;
-        } else if (filter === AccountSignMode.READ_ONLY && signMode === AccountSignMode.READ_ONLY) {
+        } else if (filter === AccountProxyType.QR && accountType === AccountProxyType.QR) {
           return true;
-        } else if (filter === AccountSignMode.PASSWORD && signMode === AccountSignMode.PASSWORD) {
+        } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
+          return true;
+        } else if (filter === AccountProxyType.LEDGER && accountType === AccountProxyType.LEDGER) {
           return true;
         }
       }
@@ -109,37 +115,34 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     }
   }, [changeAccounts, items.length, onChangeSelectedAccounts]);
 
-  const onAccountSelect = useCallback((address: string) => {
+  const onAccountSelect = useCallback((id: string) => {
     return () => {
-      onChangeSelectedAccounts(address);
+      onChangeSelectedAccounts(id);
     };
   }, [onChangeSelectedAccounts]);
 
-  const renderItem = useCallback((item: AccountJson) => {
-    const selected = changeAccounts.includes(item.address);
-    const currentAccountIsAll = isAccountAll(item.address);
+  const renderItem = useCallback((item: AccountProxy) => {
+    const selected = changeAccounts.includes(item.id);
+    const currentAccountIsAll = isAccountAll(item.id);
 
     if (currentAccountIsAll) {
       return (
-        <AccountItemWithName
-          address={ALL_ACCOUNT_KEY}
+        <AccountProxySelectorAllItem
           className='all-account-selection'
           isSelected={selected}
-          key={ALL_ACCOUNT_KEY}
+          key={item.id}
           onClick={onAccountSelect(ALL_ACCOUNT_KEY)}
-          showUnselectIcon
+          showUnSelectedIcon
         />
       );
     }
 
     return (
       <ExportAllSelectItem
-        accountName={item.name || ''}
-        address={item.address}
+        accountProxy={item}
         className={className}
-        genesisHash={item.genesisHash}
         isSelected={selected}
-        key={item.address}
+        key={item.id}
         onClick={onClickItem}
         showUnSelectedIcon
       />
@@ -252,7 +255,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
-          searchFunction={searchAccountFunction}
+          searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
           searchPlaceholder={t<string>('Account name')}
           showActionBtn

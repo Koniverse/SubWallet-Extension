@@ -1,12 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox } from '@subwallet/extension-web-ui/components';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import TonSignArea from '@subwallet/extension-web-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-web-ui/stores/base/RequestState';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -16,7 +17,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapChooseFeeTransactionConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapChooseFeeTransactionConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -33,11 +34,11 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
     case ExtrinsicType.SEND_NFT:
       return SendNftTransactionConfirmation;
     case ExtrinsicType.STAKING_JOIN_POOL:
+    case ExtrinsicType.JOIN_YIELD_POOL:
       return JoinPoolTransactionConfirmation;
     case ExtrinsicType.STAKING_LEAVE_POOL:
       return LeavePoolTransactionConfirmation;
     case ExtrinsicType.STAKING_BOND:
-    case ExtrinsicType.JOIN_YIELD_POOL:
       return BondTransactionConfirmation;
     case ExtrinsicType.STAKING_UNBOND:
       return UnbondTransactionConfirmation;
@@ -73,6 +74,8 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return TokenApproveConfirmation;
     case ExtrinsicType.SWAP:
       return SwapTransactionConfirmation;
+    case ExtrinsicType.CLAIM_BRIDGE:
+      return ClaimBridgeTransactionConfirmation;
     case ExtrinsicType.CROWDLOAN:
     case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:
     case ExtrinsicType.STAKING_COMPOUNDING:
@@ -80,6 +83,7 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
     case ExtrinsicType.SET_FEE_TOKEN:
       return SwapChooseFeeTransactionConfirmation;
     case ExtrinsicType.UNKNOWN:
+    default:
       return BaseTransactionConfirmation;
   }
 };
@@ -140,9 +144,9 @@ const Component: React.FC<Props> = (props: Props) => {
       {
         type === 'signingRequest' && (
           <SubstrateSignArea
-            account={(item as SigningRequest).account}
             extrinsicType={transaction.extrinsicType}
             id={item.id}
+            isInternal={item.isInternal}
             request={(item as SigningRequest).request}
             txExpirationTime={txExpirationTime}
           />
@@ -154,6 +158,17 @@ const Component: React.FC<Props> = (props: Props) => {
             extrinsicType={transaction.extrinsicType}
             id={item.id}
             payload={(item as ConfirmationDefinitions['evmSendTransactionRequest' | 'evmWatchTransactionRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
+        (type === 'tonSendTransactionRequest' || type === 'tonWatchTransactionRequest') && (
+          <TonSignArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitionsTon['tonSendTransactionRequest' | 'tonWatchTransactionRequest'][0])}
             txExpirationTime={txExpirationTime}
             type={type}
           />

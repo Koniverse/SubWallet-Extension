@@ -7,8 +7,9 @@ import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { SettingItemSelection } from '@subwallet/extension-web-ui/components/Setting/SettingItemSelection';
 import { EVM_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants/account';
-import { CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_MODAL, NEW_SEED_MODAL } from '@subwallet/extension-web-ui/constants/modal';
+import { CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_LIST_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { useSetSelectedMnemonicType, useSetSessionLatest } from '@subwallet/extension-web-ui/hooks';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import useClickOutSide from '@subwallet/extension-web-ui/hooks/dom/useClickOutSide';
 import useGoBackSelectAccount from '@subwallet/extension-web-ui/hooks/modal/useGoBackSelectAccount';
@@ -21,6 +22,7 @@ import CN from 'classnames';
 import { Leaf, ShareNetwork } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps;
@@ -39,11 +41,14 @@ const modalId = CREATE_ACCOUNT_MODAL;
 const Component: React.FC<Props> = ({ className }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { setStateSelectAccount } = useSetSessionLatest();
   const { isWebUI } = useContext(ScreenContext);
 
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const isActive = checkActive(modalId);
+  const navigate = useNavigate();
+  const setSelectedMnemonicType = useSetSelectedMnemonicType(false);
 
   const onBack = useGoBackSelectAccount(modalId);
 
@@ -55,8 +60,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   );
 
   const onCancel = useCallback(() => {
+    setStateSelectAccount(true);
     inactiveModal(modalId);
-  }, [inactiveModal]);
+  }, [inactiveModal, setStateSelectAccount]);
 
   useClickOutSide(isActive, renderModalSelector(className), onCancel);
 
@@ -81,7 +87,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       label: t('Create with a new seed phrase'),
       onClick: () => {
         inactiveModal(modalId);
-        activeModal(NEW_SEED_MODAL);
+        setSelectedMnemonicType('general');
+        navigate('/accounts/new-seed-phrase');
       }
     },
     {
@@ -92,10 +99,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       label: t('Derive from an existing account'),
       onClick: () => {
         inactiveModal(modalId);
-        activeModal(DERIVE_ACCOUNT_MODAL);
+        activeModal(DERIVE_ACCOUNT_LIST_MODAL);
       }
     }
-  ]), [activeModal, inactiveModal, disableDerive, t, token]);
+  ]), [token, t, disableDerive, inactiveModal, setSelectedMnemonicType, navigate, activeModal]);
 
   return (
     <BaseModal

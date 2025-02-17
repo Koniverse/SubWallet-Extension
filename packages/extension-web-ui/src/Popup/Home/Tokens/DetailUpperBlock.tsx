@@ -10,7 +10,7 @@ import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, Number, Tooltip } from '@subwallet/react-ui';
 import { SwNumberProps } from '@subwallet/react-ui/es/number';
 import CN from 'classnames';
-import { CaretLeft, CopySimple, PaperPlaneTilt, ShoppingCartSimple } from 'phosphor-react';
+import { ArrowsLeftRight, CaretLeft, CopySimple, PaperPlaneTilt, ShoppingCartSimple } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -19,11 +19,13 @@ type Props = ThemeProps & {
   balanceValue: SwNumberProps['value'];
   symbol: string;
   isSupportBuyTokens: boolean;
+  isSupportSwap: boolean;
   isShrink: boolean;
   onClickBack: () => void;
   onOpenSendFund: () => void;
   onOpenBuyTokens: () => void;
   onOpenReceive: () => void;
+  onOpenSwap: () => void;
 };
 
 function Component (
@@ -31,10 +33,12 @@ function Component (
     className = '',
     isShrink,
     isSupportBuyTokens,
+    isSupportSwap,
     onClickBack,
     onOpenBuyTokens,
     onOpenReceive,
     onOpenSendFund,
+    onOpenSwap,
     symbol }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { isShowBalance } = useSelector((state: RootState) => state.settings);
@@ -116,8 +120,25 @@ function Component (
             size={isShrink ? 'xs' : 'sm'}
             tooltip={isWebUI ? t('Send tokens') : undefined}
           />
-          <div className={'__button-space'} />
+          <div className={'__button-space hidden'} />
           <Button
+            className={CN({ hidden: true })} // not support swap on mobile yet
+            disabled={!isSupportSwap}
+            icon={(
+              <Icon
+                phosphorIcon={ArrowsLeftRight}
+                size={isShrink ? 'sm' : 'md'}
+                weight={'duotone'}
+              />
+            )}
+            onClick={onOpenSwap}
+            shape='squircle'
+            size={isShrink ? 'xs' : 'sm'}
+            tooltip={isWebUI ? t('Swap') : undefined}
+          />
+          <div className={CN('__button-space', { hidden: isShrink })} />
+          <Button
+            className={CN({ hidden: isShrink })}
             disabled={!isSupportBuyTokens}
             icon={(
               <Icon
@@ -147,19 +168,6 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
       display: 'flex',
       marginBottom: 16,
       alignItems: 'center'
-    },
-
-    '.__total-balance-symbol': {
-      marginLeft: 8,
-      marginRight: -4,
-      fontSize: token.fontSizeXL,
-      lineHeight: token.lineHeightHeading4,
-      fontWeight: token.fontWeightStrong,
-
-      '&.-not-show-balance': {
-        display: 'none'
-      }
-
     },
 
     '.__token-display': {
@@ -209,9 +217,25 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
       width: token.size
     },
 
+    '.__total-balance-symbol': {
+      marginLeft: 8,
+      marginRight: -4,
+      fontSize: token.fontSizeXL,
+      lineHeight: token.lineHeightHeading4,
+      fontWeight: token.fontWeightStrong,
+
+      '&.-not-show-balance': {
+        display: 'none'
+      }
+
+    },
+
     '.__balance-value-wrapper': {
       display: 'flex',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      cursor: 'pointer',
+      width: 'fit-content',
+      margin: 'auto'
     },
 
     '&.-shrink': {
@@ -233,7 +257,10 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
 
       '.__balance-value-wrapper': {
         flex: 1,
-        justifyContent: 'flex-start'
+        margin: 0,
+        cursor: 'pointer',
+        justifyContent: 'flex-start',
+        width: 'fit-content'
       },
 
       '.__balance-value': {

@@ -9,6 +9,7 @@ import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslat
 import { createAccountExternalV2 } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { isNoAccount } from '@subwallet/extension-web-ui/utils';
 import { checkHasInjected } from '@subwallet/extension-web-ui/utils/wallet';
 import { Button, ButtonProps, Form, Icon, Image, Input, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -50,7 +51,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const { isWebUI } = useContext(ScreenContext);
   const { enableInject, loadingInject, selectWallet } = useContext(InjectContext);
 
-  const { accounts, isNoAccount } = useSelector((root: RootState) => root.accountState);
+  const { accounts } = useSelector((root: RootState) => root.accountState);
 
   const autoGenAttachReadonlyAccountName = useGetDefaultAccountName();
   const [, setSelectedAccountTypes] = useLocalStorage(SELECTED_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES);
@@ -111,7 +112,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           if (account.address === result.content) {
             setReformatAttachAddress('');
 
-            return Promise.reject(t('Account already exists'));
+            return Promise.reject(t('Account name already in use'));
           }
         }
       } else {
@@ -235,12 +236,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     }
   }, [_isConfirmedTermGeneral, activeModal, afterConfirmTermToAttachReadonlyAccount]);
 
+  const noAccount = useMemo(() => isNoAccount(accounts), [accounts]);
+
   useEffect(() => {
-    if (!isNoAccount) {
+    if (!noAccount) {
       navigate(returnPath, { state: { from: returnPath } });
       setReturnStorage(DEFAULT_ROUTER_PATH);
     }
-  }, [isNoAccount, navigate, returnPath, setReturnStorage]);
+  }, [noAccount, navigate, returnPath, setReturnStorage]);
 
   useEffect(() => {
     if (isMobile && !AutoConnect.ignore) {

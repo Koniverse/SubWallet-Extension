@@ -17,6 +17,8 @@ type Props = ThemeProps & {
   totalChangePercent: SwNumberProps['value'];
   isPriceDecrease: boolean;
   isShrink: boolean;
+  isSupportBuyTokens: boolean;
+  isSupportSwap: boolean;
   onOpenSendFund: () => void;
   onOpenBuyTokens: () => void;
   onOpenReceive: () => void;
@@ -27,6 +29,8 @@ function Component (
   { className = '',
     isPriceDecrease,
     isShrink,
+    isSupportBuyTokens,
+    isSupportSwap,
     onOpenBuyTokens,
     onOpenReceive,
     onOpenSendFund,
@@ -59,7 +63,7 @@ function Component (
           overlayClassName={CN('__currency-value-detail-tooltip', {
             'ant-tooltip-hidden': !isShowBalance
           })}
-          placement={'top'}
+          placement='top'
           title={currencyData.symbol + ' ' + formatNumber(totalValue, 0, balanceNoPrefixFormater)}
         >
           <div
@@ -87,7 +91,7 @@ function Component (
             className='button-change-show-balance'
             icon={(
               <Icon
-                phosphorIcon={ !isShowBalance ? Eye : EyeSlash}
+                phosphorIcon={!isShowBalance ? Eye : EyeSlash}
               />
             )}
             onClick={onChangeShowBalance}
@@ -160,22 +164,26 @@ function Component (
           size={isShrink ? 'xs' : 'sm'}
           tooltip={t('Send tokens')}
         />
-        <div className={'__button-space'} />
+        <div className={'__button-space hidden'} />
         <Button
-          icon={
+          className={CN({ hidden: true })} // not support swap on mobile yet
+          disabled={!isSupportSwap}
+          icon={(
             <Icon
               phosphorIcon={ArrowsLeftRight}
-              size={isShrink ? 'sm' : 'md' }
+              size={isShrink ? 'sm' : 'md'}
               weight={'duotone'}
             />
-          }
+          )}
           onClick={onOpenSwap}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
           tooltip={t('Swap')}
         />
-        <div className={'__button-space'} />
+        <div className={CN('__button-space', { hidden: isShrink })} />
         <Button
+          className={CN({ hidden: isShrink })}
+          disabled={!isSupportBuyTokens}
           icon={
             <Icon
               phosphorIcon={PlusMinus}

@@ -5,13 +5,13 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _getAssetDecimals, _getAssetSymbol, _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { EarningStatus, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
-import { AccountSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-web-ui/components';
+import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-web-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { EarningInstructionModal } from '@subwallet/extension-web-ui/components/Modal/Earning';
@@ -23,8 +23,8 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, validateYiel
 // import { unlockDotCheckCanMint } from '@subwallet/extension-web-ui/messaging/campaigns';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-web-ui/reducer';
 import { store } from '@subwallet/extension-web-ui/stores';
-import { EarnParams, FormCallbacks, FormFieldData, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { convertFieldToObject, getValidatorKey, isAccountAll, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
+import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { convertFieldToObject, getReformatedAddressRelatedToChain, getValidatorKey, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, ModalContext, Number, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -36,8 +36,6 @@ import { Divider } from 'semantic-ui-react';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { isEthereumAddress } from '@polkadot/util-crypto';
-
 import useNotification from '../../../hooks/common/useNotification';
 import { getJoinYieldParams } from '../helper';
 import { EarnOutlet, FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '../parts';
@@ -45,7 +43,7 @@ import { EarnOutlet, FreeBalance, FreeBalanceToEarn, TransactionContent, Transac
 type Props = ThemeProps;
 type ComponentProps = { className?: string; }
 
-const hideFields: Array<keyof EarnParams> = ['slug', 'chain', 'asset'];
+const hideFields: Array<keyof EarnParams> = ['slug', 'chain', 'asset', 'fromAccountProxy'];
 const validateFields: Array<keyof EarnParams> = ['from'];
 const loadingStepPromiseKey = 'earning.step.loading';
 
@@ -82,12 +80,12 @@ const Component = ({ className }: ComponentProps) => {
     openAlert, persistData,
     setBackProps, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
-  const { hasPreSelectTarget, redirectFromPreview, slug, target } = defaultData;
+  const { fromAccountProxy, hasPreSelectTarget, redirectFromPreview, slug, target } = defaultData;
   const defaultTarget = useRef<string>(target);
   const autoCheckValidatorGetFromPreview = useRef<boolean>(true);
   const autoCheckCompoundRef = useRef<boolean>(true);
   const isReadyToShowAlertRef = useRef<boolean>(true);
-  const { accounts, currentAccount, isAllAccount } = useSelector((state) => state.accountState);
+  const { accountProxies, currentAccount, isAllAccount } = useSelector((state) => state.accountState);
   const [, setReturnPath] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
@@ -297,29 +295,41 @@ const Component = ({ className }: ComponentProps) => {
     }
   }, [poolTargetValue, poolTargetsMap, poolType, slug]);
 
-  const accountSelectorList = useMemo(() => {
-    const chainInfo = chainInfoMap[poolChain];
+  const accountAddressItems = useMemo(() => {
+    const chainInfo = poolChain ? chainInfoMap[poolChain] : undefined;
 
     if (!chainInfo) {
       return [];
     }
 
-    return accounts.filter((a) => {
-      if (isAccountAll(a.address)) {
-        return false;
+    const result: AccountAddressItemType[] = [];
+
+    accountProxies.forEach((ap) => {
+      if (!(!fromAccountProxy || ap.id === fromAccountProxy)) {
+        return;
       }
 
-      if (a.genesisHash && _getSubstrateGenesisHash(chainInfo) !== a.genesisHash) {
-        return false;
-      }
+      ap.accounts.forEach((a) => {
+        const address = getReformatedAddressRelatedToChain(a, chainInfo);
 
-      return _isChainEvmCompatible(chainInfo) === isEthereumAddress(a.address);
+        if (address) {
+          result.push({
+            accountName: ap.name,
+            accountProxyId: ap.id,
+            accountProxyType: ap.accountType,
+            accountType: a.type,
+            address
+          });
+        }
+      });
     });
-  }, [accounts, chainInfoMap, poolChain]);
+
+    return result;
+  }, [accountProxies, chainInfoMap, fromAccountProxy, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
-    const { empty, error } = simpleCheckForm(allFields, ['--asset']);
+    const { empty, error } = simpleCheckForm(allFields, ['--asset', '--fromAccountProxy']);
 
     const values = convertFieldToObject<EarnParams>(allFields);
 
@@ -832,15 +842,16 @@ const Component = ({ className }: ComponentProps) => {
   }, [checkCompoundLoading, compound, redirectFromPreview]);
 
   useEffect(() => {
-    if (redirectFromPreview && !accountSelectorList.length && checkValidAccountLoading) {
+    if (redirectFromPreview && !accountAddressItems.length && checkValidAccountLoading) {
       const isChainEvm = chainInfoMap[poolChain] && _isChainEvmCompatible(chainInfoMap[poolChain]);
 
+      // todo: Recheck what this logic do after updating unified account feature
       setSelectedAccountTypes([isChainEvm ? EVM_ACCOUNT_TYPE : SUBSTRATE_ACCOUNT_TYPE]);
       navigate('/home/earning', { state: { view: 'position', redirectFromPreview: true, chainName: chainInfoMap[poolChain]?.name || '' } });
     } else {
       setCheckValidAccountLoading(false);
     }
-  }, [accountSelectorList, chainInfoMap, checkValidAccountLoading, navigate, poolChain, redirectFromPreview, setSelectedAccountTypes]);
+  }, [accountAddressItems, chainInfoMap, checkValidAccountLoading, navigate, poolChain, redirectFromPreview, setSelectedAccountTypes]);
 
   const checkUnrecommendedValidator = useCallback((onValid?: () => void) => {
     fetchPoolTarget({ slug }).then((rs) => {
@@ -1090,12 +1101,12 @@ const Component = ({ className }: ComponentProps) => {
   }, [form, inputAsset?.slug]);
 
   useEffect(() => {
-    if (!fromValue && (isAllAccount || accountSelectorList.length === 1)) {
-      if ((hasPreSelectTarget && accountSelectorList.length >= 1) || accountSelectorList.length === 1) {
-        form.setFieldValue('from', accountSelectorList[0].address);
+    if (!fromValue && (isAllAccount || accountAddressItems.length === 1)) {
+      if ((hasPreSelectTarget && accountAddressItems.length >= 1) || accountAddressItems.length === 1) {
+        form.setFieldValue('from', accountAddressItems[0].address);
       }
     }
-  }, [accountSelectorList, form, fromValue, isAllAccount, hasPreSelectTarget]);
+  }, [accountAddressItems, form, fromValue, isAllAccount, hasPreSelectTarget]);
 
   useEffect(() => {
     if (currentStep === 0) {
@@ -1318,10 +1329,9 @@ const Component = ({ className }: ComponentProps) => {
                   <Form.Item
                     name={'from'}
                   >
-                    <AccountSelector
+                    <AccountAddressSelector
                       disabled={!isAllAccount}
-                      doFilter={false}
-                      externalAccounts={accountSelectorList}
+                      items={accountAddressItems}
                     />
                   </Form.Item>
 
