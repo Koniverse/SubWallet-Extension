@@ -10,7 +10,7 @@ import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
-import { getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
+import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { internal } from '@ton/core';
 import { Address } from '@ton/ton';
@@ -138,13 +138,14 @@ export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInf
       };
       const gasLimit = await web3.api.eth.estimateGas(transaction);
       const priority = await calculateGasFeeParams(web3, chainInfo.slug);
+      const combinedFee = combineEthFee(priority);
 
-      if (priority.baseGasFee) {
-        const maxFee = priority.maxFeePerGas;
+      if (combinedFee.maxFeePerGas) {
+        const maxFee = combinedFee.maxFeePerGas;
 
-        estimatedFee = maxFee.multipliedBy(gasLimit);
+        estimatedFee = BigN(maxFee).multipliedBy(gasLimit);
       } else {
-        estimatedFee = new BigN(priority.gasPrice).multipliedBy(gasLimit);
+        estimatedFee = new BigN(combinedFee.gasPrice as string).multipliedBy(gasLimit);
       }
     } else if (_isChainTonCompatible(chainInfo) && _isTokenTransferredByTon(tokenInfo)) {
       const mockWalletContract = keyring.getPair(address).ton.currentContract;
