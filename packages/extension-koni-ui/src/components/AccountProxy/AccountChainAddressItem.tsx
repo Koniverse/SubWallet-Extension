@@ -1,32 +1,29 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {reformatAddress} from '@subwallet/extension-base/utils';
-import {UNIFIED_CHAIN_SS58_PREFIX} from '@subwallet/extension-koni-ui/constants';
-import {AccountChainAddress, ThemeProps} from '@subwallet/extension-koni-ui/types';
-import {toShort} from '@subwallet/extension-koni-ui/utils';
-import {Button, Icon, Logo} from '@subwallet/react-ui';
+import { reformatAddress } from '@subwallet/extension-base/utils';
+import { UNIFIED_CHAIN_SS58_PREFIX } from '@subwallet/extension-koni-ui/constants';
+import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {Copy, Info, QrCode} from 'phosphor-react';
+import { Copy, Info, QrCode } from 'phosphor-react';
 import React from 'react';
 import styled from 'styled-components';
-import {useIsPolkadotUnifiedAddress} from "@subwallet/extension-koni-ui/hooks";
 
 type Props = ThemeProps & {
   item: AccountChainAddress;
   onClick?: VoidFunction;
   onClickCopyButton?: VoidFunction;
   onClickQrButton?: VoidFunction;
-  onClickInfoButton?: VoidFunction
+  onClickInfoButton?: VoidFunction;
+  isShowInfoButton?: boolean;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className,
+  const { className, isShowInfoButton,
     item,
     onClick, onClickCopyButton, onClickInfoButton, onClickQrButton } = props;
-
-  const isPolkadotUnifiedAddress = useIsPolkadotUnifiedAddress({slug: item.slug, address: item.address})
-
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
     event.stopPropagation();
     onClickCopyButton?.();
@@ -61,12 +58,12 @@ function Component (props: Props): React.ReactElement<Props> {
             {item.name}
           </div>
           <div className='__item-address'>
-            {toShort(isPolkadotUnifiedAddress ? reformatAddress(item.address, UNIFIED_CHAIN_SS58_PREFIX) : item.address, 4, 5)}
+            {toShort(isShowInfoButton ? reformatAddress(item.address, UNIFIED_CHAIN_SS58_PREFIX) : item.address, 4, 5)}
           </div>
         </div>
 
         <div className='__item-right-part'>
-          {!isPolkadotUnifiedAddress
+          {!isShowInfoButton
             ? (<Button
               icon={
                 <Icon

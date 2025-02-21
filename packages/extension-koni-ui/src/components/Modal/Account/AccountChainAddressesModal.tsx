@@ -6,7 +6,7 @@ import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, CloseIcon, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_CHAIN_ADDRESSES_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
@@ -31,6 +31,7 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   const onShowQr = useCallback((item: AccountChainAddress) => {
     return () => {
@@ -94,9 +95,12 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
 
   const renderItem = useCallback(
     (item: AccountChainAddress) => {
+      const isPolkadotUnifiedAddress = checkIsPolkadotUnifiedChain(item.slug);
+
       return (
         <AccountChainAddressItem
           className={'address-item'}
+          isShowInfoButton={isPolkadotUnifiedAddress}
           item={item}
           key={item.slug}
           onClick={onShowQr(item)}
@@ -106,7 +110,7 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
         />
       );
     },
-    [onClickInfoButton, onCopyAddress, onShowQr]
+    [checkIsPolkadotUnifiedChain, onClickInfoButton, onCopyAddress, onShowQr]
   );
 
   const emptyList = useCallback(() => {

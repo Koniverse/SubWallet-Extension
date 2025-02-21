@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { GeneralEmptyList, TokenWithStatusAddressItem } from '@subwallet/extension-koni-ui/components';
+import { AccountChainAddressWithStatusItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { UNIFIED_CHAIN_SS58_PREFIX } from '@subwallet/extension-koni-ui/constants';
 import { SELECT_ADDRESS_FORMAT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 export interface SelectAddressFormatModalProps {
@@ -41,25 +43,26 @@ const LEARN_MORE_DOCS_URL = 'https://address-format-guide.notion.site/Unified-ad
 const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const notify = useNotification();
-
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const chainInfo = chainInfoMap[chainSlug];
   const { addressQrModal } = useContext(WalletModalContext);
 
   const listItem: AddressFormatInfo[] = useMemo(() => {
-    const accInfoItem: AddressFormatInfo = {
-      address: address,
+    const legacyAccInfoItem: AddressFormatInfo = {
+      address: reformatAddress(address, chainInfo?.substrateInfo?.addressPrefix),
       name: name,
       slug: chainSlug,
       isNewFormat: false
     };
 
-    const formatAccountInfo: AddressFormatInfo = {
-      ...accInfoItem,
+    const newAccInfoInfo: AddressFormatInfo = {
+      ...legacyAccInfoItem,
       isNewFormat: true,
       address: reformatAddress(address, UNIFIED_CHAIN_SS58_PREFIX)
     };
 
-    return [accInfoItem, formatAccountInfo];
-  }, [address, name, chainSlug]);
+    return [legacyAccInfoItem, newAccInfoInfo];
+  }, [address, chainInfo?.substrateInfo?.addressPrefix, name, chainSlug]);
 
   const renderEmpty = useCallback(() => {
     return <GeneralEmptyList />;
@@ -101,11 +104,11 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
     return (
       <>
         <div className={'item-wrapper'}>
-          <TokenWithStatusAddressItem
+          <AccountChainAddressWithStatusItem
             address={item.address}
             chainName={item.name}
             isNewFormat={item.isNewFormat}
-            key={`${item.address}-${item.name}`}
+            key={`${item.address}-${item.slug}`}
             onClickCopyButton={onCopyAddress(item)}
             onClickQrButton={onShowQr(item)}
             tokenSlug={item.slug}

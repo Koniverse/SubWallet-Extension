@@ -4,7 +4,7 @@
 export { default as AccountTokenBalanceItem } from './AccountTokenBalanceItem';
 export { default as TokenToggleItem } from './TokenToggleItem';
 export { default as TokenSelectorItem } from './TokenSelectorItem';
-export { default as TokenWithStatusAddressItem } from './TokenWithStatusAddressItem';
+export { default as AccountChainAddressWithStatusItem } from './AccountChainAddressWithStatusItem';
 
 export * from './TokenBalanceDetailItem';
 export * from './TokenBalanceSelectionItem';

@@ -90,7 +90,7 @@ const Component = ({ address, chainName, className, isNewFormat, onClick, onClic
   );
 };
 
-const TokenWithStatusAddressItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AccountChainAddressWithStatusItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
     backgroundColor: token.colorBgSecondary,
@@ -154,4 +154,4 @@ const TokenWithStatusAddressItem = styled(Component)<Props>(({ theme: { token } 
   });
 });
 
-export default TokenWithStatusAddressItem;
+export default AccountChainAddressWithStatusItem;
