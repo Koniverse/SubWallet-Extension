@@ -40,7 +40,7 @@ import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertPar
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isAssetSmartContractNft, _isBridgedToken, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
-import { getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
+import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
@@ -1394,7 +1394,6 @@ export default class KoniExtension {
         });
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
-        const hydrationFeeAssetId = isCustomTokenPayFeeHydration ? this.#koniState.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.assetId : undefined;
 
         [transaction, transferAmount.value] = await createTransferExtrinsic({
           transferAll: !!transferAll,
@@ -1403,9 +1402,14 @@ export default class KoniExtension {
           networkKey: chain,
           tokenInfo: transferTokenInfo,
           to: to,
-          substrateApi,
-          hydrationFeeAssetId
+          substrateApi
         });
+
+        if (isCustomTokenPayFeeHydration) {
+          const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.assetId;
+
+          transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
+        }
       }
     } catch (e) {
       const error = e as Error;

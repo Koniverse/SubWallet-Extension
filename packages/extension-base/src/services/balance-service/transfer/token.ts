@@ -3,7 +3,6 @@
 
 import { GearApi } from '@gear-js/api';
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP } from '@subwallet/extension-base/constants';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { estimateTonTxFee } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -11,7 +10,6 @@ import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
-import { batchExtrinsicSetFeeHydration } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { internal } from '@ton/core';
@@ -30,11 +28,10 @@ interface CreateTransferExtrinsicProps {
   from: string,
   value: string,
   transferAll: boolean,
-  tokenInfo: _ChainAsset,
-  hydrationFeeAssetId?: string
+  tokenInfo: _ChainAsset
 }
 
-export const createTransferExtrinsic = async ({ from, hydrationFeeAssetId, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
+export const createTransferExtrinsic = async ({ from, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
   const api = substrateApi.api;
 
   const isDisableTransfer = tokenInfo.metadata?.isDisableTransfer as boolean;
@@ -123,10 +120,6 @@ export const createTransferExtrinsic = async ({ from, hydrationFeeAssetId, netwo
         transfer = api.tx.balances.transfer(to, new BN(value));
       }
     }
-  }
-
-  if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(networkKey)) {
-    transfer = batchExtrinsicSetFeeHydration(api, transfer, hydrationFeeAssetId);
   }
 
   return [transfer, transferAmount || value];
