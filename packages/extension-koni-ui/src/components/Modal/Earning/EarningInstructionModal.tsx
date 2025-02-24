@@ -192,8 +192,9 @@ const Component: React.FC<Props> = (props: Props) => {
   const convertTime = useCallback((_number?: number): string => {
     if (_number !== undefined) {
       const isDay = _number > 24;
-      const time = isDay ? Math.floor(_number / 24) : _number;
-      const unit = isDay ? (time === 1 ? 'day' : 'days') : time === 1 ? 'hour' : 'hours';
+      const isHour = _number >= 1;
+      const time = isDay ? Math.floor(_number / 24) : isHour ? _number : _number * 60;
+      const unit = isDay ? (time === 1 ? 'day' : 'days') : isHour ? (time === 1 ? 'hour' : 'hours') : (time * 60 === 1 ? 'minute' : 'minutes');
 
       return [time, unit].join(' ');
     } else {
@@ -297,8 +298,8 @@ const Component: React.FC<Props> = (props: Props) => {
             replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
 
             if (paidOut !== undefined) {
-              replaceEarningValue(_item, '{paidOut}', paidOut.toString());
-              replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : 'hour');
+              replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+              replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
             }
 
             return _item;
