@@ -139,7 +139,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [chainValue, destChainValue]);
 
   const isEditButton = useMemo(() => {
-    return !!(chainValue && (ASSET_HUB_CHAIN_SLUGS.includes(chainValue) || feeType === 'evm' && listTokensCanPayFee.length)) && !isXcm;
+    return !!(chainValue && ((ASSET_HUB_CHAIN_SLUGS.includes(chainValue) && listTokensCanPayFee.length) || feeType === 'evm')) && !isXcm;
   }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
 
   const rateValue = useMemo(() => {
