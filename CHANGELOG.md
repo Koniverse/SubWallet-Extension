@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.3.19
+Build date: Feb 21, 2025.
+
+Bug fixed:
+- Fixed bug related to custom token to paid fee
+
 ## 1.3.18
 Build date: Feb 20, 2025.
 
