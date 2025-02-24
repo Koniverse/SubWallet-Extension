@@ -10,13 +10,13 @@ import { _canAccountBeReaped, _isAccountActive } from '@subwallet/extension-base
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
-import { _EvmApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getChainExistentialDeposit, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isNativeToken, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
-import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, formatNumber, pairToAccount } from '@subwallet/extension-base/utils';
+import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, EvmEIP1559FeeOption, EvmFeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { balanceFormatter, combineEthFee, formatNumber, pairToAccount } from '@subwallet/extension-base/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -26,18 +26,12 @@ import { t } from 'i18next';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 // normal transfer
-export function validateTransferRequest (tokenInfo: _ChainAsset, from: _Address, to: _Address, value: string | undefined, transferAll: boolean | undefined): [TransactionError[], KeyringPair | undefined, BigN | undefined] {
+export function validateTransferRequest (tokenInfo: _ChainAsset, from: _Address, to: _Address, value: string | undefined, transferAll: boolean | undefined): TransactionError[] {
   const errors: TransactionError[] = [];
-  const keypair = keyring.getPair(from);
-  let transferValue;
 
   if (!transferAll) {
     if (value === undefined) {
       errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Transfer amount is required')));
-    }
-
-    if (value) {
-      transferValue = new BigN(value);
     }
   }
 
@@ -53,7 +47,7 @@ export function validateTransferRequest (tokenInfo: _ChainAsset, from: _Address,
     errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found TEP74 address for this token')));
   }
 
-  return [errors, keypair, transferValue];
+  return errors;
 }
 
 export function additionalValidateTransferForRecipient (
@@ -125,16 +119,15 @@ export function additionalValidateTransferForRecipient (
 }
 
 // xcm transfer
-export function validateXcmTransferRequest (destTokenInfo: _ChainAsset | undefined, sender: _Address, sendingValue: string): [TransactionError[], KeyringPair | undefined, BigN | undefined] {
+export function validateXcmTransferRequest (destTokenInfo: _ChainAsset | undefined, sender: _Address, sendingValue: string): [TransactionError[], KeyringPair | undefined] {
   const errors = [] as TransactionError[];
   const keypair = keyring.getPair(sender);
-  const transferValue = new BigN(sendingValue);
 
   if (!destTokenInfo) {
     errors.push(new TransactionError(TransferTxErrorType.INVALID_TOKEN, t('Not found token from registry')));
   }
 
-  return [errors, keypair, transferValue];
+  return [errors, keypair];
 }
 
 export function additionalValidateXcmTransfer (originTokenInfo: _ChainAsset, destinationTokenInfo: _ChainAsset, sendingAmount: string, senderTransferable: string, receiverNativeBalance: string, destChainInfo: _ChainInfo, isSnowBridge = false): [TransactionWarning | undefined, TransactionError | undefined] {
@@ -370,7 +363,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, feeInfo: EvmFeeInfo, nativeTokenInfo: _ChainAsset, tokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -391,23 +384,23 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
       } else {
         const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
 
-        const priority = await calculateGasFeeParams(evmApi, chainInfo.slug);
+        const feeCombine = combineEthFee(feeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);
 
         if (transaction.maxFeePerGas) {
           estimateFee.value = new BigN(transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
         } else if (transaction.gasPrice) {
-          estimateFee.value = new BigN((transaction.gasPrice || 0).toString()).multipliedBy(gasLimit).toFixed(0);
+          estimateFee.value = new BigN(transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
         } else {
-          if (priority.baseGasFee) {
-            const maxFee = priority.maxFeePerGas; // TODO: Need review
+          if (feeCombine.maxFeePerGas) {
+            const maxFee = new BigN(feeCombine.maxFeePerGas); // TODO: Need review
 
             estimateFee.value = maxFee.multipliedBy(gasLimit).toFixed(0);
-          } else {
-            estimateFee.value = new BigN(priority.gasPrice).multipliedBy(gasLimit).toFixed(0);
+          } else if (feeCombine.gasPrice) {
+            estimateFee.value = new BigN((feeCombine.gasPrice || 0)).multipliedBy(gasLimit).toFixed(0);
           }
         }
 
-        estimateFee.tooHigh = priority.busyNetwork;
+        estimateFee.tooHigh = feeInfo.busyNetwork;
       }
     } catch (e) {
       const error = e as Error;
@@ -416,6 +409,14 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
         validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
       }
     }
+  }
+
+  if (tokenPayFeeInfo) {
+    const estimatedFeeAmount = isTransferLocalTokenAndPayThatTokenAsFee ? (BigInt(estimateFee.value) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString() : estimateFee.value;
+
+    estimateFee.decimals = tokenPayFeeInfo.decimals || 0;
+    estimateFee.symbol = tokenPayFeeInfo.symbol;
+    estimateFee.value = await calculateToAmountByReservePool(substrateApi.api, nativeTokenInfo, tokenPayFeeInfo, estimatedFeeAmount);
   }
 
   return estimateFee;
@@ -449,9 +450,9 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     return;
   }
 
-  const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation } = transactionInput;
+  const { edAsWarning, extrinsicType, isTransferAll, nonNativeTokenPayFeeSlug, skipFeeValidation } = transactionInput;
 
-  if (skipFeeValidation) {
+  if (skipFeeValidation || nonNativeTokenPayFeeSlug) {
     return;
   }
 

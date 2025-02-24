@@ -7,8 +7,10 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getSimpleSwapEarlyValidationError } from '@subwallet/extension-base/core/logic-validation/swap';
 import { _getAssetDecimals, _getChainNativeTokenSlug, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BasicTxErrorType, CommonFeeComponent, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, SimpleSwapTxData, SimpleSwapValidationMetadata, SwapEarlyValidation, SwapErrorType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN, { BigNumber } from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -159,10 +161,11 @@ export class SimpleSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
 
-  constructor (chainService: ChainService, balanceService: BalanceService) {
+  constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService) {
     this.swapBaseHandler = new SwapBaseHandler({
       chainService,
       balanceService,
+      feeService,
       providerName: 'SimpleSwap',
       providerSlug: SwapProviderId.SIMPLE_SWAP
     });
@@ -300,7 +303,7 @@ export class SimpleSwapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getSubmitStep
+      this.getSubmitStep.bind(this)
     ]);
   }
 
@@ -476,27 +479,31 @@ export class SimpleSwapHandler implements SwapBaseInterface {
 
       extrinsic = submittableExtrinsic as SubmittableExtrinsic<'promise'>;
     } else {
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), chainInfo.slug, 'evm');
+
       if (_isNativeToken(fromAsset)) {
-        const [transactionConfig] = await getEVMTransactionObject(
-          chainInfo,
-          address,
-          addressFrom,
-          quote.fromAmount,
-          false,
-          this.chainService.getEvmApi(chainInfo.slug)
-        );
+        const [transactionConfig] = await getEVMTransactionObject({
+          evmApi: this.chainService.getEvmApi(chainInfo.slug),
+          transferAll: false,
+          value: quote.fromAmount,
+          from: address,
+          to: addressFrom,
+          chain: chainInfo.slug,
+          feeInfo
+        });
 
         extrinsic = transactionConfig;
       } else {
-        const [transactionConfig] = await getERC20TransactionObject(
-          _getContractAddressOfToken(fromAsset),
-          chainInfo,
-          address,
-          addressFrom,
-          quote.fromAmount,
-          false,
-          this.chainService.getEvmApi(chainInfo.slug)
-        );
+        const [transactionConfig] = await getERC20TransactionObject({
+          assetAddress: _getContractAddressOfToken(fromAsset),
+          chain: chainInfo.slug,
+          evmApi: this.chainService.getEvmApi(chainInfo.slug),
+          feeInfo,
+          from: address,
+          to: addressFrom,
+          value: quote.fromAmount,
+          transferAll: false
+        });
 
         extrinsic = transactionConfig;
       }

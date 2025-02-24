@@ -34,7 +34,7 @@ export const _BALANCE_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
   bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'moonbeam', 'moonbase', 'moonriver', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'moonbeam', 'moonbase', 'moonriver', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine']
@@ -258,9 +258,9 @@ export const _DEFAULT_MANTA_ZK_CHAIN = 'calamari';
 // XCM------------------------------------------------------------------------------------------------------------------
 
 export const _XCM_CHAIN_GROUP = {
-  polkadotXcm: ['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos'],
+  polkadotXcm: ['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos', 'westend_assethub'],
   polkadotXcmSpecialCases: ['astar', 'shiden'],
-  xcmPallet: ['polkadot', 'kusama', 'rococo']
+  xcmPallet: ['polkadot', 'kusama', 'rococo', 'westend']
   // default is xTokens pallet
 };
 export const SUFFICIENT_CHAIN = ['astar', 'calamari', 'parallel', 'darwinia2', 'crabParachain', 'pangolin', 'statemint', 'moonriver', 'shiden', 'moonbeam', 'statemine', 'liberland', 'dentnet', 'phala', 'crust', 'dbcchain', 'rococo_assethub'];

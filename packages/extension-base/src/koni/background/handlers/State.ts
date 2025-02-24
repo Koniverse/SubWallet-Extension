@@ -1155,15 +1155,7 @@ export default class KoniState {
       })();
 
       promiseList.push(Promise.race([promise, timeoutPromise]).then((result) => {
-        return [slug, result
-          ? {
-            ...result,
-            gasPrice: result.gasPrice?.toString(),
-            maxFeePerGas: result.maxFeePerGas?.toString(),
-            maxPriorityFeePerGas: result.maxPriorityFeePerGas?.toString(),
-            baseGasFee: result.baseGasFee?.toString()
-          } as EvmFeeInfo
-          : null];
+        return [slug, result || null];
       }));
     });
 
