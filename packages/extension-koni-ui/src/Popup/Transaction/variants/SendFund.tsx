@@ -202,6 +202,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [forceUpdateMaxValue, setForceUpdateMaxValue] = useState<object|undefined>(undefined);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
+  const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
 
@@ -889,6 +890,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     let cancel = false;
 
     const fetchTokens = async () => {
+      setIsFetchingListFeeToken(true);
+      setListTokensCanPayFee([]);
+
       try {
         const _response = await getTokensCanPayFee({
           chain: chainValue,
@@ -899,8 +903,14 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
         if (!cancel) {
           setListTokensCanPayFee(response);
+          setIsFetchingListFeeToken(false);
         }
       } catch (error) {
+        if (!cancel) {
+          setListTokensCanPayFee([]);
+          setIsFetchingListFeeToken(false);
+        }
+
         console.error('Error fetching tokens:', error);
       }
     };
@@ -1036,7 +1046,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             feeOptionsInfo={transferInfo?.feeOptions}
             feePercentageSpecialCase={transferInfo?.feePercentageSpecialCase}
             feeType={transferInfo?.feeType}
-            isLoading={isFetchingInfo}
+            isLoadingFee={isFetchingInfo}
+            isLoadingToken={isFetchingListFeeToken}
             listTokensCanPayFee={listTokensCanPayFee}
             nativeTokenSlug={nativeTokenSlug}
             onSelect={setSelectedTransactionFee}

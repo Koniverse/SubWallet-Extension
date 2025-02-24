@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.18
+Build date: Feb 20, 2025.
+
+Features & Update:
+- Support paying fee with non-native tokens on Asset Hub (#3590)
+
+
 ## 1.3.17
 Build date: Feb 18, 2025.
 
