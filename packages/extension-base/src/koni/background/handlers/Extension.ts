@@ -1323,8 +1323,8 @@ export default class KoniExtension {
     const nativeTokenSlug: string = nativeTokenInfo.slug;
     const isTransferNativeToken = nativeTokenSlug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNativeToken && nonNativeTokenPayFeeSlug === tokenSlug;
-    const isCustomTokenPayFeeAssetHub = Boolean(nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain));
-    const isCustomTokenPayFeeHydration = Boolean(nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain));
+    const isCustomTokenPayFeeAssetHub = !!nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain);
+    const isCustomTokenPayFeeHydration = !!nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain);
 
     const extrinsicType = isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN;
     let chainType = ChainType.SUBSTRATE;
@@ -1406,7 +1406,6 @@ export default class KoniExtension {
         });
 
         if (isCustomTokenPayFeeHydration) {
-          // @ts-ignore
           const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.assetId;
 
           transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
@@ -1433,10 +1432,9 @@ export default class KoniExtension {
       }
 
       // Check enough free local to pay fee local
-      if (isCustomTokenPayFeeAssetHub) {
+      if (isCustomTokenPayFeeAssetHub || isCustomTokenPayFeeHydration) {
         const nonNativeFee = BigInt(inputTransaction.estimateFee?.value || '0'); // todo: estimateFee should be must-have, need to refactor interface
         const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, nonNativeTokenPayFeeSlug);
-        // @ts-ignore
         const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[nonNativeTokenPayFeeSlug].free);
 
         if (nonNativeFee > nonNativeTokenPayFeeBalance) {

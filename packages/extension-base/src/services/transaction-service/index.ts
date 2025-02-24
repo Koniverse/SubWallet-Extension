@@ -119,8 +119,6 @@ export default class TransactionService {
     }
 
     const transaction = transactionInput.transaction;
-    const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(chain);
-    const tokenPayFeeInfo = transactionInput.nonNativeTokenPayFeeSlug ? this.chainService.getAssetBySlug(transactionInput.nonNativeTokenPayFeeSlug) : undefined;
 
     // Check duplicated transaction
     validationResponse.errors.push(...this.checkDuplicate(transactionInput));
@@ -145,8 +143,10 @@ export default class TransactionService {
     // Estimate fee for transaction
     const id = getId();
     const feeInfo = await this.state.feeService.subscribeChainFee(id, chain, 'evm') as EvmFeeInfo;
+    const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(chain);
+    const nonNativeTokenPayFeeInfo = transactionInput.nonNativeTokenPayFeeSlug ? this.chainService.getAssetBySlug(transactionInput.nonNativeTokenPayFeeSlug) : undefined;
 
-    validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, feeInfo, nativeTokenInfo, tokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
+    validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 

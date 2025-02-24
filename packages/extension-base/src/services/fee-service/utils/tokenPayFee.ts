@@ -4,6 +4,7 @@
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals, _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
 import { BalanceItem } from '@subwallet/extension-base/types';
@@ -71,12 +72,14 @@ export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, 
     return assetId[0].replaceAll(',', '');
   });
 
-  if (!nativeTokenInfo.priceId) {
+  const nativePriceId = _getAssetPriceId(nativeTokenInfo);
+
+  if (!nativePriceId) {
     return tokensList;
   }
 
-  const nativePrice = priceMap[nativeTokenInfo.priceId];
-  const nativeDecimals = nativeTokenInfo.decimals || 0;
+  const nativePrice = priceMap[nativePriceId];
+  const nativeDecimals = _getAssetDecimals(nativeTokenInfo);
   const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
     token.originChain === substrateApi.chainSlug &&
     token.assetType !== _AssetType.NATIVE &&
@@ -85,12 +88,14 @@ export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, 
   ));
 
   tokenInfos.forEach((tokenInfo) => {
-    if (!tokenInfo.priceId) {
+    const priceId = _getAssetPriceId(tokenInfo);
+
+    if (!priceId) {
       return;
     }
 
-    const tokenPrice = priceMap[tokenInfo.priceId];
-    const tokenDecimals = tokenInfo.decimals || 0;
+    const tokenPrice = priceMap[priceId];
+    const tokenDecimals = _getAssetDecimals(tokenInfo);
 
     const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
 
