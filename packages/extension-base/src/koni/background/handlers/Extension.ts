@@ -1406,6 +1406,7 @@ export default class KoniExtension {
         });
 
         if (isCustomTokenPayFeeHydration) {
+          // @ts-ignore
           const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.assetId;
 
           transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
@@ -1435,6 +1436,7 @@ export default class KoniExtension {
       if (isCustomTokenPayFeeAssetHub) {
         const nonNativeFee = BigInt(inputTransaction.estimateFee?.value || '0'); // todo: estimateFee should be must-have, need to refactor interface
         const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, nonNativeTokenPayFeeSlug);
+        // @ts-ignore
         const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[nonNativeTokenPayFeeSlug].free);
 
         if (nonNativeFee > nonNativeTokenPayFeeBalance) {

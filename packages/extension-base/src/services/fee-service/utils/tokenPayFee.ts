@@ -9,7 +9,6 @@ import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from 
 import { BalanceItem } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 
-import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 
 export async function getAssetHubTokensCanPayFee (substrateApi: _SubstrateApi, chainService: ChainService, nativeTokenInfo: _ChainAsset, nativeBalanceInfo: TokenHasBalanceInfo, tokensHasBalanceInfoMap: Record<string, BalanceItem>, feeAmount?: string): Promise<TokenHasBalanceInfo[]> {
@@ -93,8 +92,10 @@ export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, 
   return tokensList;
 }
 
-export function batchExtrinsicSetFeeHydration (api: ApiPromise, tx: SubmittableExtrinsic, assetId?: string): SubmittableExtrinsic {
-  if (!assetId || assetId === '0') {
+export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: SubmittableExtrinsic | null, assetId?: string): SubmittableExtrinsic | null {
+  const api = substrateApi.api;
+
+  if (!assetId || assetId === '0' || !tx) {
     return tx;
   }
 
