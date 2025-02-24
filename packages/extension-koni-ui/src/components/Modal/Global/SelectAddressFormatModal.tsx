@@ -119,7 +119,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
 
   return (
     <SwModal
-      className={CN(className, 'wallet-version-modal')}
+      className={CN(className, 'address-format-modal')}
       destroyOnClose={true}
       id={selectAddressFormatModalId}
       onCancel={onBack || onCancel}
@@ -141,7 +141,6 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
           list={listItem}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
-          rowGap='var(--row-gap)'
         />
       </div>
     </SwModal>
@@ -156,15 +155,17 @@ const SelectAddressFormatModal = styled(Component)<Props>(({ theme: { token } }:
     },
     '.sub-title': {
       paddingBottom: token.padding,
-      fontSize: token.fontSize,
+      fontSize: token.fontSizeSM,
       fontWeight: token.bodyFontWeight,
-      lineHeight: token.lineHeight,
+      lineHeight: token.lineHeightSM,
       textAlign: 'center',
       color: token.colorTextTertiary
     },
-    '.item-wrapper:not(:last-child)': {
-      marginBottom: 8
+
+    '.item-wrapper + .item-wrapper': {
+      marginTop: 8
     },
+
     '.ant-sw-modal-footer': {
       borderTop: 0
     }

@@ -47,7 +47,7 @@ const Component = ({ address, chainName, className, isNewFormat, onClick, onClic
       </div>
       <div className='__item-center-part'>
         <div className='__chain-name-wrapper'>
-          <span>{chainName}</span>
+          <span className={'__chain-name'}>{chainName}</span>
           <div className={'__address-tag'}>
             <Tag
               bgType={'default'}
@@ -132,11 +132,15 @@ const AccountChainAddressWithStatusItem = styled(Component)<Props>(({ theme: { t
       lineHeight: token.lineHeightLG,
       color: token.colorTextLight1,
       overflow: 'hidden',
-      'white-space': 'nowrap',
-      textOverflow: 'ellipsis',
       display: 'flex',
       justifyContent: 'space-between',
-      fontWeight: token.fontWeightStrong
+      fontWeight: token.fontWeightStrong,
+
+      '.__chain-name': {
+        'white-space': 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden'
+      }
     },
 
     '.__address-format': {
@@ -145,7 +149,8 @@ const AccountChainAddressWithStatusItem = styled(Component)<Props>(({ theme: { t
       color: token.colorTextTertiary,
       overflow: 'hidden',
       'white-space': 'nowrap',
-      textOverflow: 'ellipsis'
+      textOverflow: 'ellipsis',
+      fontWeight: token.bodyFontWeight
     },
 
     '&:hover': {

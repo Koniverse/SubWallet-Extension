@@ -274,7 +274,8 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__address-tag': {
       alignItems: 'center',
-      display: 'flex'
+      display: 'flex',
+      paddingRight: token.paddingXS
     },
 
     '.__item-tag': {
