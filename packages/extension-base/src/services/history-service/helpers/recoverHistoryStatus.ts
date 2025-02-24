@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { isHex } from '@polkadot/util';
 import { TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
@@ -9,6 +8,7 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { Vec } from '@polkadot/types';
 import { EventRecord } from '@polkadot/types/interfaces';
+import { isHex } from '@polkadot/util';
 
 export enum HistoryRecoverStatus {
   SUCCESS = 'SUCCESS',
@@ -157,11 +157,11 @@ const evmRecover = async (history: TransactionHistoryItem, chainService: ChainSe
 
             Promise.race([
               api.isReady,
-              new Promise<_EvmApi>((_, reject) => createTimeout(() => reject(new Error('Timeout'))))
+              new Promise<_EvmApi>((resolve, reject) => createTimeout(() => reject(new Error('Timeout'))))
             ])
               .then(resolve)
               .catch(reject);
-          })
+          });
         })]
       );
       const api = _api.api;
