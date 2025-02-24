@@ -41,7 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const reformatPolkadotUnifiedAddress = useReformatAddress();
+  const getReformatAddress = useReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   // chain related to tokenGroupSlug, if it is token slug
@@ -137,7 +137,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
 
     for (const accountJson of currentAccountProxy.accounts) {
-      const reformatedAddress = reformatPolkadotUnifiedAddress(accountJson, chainInfo);
+      const reformatedAddress = getReformatAddress(accountJson, chainInfo);
 
       if (reformatedAddress) {
         const accountAddressItem: AccountAddressItemType = {
@@ -164,7 +164,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [activeModal, chainInfoMap, checkIsPolkadotUnifiedChain, currentAccountProxy, inactiveModal, isAllAccount, openAddressFormatModal, openAddressQrModal, reformatPolkadotUnifiedAddress]);
+  }, [activeModal, chainInfoMap, checkIsPolkadotUnifiedChain, currentAccountProxy, inactiveModal, isAllAccount, openAddressFormatModal, openAddressQrModal, getReformatAddress]);
 
   /* token Selector --- */
 
@@ -182,7 +182,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
     accountProxies.forEach((ap) => {
       ap.accounts.forEach((a) => {
-        const reformatedAddress = reformatPolkadotUnifiedAddress(a, chainInfo);
+        const reformatedAddress = getReformatAddress(a, chainInfo);
 
         if (reformatedAddress) {
           result.push({
@@ -198,7 +198,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, reformatPolkadotUnifiedAddress, selectedChain, specificChain]);
+  }, [accountProxies, chainInfoMap, getReformatAddress, selectedChain, specificChain]);
 
   const onBackAccountSelector = useMemo(() => {
     // if specificChain has value, it means tokenSelector does not show up, so accountSelector does not have back action
