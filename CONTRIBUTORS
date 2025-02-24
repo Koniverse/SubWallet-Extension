@@ -1,9 +1,9 @@
-    2952	AnhMTV                        	Release version 1.3.19
+    2955	AnhMTV                        	
     2552	Nam Phạm                      	[Issue 3855] test: add log
-    2416	S2kael                        	[Issue-3590] Update UX
+    2418	S2kael                        	[Issue-4050] Fix error with transaction has no fee params
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
-     537	bluezdot                      	[Issue-3590] fix: fix list tokensPayFee Evm
+     538	bluezdot                      	[Issue-chainlist-399] feat: enable transferring on Invarch
      465	Jaco                          	0.42.5 (#969)
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      222	Frenkie Nguyen                	[Issue-3590] feat: sort list token
