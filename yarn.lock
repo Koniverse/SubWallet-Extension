@@ -6439,15 +6439,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.99-beta.29":
-  version: 0.2.99-beta.29
-  resolution: "@subwallet/chain-list@npm:0.2.99-beta.29"
+"@subwallet/chain-list@npm:0.2.99-beta.30":
+  version: 0.2.99-beta.30
+  resolution: "@subwallet/chain-list@npm:0.2.99-beta.30"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: eb46e1a6e48fc53be95754df35763d01e04029a24f1690b2ef75f8de7e6cfff1e599e41b19b0654306c4bda8c454bca0056e14af50dffd71fea78bbd6db932a2
+  checksum: f532a9f505882195911606d3595dbf8fd0657c0f0012f1e647562cc579c1cb03112e33c63b7d0426982f78d9da56b6760e3292a717f2ab18c02ee536538f83df
   languageName: node
   linkType: hard
 
