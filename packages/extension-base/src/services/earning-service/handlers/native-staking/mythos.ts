@@ -11,6 +11,7 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
 
@@ -314,14 +315,26 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
     const { amount, selectedValidators } = data;
     const selectedValidatorInfo = selectedValidators[0];
 
-    const tx = apiPromise.api.tx.utility.batchAll([
-      apiPromise.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
-      apiPromise.api.tx.collatorStaking.lock(amount),
-      apiPromise.api.tx.collatorStaking.stake([{
-        candidate: selectedValidatorInfo.address,
-        stake: amount
-      }])
-    ]);
+    let tx: SubmittableExtrinsic<'promise'>;
+
+    if (positionInfo?.isBondedBefore) {
+      tx = apiPromise.api.tx.utility.batch([
+        apiPromise.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
+        apiPromise.api.tx.collatorStaking.lock(amount),
+        apiPromise.api.tx.collatorStaking.stake([{
+          candidate: selectedValidatorInfo.address,
+          stake: amount
+        }])
+      ]);
+    } else {
+      tx = apiPromise.api.tx.utility.batch([
+        apiPromise.api.tx.collatorStaking.lock(amount),
+        apiPromise.api.tx.collatorStaking.stake([{
+          candidate: selectedValidatorInfo.address,
+          stake: amount
+        }])
+      ]);
+    }
 
     return [tx, { slug: this.nativeToken.slug, amount: '0' }];
   }
