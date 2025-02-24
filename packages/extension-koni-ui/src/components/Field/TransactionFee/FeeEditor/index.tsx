@@ -33,7 +33,8 @@ export type RenderFieldNodeParams = {
 
 type Props = ThemeProps & {
   onSelect?: (option: TransactionFee) => void;
-  isLoading?: boolean;
+  isLoadingFee: boolean;
+  isLoadingToken: boolean;
   tokenPayFeeSlug: string;
   tokenSlug: string;
   feePercentageSpecialCase?: number
@@ -53,7 +54,7 @@ type Props = ThemeProps & {
 // todo: will update dynamic later
 const modalId = 'FeeEditorModalId';
 
-const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoading = false, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
+const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoadingFee = false, isLoadingToken, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
@@ -87,7 +88,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return BN_ZERO;
   }, []);
 
-  const isDataReady = !isLoading && !!feeOptionsInfo;
+  const isDataReady = !isLoadingFee && !isLoadingFee && !!feeOptionsInfo;
 
   const convertedFeeValueToUSD = useMemo(() => {
     if (!isDataReady) {
@@ -121,25 +122,25 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     }
 
     return renderFieldNode({
-      isLoading: isLoading,
+      isLoading: isLoadingFee,
       feeInfo: {
         decimals,
         symbol,
         value: feeValue,
         convertedValue: feePriceValue
       },
-      disableEdit: isLoading,
+      disableEdit: isLoadingFee,
       onClickEdit
     });
-  }, [decimals, feeValue, isLoading, onClickEdit, renderFieldNode, symbol, feePriceValue]);
+  }, [decimals, feeValue, isLoadingFee, onClickEdit, renderFieldNode, symbol, feePriceValue]);
 
   const isXcm = useMemo(() => {
     return chainValue && destChainValue && chainValue !== destChainValue;
   }, [chainValue, destChainValue]);
 
   const isEditButton = useMemo(() => {
-    return !!(chainValue && (ASSET_HUB_CHAIN_SLUGS.includes(chainValue) || feeType === 'evm')) && !isXcm;
-  }, [isXcm, chainValue, feeType]);
+    return !!(chainValue && (ASSET_HUB_CHAIN_SLUGS.includes(chainValue) || feeType === 'evm' && listTokensCanPayFee.length)) && !isXcm;
+  }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
 
   const rateValue = useMemo(() => {
     const selectedToken = listTokensCanPayFee.find((item) => item.slug === tokenPayFeeSlug);
@@ -195,6 +196,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
 
                   <Button
                     className={'__fee-editor-button'}
+                    loading={isLoadingToken}
                     disabled={!isDataReady}
                     icon={
                       <Icon

@@ -303,7 +303,7 @@ export class SimpleSwapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getSubmitStep
+      this.getSubmitStep.bind(this)
     ]);
   }
 

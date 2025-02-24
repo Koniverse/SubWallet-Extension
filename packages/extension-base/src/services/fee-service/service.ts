@@ -92,8 +92,6 @@ export default class FeeService {
   public subscribeChainFee (id: string, chain: string, type: FeeChainType, callback?: (data: FeeInfo) => void) {
     return new Promise<FeeInfo>((resolve) => {
       const _callback = (value: FeeInfo | undefined) => {
-        console.log(id, this.chainFeeSubscriptionMap);
-
         if (value) {
           callback?.(value);
           resolve(value);
@@ -135,7 +133,8 @@ export default class FeeService {
           } else {
             const api = this.state.getEvmApi(chain);
 
-            if (api) {
+            // TODO: Handle case type === evm and not have api
+            if (type === 'evm' && api) {
               calculateGasFeeParams(api, chain)
                 .then((info) => {
                   observer.next(info);

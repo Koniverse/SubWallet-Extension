@@ -155,6 +155,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
       return [step, fee];
     } catch (e) {
+      console.error('Error creating xcm step', e);
+
       return undefined;
     }
   }
@@ -174,8 +176,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getXcmStep,
-      this.getSubmitStep
+      this.getXcmStep.bind(this),
+      this.getSubmitStep.bind(this)
     ]);
   }
 

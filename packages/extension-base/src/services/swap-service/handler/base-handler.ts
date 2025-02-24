@@ -66,7 +66,7 @@ export class SwapBaseHandler {
 
     try {
       for (const genStepFunc of genStepFuncList) {
-        const step = await genStepFunc.bind(this, params)();
+        const step = await genStepFunc(params);
 
         if (step) {
           result.steps.push({

@@ -1649,29 +1649,33 @@ export default class KoniExtension {
     }
 
     await Promise.all(tokenInfos.map(async (tokenInfo) => {
-      const tokenSlug = tokenInfo.slug;
-      const reserve = await getReserveForPool(substrateApi.api, nativeTokenInfo, tokenInfo);
+      try {
+        const tokenSlug = tokenInfo.slug;
+        const reserve = await getReserveForPool(substrateApi.api, nativeTokenInfo, tokenInfo);
 
-      if (!reserve || !reserve[0] || !reserve[1] || reserve[0] === '0' || reserve[1] === '0') {
-        return;
-      }
-
-      const rate = new BigN(reserve[1]).div(reserve[0]).toFixed();
-      const tokenCanPayFee = {
-        slug: tokenSlug,
-        free: tokensHasBalanceInfoMap[tokenSlug].free,
-        rate
-      };
-
-      if (feeAmount === undefined) {
-        tokensCanPayFee.push(tokenCanPayFee);
-      } else {
-        const amount = estimateTokensForPool(feeAmount, reserve);
-        const liquidityError = checkLiquidityForPool(amount, reserve[0], reserve[1]);
-
-        if (!liquidityError) {
-          tokensCanPayFee.push(tokenCanPayFee);
+        if (!reserve || !reserve[0] || !reserve[1] || reserve[0] === '0' || reserve[1] === '0') {
+          return;
         }
+
+        const rate = new BigN(reserve[1]).div(reserve[0]).toFixed();
+        const tokenCanPayFee = {
+          slug: tokenSlug,
+          free: tokensHasBalanceInfoMap[tokenSlug].free,
+          rate
+        };
+
+        if (feeAmount === undefined) {
+          tokensCanPayFee.push(tokenCanPayFee);
+        } else {
+          const amount = estimateTokensForPool(feeAmount, reserve);
+          const liquidityError = checkLiquidityForPool(amount, reserve[0], reserve[1]);
+
+          if (!liquidityError) {
+            tokensCanPayFee.push(tokenCanPayFee);
+          }
+        }
+      } catch (e) {
+        console.error('error when fetching pool with token', tokenInfo.slug, e);
       }
     }));
 
