@@ -1650,7 +1650,9 @@ export default class KoniExtension {
     if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain)) {
       tokensCanPayFee = await getAssetHubTokensCanPayFee(substrateApi, chainService, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
     } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
-      tokensCanPayFee = await getHydrationTokensCanPayFee(substrateApi, chainService, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
+      const priceMap = (await this.getPrice()).priceMap;
+
+      tokensCanPayFee = await getHydrationTokensCanPayFee(substrateApi, chainService, priceMap, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
     }
 
     return tokensCanPayFee;

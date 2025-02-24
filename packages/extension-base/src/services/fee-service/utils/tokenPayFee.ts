@@ -61,7 +61,7 @@ export async function getAssetHubTokensCanPayFee (substrateApi: _SubstrateApi, c
   return tokensList;
 }
 
-export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, chainService: ChainService, nativeTokenInfo: _ChainAsset, nativeBalanceInfo: TokenHasBalanceInfo, tokensHasBalanceInfoMap: Record<string, BalanceItem>, feeAmount?: string): Promise<TokenHasBalanceInfo[]> {
+export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, chainService: ChainService, priceMap: Record<string, number>, nativeTokenInfo: _ChainAsset, nativeBalanceInfo: TokenHasBalanceInfo, tokensHasBalanceInfoMap: Record<string, BalanceItem>, feeAmount?: string): Promise<TokenHasBalanceInfo[]> {
   const tokensList: TokenHasBalanceInfo[] = [nativeBalanceInfo];
   const _acceptedCurrencies = await substrateApi.api.query.multiTransactionPayment.acceptedCurrencies.entries();
 
@@ -71,6 +71,12 @@ export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, 
     return assetId[0].replaceAll(',', '');
   });
 
+  if (!nativeTokenInfo.priceId) {
+    return tokensList;
+  }
+
+  const nativePrice = priceMap[nativeTokenInfo.priceId];
+  const nativeDecimals = nativeTokenInfo.decimals || 0;
   const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
     token.originChain === substrateApi.chainSlug &&
     token.assetType !== _AssetType.NATIVE &&
@@ -79,12 +85,21 @@ export async function getHydrationTokensCanPayFee (substrateApi: _SubstrateApi, 
   ));
 
   tokenInfos.forEach((tokenInfo) => {
+    if (!tokenInfo.priceId) {
+      return;
+    }
+
+    const tokenPrice = priceMap[tokenInfo.priceId];
+    const tokenDecimals = tokenInfo.decimals || 0;
+
+    const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
+
     // @ts-ignore
     if (supportedAssetIds.includes(tokenInfo.metadata.assetId)) {
       tokensList.push({
         slug: tokenInfo.slug,
         free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
-        rate: '1' // todo: handle this
+        rate: rate
       });
     }
   });
