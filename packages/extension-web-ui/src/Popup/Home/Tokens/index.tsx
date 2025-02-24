@@ -19,7 +19,7 @@ import { UpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/UpperB
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { Button, Icon, ModalContext, Number, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -183,8 +183,12 @@ const Component = (): React.ReactElement => {
   const isTotalBalanceDecrease = totalBalanceInfo.change.status === 'decrease';
 
   const isSupportBuyTokens = useMemo(() => {
+    if (isSoloTonAccountProxy(currentAccountProxy)) {
+      return false;
+    }
+
     return Object.values(buyTokenInfos).some((item) => allowedChains.includes(item.network));
-  }, [allowedChains, buyTokenInfos]);
+  }, [allowedChains, buyTokenInfos, currentAccountProxy]);
 
   const isHaveOnlyTonSoloAcc = useMemo(() => {
     const checkValidAcc = (currentAcc: AccountProxy) => {

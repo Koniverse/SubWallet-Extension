@@ -7,7 +7,7 @@ import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import usePreloadView from '@subwallet/extension-web-ui/hooks/router/usePreloadView';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { computeStatus, getTransactionFromAccountProxyValue, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { computeStatus, getTransactionFromAccountProxyValue, isSoloTonAccountProxy, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleLeft, ArrowCircleRight, ArrowsLeftRight, ArrowSquareUpRight, Clock, Gear, Globe, Info, MessengerLogo, Parachute, Rocket, Vault, Wallet } from 'phosphor-react';
@@ -46,6 +46,10 @@ function Component ({ className,
     return liveMissionIds.filter((id) => !storedLiveMissionIds.includes(id));
   }, [liveMissionIds, storedLiveMissionIds]);
 
+  const isCurrentAccountProxySoloTon = useMemo(() => {
+    return isSoloTonAccountProxy(currentAccountProxy);
+  }, [currentAccountProxy]);
+
   usePreloadView([
     'Home',
     'Tokens',
@@ -73,7 +77,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: Vault,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('Swap'),
@@ -82,7 +87,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: ArrowsLeftRight,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('dApps'),
@@ -117,7 +123,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: Rocket,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('History'),
@@ -138,7 +145,7 @@ function Component ({ className,
         }
       }
     ];
-  }, [latestLiveMissionIds.length, t]);
+  }, [isCurrentAccountProxySoloTon, latestLiveMissionIds.length, t]);
 
   const staticMenuItems = useMemo<MenuItemType[]>(() => {
     return [
@@ -298,15 +305,12 @@ function Component ({ className,
           {
             menuItems.map((m) => (
               <MenuItem
+                {...m}
                 className={'side-menu-item'}
-                icon={m.icon}
                 isActivated={selectedKeys.includes(m.value)}
                 key={m.value}
-                label={m.label}
-                latestLiveMissionLength={latestLiveMissionIds.length}
                 onClick={handleNavigate}
                 showToolTip={isCollapsed}
-                value={m.value}
               />
             ))
           }
@@ -316,14 +320,12 @@ function Component ({ className,
           {
             staticMenuItems.map((m) => (
               <MenuItem
+                {...m}
                 className={'side-menu-item'}
-                icon={m.icon}
                 isActivated={false}
                 key={m.value}
-                label={m.label}
                 onClick={handleLink}
                 showToolTip={isCollapsed}
-                value={m.value}
               />
             ))
           }

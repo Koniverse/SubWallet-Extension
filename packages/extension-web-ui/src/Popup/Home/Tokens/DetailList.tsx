@@ -20,7 +20,7 @@ import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, EarningPoolsParam, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
@@ -242,7 +242,7 @@ function Component (): React.ReactElement {
 
   const isHaveOnlyTonSoloAcc = useMemo(() => {
     const checkValidAcc = (currentAcc: AccountProxy) => {
-      return currentAcc?.accountType === AccountProxyType.SOLO && currentAcc?.chainTypes.includes(AccountChainType.TON);
+      return isSoloTonAccountProxy(currentAcc);
     };
 
     if (isAllAccount) {
@@ -373,6 +373,14 @@ function Component (): React.ReactElement {
   },
   [currentAccountProxy, navigate, notify, setStorage, t, tokenGroupSlug]
   );
+
+  const isSupportBuyTokens = useMemo(() => {
+    if (isSoloTonAccountProxy(currentAccountProxy)) {
+      return false;
+    }
+
+    return !!buyInfos.length;
+  }, [buyInfos.length, currentAccountProxy]);
 
   const onOpenBuyTokens = useCallback(() => {
     let symbol = '';
@@ -535,7 +543,7 @@ function Component (): React.ReactElement {
             balanceValue={tokenBalanceValue}
             className={'__static-block'}
             isShrink={isShrink}
-            isSupportBuyTokens={!!buyInfos.length}
+            isSupportBuyTokens={isSupportBuyTokens}
             isSupportSwap={isEnableSwapButton}
             onClickBack={goHome}
             onOpenBuyTokens={onOpenBuyTokens}

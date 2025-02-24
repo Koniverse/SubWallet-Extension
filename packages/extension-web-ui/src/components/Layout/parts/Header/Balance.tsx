@@ -18,7 +18,7 @@ import SendFund from '@subwallet/extension-web-ui/Popup/Transaction/variants/Sen
 import SendFundOffRamp from '@subwallet/extension-web-ui/Popup/Transaction/variants/SendFundOffRamp';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getTransactionFromAccountProxyValue, removeStorage } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isSoloTonAccountProxy, removeStorage } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext, Number, Tag, Tooltip, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowsClockwise, CopySimple, Eye, EyeSlash, PaperPlaneTilt, PlusMinus } from 'phosphor-react';
@@ -185,12 +185,16 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   }, [inactiveModal]);
 
   const isSupportBuyTokens = useMemo(() => {
+    if (isSoloTonAccountProxy(currentAccountProxy)) {
+      return false;
+    }
+
     if (!locationPathname.includes('/home/tokens/detail/')) {
       return true;
     }
 
     return !!buyInfos.length;
-  }, [buyInfos.length, locationPathname]);
+  }, [buyInfos.length, currentAccountProxy, locationPathname]);
 
   const reloadBalance = useCallback(() => {
     setReloading(true);
