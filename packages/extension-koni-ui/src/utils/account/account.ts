@@ -164,7 +164,7 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
 
 // todo:
 //  - support bitcoin
-export function getReformatedAddressRelatedToChain (accountJson: AccountJson, chainInfo: _ChainInfo, isPolkadotUnifiedChain = false): string | undefined {
+export function getReformatedAddressRelatedToChain (accountJson: AccountJson, chainInfo: _ChainInfo, shouldUseUnifiedFormat?: (chainSlug: string) => boolean): string | undefined {
   if (accountJson.specialChain && accountJson.specialChain !== chainInfo.slug) {
     return undefined;
   }
@@ -174,7 +174,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
   }
 
   if (accountJson.chainType === AccountChainType.SUBSTRATE && chainInfo.substrateInfo) {
-    const prefixAddress = isPolkadotUnifiedChain ? UNIFIED_CHAIN_SS58_PREFIX : chainInfo.substrateInfo.addressPrefix;
+    const prefixAddress = shouldUseUnifiedFormat?.(chainInfo.slug) ? UNIFIED_CHAIN_SS58_PREFIX : chainInfo.substrateInfo.addressPrefix;
 
     return reformatAddress(accountJson.address, prefixAddress);
   } else if (accountJson.chainType === AccountChainType.ETHEREUM && chainInfo.evmInfo) {

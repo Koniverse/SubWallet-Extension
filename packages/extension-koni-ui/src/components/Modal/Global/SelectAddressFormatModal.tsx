@@ -3,7 +3,6 @@
 
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountChainAddressWithStatusItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
-import { UNIFIED_CHAIN_SS58_PREFIX } from '@subwallet/extension-koni-ui/constants';
 import { SELECT_ADDRESS_FORMAT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
@@ -58,7 +57,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
     const newAccInfoInfo: AddressFormatInfo = {
       ...legacyAccInfoItem,
       isNewFormat: true,
-      address: reformatAddress(address, UNIFIED_CHAIN_SS58_PREFIX)
+      address: address
     };
 
     return [legacyAccInfoItem, newAccInfoInfo];

@@ -9,7 +9,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatUnifiedAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -41,6 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
+  const reformatPolkadotUnifiedAddress = useReformatUnifiedAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   // chain related to tokenGroupSlug, if it is token slug
@@ -136,7 +137,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
 
     for (const accountJson of currentAccountProxy.accounts) {
-      const reformatedAddress = getReformatedAddressRelatedToChain(accountJson, chainInfo, isPolkadotUnifiedChain);
+      const reformatedAddress = reformatPolkadotUnifiedAddress(accountJson, chainInfo);
 
       if (reformatedAddress) {
         const accountAddressItem: AccountAddressItemType = {
@@ -163,7 +164,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [activeModal, chainInfoMap, checkIsPolkadotUnifiedChain, currentAccountProxy, inactiveModal, isAllAccount, openAddressFormatModal, openAddressQrModal]);
+  }, [activeModal, chainInfoMap, checkIsPolkadotUnifiedChain, currentAccountProxy, inactiveModal, isAllAccount, openAddressFormatModal, openAddressQrModal, reformatPolkadotUnifiedAddress]);
 
   /* token Selector --- */
 
@@ -177,13 +178,11 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return [];
     }
 
-    const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(targetChain);
-
     const result: AccountAddressItemType[] = [];
 
     accountProxies.forEach((ap) => {
       ap.accounts.forEach((a) => {
-        const reformatedAddress = getReformatedAddressRelatedToChain(a, chainInfo, isPolkadotUnifiedChain);
+        const reformatedAddress = reformatPolkadotUnifiedAddress(a, chainInfo);
 
         if (reformatedAddress) {
           result.push({
@@ -199,7 +198,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, checkIsPolkadotUnifiedChain, selectedChain, specificChain]);
+  }, [accountProxies, chainInfoMap, reformatPolkadotUnifiedAddress, selectedChain, specificChain]);
 
   const onBackAccountSelector = useMemo(() => {
     // if specificChain has value, it means tokenSelector does not show up, so accountSelector does not have back action

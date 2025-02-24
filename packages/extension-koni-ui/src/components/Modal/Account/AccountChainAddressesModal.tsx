@@ -95,12 +95,12 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
 
   const renderItem = useCallback(
     (item: AccountChainAddress) => {
-      const isPolkadotUnifiedAddress = checkIsPolkadotUnifiedChain(item.slug);
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
 
       return (
         <AccountChainAddressItem
           className={'address-item'}
-          isShowInfoButton={isPolkadotUnifiedAddress}
+          isShowInfoButton={isPolkadotUnifiedChain}
           item={item}
           key={item.slug}
           onClick={onShowQr(item)}

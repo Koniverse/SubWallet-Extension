@@ -6,7 +6,6 @@ import { AccountAddressItemType } from '@subwallet/extension-koni-ui/types/accou
 
 export type ReceiveModalProps = {
   tokenSelectorItems: _ChainAsset[];
-  selectedChain?: string;
   onCloseTokenSelector: VoidFunction;
   onSelectTokenSelector: (item: _ChainAsset) => void;
   accountSelectorItems: AccountAddressItemType[];

@@ -1,8 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { reformatAddress } from '@subwallet/extension-base/utils';
-import { UNIFIED_CHAIN_SS58_PREFIX } from '@subwallet/extension-koni-ui/constants';
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
@@ -58,7 +56,7 @@ function Component (props: Props): React.ReactElement<Props> {
             {item.name}
           </div>
           <div className='__item-address'>
-            {toShort(isShowInfoButton ? reformatAddress(item.address, UNIFIED_CHAIN_SS58_PREFIX) : item.address, 4, 5)}
+            {toShort(item.address, 4, 5)}
           </div>
         </div>
 
