@@ -9,7 +9,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatUnifiedAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -41,7 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const reformatPolkadotUnifiedAddress = useReformatUnifiedAddress();
+  const reformatPolkadotUnifiedAddress = useReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   // chain related to tokenGroupSlug, if it is token slug
@@ -350,7 +350,6 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     onOpenReceive,
     receiveModalProps: {
       tokenSelectorItems,
-      selectedChain,
       onCloseTokenSelector,
       onSelectTokenSelector,
       accountSelectorItems,
@@ -358,5 +357,5 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       onCloseAccountSelector,
       onSelectAccountSelector
     }
-  }), [accountSelectorItems, onBackAccountSelector, onCloseAccountSelector, onCloseTokenSelector, onOpenReceive, onSelectAccountSelector, onSelectTokenSelector, selectedChain, tokenSelectorItems]);
+  }), [accountSelectorItems, onBackAccountSelector, onCloseAccountSelector, onCloseTokenSelector, onOpenReceive, onSelectAccountSelector, onSelectTokenSelector, tokenSelectorItems]);
 }

@@ -7,7 +7,7 @@ import { useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { getReformatedAddressRelatedToChain } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
-const useReformatUnifiedAddress = () => {
+const useReformatAddress = () => {
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   return useCallback((accountJson: AccountJson, chainInfo: _ChainInfo): string | undefined => {
@@ -15,4 +15,4 @@ const useReformatUnifiedAddress = () => {
   }, [checkIsPolkadotUnifiedChain]);
 };
 
-export default useReformatUnifiedAddress;
+export default useReformatAddress;
