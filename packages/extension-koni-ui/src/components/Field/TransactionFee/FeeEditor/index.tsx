@@ -103,7 +103,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [estimateFee, isDataReady, nativeTokenDecimals, priceNativeValue]);
 
   const onClickEdit = useCallback(() => {
-    if (chainValue && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue)) {
+    if (chainValue && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue))) {
       activeModal(CHOOSE_FEE_TOKEN_MODAL);
     } else {
       setFeeEditorModalRenderKey(`${modalId}_${Date.now()}`);
