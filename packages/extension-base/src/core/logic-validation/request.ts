@@ -436,7 +436,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       try {
         const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
         const id = getId();
-        const feeInfo = await koni.feeService.subscribeChainFee(id, transaction.chain || '', 'evm') as EvmFeeInfo;
+        const feeInfo = await koni.feeService.subscribeChainFee(id, networkKey, 'evm') as EvmFeeInfo;
         const feeCombine = combineEthFee(feeInfo);
 
         if (transaction.maxFeePerGas) {
