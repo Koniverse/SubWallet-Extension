@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { isHex } from '@polkadot/util';
 import { TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { Vec } from '@polkadot/types';
@@ -143,10 +145,28 @@ const evmRecover = async (history: TransactionHistoryItem, chainService: ChainSe
     const evmApi = chainService.getEvmApi(chain);
 
     if (evmApi) {
-      const _api = await evmApi.isReady;
+      const _api = await Promise.race([
+        evmApi.isReady,
+        new Promise<_EvmApi>((resolve, reject) => {
+          const createTimeout = (callback: () => void) => {
+            setTimeout(callback, 10000);
+          };
+
+          createTimeout(() => {
+            const api = chainService.getEvmApi(chain);
+
+            Promise.race([
+              api.isReady,
+              new Promise<_EvmApi>((_, reject) => createTimeout(() => reject(new Error('Timeout'))))
+            ])
+              .then(resolve)
+              .catch(reject);
+          })
+        })]
+      );
       const api = _api.api;
 
-      if (extrinsicHash) {
+      if (extrinsicHash && isHex(extrinsicHash)) {
         const transactionReceipt = await api.eth.getTransactionReceipt(extrinsicHash);
 
         return { ...result, status: transactionReceipt.status ? HistoryRecoverStatus.SUCCESS : HistoryRecoverStatus.FAILED };
