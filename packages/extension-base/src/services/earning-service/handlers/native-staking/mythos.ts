@@ -381,7 +381,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
     const extrinsicList = [
       substrateApi.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
       substrateApi.api.tx.collatorStaking.unstakeFrom(selectedTarget),
-      substrateApi.api.tx.collatorStaking.unlock() // ignore amount to unlock all
+      substrateApi.api.tx.collatorStaking.unlock(null) // ignore amount to unlock all
     ];
 
     return [ExtrinsicType.STAKING_UNBOND, substrateApi.api.tx.utility.batch(extrinsicList)];
