@@ -168,7 +168,11 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
         filename: 'index.html',
         template: 'public/index.html',
         meta: { 'app-version': pkgJson.buildNumber }
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({
