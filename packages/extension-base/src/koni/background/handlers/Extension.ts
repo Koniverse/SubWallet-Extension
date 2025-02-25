@@ -57,7 +57,7 @@ import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTrans
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
-import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { OptimalSwapPathParams, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, createTransactionFromRLP, detectTransferTxType, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -3878,6 +3878,10 @@ export default class KoniExtension {
     return this.#koniState.swapService.getSwapPairs();
   }
 
+  private async generateOptimalProcess (request: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+    return this.#koniState.swapService.generateOptimalProcess(request);
+  }
+
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
     return this.#koniState.swapService.handleSwapRequest(request);
   }
@@ -4649,6 +4653,8 @@ export default class KoniExtension {
         /* Swap service */
       case 'pri(swapService.subscribePairs)':
         return this.subscribeSwapPairs(id, port);
+      case 'pri(swapService.generateOptimalProcess)':
+        return this.generateOptimalProcess(request as OptimalSwapPathParams);
       case 'pri(swapService.handleSwapRequest)':
         return this.handleSwapRequest(request as SwapRequest);
       case 'pri(swapService.getLatestQuote)':

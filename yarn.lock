@@ -62,13 +62,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@adraffy/ens-normalize@npm:1.10.1":
-  version: 1.10.1
-  resolution: "@adraffy/ens-normalize@npm:1.10.1"
-  checksum: 0836f394ea256972ec19a0b5e78cb7f5bcdfd48d8a32c7478afc94dd53ae44c04d1aa2303d7f3077b4f3ac2323b1f557ab9188e8059978748fdcd83e04a80dcc
-  languageName: node
-  linkType: hard
-
 "@adraffy/ens-normalize@npm:1.9.2":
   version: 1.9.2
   resolution: "@adraffy/ens-normalize@npm:1.9.2"
@@ -1844,42 +1837,6 @@ __metadata:
     "@noble/hashes": ^1.1.5
     "@noble/secp256k1": ^1.7.1
   checksum: 01f23cb05553ceb3783513b9c79b3303289bf55cd694150967b15ce60a35821cad68794ae958088cbe6b8a2b02c9294ebff78fd6b53d6fd78662eeda7bc742f1
-  languageName: node
-  linkType: hard
-
-"@chainflip/rpc@npm:^1.6.7":
-  version: 1.6.7
-  resolution: "@chainflip/rpc@npm:1.6.7"
-  dependencies:
-    "@chainflip/utils": ^0.3.0
-    zod: ^3.22.8
-  checksum: ee0cec236fa88d2869bb20037b274fc2cc11623ad268d8c262d998210769e92b37c8107f9a28f7ee14de21cf6bb7b772d3329354ec9deb5762e9c6933b569d27
-  languageName: node
-  linkType: hard
-
-"@chainflip/sdk@npm:^1.6.0":
-  version: 1.6.4
-  resolution: "@chainflip/sdk@npm:1.6.4"
-  dependencies:
-    "@chainflip/rpc": ^1.6.7
-    "@chainflip/utils": ^0.4.0
-    axios: ^1.7.7
-    ethers: ^6.13.2
-  checksum: 1f0a02cd0ab49c58a1aeb9195c92b250d0f392ccb81c1c126e632dda17bada49b05e33619e4b9604e416a27545d6f142804ba3c6c30e9ef6f82885639e468659
-  languageName: node
-  linkType: hard
-
-"@chainflip/utils@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "@chainflip/utils@npm:0.3.0"
-  checksum: 28d0bdc00ad71255efa51c3a0fc51257b1af0579f1b8c8adb24ad450c42b48246a4a0d7c3eeafbc7d361249bab54b5a1fce4e3ce190a97886da590b704f97ee4
-  languageName: node
-  linkType: hard
-
-"@chainflip/utils@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@chainflip/utils@npm:0.4.0"
-  checksum: 4d36bc8a2f105ed70ff19f808a38baa9dc7efd735059df7206073b2af4662f5d5e37b93bc7b1fc6c72b0c538f3c0eecaada49469f5469be29c27eb63f350b5bf
   languageName: node
   linkType: hard
 
@@ -3849,15 +3806,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@noble/curves@npm:1.2.0"
-  dependencies:
-    "@noble/hashes": 1.3.2
-  checksum: bb798d7a66d8e43789e93bc3c2ddff91a1e19fdb79a99b86cd98f1e5eff0ee2024a2672902c2576ef3577b6f282f3b5c778bebd55761ddbb30e36bf275e83dd0
-  languageName: node
-  linkType: hard
-
 "@noble/curves@npm:1.3.0, @noble/curves@npm:^1.3.0, @noble/curves@npm:~1.3.0":
   version: 1.3.0
   resolution: "@noble/curves@npm:1.3.0"
@@ -3880,13 +3828,6 @@ __metadata:
   version: 1.1.2
   resolution: "@noble/hashes@npm:1.1.2"
   checksum: 3c2a8cb7c2e053811032f242155d870c5eb98844d924d69702244d48804cb03b42d4a666c49c2b71164420d8229cb9a6f242b972d50d5bb2f1d673b98b041de2
-  languageName: node
-  linkType: hard
-
-"@noble/hashes@npm:1.3.2":
-  version: 1.3.2
-  resolution: "@noble/hashes@npm:1.3.2"
-  checksum: fe23536b436539d13f90e4b9be843cc63b1b17666a07634a2b1259dded6f490be3d050249e6af98076ea8f2ea0d56f578773c2197f2aa0eeaa5fba5bc18ba474
   languageName: node
   linkType: hard
 
@@ -6439,15 +6380,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.98":
-  version: 0.2.98
-  resolution: "@subwallet/chain-list@npm:0.2.98"
+"@subwallet/chain-list@npm:0.2.99-beta.28":
+  version: 0.2.99-beta.28
+  resolution: "@subwallet/chain-list@npm:0.2.99-beta.28"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: bf03699ae2f5eb97f49ebbdb92416095230e38b104a0c945884c4f05447adf728c722b57dd145805231433468faa471bd5d6d8b71e7c6fc307a32724897edb71
+  checksum: 918151fb8f95ff5105071eda957086f624aa062c6e998f12b1e7480788b73b8b1c05dfbedef0a1379c62a0d054fe7ffa470b0b0af94f8ee3871fa361d075e519
   languageName: node
   linkType: hard
 
@@ -6458,7 +6399,6 @@ __metadata:
     "@acala-network/api": ^5.0.2
     "@apollo/client": ^3.7.14
     "@azns/resolver-core": ^1.4.0
-    "@chainflip/sdk": ^1.6.0
     "@equilab/api": ~1.14.25
     "@ethereumjs/common": ^4.1.0
     "@ethereumjs/tx": ^5.1.0
@@ -6490,7 +6430,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.99-beta.14
+    "@subwallet/chain-list": 0.2.99-beta.28
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6630,7 +6570,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.14
+    "@subwallet/chain-list": 0.2.99-beta.28
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6770,7 +6710,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.14
+    "@subwallet/chain-list": 0.2.99-beta.28
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6950,7 +6890,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.97
+    "@subwallet/chain-list": 0.2.99-beta.28
   languageName: unknown
   linkType: soft
 
@@ -10151,17 +10091,6 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: cb8ce291818effda09240cb60f114d5625909b345e10f389a945320e06acf0bc949d0f8422d25720f5dd421362abee302c99f5e97edec4c156c8939814b23d19
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.7.7":
-  version: 1.7.7
-  resolution: "axios@npm:1.7.7"
-  dependencies:
-    follow-redirects: ^1.15.6
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: 882d4fe0ec694a07c7f5c1f68205eb6dc5a62aecdb632cc7a4a3d0985188ce3030e0b277e1a8260ac3f194d314ae342117660a151fabffdc5081ca0b5a8b47fe
   languageName: node
   linkType: hard
 
@@ -14771,21 +14700,6 @@ __metadata:
     utf8: ^3.0.0
     uuid: ^8.3.2
   checksum: 555effe571c633ca9189e08639928e7bfcb601474f5a37653a3d028b06a10fb8577408c32d425ccecb3ac25d7165322cb9786239fa09ce276532d262206feb8c
-  languageName: node
-  linkType: hard
-
-"ethers@npm:^6.13.2":
-  version: 6.13.2
-  resolution: "ethers@npm:6.13.2"
-  dependencies:
-    "@adraffy/ens-normalize": 1.10.1
-    "@noble/curves": 1.2.0
-    "@noble/hashes": 1.3.2
-    "@types/node": 18.15.13
-    aes-js: 4.0.0-beta.5
-    tslib: 2.4.0
-    ws: 8.17.1
-  checksum: 981860c736c7ae121774ad38ea07e3611ce524a77d2fcb77db499b65afe0cbe8f344cd5204d94b68b316349ff770fd2a7d9c8b2039da41c072f98d9864099925
   languageName: node
   linkType: hard
 
@@ -29211,21 +29125,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.17.1":
-  version: 8.17.1
-  resolution: "ws@npm:8.17.1"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
-  languageName: node
-  linkType: hard
-
 "ws@npm:8.5.0":
   version: 8.5.0
   resolution: "ws@npm:8.5.0"
@@ -29499,7 +29398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.21.4, zod@npm:^3.22.8":
+"zod@npm:^3.21.4":
   version: 3.23.8
   resolution: "zod@npm:3.23.8"
   checksum: 15949ff82118f59c893dacd9d3c766d02b6fa2e71cf474d5aa888570c469dbf5446ac5ad562bb035bf7ac9650da94f290655c194f4a6de3e766f43febd432c5c

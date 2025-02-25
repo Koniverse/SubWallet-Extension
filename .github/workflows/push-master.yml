@@ -39,6 +39,7 @@ jobs:
         BITTENSOR_API_KEY_9: ${{ secrets.BITTENSOR_API_KEY_9 }}
         BITTENSOR_API_KEY_10: ${{ secrets.BITTENSOR_API_KEY_10 }}
         SIMPLE_SWAP_API_KEY: ${{ secrets.SIMPLE_SWAP_API_KEY }}
+        UNISWAP_API_KEY:  ${{ secrets.UNISWAP_API_KEY }}
         SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
         BRANCH_NAME: ${{ github.ref_name }}
       run: |

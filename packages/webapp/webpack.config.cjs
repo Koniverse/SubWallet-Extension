@@ -70,6 +70,7 @@ const _additionalEnv = {
   BITTENSOR_API_KEY_9: JSON.stringify(process.env.BITTENSOR_API_KEY_9),
   BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
   SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
+  UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API)
 };
 
