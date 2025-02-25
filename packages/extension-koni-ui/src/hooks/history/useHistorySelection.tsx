@@ -78,7 +78,7 @@ export default function useHistorySelection () {
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, selectedChain]);
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedChain]);
 
   useEffect(() => {
     if (chainItems.length) {

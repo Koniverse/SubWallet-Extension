@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RequestCameraAccessModal, RequestCreatePasswordModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
+import { AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
+import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
-import { ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -235,7 +236,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     transactionStepsModal: {
       open: openTransactionStepsModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {

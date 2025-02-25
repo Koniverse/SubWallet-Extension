@@ -308,7 +308,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, currentAccountProxy, isAllAccount, openAddressQrModal, specificChain, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, currentAccountProxy, getReformatAddress, isAllAccount, openAddressQrModal, specificChain, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

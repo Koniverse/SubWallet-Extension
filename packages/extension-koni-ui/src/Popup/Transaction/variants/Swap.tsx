@@ -20,7 +20,7 @@ import { AddMoreBalanceModal, ChooseFeeTokenModal, SlippageModal, SwapIdleWarnin
 import { QuoteResetTime, SwapRoute } from '@subwallet/extension-koni-ui/components/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_MORE_BALANCE_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { getLatestSwapQuote, handleSwapRequest, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -29,7 +29,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, getReformatedAddressRelatedToChain, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, BackgroundIcon, Button, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -336,7 +336,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, chainValue, targetAccountProxy]);
+  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
