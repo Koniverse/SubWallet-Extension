@@ -1657,7 +1657,7 @@ export default class KoniExtension {
     if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain)) {
       tokensCanPayFee = await getAssetHubTokensCanPayFee(substrateApi, chainService, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
     } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
-      const [ priceInfo, _assetId] = await Promise.all([
+      const [priceInfo, _assetId] = await Promise.all([
         this.getPrice(),
         substrateApi.api.query.multiTransactionPayment.accountCurrencyMap(address)
       ]);

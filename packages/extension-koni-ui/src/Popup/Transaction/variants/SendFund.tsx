@@ -162,7 +162,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
   const [listTokensCanPayFee, setListTokensCanPayFee] = useState<TokenHasBalanceInfo[]>([]);
 
-  // TODO: Should manage the states `tokenPayFeeAmount` and `currentTokenPayFee` together.
+  // todo: refactor name and review logic currentNonNativeTokenPayFee
   const [currentNonNativeTokenPayFee, setCurrentNonNativeTokenPayFee] = useState<string | undefined>(undefined);
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
