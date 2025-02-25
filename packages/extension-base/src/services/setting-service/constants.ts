@@ -16,6 +16,7 @@ export const DEFAULT_SHOW_ZERO_BALANCE = true;
 export const DEFAULT_SHOW_BALANCE = false;
 export const DEFAULT_ALL_LOGO = '';
 export const DEFAULT_CAMERA_ENABLE = false;
+export const DEFAULT_ALLOW_ONE_SIGN = true;
 export const DEFAULT_NOTIFICATION_SETUP: NotificationSetup = {
   isEnabled: true,
   showNotice: {
@@ -44,5 +45,6 @@ export const DEFAULT_SETTING: UiSettings = {
   timeAutoLock: DEFAULT_AUTO_LOCK_TIME,
   enableChainPatrol: DEFAULT_CHAIN_PATROL_ENABLE,
   notificationSetup: DEFAULT_NOTIFICATION_SETUP,
-  walletReference: ''
+  walletReference: '',
+  allowOneSign: DEFAULT_ALLOW_ONE_SIGN
 };
