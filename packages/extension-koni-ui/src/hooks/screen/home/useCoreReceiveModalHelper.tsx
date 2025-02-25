@@ -13,7 +13,6 @@ import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHan
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
-import { getReformatedAddressRelatedToChain } from '@subwallet/extension-koni-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -252,7 +251,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       }
 
       for (const accountJson of currentAccountProxy.accounts) {
-        const reformatedAddress = getReformatedAddressRelatedToChain(accountJson, chainInfo);
+        const reformatedAddress = getReformatAddress(accountJson, chainInfo);
 
         if (reformatedAddress) {
           const accountAddressItem: AccountAddressItemType = {
