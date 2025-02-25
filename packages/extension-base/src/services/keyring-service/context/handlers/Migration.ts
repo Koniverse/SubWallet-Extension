@@ -231,6 +231,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         };
 
         const rs = keyring.addUri(suri, metadata, type);
+
         soloAccountProxyIds.push(rs.json.address);
         const address = rs.pair.address;
 

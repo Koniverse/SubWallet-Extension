@@ -50,7 +50,8 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
       .modify((item) => {
         item.proxyId = newProxyId;
         item.title = item.title.replace(/\[.*?\]/, `[${newName}]`);
-      });
+      })
+      .catch(console.error);
   }
 
   async cleanUpOldNotifications (overdueTime: number) {

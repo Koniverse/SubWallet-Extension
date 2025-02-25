@@ -1951,6 +1951,7 @@ export default class KoniExtension {
 
     const _request: CalculateMaxTransferable = {
       address: address,
+      cardanoApi: this.#koniState.chainService.getCardanoApi(chain),
       destChain,
       destToken,
       evmApi: this.#koniState.chainService.getEvmApi(chain),

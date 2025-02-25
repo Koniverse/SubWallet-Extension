@@ -217,13 +217,13 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           feeOptions = {
             ...fee,
             estimatedFee: estimatedFee
-          }
+          };
         } else if (isCardanoTransaction(transaction)) {
           estimatedFee = transaction.estimateCardanoFee;
           feeOptions = {
             ...fee,
             estimatedFee: estimatedFee
-          }
+          };
         } else {
           // Not implemented yet
           estimatedFee = '0';

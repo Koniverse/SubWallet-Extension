@@ -162,7 +162,7 @@ export default class FeeService {
               }
             } else {
               observer.next({
-                type: type as Exclude<FeeChainType, 'evm'>,
+                type,
                 busyNetwork: false,
                 options: {
                   slow: {
@@ -176,7 +176,7 @@ export default class FeeService {
                   },
                   default: 'slow'
                 }
-              });
+              } as Exclude<FeeInfo, EvmFeeInfo>);
               clearInterval(interval);
             }
           }
