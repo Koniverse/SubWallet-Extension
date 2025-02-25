@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectExtensionModal } from '@subwallet/extension-web-ui/components';
+import { AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectExtensionModal, TonWalletContractSelectorModal } from '@subwallet/extension-web-ui/components';
 import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Account/SeedPhraseModal';
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
 import { AddressQrModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AddressQrModal';
-import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { useAlert, useGetConfig, useSetSessionLatest, useSwitchModal } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -17,6 +17,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { TonWalletContractSelectorModalProps } from '../components/Modal/TonWalletContractSelectorModal';
 import { UnlockModal } from '../components/Modal/UnlockModal';
 
 interface Props {
@@ -69,6 +70,10 @@ export interface WalletModalContextType {
     update: React.Dispatch<React.SetStateAction<AddressQrModalProps | undefined>>;
     close: VoidFunction
   },
+  tonWalletContractSelectorModal: {
+    open: (props: TonWalletContractSelectorModalProps) => void,
+    close: VoidFunction
+  },
   alertModal: {
     open: (props: AlertDialogProps) => void,
     close: VoidFunction
@@ -87,6 +92,11 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     update: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
+  },
+  tonWalletContractSelectorModal: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    open: (props) => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: () => {}
   },
@@ -140,6 +150,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const [addressQrModalProps, setAddressQrModalProps] = useState<AddressQrModalProps | undefined>();
   // @ts-ignore
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
+  const [tonWalletContractSelectorModalProps, setTonWalletContractSelectorModalProps] = useState<TonWalletContractSelectorModalProps | undefined>();
 
   const openAddressQrModal = useCallback((props: AddressQrModalProps) => {
     setAddressQrModalProps(props);
@@ -161,6 +172,22 @@ export const WalletModalContextProvider = ({ children }: Props) => {
 
   /* Address QR Modal */
 
+  /* TON Contract Modal */
+  const openTonWalletContractSelectorModal = useCallback((props: AddressQrModalProps) => {
+    setTonWalletContractSelectorModalProps(props);
+    activeModal(TON_WALLET_CONTRACT_SELECTOR_MODAL);
+  }, [activeModal]);
+
+  const closeTonWalletContractSelectorModal = useCallback(() => {
+    inactiveModal(TON_WALLET_CONTRACT_SELECTOR_MODAL);
+    setTonWalletContractSelectorModalProps(undefined);
+  }, [inactiveModal]);
+
+  const onCancelTonWalletContractSelectorModal = useCallback(() => {
+    tonWalletContractSelectorModalProps?.onCancel?.() || closeTonWalletContractSelectorModal();
+  }, [closeTonWalletContractSelectorModal, tonWalletContractSelectorModalProps]);
+  /* TON Contract Modal */
+
   /* Derive modal */
   const openDeriveModal = useCallback((actionProps: AccountDeriveActionProps) => {
     setDeriveActionModalProps(actionProps);
@@ -175,6 +202,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       update: setAddressQrModalProps,
       close: closeAddressQrModal
     },
+    tonWalletContractSelectorModal: {
+      open: openTonWalletContractSelectorModal,
+      close: onCancelTonWalletContractSelectorModal
+    },
     alertModal: {
       open: openAlert,
       close: closeAlert
@@ -182,7 +213,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     deriveModal: {
       open: openDeriveModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, openAddressQrModal, openAlert, openDeriveModal]);
+  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, onCancelTonWalletContractSelectorModal, openAddressQrModal, openAlert, openDeriveModal, openTonWalletContractSelectorModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -243,6 +274,14 @@ export const WalletModalContextProvider = ({ children }: Props) => {
           onCancel={onCancelAddressQrModal}
         />
       )
+    }
+
+    {!!tonWalletContractSelectorModalProps &&
+      <TonWalletContractSelectorModal
+        {...tonWalletContractSelectorModalProps}
+        id={TON_WALLET_CONTRACT_SELECTOR_MODAL}
+        onCancel={onCancelTonWalletContractSelectorModal}
+      />
     }
 
     {

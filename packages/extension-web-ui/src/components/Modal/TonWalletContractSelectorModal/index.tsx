@@ -1,11 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
-import type { IconProps } from 'phosphor-react';
-
 import { AccountActions, AccountProxyType, ResponseGetAllTonWalletContractVersion } from '@subwallet/extension-base/types';
-import { BaseModal, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
+import { BaseModal, CloseIcon, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import { TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { useFetchChainInfo, useGetAccountByAddress, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -22,27 +19,28 @@ import styled from 'styled-components';
 
 import { TonWalletContractItem, TonWalletContractItemType } from './TonWalletContractItem';
 
-type Props = ThemeProps & {
+export type TonWalletContractSelectorModalProps = {
   onCancel?: VoidFunction;
-  id: string;
   chainSlug: string;
   address: string;
-  closeIcon?: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<SVGSVGElement>>;
-  rightIconProps?: ButtonProps;
-  isShowBackButton?: boolean;
   onBack?: VoidFunction;
 };
+
+type Props = ThemeProps & TonWalletContractSelectorModalProps & {
+  id: string;
+}
 
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 const TON_WALLET_CONTRACT_TYPES_URL = 'https://docs.ton.org/participate/wallets/contracts#how-can-wallets-be-different';
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon = CaretLeft, isShowBackButton, onBack, onCancel, rightIconProps }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const notification = useNotification();
   const chainInfo = useFetchChainInfo(chainSlug);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const [tonWalletContractVersionData, setTonWalletContractVersionData] = useState<ResponseGetAllTonWalletContractVersion | null>(null);
-  const accountInfo = useGetAccountByAddress(address);
+  const originAccountInfo = useGetAccountByAddress(address);
+  const [accountInfo] = useState(originAccountInfo);
   const [selectedContractVersion, setSelectedContractVersion] = useState<TonWalletContractVersion | undefined>(
     accountInfo ? accountInfo.tonContractVersion as TonWalletContractVersion : undefined
   );
@@ -61,7 +59,8 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
       }).catch((e: Error) => {
         sync && notification({
           message: e.message,
-          type: 'error'
+          type: 'error',
+          duration: 10
         });
       });
     }
@@ -125,8 +124,8 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
 
       tonAccountChangeWalletContractVersion({ proxyId: '', address: accountInfo.address, version: selectedContractVersion })
         .then((newAddress) => {
+          onCancel?.();
           setTimeout(() => {
-            onCancel?.();
             setIsSubmitting(false);
             const selectedAccount = accountProxies.find((account) => account.id === accountInfo.proxyId);
             const isOnAccountDetailScreen = location.pathname.includes('/accounts/detail');
@@ -151,13 +150,17 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
   return (
     <BaseModal
       className={CN(className, 'wallet-version-modal')}
-      closable={isShowBackButton}
       closeIcon={
-        <Icon
-          phosphorIcon={closeIcon}
-          size='md'
-        />
+        onBack
+          ? (
+            <Icon
+              phosphorIcon={CaretLeft}
+              size='md'
+            />
+          )
+          : undefined
       }
+      destroyOnClose={true}
       footer={
         <Button
           block={true}
@@ -176,9 +179,14 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
         </Button>
       }
       id={tonWalletContractSelectorModalId}
-      maskClosable={isShowBackButton}
-      onCancel={onBack}
-      rightIconProps={rightIconProps}
+      onCancel={onBack || onCancel}
+      rightIconProps={onBack
+        ? {
+          icon: <CloseIcon />,
+          onClick: onCancel
+        }
+        : undefined
+      }
       title={t<string>('Wallet address & version')}
     >
       <div>

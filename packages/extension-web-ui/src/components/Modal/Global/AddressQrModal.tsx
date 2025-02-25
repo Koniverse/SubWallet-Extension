@@ -5,17 +5,18 @@ import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
-import { BaseModal, CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-web-ui/components';
-import { ADDRESS_QR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
+import { BaseModal, CloseIcon } from '@subwallet/extension-web-ui/components';
+import { ADDRESS_QR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab, toShort } from '@subwallet/extension-web-ui/utils';
-import { Button, Icon, Logo, ModalContext, SwQRCode } from '@subwallet/react-ui';
+import { Button, Icon, Logo, SwQRCode } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretLeft, CopySimple, Gear } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
 
@@ -31,15 +32,13 @@ type Props = ThemeProps & AddressQrModalProps & {
 };
 
 const modalId = ADDRESS_QR_MODAL;
-const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
 const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
   const chainInfo = useFetchChainInfo(chainSlug);
   const accountInfo = useGetAccountByAddress(address);
-  const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
+  const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
 
   const scanExplorerAddressUrl = useMemo(() => {
     return getExplorerLink(chainInfo, address, 'account');
@@ -59,14 +58,6 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
     return accountInfo?.accountActions.includes(AccountActions.TON_CHANGE_WALLET_CONTRACT_VERSION);
   }, [accountInfo]);
 
-  const onChangeTonWalletContact = useCallback(() => {
-    activeModal(tonWalletContractSelectorModalId);
-  }, [activeModal]);
-
-  const onCloseTonWalletContactModal = useCallback(() => {
-    inactiveModal(tonWalletContractSelectorModalId);
-  }, [inactiveModal]);
-
   const onClickCopyButton = useCallback(() => notify({ message: t('Copied to clipboard') }), [notify, t]);
 
   const tonWalletContactSelectorButtonProps = useMemo<ButtonProps>(() => {
@@ -77,11 +68,22 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
         />
       ),
       type: 'ghost',
-      onClick: onChangeTonWalletContact,
+      onClick: () => {
+        tonWalletContractSelectorModal.open({
+          address,
+          chainSlug,
+          onBack: tonWalletContractSelectorModal.close,
+          onCancel: tonWalletContractSelectorModal.close
+        });
+      },
       tooltip: t('Click to change wallet address'),
       tooltipPlacement: 'topRight'
     };
-  }, [onChangeTonWalletContact, t]);
+  }, [address, chainSlug, t, tonWalletContractSelectorModal]);
+
+  useEffect(() => {
+    console.log('selectedAccount-888888');
+  }, []);
 
   return (
     <>
@@ -179,15 +181,6 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
           >{t('View on explorer')}</Button>
         </>
       </BaseModal>
-      {isRelatedToTon && isTonWalletContactSelectorModalActive &&
-        <TonWalletContractSelectorModal
-          address={address}
-          chainSlug={chainSlug}
-          id={tonWalletContractSelectorModalId}
-          onBack={onCloseTonWalletContactModal}
-          onCancel={onCloseTonWalletContactModal}
-        />
-      }
     </>
   );
 };

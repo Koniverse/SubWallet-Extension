@@ -261,8 +261,9 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     if (tokenSelectorItems.length === 1 && tokenGroupSlug) {
+      setSelectedChain(tokenSelectorItems[0].originChain);
+
       if (isAllAccount) {
-        setSelectedChain(tokenSelectorItems[0].originChain);
         activeModal(accountSelectorModalId);
 
         return;

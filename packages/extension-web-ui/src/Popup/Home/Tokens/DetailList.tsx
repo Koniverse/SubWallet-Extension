@@ -5,14 +5,15 @@ import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-s
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, CloseIcon, ReceiveModal, TokenBalance, TokenItem, TonWalletContractSelectorModal } from '@subwallet/extension-web-ui/components';
+import { AccountSelectorModal, AlertBox, ReceiveModal, TokenBalance, TokenItem } from '@subwallet/extension-web-ui/components';
 import PageWrapper from '@subwallet/extension-web-ui/components/Layout/PageWrapper';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenBalanceDetailItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenBalanceDetailItem';
-import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SHOW_BANNER_TOKEN_GROUPS, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SHOW_BANNER_TOKEN_GROUPS, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useCoreReceiveModalHelper, useDefaultNavigate, useGetChainSlugsByAccount, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
 import Banner from '@subwallet/extension-web-ui/Popup/Home/Tokens/Banner';
 import { DetailModal } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailModal';
@@ -55,7 +56,6 @@ function WrapperComponent ({ className = '' }: ThemeProps): React.ReactElement<P
 }
 
 const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;
-const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 const TokenDetailModalId = 'tokenDetailModalId';
 
 const searchFunc = (item: TokenBalanceItemType, searchText: string) => {
@@ -84,7 +84,7 @@ function Component (): React.ReactElement {
   const navigate = useNavigate();
   const { goHome } = useDefaultNavigate();
 
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const { isWebUI } = useContext(ScreenContext);
   const { accountBalance: { tokenBalanceMap, tokenGroupBalanceMap }, tokenGroupStructure: { tokenGroupMap } } = useContext(HomeContext);
 
@@ -99,12 +99,11 @@ function Component (): React.ReactElement {
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
   const allowedChains = useGetChainSlugsByAccount();
-  const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
+  const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
-  const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
 
   const filteredAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => {
@@ -441,9 +440,31 @@ function Component (): React.ReactElement {
   }, [inactiveModal, setIsShowTonWarning]);
 
   const onSelectAccountSelector = useCallback((item: AccountAddressItemType) => {
-    setCurrentTonAddress(item.address);
-    activeModal(tonWalletContractSelectorModalId);
-  }, [activeModal]);
+    tonWalletContractSelectorModal.open({
+      address: item.address,
+      chainSlug: 'ton',
+      onCancel: () => {
+        setIsShowTonWarning(false);
+        inactiveModal(tonAccountSelectorModalId);
+        tonWalletContractSelectorModal.close();
+      },
+      onBack: tonWalletContractSelectorModal.close
+    });
+  }, [inactiveModal, setIsShowTonWarning, tonWalletContractSelectorModal]);
+
+  const onOpenTonWalletContactModal = useCallback(() => {
+    if (isAllAccount) {
+      activeModal(tonAccountSelectorModalId);
+    } else {
+      if (tonAddress) {
+        tonWalletContractSelectorModal.open({
+          address: tonAddress,
+          chainSlug: 'ton',
+          onCancel: tonWalletContractSelectorModal.close
+        });
+      }
+    }
+  }, [activeModal, isAllAccount, tonAddress, tonWalletContractSelectorModal]);
 
   useEffect(() => {
     if (currentTokenInfo) {
@@ -504,25 +525,6 @@ function Component (): React.ReactElement {
       } as EarningPoolsParam });
     }
   }, [navigate, symbol, tokenGroupMap, tokenGroupSlug]);
-
-  const onBackTonWalletContactModal = useCallback(() => {
-    inactiveModal(tonWalletContractSelectorModalId);
-  }, [inactiveModal]);
-
-  const onCloseTonWalletContactModal = useCallback(() => {
-    setIsShowTonWarning(false);
-    inactiveModal(tonAccountSelectorModalId);
-    inactiveModal(tonWalletContractSelectorModalId);
-  }, [inactiveModal, setIsShowTonWarning]);
-
-  const onOpenTonWalletContactModal = useCallback(() => {
-    if (isAllAccount) {
-      activeModal(tonAccountSelectorModalId);
-    } else {
-      setCurrentTonAddress(tonAddress);
-      activeModal(tonWalletContractSelectorModalId);
-    }
-  }, [activeModal, isAllAccount, tonAddress]);
 
   return (
     <div
@@ -679,20 +681,6 @@ function Component (): React.ReactElement {
                 onSelectItem={onSelectAccountSelector}
               />
             )}
-            {currentTonAddress && isTonWalletContactSelectorModalActive &&
-              <TonWalletContractSelectorModal
-                address={currentTonAddress}
-                chainSlug={'ton'}
-                id={tonWalletContractSelectorModalId}
-                isShowBackButton={isAllAccount}
-                onBack={onBackTonWalletContactModal}
-                onCancel={onCloseTonWalletContactModal}
-                rightIconProps={{
-                  icon: <CloseIcon />,
-                  onClick: onCloseTonWalletContactModal
-                }}
-              />
-            }
           </>
         )
       }

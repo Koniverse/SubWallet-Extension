@@ -4,14 +4,15 @@
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TokenBalance, TokenItem, TokenPrice, TonWalletContractSelectorModal } from '@subwallet/extension-web-ui/components';
+import { AccountSelectorModal, AlertBox, EmptyList, PageWrapper, ReceiveModal, TokenBalance, TokenItem, TokenPrice } from '@subwallet/extension-web-ui/components';
 import AnimatedNetworkGroup from '@subwallet/extension-web-ui/components/MetaInfo/parts/AnimatedNetworkGroup';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenGroupBalanceItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenGroupBalanceItem';
-import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useCoreReceiveModalHelper, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -45,7 +46,6 @@ const searchFunc = (item: TokenBalanceItemType, searchText: string) => {
   return symbol.includes(searchTextLowerCase);
 };
 
-const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;
 
 const Component = (): React.ReactElement => {
@@ -70,13 +70,12 @@ const Component = (): React.ReactElement => {
   const allowedChains = useGetChainSlugsByAccount();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
   const swapPairs = useSelector((state: RootState) => state.swap.swapPairs);
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
-  const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
-  const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
   const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
     const result: Record<string, string[]> = {};
 
@@ -219,30 +218,31 @@ const Component = (): React.ReactElement => {
   }, [inactiveModal, setIsShowTonWarning]);
 
   const onSelectAccountSelector = useCallback((item: AccountAddressItemType) => {
-    setCurrentTonAddress(item.address);
-    activeModal(tonWalletContractSelectorModalId);
-  }, [activeModal]);
-
-  const onBackTonWalletContactModal = useCallback(() => {
-    inactiveModal(tonWalletContractSelectorModalId);
-  }, [inactiveModal]);
-
-  const onCloseTonWalletContactModal = useCallback(() => {
-    setIsShowTonWarning(false);
-    setTimeout(() => {
-      inactiveModal(tonAccountSelectorModalId);
-      inactiveModal(tonWalletContractSelectorModalId);
-    }, 200);
-  }, [inactiveModal, setIsShowTonWarning]);
+    tonWalletContractSelectorModal.open({
+      address: item.address,
+      chainSlug: 'ton',
+      onCancel: () => {
+        setIsShowTonWarning(false);
+        inactiveModal(tonAccountSelectorModalId);
+        tonWalletContractSelectorModal.close();
+      },
+      onBack: tonWalletContractSelectorModal.close
+    });
+  }, [inactiveModal, setIsShowTonWarning, tonWalletContractSelectorModal]);
 
   const onOpenTonWalletContactModal = useCallback(() => {
     if (isAllAccount) {
       activeModal(tonAccountSelectorModalId);
     } else {
-      setCurrentTonAddress(tonAddress);
-      activeModal(tonWalletContractSelectorModalId);
+      if (tonAddress) {
+        tonWalletContractSelectorModal.open({
+          address: tonAddress,
+          chainSlug: 'ton',
+          onCancel: tonWalletContractSelectorModal.close
+        });
+      }
     }
-  }, [activeModal, isAllAccount, tonAddress]);
+  }, [activeModal, isAllAccount, tonAddress, tonWalletContractSelectorModal]);
 
   const onClickItem = useCallback((item: TokenBalanceItemType) => {
     navigate(`/home/tokens/detail/${item.slug}`);
@@ -550,20 +550,6 @@ const Component = (): React.ReactElement => {
                   onCancel={onCloseAccountSelector}
                   onSelectItem={onSelectAccountSelector}
                 />
-                {currentTonAddress && isTonWalletContactSelectorModalActive &&
-                  <TonWalletContractSelectorModal
-                    address={currentTonAddress}
-                    chainSlug={'ton'}
-                    id={tonWalletContractSelectorModalId}
-                    isShowBackButton={isAllAccount}
-                    onBack={onBackTonWalletContactModal}
-                    onCancel={onCloseTonWalletContactModal}
-                    rightIconProps={{
-                      icon: <CloseIcon />,
-                      onClick: onCloseTonWalletContactModal
-                    }}
-                  />
-                }
               </>
             )
           }
