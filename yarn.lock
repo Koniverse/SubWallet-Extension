@@ -6394,15 +6394,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.99-beta.28":
-  version: 0.2.99-beta.28
-  resolution: "@subwallet/chain-list@npm:0.2.99-beta.28"
+"@subwallet/chain-list@npm:0.2.99-cardano.0":
+  version: 0.2.99-cardano.0
+  resolution: "@subwallet/chain-list@npm:0.2.99-cardano.0"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: 918151fb8f95ff5105071eda957086f624aa062c6e998f12b1e7480788b73b8b1c05dfbedef0a1379c62a0d054fe7ffa470b0b0af94f8ee3871fa361d075e519
+  checksum: cccefc1e37f6029b907363d7e11c6d7de9f0d8784fd367dd4175c281534d7ecaae334342fd02382a9357f942dcb55327696cbce3c22e3594edc32f110aec106f
   languageName: node
   linkType: hard
 
@@ -6445,7 +6445,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": 0.2.99-cardano.0
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6585,7 +6585,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": 0.2.99-cardano.0
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6726,7 +6726,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": 0.2.99-cardano.0
     "@subwallet/extension-base": ^1.3.19-0
     "@subwallet/extension-chains": ^1.3.19-0
     "@subwallet/extension-dapp": ^1.3.19-0
@@ -6799,7 +6799,7 @@ __metadata:
 
 "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.7
-  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/#../SubWallet-Base/packages/keyring/build/::hash=c7414c&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/#../SubWallet-Base/packages/keyring/build/::hash=2d5a58&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
@@ -6820,7 +6820,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: 72e31f30f41062ef7861e3ad59920f214d403608e8908e97acff711740def705eefaace3fe004580d03dd53f45035a5d3d972390b73444b11765d16d51afc8f4
+  checksum: 77a67430d3b29fd4f1913c65c027a9c97259fa9fc5d15f1c4d2dff57846f9dd1831abbb5f5230dd6b59b11676844916a6479211fbd02e1558e2a92871204c3b1
   languageName: node
   linkType: hard
 
@@ -6911,18 +6911,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/subwallet-api-sdk@^1.3.12-1, @subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk":
-  version: 0.0.0-use.local
-  resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
-  dependencies:
-    "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.97
-  languageName: unknown
-  linkType: soft
-
 "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.7
-  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=a1c075&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=bf6e16&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
@@ -6932,7 +6923,7 @@ __metadata:
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 590f3230b812b5405b5094da4565e798edfe670efb3839e41670d83ba51e372788dbc523e5365764625ef418b7be6e88ba6a949023e3b7023c7931afea52d946
+  checksum: 7b8b9f59d886fabfab9f4ab85c93375230c2a755dea0e25e8a23ea03daf4bd64c8ecea65062c0a9c8d5655fb985d2be32487c1b42ff14db672b5c8911b8939eb
   languageName: node
   linkType: hard
 
