@@ -16,7 +16,8 @@ export default class FeeService {
   private chainFeeSubscriptionMap: Record<FeeChainType, Record<string, FeeSubscription>> = {
     evm: {},
     substrate: {},
-    ton: {}
+    ton: {},
+    cardano: {}
   };
 
   constructor (state: KoniState) {
@@ -134,20 +135,31 @@ export default class FeeService {
             const api = this.state.getEvmApi(chain);
 
             // TODO: Handle case type === evm and not have api
-            if (type === 'evm' && api) {
-              calculateGasFeeParams(api, chain)
-                .then((info) => {
-                  observer.next(info);
-                })
-                .catch((e) => {
-                  console.warn(`Cannot get fee param for ${chain}`, e);
-                  observer.next({
-                    type: 'evm',
-                    gasPrice: '0',
-                    baseGasFee: undefined,
-                    options: undefined
-                  } as EvmFeeInfo);
-                });
+            if (type === 'evm') {
+              if (api) {
+                calculateGasFeeParams(api, chain)
+                  .then((info) => {
+                    observer.next(info);
+                  })
+                  .catch((e) => {
+                    console.warn(`Cannot get fee param for ${chain}`, e);
+                    observer.next({
+                      type: 'evm',
+                      gasPrice: '0',
+                      baseGasFee: undefined,
+                      options: undefined
+                    } as EvmFeeInfo);
+                  });
+              } else {
+                console.warn(`Cannot get fee param for ${chain}`, 'Cannot get api');
+
+                observer.next({
+                  type: 'evm',
+                  gasPrice: '0',
+                  baseGasFee: undefined,
+                  options: undefined
+                } as EvmFeeInfo);
+              }
             } else {
               observer.next({
                 type: type as Exclude<FeeChainType, 'evm'>,
