@@ -79,6 +79,42 @@ export const getMissionPoolData = (() => {
   return rs;
 })();
 
+export const updateOldChainPrefixStore = (data: Record<string, number>) => {
+  store.dispatch({
+    type: 'chainStore/updateChainOldPrefixMap',
+    payload: data
+  });
+};
+
+export const getOldChainPrefixData = (() => {
+  const handler: {
+    resolve?: (value: Record<string, number>) => void,
+    reject?: (reason?: any) => void
+  } = {};
+
+  const promise = new Promise<Record<string, number>>((resolve, reject) => {
+    handler.resolve = resolve;
+    handler.reject = reject;
+  });
+
+  const rs = {
+    promise,
+    start: () => {
+      fetchStaticData<Record<string, number>>('old-chain-prefix')
+        .then((data) => {
+          handler.resolve?.(data);
+        })
+        .catch(handler.reject);
+    }
+  };
+
+  rs.promise.then((data) => {
+    updateOldChainPrefixStore(data);
+  }).catch(console.error);
+
+  return rs;
+})();
+
 export const updateCurrentAccountState = (currentAccountJson: AccountJson) => {
   store.dispatch({ type: 'accountState/updateCurrentAccount', payload: currentAccountJson });
 };
