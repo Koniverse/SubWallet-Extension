@@ -1420,7 +1420,8 @@ export default class KoniExtension {
           value: value || '0',
           cardanoTtlOffset: DEFAULT_CARDANO_TTL_OFFSET,
           transferAll: !!transferAll,
-          cardanoApi
+          cardanoApi,
+          nativeTokenInfo
         });
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
@@ -4132,9 +4133,11 @@ export default class KoniExtension {
 
   /* Migrate Unified Account */
   private async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
-    this.saveUnifiedAccountMigrationInProgress({ isUnifiedAccountMigrationInProgress: true });
+    const setMigratingMode = () => {
+      this.saveUnifiedAccountMigrationInProgress({ isUnifiedAccountMigrationInProgress: true });
+    };
 
-    return await this.#koniState.keyringService.context.migrateUnifiedAndFetchEligibleSoloAccounts(request);
+    return await this.#koniState.keyringService.context.migrateUnifiedAndFetchEligibleSoloAccounts(request, setMigratingMode);
   }
 
   private migrateSoloAccount (request: RequestMigrateSoloAccount): ResponseMigrateSoloAccount {

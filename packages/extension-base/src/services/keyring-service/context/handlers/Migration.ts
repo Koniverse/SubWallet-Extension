@@ -38,13 +38,13 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     return true;
   }
 
-  public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
+  public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts, setMigratingModeFn: () => void): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
     // Migrate unified -> unified
     const password = request.password;
     const allAccountProxies = Object.values(this.state.accounts);
     const UACanBeMigrated = this.getUACanBeMigrated(allAccountProxies);
     const UACanBeMigratedSortedByParent = this.sortUAByParent(UACanBeMigrated); // master account must be migrated before derived account
-    const migratedUnifiedAccountIds = await this.migrateUnifiedToUnifiedAccount(password, UACanBeMigratedSortedByParent);
+    const migratedUnifiedAccountIds = await this.migrateUnifiedToUnifiedAccount(password, UACanBeMigratedSortedByParent, setMigratingModeFn);
 
     // Get solo accounts can be migrated
     const soloAccountsNeedToBeMigrated = this.getSoloAccountsNeedToBeMigrated(allAccountProxies);
@@ -67,9 +67,10 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     };
   }
 
-  public async migrateUnifiedToUnifiedAccount (password: string, accountProxies: AccountProxy[]): Promise<string[]> {
+  public async migrateUnifiedToUnifiedAccount (password: string, accountProxies: AccountProxy[], setMigratingModeFn: () => void): Promise<string[]> {
     keyring.unlockKeyring(password);
     this.parentService.updateKeyringState();
+    setMigratingModeFn();
 
     const unifiedAccountIds: string[] = [];
     const modifiedPairs = structuredClone(this.state.modifyPairs);

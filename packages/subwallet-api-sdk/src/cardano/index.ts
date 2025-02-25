@@ -36,17 +36,17 @@ export async function fetchUnsignedPayload (baseUrl: string, params: BuildCardan
     const errorMessage = (error as Error).message;
 
     if (errorMessage.includes(POPULAR_CARDANO_ERROR_PHRASE.NOT_MATCH_MIN_AMOUNT)) {
-      const decimal = params.tokenDecimals;
       const minAdaRequiredRaw = getFirstNumberAfterSubstring(errorMessage, POPULAR_CARDANO_ERROR_PHRASE.NOT_MATCH_MIN_AMOUNT);
-      const minAdaRequired = minAdaRequiredRaw ? toUnit(minAdaRequiredRaw, decimal) : 1;
+      const minAdaRequired = minAdaRequiredRaw ? toUnit(minAdaRequiredRaw, params.tokenDecimals) : 1;
 
-      throw new Error(`Minimum ${minAdaRequired} ADA is required`);
+      throw new Error(`Amount too low. Increase your amount above ${minAdaRequired} ${params.nativeTokenSymbol} and try again`);
     }
 
     if (errorMessage.includes(POPULAR_CARDANO_ERROR_PHRASE.INSUFFICIENT_INPUT)) {
-      throw new Error('Not enough ADA to make this transaction');
+      throw new Error(`Insufficient ${params.nativeTokenSymbol} balance to perform transaction. Top up ${params.nativeTokenSymbol} and try again`);
     }
 
-    throw new Error(`Transaction is not built successfully: ${errorMessage}`);
+    console.error(`Transaction is not built successfully: ${errorMessage}`);
+    throw new Error('Unable to perform this transaction at the moment. Try again later');
   }
 }

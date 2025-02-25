@@ -1,12 +1,9 @@
 // Copyright 2017-2022 @subwallet/subwallet-api-sdk authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SWApiResponse } from '@subwallet/subwallet-api-sdk/types';
-
-export type SWFetchCardanoTx = SWApiResponse<string>;
-
 export interface BuildCardanoTxParams {
   tokenDecimals: number;
+  nativeTokenSymbol: string;
   cardanoId: string;
   from: string;
   to: string;

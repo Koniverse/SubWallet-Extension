@@ -275,8 +275,8 @@ export class AccountContext {
   /* Inject */
 
   /* Migration */
-  public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts) {
-    return await this.migrationHandler.migrateUnifiedAndFetchEligibleSoloAccounts(request);
+  public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts, setMigratingModeFn: () => void) {
+    return await this.migrationHandler.migrateUnifiedAndFetchEligibleSoloAccounts(request, setMigratingModeFn);
   }
 
   public migrateSoloAccount (request: RequestMigrateSoloAccount) {

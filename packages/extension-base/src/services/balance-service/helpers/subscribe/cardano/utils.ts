@@ -3,13 +3,23 @@
 
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 
 export function getCardanoAssetId (chainAsset: _ChainAsset): string {
   return chainAsset.metadata?.cardanoId as string;
 }
 
-export function estimateCardanoTxFee (tx: string) {
-  return Transaction.from_hex(tx).body().fee().to_str();
+export function getCardanoTxFee (payload: string) {
+  return BigInt(Transaction.from_hex(payload).body().fee().to_str());
+}
+
+export function getAdaBelongUtxo (payload: string, receiverAddress: string) {
+  const txOutputsRaw = Transaction.from_hex(payload).body().outputs().to_json();
+  const txOutputs = JSON.parse(txOutputsRaw) as CardanoTxOutput[];
+  const receiverUtxo = txOutputs.find((utxo) => utxo.address === receiverAddress); // must has utxo to receiver
+
+  // @ts-ignore
+  return BigInt(receiverUtxo.amount.coin);
 }
 
 export const cborToBytes = (hex: string): Uint8Array => {
