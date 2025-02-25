@@ -12,6 +12,7 @@ import { combineEthFee } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { TransactionConfig } from 'web3-core';
+import { ContractSendMethod } from 'web3-eth-contract';
 
 interface TransferEvmProps extends TransactionFee {
   chain: string;
@@ -21,6 +22,7 @@ interface TransferEvmProps extends TransactionFee {
   transferAll: boolean;
   value: string;
   evmApi: _EvmApi;
+  fallbackFee?: boolean;
 }
 
 export async function getEVMTransactionObject ({ chain,
@@ -31,6 +33,7 @@ export async function getEVMTransactionObject ({ chain,
   from,
   to,
   transferAll,
+  fallbackFee,
   value }: TransferEvmProps): Promise<[TransactionConfig, string]> {
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
@@ -44,7 +47,13 @@ export async function getEVMTransactionObject ({ chain,
     ...feeCombine
   } as TransactionConfig;
 
-  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject);
+  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e) => {
+    if (fallbackFee) {
+      return 21000;
+    } else {
+      throw e;
+    }
+  });
 
   transactionObject.gas = gasLimit;
 
@@ -101,7 +110,7 @@ export async function getERC20TransactionObject (
 
   const transferData = generateTransferData(to, transferValue);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  const gasLimit = await erc20Contract.methods.transfer(to, transferValue).estimateGas({ from }) as number;
+  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from });
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
 
@@ -131,6 +140,7 @@ interface TransferERC20Props extends TransactionFee {
   to: string;
   transferAll: boolean;
   value: string;
+  fallbackFee?: boolean;
 }
 
 export async function getERC721Transaction (
