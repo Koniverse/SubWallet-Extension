@@ -9,7 +9,7 @@ import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/ext
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, ResponseSubscribeProcessAlive, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { addLazy, fetchStaticData } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
@@ -552,3 +552,11 @@ export const updatePriorityTokens = (data: TokenPriorityDetails) => {
 
 export const subscribePriorityTokens = lazySubscribeMessage('pri(tokens.subscribePriority)', null, updatePriorityTokens, updatePriorityTokens);
 /* Priority tokens */
+
+/* Process multi steps */
+export const updateAliveProcess = (data: ResponseSubscribeProcessAlive) => {
+  store.dispatch({ type: 'requestState/updateAliveProcess', payload: data.processes });
+};
+
+export const subscribeAliveProcess = lazySubscribeMessage('pri(process.subscribe.alive)', null, updateAliveProcess, updateAliveProcess);
+/* Process multi steps */

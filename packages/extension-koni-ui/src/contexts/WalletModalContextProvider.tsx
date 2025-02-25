@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal } from '@subwallet/extension-koni-ui/components';
+import { AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RequestCameraAccessModal, RequestCreatePasswordModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
-import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
-import { ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
+import { ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -74,6 +74,12 @@ export interface WalletModalContextType {
   },
   deriveModal: {
     open: (props: AccountDeriveActionProps) => void
+  },
+  transactionProcessDetailModal: {
+    open: (processId: string) => void
+  },
+  transactionStepsModal: {
+    open: (props: TransactionStepsModalProps) => void
   }
 }
 
@@ -103,6 +109,12 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
   },
   deriveModal: {
     open: noop
+  },
+  transactionProcessDetailModal: {
+    open: noop
+  },
+  transactionStepsModal: {
+    open: noop
   }
 });
 
@@ -111,7 +123,7 @@ const alertModalId = GLOBAL_ALERT_MODAL;
 export const WalletModalContextProvider = ({ children }: Props) => {
   const { activeModal, checkActive, hasActiveModal, inactiveAll, inactiveModal, inactiveModals } = useContext(ModalContext);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { hasConfirmations } = useSelector((state: RootState) => state.requestState);
+  const hasConfirmations = useSelector((state: RootState) => state.requestState.hasConfirmations);
   const { hasMasterPassword, isLocked } = useSelector((state: RootState) => state.accountState);
   const { getConfig } = useGetConfig();
   const { onHandleSessionLatest, setTimeBackUp } = useSetSessionLatest();
@@ -132,6 +144,8 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const [addressQrModalProps, setAddressQrModalProps] = useState<AddressQrModalProps | undefined>();
   const [selectAddressFormatModalProps, setSelectAddressFormatModalProps] = useState<SelectAddressFormatModalProps | undefined>();
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
+  const [transactionProcessId, setTransactionProcessId] = useState('');
+  const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
 
   const openAddressQrModal = useCallback((props: AddressQrModalProps) => {
     setAddressQrModalProps(props);
@@ -174,6 +188,29 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   }, [activeModal]);
   /* Derive modal */
 
+  /* Process modal */
+
+  const openProcessModal = useCallback((processId: string) => {
+    setTransactionProcessId(processId);
+    activeModal(TRANSACTION_PROCESS_DETAIL_MODAL);
+  }, [activeModal]);
+
+  const closeProcessModal = useCallback(() => {
+    setTransactionProcessId('');
+    inactiveModal(TRANSACTION_PROCESS_DETAIL_MODAL);
+  }, [inactiveModal]);
+
+  const openTransactionStepsModal = useCallback((props: TransactionStepsModalProps) => {
+    setTransactionStepsModalProps(props);
+    activeModal(TRANSACTION_STEPS_MODAL);
+  }, [activeModal]);
+
+  const closeTransactionStepsModal = useCallback(() => {
+    setTransactionStepsModalProps(undefined);
+    inactiveModal(TRANSACTION_STEPS_MODAL);
+  }, [inactiveModal]);
+  /* Process modal */
+
   const contextValue: WalletModalContextType = useMemo(() => ({
     addressQrModal: {
       open: openAddressQrModal,
@@ -191,8 +228,14 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     },
     deriveModal: {
       open: openDeriveModal
+    },
+    transactionProcessDetailModal: {
+      open: openProcessModal
+    },
+    transactionStepsModal: {
+      open: openTransactionStepsModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openSelectAddressFormatModal]);
+  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -285,5 +328,20 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         />
       )
     }
+
+    <TransactionProcessDetailModal
+      onCancel={closeProcessModal}
+      processId={transactionProcessId}
+    />
+
+    {
+      transactionStepsModalProps && (
+        <TransactionStepsModal
+          {...transactionStepsModalProps}
+          onCancel={closeTransactionStepsModal}
+        />
+      )
+    }
+
   </WalletModalContext.Provider>;
 };

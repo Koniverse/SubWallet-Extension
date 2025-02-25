@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 1.3.20
+Build date: Feb 24, 2025.
+
+Features & Update:
+- Support transferring VARCH on InvArch Network
+
+Bug fixed:
+- Fixed bug Unable to estimate fee when signing for dApp (#4050)
+
+## 1.3.19
+Build date: Feb 21, 2025.
+
+Bug fixed:
+- Fixed bug related to custom token to paid fee
+
+## 1.3.18
+Build date: Feb 20, 2025.
+
+Features & Update:
+- Support paying fee with non-native tokens on Asset Hub (#3590)
+
+
 ## 1.3.17
 Build date: Feb 18, 2025.
 
