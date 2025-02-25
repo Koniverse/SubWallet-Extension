@@ -1,12 +1,13 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Layout } from '@subwallet/extension-web-ui/components';
 import { AutoConnect, CONFIRM_GENERAL_TERM, CONNECT_EXTENSION, CREATE_RETURN, DEFAULT_ACCOUNT_TYPES, DEFAULT_ROUTER_PATH, PREDEFINED_WALLETS, SELECTED_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { ATTACH_ACCOUNT_MODAL, CREATE_ACCOUNT_MODAL, GENERAL_TERM_AND_CONDITION_MODAL, IMPORT_ACCOUNT_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { InjectContext } from '@subwallet/extension-web-ui/contexts/InjectContext';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
-import { createAccountExternalV2 } from '@subwallet/extension-web-ui/messaging';
+import { createAccountExternalV2, validateAccountName } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { isNoAccount } from '@subwallet/extension-web-ui/utils';
@@ -24,7 +25,6 @@ import { useLocalStorage } from 'usehooks-ts';
 import { GeneralTermModal } from '../components/Modal/TermsAndConditions/GeneralTermModal';
 import SocialGroup from '../components/SocialGroup';
 import { ScreenContext } from '../contexts/ScreenContext';
-import useGetDefaultAccountName from '../hooks/account/useGetDefaultAccountName';
 import usePreloadView from '../hooks/router/usePreloadView';
 import { convertFieldToObject, isMobile, readOnlyScan, simpleCheckForm } from '../utils';
 
@@ -53,7 +53,6 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const { accounts } = useSelector((root: RootState) => root.accountState);
 
-  const autoGenAttachReadonlyAccountName = useGetDefaultAccountName();
   const [, setSelectedAccountTypes] = useLocalStorage(SELECTED_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES);
   const [_returnPath, setReturnStorage] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
   const [modalIdAfterConfirm, setModalIdAfterConfirm] = useState('');
@@ -64,8 +63,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const [reformatAttachAddress, setReformatAttachAddress] = useState('');
   const [returnPath] = useState(_returnPath);
   const [loading, setLoading] = useState(false);
-  const [isAttachAddressEthereum, setAttachAddressEthereum] = useState(false);
   const [isAttachReadonlyAccountButtonDisable, setIsAttachReadonlyAccountButtonDisable] = useState(true);
+  const [isHideAccountNameInput, setIsHideAccountNameInput] = useState(true);
 
   usePreloadView([
     'CreatePassword',
@@ -82,7 +81,6 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
     if (result) {
       setReformatAttachAddress(result.content);
-      setAttachAddressEthereum(result.isEthereum);
     }
   }, []);
 
@@ -106,22 +104,32 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     (rule: RuleObject, value: string) => {
       const result = readOnlyScan(value);
 
+      if (!result) {
+        setIsHideAccountNameInput(true);
+
+        return Promise.reject(t('Account address is required'));
+      }
+
       if (result) {
         // For each account, check if the address already exists return promise reject
         for (const account of accounts) {
-          if (account.address === result.content) {
+          if (isSameAddress(account.address, result.content)) {
             setReformatAttachAddress('');
+            setIsHideAccountNameInput(true);
 
-            return Promise.reject(t('Account name already in use'));
+            return Promise.reject(t('Account already exists'));
           }
         }
       } else {
         setReformatAttachAddress('');
+        setIsHideAccountNameInput(true);
 
         if (value !== '') {
           return Promise.reject(t('Invalid address'));
         }
       }
+
+      setIsHideAccountNameInput(false);
 
       return Promise.resolve();
     },
@@ -194,13 +202,13 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const afterConfirmTermToAttachReadonlyAccount = useCallback(() => {
     setLoading(true);
+    const accountName = form.getFieldValue('name') as string;
 
     if (reformatAttachAddress) {
       createAccountExternalV2({
-        name: autoGenAttachReadonlyAccountName,
+        name: accountName,
         address: reformatAttachAddress,
         genesisHash: '',
-        isEthereum: isAttachAddressEthereum,
         isAllowed: true,
         isReadOnly: true
       })
@@ -224,7 +232,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     }
 
     setIsConfirmedTermGeneral('confirmed');
-  }, [reformatAttachAddress, setIsConfirmedTermGeneral, autoGenAttachReadonlyAccountName, isAttachAddressEthereum, form, navigate]);
+  }, [reformatAttachAddress, setIsConfirmedTermGeneral, form, navigate]);
 
   const onSubmitAttachReadonlyAccount = useCallback(() => {
     setModalIdAfterConfirm('');
@@ -235,6 +243,22 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       afterConfirmTermToAttachReadonlyAccount();
     }
   }, [_isConfirmedTermGeneral, activeModal, afterConfirmTermToAttachReadonlyAccount]);
+
+  const accountNameValidator = useCallback(async (rule: RuleObject, value: string) => {
+    if (value) {
+      try {
+        const { isValid } = await validateAccountName({ name: value });
+
+        if (!isValid) {
+          return Promise.reject(t('Account name already in use'));
+        }
+      } catch (e) {
+        return Promise.reject(t('Account name invalid'));
+      }
+    }
+
+    return Promise.resolve();
+  }, [t]);
 
   const noAccount = useMemo(() => isNoAccount(accounts), [accounts]);
 
@@ -351,6 +375,30 @@ function Component ({ className }: Props): React.ReactElement<Props> {
                   type={'text'}
                 />
               </Form.Item>
+
+              <Form.Item
+                className={CN('__account-name-field')}
+                hidden={isHideAccountNameInput}
+                name={'name'}
+                rules={[{
+                  message: t('Account name is required'),
+                  transform: (value: string) => value.trim(),
+                  required: true
+                },
+                {
+                  validator: accountNameValidator
+                }
+
+                ]}
+                statusHelpAsTooltip={true}
+              >
+                <Input
+                  className='__account-name-input'
+                  disabled={loading}
+                  label={t('Account name')}
+                  placeholder={t('Enter the account name')}
+                />
+              </Form.Item>
               <Button
                 block
                 className='add-wallet-button'
@@ -382,6 +430,11 @@ const Welcome = styled(Component)<Props>(({ theme: { token } }: Props) => {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center'
+    },
+
+    '.__account-name-input .ant-input-label': {
+      display: 'flex',
+      alignItems: 'center'
     },
 
     '.bg-image': {
