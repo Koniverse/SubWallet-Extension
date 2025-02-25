@@ -8,7 +8,7 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
-import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE, UNIFIED_CHAIN_SS58_PREFIX } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
@@ -164,7 +164,7 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
 
 // todo:
 //  - support bitcoin
-export function getReformatedAddressRelatedToChain (accountJson: AccountJson, chainInfo: _ChainInfo, shouldUseUnifiedFormat?: (chainSlug: string) => boolean): string | undefined {
+export function getReformatedAddressRelatedToChain (accountJson: AccountJson, chainInfo: _ChainInfo): string | undefined {
   if (accountJson.specialChain && accountJson.specialChain !== chainInfo.slug) {
     return undefined;
   }
@@ -174,9 +174,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
   }
 
   if (accountJson.chainType === AccountChainType.SUBSTRATE && chainInfo.substrateInfo) {
-    const prefixAddress = shouldUseUnifiedFormat?.(chainInfo.slug) ? UNIFIED_CHAIN_SS58_PREFIX : chainInfo.substrateInfo.addressPrefix;
-
-    return reformatAddress(accountJson.address, prefixAddress);
+    return reformatAddress(accountJson.address, chainInfo.substrateInfo.addressPrefix);
   } else if (accountJson.chainType === AccountChainType.ETHEREUM && chainInfo.evmInfo) {
     return accountJson.address;
   } else if (accountJson.chainType === AccountChainType.TON && chainInfo.tonInfo) {

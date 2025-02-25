@@ -1,20 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchStaticData, reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountChainAddressWithStatusItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { SELECT_ADDRESS_FORMAT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { FadersHorizontal } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 export interface SelectAddressFormatModalProps {
@@ -42,13 +40,14 @@ const LEARN_MORE_DOCS_URL = 'https://address-format-guide.notion.site/Unified-ad
 const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const notify = useNotification();
-  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const chainInfo = chainInfoMap[chainSlug];
   const { addressQrModal } = useContext(WalletModalContext);
-
+  const [chainOldPrefixMapping, setChainOldPrefixMapping] = useState<Record<string, number>>({});
+  const oldPrefixAddress = useMemo(() => {
+    return chainOldPrefixMapping[chainSlug];
+  }, [chainOldPrefixMapping, chainSlug]);
   const listItem: AddressFormatInfo[] = useMemo(() => {
     const legacyAccInfoItem: AddressFormatInfo = {
-      address: reformatAddress(address, chainInfo?.substrateInfo?.addressPrefix),
+      address: reformatAddress(address, oldPrefixAddress),
       name: name,
       slug: chainSlug,
       isNewFormat: false
@@ -61,7 +60,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
     };
 
     return [legacyAccInfoItem, newAccInfoInfo];
-  }, [address, chainInfo?.substrateInfo?.addressPrefix, name, chainSlug]);
+  }, [address, oldPrefixAddress, name, chainSlug]);
 
   const renderEmpty = useCallback(() => {
     return <GeneralEmptyList />;
@@ -116,6 +115,16 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
       </>
     );
   }, [onCopyAddress, onShowQr]);
+
+  useEffect(() => {
+    fetchStaticData<Record<string, number>>('old-chain-prefix')
+      .then((result) => {
+        setChainOldPrefixMapping(result);
+      })
+      .catch((error) => {
+        console.error('Error fetching static data:', error);
+      });
+  }, []);
 
   return (
     <SwModal

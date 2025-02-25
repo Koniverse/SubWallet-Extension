@@ -3,16 +3,13 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountJson } from '@subwallet/extension-base/types';
-import { useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { getReformatedAddressRelatedToChain } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
 const useReformatAddress = () => {
-  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
-
   return useCallback((accountJson: AccountJson, chainInfo: _ChainInfo): string | undefined => {
-    return getReformatedAddressRelatedToChain(accountJson, chainInfo, checkIsPolkadotUnifiedChain);
-  }, [checkIsPolkadotUnifiedChain]);
+    return getReformatedAddressRelatedToChain(accountJson, chainInfo);
+  }, []);
 };
 
 export default useReformatAddress;
