@@ -6,3 +6,8 @@ export interface TokenHasBalanceInfo {
   free: string;
   rate: string; // rate = payFeeToken / nativeToken
 }
+
+export interface TokenPayFeeInfo {
+  tokensCanPayFee: TokenHasBalanceInfo[],
+  defaultTokenSlug: string
+}
