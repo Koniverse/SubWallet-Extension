@@ -17,7 +17,7 @@ import { getBalanceValue } from '@subwallet/extension-web-ui/hooks/screen/home/u
 import { ChainConnectionWrapper } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/ChainConnectionWrapper';
 import { Toolbar } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/Toolbar';
 import { EarningEntryView, EarningPoolsParam, NetworkType, ThemeProps, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
-import { isAccountAll, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { FadersHorizontal, Vault } from 'phosphor-react';
@@ -72,7 +72,7 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const currentAccount = useSelector((state) => state.accountState.currentAccount);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
 
   const isShowBalance = useSelector((state) => state.settings.isShowBalance);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('earning');
@@ -137,11 +137,11 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
         ...DEFAULT_EARN_PARAMS,
         slug,
         chain,
-        from: currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : ''
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
       navigate('/transaction/earn');
     },
-    [currentAccount?.address, navigate, setEarnStorage]
+    [currentAccountProxy, navigate, setEarnStorage]
   );
 
   const onConnectChainSuccess = useCallback(() => {
@@ -458,7 +458,6 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
       {
         selectedPoolGroup && selectedPoolGroup.poolSlugs.length && (
           <EarningInstructionModal
-            address={currentAccount?.address}
             assetRegistry={assetRegistry}
             closeAlert={closeAlert}
             isShowStakeMoreButton={true}

@@ -17,7 +17,7 @@ import useGetChainInfo from '@subwallet/extension-web-ui/hooks/screen/common/use
 import useGetAccountInfoByAddress from '@subwallet/extension-web-ui/hooks/screen/common/useGetAccountInfoByAddress';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { SendNftParams, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { BackgroundIcon, Button, ButtonProps, Field, Icon, Image, Logo, ModalContext } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
@@ -68,9 +68,7 @@ function Component ({ className = '', collectionInfo,
   const { token } = useTheme() as Theme;
 
   const { activeModal, addExclude, checkActive, inactiveModal, removeExclude } = useContext(ModalContext);
-
-  const accounts = useSelector((root: RootState) => root.accountState.accounts);
-
+  const { accounts, currentAccountProxy } = useSelector((root: RootState) => root.accountState);
   const ownerAccountInfo = useGetAccountInfoByAddress(nftItem.owner || '');
   const accountExternalUrl = getExplorerLink(originChainInfo, nftItem.owner, 'account');
   const [sendNftKey, setSendNftKey] = useState<string>('sendNftKey');
@@ -101,7 +99,8 @@ function Component ({ className = '', collectionInfo,
       from: nftItem.owner,
       itemId: nftItem.id,
       to: '',
-      chain: nftItem.chain
+      chain: nftItem.chain,
+      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
 
     if (isWebUI) {
@@ -109,7 +108,7 @@ function Component ({ className = '', collectionInfo,
     } else {
       navigate('/transaction/send-nft');
     }
-  }, [accounts, navigate, nftItem, isWebUI, activeModal, notify, setStorage, t]);
+  }, [nftItem, setStorage, currentAccountProxy, isWebUI, accounts, notify, t, activeModal, navigate]);
 
   const subHeaderRightButton: ButtonProps[] = [
     {

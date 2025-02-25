@@ -4,7 +4,7 @@
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertBox } from '@subwallet/extension-web-ui/components';
 import MetaInfo from '@subwallet/extension-web-ui/components/MetaInfo/MetaInfo';
-import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo } from '@subwallet/extension-web-ui/hooks';
+import { useGetNativeTokenBasicInfo } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
@@ -29,16 +29,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
     [chainInfoMap, transaction.chain]
   );
 
-  const receiveChain = useMemo(() => {
-    if (xcmData) {
-      return xcmData.destinationNetworkKey || transaction.chain;
-    } else {
-      return transaction.chain;
-    }
-  }, [transaction.chain, xcmData]);
   const { decimals: chainDecimals, symbol: chainSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const senderPrefix = useGetChainPrefixBySlug(transaction.chain);
-  const receiverPrefix = useGetChainPrefixBySlug(receiveChain);
 
   return (
     <>
@@ -46,7 +37,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         <MetaInfo.Account
           address={data.from}
           label={t('Send from')}
-          networkPrefix={senderPrefix}
         />
 
         {
@@ -62,7 +52,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         <MetaInfo.Account
           address={data.to}
           label={t('Send to')}
-          networkPrefix={receiverPrefix}
         />
 
         {

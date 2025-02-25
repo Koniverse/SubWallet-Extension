@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationsQueueItem, EvmSendTransactionRequest } from '@subwallet/extension-base/background/KoniTypes';
-import { ConfirmationGeneralInfo, MetaInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
+import { AlertBox, ConfirmationGeneralInfo, MetaInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
 import { useGetAccountByAddress, useGetChainInfoByChainId, useOpenDetailModal } from '@subwallet/extension-web-ui/hooks';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { EvmSignatureSupportType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BaseDetailModal, EvmSignArea, EvmTransactionDetail } from '../parts';
@@ -28,8 +30,14 @@ const convertToBigN = (num: EvmSendTransactionRequest['value']): string | number
 };
 
 function Component ({ className, request, type }: Props) {
-  const { id, payload: { account, chainId, errors, to } } = request;
+  const { id, payload: { address, chainId, errors, to } } = request;
   const { t } = useTranslation();
+  const account = useGetAccountByAddress(address);
+
+  const { transactionRequest } = useSelector((state: RootState) => state.requestState);
+
+  const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
+
   const chainInfo = useGetChainInfoByChainId(chainId);
   const recipientAddress = to;
   const recipient = useGetAccountByAddress(recipientAddress);
@@ -59,9 +67,10 @@ function Component ({ className, request, type }: Props) {
             )
           }
           <MetaInfo.Account
-            address={account.address}
+            address={address}
+            className={'account-info-item'}
             label={t('From account')}
-            name={account.name}
+            name={account?.name || ''}
           />
           {(recipientAddress || recipient?.address) && <MetaInfo.Account
             address={recipient?.address || recipientAddress || ''}
@@ -77,18 +86,25 @@ function Component ({ className, request, type }: Props) {
                 value={request.payload.estimateGas || '0'}
               />}
         </MetaInfo>
-        <div>
-          {(!errors || errors.length === 0) &&
-            <Button
-              icon={<ViewDetailIcon />}
-              onClick={onClickDetail}
-              size='xs'
-              type='ghost'
-            >
-              {t('View details')}
-            </Button>
-          }
+        {!!transaction?.estimateFee?.tooHigh && (
+          <AlertBox
+            className='network-box'
+            description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: chainInfo?.name } })}
+            title={t('Pay attention!')}
+            type='warning'
+          />
+        )}
+        {(!errors || errors.length === 0) && <div>
+          <Button
+            icon={<ViewDetailIcon />}
+            onClick={onClickDetail}
+            size='xs'
+            type='ghost'
+          >
+            {t('View details')}
+          </Button>
         </div>
+        }
       </div>
       <EvmSignArea
         id={id}
@@ -100,7 +116,8 @@ function Component ({ className, request, type }: Props) {
           title={t('Transaction details')}
         >
           <EvmTransactionDetail
-            account={account}
+            accountName={account?.name}
+            address={address}
             request={request.payload}
           />
         </BaseDetailModal>
@@ -124,6 +141,12 @@ const EvmTransactionConfirmation = styled(Component)<Props>(({ theme: { token } 
 
   '.__label': {
     textAlign: 'left'
+  },
+
+  '.account-info-item, .to-account': {
+    '.__account-item-address': {
+      textAlign: 'right'
+    }
   }
 }));
 

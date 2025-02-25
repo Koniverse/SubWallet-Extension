@@ -34,6 +34,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { checkChainConnected, turnOnChain } = useChainConnection();
 
   const isChainActive = checkChainConnected(defaultData.chain);
+  const ignoreCheckChain = ['/transaction/claim-reward'].includes(path);
 
   useEffect(() => {
     if (!isChainActive && autoEnableChain && defaultData.chain) {
@@ -42,12 +43,12 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [autoEnableChain, defaultData.chain, isChainActive, turnOnChain]);
 
   useEffect(() => {
-    if (!isChainActive && !autoEnableChain) {
+    if (!isChainActive && !autoEnableChain && !ignoreCheckChain) {
       navigate('/home/earning');
     }
-  }, [autoEnableChain, inactiveModal, isChainActive, navigate]);
+  }, [autoEnableChain, ignoreCheckChain, inactiveModal, isChainActive, navigate]);
 
-  if (!isChainActive) {
+  if (!isChainActive && !ignoreCheckChain) {
     return <LoadingScreen />;
   }
 

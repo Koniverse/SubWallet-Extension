@@ -5,8 +5,8 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { EarningRewardHistoryItem } from '@subwallet/extension-base/types';
 import { BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
-import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { customFormatDate, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { ThemeProps, VoidFunction } from '@subwallet/extension-web-ui/types';
+import { customFormatDate } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowSquareOut } from 'phosphor-react';
@@ -17,19 +17,12 @@ type Props = ThemeProps & {
   modalId: string;
   rewardHistories: EarningRewardHistoryItem[];
   inputAsset: _ChainAsset;
-  subscanSlug?: string;
-  address?: string;
+  onClickViewExplore?: VoidFunction;
 };
 
-function Component ({ address, className, inputAsset, modalId, rewardHistories, subscanSlug }: Props) {
+function Component ({ className, inputAsset, modalId, onClickViewExplore, rewardHistories }: Props) {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
-
-  const onClickViewExplore = useCallback(() => {
-    if (subscanSlug && address) {
-      openInNewTab(`https://${subscanSlug}.subscan.io/account/${address}?tab=reward`)();
-    }
-  }, [address, subscanSlug]);
 
   const closeModal = useCallback(() => {
     inactiveModal(modalId);

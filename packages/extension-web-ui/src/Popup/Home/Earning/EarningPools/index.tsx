@@ -418,7 +418,6 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
       {
         selectedPool && (
           <EarningInstructionModal
-            address={currentAccount?.address}
             assetRegistry={assetRegistry}
             closeAlert={closeAlert}
             isShowStakeMoreButton={true}

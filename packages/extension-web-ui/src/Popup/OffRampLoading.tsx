@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { toBNString } from '@subwallet/extension-base/utils';
+import { BN_TEN } from '@subwallet/extension-base/utils';
 import { DEFAULT_OFF_RAMP_PARAMS, DEFAULT_TRANSFER_PARAMS, NO_ACCOUNT_MODAL, OFF_RAMP_DATA, REDIRECT_TRANSAK_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { OffRampParams, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
+import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { Warning, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
@@ -20,6 +21,13 @@ import { LoadingScreen } from '../components';
 import { removeStorage } from '../utils';
 
 type Props = ThemeProps;
+
+// todo: may need recheck usage, move to util if is necessary
+const toBNString = (input: string | number | BigNumber, decimal: number): string => {
+  const raw = new BigNumber(input);
+
+  return raw.multipliedBy(BN_TEN.pow(decimal)).toFixed();
+};
 
 const noAccountModalId = NO_ACCOUNT_MODAL;
 const redirectTransakModalId = REDIRECT_TRANSAK_MODAL;

@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
@@ -12,9 +13,10 @@ import { BaseModal, InstructionItem } from '@subwallet/extension-web-ui/componen
 import { getInputValuesFromString } from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-web-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getBannerButtonIcon } from '@subwallet/extension-web-ui/utils';
+import { getBannerButtonIcon, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Button, Icon, ModalContext } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
@@ -31,7 +33,6 @@ interface Props extends ThemeProps {
   openAlert: (alertProps: AlertDialogProps) => void;
   closeAlert: VoidFunction;
   assetRegistry: Record<string, _ChainAsset>;
-  address?: string;
   bypassEarlyValidate?: boolean;
   customButtonTitle?: string;
 }
@@ -47,7 +48,7 @@ export interface BoxProps {
 const modalId = EARNING_INSTRUCTION_MODAL;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { address, assetRegistry, bypassEarlyValidate, className, closeAlert, customButtonTitle, isShowStakeMoreButton = true, onCancel, onStakeMore, openAlert, poolInfo } = props;
+  const { assetRegistry, bypassEarlyValidate, className, closeAlert, customButtonTitle, isShowStakeMoreButton = true, onCancel, onStakeMore, openAlert, poolInfo } = props;
   const checkRef = useRef<number>(Date.now());
   const scrollRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -55,9 +56,33 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
+
   const [loading, setLoading] = useState(false);
   const [isScrollEnd, setIsScrollEnd] = useState(false);
   const [isDisableEarnButton, setDisableEarnButton] = useState(true);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const targetAddress = useMemo(() => {
+    if (currentAccountProxy && isAccountAll(currentAccountProxy?.id)) {
+      return ALL_ACCOUNT_KEY;
+    }
+
+    if (!poolInfo?.chain) {
+      return undefined;
+    }
+
+    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+      if (chainInfoMap[poolInfo.chain]) {
+        const chainInfo = chainInfoMap[poolInfo.chain];
+
+        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+      }
+
+      return false;
+    });
+
+    return accountAddress?.address;
+  }, [chainInfoMap, currentAccountProxy, poolInfo?.chain]);
   const title = useMemo(() => {
     if (!poolInfo) {
       return '';
@@ -443,7 +468,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     earlyValidateJoin({
       slug: poolInfo.slug,
-      address: address || ''
+      address: targetAddress || ''
     })
       .then((rs) => {
         if (isValid()) {
@@ -471,7 +496,7 @@ const Component: React.FC<Props> = (props: Props) => {
           setLoading(false);
         }
       });
-  }, [address, bypassEarlyValidate, closeAlert, onStakeMore, openAlert, poolInfo, setVisible, t]);
+  }, [targetAddress, bypassEarlyValidate, closeAlert, onStakeMore, openAlert, poolInfo, setVisible, t]);
 
   const onScrollContent = useCallback(() => {
     scrollRef?.current?.scroll({ top: scrollRef?.current?.scrollHeight, left: 0 });

@@ -108,7 +108,7 @@ const Component: React.FC<Props> = (props: Props) => {
         hasBackgroundWrapper={false}
       >
         <MetaInfo.Account
-          address={data.recipient || ''}
+          address={recipientAddress}
           className={'__recipient-item'}
           label={t('Recipient')}
           name={account?.name}

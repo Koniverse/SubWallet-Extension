@@ -17,10 +17,12 @@ type Props = ThemeProps & {
   actionBtnIcon?: JSX.Element;
   showActionBtn?: boolean;
   extraButton?: JSX.Element
-  showExtraButton?: boolean
+  showExtraButton?: boolean;
+  autoFocus?: boolean;
+  simpleLayout?: boolean;
 }
 
-const Component: React.FC<Props> = ({ actionBtnIcon,
+const Component: React.FC<Props> = ({ actionBtnIcon, autoFocus,
   className,
   extraButton,
   onClickActionBtn,
@@ -28,7 +30,7 @@ const Component: React.FC<Props> = ({ actionBtnIcon,
   placeholder,
   searchValue,
   showActionBtn,
-  showExtraButton = false }) => {
+  showExtraButton = false, simpleLayout }) => {
   // CONTROLLED STATE
   // const [value, setValue] = useState<string>(searchValue)
 
@@ -62,11 +64,38 @@ const Component: React.FC<Props> = ({ actionBtnIcon,
     />
   ), [extraButton]);
 
+  if (simpleLayout) {
+    return (
+      <div className={CN(className)}>
+        <Input.Search
+          autoFocus={autoFocus}
+          className='__search-input'
+          onChange={handleInputChange}
+          placeholder={placeholder}
+          prefix={<Icon phosphorIcon={MagnifyingGlass} />}
+          size='md'
+          suffix={
+            showActionBtn && (
+              <Button
+                icon={actionBtnIcon}
+                onClick={onClickActionBtn}
+                size='xs'
+                type='ghost'
+              />
+            )
+          }
+          value={searchValue}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={CN('search-container', className)}>
       <div className='right-section'>
         {showExtraButton && button}
         <Input.Search
+          autoFocus={autoFocus}
           className='search-input'
           onChange={handleInputChange}
           placeholder={placeholder}
@@ -92,8 +121,10 @@ const Component: React.FC<Props> = ({ actionBtnIcon,
 
 const Search = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    display: 'grid',
-    width: '100%',
+    '&.search-container': {
+      display: 'grid',
+      width: '100%'
+    },
 
     '.right-section': {
       justifySelf: 'end',

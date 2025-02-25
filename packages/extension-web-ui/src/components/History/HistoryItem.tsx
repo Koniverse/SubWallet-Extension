@@ -3,7 +3,10 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType, TransactionAdditionalInfo, TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
+import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { RequestClaimBridge } from '@subwallet/extension-base/types';
+import { AccountProxyAvatar } from '@subwallet/extension-web-ui/components';
 import { HistoryStatusMap } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -12,7 +15,6 @@ import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-web-ui/types';
 import { customFormatDate, isAbleToShowFee, openInNewTab, toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo, Number, Tag, Typography, Web3Block } from '@subwallet/react-ui';
-import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretRight } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useMemo } from 'react';
@@ -48,6 +50,18 @@ function Component (
   const displayData = item.displayData;
   const { isWebUI } = useContext(ScreenContext);
   const { isShowBalance } = useSelector((state) => state.settings);
+
+  let amountValue = item?.amount?.value;
+
+  if (item.type === ExtrinsicType.CLAIM_BRIDGE) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo.notification.actionType === NotificationActionType.CLAIM_POLYGON_BRIDGE) {
+      const metadata = additionalInfo.notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+
+      amountValue = metadata.amounts[0];
+    }
+  }
 
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const priceMap = useSelector((state: RootState) => state.price.priceMap);
@@ -103,7 +117,7 @@ function Component (
                 hide={!isShowBalance}
                 intOpacity={showAmount ? 1 : 0}
                 suffix={item?.amount?.symbol}
-                value={item?.amount?.value || '0'}
+                value={amountValue || '0'}
               />
               <Number
                 className={CN('__fee', {
@@ -145,7 +159,8 @@ function Component (
       onClick={onClick}
     >
       <div className='account-wrapper'>
-        <SwAvatar
+        <AccountProxyAvatar
+          className={'__account-avatar'}
           size={30}
           value={item.address}
         />

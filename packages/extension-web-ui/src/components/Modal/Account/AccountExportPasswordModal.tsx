@@ -4,7 +4,7 @@
 import { ACCOUNT_EXPORT_ALL_MODAL, EXPORT_ACCOUNTS_PASSWORD_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useFocusById, useTranslation } from '@subwallet/extension-web-ui/hooks';
-import { exportAccountsV2 } from '@subwallet/extension-web-ui/messaging';
+import { exportAccountBatch } from '@subwallet/extension-web-ui/messaging';
 import ExportAllDone from '@subwallet/extension-web-ui/Popup/Account/ExportAllDone';
 import { FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { simpleCheckForm } from '@subwallet/extension-web-ui/utils';
@@ -75,9 +75,9 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
   const onSubmit: FormCallbacks<LoginFormState>['onFinish'] = useCallback((values: LoginFormState) => {
     setLoading(true);
     setTimeout(() => {
-      exportAccountsV2({
+      exportAccountBatch({
         password: values[FormFieldName.PASSWORD],
-        addresses: addresses
+        proxyIds: addresses
       })
         .then((data) => {
           closeModal();

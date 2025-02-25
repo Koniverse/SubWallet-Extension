@@ -7,7 +7,7 @@ import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import usePreloadView from '@subwallet/extension-web-ui/hooks/router/usePreloadView';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { computeStatus, isAccountAll, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { computeStatus, getTransactionFromAccountProxyValue, isSoloTonAccountProxy, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleLeft, ArrowCircleRight, ArrowsLeftRight, ArrowSquareUpRight, Clock, Gear, Globe, Info, MessengerLogo, Parachute, Rocket, Vault, Wallet } from 'phosphor-react';
@@ -29,11 +29,8 @@ function Component ({ className,
   const navigate = useNavigate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { t } = useTranslation();
-  const currentAccount = useSelector((root) => root.accountState.currentAccount);
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
-  const transactionFromValue = useMemo(() => {
-    return currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : '';
-  }, [currentAccount?.address]);
 
   const { missions } = useSelector((state: RootState) => state.missionPool);
 
@@ -48,6 +45,10 @@ function Component ({ className,
   const latestLiveMissionIds = useMemo(() => {
     return liveMissionIds.filter((id) => !storedLiveMissionIds.includes(id));
   }, [liveMissionIds, storedLiveMissionIds]);
+
+  const isCurrentAccountProxySoloTon = useMemo(() => {
+    return isSoloTonAccountProxy(currentAccountProxy);
+  }, [currentAccountProxy]);
 
   usePreloadView([
     'Home',
@@ -76,7 +77,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: Vault,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('Swap'),
@@ -85,7 +87,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: ArrowsLeftRight,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('dApps'),
@@ -120,7 +123,8 @@ function Component ({ className,
           type: 'phosphor',
           phosphorIcon: Rocket,
           weight: 'fill'
-        }
+        },
+        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('History'),
@@ -141,7 +145,7 @@ function Component ({ className,
         }
       }
     ];
-  }, [latestLiveMissionIds.length, t]);
+  }, [isCurrentAccountProxySoloTon, latestLiveMissionIds.length, t]);
 
   const staticMenuItems = useMemo<MenuItemType[]>(() => {
     return [
@@ -196,7 +200,7 @@ function Component ({ className,
     if (value === swapPath) {
       setSwapStorage({
         ...DEFAULT_SWAP_PARAMS,
-        from: transactionFromValue
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
     }
 
@@ -205,7 +209,7 @@ function Component ({ className,
     }
 
     navigate(`${value}`);
-  }, [latestLiveMissionIds.length, liveMissionIds, navigate, setStoredLiveMissionIds, setSwapStorage, transactionFromValue]);
+  }, [currentAccountProxy, latestLiveMissionIds.length, liveMissionIds, navigate, setStoredLiveMissionIds, setSwapStorage]);
 
   const goHome = useCallback(() => {
     navigate('/home');
@@ -301,15 +305,12 @@ function Component ({ className,
           {
             menuItems.map((m) => (
               <MenuItem
+                {...m}
                 className={'side-menu-item'}
-                icon={m.icon}
                 isActivated={selectedKeys.includes(m.value)}
                 key={m.value}
-                label={m.label}
-                latestLiveMissionLength={latestLiveMissionIds.length}
                 onClick={handleNavigate}
                 showToolTip={isCollapsed}
-                value={m.value}
               />
             ))
           }
@@ -319,14 +320,12 @@ function Component ({ className,
           {
             staticMenuItems.map((m) => (
               <MenuItem
+                {...m}
                 className={'side-menu-item'}
-                icon={m.icon}
                 isActivated={false}
                 key={m.value}
-                label={m.label}
                 onClick={handleLink}
                 showToolTip={isCollapsed}
-                value={m.value}
               />
             ))
           }
