@@ -282,6 +282,18 @@ export class ChainService {
     return assetHubToken;
   }
 
+  public getHydrationAssetIdMap (chain: string): Record<string, string> {
+    const hydrationAssetIdMap: Record<string, string> = {};
+
+    Object.values(this.getAssetRegistry()).forEach((asset) => {
+      if (asset.originChain === chain && asset.metadata?.assetId) {
+        hydrationAssetIdMap[asset.slug] = asset.metadata.assetId;
+      }
+    });
+
+    return hydrationAssetIdMap;
+  }
+
   public getChainInfoMap (): Record<string, _ChainInfo> {
     return this.dataMap.chainInfoMap;
   }

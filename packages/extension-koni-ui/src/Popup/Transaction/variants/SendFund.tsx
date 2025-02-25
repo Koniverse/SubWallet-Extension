@@ -899,10 +899,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           address: fromValue
         });
 
-        const response = _response.filter((item) => item !== null && item !== undefined);
+        const tokensCanPayFee = _response.tokensCanPayFee.filter((item) => item !== null && item !== undefined);
+        const defaultTokenSlug = _response.defaultTokenSlug;
 
         if (!cancel) {
-          setListTokensCanPayFee(response);
+          setCurrentNonNativeTokenPayFee(defaultTokenSlug);
+          setListTokensCanPayFee(tokensCanPayFee);
           setIsFetchingListFeeToken(false);
         }
       } catch (error) {
