@@ -201,8 +201,8 @@ export default class RequestService {
     return this.#substrateRequestHandler.getSignRequest(id);
   }
 
-  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON): Promise<ResponseSigning> {
-    return this.#substrateRequestHandler.signTransaction(id, address, url, payload);
+  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void): Promise<ResponseSigning> {
+    return this.#substrateRequestHandler.signTransaction(id, address, url, payload, onSign);
   }
 
   public addConfirmation<CT extends ConfirmationType> (

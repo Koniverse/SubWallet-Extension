@@ -6,6 +6,7 @@ import { ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon } 
 import { AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
+import { ProcessTransactionData } from '@subwallet/extension-base/types';
 import { ReduxStatus, RequestState } from '@subwallet/extension-koni-ui/stores/types';
 
 const initialState: RequestState = {
@@ -33,6 +34,8 @@ const initialState: RequestState = {
   cardanoSignatureRequest: {},
   cardanoSendTransactionRequest: {},
   cardanoWatchTransactionRequest: {},
+
+  aliveProcess: {},
 
   // Summary Info
   reduxStatus: ReduxStatus.INIT,
@@ -105,6 +108,9 @@ const requestStateSlice = createSlice({
   initialState,
   name: 'requestState',
   reducers: {
+    updateAliveProcess (state, { payload }: PayloadAction<Record<string, ProcessTransactionData>>) {
+      state.aliveProcess = payload;
+    },
     updateAuthorizeRequests (state, { payload }: PayloadAction<Record<string, AuthorizeRequest>>) {
       state.authorizeRequest = payload;
       readyMap.updateAuthorizeRequests = true;

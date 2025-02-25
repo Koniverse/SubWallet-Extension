@@ -4,18 +4,35 @@
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
+import { useIsPopup, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
+import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, CommonProcessAction } from '@subwallet/extension-koni-ui/reducer';
 import { ClaimRewardParams } from '@subwallet/extension-koni-ui/types';
 import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useNotification, useTranslation } from '../common';
 
 const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonProcessAction) => void, handleWarning?: (value: TransactionWarning[]) => void, handleDataForInsufficientAlert?: (estimateFee: AmountData) => Record<string, string>) => {
   const notify = useNotification();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isPopup = useIsPopup();
 
   const { onDone } = useTransactionContext<ClaimRewardParams>();
+
+  const onHandleOneSignConfirmation = useCallback((transactionProcessId: string) => {
+    if (isPopup) {
+      windowOpen({
+        allowedPath: '/transaction-submission',
+        params: {
+          'transaction-process-id': transactionProcessId
+        }
+      }).then(window.close).catch(console.log);
+    } else {
+      navigate(`/transaction-submission?transaction-process-id=${transactionProcessId}`);
+    }
+  }, [isPopup, navigate]);
 
   const onError = useCallback(
     (error: Error) => {
@@ -36,7 +53,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
   const onSuccess = useCallback(
     (lastStep: boolean, needRollback: boolean): ((rs: SWTransactionResponse) => boolean) => {
       return (rs: SWTransactionResponse): boolean => {
-        const { errors: _errors, id, warnings } = rs;
+        const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
           if (_errors[0]?.message !== 'Rejected by user') {
@@ -84,7 +101,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
           });
 
           if (lastStep) {
-            onDone(id);
+            processId ? onHandleOneSignConfirmation(processId) : onDone(id);
 
             return false;
           }
@@ -95,7 +112,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         return false;
       };
     },
-    [dispatchProcessState, notify, onDone, onError, handleWarning, t]
+    [notify, t, handleWarning, onError, dispatchProcessState, onHandleOneSignConfirmation, onDone]
   );
 
   return useMemo(() => ({

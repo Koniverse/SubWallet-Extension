@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainType, ExtrinsicStatus, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionHistoryItem, XCMTransactionAdditionalInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_RECOVER_HISTORY_INTERVAL } from '@subwallet/extension-base/constants';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -213,8 +213,8 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     await this.addHistoryItems(updatedRecords);
   }
 
-  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>) {
-    await this.dbService.updateHistoryByExtrinsicHash(extrinsicHash, updateData);
+  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>, isRecover = false) {
+    await this.dbService.updateHistoryByExtrinsicHash(extrinsicHash, updateData, isRecover);
     this.historySubject.next(await this.dbService.getHistories());
   }
 
@@ -311,11 +311,11 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
           delete this.#needRecoveryHistories[currentExtrinsicHash];
           break;
         default:
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
           delete this.#needRecoveryHistories[currentExtrinsicHash];
       }
     });
@@ -330,6 +330,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
     await this.eventService.waitCryptoReady;
+    this.restoreProcessTransaction().catch(console.error);
     await this.loadData();
     Promise.all([this.eventService.waitKeyringReady, this.eventService.waitChainReady]).then(() => {
       this.getHistories().catch(console.log);
@@ -342,16 +343,31 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     this.status = ServiceStatus.INITIALIZED;
   }
 
+  async restoreProcessTransaction () {
+    await this.dbService.restoreProcessTransaction();
+  }
+
   async recoverProcessingHistory () {
     const histories = await this.dbService.getHistories();
 
     this.#needRecoveryHistories = {};
 
-    histories.filter((history) => {
-      return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
-    }).forEach((history) => {
-      this.#needRecoveryHistories[history.extrinsicHash] = history;
-    });
+    histories
+      .filter((history) => {
+        return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
+      })
+      .filter((history) => {
+        if (history.type === ExtrinsicType.TRANSFER_XCM) {
+          const data = history.additionalInfo as XCMTransactionAdditionalInfo;
+
+          return data.originalChain === history.chain;
+        } else {
+          return true;
+        }
+      })
+      .forEach((history) => {
+        this.#needRecoveryHistories[history.extrinsicHash] = history;
+      });
 
     const recoverNumber = Object.keys(this.#needRecoveryHistories).length;
 

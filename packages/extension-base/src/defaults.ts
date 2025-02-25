@@ -4,6 +4,7 @@
 const ALLOWED_PATH = [
   '/',
   '/settings/security',
+  '/transaction-submission',
   '/accounts/connect-ledger',
   '/accounts/restore-json',
   '/accounts/detail',

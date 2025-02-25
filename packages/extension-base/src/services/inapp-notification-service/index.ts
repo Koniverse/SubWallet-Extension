@@ -8,14 +8,16 @@ import { CRON_LISTEN_AVAIL_BRIDGE_CLAIM } from '@subwallet/extension-base/consta
 import { fetchLastestRemindNotificationTime } from '@subwallet/extension-base/constants/remind-notification-time';
 import { CronServiceInterface, ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
+import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { formatNumber, getAddressesByChainType } from '@subwallet/extension-base/utils';
+import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
 
 export class InappNotificationService implements CronServiceInterface {
@@ -156,6 +158,20 @@ export class InappNotificationService implements CronServiceInterface {
           candidateMetadata.counter === comparedMetadata.counter;
 
         if (sameNotification) {
+          return false;
+        }
+      }
+    }
+
+    if ([NotificationActionType.SWAP, NotificationActionType.EARNING].includes(candidateNotification.actionType)) {
+      const candidateMetadata = candidateNotification.metadata as ProcessNotificationMetadata;
+      const processId = candidateMetadata.processId;
+
+      for (const notification of comparedNotifications) {
+        const comparedMetadata = notification.metadata as ProcessNotificationMetadata;
+        const _processId = comparedMetadata.processId;
+
+        if (processId === _processId) {
           return false;
         }
       }
@@ -364,6 +380,92 @@ export class InappNotificationService implements CronServiceInterface {
     });
 
     await this.validateAndWriteNotificationsToDB(notifications, address);
+  }
+
+  public async createProcessNotification (process: ProcessTransactionData) {
+    const timestamp = Date.now();
+    const _id = process.id;
+    const address = process.address;
+
+    let actionType: NotificationActionType;
+    let extrinsicType: ExtrinsicType;
+    let title = '';
+    let description = '';
+
+    if (process.type === ProcessType.SWAP) {
+      actionType = NotificationActionType.SWAP;
+      extrinsicType = ExtrinsicType.SWAP;
+      const combineInfo = process.combineInfo as SwapBaseTxData;
+
+      const fromAsset = this.chainService.getAssetBySlug(combineInfo.quote.pair.from);
+      const toAsset = this.chainService.getAssetBySlug(combineInfo.quote.pair.to);
+      const fromChain = this.chainService.getChainInfoByKey(fromAsset.originChain);
+      const toChain = this.chainService.getChainInfoByKey(toAsset.originChain);
+
+      title = '[{{accountName}}]  SWAPPED {{fromAsset}}'
+        .replace('{{fromAsset}}', fromAsset.symbol);
+      description = '{{fromAmount}} {{fromAsset}} on {{fromChain}} swapped for {{toAmount}} {{toAsset}} on {{toChain}}. Click to view details'
+        .replace('{{fromAmount}}', formatNumber(combineInfo.quote.fromAmount, fromAsset.decimals || 0))
+        .replace('{{fromAsset}}', fromAsset.symbol)
+        .replace('{{fromChain}}', fromChain.name)
+        .replace('{{toAmount}}', formatNumber(combineInfo.quote.toAmount, toAsset.decimals || 0))
+        .replace('{{toAsset}}', toAsset.symbol)
+        .replace('{{toChain}}', toChain.name);
+    } else {
+      actionType = NotificationActionType.EARNING;
+      extrinsicType = ExtrinsicType.JOIN_YIELD_POOL; // Not used
+
+      const combineInfo = process.combineInfo as SummaryEarningProcessData;
+      const asset = this.chainService.getAssetBySlug(combineInfo.brief.token);
+      const chain = this.chainService.getChainInfoByKey(combineInfo.brief.chain);
+      const amount = combineInfo.brief.amount;
+      let method: string;
+
+      switch (combineInfo.brief.method) {
+        case YieldPoolType.LIQUID_STAKING:
+          method = 'Liquid staking';
+          break;
+        case YieldPoolType.LENDING:
+          method = 'Lending';
+          break;
+        case YieldPoolType.SINGLE_FARMING:
+          method = 'Single farming';
+          break;
+        case YieldPoolType.NOMINATION_POOL:
+          method = 'Nomination pool';
+          break;
+        case YieldPoolType.PARACHAIN_STAKING:
+          method = 'Parachain staking';
+          break;
+        case YieldPoolType.NATIVE_STAKING:
+          method = _STAKING_CHAIN_GROUP.astar.includes(chain.slug) ? 'dApp staking' : 'Direct nomination';
+          break;
+      }
+
+      title = '[{{accountName}}] STAKED {{asset}}'
+        .replace('{{asset}}', asset.symbol);
+      description = '{{amount}} {{asset}} on {{chain}} staked via {{method}}. Click to view details'
+        .replace('{{amount}}', formatNumber(amount, asset.decimals || 0))
+        .replace('{{asset}}', asset.symbol)
+        .replace('{{chain}}', chain.name)
+        .replace('{{method}}', method);
+    }
+
+    const notification: _BaseNotificationInfo = {
+      id: `${actionType}___${_id}___${timestamp}`,
+      address: reformatAddress(address),
+      title,
+      actionType,
+      metadata: {
+        processId: process.id
+      },
+      time: timestamp,
+      description,
+      isRead: false,
+      extrinsicType
+    };
+
+    await this.validateAndWriteNotificationsToDB([notification], process.address);
   }
 
   // Polygon Claimable Handle

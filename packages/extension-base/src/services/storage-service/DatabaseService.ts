@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { APIItemState, ChainStakingMetadata, CrowdloanItem, MantaPayConfig, NftCollection, NftItem, NominatorMetadata, PriceJson, StakingItem, StakingType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { APIItemState, ChainStakingMetadata, CrowdloanItem, ExtrinsicStatus, MantaPayConfig, NftCollection, NftItem, NominatorMetadata, PriceJson, StakingItem, StakingType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { _NotificationInfo } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import KoniDatabase, { IBalance, ICampaign, IChain, ICrowdloanItem, INft } from '@subwallet/extension-base/services/storage-service/databases';
-import { AssetStore, BalanceStore, ChainStore, CrowdloanStore, MetadataStore, MetadataV15Store, MigrationStore, NftCollectionStore, NftStore, PriceStore, StakingStore, TransactionStore } from '@subwallet/extension-base/services/storage-service/db-stores';
+import { AssetStore, BalanceStore, ChainStore, CrowdloanStore, MetadataStore, MetadataV15Store, MigrationStore, NftCollectionStore, NftStore, PriceStore, ProcessTransactionStore, StakingStore, TransactionStore } from '@subwallet/extension-base/services/storage-service/db-stores';
 import BaseStore from '@subwallet/extension-base/services/storage-service/db-stores/BaseStore';
 import CampaignStore from '@subwallet/extension-base/services/storage-service/db-stores/Campaign';
 import ChainStakingMetadataStore from '@subwallet/extension-base/services/storage-service/db-stores/ChainStakingMetadata';
@@ -16,7 +16,7 @@ import NominatorMetadataStore from '@subwallet/extension-base/services/storage-s
 import { HistoryQuery } from '@subwallet/extension-base/services/storage-service/db-stores/Transaction';
 import YieldPoolStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPoolStore';
 import YieldPositionStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPositionStore';
-import { BalanceItem, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BalanceItem, ProcessTransactionData, StepStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { BN_ZERO, reformatAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
@@ -73,7 +73,10 @@ export default class DatabaseService {
       // assetRef: new AssetRefStore(this._db.assetRef)
 
       // inapp notification
-      inappNotification: new InappNotificationStore(this._db.inappNotification)
+      inappNotification: new InappNotificationStore(this._db.inappNotification),
+
+      // process transaction
+      processTransactions: new ProcessTransactionStore(this._db.processTransactions)
 
     };
   }
@@ -323,14 +326,110 @@ export default class DatabaseService {
     return this.stores.transaction.bulkUpsert(cleanedHistory);
   }
 
-  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>) {
+  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>, isRecover: boolean) {
     const canUpdate = updateData && extrinsicHash;
 
     if (!canUpdate) {
       return;
     }
 
+    if (isRecover) {
+      await this.recoverProcessTransaction(extrinsicHash, updateData);
+    }
+
     return this.stores.transaction.updateWithQuery({ extrinsicHash }, updateData);
+  }
+
+  async restoreProcessTransaction () {
+    const processes = await this.stores.processTransactions.getSubmittingProcess();
+    const queuedProcesses = processes.filter((process) => process.status === StepStatus.QUEUED);
+    const processingProcesses = processes.filter((process) => process.status === StepStatus.PROCESSING);
+
+    await this.stores.processTransactions.bulkDelete(queuedProcesses.map((process) => process.id));
+
+    for (const process of processingProcesses) {
+      const currentStepId = process.currentStepId;
+      const currentStep = process.steps.find((step) => step.id === currentStepId);
+
+      if (currentStep) {
+        const currentStepStatus = currentStep.status;
+
+        if ([StepStatus.QUEUED, StepStatus.PREPARE].includes(currentStepStatus)) {
+          currentStep.status = StepStatus.CANCELLED;
+          process.status = StepStatus.CANCELLED;
+        } else if (currentStepStatus === StepStatus.TIMEOUT) {
+          currentStep.status = StepStatus.CANCELLED;
+        }
+
+        const nextSteps = process.steps.filter((step) => step.id > currentStepId);
+
+        for (const step of nextSteps) {
+          step.status = StepStatus.CANCELLED;
+        }
+      }
+    }
+
+    await this.stores.processTransactions.bulkUpsert(processingProcesses);
+  }
+
+  async recoverProcessTransaction (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>) {
+    const txs = await this.stores.transaction.queryHistory({ extrinsicHash });
+
+    const map = new Map<string, string>(txs.filter((x) => !!x.processId && x.extrinsicHash === extrinsicHash).map((tx) => [tx.processId || '', tx.transactionId || '']));
+
+    if (map.size && updateData.status) {
+      const processes = await this.stores.processTransactions.getByIds(Array.from(map.keys()));
+
+      for (const [processId, process] of Object.entries(processes)) {
+        const txId = map.get(processId);
+
+        if (txId) {
+          const currentStep = process.steps.find((tx) => tx.transactionId === txId);
+
+          if (currentStep) {
+            const differentHash = txId !== extrinsicHash && currentStep.extrinsicHash !== extrinsicHash;
+
+            if (currentStep.status === StepStatus.PROCESSING || currentStep.status === StepStatus.SUBMITTING) {
+              switch (updateData.status) {
+                case ExtrinsicStatus.SUCCESS:
+                  currentStep.status = StepStatus.COMPLETE;
+
+                  if (differentHash) {
+                    currentStep.extrinsicHash = extrinsicHash;
+                  }
+
+                  break;
+                case ExtrinsicStatus.FAIL:
+                  currentStep.status = StepStatus.FAILED;
+
+                  if (differentHash) {
+                    currentStep.extrinsicHash = extrinsicHash;
+                  }
+
+                  break;
+                case ExtrinsicStatus.UNKNOWN:
+                  currentStep.status = StepStatus.TIMEOUT;
+                  break;
+              }
+            }
+
+            const isLastStep = process.steps[process.steps.length - 1].id === currentStep.id;
+
+            if (isLastStep) {
+              process.status = currentStep.status;
+            } else {
+              if (currentStep.status === StepStatus.TIMEOUT) {
+                process.status = StepStatus.TIMEOUT;
+              } else {
+                process.status = StepStatus.CANCELLED;
+              }
+            }
+
+            await this.stores.processTransactions.upsert(process);
+          }
+        }
+      }
+    }
   }
 
   // NFT Collection
@@ -683,6 +782,30 @@ export default class DatabaseService {
 
   async getExportJson () {
     return JSON.parse(await this.exportDB()) as DexieExportJsonStructure;
+  }
+
+  public upsertProcessTransaction (processTransaction: ProcessTransactionData) {
+    return this.stores.processTransactions.upsert(processTransaction);
+  }
+
+  public observableProcessTransactions () {
+    return this.stores.processTransactions.observableAll();
+  }
+
+  public getProcessTransactions () {
+    return this.stores.processTransactions.getAll();
+  }
+
+  public getProcessTransactionById (processId: string) {
+    return this.stores.processTransactions.getOne(processId);
+  }
+
+  public observableProcessTransactionById (processId: string) {
+    return this.stores.processTransactions.observableOne(processId);
+  }
+
+  public deleteProcessTransactionById (processId: string) {
+    return this.stores.processTransactions.delete(processId);
   }
 
   // public setAssetRef (assetRef: Record<string, _AssetRef>) {

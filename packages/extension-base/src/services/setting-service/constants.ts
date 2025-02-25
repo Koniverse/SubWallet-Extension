@@ -16,6 +16,7 @@ export const DEFAULT_SHOW_ZERO_BALANCE = true;
 export const DEFAULT_SHOW_BALANCE = false;
 export const DEFAULT_ALL_LOGO = '';
 export const DEFAULT_CAMERA_ENABLE = false;
+export const DEFAULT_ALLOW_ONE_SIGN = true;
 export const DEFAULT_NOTIFICATION_SETUP: NotificationSetup = {
   isEnabled: true,
   showNotice: {
@@ -50,5 +51,6 @@ export const DEFAULT_SETTING: UiSettings = {
   isAcknowledgedUnifiedAccountMigration: DEFAULT_ACKNOWLEDGED_MIGRATION_STATUS,
   isUnifiedAccountMigrationInProgress: DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_PROGRESS,
   isUnifiedAccountMigrationDone: DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_DONE,
-  walletReference: ''
+  walletReference: '',
+  allowOneSign: DEFAULT_ALLOW_ONE_SIGN
 };

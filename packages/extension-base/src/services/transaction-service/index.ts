@@ -10,7 +10,6 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { cellToBase64Str, externalMessage, getTransferCellPromise } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getEvmChainId, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
@@ -23,7 +22,7 @@ import { getBaseTransactionInfo, getTransactionId, isCardanoTransaction, isSubst
 import { SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BasicTxErrorType, BasicTxWarningCode, EvmFeeInfo, LeavePoolAdditionalData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, SubmitJoinNominationPool, SubstrateTipInfo, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountJson, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -36,7 +35,7 @@ import { addHexPrefix } from 'ethereumjs-util';
 import { ethers, TransactionLike } from 'ethers';
 import EventEmitter from 'eventemitter3';
 import { t } from 'i18next';
-import { BehaviorSubject, interval as rxjsInterval, Subscription } from 'rxjs';
+import { BehaviorSubject, interval as rxjsInterval, map as rxjsMap, Subscription } from 'rxjs';
 import { TransactionConfig, TransactionReceipt } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -50,13 +49,17 @@ import NotificationService from '../notification-service/NotificationService';
 
 export default class TransactionService {
   private readonly state: KoniState;
-  private readonly transactionSubject: BehaviorSubject<Record<string, SWTransaction>> = new BehaviorSubject<Record<string, SWTransaction>>({});
   private readonly eventService: EventService;
   private readonly historyService: HistoryService;
   private readonly notificationService: NotificationService;
   private readonly chainService: ChainService;
 
   private readonly watchTransactionSubscribes: Record<string, Promise<void>> = {};
+
+  private aliveProcessMap: Map<string, ProcessTransactionData> = new Map();
+
+  private readonly transactionSubject: BehaviorSubject<Record<string, SWTransaction>> = new BehaviorSubject<Record<string, SWTransaction>>({});
+  private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
 
   private get transactions (): Record<string, SWTransaction> {
     return this.transactionSubject.getValue();
@@ -99,7 +102,8 @@ export default class TransactionService {
       ...transactionInput,
       status: undefined,
       errors: transactionInput.errors || [],
-      warnings: transactionInput.warnings || []
+      warnings: transactionInput.warnings || [],
+      processId: transactionInput.step?.processId
     };
     const { additionalValidator, address, chain, extrinsicType } = validationResponse;
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
@@ -176,6 +180,56 @@ export default class TransactionService {
 
   public getTransactionSubject () {
     return this.transactionSubject;
+  }
+
+  public get observables () {
+    const transactionSubject = this.transactionSubject;
+    const aliveProcessSubject = this.aliveProcessSubject;
+
+    return {
+      get transaction () {
+        return transactionSubject.asObservable();
+      },
+      get aliveProcess () {
+        return aliveProcessSubject.asObservable().pipe(
+          rxjsMap((aliveProcessMap): Record<string, ProcessTransactionData> => {
+            const aliveProcessRecord: Record<string, ProcessTransactionData> = {};
+
+            aliveProcessMap.forEach((value, key) => {
+              aliveProcessRecord[key] = value;
+            });
+
+            return aliveProcessRecord;
+          })
+        );
+      }
+    };
+  }
+
+  public get values () {
+    const transactionSubject = this.transactionSubject;
+    const aliveProcessSubject = this.aliveProcessSubject;
+
+    return {
+      get transaction () {
+        return transactionSubject.value;
+      },
+      get aliveProcess (): Record<string, ProcessTransactionData> {
+        const aliveProcessMap = aliveProcessSubject.value;
+
+        const aliveProcessRecord: Record<string, ProcessTransactionData> = {};
+
+        aliveProcessMap.forEach((value, key) => {
+          aliveProcessRecord[key] = value;
+        });
+
+        return aliveProcessRecord;
+      }
+    };
+  }
+
+  private updateAliveProcess () {
+    this.aliveProcessSubject.next(this.aliveProcessMap);
   }
 
   private fillTransactionDefaultInfo (transaction: SWTransactionInput): SWTransaction {
@@ -264,6 +318,13 @@ export default class TransactionService {
           resolve();
         }
       });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
     });
 
     // @ts-ignore
@@ -284,7 +345,7 @@ export default class TransactionService {
           ? this.signAndSendCardanoTransaction(transaction)
           : this.signAndSendTonTransaction(transaction));
 
-    const { eventsHandler } = transaction;
+    const { eventsHandler, step } = transaction;
 
     emitter.on('signed', (data: TransactionEventResponse) => {
       this.onSigned(data);
@@ -292,24 +353,57 @@ export default class TransactionService {
 
     emitter.on('send', (data: TransactionEventResponse) => {
       this.onSend(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { transactionId: transaction.id, status: StepStatus.SUBMITTING, chain: transaction.chain });
+      }
     });
 
     emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
       this.onHasTransactionHash(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { extrinsicHash: data.extrinsicHash, status: StepStatus.PROCESSING });
+      }
     });
 
     emitter.on('success', (data: TransactionEventResponse) => {
       this.handlePostProcessing(data.id);
       this.onSuccess(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.COMPLETE });
+      }
     });
 
     emitter.on('error', (data: TransactionEventResponse) => {
       // this.handlePostProcessing(data.id); // might enable this later
       this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
+
+      if (step) {
+        const rejectError = data.errors.find((error) => {
+          // TODO: REFACTOR ERROR CODE
+          if (([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType)) {
+            return true;
+          }
+
+          return false;
+        });
+
+        if (rejectError) {
+          this.deleteProcess(step);
+        } else {
+          this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+        }
+      }
     });
 
     emitter.on('timeout', (data: TransactionEventResponse) => {
       this.onTimeOut({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.TIMEOUT)] });
+
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.TIMEOUT });
+      }
     });
 
     // Todo: handle any event with transaction.eventsHandler
@@ -368,7 +462,8 @@ export default class TransactionService {
       blockNumber: 0, // Will be added in next step
       blockHash: '', // Will be added in next step
       nonce: nonce ?? 0,
-      startBlock: startBlock || 0
+      startBlock: startBlock || 0,
+      processId: transaction.step?.processId
     };
 
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
@@ -701,6 +796,8 @@ export default class TransactionService {
     // Create Input History Transaction History
     this.state.historyService.insertHistories(this.transactionToHistories(id, startBlock, nonce)).catch(console.error);
 
+    this.createProcessNotification(id).catch(console.error);
+
     console.debug(`Transaction "${id}" is sent`);
   }
 
@@ -887,7 +984,7 @@ export default class TransactionService {
     return ethers.Transaction.from(txObject).unsignedSerialized as HexString;
   }
 
-  private async signAndSendEvmTransaction ({ address, chain, id, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+  private async signAndSendEvmTransaction ({ address, chain, id, isPassConfirmation, step, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
     const payload = (transaction as EvmSendTransactionRequest);
     const evmApi = this.state.chainService.getEvmApi(chain);
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
@@ -977,7 +1074,8 @@ export default class TransactionService {
       id,
       errors: [],
       warnings: [],
-      extrinsicHash: id
+      extrinsicHash: id,
+      processId: step?.processId
     };
 
     if (isInjected) {
@@ -1053,7 +1151,7 @@ export default class TransactionService {
           emitter.emit('error', eventData);
         });
     } else {
-      this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSendTransactionRequest', payload, {})
+      this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSendTransactionRequest', payload, { isPassConfirmation })
         .then(async ({ isApproved, payload }) => {
           if (isApproved) {
             let signedTransaction: string | undefined;
@@ -1124,7 +1222,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, nonNativeTokenPayFeeSlug, transaction, url }: SWTransaction): TransactionEmitter {
+  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, nonNativeTokenPayFeeSlug, signAfterCreate, step, transaction, url }: SWTransaction): TransactionEmitter {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = nonNativeTokenPayFeeSlug ? this.state.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1133,7 +1231,8 @@ export default class TransactionService {
       id,
       errors: [],
       warnings: [],
-      extrinsicHash: id
+      extrinsicHash: id,
+      processId: step?.processId
     };
 
     const extrinsic = transaction as SubmittableExtrinsic;
@@ -1143,7 +1242,7 @@ export default class TransactionService {
     const signerOption: Partial<SignerOptions> = {
       signer: {
         signPayload: async (payload: SignerPayloadJSON) => {
-          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, address, url || EXTENSION_REQUEST_URL, payload);
+          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, address, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
 
           return {
             id: (new Date()).getTime(),
@@ -1222,14 +1321,15 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendTonTransaction ({ address, chain, extrinsicType, id, transaction, url }: SWTransaction): TransactionEmitter {
+  private signAndSendTonTransaction ({ address, chain, extrinsicType, id, step, transaction, url }: SWTransaction): TransactionEmitter {
     const walletContract = keyring.getPair(address).ton.currentContract;
     const emitter = new EventEmitter<TransactionEventMap>();
     const eventData: TransactionEventResponse = {
       id,
       errors: [],
       warnings: [],
-      extrinsicHash: id
+      extrinsicHash: id,
+      processId: step?.processId
     };
 
     const payload = transaction as TonTransactionConfig;
@@ -1435,6 +1535,143 @@ export default class TransactionService {
       extrinsicHash: transaction.extrinsicHash
     })
       .catch(console.error);
+  }
+
+  public async createProcessIfNeed (process: ProcessTransactionData) {
+    if (!this.aliveProcessMap.has(process.id)) {
+      this.aliveProcessMap.set(process.id, process);
+
+      this.updateAliveProcess();
+      await this.state.dbService.upsertProcessTransaction(process);
+    }
+  }
+
+  public checkProcessExist (processId: string) {
+    return this.aliveProcessMap.has(processId);
+  }
+
+  private deleteProcess (step: BriefProcessStep) {
+    const { processId } = step;
+
+    this.aliveProcessMap.delete(processId);
+    this.state.dbService.deleteProcessTransactionById(processId).catch(console.error);
+
+    this.updateAliveProcess();
+  }
+
+  public updateProcessStepStatus (step: BriefProcessStep, data: Pick<ProcessStep, 'status' | 'transactionId' | 'extrinsicHash' | 'chain'>) {
+    const { processId, stepId } = step;
+    const process = this.aliveProcessMap.get(processId);
+
+    if (process) {
+      const step = process.steps.find((item) => item.id === stepId);
+
+      if (step) {
+        Object.assign(step, data);
+
+        if ([StepStatus.PREPARE || StepStatus.PROCESSING].includes(step.status)) {
+          process.currentStepId = step.id;
+        }
+
+        if (step.status === StepStatus.COMPLETE) {
+          const nextStep = process.steps.find((item) => item.id === stepId + 1);
+
+          if (nextStep) {
+            nextStep.status = StepStatus.PREPARE;
+            process.currentStepId = nextStep.id;
+          }
+        } else if ([StepStatus.FAILED, StepStatus.TIMEOUT].includes(step.status)) {
+          const nextSteps = process.steps.filter((item) => item.id > stepId);
+
+          nextSteps.forEach((item) => {
+            item.status = StepStatus.CANCELLED;
+          });
+        }
+      }
+
+      if (process.steps.some((item) => [StepStatus.PROCESSING, StepStatus.SUBMITTING].includes(item.status))) {
+        process.status = StepStatus.PROCESSING;
+      }
+
+      if (process.steps.some((item) => item.status === StepStatus.TIMEOUT)) {
+        process.status = StepStatus.TIMEOUT;
+      }
+
+      if (process.steps.every((item) => item.status === StepStatus.COMPLETE)) {
+        const lastStep = process.steps[process.steps.length - 1];
+
+        process.lastTransactionChain = lastStep.chain;
+        process.lastTransactionId = lastStep.transactionId;
+        process.status = StepStatus.COMPLETE;
+      }
+
+      if (process.steps.some((item) => item.status === StepStatus.FAILED)) {
+        process.status = StepStatus.FAILED;
+      }
+
+      this.aliveProcessMap.set(processId, process);
+      this.state.dbService.upsertProcessTransaction(process).catch(console.error);
+
+      if ([StepStatus.COMPLETE, StepStatus.FAILED, StepStatus.TIMEOUT].includes(process.status)) {
+        this.aliveProcessMap.delete(processId);
+      }
+
+      this.updateAliveProcess();
+    } else {
+      this.state.dbService.getProcessTransactionById(processId)
+        .then((process) => {
+          if (process) {
+            const step = process.steps.find((item) => item.id === stepId);
+
+            if (step && step.status === StepStatus.TIMEOUT && [StepStatus.COMPLETE, StepStatus.FAILED].includes(data.status)) {
+              Object.assign(step, data);
+
+              const isLastStep = process.steps[process.steps.length - 1].id = stepId;
+
+              if (isLastStep) {
+                process.status = data.status;
+              }
+
+              this.state.dbService.upsertProcessTransaction(process).catch(console.error);
+            }
+          }
+        })
+        .catch(console.error);
+    }
+  }
+
+  public async updateProcessInfo (id: string, combineInfo: unknown, step?: ProcessStep) {
+    const process = this.aliveProcessMap.get(id);
+
+    if (process) {
+      if (step) {
+        const index = process.steps.findIndex((item) => item.id === step?.id);
+
+        if (index !== -1) {
+          process.steps[index] = step;
+        }
+      }
+
+      if (combineInfo) {
+        process.combineInfo = combineInfo;
+      }
+
+      this.aliveProcessMap.set(process.id, process);
+      this.updateAliveProcess();
+      await this.state.dbService.upsertProcessTransaction(process);
+    }
+  }
+
+  public async createProcessNotification (transactionId: string) {
+    const transaction = this.getTransaction(transactionId);
+
+    if (transaction && transaction.step?.processId) {
+      const process = this.aliveProcessMap.get(transaction.step.processId);
+
+      if (process) {
+        await this.state.inappNotificationService.createProcessNotification(process);
+      }
+    }
   }
 
   public resetWallet (): void {
