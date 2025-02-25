@@ -47,6 +47,8 @@ export default function useMetadata (genesisHash?: string | null, isPartial?: bo
 
       const fetchData = async () => {
         try {
+          await new Promise((resolve) => setTimeout(resolve, 5000)); // wait metadata ready to avoid spamming warning alert
+
           const chainFromRaw = await getMetadataRaw(chainInfo, genesisHash);
           const chainFromMetaStore = await getChainByMetaStore();
 
