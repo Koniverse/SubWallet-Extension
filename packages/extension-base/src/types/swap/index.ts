@@ -70,7 +70,8 @@ export enum SwapProviderId {
   KUSAMA_ASSET_HUB = 'KUSAMA_ASSET_HUB',
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
-  SIMPLE_SWAP = 'SIMPLE_SWAP'
+  SIMPLE_SWAP = 'SIMPLE_SWAP',
+  UNISWAP = 'UNISWAP'
 }
 
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
@@ -80,9 +81,10 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
-  SwapProviderId.ROCOCO_ASSET_HUB,
+  // SwapProviderId.ROCOCO_ASSET_HUB,
   SwapProviderId.WESTEND_ASSET_HUB,
-  SwapProviderId.SIMPLE_SWAP
+  SwapProviderId.SIMPLE_SWAP,
+  SwapProviderId.UNISWAP
 ];
 
 export interface SwapProvider {
