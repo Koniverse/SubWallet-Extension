@@ -924,6 +924,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     };
   }, [chainValue, fromValue, nativeTokenBalance, nativeTokenSlug]);
 
+  useEffect(() => {
+    console.log('transferInfo', transferInfo);
+  }, [transferInfo]);
+
   useRestoreTransaction(form);
 
   return (
