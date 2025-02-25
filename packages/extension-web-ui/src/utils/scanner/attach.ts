@@ -4,6 +4,7 @@
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { ETHEREUM_PREFIX, SCAN_TYPE, SECRET_PREFIX, SUBSTRATE_PREFIX } from '@subwallet/extension-web-ui/constants';
 import { QrAccount } from '@subwallet/extension-web-ui/types';
+import { isAddress } from '@subwallet/keyring';
 
 import { isHex } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -81,6 +82,10 @@ export const readOnlyScan = (data: string): QrAccount | null => {
 
   try {
     if (isHex(data)) {
+      return null;
+    }
+
+    if (!isAddress(data)) {
       return null;
     }
 
