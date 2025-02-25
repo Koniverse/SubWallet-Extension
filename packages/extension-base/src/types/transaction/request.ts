@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-import { TransactionWarningType } from '@subwallet/extension-base/types';
+import { TransactionFee, TransactionWarningType } from '@subwallet/extension-base/types';
 
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
@@ -18,13 +18,13 @@ export interface RequestBaseTransfer {
   transferBounceable?: boolean;
 }
 
-export interface RequestCheckTransfer extends RequestBaseTransfer {
+export interface RequestCheckTransfer extends RequestBaseTransfer, TransactionFee {
   networkKey: string,
 }
 
 export type RequestTransfer = InternalRequestSign<RequestCheckTransfer>;
 
-export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer {
+export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer, TransactionFee {
   value: string;
   originNetworkKey: string,
   destinationNetworkKey: string,
@@ -32,3 +32,15 @@ export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer {
 }
 
 export type RequestCrossChainTransfer = InternalRequestSign<RequestCheckCrossChainTransfer>;
+
+export interface RequestGetTokensCanPayFee {
+  address: string;
+  chain: string;
+  feeAmount?: string;
+}
+
+export interface RequestGetAmountForPair {
+  nativeTokenFeeAmount: string,
+  nativeTokenSlug: string,
+  toTokenSlug: string
+}

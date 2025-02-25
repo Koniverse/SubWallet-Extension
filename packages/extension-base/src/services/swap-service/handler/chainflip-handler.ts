@@ -13,11 +13,13 @@ import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/e
 import { createTransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { calculateSwapRate, CHAIN_FLIP_SUPPORTED_MAINNET_ASSET_MAPPING, CHAIN_FLIP_SUPPORTED_MAINNET_MAPPING, CHAIN_FLIP_SUPPORTED_TESTNET_ASSET_MAPPING, CHAIN_FLIP_SUPPORTED_TESTNET_MAPPING, getChainflipOptions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonFeeComponent, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { ChainflipPreValidationMetadata, ChainflipSwapTxData, OptimalSwapPathParams, SwapEarlyValidation, SwapErrorType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { AxiosError } from 'axios';
 import BigNumber from 'bignumber.js';
 
@@ -48,10 +50,11 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
 
-  constructor (chainService: ChainService, balanceService: BalanceService, isTestnet = true) {
+  constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
       chainService,
       balanceService,
+      feeService,
       providerName: isTestnet ? 'Chainflip Testnet' : 'Chainflip',
       providerSlug: isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET
     });
@@ -442,12 +445,32 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
       extrinsic = submittableExtrinsic as SubmittableExtrinsic<'promise'>;
     } else {
+      const id = getId();
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, chainInfo.slug, 'evm');
+
       if (_isNativeToken(fromAsset)) {
-        const [transactionConfig] = await getEVMTransactionObject(chainInfo, address, depositAddressResponse.depositAddress, quote.fromAmount, false, this.chainService.getEvmApi(chainInfo.slug));
+        const [transactionConfig] = await getEVMTransactionObject({
+          chain: chainInfo.slug,
+          evmApi: this.chainService.getEvmApi(chainInfo.slug),
+          from: address,
+          to: depositAddressResponse.depositAddress,
+          value: quote.fromAmount,
+          feeInfo,
+          transferAll: false
+        });
 
         extrinsic = transactionConfig;
       } else {
-        const [transactionConfig] = await getERC20TransactionObject(_getContractAddressOfToken(fromAsset), chainInfo, address, depositAddressResponse.depositAddress, quote.fromAmount, false, this.chainService.getEvmApi(chainInfo.slug));
+        const [transactionConfig] = await getERC20TransactionObject({
+          assetAddress: _getContractAddressOfToken(fromAsset),
+          chain: chainInfo.slug,
+          evmApi: this.chainService.getEvmApi(chainInfo.slug),
+          from: address,
+          to: depositAddressResponse.depositAddress,
+          value: quote.fromAmount,
+          feeInfo,
+          transferAll: false
+        });
 
         extrinsic = transactionConfig;
       }
@@ -492,7 +515,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getSubmitStep
+      this.getSubmitStep.bind(this)
     ]);
   }
 }

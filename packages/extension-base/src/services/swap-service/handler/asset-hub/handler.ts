@@ -9,10 +9,12 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { convertSwapRate, getSwapAlternativeAsset, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonFeeComponent, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { AssetHubSwapEarlyValidation, OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 
 import { SwapBaseHandler, SwapBaseInterface } from '../base-handler';
@@ -27,7 +29,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   isReady = false;
   providerSlug: SwapProviderId;
 
-  constructor (chainService: ChainService, balanceService: BalanceService, chain: string) {
+  constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, chain: string) {
     const chainInfo = chainService.getChainInfoByKey(chain);
     const providerSlug = chain === 'statemint'
       ? SwapProviderId.POLKADOT_ASSET_HUB
@@ -39,7 +41,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       balanceService,
       chainService,
       providerName: chainInfo.name,
-      providerSlug
+      providerSlug,
+      feeService
     });
 
     this.providerSlug = providerSlug;
@@ -110,6 +113,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     try {
       const alternativeChainInfo = this.chainService.getChainInfoByKey(alternativeAsset.originChain);
+      const originalChainInfo = this.chainService.getChainInfoByKey(this.chain);
       const step: BaseStepDetail = {
         metadata: {
           sendingValue: bnAmount.toString(),
@@ -121,14 +125,19 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       };
 
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
+      const id = getId();
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, alternativeChainInfo.slug, 'substrate');
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
         sendingValue: bnAmount.toString(),
         recipient: params.request.address,
-        chainInfoMap: this.chainService.getChainInfoMap(),
-        substrateApi: xcmOriginSubstrateApi
+        sender: params.request.address,
+        feeInfo: feeInfo,
+        substrateApi: xcmOriginSubstrateApi,
+        destinationChain: originalChainInfo,
+        originChain: alternativeChainInfo
       });
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
@@ -146,6 +155,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
       return [step, fee];
     } catch (e) {
+      console.error('Error creating xcm step', e);
+
       return undefined;
     }
   }
@@ -165,8 +176,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getXcmStep,
-      this.getSubmitStep
+      this.getXcmStep.bind(this),
+      this.getSubmitStep.bind(this)
     ]);
   }
 
@@ -236,6 +247,9 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     const originAsset = this.chainService.getAssetBySlug(alternativeAssetSlug);
     const destinationAsset = this.chainService.getAssetBySlug(pair.from);
 
+    const originChain = this.chainService.getChainInfoByKey(originAsset.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationAsset.originChain);
+
     const substrateApi = this.chainService.getSubstrateApi(originAsset.originChain);
 
     const chainApi = await substrateApi.isReady;
@@ -245,6 +259,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     const bnAmount = new BigN(params.quote.fromAmount);
     const bnDestinationAssetBalance = new BigN(destinationAssetBalance.value);
+    const id = getId();
+    const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, originChain.slug, 'substrate');
 
     let bnTotalAmount = bnAmount.minus(bnDestinationAssetBalance);
 
@@ -259,8 +275,11 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       destinationTokenInfo: destinationAsset,
       sendingValue: bnTotalAmount.toString(),
       recipient: params.address,
-      chainInfoMap: this.chainService.getChainInfoMap(),
-      substrateApi: chainApi
+      substrateApi: chainApi,
+      sender: params.address,
+      originChain: originChain,
+      destinationChain: destinationChain,
+      feeInfo
     });
 
     const xcmData: RequestCrossChainTransfer = {
