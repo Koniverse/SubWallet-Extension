@@ -113,7 +113,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           from: address,
           to: recipient,
           transferAll: false,
-          value: '0'
+          value: '0',
+          fallbackFee: true
         });
       } else {
         [transaction] = await getEVMTransactionObject({
@@ -125,7 +126,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           from: address,
           to: recipient,
           transferAll: false,
-          value: '0'
+          value: '0',
+          fallbackFee: true
         });
       }
     } else if (isTonAddress(address) && _isTokenTransferredByTon(srcToken)) {
