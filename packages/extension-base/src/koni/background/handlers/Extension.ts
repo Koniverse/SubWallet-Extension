@@ -1664,7 +1664,7 @@ export default class KoniExtension {
       const hydrationAssets = this.#koniState.chainService.getHydrationAssetIdMap(chain);
 
       for (const [key, value] of Object.entries(hydrationAssets)) {
-        if (assetId.toString() === value) {
+        if (assetId && assetId.toString() === value) {
           defaultTokenSlug = key;
           break;
         }

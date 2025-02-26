@@ -161,6 +161,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
   const [listTokensCanPayFee, setListTokensCanPayFee] = useState<TokenHasBalanceInfo[]>([]);
+  const [defaultTokenPayFee, setDefaultTokenPayFee] = useState<string | undefined>(undefined);
   const [currentTokenPayFee, setCurrentTokenPayFee] = useState<string | undefined>(undefined);
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
@@ -380,7 +381,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setIsTransferAll(false);
         setForceUpdateMaxValue(undefined);
 
-        setCurrentTokenPayFee(undefined);
+        setCurrentTokenPayFee(defaultTokenPayFee);
       }
 
       if (part.destChain || part.chain || part.value || part.asset) {
@@ -398,7 +399,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       if (part.destChain) {
         form.resetFields(['to']);
-        setCurrentTokenPayFee(undefined);
+        setCurrentTokenPayFee(defaultTokenPayFee);
       }
 
       if (part.from || part.destChain) {
@@ -420,7 +421,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [persistData, form, assetRegistry, isTransferAll]
+    [defaultTokenPayFee, persistData, form, assetRegistry, isTransferAll]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -494,7 +495,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [currentTokenPayFee, nativeTokenSlug, selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom]);
+  }, [currentTokenPayFee, selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
@@ -900,6 +901,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         const defaultTokenSlug = _response.defaultTokenSlug;
 
         if (!cancel) {
+          setDefaultTokenPayFee(defaultTokenSlug);
           setCurrentTokenPayFee(defaultTokenSlug);
           setListTokensCanPayFee(tokensCanPayFee);
           setIsFetchingListFeeToken(false);
