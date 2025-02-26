@@ -6,6 +6,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType, RequestChangeFeeToken } from '@subwallet/extension-base/background/KoniTypes';
+import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -121,15 +122,6 @@ export class HydradxHandler implements SwapBaseInterface {
     try {
       const alternativeChainInfo = this.chainService.getChainInfoByKey(alternativeAsset.originChain);
       const destChainInfo = this.chainService.getChainInfoByKey(this.chain());
-      const step: BaseStepDetail = {
-        metadata: {
-          sendingValue: bnAmount.toString(),
-          originTokenInfo: alternativeAsset,
-          destinationTokenInfo: fromAsset
-        },
-        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
-        type: CommonStepType.XCM
-      };
 
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
       const id = getId();
@@ -138,6 +130,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
+        // Mock sending value to get payment info
         sendingValue: bnAmount.toString(),
         recipient: params.request.address,
         substrateApi: xcmOriginSubstrateApi,
@@ -153,15 +146,35 @@ export class HydradxHandler implements SwapBaseInterface {
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.round(xcmFeeInfo.partialFee * 1.2).toString(),
+          amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString(),
           tokenSlug: _getChainNativeTokenSlug(alternativeChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(alternativeChainInfo),
         feeOptions: [_getChainNativeTokenSlug(alternativeChainInfo)]
       };
 
+      let bnTransferAmount = bnAmount.minus(bnFromAssetBalance);
+
+      if (_isNativeToken(alternativeAsset)) {
+        const bnXcmFee = new BigNumber(fee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
+
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      }
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: alternativeAsset,
+          destinationTokenInfo: fromAsset
+        },
+        name: `Transfer ${alternativeAsset.symbol} from ${alternativeChainInfo.name}`,
+        type: CommonStepType.XCM
+      };
+
       return [step, fee];
     } catch (e) {
+      console.error('Error creating xcm step', e);
+
       return undefined;
     }
   }
@@ -235,9 +248,9 @@ export class HydradxHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getXcmStep,
+      this.getXcmStep.bind(this),
       // this.getFeeOptionStep.bind(this),
-      this.getSubmitStep
+      this.getSubmitStep.bind(this)
     ]);
   }
 

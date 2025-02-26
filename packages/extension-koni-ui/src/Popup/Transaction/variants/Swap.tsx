@@ -9,17 +9,19 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, ProcessType } from '@subwallet/extension-base/types';
 import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AddressInputNew, AlertBox, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
 import { AddMoreBalanceModal, ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { QuoteResetTime, SwapRoute } from '@subwallet/extension-koni-ui/components/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_MORE_BALANCE_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequest, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
@@ -158,8 +160,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const toTokenSlugValue = useWatchTransaction('toTokenSlug', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const recipientValue = useWatchTransaction('recipient', form, defaultData);
+
   const { checkChainConnected, turnOnChain } = useChainConnection();
   const onPreCheck = usePreCheckAction(fromValue);
+  const oneSign = useOneSignProcess(fromValue);
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -674,16 +678,21 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       setSubmitLoading(true);
 
       const { from, recipient } = values;
+      let processId = processState.processId;
 
       const submitData = async (step: number): Promise<boolean> => {
-        dispatchProcessState({
-          type: CommonActionType.STEP_SUBMIT,
-          payload: null
-        });
-
         const isFirstStep = step === 0;
         const isLastStep = step === processState.steps.length - 1;
         const needRollback = step === 1;
+
+        if (isFirstStep) {
+          processId = getId();
+        }
+
+        dispatchProcessState({
+          type: CommonActionType.STEP_SUBMIT,
+          payload: isFirstStep ? { processId } : null
+        });
 
         try {
           if (isFirstStep) {
@@ -729,22 +738,44 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               }
             }
 
-            const submitPromise: Promise<SWTransactionResponse> = handleSwapStep({
-              process: currentOptimalSwapPath,
-              currentStep: step,
-              quote: latestOptimalQuote,
-              address: from,
-              slippage: slippage,
-              recipient
-            });
+            if (oneSign && currentOptimalSwapPath.steps.length > 2) {
+              const submitPromise: Promise<SWTransactionResponse> = submitProcess({
+                address: from,
+                id: processId,
+                type: ProcessType.SWAP,
+                request: {
+                  process: currentOptimalSwapPath,
+                  currentStep: step,
+                  quote: latestOptimalQuote,
+                  address: from,
+                  slippage: slippage,
+                  recipient
+                }
+              });
 
-            const rs = await submitPromise;
-            const success = onSuccess(isLastStep, needRollback)(rs);
+              const rs = await submitPromise;
 
-            if (success) {
-              return await submitData(step + 1);
+              onSuccess(true, needRollback)(rs);
+
+              return true;
             } else {
-              return false;
+              const submitPromise: Promise<SWTransactionResponse> = handleSwapStep({
+                process: currentOptimalSwapPath,
+                currentStep: step,
+                quote: latestOptimalQuote,
+                address: from,
+                slippage: slippage,
+                recipient
+              });
+
+              const rs = await submitPromise;
+              const success = onSuccess(isLastStep, needRollback)(rs);
+
+              if (success) {
+                return await submitData(step + 1);
+              } else {
+                return false;
+              }
             }
           }
         } catch (e) {
@@ -785,7 +816,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, isChainConnected, notify, onError, onSuccess, openAlert, processState.currentStep, processState.steps.length, slippage, swapError, t]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const minimumReceived = useMemo(() => {
     const adjustedValue = new BigN(currentQuote?.toAmount || '0').multipliedBy(new BigN(1).minus(new BigN(slippage))).integerValue(BigN.ROUND_DOWN);
