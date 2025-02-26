@@ -14,6 +14,7 @@ const ReceiveModal = ({ accountSelectorItems,
   onCloseTokenSelector,
   onSelectAccountSelector,
   onSelectTokenSelector,
+  selectedAccountAddressItem,
   tokenSelectorItems }: ReceiveModalProps): React.ReactElement<ReceiveModalProps> => {
   return (
     <>
@@ -21,6 +22,7 @@ const ReceiveModal = ({ accountSelectorItems,
         items={tokenSelectorItems}
         onCancel={onCloseTokenSelector}
         onSelectItem={onSelectTokenSelector}
+        selectedAccountAddressItem={selectedAccountAddressItem}
       />
       <AccountSelectorModal
         items={accountSelectorItems}
