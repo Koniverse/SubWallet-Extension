@@ -554,10 +554,6 @@ const Wrapper = ({ className }: Props) => {
 
 const AccountDetail = styled(Wrapper)<Props>(({ theme: { extendToken, token } }: Props) => {
   return {
-    '.ant-sw-screen-layout-body': {
-      display: 'flex',
-      overflow: 'hidden'
-    },
 
     '.body-container': {
       flexGrow: 1
@@ -645,7 +641,18 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { extendToken, token } }:
       }
     },
 
+    '.screen-size-mobile &': {
+      '.ant-sw-screen-layout-body': {
+        display: 'block'
+      }
+    },
+
     '.web-ui-enable &': {
+      '.ant-sw-screen-layout-body': {
+        display: 'flex',
+        overflow: 'hidden'
+      },
+
       '.ant-sw-sub-header-container': {
         marginBottom: 24
       },
