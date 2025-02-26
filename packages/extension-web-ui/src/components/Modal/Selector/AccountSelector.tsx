@@ -143,7 +143,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
         groupLabel: t('Injected account')
       });
 
-      result.push(...ledgerAccounts);
+      result.push(...injectedAccounts);
     }
 
     if (unknownAccounts.length) {
