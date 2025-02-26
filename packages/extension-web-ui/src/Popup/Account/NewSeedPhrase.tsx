@@ -1,15 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CloseIcon, InstructionContainer, InstructionContentType, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-web-ui/components';
+import { AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountNameModal, CloseIcon, InstructionContainer, InstructionContentType, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-web-ui/components';
 import { SeedPhraseTermModal } from '@subwallet/extension-web-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
-import { CONFIRM_TERM_SEED_PHRASE, DEFAULT_ACCOUNT_TYPES, DEFAULT_ROUTER_PATH, NEW_SEED_MODAL, SEED_PREVENT_MODAL, SELECTED_ACCOUNT_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useGetDefaultAccountName, useIsPopup, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-web-ui/hooks';
+import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useIsPopup, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-web-ui/hooks';
 import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isFirefox } from '@subwallet/extension-web-ui/utils';
+import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { isFirefox, isNoAccount } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { saveAs } from 'file-saver';
@@ -29,43 +30,45 @@ const FooterIcon = (
   />
 );
 
+const accountNameModalId = ACCOUNT_NAME_MODAL;
+const GeneralTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', useDefaultContent: false };
+
 const Component: React.FC<Props> = ({ className }: Props) => {
   useAutoNavigateToCreatePassword();
   const { t } = useTranslation();
   const notify = useNotification();
   const navigate = useNavigate();
-  const [_isConfirmedTermSeedPhrase] = useLocalStorage(CONFIRM_TERM_SEED_PHRASE, 'nonConfirmed');
+  const [confirmedTermSeedPhrase, setConfirmedTermSeedPhrase] = useLocalStorage<SeedPhraseTermStorage>(CONFIRM_TERM_SEED_PHRASE, GeneralTermLocalDefault);
   const { goHome } = useDefaultNavigate();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const checkUnlock = useUnlockChecker();
   const { isWebUI } = useContext(ScreenContext);
 
   const onComplete = useCompleteCreateAccount();
-  const accountName = useGetDefaultAccountName();
   const isPopup = useIsPopup();
 
-  const { hasMasterPassword, isNoAccount } = useSelector((state: RootState) => state.accountState);
+  const { accounts, hasMasterPassword } = useSelector((state: RootState) => state.accountState);
 
   const isOpenWindowRef = useRef(false);
 
-  const [typesStorage] = useLocalStorage(SELECTED_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES);
+  const [selectedMnemonicType] = useLocalStorage(SELECTED_MNEMONIC_TYPE, DEFAULT_MNEMONIC_TYPE);
   const [preventModalStorage] = useLocalStorage(SEED_PREVENT_MODAL, false);
   const [preventModal] = useState(preventModalStorage);
 
-  const [accountTypes] = useState(typesStorage);
-
   const [seedPhrase, setSeedPhrase] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const noAccount = useMemo(() => isNoAccount(accounts), [accounts]);
 
   const onBack = useCallback(() => {
     navigate(DEFAULT_ROUTER_PATH);
 
     if (!preventModal) {
-      if (!isNoAccount) {
-        activeModal(NEW_SEED_MODAL);
+      if (!noAccount) {
+        activeModal(CREATE_ACCOUNT_MODAL);
       }
     }
-  }, [navigate, preventModal, isNoAccount, activeModal]);
+  }, [navigate, preventModal, noAccount, activeModal]);
 
   const onClickToSave = useCallback(() => {
     const blob = new Blob([seedPhrase], { type: 'text/plain' });
@@ -103,67 +106,79 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     ];
   }, [onClickToSave, t]);
 
-  const _onCreate = useCallback((): void => {
+  const onConfirmSeedPhrase = useCallback(() => {
     if (!seedPhrase) {
       return;
     }
 
     checkUnlock().then(() => {
-      setLoading(true);
-      setTimeout(() => {
-        createAccountSuriV2({
-          name: accountName,
-          suri: seedPhrase,
-          types: accountTypes,
-          isAllowed: true
-        })
-          .then(() => {
-            onComplete();
-          })
-          .catch((error: Error): void => {
-            notify({
-              message: error.message,
-              type: 'error'
-            });
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }, 500);
+      activeModal(accountNameModalId);
     }).catch(() => {
       // User cancel unlock
     });
-  }, [seedPhrase, checkUnlock, accountName, accountTypes, onComplete, notify]);
+  }, [seedPhrase, checkUnlock, activeModal]);
 
-  const onConfirmTerms = useCallback(() => {
-    _onCreate();
-  }, [_onCreate]);
+  const onSubmit = useCallback((accountName: string) => {
+    setLoading(true);
+    createAccountSuriV2({
+      name: accountName,
+      suri: seedPhrase,
+      type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
+      isAllowed: true
+    })
+      .then(() => {
+        onComplete();
+      })
+      .catch((error: Error): void => {
+        notify({
+          message: error.message,
+          type: 'error'
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+        inactiveModal(accountNameModalId);
+      });
+  }, [inactiveModal, notify, onComplete, seedPhrase, selectedMnemonicType]);
+
+  const buttonProps = {
+    children: t('I have saved it somewhere safe'),
+    icon: FooterIcon,
+    onClick: onConfirmSeedPhrase,
+    disabled: !seedPhrase,
+    loading: loading
+  };
 
   useEffect(() => {
-    if (_isConfirmedTermSeedPhrase === 'nonConfirmed') {
+    // Note: This useEffect checks if the data in localStorage has already been migrated from the old "string" structure to the new structure in "SeedPhraseTermStorage".
+    const item = localStorage.getItem(CONFIRM_TERM_SEED_PHRASE);
+
+    if (item) {
+      const confirmedTermSeedPhrase_ = JSON.parse(item) as string | SeedPhraseTermStorage;
+
+      if (typeof confirmedTermSeedPhrase_ === 'string') {
+        setConfirmedTermSeedPhrase({ ...GeneralTermLocalDefault, state: confirmedTermSeedPhrase_ });
+      }
+    }
+  }, [setConfirmedTermSeedPhrase]);
+
+  useEffect(() => {
+    if (confirmedTermSeedPhrase.state === 'nonConfirmed') {
       activeModal(TERM_AND_CONDITION_SEED_PHRASE_MODAL);
     }
-  }, [_isConfirmedTermSeedPhrase, activeModal]);
+  }, [confirmedTermSeedPhrase.state, activeModal, inactiveModal, setConfirmedTermSeedPhrase]);
 
   useEffect(() => {
-    createSeedV2(undefined, undefined, DEFAULT_ACCOUNT_TYPES)
+    createSeedV2(undefined, undefined, selectedMnemonicType)
       .then((response): void => {
-        const phrase = response.seed;
+        const phrase = response.mnemonic;
 
         setSeedPhrase(phrase);
       })
       .catch((e: Error) => {
         console.error(e);
       });
-  }, []);
-
-  const buttonProps = {
-    children: t('I have saved it somewhere safe'),
-    icon: FooterIcon,
-    onClick: onConfirmTerms,
-    disabled: !seedPhrase,
-    loading: loading
-  };
+  }, [selectedMnemonicType]);
 
   useEffect(() => {
     if (isPopup && isFirefox && hasMasterPassword && !isOpenWindowRef.current) {
@@ -178,7 +193,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       resolve={new Promise((resolve) => !!seedPhrase && resolve(true))}
     >
       <Layout.WithSubHeaderOnly
-        onBack={onBack}
+        onBack={preventModal ? goHome : onBack}
         {...(!isWebUI
           ? {
             rightFooterButton: buttonProps,
@@ -189,14 +204,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             subHeaderBackground: 'transparent'
           }
           : {})}
-        subHeaderIcons={[
-          !isWebUI
-            ? {
-              icon: <CloseIcon />,
-              onClick: goHome
-            }
-            : {}
-        ]}
+        subHeaderIcons={preventModal
+          ? undefined
+          : [
+            !isWebUI
+              ? {
+                icon: <CloseIcon />,
+                onClick: goHome
+              }
+              : {}
+          ]}
+        subHeaderLeft={preventModal ? !isWebUI ? <CloseIcon /> : undefined : undefined }
         title={t('Your seed phrase')}
       >
         <div className={CN('container', {
@@ -226,7 +244,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         </div>
 
       </Layout.WithSubHeaderOnly>
-      <SeedPhraseTermModal onOk={_onCreate} />
+      <SeedPhraseTermModal />
+      <AccountNameModal
+        accountType={selectedMnemonicType === 'general' ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
+        isLoading={loading}
+        onSubmit={onSubmit}
+      />
     </PageWrapper>
   );
 };
@@ -241,7 +264,7 @@ const NewSeedPhrase = styled(Component)<Props>(({ theme: { extendToken, token } 
       margin: '0 auto',
 
       '.seed-phrase-container': {
-        padding: token.padding,
+        paddingTop: token.paddingXS,
         textAlign: 'center',
         flex: 1
 
@@ -252,7 +275,7 @@ const NewSeedPhrase = styled(Component)<Props>(({ theme: { extendToken, token } 
         justifyContent: 'center',
         maxWidth: '60%',
         margin: '0 auto',
-        gap: token.paddingMD,
+        gap: token.padding,
 
         '.action': {
           marginTop: 40,

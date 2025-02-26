@@ -8,18 +8,23 @@ import { isAccountAll } from '@subwallet/extension-web-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useState } from 'react';
 
+// todo: recheck this hook usage and logic
 export function useSelectAccount (getAllAddress: string[], modalId: string, onChange?: BasicOnChangeFunction, isSingleSelect?: boolean) {
-  const { accounts } = useSelector((state) => state.accountState);
+  const { accountProxies } = useSelector((state) => state.accountState);
   const [selected, setSelected] = useState<string[]>([]);
   const [changeAccounts, setChangeAccounts] = useState<string[]>([]);
   const { inactiveModal } = useContext(ModalContext);
 
   const onChangeSelectedAccounts = useCallback((changeVal: string) => {
     setChangeAccounts((changeAccounts) => {
+      if (!changeVal) {
+        return [];
+      }
+
       let result: string[];
       const isAll = isAccountAll(changeVal);
 
-      if (!changeAccounts.includes(changeVal) && changeAccounts.length === accounts.length - 2) {
+      if (!changeAccounts.includes(changeVal) && changeAccounts.length === accountProxies.length - 2) {
         result = getAllAddress;
       } else if (!changeAccounts.includes(changeVal)) {
         if (!changeVal) {
@@ -43,7 +48,7 @@ export function useSelectAccount (getAllAddress: string[], modalId: string, onCh
 
       return result;
     });
-  }, [accounts, getAllAddress, isSingleSelect]);
+  }, [accountProxies.length, getAllAddress, isSingleSelect]);
 
   const onApplyChangeAccounts = useCallback(() => {
     onChange && onChange({ target: { value: changeAccounts.join(',') } });

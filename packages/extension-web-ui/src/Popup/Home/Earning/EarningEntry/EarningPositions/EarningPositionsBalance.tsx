@@ -11,7 +11,6 @@ import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { saveShowBalance } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ExtraYieldPositionInfo, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { findAccountByAddress } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -30,7 +29,8 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
   const { currencyData } = useSelector((state: RootState) => state.price);
   const earningRewards = useSelector((state) => state.earning.earningRewards);
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
-  const { accounts, currentAccount } = useSelector((state) => state.accountState);
+  const accounts = useSelector((state) => state.accountState.accounts);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
 
   const { t } = useTranslation();
   const { accountBalance: { totalBalanceInfo } } = useContext(HomeContext);
@@ -89,16 +89,18 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
 
   const totalUnclaimReward = useMemo(() => {
     let result = BN_ZERO;
-    const address = currentAccount?.address || '';
-    const isAll = isAccountAll(address);
+
+    if (!currentAccountProxy) {
+      return result;
+    }
+
+    const isAll = isAccountAll(currentAccountProxy.id);
 
     const checkAddress = (item: EarningRewardItem) => {
       if (isAll) {
-        const account = findAccountByAddress(accounts, item.address);
-
-        return !!account;
+        return accounts.some((a) => isSameAddress(item.address, a.address));
       } else {
-        return isSameAddress(address, item.address);
+        return currentAccountProxy.accounts.some((a) => isSameAddress(item.address, a.address));
       }
     };
 
@@ -113,7 +115,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
       });
 
     return result;
-  }, [currentAccount?.address, earningRewards, items, accounts]);
+  }, [earningRewards, currentAccountProxy, items, accounts]);
 
   useEffect(() => {
     const backgroundColor = isTotalBalanceDecrease ? BackgroundColorMap.DECREASE : BackgroundColorMap.INCREASE;

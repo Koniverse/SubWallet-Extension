@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchStaticData } from '@subwallet/extension-base/utils';
-import { AppPopupModalContext, AppPopupModalInfo } from '@subwallet/extension-web-ui/contexts/AppPopupModalContext';
+import { MktCampaignModalContext, MktCampaignModalInfo } from '@subwallet/extension-web-ui/contexts/MktCampaignModalContext';
 import { useGroupYieldPosition } from '@subwallet/extension-web-ui/hooks';
 import { useGetAppInstructionData } from '@subwallet/extension-web-ui/hooks/static-content/useGetAppInstructionData';
 import { useHandleAppBannerMap } from '@subwallet/extension-web-ui/hooks/static-content/useHandleAppBannerMap';
@@ -10,12 +10,14 @@ import { useHandleAppConfirmationMap } from '@subwallet/extension-web-ui/hooks/s
 import { useHandleAppPopupMap } from '@subwallet/extension-web-ui/hooks/static-content/useHandleAppPopupMap';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { EarningPoolsParam, EarningPositionDetailParam } from '@subwallet/extension-web-ui/types';
-import { AppBannerData, AppBasicInfoData, AppConfirmationData, AppPopupData, OnlineContentDataType, PopupFrequency, PopupHistoryData } from '@subwallet/extension-web-ui/types/staticContent';
+import { AppBannerData, AppBasicInfoData, AppConfirmationData, AppPopupData, MktCampaignHistoryData, OnlineContentDataType, PopupFrequency } from '@subwallet/extension-web-ui/types/staticContent';
 import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import urlParse from 'url-parse';
+
+// todo: Recheck this file (compare with the one in extension-koni-ui)
 
 interface AppOnlineContentContextProviderProps {
   children?: React.ReactElement;
@@ -25,9 +27,9 @@ interface AppOnlineContentContextType {
   appPopupMap: Record<string, AppPopupData[]>;
   appBannerMap: Record<string, AppBannerData[]>;
   appConfirmationMap: Record<string, AppConfirmationData[]>;
-  popupHistoryMap: Record<string, PopupHistoryData>;
-  bannerHistoryMap: Record<string, PopupHistoryData>;
-  confirmationHistoryMap: Record<string, PopupHistoryData>;
+  popupHistoryMap: Record<string, MktCampaignHistoryData>;
+  bannerHistoryMap: Record<string, MktCampaignHistoryData>;
+  confirmationHistoryMap: Record<string, MktCampaignHistoryData>;
   updatePopupHistoryMap: (id: string) => void;
   updateBannerHistoryMap: (ids: string[]) => void;
   updateConfirmationHistoryMap: (id: string) => void;
@@ -40,7 +42,7 @@ interface AppOnlineContentContextType {
   ) => boolean;
   handleButtonClick: (id: string) => (type: OnlineContentDataType, url?: string) => void;
   checkBannerVisible: (showTimes: number) => boolean;
-  checkPositionParam: (screen: string, positionParams: { property: string; value: string }[], value: string) => boolean;
+  checkPositionParam: (screen: string, positionParams: { property: string; value: string }[], value: string[]) => boolean;
   showAppPopup: (currentRoute: string | undefined) => void;
 }
 
@@ -64,6 +66,10 @@ const getPositionByRouteName = (currentRoute?: string) => {
       return 'earning';
     case '/home/crowdloans':
       return 'crowdloan';
+    case '/home/mission-pools':
+      return 'mission_pool';
+    case '/home/history':
+      return 'history';
     case '/':
     default:
       return 'token';
@@ -71,7 +77,7 @@ const getPositionByRouteName = (currentRoute?: string) => {
 };
 
 export const AppOnlineContentContextProvider = ({ children }: AppOnlineContentContextProviderProps) => {
-  const appPopupModalContext = useContext(AppPopupModalContext);
+  const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const yieldPositionList = useGroupYieldPosition();
   const language = useSelector((state: RootState) => state.settings.language);
   const { getAppInstructionData } = useGetAppInstructionData(language);
@@ -135,20 +141,50 @@ export const AppOnlineContentContextProvider = ({ children }: AppOnlineContentCo
   }, []);
 
   const checkPositionParam = useCallback(
-    (screen: string, positionParams: { property: string; value: string }[], value: string) => {
+    (screen: string, positionParams: { property: string; value: string }[], value: string[]) => {
       if (positionParams && positionParams.length) {
-        if (screen === 'token_detail') {
-          const allowTokenSlugs = positionParams
-            .filter((item) => item.property === 'tokenSlug')
-            .map((param) => param.value);
+        switch (screen) {
+          case 'token_detail': {
+            const allowTokenSlugs = positionParams
+              .filter((item) => item.property === 'tokenSlug')
+              .map((param) => param.value);
 
-          return allowTokenSlugs.some((slug) => value.toLowerCase().includes(slug.toLowerCase()));
-        } else if (screen === 'earning') {
-          const allowPoolSlugs = positionParams.filter((item) => item.property === 'poolSlug').map((param) => param.value);
+            return allowTokenSlugs.some((slug) => value[0].toLowerCase().includes(slug.toLowerCase()));
+          }
 
-          return allowPoolSlugs.some((slug) => value.toLowerCase().includes(slug.toLowerCase()));
-        } else {
-          return true;
+          case 'earning': {
+            const allowPoolSlugs = positionParams.filter((item) => item.property === 'poolSlug').map((param) => param.value);
+
+            return allowPoolSlugs.some((slug) => value[0].toLowerCase().includes(slug.toLowerCase()));
+          }
+
+          case 'missionPools': {
+            const selectedIds = positionParams.filter((item) => item.property === 'id').map((param) => param.value);
+
+            return selectedIds.some((id) => value[0].toLowerCase().includes(id.toLowerCase()));
+          }
+
+          case 'send-fund': {
+            const currentChain = value[0];
+            const currentDestChain = value[1];
+            let isValidChain = true;
+            let isValidDestChain = true;
+
+            positionParams.forEach((item) => {
+              if (item.property === 'chainValue') {
+                isValidChain = item.value === currentChain;
+              }
+
+              if (item.property === 'destChainValue') {
+                isValidDestChain = item.value === currentDestChain;
+              }
+            });
+
+            return isValidChain && isValidDestChain;
+          }
+
+          default:
+            return true;
         }
       } else {
         return true;
@@ -234,6 +270,10 @@ export const AppOnlineContentContextProvider = ({ children }: AppOnlineContentCo
                 symbol: urlQueryMap.symbol
               } as EarningPoolsParam });
             }
+
+            if (parseUrl.pathname.startsWith('/main/tokens/tokens/token-groups-detail')) {
+              navigate(`home/tokens/detail/${urlQueryMap.slug}`);
+            }
           } else {
             openInNewTab(url)();
           }
@@ -262,21 +302,21 @@ export const AppOnlineContentContextProvider = ({ children }: AppOnlineContentCo
           } else {
             return false;
           }
-        });
+        }).sort((a, b) => a.priority - b.priority);
 
         if (filteredPopupList && filteredPopupList.length) {
-          const result: AppPopupModalInfo[] = filteredPopupList.map((item) => ({
+          const result: MktCampaignModalInfo[] = filteredPopupList.map((item) => ({
             type: 'popup',
             repeat: item.repeat,
-            title: item.info.name,
+            title: item.info?.name,
             message: item.content || '',
             buttons: item.buttons,
-            onPressBtn: (url?: string) => {
+            onClickBtn: (url?: string) => {
               handleButtonClick(`${item.position}-${item.id}`)('popup', url);
             }
           }));
 
-          appPopupModalContext.openAppPopupModal(result[0]);
+          mktCampaignModalContext.openModal(result[0]);
         }
       }
     },

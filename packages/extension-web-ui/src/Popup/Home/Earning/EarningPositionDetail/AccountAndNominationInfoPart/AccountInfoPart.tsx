@@ -156,6 +156,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             ? (
               <MetaInfo.Account
                 address={item.address}
+                chainSlug={poolInfo.chain}
                 label={t('Account')}
               />
             )
@@ -248,7 +249,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset?.decimals, inputAsset?.symbol, isAllAccount, isSpecial, list, renderAccount, t]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset?.decimals, inputAsset?.symbol, isAllAccount, isSpecial, list, poolInfo.chain, renderAccount, t]);
 
   return (
     <>
