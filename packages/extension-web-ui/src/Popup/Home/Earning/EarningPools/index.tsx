@@ -17,7 +17,7 @@ import { ChainConnectionWrapper } from '@subwallet/extension-web-ui/Popup/Home/E
 import { EarningPoolsTable } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/EarningPoolsTable';
 import { Toolbar } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/Toolbar';
 import { EarningEntryParam, EarningEntryView, EarningPoolsParam, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isAccountAll } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll } from '@subwallet/extension-web-ui/utils';
 import { Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -49,7 +49,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
 
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
-  const currentAccount = useSelector((state) => state.accountState.currentAccount);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
   const { accountBalance: { tokenBalanceMap } } = useContext(HomeContext);
 
   const [, setEarnStorage] = useLocalStorage(EARN_TRANSACTION, DEFAULT_EARN_PARAMS);
@@ -66,14 +66,15 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     return yieldPositionsList.map((p) => p.slug);
   }, [yieldPositionsList]);
 
-  const filterOptions = [
+  const filterOptions = useMemo(() => [
     { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
     { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
     { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
-  ];
+  ], [t]);
+
   const items: YieldPoolInfo[] = useMemo(() => {
     if (!pools.length) {
       return [];
@@ -174,11 +175,15 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   }, [selectedFilters]);
 
   const isNeedToShowInstruction = useCallback((item: YieldPoolInfo) => {
-    const address = currentAccount?.address || '';
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    const _isAccountAll = isAccountAll(currentAccountProxy.id);
 
     for (const info of yieldPositions) {
       if (item.slug === info.slug) {
-        const isValid = isAccountAll(address) ? true : isSameAddress(address, info.address);
+        const isValid = _isAccountAll ? true : currentAccountProxy.accounts.some((account) => isSameAddress(account.address, info.address));
         const haveStake = new BigN(info.totalStake).gt(0);
 
         if (isValid && haveStake) {
@@ -188,7 +193,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     }
 
     return true;
-  }, [currentAccount?.address, yieldPositions]);
+  }, [currentAccountProxy, yieldPositions]);
 
   const navigateToEarnTransaction = useCallback(
     (slug: string, chain: string) => {
@@ -196,11 +201,11 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         ...DEFAULT_EARN_PARAMS,
         slug,
         chain,
-        from: currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : ''
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
       navigate('/transaction/earn');
     },
-    [currentAccount?.address, navigate, setEarnStorage]
+    [currentAccountProxy, navigate, setEarnStorage]
   );
 
   const onConnectChainSuccess = useCallback(() => {

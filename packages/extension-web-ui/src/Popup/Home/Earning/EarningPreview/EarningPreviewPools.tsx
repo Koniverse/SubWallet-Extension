@@ -52,6 +52,7 @@ const getFilteredAccount = (chainInfo: _ChainInfo) => (account: AccountJson) => 
   return _isChainEvmCompatible(chainInfo) === isEthereumAddress(account.address);
 };
 
+// todo: recheck this file for unified accounts
 function Component ({ poolGroup, symbol }: ComponentProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
 
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
-  const currentAccount = useSelector((state) => state.accountState.currentAccount);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
   const isNoAccount = useSelector((state) => state.accountState.isNoAccount);
   const accounts = useSelector((state) => state.accountState.accounts);
   const [isContainOnlySubstrate] = analysisAccounts(accounts);
@@ -192,12 +193,12 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           const _filteredAccounts = accounts.filter(getFilteredAccount(chainInfo));
 
           if (_filteredAccounts.length === 1) {
-            earnParams.from = _filteredAccounts[0].address;
+            earnParams.fromAccountProxy = _filteredAccounts[0].proxyId as string;
             setEarnStorage(earnParams);
             saveCurrentAccountAddress(_filteredAccounts[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
           } else {
-            if (currentAccount && _filteredAccounts.some((acc) => acc.address === currentAccount.address)) {
-              earnParams.from = currentAccount.address;
+            if (currentAccountProxy && _filteredAccounts.some((acc) => acc.proxyId === currentAccountProxy.id)) {
+              earnParams.fromAccountProxy = currentAccountProxy.id;
               setEarnStorage(earnParams);
               navigate(earnPath, { state: { from: earnPath } });
 
@@ -210,7 +211,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         }
       }
     },
-    [accounts, chainInfoMap, checkIsAnyAccountValid, currentAccount, isContainOnlySubstrate, isNoAccount, navigate, setEarnStorage, setReturnStorage, setSelectedAccountTypes]
+    [accounts, chainInfoMap, checkIsAnyAccountValid, currentAccountProxy, isContainOnlySubstrate, isNoAccount, navigate, setEarnStorage, setReturnStorage, setSelectedAccountTypes]
   );
 
   const onConnectChainSuccess = useCallback(() => {

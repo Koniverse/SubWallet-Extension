@@ -12,6 +12,7 @@ const initialState: AccountState = {
   // CurrentAccount
   currentAccount: null,
   isAllAccount: false,
+  isNoAccount: true,
 
   currentAccountProxy: null,
   accountProxies: [],
@@ -77,10 +78,12 @@ const accountStateSlice = createSlice({
     },
     updateAccountProxies (state, action: PayloadAction<AccountProxy[]>) {
       const payload = action.payload;
+      const accounts = payload.reduce((accounts, ap) => [...accounts, ...ap.accounts], [] as AccountJson[]);
 
       return {
         ...state,
-        accounts: payload.reduce((accounts, ap) => [...accounts, ...ap.accounts], [] as AccountJson[]),
+        accounts,
+        isNoAccount: !accounts.length,
         accountProxies: payload,
         reduxStatus: ReduxStatus.READY
       };

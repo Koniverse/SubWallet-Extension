@@ -57,6 +57,7 @@ function filterNftByAccount (currentAccount: AccountJson | null, nftCollections:
   return { nftCollections: filteredNftCollections, nftItems: filteredNftItems };
 }
 
+// todo: recheck this hook, it may work but the logic is outdate
 export default function useGetNftByAccount () {
   const nftCollections = useSelector((state: RootState) => state.nft.nftCollections);
   const nftItems = useSelector((state: RootState) => state.nft.nftItems);

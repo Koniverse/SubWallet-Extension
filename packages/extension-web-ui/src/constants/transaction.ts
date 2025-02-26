@@ -150,6 +150,7 @@ export const DEFAULT_CLAIM_REWARD_PARAMS: ClaimRewardParams = {
 };
 
 export const DEFAULT_SWAP_PARAMS: SwapParams = {
+  defaultSlug: '',
   ...DEFAULT_TRANSACTION_PARAMS,
   fromAmount: '',
   fromTokenSlug: '',

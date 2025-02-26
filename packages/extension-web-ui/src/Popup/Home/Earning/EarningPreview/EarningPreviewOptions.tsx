@@ -15,7 +15,7 @@ import { fetchPoolTarget, saveCurrentAccountAddress } from '@subwallet/extension
 import { ChainConnectionWrapper } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/ChainConnectionWrapper';
 import { Toolbar } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/Toolbar';
 import { EarningPoolsParam, EarnParams, ThemeProps, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
-import { getValidatorKey, isAccountAll, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, getValidatorKey, isAccountAll, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { FadersHorizontal, Vault, XCircle } from 'phosphor-react';
@@ -82,6 +82,7 @@ enum FilterOptionType {
 const validatorModalId = VALIDATOR_DETAIL_RW_MODAL;
 const earnPath = '/transaction/earn';
 
+// todo: recheck this file for unified accounts
 function Component ({ className }: Props) {
   const [searchParams] = useSearchParams();
   const [chainParam] = useState(searchParams.get('chain') || '');
@@ -101,7 +102,7 @@ function Component ({ className }: Props) {
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
   const [validator, setValidator] = useState<YieldPoolTarget>();
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const { accounts, currentAccount } = useSelector((state) => state.accountState);
+  const { accounts, currentAccountProxy } = useSelector((state) => state.accountState);
   const isNoAccount = useSelector((state) => state.accountState.isNoAccount);
   const [isContainOnlySubstrate] = analysisAccounts(accounts);
   const isShowBalance = useSelector((state) => state.settings.isShowBalance);
@@ -196,11 +197,11 @@ function Component ({ className }: Props) {
               ...prevState,
               slug: slug || prevState.slug,
               chain: chain || prevState.chain,
-              from: accountList[0].address
+              fromAccountProxy: accountList[0].proxyId as string
             }));
             saveCurrentAccountAddress(accountList[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
           } else {
-            if (currentAccount && accountList.some((acc) => acc.address === currentAccount.address)) {
+            if (currentAccountProxy && accountList.some((acc) => acc.proxyId === currentAccountProxy.id)) {
               navigate(earnPath, { state: { from: earnPath } });
 
               return;
@@ -216,7 +217,7 @@ function Component ({ className }: Props) {
         }
       }
     },
-    [isNoAccount, setReturnStorage, navigate, chainInfoMap, selectedChain, checkIsAnyAccountValid, accounts, isContainOnlySubstrate, setSelectedAccountTypes, setEarnStorage, currentAccount]
+    [isNoAccount, setReturnStorage, navigate, chainInfoMap, selectedChain, checkIsAnyAccountValid, accounts, isContainOnlySubstrate, setSelectedAccountTypes, setEarnStorage, currentAccountProxy]
   );
 
   const onConnectChainSuccess = useCallback(() => {
@@ -247,13 +248,9 @@ function Component ({ className }: Props) {
     return '';
   }, [assetRegistry]);
 
-  const transactionFromValue = useMemo(() => {
-    if (isNoAccount) {
-      return '';
-    }
-
-    return currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : '';
-  }, [currentAccount?.address, isNoAccount]);
+  const transactionFromAccountProxyValue = useMemo(() => {
+    return getTransactionFromAccountProxyValue(currentAccountProxy);
+  }, [currentAccountProxy]);
 
   const onClickItem = useCallback((item: YieldGroupInfo) => {
     return () => {
@@ -300,7 +297,7 @@ function Component ({ className }: Props) {
           ...DEFAULT_EARN_PARAMS,
           slug: poolInfo.slug,
           chain: poolInfo.chain,
-          from: transactionFromValue,
+          fromAccountProxy: transactionFromAccountProxyValue,
           redirectFromPreview: true
         });
 
@@ -327,7 +324,7 @@ function Component ({ className }: Props) {
         navigateToEarnTransaction(poolInfo.slug, poolInfo.chain);
       }
     };
-  }, [checkChainConnected, closeAlert, getAltChain, navigate, navigateToEarnTransaction, onConnectChain, openAlert, poolInfoMap, setEarnStorage, t, transactionFromValue]);
+  }, [checkChainConnected, closeAlert, getAltChain, navigate, navigateToEarnTransaction, onConnectChain, openAlert, poolInfoMap, setEarnStorage, t, transactionFromAccountProxyValue]);
 
   const _onConnectChain = useCallback((chain: string) => {
     if (currentAltChain) {
@@ -421,7 +418,7 @@ function Component ({ className }: Props) {
               ...DEFAULT_EARN_PARAMS,
               slug: poolInfo.slug,
               chain: poolInfo.chain,
-              from: transactionFromValue,
+              fromAccountProxy: transactionFromAccountProxyValue,
               redirectFromPreview: true,
               hasPreSelectTarget: true,
               target: targetParam
@@ -486,7 +483,7 @@ function Component ({ className }: Props) {
     return () => {
       isSync = false;
     };
-  }, [activeModal, chainParam, earningTypeParam, poolInfoMap, setEarnStorage, t, targetParam, transactionFromValue]);
+  }, [activeModal, chainParam, earningTypeParam, poolInfoMap, setEarnStorage, t, targetParam, transactionFromAccountProxyValue]);
 
   useEffect(() => {
     isAlertWarningValidator && openAlert({
