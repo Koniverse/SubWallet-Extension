@@ -8,7 +8,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
-import { BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
@@ -27,6 +27,7 @@ export const getStellaswapLiquidStakingContract = (networkKey: string, assetAddr
 const APR_STATS_URL = 'https://apr-api.stellaswap.com/api/v1/stdot';
 
 const SUBWALLET_REFERRAL = '0x7e6815f45E624768548d085231f2d453f16FD7DD';
+const TOP_HOLDER = '0x4300e09284e3bB4d9044DdAB31EfAF5f3301DABa';
 
 interface StellaswapApr {
   code: number,
@@ -249,9 +250,16 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     ]);
 
     if (!allowance || parseInt(allowance) <= 0) {
+      const metadata: ApproveStepMetadata = {
+        tokenApprove: inputTokenSlug,
+        contractAddress: _getContractAddressOfToken(inputTokenInfo),
+        spenderAddress: _getContractAddressOfToken(derivativeTokenInfo)
+      };
+
       const step: BaseYieldStepDetail = {
         name: 'Authorize token approval',
-        type: YieldStepType.TOKEN_APPROVAL
+        type: YieldStepType.TOKEN_APPROVAL,
+        metadata: metadata as unknown as Record<string, unknown>
       };
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -282,11 +290,17 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
 
       let estimatedDepositGas = 0;
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        estimatedDepositGas = (await depositCall.estimateGas({ from: params.address })) as number;
-      } catch (e) {
-        console.error(e);
+      const addressToTests: string[] = [params.address, TOP_HOLDER];
+
+      for (const address of addressToTests) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+          estimatedDepositGas = (await depositCall.estimateGas({ from: address })) as number;
+
+          break;
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       const gasPrice = await evmApi.api.eth.getGasPrice();

@@ -4,7 +4,7 @@
 import { ConfirmationDefinitions, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson } from '@subwallet/extension-base/types';
+import { AccountJson, ProcessType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
@@ -188,6 +188,16 @@ const Component = function ({ className }: Props) {
 
       if (!transaction) {
         return t(titleMap[confirmation.type] || '');
+      }
+
+      if (transaction.process) {
+        switch (transaction.process.type) {
+          case ProcessType.SWAP:
+            return t('Swap confirmation');
+          case ProcessType.EARNING:
+            // TODO: Replace message
+            return t('Earning confirmation');
+        }
       }
 
       switch (transaction.extrinsicType) {

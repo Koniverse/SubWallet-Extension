@@ -113,6 +113,7 @@ const AccountExport = new LazyLoader('AccountExport', () => import('@subwallet/e
 
 const Transaction = new LazyLoader('Transaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/Transaction'));
 const TransactionDone = new LazyLoader('TransactionDone', () => import('@subwallet/extension-koni-ui/Popup/TransactionDone'));
+const TransactionSubmission = new LazyLoader('TransactionSubmission', () => import('@subwallet/extension-koni-ui/Popup/TransactionSubmission'));
 const SendFund = new LazyLoader('SendFund', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendFund'));
 const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap'));
 const SendNFT = new LazyLoader('SendNFT', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendNFT'));
@@ -214,6 +215,9 @@ export const router = createHashRouter([
             element: <Example />
           }
         ]
+      },
+      {
+        ...TransactionSubmission.generateRouterObject('transaction-submission')
       },
       {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
