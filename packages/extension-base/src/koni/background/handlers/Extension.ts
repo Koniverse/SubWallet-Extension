@@ -37,7 +37,7 @@ import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } 
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, SUFFICIENT_CHAIN } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _SubstrateAdapterQueryArgs, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isAssetSmartContractNft, _isBridgedToken, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isAssetSmartContractNft, _isBridgedToken, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
@@ -1318,19 +1318,18 @@ export default class KoniExtension {
   }
 
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
-    const { chain, feeCustom, feeOption, from, nonNativeTokenPayFeeSlug, to, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const { chain, feeCustom, feeOption, from, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
-
     const warnings: TransactionWarning[] = [];
     const chainInfo = this.#koniState.getChainInfo(chain);
 
     const nativeTokenInfo = this.#koniState.getNativeTokenInfo(chain);
     const nativeTokenSlug: string = nativeTokenInfo.slug;
     const isTransferNativeToken = nativeTokenSlug === tokenSlug;
-    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNativeToken && nonNativeTokenPayFeeSlug === tokenSlug;
-    const isCustomTokenPayFeeAssetHub = !!nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain);
-    const isCustomTokenPayFeeHydration = !!nonNativeTokenPayFeeSlug && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain);
+    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNativeToken && tokenPayFeeSlug === tokenSlug;
+    const isCustomTokenPayFeeAssetHub = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain);
+    const isCustomTokenPayFeeHydration = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain);
 
     const extrinsicType = isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN;
     let chainType = ChainType.SUBSTRATE;
@@ -1412,7 +1411,7 @@ export default class KoniExtension {
         });
 
         if (isCustomTokenPayFeeHydration) {
-          const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.assetId;
+          const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
 
           transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
         }
@@ -1440,8 +1439,8 @@ export default class KoniExtension {
       // Check enough free local to pay fee local
       if (isCustomTokenPayFeeAssetHub || isCustomTokenPayFeeHydration) {
         const nonNativeFee = BigInt(inputTransaction.estimateFee?.value || '0'); // todo: estimateFee should be must-have, need to refactor interface
-        const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, nonNativeTokenPayFeeSlug);
-        const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[nonNativeTokenPayFeeSlug].free);
+        const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, tokenPayFeeSlug);
+        const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[tokenPayFeeSlug].free);
 
         if (nonNativeFee > nonNativeTokenPayFeeBalance) {
           inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
@@ -1490,7 +1489,7 @@ export default class KoniExtension {
       chain,
       feeCustom,
       feeOption,
-      nonNativeTokenPayFeeSlug,
+      tokenPayFeeSlug,
       chainType,
       transferNativeAmount,
       transaction,
@@ -1505,7 +1504,7 @@ export default class KoniExtension {
   }
 
   private async makeCrossChainTransfer (inputData: RequestCrossChainTransfer): Promise<SWTransactionResponse> {
-    const { destinationNetworkKey, feeCustom, feeOption, from, isPassConfirmation, nonNativeTokenPayFeeSlug, originNetworkKey, to, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const { destinationNetworkKey, feeCustom, feeOption, from, isPassConfirmation, originNetworkKey, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
 
     const originTokenInfo = this.#koniState.getAssetBySlug(tokenSlug);
     const destinationTokenInfo = this.#koniState.getXcmEqualAssetByChain(destinationNetworkKey, tokenSlug);
@@ -1524,7 +1523,7 @@ export default class KoniExtension {
     const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
-    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === nonNativeTokenPayFeeSlug;
+    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
 
     let additionalValidator: undefined | ((inputTransaction: SWTransactionResponse) => Promise<void>);
     let eventsHandler: undefined | ((eventEmitter: TransactionEmitter) => void);
@@ -1627,7 +1626,7 @@ export default class KoniExtension {
       chainType: !isSnowBridgeEvmTransfer && !isAvailBridgeFromEvm && !isPolygonBridgeTransfer && !isPosBridgeTransfer ? ChainType.SUBSTRATE : ChainType.EVM,
       transferNativeAmount: _isNativeToken(originTokenInfo) ? value : '0',
       ignoreWarnings,
-      nonNativeTokenPayFeeSlug,
+      tokenPayFeeSlug,
       isTransferAll: transferAll,
       isTransferLocalTokenAndPayThatTokenAsFee,
       isPassConfirmation,
@@ -1885,12 +1884,12 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, nonNativeTokenPayFeeSlug, token } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, token, tokenPayFeeSlug } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
-    const isTransferLocalTokenAndPayThatTokenAsFee = !_isNativeToken(transferTokenInfo) && !!nonNativeTokenPayFeeSlug && nonNativeTokenPayFeeSlug === token;
-    const isTransferNativeTokenAndPayLocalTokenAsFee = _isNativeToken(transferTokenInfo) && !!nonNativeTokenPayFeeSlug;
+    const isTransferLocalTokenAndPayThatTokenAsFee = !_isNativeToken(transferTokenInfo) && !!tokenPayFeeSlug && tokenPayFeeSlug === token;
+    const isTransferNativeTokenAndPayLocalTokenAsFee = _isNativeToken(transferTokenInfo) && !!tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug);
     const srcToken = token ? this.#koniState.chainService.getAssetBySlug(token) : this.#koniState.chainService.getNativeTokenInfo(chain);
     const destToken = _destChain !== chain ? this.#koniState.getXcmEqualAssetByChain(_destChain, srcToken.slug) as _ChainAsset : srcToken;
     const srcChain = this.#koniState.chainService.getChainInfoByKey(chain);
