@@ -94,7 +94,8 @@ export interface AccountState extends AccountsContext, KeyringState, AddressBook
   currentAccount: AccountJson | null
   currentAccountProxy: AccountProxy | null,
   accountProxies: AccountProxy[],
-  isAllAccount: boolean
+  isAllAccount: boolean,
+  isNoAccount: boolean;
 }
 
 export interface RequestState extends ConfirmationsQueue, ConfirmationsQueueTon, BaseReduxStore {
