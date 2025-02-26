@@ -27,7 +27,7 @@ export async function fetchUnsignedPayload (baseUrl: string, params: BuildCardan
 
     const response = await rawResponse.json() as SWApiResponse<string>;
 
-    if (response.error && response.status === 'error') {
+    if (response.error && response.status === 'fail') {
       throw new Error(response.error.message);
     }
 
