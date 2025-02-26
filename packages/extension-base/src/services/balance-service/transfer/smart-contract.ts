@@ -48,6 +48,8 @@ export async function getEVMTransactionObject ({ chain,
   } as TransactionConfig;
 
   const gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e) => {
+    console.log('Cannot estimate fee with native transfer on', chain, e);
+
     if (fallbackFee) {
       return 21000;
     } else {
@@ -80,7 +82,9 @@ export async function getEVMTransactionObject ({ chain,
 
 export async function getERC20TransactionObject (
   { assetAddress,
+    chain,
     evmApi,
+    fallbackFee,
     feeCustom: _feeCustom,
     feeInfo: _feeInfo,
     feeOption,
@@ -110,7 +114,16 @@ export async function getERC20TransactionObject (
 
   const transferData = generateTransferData(to, transferValue);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from });
+  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
+    .catch((e) => {
+      console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
+
+      if (fallbackFee) {
+        return 70000;
+      } else {
+        throw e;
+      }
+    });
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
 
