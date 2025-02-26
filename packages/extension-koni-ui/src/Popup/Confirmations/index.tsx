@@ -120,7 +120,7 @@ const Component = function ({ className }: Props) {
       }
     }
 
-    if (confirmation.item.isInternal && confirmation.type !== 'connectWCRequest') {
+    if (confirmation.item.isInternal && confirmation.type !== 'connectWCRequest' && confirmation.type !== 'evmSignatureRequest') {
       return (
         <TransactionConfirmation
           closeAlert={closeAlert}
