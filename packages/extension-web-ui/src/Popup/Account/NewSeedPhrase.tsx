@@ -264,7 +264,7 @@ const NewSeedPhrase = styled(Component)<Props>(({ theme: { extendToken, token } 
       margin: '0 auto',
 
       '.seed-phrase-container': {
-        padding: token.padding,
+        paddingTop: token.paddingXS,
         textAlign: 'center',
         flex: 1
 
@@ -275,7 +275,7 @@ const NewSeedPhrase = styled(Component)<Props>(({ theme: { extendToken, token } 
         justifyContent: 'center',
         maxWidth: '60%',
         margin: '0 auto',
-        gap: token.paddingMD,
+        gap: token.padding,
 
         '.action': {
           marginTop: 40,
