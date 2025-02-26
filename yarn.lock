@@ -6380,15 +6380,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.99-beta.28":
-  version: 0.2.99-beta.28
-  resolution: "@subwallet/chain-list@npm:0.2.99-beta.28"
+"@subwallet/chain-list@npm:0.2.100-beta.0 ":
+  version: 0.2.100-beta.0
+  resolution: "@subwallet/chain-list@npm:0.2.100-beta.0"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: 918151fb8f95ff5105071eda957086f624aa062c6e998f12b1e7480788b73b8b1c05dfbedef0a1379c62a0d054fe7ffa470b0b0af94f8ee3871fa361d075e519
+  checksum: 92375a42142d36a784d1b177cc9453b8242146f964602d67e6038ebeb880b7c1a58766da9d9a6c71c115dd1f3cc56c5e7282372f5bb8c583c70081edfefb0a47
   languageName: node
   linkType: hard
 
@@ -6430,7 +6430,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": "0.2.100-beta.0 "
     "@subwallet/extension-base": ^1.3.17-0
     "@subwallet/extension-chains": ^1.3.17-0
     "@subwallet/extension-dapp": ^1.3.17-0
@@ -6570,7 +6570,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": "0.2.100-beta.0 "
     "@subwallet/extension-base": ^1.3.17-0
     "@subwallet/extension-chains": ^1.3.17-0
     "@subwallet/extension-dapp": ^1.3.17-0
@@ -6710,7 +6710,7 @@ __metadata:
     "@polkadot/util-crypto": ^12.6.2
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": "0.2.100-beta.0 "
     "@subwallet/extension-base": ^1.3.17-0
     "@subwallet/extension-chains": ^1.3.17-0
     "@subwallet/extension-dapp": ^1.3.17-0
@@ -6890,7 +6890,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.99-beta.28
+    "@subwallet/chain-list": "0.2.100-beta.0 "
   languageName: unknown
   linkType: soft
 
