@@ -116,8 +116,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getApprovalStep,
-      this.getSubmitStep
+      this.getApprovalStep.bind(this),
+      this.getPermitStep.bind(this),
+      this.getSubmitStep.bind(this)
     ]);
   }
 
@@ -137,6 +138,28 @@ export class UniswapHandler implements SwapBaseInterface {
 
         return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
       }
+    }
+
+    return Promise.resolve(undefined);
+  }
+
+  async getPermitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    if (params.selectedQuote?.metadata.permitData) {
+      const submitStep = {
+        name: 'Permit Step',
+        type: SwapStepType.PERMIT
+      };
+
+      const feeInfo = params.selectedQuote.feeInfo;
+
+      feeInfo.feeComponent = feeInfo.feeComponent.map((feeComponent) => {
+        return {
+          ...feeComponent,
+          amount: '0'
+        };
+      });
+
+      return Promise.resolve([submitStep, feeInfo]);
     }
 
     return Promise.resolve(undefined);
@@ -200,6 +223,8 @@ export class UniswapHandler implements SwapBaseInterface {
         return this.tokenApproveSpending(params);
       case SwapStepType.SWAP:
         return this.handleSubmitStep(params);
+      case SwapStepType.PERMIT:
+        return this.handlePermitStep(params);
       default:
         return this.handleSubmitStep(params);
     }
@@ -349,5 +374,40 @@ export class UniswapHandler implements SwapBaseInterface {
       extrinsicType: ExtrinsicType.SWAP,
       chainType: ChainType.EVM
     } as SwapSubmitStepData;
+  }
+
+  public handlePermitStep (params: SwapSubmitParams) {
+    const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
+    const { permitData } = params.quote.metadata as UniswapMetadata;
+
+    let validatePayload;
+
+    if (permitData) {
+      const payload = {
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' }
+          ],
+          ...permitData.types
+        },
+        domain: permitData.domain,
+        primaryType: 'PermitSingle',
+        message: permitData.values
+      };
+
+      validatePayload = validateTypedSignMessageDataV3V4({ data: payload, from: params.address });
+    }
+
+    return {
+      txChain: fromAsset.originChain,
+      txData: validatePayload,
+      extrinsic: {},
+      extrinsicType: ExtrinsicType.PERMIT,
+      transferNativeAmount: '0',
+      chainType: ChainType.EVM,
+      isPermit: true
+    };
   }
 }

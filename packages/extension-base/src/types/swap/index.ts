@@ -58,7 +58,8 @@ export enum SwapErrorType {
 }
 
 export enum SwapStepType {
-  SWAP = 'SWAP'
+  SWAP = 'SWAP',
+  PERMIT = 'PERMIT'
 }
 
 export enum SwapProviderId {
@@ -195,7 +196,8 @@ export interface SwapSubmitStepData {
   extrinsic: TransactionData;
   transferNativeAmount: string;
   extrinsicType: ExtrinsicType;
-  chainType: ChainType
+  chainType: ChainType;
+  isPermit?: boolean;
 }
 
 export interface OptimalSwapPathParams {
