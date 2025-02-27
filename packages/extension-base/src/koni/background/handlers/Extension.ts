@@ -4098,9 +4098,25 @@ export default class KoniExtension {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = await this.#koniState.swapService.handleSwapProcess(inputData);
+    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData, isPermit } = await this.#koniState.swapService.handleSwapProcess(inputData);
     // const chosenFeeToken = process.steps.findIndex((step) => step.type === SwapStepType.SET_FEE_TOKEN) > -1;
     // const allowSkipValidation = [ExtrinsicType.SET_FEE_TOKEN, ExtrinsicType.SWAP].includes(extrinsicType);
+    if (isPermit) {
+      return await this.#koniState.transactionService.handlePermitTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic,
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        step
+      })
+    }
+
 
     const eventsHandler = (eventEmitter: TransactionEmitter) => {
       if (onSend) {

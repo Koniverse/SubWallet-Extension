@@ -535,7 +535,6 @@ export enum ExtrinsicType {
   TOKEN_SPENDING_APPROVAL = 'token.spending_approval',
 
   SWAP = 'swap',
-  PERMIT = 'permit', // todo
 
   CLAIM_BRIDGE = 'claim.claim_bridge',
 

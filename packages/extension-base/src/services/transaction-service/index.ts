@@ -335,6 +335,48 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
+  public async handlePermitTransaction (transaction: SWTransactionInput) {
+    const emitter = await this.sendPermitTransaction(transaction);
+
+    await new Promise<void>((resolve, reject) => {
+      // TODO
+      if (transaction.resolveOnDone) {
+        emitter.on('success', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        });
+      } else {
+        emitter.on('signed', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        });
+      }
+
+      emitter.on('error', (data: TransactionEventResponse) => {
+        if (data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+    });
+
+    // @ts-ignore
+    'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+    'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+    'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    return validatedTransaction;
+  }
+
   private async sendTransaction (transaction: SWTransaction): Promise<TransactionEmitter> {
     // Send Transaction
     const emitter = await (transaction.chainType === 'substrate'
@@ -411,6 +453,10 @@ export default class TransactionService {
     eventsHandler?.(emitter);
 
     return emitter;
+  }
+
+  private async sendPermitTransaction (transaction: SWTransaction) {
+
   }
 
   private removeTransaction (id: string): void {
@@ -1220,6 +1266,10 @@ export default class TransactionService {
     }
 
     return emitter;
+  }
+
+  private async signAndSendEvmPermitTransaction () {
+
   }
 
   private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, nonNativeTokenPayFeeSlug, signAfterCreate, step, transaction, url }: SWTransaction): TransactionEmitter {

@@ -404,7 +404,7 @@ export class UniswapHandler implements SwapBaseInterface {
       txChain: fromAsset.originChain,
       txData: validatePayload,
       extrinsic: {},
-      extrinsicType: ExtrinsicType.PERMIT,
+      extrinsicType: ExtrinsicType.TOKEN_SPENDING_APPROVAL,
       transferNativeAmount: '0',
       chainType: ChainType.EVM,
       isPermit: true
