@@ -103,7 +103,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       // todo: refactor: merge getERC20TransactionObject & getEVMTransactionObject
       // Estimate with EVM API
       if (_isTokenEvmSmartContract(srcToken) || _isLocalToken(srcToken)) {
-        [transaction] = await getERC20TransactionObject({
+        [transaction, , error] = await getERC20TransactionObject({
           assetAddress: _getContractAddressOfToken(srcToken),
           chain: srcChain.slug,
           evmApi,
@@ -117,7 +117,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           fallbackFee: true
         });
       } else {
-        [transaction] = await getEVMTransactionObject({
+        [transaction, , error] = await getEVMTransactionObject({
           chain: srcChain.slug,
           evmApi,
           feeCustom,
