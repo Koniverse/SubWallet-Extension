@@ -119,7 +119,7 @@ function Component ({ className = '', items, onCancel, onSelectItem, selectedAcc
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter token name or network name 3')}
+        placeholder={t<string>('Enter token name or network name')}
         searchValue={currentSearchText}
       />
       <SwList

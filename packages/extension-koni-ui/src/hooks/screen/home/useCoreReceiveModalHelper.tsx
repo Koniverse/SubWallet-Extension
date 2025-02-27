@@ -27,7 +27,7 @@ const tokenSelectorModalId = RECEIVE_MODAL_TOKEN_SELECTOR;
 const accountSelectorModalId = RECEIVE_MODAL_ACCOUNT_SELECTOR;
 
 export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): HookType {
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const { chainAssets } = useChainAssets();
 
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -51,11 +51,6 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     return undefined;
   }, [assetRegistryMap, tokenGroupSlug]);
 
-  const isActiveHook = checkActive(tokenSelectorModalId);
-
-  console.log('selectedAccountAddressItem', selectedAccountAddressItem);
-  console.log('isActiveHook', isActiveHook);
-
   const openAddressQrModal = useCallback((address: string, accountType: KeypairType, accountProxyId: string, chainSlug: string, closeCallback?: VoidCallback, showQrBack = true) => {
     const processFunction = () => {
       addressQrModal.open({
@@ -63,7 +58,6 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         chainSlug,
         onBack: showQrBack ? addressQrModal.close : undefined,
         onCancel: () => {
-          console.log('cancel-qr-modal: clicked');
           addressQrModal.close();
           closeCallback?.();
         }
