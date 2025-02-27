@@ -436,7 +436,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       try {
         const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
         const id = getId();
-        const feeInfo = await koni.feeService.subscribeChainFee(id, transaction.chain || '', 'evm') as EvmFeeInfo;
+        const feeInfo = await koni.feeService.subscribeChainFee(id, networkKey, 'evm') as EvmFeeInfo;
         const feeCombine = combineEthFee(feeInfo);
 
         if (transaction.maxFeePerGas) {
@@ -448,8 +448,11 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
             const maxFee = new BigN(feeCombine.maxFeePerGas); // TODO: Need review
 
             estimateGas = maxFee.multipliedBy(gasLimit).toFixed(0);
+            transaction.maxFeePerGas = feeCombine.maxFeePerGas;
+            transaction.maxPriorityFeePerGas = feeCombine.maxPriorityFeePerGas;
           } else if (feeCombine.gasPrice) {
             estimateGas = new BigN((feeCombine.gasPrice || 0)).multipliedBy(gasLimit).toFixed(0);
+            transaction.maxPriorityFeePerGas = feeCombine.gasPrice;
           }
         }
       } catch (e) {

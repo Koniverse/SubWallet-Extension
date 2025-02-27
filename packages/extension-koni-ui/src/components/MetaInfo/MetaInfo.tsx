@@ -6,7 +6,7 @@ import CN from 'classnames';
 import React from 'react';
 import styled from 'styled-components';
 
-import { AccountGroupItem, AccountItem, ChainItem, DataItem, DefaultItem, DisplayTypeItem, NumberItem, StatusItem, TotalItem, TransferItem } from './parts';
+import { AccountGroupItem, AccountItem, ChainItem, DataItem, DefaultItem, DisplayTypeItem, NumberItem, StatusItem, TotalItem, TransactionProcessItem, TransferItem } from './parts';
 
 interface Props extends ThemeProps {
   children?: React.ReactNode;
@@ -241,6 +241,7 @@ type CompoundedComponent = React.ForwardRefExoticComponent<Omit<Props, 'theme'>>
   Number: typeof NumberItem,
   Total: typeof TotalItem,
   Default: typeof DefaultItem,
+  TransactionProcess: typeof TransactionProcessItem,
 };
 
 const MetaInfo = _MetaInfo as unknown as CompoundedComponent;
@@ -255,5 +256,6 @@ MetaInfo.DisplayType = DisplayTypeItem;
 MetaInfo.Number = NumberItem;
 MetaInfo.Total = TotalItem;
 MetaInfo.Default = DefaultItem;
+MetaInfo.TransactionProcess = TransactionProcessItem;
 
 export default MetaInfo;
