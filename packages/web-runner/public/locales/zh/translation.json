@@ -1320,12 +1320,9 @@
   "Advanced address detection": "",
   "Recommended": "",
   "Custom": "",
-  "Choose fee": "",
   "Fee paid in": "",
   "Low": "",
   "Medium": "",
-  "Highest": "",
-  "Estimate fee": "",
   "Injected account": "",
   "Select address": "",
   "Enter network name": "",
@@ -1416,5 +1413,13 @@
   "Unable to process this swap at the moment. Try again later": "",
   "Open dApp to unstake": "",
   "Open Taostats Dashboard and connect your SubWallet account to unstake your funds. This feature will come back to SubWallet soon!": "",
-  "Open dApp": ""
+  "Open dApp": "",
+  "The custom value must be greater than 0": "",
+  "The priority fee must be greater than 0": "",
+  "Max fee/Priority fee must be higher than min GWEI": "",
+  "The maximum fee must be greater than 0": "",
+  "Apply fee": "",
+  "Edit fee": "",
+  "High": "",
+  "Coming soon!": ""
 }

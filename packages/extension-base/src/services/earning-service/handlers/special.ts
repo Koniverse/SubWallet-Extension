@@ -10,6 +10,7 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, RuntimeDispatchInfo, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { t } from 'i18next';
 
 import { BN, BN_TEN, BN_ZERO, noop } from '@polkadot/util';
@@ -279,14 +280,19 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           };
 
           const xcmOriginSubstrateApi = await this.state.getSubstrateApi(altInputTokenInfo.originChain).isReady;
+          const id = getId();
+          const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
 
           const xcmTransfer = await createXcmExtrinsic({
+            sender: address,
             originTokenInfo: altInputTokenInfo,
             destinationTokenInfo: inputTokenInfo,
             sendingValue: bnAmount.toString(),
             recipient: address,
-            chainInfoMap: this.state.getChainInfoMap(),
-            substrateApi: xcmOriginSubstrateApi
+            destinationChain: this.chainInfo,
+            originChain: altChainInfo,
+            substrateApi: xcmOriginSubstrateApi,
+            feeInfo
           });
 
           const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
@@ -534,13 +540,19 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
     const bnTotalAmount = bnAmount.sub(bnInputTokenBalance).add(bnXcmFee);
 
+    const id = getId();
+    const feeInfo = await this.state.feeService.subscribeChainFee(id, originChainInfo.slug, 'substrate');
+
     const extrinsic = await createXcmExtrinsic({
-      chainInfoMap: this.state.getChainInfoMap(),
       destinationTokenInfo,
       originTokenInfo,
       recipient: address,
       sendingValue: bnTotalAmount.toString(),
-      substrateApi
+      substrateApi,
+      sender: address,
+      originChain: originChainInfo,
+      destinationChain: this.chainInfo,
+      feeInfo
     });
 
     const xcmData: RequestCrossChainTransfer = {

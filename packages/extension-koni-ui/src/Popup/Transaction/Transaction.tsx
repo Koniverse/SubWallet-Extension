@@ -173,7 +173,7 @@ function Component ({ className }: Props) {
           closeRecheckChainConnectionModal
         }}
         >
-          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
             <div className={CN(className, 'transaction-wrapper')}>
               <SwSubHeader
                 background={'transparent'}

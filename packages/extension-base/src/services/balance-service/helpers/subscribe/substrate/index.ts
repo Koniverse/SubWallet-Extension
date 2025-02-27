@@ -240,7 +240,7 @@ const subscribeForeignAssetBalance = async ({ addresses, assetMap, callback, cha
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
     try {
       if (_isBridgedToken(tokenInfo)) {
-        const version: number = ['statemint', 'statemine'].includes(chainInfo.slug) ? 4 : 3;
+        const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(chainInfo.slug) ? 4 : 3;
         const params: _SubstrateAdapterSubscriptionArgs[] = [
           {
             section: 'query',

@@ -12,11 +12,13 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { calculateSwapRate, getSwapAlternativeAsset, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonFeeComponent, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxPreValidationMetadata, HydradxSwapTxData, OptimalSwapPathParams, SwapEarlyValidation, SwapErrorType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest, SwapRoute, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -36,10 +38,11 @@ export class HydradxHandler implements SwapBaseInterface {
   public isReady = false;
   providerSlug: SwapProviderId;
 
-  constructor (chainService: ChainService, balanceService: BalanceService, isTestnet = true) {
+  constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
       balanceService,
       chainService,
+      feeService,
       providerName: isTestnet ? 'Hydration Testnet' : 'Hydration',
       providerSlug: isTestnet ? SwapProviderId.HYDRADX_TESTNET : SwapProviderId.HYDRADX_MAINNET
     });
@@ -121,6 +124,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
     try {
       const alternativeChainInfo = this.chainService.getChainInfoByKey(alternativeAsset.originChain);
+      const destChainInfo = this.chainService.getChainInfoByKey(this.chain());
       const step: BaseStepDetail = {
         metadata: {
           sendingValue: bnAmount.toString(),
@@ -132,14 +136,19 @@ export class HydradxHandler implements SwapBaseInterface {
       };
 
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
+      const id = getId();
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, alternativeAsset.originChain, 'substrate');
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
         sendingValue: bnAmount.toString(),
         recipient: params.request.address,
-        chainInfoMap: this.chainService.getChainInfoMap(),
-        substrateApi: xcmOriginSubstrateApi
+        substrateApi: xcmOriginSubstrateApi,
+        sender: params.request.address,
+        destinationChain: destChainInfo,
+        originChain: alternativeChainInfo,
+        feeInfo
       });
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
@@ -157,6 +166,8 @@ export class HydradxHandler implements SwapBaseInterface {
 
       return [step, fee];
     } catch (e) {
+      console.error('Error creating xcm step', e);
+
       return undefined;
     }
   }
@@ -230,9 +241,9 @@ export class HydradxHandler implements SwapBaseInterface {
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getXcmStep,
+      this.getXcmStep.bind(this),
       // this.getFeeOptionStep.bind(this),
-      this.getSubmitStep
+      this.getSubmitStep.bind(this)
     ]);
   }
 
@@ -380,6 +391,9 @@ export class HydradxHandler implements SwapBaseInterface {
     const originAsset = this.chainService.getAssetBySlug(alternativeAssetSlug);
     const destinationAsset = this.chainService.getAssetBySlug(pair.from);
 
+    const originChain = this.chainService.getChainInfoByKey(originAsset.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationAsset.originChain);
+
     const substrateApi = this.chainService.getSubstrateApi(originAsset.originChain);
 
     const chainApi = await substrateApi.isReady;
@@ -398,13 +412,18 @@ export class HydradxHandler implements SwapBaseInterface {
       bnTotalAmount = bnTotalAmount.plus(bnXcmFee);
     }
 
+    const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originAsset.originChain, 'substrate');
+
     const xcmTransfer = await createXcmExtrinsic({
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: bnTotalAmount.toString(),
       recipient: params.address,
-      chainInfoMap: this.chainService.getChainInfoMap(),
-      substrateApi: chainApi
+      substrateApi: chainApi,
+      sender: params.address,
+      destinationChain,
+      originChain,
+      feeInfo
     });
 
     const xcmData: RequestCrossChainTransfer = {
