@@ -314,7 +314,6 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   return useMemo(() => ({
     onOpenReceive,
     receiveModalProps: {
-      selectedAccountAddressItem,
       tokenSelectorItems,
       onCloseTokenSelector,
       onSelectTokenSelector,
@@ -323,5 +322,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       onCloseAccountSelector,
       onSelectAccountSelector
     }
-  }), [accountSelectorItems, onBackAccountSelector, onCloseAccountSelector, onCloseTokenSelector, onOpenReceive, onSelectAccountSelector, onSelectTokenSelector, selectedAccountAddressItem, tokenSelectorItems]);
+  }), [accountSelectorItems, onBackAccountSelector, onCloseAccountSelector,
+    onCloseTokenSelector, onOpenReceive, onSelectAccountSelector,
+    onSelectTokenSelector, tokenSelectorItems]);
 }

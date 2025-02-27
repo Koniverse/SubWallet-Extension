@@ -7,9 +7,9 @@ import { TokenSelectorItem } from '@subwallet/extension-koni-ui/components';
 import TokenEmptyList from '@subwallet/extension-koni-ui/components/EmptyList/TokenEmptyList';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
-import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useIsModalInactive, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -19,7 +19,6 @@ interface Props extends ThemeProps {
   onSelectItem?: (item: _ChainAsset) => void,
   items: _ChainAsset[];
   onCancel?: VoidFunction;
-  selectedAccountAddressItem?: AccountAddressItemType
 }
 
 const modalId = RECEIVE_MODAL_TOKEN_SELECTOR;
@@ -27,12 +26,13 @@ const modalId = RECEIVE_MODAL_TOKEN_SELECTOR;
 const renderEmpty = () => <TokenEmptyList modalId={modalId} />;
 
 // todo : will move to Modal/Selector if is necessary
-function Component ({ className = '', items, onCancel, onSelectItem, selectedAccountAddressItem }: Props): React.ReactElement<Props> {
+function Component ({ className = '', items, onCancel, onSelectItem }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // @ts-ignore
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
+  const isModalInactive = useIsModalInactive(modalId);
 
   const listItems = useMemo(() => {
     const filteredList = items.filter((item) => {
@@ -88,19 +88,13 @@ function Component ({ className = '', items, onCancel, onSelectItem, selectedAcc
     );
   }, [chainInfoMap, onSelect]);
 
-  // useEffect(() => {
-  //   if (!isActive) {
-  //     setTimeout(() => {
-  //       sectionRef.current?.setSearchValue('');
-  //     }, 100);
-  //   }
-  // }, [isActive]);
-
   useEffect(() => {
-    if (!selectedAccountAddressItem) {
-      setCurrentSearchText('');
+    if (isModalInactive) {
+      setTimeout(() => {
+        setCurrentSearchText('');
+      }, 100);
     }
-  }, [selectedAccountAddressItem]);
+  }, [isModalInactive]);
 
   const onPressCancel = useCallback(() => {
     setCurrentSearchText('');
