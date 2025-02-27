@@ -11,6 +11,12 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
     const days = unstakingPeriod / 24;
 
     if (days < 1) {
+      if (unstakingPeriod < 1) {
+        const minutes = unstakingPeriod * 60;
+
+        return t('{{time}} minutes', { replace: { time: minutes } });
+      }
+
       return t('{{time}} hours', { replace: { time: unstakingPeriod } });
     } else {
       return t('{{time}} days', { replace: { time: days } });
