@@ -381,6 +381,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
         setIsTransferAll(false);
         setForceUpdateMaxValue(undefined);
+        setSelectedTransactionFee(undefined);
 
         setCurrentNonNativeTokenPayFee(undefined);
       }
