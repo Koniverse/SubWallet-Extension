@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType, _ChainInfo } from '@subwallet/chain-list/types';
-import { _getTokenTypesSupportedByChain, _isChainTestNet, _parseMetadataForSmartContractAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getTokenTypesSupportedByChain, _isChainTestNet, _parseMetadataForAssetId, _parseMetadataForSmartContractAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { isValidSubstrateAddress } from '@subwallet/extension-base/utils';
-import { AddressInput, ChainSelector, Layout, PageWrapper, TokenTypeSelector } from '@subwallet/extension-web-ui/components';
+import { AddressInput, ChainSelector, HiddenInput, Layout, PageWrapper, TokenTypeSelector } from '@subwallet/extension-web-ui/components';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useChainChecker, useDefaultNavigate, useGetChainPrefixBySlug, useGetFungibleContractSupportedChains, useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { upsertCustomToken, validateCustomToken } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, FormRule, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { convertFieldToError, convertFieldToObject, reformatAddress, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
+import { reformatContractAddress } from '@subwallet/extension-web-ui/utils/account/reformatContractAddress';
 import { Col, Field, Form, Icon, Input, Row } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { PlusCircle } from 'phosphor-react';
@@ -30,11 +31,16 @@ interface TokenImportFormType {
   tokenName: string;
   decimals: number;
   symbol: string;
+  assetId?: string;
 }
 
 interface TokenTypeOption {
   label: string,
   value: _AssetType
+}
+
+function isAssetHubChain (chainslug: string) {
+  return ['statemint', 'statemine'].includes(chainslug);
 }
 
 function getTokenTypeSupported (chainInfo: _ChainInfo) {
@@ -94,20 +100,27 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const chainChecker = useChainChecker();
   const chainNetworkPrefix = useGetChainPrefixBySlug(selectedChain);
 
-  const isSelectGearToken = useMemo(() => {
-    return selectedTokenType === _AssetType.VFT;
-  }, [selectedTokenType]);
-
   const tokenTypeOptions = useMemo(() => {
     return getTokenTypeSupported(chainInfoMap[selectedChain]);
   }, [chainInfoMap, selectedChain]);
 
+  const isSelectGearToken = useMemo(() => {
+    return selectedTokenType === _AssetType.VFT;
+  }, [selectedTokenType]);
+
   const contractRules = useMemo((): FormRule[] => {
     return [
       ({ getFieldValue }) => ({
+        transform: (contractAddress: string) => {
+          const selectedChain = getFieldValue('chain') as string;
+
+          return reformatContractAddress(selectedChain, contractAddress);
+        },
         validator: (_, contractAddress: string) => {
           return new Promise<void>((resolve, reject) => {
             const selectedTokenType = getFieldValue('type') as _AssetType;
+            const selectedChain = getFieldValue('chain') as string;
+
             const isValidEvmContract = [_AssetType.ERC20].includes(selectedTokenType) && isEthereumAddress(contractAddress);
             const isValidWasmContract = [_AssetType.PSP22].includes(selectedTokenType) && isValidSubstrateAddress(contractAddress);
             const isValidGearContract = [_AssetType.VFT].includes(selectedTokenType) && isValidSubstrateAddress(contractAddress);
@@ -152,16 +165,63 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         }
       })
     ];
-  }, [chainNetworkPrefix, form, selectedChain, t]);
+  }, [chainNetworkPrefix, form, t]);
+
+  const assetIdRules = useMemo((): FormRule[] => {
+    return [
+      ({ getFieldValue }) => ({
+        validator: (_, assetId: string) => {
+          return new Promise<void>((resolve, reject) => {
+            const selectedTokenType = getFieldValue('type') as _AssetType;
+
+            setLoading(true);
+            validateCustomToken({
+              originChain: selectedChain,
+              type: selectedTokenType,
+              assetId: assetId
+            })
+              .then((validationResult) => {
+                setLoading(false);
+
+                if (validationResult.isExist) {
+                  reject(new Error(t('Existed token')));
+                }
+
+                if (validationResult.contractError) {
+                  reject(new Error(t('Invalid asset ID')));
+                }
+
+                if (!validationResult.isExist && !validationResult.contractError) {
+                  form.setFieldValue('tokenName', validationResult.name);
+                  form.setFieldsValue({
+                    tokenName: validationResult.name,
+                    decimals: validationResult.decimals,
+                    symbol: validationResult.symbol
+                  });
+                  resolve();
+                }
+              })
+              .catch(() => {
+                setLoading(false);
+                reject(new Error(t('Error validating this token')));
+              });
+          });
+        }
+      })
+    ];
+  }, [form, selectedChain, t]);
+
+  const hideFields = useMemo(() => !isAssetHubChain(selectedChain) ? ['assetId'] : ['contractAddress'], [selectedChain]);
 
   const onFieldChange: FormCallbacks<TokenImportFormType>['onFieldsChange'] = useCallback((changedFields: FieldData[], allFields: FieldData[]) => {
-    const { empty, error } = simpleCheckForm(allFields, ['--priceId', '--tokenName']);
+    const { empty, error } = simpleCheckForm(allFields, ['--priceId', '--tokenName', '--contractAddress', '--assetId']);
 
     const changes = convertFieldToObject<TokenImportFormType>(changedFields);
     const all = convertFieldToObject<TokenImportFormType>(allFields);
     const allError = convertFieldToError<TokenImportFormType>(allFields);
 
-    const { chain, type } = changes;
+    const { chain, contractAddress, type } = changes;
+    const { chain: selectedChain } = all;
 
     const baseResetFields = ['tokenName', 'symbol', 'decimals', 'priceId'];
 
@@ -175,21 +235,27 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       }
 
       form.resetFields(['contractAddress', ...baseResetFields]);
+      form.resetFields(['assetId', ...baseResetFields]);
     }
 
     if (type) {
       form.resetFields(['contractAddress', ...baseResetFields]);
+      form.resetFields(['assetId', ...baseResetFields]);
     }
 
-    if (allError.contractAddress.length > 0) {
+    if (contractAddress) {
+      form.setFieldValue('contractAddress', reformatContractAddress(selectedChain, contractAddress));
+    }
+
+    if (allError.contractAddress.length > 0 || allError.assetId.length > 0) {
       form.resetFields([...baseResetFields]);
     }
 
-    setFieldDisabled(!all.chain || !all.type || allError.contractAddress.length > 0);
+    setFieldDisabled(!all.chain || !all.type || allError.contractAddress.length > 0 || allError.assetId.length > 0);
     setIsDisabled(empty || error);
   }, [chainInfoMap, form]);
 
-  const onSubmit: FormCallbacks<TokenImportFormType>['onFinish'] = useCallback((formValues: TokenImportFormType) => {
+  const onSubmitContractAddress: FormCallbacks<TokenImportFormType>['onFinish'] = useCallback((formValues: TokenImportFormType) => {
     const { chain, contractAddress, decimals, priceId, symbol, tokenName, type } = formValues;
 
     const reformattedAddress = type === _AssetType.VFT ? contractAddress : reformatAddress(contractAddress, chainNetworkPrefix);
@@ -231,6 +297,49 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setLoading(false);
       });
   }, [chainNetworkPrefix, chainInfoMap, showNotification, t, goBack]);
+
+  const onSubmitAssetId: FormCallbacks<TokenImportFormType>['onFinish'] = useCallback((formValues: TokenImportFormType) => {
+    const { assetId, chain, decimals, priceId, symbol, tokenName, type } = formValues;
+
+    if (assetId) {
+      setLoading(true);
+
+      upsertCustomToken({
+        originChain: chain,
+        slug: '',
+        name: tokenName || symbol,
+        symbol,
+        decimals,
+        priceId: priceId || null,
+        minAmount: null,
+        assetType: type,
+        metadata: _parseMetadataForAssetId(assetId),
+        multiChainAsset: null,
+        hasValue: _isChainTestNet(chainInfoMap[formValues.chain]),
+        icon: 'default.png'
+      })
+        .then((result) => {
+          if (result) {
+            showNotification({
+              message: t('Imported token successfully')
+            });
+            goBack();
+          } else {
+            showNotification({
+              message: t('An error occurred, please try again')
+            });
+          }
+        })
+        .catch(() => {
+          showNotification({
+            message: t('An error occurred, please try again')
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [chainInfoMap, showNotification, t, goBack]);
 
   const tokenDecimalsPrefix = useCallback(() => {
     const contractAddress = form.getFieldValue('contractAddress') as string;
@@ -280,7 +389,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             initialValues={formDefault}
             name={'token-import'}
             onFieldsChange={onFieldChange}
-            onFinish={onSubmit}
+            onFinish={!isAssetHubChain(selectedChain) ? onSubmitContractAddress : onSubmitAssetId}
           >
             <Form.Item
               name={'chain'}
@@ -307,18 +416,36 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               />
             </Form.Item>
 
-            <Form.Item
-              name={'contractAddress'}
-              rules={contractRules}
-              statusHelpAsTooltip={isWebUI}
-            >
-              <AddressInput
-                addressPrefix={chainNetworkPrefix}
-                disabled={!selectedTokenType}
-                label={isSelectGearToken ? t('Program ID') : t('Contract address')}
-                showScanner={true}
-              />
-            </Form.Item>
+            <HiddenInput fields={hideFields} />
+            {
+              !isAssetHubChain(selectedChain)
+                ? (
+                  <Form.Item
+                    name={'contractAddress'}
+                    rules={contractRules}
+                    statusHelpAsTooltip={true}
+                  >
+                    <AddressInput
+                      addressPrefix={chainNetworkPrefix}
+                      disabled={!selectedTokenType}
+                      label={isSelectGearToken ? t('Program ID') : t('Contract address')}
+                      showScanner={true}
+                    />
+                  </Form.Item>
+                )
+                : <Form.Item
+                  name={'assetId'}
+                  rules={assetIdRules}
+                  statusHelpAsTooltip={true}
+                >
+                  <AddressInput
+                    disabled={!selectedTokenType}
+                    label={t('Asset ID')}
+                    placeholder={t('Please type or paste an asset ID')}
+                    showScanner={true}
+                  />
+                </Form.Item>
+            }
 
             <Row
               className={'token-symbol-decimals'}

@@ -10,10 +10,11 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { getAvailBridgeGatewayContract, getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
+import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getContractAddressOfToken, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, BasicTxWarningCode } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode } from '@subwallet/extension-base/types';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertModal, HiddenInput } from '@subwallet/extension-web-ui/components';
@@ -183,12 +184,20 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
   const hideMaxButton = useMemo(() => {
     const chainInfo = chainInfoMap[chainValue];
 
-    if (_isPolygonChainBridge(chainValue, destChainValue)) {
+    if (_isPolygonChainBridge(chainValue, destChainValue) || _isPosChainBridge(chainValue, destChainValue)) {
       return true;
     }
 
     return !!chainInfo && !!assetInfo && _isChainEvmCompatible(chainInfo) && destChainValue === chainValue && _isNativeToken(assetInfo);
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
+
+  const disabledToAddressInput = useMemo(() => {
+    if (_isPosChainL2Bridge(chainValue, destChainValue)) {
+      return true;
+    }
+
+    return false;
+  }, [chainValue, destChainValue]);
 
   const [loading, setLoading] = useState(false);
   const [isTransferAll, setIsTransferAll] = useState(false);
@@ -300,10 +309,11 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
   const addressInputRef = useRef<AddressInputRef>(null);
+  const addressInputCurrent = addressInputRef.current;
 
   const updateAddressInputValue = useCallback((value: string) => {
-    addressInputRef.current?.setInputValue(value);
-    addressInputRef.current?.setSelectedOption((prev) => {
+    addressInputCurrent?.setInputValue(value);
+    addressInputCurrent?.setSelectedOption((prev) => {
       if (!prev) {
         return prev;
       }
@@ -313,7 +323,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
         formatedAddress: value
       };
     });
-  }, []);
+  }, [addressInputCurrent]);
 
   const validateRecipient = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     const { chain, destChain, from } = form.getFieldsValue();
@@ -825,6 +835,23 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
       });
   }, [assetValue, chainValue, destChainValue, fromValue, transferAmountValue]);
 
+  useEffect(() => {
+    if (disabledToAddressInput) {
+      const selectedItem = accountAddressItems.find((i) => i.address === fromValue);
+      const chainInfo = chainInfoMap[chainValue];
+      const reformatedInputValue = _reformatAddressWithChain(fromValue, chainInfo);
+
+      addressInputCurrent?.setInputValue?.(selectedItem?.address);
+      addressInputCurrent?.setSelectedOption?.({
+        address: selectedItem?.address || '',
+        formatedAddress: reformatedInputValue,
+        analyzedGroup: AnalyzedGroup.RECENT,
+        displayName: selectedItem?.accountName
+      });
+      form.setFieldValue('to', fromValue);
+    }
+  }, [accountAddressItems, addressInputCurrent, chainInfoMap, chainValue, disabledToAddressInput, form, fromValue]);
+
   useRestoreTransaction(form);
 
   return (
@@ -897,6 +924,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
           >
             <AddressInputNew
               chainSlug={destChainValue}
+              disabled={disabledToAddressInput}
               dropdownHeight={isNotShowAccountSelector ? 317 : 257}
               key={addressInputRenderKey}
               label={`${t('To')}:`}

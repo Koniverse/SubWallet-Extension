@@ -397,7 +397,11 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8
+      padding: `${token.paddingXS}px`,
+      paddingLeft: token.marginXXS,
+      paddingRight: token.marginXS,
+      overflow: 'hidden',
+      gap: token.sizeXS
     },
 
     '.anticon.__export-remind-btn': {
@@ -407,8 +411,8 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
 
     '.connect-icon': {
       color: token.colorTextBase,
-      width: 40,
       height: 40,
+      paddingRight: token.paddingXXS,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
