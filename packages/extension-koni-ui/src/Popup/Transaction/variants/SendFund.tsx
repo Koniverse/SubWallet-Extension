@@ -381,6 +381,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
         setIsTransferAll(false);
         setForceUpdateMaxValue(undefined);
+        setSelectedTransactionFee(undefined);
 
         setCurrentNonNativeTokenPayFee(undefined);
       }
@@ -923,6 +924,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
     };
   }, [chainValue, fromValue, nativeTokenBalance, nativeTokenSlug]);
+
+  useEffect(() => {
+    console.log('transferInfo', transferInfo);
+  }, [transferInfo]);
 
   useRestoreTransaction(form);
 
