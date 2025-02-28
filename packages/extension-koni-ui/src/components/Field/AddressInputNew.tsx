@@ -10,7 +10,7 @@ import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useForwardFieldRef, useOpenQrScanner, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useForwardFieldRef, useIsPolkadotUnifiedChain, useOpenQrScanner, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import useGetChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useFetchChainInfo';
 import { cancelSubscription, saveRecentAccount, subscribeAccountsInputAddress } from '@subwallet/extension-koni-ui/messaging';
 import { ScannerResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -73,6 +73,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     id, label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly,
     saveAddress, showAddressBook, showScanner, status, statusHelp, value } = props;
   const { t } = useTranslation();
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { alertModal } = useContext(WalletModalContext);
@@ -114,28 +115,33 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
 
   const _onBlur: React.FocusEventHandler<HTMLInputElement> = useCallback((event) => {
     const _inputValue = inputValue || '';
+    const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
+    const shouldReformatAddress = isShowAdvancedAddressDetection && (autoFormatValue || isPolkadotUnifiedChain) && isAddress(_inputValue) && chainInfo && !selectedOption;
+    let finalInputValue = _inputValue;
 
-    if (isShowAdvancedAddressDetection && autoFormatValue && isAddress(_inputValue) && chainInfo && !selectedOption) {
-      const reformatedInputValue = _reformatAddressWithChain(_inputValue, chainInfo);
+    if (shouldReformatAddress) {
+      const reformattedInputValue = _reformatAddressWithChain(_inputValue, chainInfo);
 
-      parseAndChangeValue(reformatedInputValue);
+      if (_inputValue !== reformattedInputValue) {
+        finalInputValue = reformattedInputValue;
 
-      setSelectedOption({
-        address: _inputValue,
-        formatedAddress: reformatedInputValue,
-        analyzedGroup: AnalyzedGroup.RECENT,
-        displayName: toShort(_inputValue, 3, 4)
-      });
+        setSelectedOption({
+          address: _inputValue,
+          formatedAddress: reformattedInputValue,
+          analyzedGroup: AnalyzedGroup.RECENT,
+          displayName: toShort(_inputValue, 3, 4)
+        });
 
-      setInputValue(reformatedInputValue);
-    } else {
-      parseAndChangeValue(_inputValue);
+        setInputValue(reformattedInputValue);
+      }
     }
+
+    parseAndChangeValue(finalInputValue);
 
     setOpenDropdownManually(undefined);
 
     onBlur?.(event);
-  }, [autoFormatValue, chainInfo, inputValue, isShowAdvancedAddressDetection, onBlur, parseAndChangeValue, selectedOption]);
+  }, [autoFormatValue, chainInfo, chainSlug, checkIsPolkadotUnifiedChain, inputValue, isShowAdvancedAddressDetection, onBlur, parseAndChangeValue, selectedOption]);
 
   // autoComplete
   // "item: unknown" is hotfix for typescript error of AutoComplete
