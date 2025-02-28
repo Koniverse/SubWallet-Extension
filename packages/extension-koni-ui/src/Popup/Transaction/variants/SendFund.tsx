@@ -20,9 +20,9 @@ import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balan
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components';
-import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
+import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, FAQ_URL } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetBalance, useHandleSubmitMultiTransaction, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
@@ -162,6 +162,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
   const [listTokensCanPayFee, setListTokensCanPayFee] = useState<TokenHasBalanceInfo[]>([]);
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
 
   // TODO: Should manage the states `tokenPayFeeAmount` and `currentTokenPayFee` together.
   const [currentNonNativeTokenPayFee, setCurrentNonNativeTokenPayFee] = useState<string | undefined>(undefined);
@@ -1065,6 +1067,27 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 description={t('Cross-chain transfer to an exchange (CEX) will result in loss of funds. Make sure the receiving address is not an exchange address.')}
                 title={t('Pay attention!')}
                 type={'warning'}
+              />
+            </div>
+          )
+        }
+        {
+          !(chainValue !== destChainValue) && isShowAddressFormatInfoBox && (
+            <div className={'__warning_message_cross_chain'}>
+              <AlertBox
+                description={
+                  <>
+                    {t('This network has 2 address formats, a Legacy format and a New format that starts with 1. SubWallet automatically transforms Legacy formats into New one without affecting your transfer. ')}
+                    <a
+                      href={FAQ_URL}
+                      rel='noreferrer'
+                      style={{ textDecoration: 'underline' }}
+                      target={'_blank'}
+                    >Learn more</a>
+                  </>
+                }
+                title={t('New address format')}
+                type={'info'}
               />
             </div>
           )

@@ -7,7 +7,8 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
-import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { FAQ_URL } from '@subwallet/extension-koni-ui/constants';
+import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-koni-ui/stores/base/RequestState';
@@ -109,6 +110,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
 
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(transaction.chain);
+
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
 
   const renderContent = useCallback((transaction: SWTransactionResult): React.ReactNode => {
@@ -167,6 +171,24 @@ const Component: React.FC<Props> = (props: Props) => {
             type='warning'
           />
         )}
+        {isShowAddressFormatInfoBox && (
+          <AlertBox
+            className='address-format-info-box'
+            description={
+              <>
+                {t('This network has 2 address formats, a Legacy format and a New format that starts with 1. SubWallet automatically transforms Legacy formats into New one without affecting your transfer. ')}
+                <a
+                  href={FAQ_URL}
+                  rel='noreferrer'
+                  style={{ textDecoration: 'underline' }}
+                  target={'_blank'}
+                >Learn more</a>
+              </>
+            }
+            title={t('New address format')}
+            type={'info'}
+          />
+        )}
       </div>
       {
         type === 'signingRequest' && (
@@ -210,7 +232,7 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
     '--content-gap': 0,
     marginTop: token.marginXS,
 
-    '.network-box': {
+    '.network-box, .address-format-info-box': {
       marginTop: token.marginSM
     },
 

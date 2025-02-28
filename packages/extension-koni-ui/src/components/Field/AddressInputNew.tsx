@@ -116,7 +116,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
   const _onBlur: React.FocusEventHandler<HTMLInputElement> = useCallback((event) => {
     const _inputValue = inputValue || '';
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
-    const shouldReformatAddress = isShowAdvancedAddressDetection && (autoFormatValue || isPolkadotUnifiedChain) && isAddress(_inputValue) && chainInfo && !selectedOption;
+    const shouldReformatAddress = (isPolkadotUnifiedChain || (isShowAdvancedAddressDetection && autoFormatValue)) && isAddress(_inputValue) && chainInfo && !selectedOption;
     let finalInputValue = _inputValue;
 
     if (shouldReformatAddress) {
