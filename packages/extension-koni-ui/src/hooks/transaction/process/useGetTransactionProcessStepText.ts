@@ -118,6 +118,8 @@ const useGetTransactionProcessStepText = () => {
       });
     }
 
+    if (processStep.type === SwapStepType.PERMIT) {}
+
     if (([
       YieldStepType.NOMINATE,
       YieldStepType.JOIN_NOMINATION_POOL,

@@ -5,7 +5,6 @@ import { EvmProviderError } from '@subwallet/extension-base/background/errors/Ev
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, EvmSignatureRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY, fetchBlockedConfigObjects, fetchLastestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
-import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { checkBalanceWithTransactionFee, checkSigningAccountForTransaction, checkSupportForAction, checkSupportForFeature, checkSupportForTransaction, estimateFeeForTransaction } from '@subwallet/extension-base/core/logic-validation/transfer';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { cellToBase64Str, externalMessage, getTransferCellPromise } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -20,10 +19,10 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
 import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -61,6 +60,8 @@ export default class TransactionService {
 
   private readonly transactionSubject: BehaviorSubject<Record<string, SWTransaction>> = new BehaviorSubject<Record<string, SWTransaction>>({});
   private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
+
+  private cacheProcessInfo: Record<string, Record<string, string>> = {};
 
   private get transactions (): Record<string, SWTransaction> {
     return this.transactionSubject.getValue();
@@ -229,6 +230,10 @@ export default class TransactionService {
     };
   }
 
+  public getCacheInfo (processId: string, step: BaseStepType): string {
+    return this.cacheProcessInfo[processId]?.[step] || '';
+  }
+
   private updateAliveProcess () {
     this.aliveProcessSubject.next(this.aliveProcessMap);
   }
@@ -336,7 +341,7 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
-  public async handlePermitTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
+  public async handlePermitTransaction (transaction: SWPermitTransactionInput): Promise<SWTransactionResponse> {
     const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
     const validatedTransaction: SWTransactionResponse = {
       ...transaction,
@@ -346,35 +351,32 @@ export default class TransactionService {
       errors: transaction.errors || [],
       warnings: transaction.warnings || [],
       processId: transaction.step?.processId
-    }
+    };
 
-    const txInput: SWTransaction = {
+    const txInput: SWPermitTransaction = {
       ...transaction,
       isInternal: true,
       status: ExtrinsicStatus.QUEUED,
       id: transactionId,
       extrinsicHash: transactionId,
       createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
-    } as SWTransaction;
+      updatedAt: new Date().getTime()
+    } as SWPermitTransaction;
 
-    const emitter = await this.sendPermitTransaction(txInput);
+    const _data = transaction.data as PermitSwapData;
+    const emitter = this.sendPermitTransaction(txInput);
 
     await new Promise<void>((resolve, reject) => {
-      // TODO
-      if (transaction.resolveOnDone) {
-        emitter.on('success', (data: TransactionEventResponse) => {
-          validatedTransaction.id = data.id;
-          validatedTransaction.extrinsicHash = data.extrinsicHash;
-          resolve();
-        });
-      } else {
-        emitter.on('signed', (data: TransactionEventResponse) => {
-          validatedTransaction.id = data.id;
-          validatedTransaction.extrinsicHash = data.extrinsicHash;
-          resolve();
-        });
-      }
+      emitter.on('success', (data: TransactionEventResponse) => {
+        validatedTransaction.id = data.id;
+        validatedTransaction.extrinsicHash = data.extrinsicHash;
+
+        this.cacheProcessInfo[_data.processId] = {
+          [_data.step]: data.extrinsicHash as string
+        };
+
+        resolve();
+      });
 
       emitter.on('error', (data: TransactionEventResponse) => {
         if (data.errors.length > 0) {
@@ -477,9 +479,9 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async sendPermitTransaction (transaction: SWTransaction) {
+  private sendPermitTransaction (transaction: SWPermitTransaction) {
     // Send Transaction
-    const emitter = await this.signAndSendEvmPermitTransaction(transaction);
+    const emitter = this.signAndSendEvmPermitTransaction(transaction);
 
     const { eventsHandler, step } = transaction;
 
@@ -1339,9 +1341,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async signAndSendEvmPermitTransaction ({ address, chain, id, isPassConfirmation, step, transaction, url, data }: SWTransaction): Promise<TransactionEmitter> {
-    const validatePayload = (data as SignTypedDataMessageV3V4);
-
+  private signAndSendEvmPermitTransaction ({ address, id, isPassConfirmation, step, transaction, url }: SWPermitTransaction): TransactionEmitter {
     // Allow sign transaction
     const canSign = true;
     const emitter = new EventEmitter<TransactionEventMap>();
@@ -1357,14 +1357,14 @@ export default class TransactionService {
     const evmSignaturePayload: EvmSignatureRequest = {
       id: id,
       type: 'eth_signTypedData_v4',
-      payload: validatePayload,
+      payload: transaction,
       address: address,
       hashPayload: '',
       canSign: canSign
     };
 
     this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
-      .then(async ({ isApproved, payload: signature }) => {
+      .then(({ isApproved, payload: signature }) => {
         if (isApproved) {
           // Emit signed event
           emitter.emit('signed', eventData);

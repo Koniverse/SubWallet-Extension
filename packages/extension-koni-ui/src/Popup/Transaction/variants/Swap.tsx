@@ -9,7 +9,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, ProcessType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
@@ -112,6 +112,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
+
+  console.log('currentOptimalSwapPath', currentOptimalSwapPath);
 
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
@@ -723,8 +725,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             }
           } else {
             let latestOptimalQuote = currentQuote;
+            const specialCaseForUniswap = latestOptimalQuote.provider.id === SwapProviderId.UNISWAP && !!currentOptimalSwapPath.steps.find((step) => step.type === SwapStepType.PERMIT);
 
-            if (currentOptimalSwapPath.steps.length > 2 && isLastStep) {
+            if (currentOptimalSwapPath.steps.length > 2 && isLastStep && !specialCaseForUniswap) {
               if (currentQuoteRequest) {
                 const latestSwapQuote = await getLatestSwapQuote(currentQuoteRequest);
 
@@ -744,6 +747,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 id: processId,
                 type: ProcessType.SWAP,
                 request: {
+                  cacheProcessId: processId,
                   process: currentOptimalSwapPath,
                   currentStep: step,
                   quote: latestOptimalQuote,
@@ -760,6 +764,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               return true;
             } else {
               const submitPromise: Promise<SWTransactionResponse> = handleSwapStep({
+                cacheProcessId: processId,
                 process: currentOptimalSwapPath,
                 currentStep: step,
                 quote: latestOptimalQuote,

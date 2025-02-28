@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
 import { BaseProcessRequestSign, TransactionData } from '../transaction';
@@ -188,6 +188,7 @@ export interface SwapSubmitParams extends BaseProcessRequestSign {
   address: string;
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
+  cacheProcessId: string;
 }
 
 export interface SwapSubmitStepData {
@@ -224,6 +225,11 @@ export interface ValidateSwapProcessParams {
 export interface SlippageType {
   slippage: BigN,
   isCustomType: boolean
+}
+
+export interface PermitSwapData {
+  processId: string;
+  step: BaseStepType;
 }
 
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
