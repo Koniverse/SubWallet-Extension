@@ -118,7 +118,9 @@ const useGetTransactionProcessStepText = () => {
       });
     }
 
-    if (processStep.type === SwapStepType.PERMIT) {}
+    if (processStep.type === SwapStepType.PERMIT) {
+      return 'TODO Update this message';
+    }
 
     if (([
       YieldStepType.NOMINATE,
