@@ -456,7 +456,11 @@ export default class TransactionService {
           return false;
         });
 
-        if (rejectError) {
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
           this.deleteProcess(step);
         } else {
           this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
@@ -517,7 +521,11 @@ export default class TransactionService {
           return false;
         });
 
-        if (rejectError) {
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
           this.deleteProcess(step);
         } else {
           this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
