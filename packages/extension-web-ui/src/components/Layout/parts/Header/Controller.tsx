@@ -2,11 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CaretLeft } from 'phosphor-react';
-import React, { useMemo } from 'react';
+import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import SelectAccount from '../SelectAccount';
@@ -20,6 +24,24 @@ export type Props = ThemeProps & {
 }
 
 function Component ({ className, onBack, showBackButton, title = '' }: Props): React.ReactElement<Props> {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
+  const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
+  const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
+
+  const unreadNotificationCount = useMemo(() => {
+    if (!currentAccountProxy || !unreadNotificationCountMap) {
+      return 0;
+    }
+
+    return isAllAccount ? Object.values(unreadNotificationCountMap).reduce((acc, val) => acc + val, 0) : unreadNotificationCountMap[currentAccountProxy.id] || 0;
+  }, [currentAccountProxy, isAllAccount, unreadNotificationCountMap]);
+
+  const onOpenNotification = useCallback(() => {
+    navigate('/settings/notification');
+  }, [navigate]);
+
   const backButton = useMemo(() => {
     if (showBackButton && onBack) {
       return (
@@ -57,6 +79,24 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
           <div className={'trigger-container -select-account'}>
             <SelectAccount />
           </div>
+
+          <Button
+            icon={
+              <div className={'notification-icon'}>
+                <Icon
+                  phosphorIcon={BellSimpleRinging}
+                  size='md'
+                />
+                {notiEnable && !!unreadNotificationCount &&
+                  <div className={CN('__unread-count')}>{unreadNotificationCount}</div>}
+              </div>
+            }
+            onClick={onOpenNotification}
+            tooltip={t('Notifications')}
+            tooltipPlacement={'bottomRight'}
+            type={'ghost'}
+          >
+          </Button>
 
           <LockStatus />
         </div>
@@ -118,6 +158,26 @@ const Controller = styled(Component)<Props>(({ theme: { token } }: Props) => ({
         fontSize: 12,
         color: token.colorTextLight3
       }
+    },
+
+    '.notification-icon': {
+      position: 'relative',
+      display: 'flex'
+    },
+
+    '.__unread-count': {
+      borderRadius: '50%',
+      color: token.colorWhite,
+      fontSize: token.sizeXS,
+      fontWeight: token.bodyFontWeight,
+      lineHeight: token.lineHeightLG,
+      paddingTop: 0,
+      paddingBottom: 0,
+      backgroundColor: token.colorError,
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      minWidth: '12px'
     }
   }
 }));
