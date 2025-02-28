@@ -10,9 +10,9 @@ import { BehaviorSubject } from 'rxjs';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
 
-export const API_KEY = { // todo: move to env.
-  mainnet: 'mainnet6uE9JH3zGYquaxRKA7IMhEuzRUB58uGK',
-  testnet: 'preprodcnP5RADcrWMlf2cQe4ZKm4cjRvrBQFXM'
+export const API_KEY = {
+  mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
+  testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
 };
 
 export class CardanoApi implements _CardanoApi {
