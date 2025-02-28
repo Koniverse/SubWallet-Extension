@@ -1360,7 +1360,8 @@ export default class TransactionService {
       payload: transaction,
       address: address,
       hashPayload: '',
-      canSign: canSign
+      canSign: canSign,
+      processId: step?.processId
     };
 
     this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })

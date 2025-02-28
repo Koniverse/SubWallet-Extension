@@ -20,7 +20,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
 
 type Props = ThemeProps
 
@@ -130,6 +130,20 @@ const Component = function ({ className }: Props) {
       );
     }
 
+    if (confirmation.item.isInternal && confirmation.type === 'evmSignatureRequest') {
+      const request = confirmation.item as ConfirmationDefinitions['evmSignatureRequest'][0];
+
+      if (request.payload.processId) {
+        return (
+          <EvmSignatureWithProcess
+            closeAlert={closeAlert}
+            openAlert={openAlert}
+            request={request}
+          />
+        );
+      }
+    }
+
     switch (confirmation.type) {
       case 'addNetworkRequest':
         return <AddNetworkConfirmation request={confirmation.item as ConfirmationDefinitions['addNetworkRequest'][0]} />;
@@ -187,6 +201,17 @@ const Component = function ({ className }: Props) {
       const transaction = transactionRequest[confirmation.item.id];
 
       if (!transaction) {
+        if (confirmation.type === 'evmSignatureRequest') {
+          const request = confirmation.item as ConfirmationDefinitions['evmSignatureRequest'][0];
+
+          /**
+           * TODO: REFACTOR THIS TO SCALE
+           * */
+          if (request.payload.processId) {
+            return t('Swap confirmation');
+          }
+        }
+
         return t(titleMap[confirmation.type] || '');
       }
 

@@ -1116,7 +1116,8 @@ export interface EvmSignatureRequest extends EvmSignRequest {
   id: string;
   type: string;
   payload: unknown;
-  errors?: ErrorValidation[]
+  errors?: ErrorValidation[];
+  processId?: string;
 }
 
 export interface TonSignatureRequest extends TonSignRequest {

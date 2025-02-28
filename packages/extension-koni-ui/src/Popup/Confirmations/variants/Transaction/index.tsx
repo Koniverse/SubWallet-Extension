@@ -88,6 +88,7 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
   }
 };
 
+// TODO: NEED TO MERGE THESE COMPONENTS TO COMPONENTS IN THE PROCESS DIRECTORY
 const getProcessComponent = (processType: ProcessType): typeof BaseProcessConfirmation => {
   switch (processType) {
     case ProcessType.SWAP:
