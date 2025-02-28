@@ -349,14 +349,17 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             const hotkey = delegate.hotkey;
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
-            const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
 
-            const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+            if (netuid === 0) {
+              const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
 
-            if (totalDelegate[hotkey]) {
-              totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
-            } else {
-              totalDelegate[hotkey] = taoStake;
+              const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+
+              if (totalDelegate[hotkey]) {
+                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
+              } else {
+                totalDelegate[hotkey] = taoStake;
+              }
             }
           }
 

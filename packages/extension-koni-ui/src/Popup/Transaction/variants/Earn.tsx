@@ -259,7 +259,7 @@ const Component = () => {
         }
 
         return [];
-      } else if (YieldPoolType.NATIVE_STAKING === poolType) {
+      } else if (YieldPoolType.NATIVE_STAKING === poolType || YieldPoolType.DYNAMIC_STAKING === poolType) {
         const validatorList = _poolTargets as ValidatorInfo[];
 
         if (!validatorList) {
@@ -1113,7 +1113,7 @@ const Component = () => {
                   </Form.Item>
                 )}
 
-                {poolType === YieldPoolType.NATIVE_STAKING && (
+                {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.DYNAMIC_STAKING) && (
                   <Form.Item
                     name={'target'}
                   >

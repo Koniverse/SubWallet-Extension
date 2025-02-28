@@ -17,7 +17,8 @@ import { addLazy, categoryAddresses, createPromiseHandler, PromiseHandler, remov
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
-import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
+import { fetchSubnetData } from './handlers/native-staking/dtao';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, DynamicTaoStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -39,7 +40,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   private dbService: DatabaseService;
   private eventService: EventService;
-  private useOnlineCacheOnly = true;
+  private useOnlineCacheOnly = false;
 
   constructor (state: KoniState) {
     this.state = state;
@@ -83,6 +84,17 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+        // Mainnet only
+        if (chain === 'bittensor') {
+          const response = await fetchSubnetData();
+
+          if (response) {
+            handlers.push(
+              ...response.slice(1).map((item) => new DynamicTaoStakingPoolHandler(this.state, chain, item))
+            );
+          }
+        }
+
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
       }
 
