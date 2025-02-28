@@ -5,13 +5,13 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
-import { BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
-import { _isNativeToken } from '../../chain-service/utils';
+import { _getContractAddressOfToken, _isNativeToken } from '../../chain-service/utils';
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
@@ -50,7 +50,12 @@ interface SwapResponse {
 
 interface CheckApprovalResponse {
   requestId: string;
-  approval: any;
+  approval?: {
+    to: string;
+    value: string;
+    from: string;
+    data: string;
+  };
   cancel: any;
 }
 
@@ -123,14 +128,33 @@ export class UniswapHandler implements SwapBaseInterface {
     if (params.selectedQuote) {
       const walletAddress = params.request.address;
       const fromAmount = params.selectedQuote.fromAmount;
+      const inputTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
       const { quote } = params.selectedQuote.metadata as UniswapMetadata;
 
       const checkApprovalResponse = await fetchCheckApproval(walletAddress, fromAmount, quote);
+      const approval = checkApprovalResponse.approval;
 
-      if (checkApprovalResponse.approval) {
+      if (approval) {
+        let spender = '';
+
+        try {
+          const valueLength = 40;
+
+          spender = approval.data.slice(-(valueLength * 2), -valueLength);
+        } catch (e) {
+          // Empty
+        }
+
+        const metadata: ApproveStepMetadata = {
+          tokenApprove: inputTokenInfo.slug,
+          contractAddress: _getContractAddressOfToken(inputTokenInfo),
+          spenderAddress: spender
+        };
+
         const submitStep = {
           name: 'Approve token',
-          type: CommonStepType.TOKEN_APPROVAL
+          type: CommonStepType.TOKEN_APPROVAL,
+          metadata: metadata as unknown as Record<string, unknown>
         };
 
         return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
