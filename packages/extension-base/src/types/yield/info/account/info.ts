@@ -107,7 +107,16 @@ export interface NativeYieldPositionInfo extends AbstractYieldPositionInfo {
   type: YieldPoolType.NATIVE_STAKING;
 }
 
+export interface DynamicYieldPositionInfo extends AbstractYieldPositionInfo {
+  type: YieldPoolType.DYNAMIC_STAKING;
+  subnetData: {
+    subnetName: string;
+    subnetSymbol: string;
+    subnetShortName: string;
+  };
+}
+
 /**
  * Info of yield pool
  * */
-export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo;
+export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo | DynamicYieldPositionInfo;
