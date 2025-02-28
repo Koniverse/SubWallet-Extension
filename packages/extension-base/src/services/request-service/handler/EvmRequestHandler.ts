@@ -107,7 +107,7 @@ export default class EvmRequestHandler {
     }
 
     if (options.isPassConfirmation) {
-      await this.completeConfirmation({ evmSendTransactionRequest: { id, url, isApproved: true, payload: '' } });
+      await this.completeConfirmation({ [type]: { id, url, isApproved: true, payload: '' } });
     }
 
     this.#requestService.updateIconV2();
