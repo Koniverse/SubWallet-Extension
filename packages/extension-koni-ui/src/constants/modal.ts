@@ -40,6 +40,7 @@ export const GLOBAL_ALERT_MODAL = 'global-alert-modal';
 export const TON_WALLET_CONTRACT_SELECTOR_MODAL = 'ton-wallet-contract-selector-modal';
 export const TON_ACCOUNT_SELECTOR_MODAL = 'ton-account-selector-modal';
 export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
+export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
 /* Campaign */

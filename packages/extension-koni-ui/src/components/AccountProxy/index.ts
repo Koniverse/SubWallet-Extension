@@ -10,3 +10,4 @@ export { default as AccountProxyAvatarGroup } from './AccountProxyAvatarGroup';
 export { default as AccountChainAddressItem } from './AccountChainAddressItem';
 export { default as AddressSelectorItem } from './AddressSelectorItem';
 export { default as AccountProxyTypeTag } from './AccountProxyTypeTag';
+export { default as AccountChainAddressWithStatusItem } from '../AccountProxy/AccountChainAddressWithStatusItem';

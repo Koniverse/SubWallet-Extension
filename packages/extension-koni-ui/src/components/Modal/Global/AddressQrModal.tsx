@@ -12,7 +12,7 @@ import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotifi
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, Logo, ModalContext, SwModal, SwQRCode } from '@subwallet/react-ui';
+import { Button, Icon, Logo, ModalContext, SwModal, SwQRCode, Tag } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretLeft, CopySimple, Gear } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -24,6 +24,7 @@ export interface AddressQrModalProps {
   chainSlug: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
+  isNewFormat?: boolean
 }
 
 type Props = ThemeProps & AddressQrModalProps & {
@@ -33,7 +34,7 @@ type Props = ThemeProps & AddressQrModalProps & {
 const modalId = ADDRESS_QR_MODAL;
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
@@ -145,6 +146,16 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
               <div className='__address'>
                 {toShort(address || '', 7, 7)}
               </div>
+
+              {isNewFormat !== undefined && <div className={'__address-tag'}>
+                <Tag
+                  bgType={'default'}
+                  className={CN(className, '__item-tag')}
+                  color={isNewFormat ? 'green' : 'yellow'}
+                >
+                  {t(isNewFormat ? 'New' : 'Legacy')}
+                </Tag>
+              </div>}
 
               <CopyToClipboard text={address}>
                 <Button
@@ -259,6 +270,24 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__view-on-explorer': {
       fontSize: token.fontSizeLG
+    },
+
+    '.__address-tag': {
+      alignItems: 'center',
+      display: 'flex',
+      paddingRight: token.paddingXS
+    },
+
+    '.__item-tag': {
+      marginRight: 0,
+      'white-space': 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      minWidth: 39,
+      padding: `2px ${token.paddingXS}px`,
+      fontSize: token.fontSizeXS,
+      fontWeight: 700,
+      lineHeight: token.lineHeightXS
     }
   };
 });
