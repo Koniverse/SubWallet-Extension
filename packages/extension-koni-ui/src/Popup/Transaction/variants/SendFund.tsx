@@ -19,8 +19,8 @@ import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, Anal
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components';
-import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, FAQ_URL } from '@subwallet/extension-koni-ui/constants';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components';
+import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -1074,21 +1074,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         {
           !(chainValue !== destChainValue) && isShowAddressFormatInfoBox && (
             <div className={'__warning_message_cross_chain'}>
-              <AlertBox
-                description={
-                  <>
-                    {t('This network has 2 address formats, a Legacy format and a New format that starts with 1. SubWallet automatically transforms Legacy formats into New one without affecting your transfer. ')}
-                    <a
-                      href={FAQ_URL}
-                      rel='noreferrer'
-                      style={{ textDecoration: 'underline' }}
-                      target={'_blank'}
-                    >Learn more</a>
-                  </>
-                }
-                title={t('New address format')}
-                type={'info'}
-              />
+              <AlertBoxInstant type={'new-address-format'} />
             </div>
           )
         }
