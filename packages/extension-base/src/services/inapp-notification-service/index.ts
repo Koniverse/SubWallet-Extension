@@ -439,7 +439,7 @@ export class InappNotificationService implements CronServiceInterface {
           method = _STAKING_CHAIN_GROUP.astar.includes(chain.slug) ? 'dApp staking' : 'Direct nomination';
           break;
         case YieldPoolType.DYNAMIC_STAKING:
-          method = 'Dynamic staking';
+          method = 'Dynamic staking'; // todo: confirm with tester
           break;
       }
 

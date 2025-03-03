@@ -81,6 +81,7 @@ interface PoolApiResponse {
 export async function fetchSubnetData () {
   try {
     const [subnetResponse, poolResponse] = await Promise.all([
+      // todo: split url to variable
       fetch('https://dash.taostats.io/api/subnet').then((res) => res.json()) as Promise<ApiResponse>,
       fetch('https://dash.taostats.io/api/dtao/pool').then((res) => res.json()) as Promise<PoolApiResponse>
     ]);
@@ -89,7 +90,7 @@ export async function fetchSubnetData () {
 
     const mergedData = subnetResponse.data.map((subnet) => ({
       ...subnet,
-      name: poolMap.get(subnet.netuid)?.name || 'Unknown',
+      name: poolMap.get(subnet.netuid)?.name || 'Unknown', // todo: check with tester
       symbol: poolMap.get(subnet.netuid)?.symbol || 'Unknown'
     }));
 

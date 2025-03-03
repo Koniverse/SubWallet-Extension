@@ -84,11 +84,15 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+        // todo: check support for testnet
         // Mainnet only
         if (chain === 'bittensor') {
+          console.log('init bittensor');
+          // todo: do not fetch data here
           const response = await fetchSubnetData();
 
           if (response) {
+            // todo: 1 handler to handle all subnets, not just 1
             handlers.push(
               ...response.slice(1).map((item) => new DynamicTaoStakingPoolHandler(this.state, chain, item))
             );
