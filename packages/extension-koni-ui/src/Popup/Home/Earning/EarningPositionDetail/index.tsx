@@ -124,11 +124,6 @@ function Component ({ compound,
     return compound.chain || poolInfo.chain || '';
   }, [compound.chain, poolInfo.chain]);
 
-  // Update bittensor logic later
-  const isBittensorStake = useMemo(() => {
-    return poolInfo.chain === 'bittensor';
-  }, [poolInfo.chain]);
-
   const onLeavePool = useCallback(() => {
     if (isActiveStakeZero) {
       openAlert({

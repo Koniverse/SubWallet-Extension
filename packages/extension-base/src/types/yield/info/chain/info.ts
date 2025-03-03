@@ -115,7 +115,10 @@ export interface BaseYieldPoolMetadata {
   availableMethod: YieldPoolMethodInfo;
 
   /* Special info */
-  subnetAsset?: string;
+  subnetData?: {
+    subnetName: string;
+    netuid: number;
+  };
 }
 
 /**

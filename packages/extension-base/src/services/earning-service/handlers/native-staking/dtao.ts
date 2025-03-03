@@ -81,16 +81,17 @@ interface PoolApiResponse {
 export async function fetchSubnetData () {
   try {
     const [subnetResponse, poolResponse] = await Promise.all([
-      // todo: split url to variable
       fetch('https://dash.taostats.io/api/subnet').then((res) => res.json()) as Promise<ApiResponse>,
       fetch('https://dash.taostats.io/api/dtao/pool').then((res) => res.json()) as Promise<PoolApiResponse>
     ]);
 
     const poolMap = new Map(poolResponse.data.map((pool) => [pool.netuid, pool]));
 
-    const mergedData = subnetResponse.data.map((subnet) => ({
+    const filteredSubnets = subnetResponse.data.filter((subnet) => subnet.netuid !== 0);
+
+    const mergedData = filteredSubnets.map((subnet) => ({
       ...subnet,
-      name: poolMap.get(subnet.netuid)?.name || 'Unknown', // todo: check with tester
+      name: poolMap.get(subnet.netuid)?.name || 'Unknown',
       symbol: poolMap.get(subnet.netuid)?.symbol || 'Unknown'
     }));
 
@@ -117,31 +118,38 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   protected override name: string;
   protected override shortName: string;
   public subnetName: string;
-  public subnetSymbol: string;
+  public subnetData: MergeSubnetData[] = [];
 
-  subnetData: SubnetData;
-
-  constructor (state: KoniState, chain: string, subnetData: MergeSubnetData) {
+  constructor (state: KoniState, chain: string) {
     super(state, chain);
-    this.subnetData = subnetData;
-    const netuid = subnetData.netuid.toString().padStart(2, '0');
-
-    this.slug = `TAO___dynamic_staking___${chain}__subnet_${netuid}`;
-    this.name = `${subnetData.metadata?.name || 'Unknown'}`;
-    this.shortName = `${subnetData.metadata?.name || 'Unknown'} ${netuid}`;
     this.subnetName = 'dTAO';
-    this.subnetSymbol = subnetData.symbol;
+    this.slug = `TAO___dynamic_staking___${chain}__subnet`;
+    this.name = 'Dynamic Tao Staking';
+    this.shortName = 'dTAO Staking';
+    this.init().catch(console.error);
+  }
+
+  private async init () {
+    const data = await fetchSubnetData();
+
+    if (data.length > 0) {
+      this.subnetData = data;
+    }
   }
 
   protected override getDescription (): string {
-    return `${this.subnetData.metadata?.description || 'Stake TAO to earn DTAO'}`;
+    return 'Stake TAO to earn rewards from subnet';
+  }
+
+  private getSubnetByNetuid (netuid: number): MergeSubnetData | undefined {
+    return this.subnetData.find((subnet) => subnet.netuid === netuid);
   }
 
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
     let cancel = false;
-    const substrateApi = this.substrateApi;
+    const substrateApi = await this.substrateApi.isReady;
 
     const updateStakingInfo = async () => {
       try {
@@ -150,39 +158,50 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
         }
 
         const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toJSON() || 0;
-
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
-        const data: NativeYieldPoolInfo = {
-          ...this.baseInfo,
-          type: this.type,
-          metadata: {
-            ...this.metadataInfo,
-            description: this.getDescription(),
-            subnetAsset: this.subnetName
-          },
-          statistic: {
-            assetEarning: [
-              {
-                slug: this.nativeToken.slug
-              }
-            ],
-            maxCandidatePerFarmer: this.subnetData.max_validators,
-            maxWithdrawalRequestPerFarmer: 1,
-            earningThreshold: {
-              join: BNminDelegatorStake.toString(),
-              defaultUnstake: '0',
-              fastUnstake: '0'
-            },
-            eraTime: 1.2,
-            era: 0,
-            unstakingPeriod: 1.2
-          }
-        };
+        this.subnetData.forEach((subnet) => {
+          const netuid = subnet.netuid.toString().padStart(2, '0');
+          const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid}`;
+          const subnetName = `${subnet.metadata?.name || 'Unknown'} ${netuid}`;
 
-        callback(data);
+          const data: NativeYieldPoolInfo = {
+            ...this.baseInfo,
+            type: this.type,
+            slug: subnetSlug,
+            metadata: {
+              ...this.metadataInfo,
+              name: subnetName,
+              shortName: subnetName,
+              description: subnet.metadata?.description || 'Stake TAO to earn rewards',
+              subnetData: {
+                subnetName: this.subnetName,
+                netuid: subnet.netuid
+              }
+            },
+            statistic: {
+              assetEarning: [
+                {
+                  slug: this.nativeToken.slug
+                }
+              ],
+              maxCandidatePerFarmer: subnet.max_validators,
+              maxWithdrawalRequestPerFarmer: 1,
+              earningThreshold: {
+                join: BNminDelegatorStake.toString(),
+                defaultUnstake: '0',
+                fastUnstake: '0'
+              },
+              eraTime: 1.2,
+              era: 0,
+              unstakingPeriod: 1.2
+            }
+          };
+
+          callback(data);
+        });
       } catch (error) {
-        console.log(error);
+        console.error('Error updating staking info:', error);
       }
     };
 
@@ -259,76 +278,89 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
           const owner = reformatAddress(useAddresses[i], 42);
-          const delegatorState: TaoStakingStakeOption[] = [];
-          let bnTotalBalance = BN_ZERO;
-
           const delegateStateInfo = rawDelegateStateInfo as unknown as TaoStakeInfo[];
 
-          const totalDelegate: Record<string, string> = {};
+          const subnetPositions: Record<number, { delegatorState: TaoStakingStakeOption[], totalBalance: BN }> = {};
 
           for (const delegate of delegateStateInfo) {
             const hotkey = delegate.hotkey;
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
+            const subnet = this.getSubnetByNetuid(netuid);
 
-            if (netuid === this.subnetData.netuid) {
+            if (subnet) {
               const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
-
               const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
 
-              if (totalDelegate[hotkey]) {
-                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
-              } else {
-                totalDelegate[hotkey] = taoStake;
+              if (!subnetPositions[netuid]) {
+                subnetPositions[netuid] = { delegatorState: [], totalBalance: BN_ZERO };
               }
+
+              const existingStake = subnetPositions[netuid].delegatorState.find((d) => d.owner === hotkey);
+
+              if (existingStake) {
+                existingStake.amount = new BigN(existingStake.amount).plus(taoStake).toString();
+              } else {
+                subnetPositions[netuid].delegatorState.push({
+                  owner: hotkey,
+                  amount: taoStake
+                });
+              }
+
+              subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(taoStake));
             }
           }
 
-          for (const hotkey in totalDelegate) {
-            bnTotalBalance = bnTotalBalance.add(new BN(totalDelegate[hotkey]));
+          Object.entries(subnetPositions).forEach(([netuid, { delegatorState }]) => {
+            const subnet = this.getSubnetByNetuid(parseInt(netuid));
 
-            delegatorState.push({
-              owner: hotkey,
-              amount: totalDelegate[hotkey]
-            });
-          }
+            if (!subnet) {
+              return;
+            }
 
-          if (delegateStateInfo && delegateStateInfo.length > 0) {
-            this.parseNominatorMetadata(chainInfo, owner, delegatorState)
-              .then((nominatorMetadata) => {
-                rsCallback({
-                  ...defaultInfo,
-                  ...nominatorMetadata,
-                  address: owner,
-                  type: this.type,
-                  subnetData: {
-                    subnetName: this.subnetName,
-                    subnetSymbol: this.subnetSymbol,
-                    subnetShortName: this.shortName
-                  }
-                });
-              })
-              .catch(console.error);
-          } else {
-            rsCallback({
-              ...defaultInfo,
-              type: this.type,
-              address: owner,
-              balanceToken: this.nativeToken.slug,
-              totalStake: '0',
-              activeStake: '0',
-              unstakeBalance: '0',
-              status: EarningStatus.NOT_STAKING,
-              isBondedBefore: false,
-              nominations: [],
-              unstakings: [],
-              subnetData: {
-                subnetName: this.subnetName,
-                subnetSymbol: this.subnetSymbol,
-                subnetShortName: this.shortName
-              }
-            });
-          }
+            const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid.padStart(2, '0')}`;
+            const subnetName = `${subnet.metadata?.name || 'Unknown'} ${netuid}`;
+            const subnetSymbol = subnet.symbol || 'dTAO';
+
+            if (delegatorState.length > 0) {
+              this.parseNominatorMetadata(chainInfo, owner, delegatorState)
+                .then((nominatorMetadata) => {
+                  rsCallback({
+                    ...defaultInfo,
+                    ...nominatorMetadata,
+                    address: owner,
+                    type: this.type,
+                    slug: subnetSlug,
+                    subnetData: {
+                      subnetName: this.subnetName,
+                      subnetSymbol: subnetSymbol,
+                      subnetShortName: subnetName
+                    }
+                  });
+                })
+                .catch(console.error);
+            } else {
+              rsCallback({
+                ...defaultInfo,
+                type: this.type,
+                address: owner,
+                balanceToken: this.nativeToken.slug,
+                totalStake: '0',
+                activeStake: '0',
+                unstakeBalance: '0',
+                status: EarningStatus.NOT_STAKING,
+                isBondedBefore: false,
+                nominations: [],
+                unstakings: [],
+                slug: subnetSlug,
+                subnetData: {
+                  subnetName: this.subnetName,
+                  subnetSymbol: subnetSymbol,
+                  subnetShortName: subnetName
+                }
+              });
+            }
+          });
         });
       }
     };
@@ -362,6 +394,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
     const _topValidator = await fetchDelegates();
 
+    console.log('topValidator', _topValidator);
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
     const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
@@ -413,13 +446,12 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
   /* Join pool action */
 
-  async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
+  async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked', netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const { amount, selectedValidators: targetValidators } = data;
     const chainApi = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
-    const netuid = this.subnetData.netuid;
 
     const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, netuid, binaryAmount);
 
@@ -430,16 +462,14 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
   /* Leave pool action */
 
-  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]> {
+  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
-    const poolPosition = await this.getPoolPosition(address);
 
-    if (!selectedTarget || !poolPosition) {
+    if (!selectedTarget) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const netuid = this.subnetData.netuid;
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, netuid, binaryAmount);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];

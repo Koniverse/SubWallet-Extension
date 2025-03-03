@@ -17,7 +17,6 @@ import { addLazy, categoryAddresses, createPromiseHandler, PromiseHandler, remov
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
-import { fetchSubnetData } from './handlers/native-staking/dtao';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, DynamicTaoStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 const fetchPoolsData = async () => {
@@ -87,16 +86,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         // todo: check support for testnet
         // Mainnet only
         if (chain === 'bittensor') {
-          console.log('init bittensor');
-          // todo: do not fetch data here
-          const response = await fetchSubnetData();
-
-          if (response) {
-            // todo: 1 handler to handle all subnets, not just 1
-            handlers.push(
-              ...response.slice(1).map((item) => new DynamicTaoStakingPoolHandler(this.state, chain, item))
-            );
-          }
+          handlers.push(new DynamicTaoStakingPoolHandler(this.state, chain));
         }
 
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
@@ -927,6 +917,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params;
+
+    if (slug.includes('dynamic_staking')) {
+      return Promise.resolve([]);
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -941,14 +936,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
     const handler = this.getPoolHandler(slug);
+    const netuid = params.poolInfo.metadata.subnetData?.netuid;
 
     if (handler) {
-      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget);
+      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
   }
-
   /* Leave */
 
   /* Other */

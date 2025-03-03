@@ -234,7 +234,11 @@ const Component: React.FC = () => {
       return;
     }
 
-    const { fastLeave, from, slug, value } = values;
+    let { fastLeave, from, slug, value } = values;
+
+    if (slug.includes('dynamic_staking')) {
+      slug = slug.replace(/_subnet_\d+$/, '_subnet');
+    }
 
     const request: RequestYieldLeave = {
       address: from,
