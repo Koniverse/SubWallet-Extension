@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { AccountChainAddressWithStatusItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
+import { AccountChainAddressWithStatusItem, CloseIcon, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { SELECT_ADDRESS_FORMAT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -12,7 +12,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { FadersHorizontal } from 'phosphor-react';
+import { CaretLeft, FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -120,9 +120,26 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
   return (
     <SwModal
       className={CN(className, 'address-format-modal')}
+      closeIcon={
+        onBack
+          ? (
+            <Icon
+              phosphorIcon={CaretLeft}
+              size='md'
+            />
+          )
+          : undefined
+      }
       destroyOnClose={true}
       id={selectAddressFormatModalId}
       onCancel={onBack || onCancel}
+      rightIconProps={onBack
+        ? {
+          icon: <CloseIcon />,
+          onClick: onCancel
+        }
+        : undefined
+      }
       title={t<string>('Select address format')}
     >
       <div>
