@@ -318,7 +318,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
     let tx: SubmittableExtrinsic<'promise'>;
 
     if (positionInfo?.isBondedBefore) {
-      tx = apiPromise.api.tx.utility.batch([
+      tx = apiPromise.api.tx.utility.batchAll([
         apiPromise.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
         apiPromise.api.tx.collatorStaking.lock(amount),
         apiPromise.api.tx.collatorStaking.stake([{
@@ -327,7 +327,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
         }])
       ]);
     } else {
-      tx = apiPromise.api.tx.utility.batch([
+      tx = apiPromise.api.tx.utility.batchAll([
         apiPromise.api.tx.collatorStaking.lock(amount),
         apiPromise.api.tx.collatorStaking.stake([{
           candidate: selectedValidatorInfo.address,
@@ -397,7 +397,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
       substrateApi.api.tx.collatorStaking.unlock(null) // ignore amount to unlock all
     ];
 
-    return [ExtrinsicType.STAKING_UNBOND, substrateApi.api.tx.utility.batch(extrinsicList)];
+    return [ExtrinsicType.STAKING_UNBOND, substrateApi.api.tx.utility.batchAll(extrinsicList)];
   }
 
   /* Leave pool action */
