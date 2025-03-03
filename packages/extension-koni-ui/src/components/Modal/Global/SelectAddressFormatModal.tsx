@@ -22,10 +22,12 @@ export interface SelectAddressFormatModalProps {
   name: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
+  onGoHome?: VoidFunction;
 }
 
 type Props = ThemeProps & SelectAddressFormatModalProps & {
   onCancel: VoidFunction;
+  onGoHome: VoidFunction;
 };
 
 export type AddressFormatInfo = {
@@ -38,7 +40,7 @@ export type AddressFormatInfo = {
 const selectAddressFormatModalId = SELECT_ADDRESS_FORMAT_MODAL;
 const LEARN_MORE_DOCS_URL = 'https://address-format-guide.notion.site/Unified-address-format-integration-guide-12dffd09c4a280c0a1ebc475657dd6f6';
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBack, onCancel, onGoHome }: Props) => {
   const { t } = useTranslation();
   const notify = useNotification();
   const { addressQrModal } = useContext(WalletModalContext);
@@ -74,6 +76,10 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
           address: item.address,
           chainSlug: item.slug,
           onBack: addressQrModal.close,
+          onGoHome: () => {
+            addressQrModal.close();
+            onGoHome();
+          },
           isNewFormat: item.isNewFormat,
           onCancel: () => {
             addressQrModal.close();
@@ -84,7 +90,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
 
       processFunction();
     };
-  }, [addressQrModal, onCancel]);
+  }, [addressQrModal, onCancel, onGoHome]);
 
   const onCopyAddress = useCallback((item: AddressFormatInfo) => {
     return () => {

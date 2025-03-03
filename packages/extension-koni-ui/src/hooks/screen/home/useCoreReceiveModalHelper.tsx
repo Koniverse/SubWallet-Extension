@@ -9,7 +9,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -42,6 +42,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const goHome = useDefaultNavigate().goHome;
 
   // chain related to tokenGroupSlug, if it is token slug
   const specificChain = useMemo(() => {
@@ -73,13 +74,17 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     });
   }, [accountProxies, addressQrModal, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning]);
 
-  const openAddressFormatModal = useCallback((name: string, address: string, chainSlug: string, closeCallback?: VoidCallback) => {
+  const openAddressFormatModal = useCallback((name: string, address: string, chainSlug: string, closeCallback?: VoidCallback, goHomeCallback?: VoidCallback) => {
     const processFunction = () => {
       selectAddressFormatModal.open({
         name: name,
         address: address,
         chainSlug: chainSlug,
         onBack: selectAddressFormatModal.close,
+        onGoHome: () => {
+          goHomeCallback?.();
+          selectAddressFormatModal.close();
+        },
         onCancel: () => {
           selectAddressFormatModal.close();
           closeCallback?.();
@@ -151,6 +156,10 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
         if (isPolkadotUnifiedChain) {
           openAddressFormatModal(chainInfo.name, reformatedAddress, chainSlug, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          }, () => {
+            inactiveModal(tokenSelectorModalId);
             setSelectedAccountAddressItem(undefined);
           });
         } else {
@@ -230,11 +239,14 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(targetChain);
 
     if (isPolkadotUnifiedChain) {
-      openAddressFormatModal(chainInfo.name, item.address, targetChain, onCloseAccountSelector);
+      openAddressFormatModal(chainInfo.name, item.address, targetChain, onCloseAccountSelector, () => {
+        onCloseAccountSelector();
+        goHome();
+      });
     } else {
       openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, onCloseAccountSelector);
     }
-  }, [chainInfoMap, checkIsPolkadotUnifiedChain, onCloseAccountSelector, openAddressFormatModal, openAddressQrModal, selectedChain, specificChain]);
+  }, [chainInfoMap, checkIsPolkadotUnifiedChain, goHome, onCloseAccountSelector, openAddressFormatModal, openAddressQrModal, selectedChain, specificChain]);
 
   /* account Selector --- */
 
@@ -250,6 +262,8 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         return;
       }
 
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chain);
+
       for (const accountJson of currentAccountProxy.accounts) {
         const reformatedAddress = getReformatAddress(accountJson, chainInfo);
 
@@ -264,9 +278,18 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
           setSelectedAccountAddressItem(accountAddressItem);
 
-          openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chain, () => {
-            setSelectedAccountAddressItem(undefined);
-          }, false);
+          if (isPolkadotUnifiedChain) {
+            openAddressFormatModal(chainInfo.name, reformatedAddress, chain, () => {
+              setSelectedAccountAddressItem(undefined);
+            }, () => {
+              goHome();
+              setSelectedAccountAddressItem(undefined);
+            });
+          } else {
+            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chain, () => {
+              setSelectedAccountAddressItem(undefined);
+            }, false);
+          }
 
           break;
         }
@@ -308,7 +331,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, currentAccountProxy, getReformatAddress, isAllAccount, openAddressQrModal, specificChain, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, goHome, isAllAccount, openAddressFormatModal, openAddressQrModal, specificChain, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

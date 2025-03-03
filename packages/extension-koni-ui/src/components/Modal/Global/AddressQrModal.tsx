@@ -14,7 +14,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo, ModalContext, SwModal, SwQRCode, Tag } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowSquareOut, CaretLeft, CopySimple, Gear } from 'phosphor-react';
+import { ArrowSquareOut, CaretLeft, CopySimple, Gear, House } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
@@ -24,7 +24,8 @@ export interface AddressQrModalProps {
   chainSlug: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
-  isNewFormat?: boolean
+  onGoHome?: VoidFunction;
+  isNewFormat?: boolean;
 }
 
 type Props = ThemeProps & AddressQrModalProps & {
@@ -34,7 +35,7 @@ type Props = ThemeProps & AddressQrModalProps & {
 const modalId = ADDRESS_QR_MODAL;
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel, onGoHome }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
@@ -175,20 +176,39 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
             </div>
           </div>
 
-          <Button
-            block
-            className={'__view-on-explorer'}
-            disabled={!scanExplorerAddressUrl}
-            icon={
-              <Icon
-                customSize={'28px'}
-                phosphorIcon={ArrowSquareOut}
-                size='sm'
-                weight={'fill'}
-              />
-            }
-            onClick={handleClickViewOnExplorer}
-          >{t('View on explorer')}</Button>
+          {isNewFormat
+            ? (
+              <Button
+                block
+                className={'__view-on-explorer'}
+                disabled={!scanExplorerAddressUrl}
+                icon={
+                  <Icon
+                    customSize={'28px'}
+                    phosphorIcon={ArrowSquareOut}
+                    size='sm'
+                    weight={'fill'}
+                  />
+                }
+                onClick={handleClickViewOnExplorer}
+              >{t('View on explorer')}</Button>
+            )
+            : (
+              <Button
+                block
+                className={'__view-on-explorer'}
+                disabled={!scanExplorerAddressUrl}
+                icon={
+                  <Icon
+                    customSize={'28px'}
+                    phosphorIcon={House}
+                    size='sm'
+                    weight={'fill'}
+                  />
+                }
+                onClick={onGoHome || onCancel}
+              >{t('Back to home')}</Button>
+            )}
         </>
       </SwModal>
       {isRelatedToTon && isTonWalletContactSelectorModalActive &&

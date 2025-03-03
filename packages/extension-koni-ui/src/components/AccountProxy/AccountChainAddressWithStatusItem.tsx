@@ -133,7 +133,7 @@ const AccountChainAddressWithStatusItem = styled(Component)<Props>(({ theme: { t
       color: token.colorTextLight1,
       overflow: 'hidden',
       display: 'flex',
-      justifyContent: 'space-between',
+      gap: 8,
       fontWeight: token.fontWeightStrong,
 
       '.__chain-name': {
