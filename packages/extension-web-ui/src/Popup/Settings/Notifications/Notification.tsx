@@ -1,10 +1,9 @@
-// Copyright 2019-2022 @polkadot/extension-ui authors & contributors
+// Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _POLYGON_BRIDGE_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
@@ -19,6 +18,7 @@ import { useAlert, useDefaultNavigate, useGetChainSlugsByAccount, useSelector } 
 import { useLocalStorage } from '@subwallet/extension-web-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-web-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-web-ui/messaging/transaction/notification';
+import { NotificationItem } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/index';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getTotalWidrawable, getYieldRewardTotal } from '@subwallet/extension-web-ui/utils/notification';
@@ -31,9 +31,13 @@ import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, use
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { NotificationItem } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/index';
 
-type Props = ThemeProps;
+type Props = {
+  modalContent?: boolean;
+  className?: string;
+};
+
+type WrapperProps = ThemeProps & Props;
 
 export interface NotificationInfoItem extends _NotificationInfo {
   backgroundColor: string;
@@ -63,7 +67,7 @@ export const NotificationIconMap = {
 
 const alertModalId = 'notification-alert-modal';
 
-function Component ({ className = '' }: Props): React.ReactElement<Props> {
+function Component ({ className = '', modalContent }: Props): React.ReactElement<Props> {
   const { activeModal, checkActive } = useContext(ModalContext);
 
   const { t } = useTranslation();
@@ -511,8 +515,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, []);
 
   return (
-    <PageWrapper className={`manage-website-access ${className}`}>
-      <SwSubHeader
+    <PageWrapper className={CN(className, 'manage-website-access', {
+      '__web-wrapper': modalContent
+    })}>
+      {!modalContent && (<SwSubHeader
         background={'transparent'}
         center
         onBack={onClickBack}
@@ -532,7 +538,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         ]}
         showBackButton
         title={t('Notifications')}
-      />
+      />)}
 
       <div className={'tool-area'}>
         <FilterTabs
@@ -606,8 +612,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   );
 }
 
-const Wrapper = (props: Props) => {
+const Wrapper = (props: WrapperProps) => {
   const dataContext = useContext(DataContext);
+  const { className, modalContent } = props;
+
+  if (modalContent) {
+    return (
+      <Component
+        className={className}
+        modalContent={modalContent}
+      />
+
+    );
+  }
 
   return (
     <PageWrapper
@@ -620,7 +637,7 @@ const Wrapper = (props: Props) => {
   );
 };
 
-const Notification = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
+const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
     height: '100%',
     backgroundColor: token.colorBgDefault,

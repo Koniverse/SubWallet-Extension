@@ -1,14 +1,18 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BaseModal } from '@subwallet/extension-web-ui/components';
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
+import { NOTIFICATION_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
+import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon, Typography } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
-import React, { useCallback, useMemo } from 'react';
+import { BellSimpleRinging, CaretLeft, GearSix } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -26,6 +30,8 @@ export type Props = ThemeProps & {
 function Component ({ className, onBack, showBackButton, title = '' }: Props): React.ReactElement<Props> {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isWebUI } = useContext(ScreenContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
@@ -39,7 +45,19 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   }, [currentAccountProxy, isAllAccount, unreadNotificationCountMap]);
 
   const onOpenNotification = useCallback(() => {
-    navigate('/settings/notification');
+    if (isWebUI) {
+      activeModal(NOTIFICATION_MODAL);
+    } else {
+      navigate('/settings/notification');
+    }
+  }, [activeModal, isWebUI, navigate]);
+
+  const onCancelNotification = useCallback(() => {
+    inactiveModal(NOTIFICATION_MODAL);
+  }, [inactiveModal]);
+
+  const onNotificationConfig = useCallback(() => {
+    navigate('/settings/notification-config');
   }, [navigate]);
 
   const backButton = useMemo(() => {
@@ -100,6 +118,28 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
           <LockStatus />
         </div>
+        <BaseModal
+          className={'right-side-modal'}
+          destroyOnClose={true}
+          id={NOTIFICATION_MODAL}
+          onCancel={onCancelNotification}
+          rightIconProps={{
+            icon: (
+              <Icon
+                customSize={'24px'}
+                phosphorIcon={GearSix}
+                type='phosphor'
+                weight={'bold'}
+              />
+            ),
+            onClick: onNotificationConfig
+          }}
+          title={t('Notifications')}
+        >
+          <Notification
+            modalContent={isWebUI}
+          />
+        </BaseModal>
       </div>
     </div>
   );
