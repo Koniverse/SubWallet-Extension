@@ -181,7 +181,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
             </div>
           </div>
 
-          {isNewFormat
+          {isNewFormat === undefined || isNewFormat
             ? (
               <Button
                 block
@@ -212,7 +212,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
                   />
                 }
                 onClick={onGoHome}
-                type={'ghost'}
+                schema={'secondary'}
               >{t('Back to home')}</Button>
             )}
         </>
@@ -296,12 +296,6 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__view-on-explorer': {
       fontSize: token.fontSizeLG
-    },
-
-    '.__go-home-button': {
-      fontSize: token.fontSizeLG,
-      backgroundColor: token['gray-1'],
-      borderRadius: token.borderRadiusLG
     },
 
     '.__address-tag': {
