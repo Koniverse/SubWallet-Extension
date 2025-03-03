@@ -5,7 +5,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useDefaultNavigate, useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwList } from '@subwallet/react-ui';
@@ -27,10 +27,23 @@ function Component ({ accountProxy, className }: Props) {
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
-  const goHome = useDefaultNavigate().goHome;
+
+  const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
+    selectAddressFormatModal.open({
+      name: item.name,
+      address: item.address,
+      chainSlug: item.slug,
+      onBack: selectAddressFormatModal.close,
+      onCancel: () => {
+        selectAddressFormatModal.close();
+      }
+    });
+  }, [selectAddressFormatModal]);
 
   const onShowQr = useCallback((item: AccountChainAddress) => {
     return () => {
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+
       const processFunction = () => {
         addressQrModal.open({
           address: item.address,
@@ -41,30 +54,18 @@ function Component ({ accountProxy, className }: Props) {
         });
       };
 
-      onHandleTonAccountWarning(item.accountType, () => {
-        onHandleLedgerGenericAccountWarning({
-          accountProxy: accountProxy,
-          chainSlug: item.slug
-        }, processFunction);
-      });
-    };
-  }, [accountProxy, addressQrModal, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning]);
-
-  const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
-    selectAddressFormatModal.open({
-      name: item.name,
-      address: item.address,
-      chainSlug: item.slug,
-      onBack: selectAddressFormatModal.close,
-      onGoHome: () => {
-        selectAddressFormatModal.close();
-        goHome();
-      },
-      onCancel: () => {
-        selectAddressFormatModal.close();
+      if (isPolkadotUnifiedChain) {
+        openSelectAddressFormatModal(item);
+      } else {
+        onHandleTonAccountWarning(item.accountType, () => {
+          onHandleLedgerGenericAccountWarning({
+            accountProxy: accountProxy,
+            chainSlug: item.slug
+          }, processFunction);
+        });
       }
-    });
-  }, [goHome, selectAddressFormatModal]);
+    };
+  }, [accountProxy, addressQrModal, checkIsPolkadotUnifiedChain, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal]);
 
   const onCopyAddress = useCallback((item: AccountChainAddress) => {
     return () => {

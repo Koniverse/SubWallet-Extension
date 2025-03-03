@@ -6,7 +6,7 @@ import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, CloseIcon, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_CHAIN_ADDRESSES_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useDefaultNavigate, useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
@@ -32,10 +32,23 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
-  const goHome = useDefaultNavigate().goHome;
+
+  const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
+    selectAddressFormatModal.open({
+      name: item.name,
+      address: item.address,
+      chainSlug: item.slug,
+      onBack: selectAddressFormatModal.close,
+      onCancel: () => {
+        selectAddressFormatModal.close();
+      }
+    });
+  }, [selectAddressFormatModal]);
 
   const onShowQr = useCallback((item: AccountChainAddress) => {
     return () => {
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+
       const processFunction = () => {
         addressQrModal.open({
           address: item.address,
@@ -48,30 +61,18 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
         });
       };
 
-      onHandleTonAccountWarning(item.accountType, () => {
-        onHandleLedgerGenericAccountWarning({
-          accountProxy: accountProxy,
-          chainSlug: item.slug
-        }, processFunction);
-      });
-    };
-  }, [accountProxy, addressQrModal, onCancel, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning]);
-
-  const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
-    selectAddressFormatModal.open({
-      name: item.name,
-      address: item.address,
-      chainSlug: item.slug,
-      onBack: selectAddressFormatModal.close,
-      onGoHome: () => {
-        selectAddressFormatModal.close();
-        goHome();
-      },
-      onCancel: () => {
-        selectAddressFormatModal.close();
+      if (isPolkadotUnifiedChain) {
+        openSelectAddressFormatModal(item);
+      } else {
+        onHandleTonAccountWarning(item.accountType, () => {
+          onHandleLedgerGenericAccountWarning({
+            accountProxy: accountProxy,
+            chainSlug: item.slug
+          }, processFunction);
+        });
       }
-    });
-  }, [goHome, selectAddressFormatModal]);
+    };
+  }, [accountProxy, addressQrModal, checkIsPolkadotUnifiedChain, onCancel, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal]);
 
   const onClickInfoButton = useCallback((item: AccountChainAddress) => {
     return () => {

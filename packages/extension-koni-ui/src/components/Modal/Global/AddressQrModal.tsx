@@ -7,7 +7,7 @@ import { getExplorerLink } from '@subwallet/extension-base/services/transaction-
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_QR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
-import { useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -24,8 +24,7 @@ export interface AddressQrModalProps {
   chainSlug: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
-  onGoHome?: VoidFunction;
-  isNewFormat?: boolean;
+  isNewFormat?: boolean
 }
 
 type Props = ThemeProps & AddressQrModalProps & {
@@ -35,17 +34,23 @@ type Props = ThemeProps & AddressQrModalProps & {
 const modalId = ADDRESS_QR_MODAL;
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel, onGoHome }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
   const chainInfo = useFetchChainInfo(chainSlug);
   const accountInfo = useGetAccountByAddress(address);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
+  const goHome = useDefaultNavigate().goHome;
 
   const scanExplorerAddressUrl = useMemo(() => {
     return getExplorerLink(chainInfo, address, 'account');
   }, [address, chainInfo]);
+
+  const onGoHome = useCallback(() => {
+    goHome();
+    onCancel();
+  }, [goHome, onCancel]);
 
   const handleClickViewOnExplorer = useCallback(() => {
     try {
@@ -206,7 +211,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
                     weight={'fill'}
                   />
                 }
-                onClick={onGoHome || onCancel}
+                onClick={onGoHome}
                 type={'ghost'}
               >{t('Back to home')}</Button>
             )}

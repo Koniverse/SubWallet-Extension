@@ -180,10 +180,6 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     selectAddressFormatModalProps?.onCancel?.() || closeSelectAddressFormatModal();
   }, [closeSelectAddressFormatModal, selectAddressFormatModalProps]);
 
-  const onGoHomeSelectAddressFormatModal = useCallback(() => {
-    selectAddressFormatModalProps?.onGoHome?.() || closeSelectAddressFormatModal();
-  }, [closeSelectAddressFormatModal, selectAddressFormatModalProps]);
-
   /* Address QR Modal */
 
   /* Derive modal */
@@ -313,7 +309,6 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         <SelectAddressFormatModal
           {...selectAddressFormatModalProps}
           onCancel={onCancelSelectAddressFormatModal}
-          onGoHome={onGoHomeSelectAddressFormatModal}
         />
       )
     }
