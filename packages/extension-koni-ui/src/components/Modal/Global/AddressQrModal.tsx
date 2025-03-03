@@ -196,7 +196,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
             : (
               <Button
                 block
-                className={'__view-on-explorer'}
+                className={'__go-home-button'}
                 disabled={!scanExplorerAddressUrl}
                 icon={
                   <Icon
@@ -207,6 +207,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
                   />
                 }
                 onClick={onGoHome || onCancel}
+                type={'ghost'}
               >{t('Back to home')}</Button>
             )}
         </>
@@ -290,6 +291,12 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__view-on-explorer': {
       fontSize: token.fontSizeLG
+    },
+
+    '.__go-home-button': {
+      fontSize: token.fontSizeLG,
+      backgroundColor: token['gray-1'],
+      borderRadius: token.borderRadiusLG
     },
 
     '.__address-tag': {
