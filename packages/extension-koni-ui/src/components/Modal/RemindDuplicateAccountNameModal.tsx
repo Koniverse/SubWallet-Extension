@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { REMIND_DUPLICATE_ACCOUNT_NAME_MODAL, UPGRADE_DUPLICATE_ACCOUNT_NAME } from '@subwallet/extension-koni-ui/constants';
+import { NOTIFICATION_MODAL_WHITELIST_PATHS, REMIND_DUPLICATE_ACCOUNT_NAME_MODAL, UPGRADE_DUPLICATE_ACCOUNT_NAME } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { getValueLocalStorageWS, setValueLocalStorageWS } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -11,6 +11,7 @@ import { Button, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ShieldWarning } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps;
@@ -19,6 +20,7 @@ const RemindDuplicateAccountNameModalId = REMIND_DUPLICATE_ACCOUNT_NAME_MODAL;
 const CHANGE_ACCOUNT_NAME_URL = 'https://docs.subwallet.app/main/extension-user-guide/account-management/switch-between-accounts-and-change-account-name#change-your-account-name';
 
 function Component ({ className }: Props): React.ReactElement<Props> {
+  const location = useLocation();
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { token } = useTheme() as Theme;
@@ -28,13 +30,19 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     setValueLocalStorageWS({ key: UPGRADE_DUPLICATE_ACCOUNT_NAME, value: 'false' }).catch(noop);
   }, [inactiveModal]);
 
+  const isInWhitelistPaths = useMemo(() => {
+    return NOTIFICATION_MODAL_WHITELIST_PATHS.includes(location.pathname);
+  }, [location.pathname]);
+
   useEffect(() => {
-    getValueLocalStorageWS(UPGRADE_DUPLICATE_ACCOUNT_NAME).then((value) => {
-      if (value === 'true') {
-        activeModal(RemindDuplicateAccountNameModalId);
-      }
-    }).catch(noop);
-  }, [activeModal]);
+    if (isInWhitelistPaths) {
+      getValueLocalStorageWS(UPGRADE_DUPLICATE_ACCOUNT_NAME).then((value) => {
+        if (value === 'true') {
+          activeModal(RemindDuplicateAccountNameModalId);
+        }
+      }).catch(noop);
+    }
+  }, [activeModal, isInWhitelistPaths]);
 
   const footerModal = useMemo(() => {
     return (
@@ -54,6 +62,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       <SwModal
         className={CN(className)}
         closable={true}
+        destroyOnClose={true}
         footer={footerModal}
         id={RemindDuplicateAccountNameModalId}
         maskClosable={false}

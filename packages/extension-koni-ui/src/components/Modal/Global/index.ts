@@ -3,3 +3,4 @@
 
 export { default as AddressQrModal } from './AddressQrModal';
 export { default as SelectAddressFormatModal } from './SelectAddressFormatModal';
+export { default as AccountMigrationInProgressWarningModal } from './AccountMigrationInProgressWarningModal';
