@@ -49,6 +49,7 @@ export const BUY_TOKEN_MODAL = 'buy-token-modal';
 
 export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
 export const NOTIFICATION_MODAL = 'notification-modal';
+export const NOTIFICATION_SETTING_MODAL = 'notification-setting-modal';
 export const RECEIVE_MODAL_TOKEN_SELECTOR = 'receive-modal-token-selector';
 export const RECEIVE_MODAL_ACCOUNT_SELECTOR = 'receive-modal-account-selector';
 

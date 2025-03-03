@@ -1,4 +1,4 @@
-// Copyright 2019-2022 @polkadot/extension-ui authors & contributors
+// Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
@@ -16,7 +16,10 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
 
-type Props = ThemeProps;
+type Props = ThemeProps & {
+  modalContent?: boolean;
+  className?: string;
+};
 
 // interface ViewOption {
 //   label: string;
@@ -30,7 +33,7 @@ interface ShowNoticeOption {
 
 const CAN_NOT_CHANGE_SETTING: Array<keyof NotificationSetup['showNotice']> = ['earningClaim', 'earningWithdraw', 'availBridgeClaim', 'polygonBridgeClaim'];
 
-const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
+const Component = ({ className = '', modalContent }: Props): React.ReactElement<Props> => {
   const { token } = useTheme() as Theme;
   const { t } = useTranslation();
   const { goBack } = useDefaultNavigate();
@@ -114,15 +117,17 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
   }, [notificationSetup]);
 
   return (
-    <PageWrapper className={`notification-setting ${className}`}>
-      <SwSubHeader
+    <PageWrapper className={CN(className, 'notification-setting', {
+      '__web-wrapper': modalContent
+    })}>
+      {!modalContent && <SwSubHeader
         background={'transparent'}
         center
         onBack={goBack}
         paddingVertical
         showBackButton
         title={t('Notification settings')}
-      />
+      />}
 
       <div className={'body-container'}>
         <div>
@@ -188,6 +193,13 @@ const NotificationSetting = styled(Component)<Props>(({ theme: { token } }: Prop
     backgroundColor: token.colorBgDefault,
     display: 'flex',
     flexDirection: 'column',
+
+    '.notification-setting-modal': {
+      '.ant-sw-modal-body': {
+        padding: 0
+      }
+    },
+
     '.body-container': {
       padding: token.padding,
       justifyContent: 'space-between',

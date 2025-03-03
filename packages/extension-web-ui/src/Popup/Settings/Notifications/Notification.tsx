@@ -515,7 +515,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
   }, []);
 
   return (
-    <PageWrapper className={CN(className, 'manage-website-access', {
+    <PageWrapper className={CN(className, 'notification-container', {
       '__web-wrapper': modalContent
     })}>
       {!modalContent && (<SwSubHeader
@@ -558,6 +558,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
           onClick={handleSwitchClick}
           size='xs'
           type='ghost'
+          className={'__filter-tab-mark-read-button'}
         >
           {t('Mark all as read')}
         </Button>
@@ -644,6 +645,28 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
     display: 'flex',
     flexDirection: 'column',
 
+    '.notification-modal': {
+      '.ant-sw-modal-body': {
+        padding: 0
+      }
+    },
+
+    '&.notification-container': {
+      '.filter-tabs-container': {
+        marginLeft: 0
+      },
+      '.__filter-tab-mark-read-button': {
+        paddingRight: 0
+      },
+      '.right-section': {
+        justifySelf: 'normal'
+      },
+      '.ant-input-search': {
+        flex: 1,
+        width: 'auto'
+      }
+    },
+
     '.tool-area': {
       display: 'flex',
       justifyContent: 'space-between'
@@ -671,10 +694,7 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
     },
 
     '.list-container-wrapper': {
-      paddingLeft: token.padding,
-      paddingRight: token.padding,
-      paddingTop: token.padding,
-      paddingBottom: token.padding,
+      paddingTop: token.paddingSM,
       display: 'flex',
       flexDirection: 'column',
       flex: 1,

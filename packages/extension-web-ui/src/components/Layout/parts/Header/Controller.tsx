@@ -3,7 +3,7 @@
 
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
-import { NOTIFICATION_MODAL } from '@subwallet/extension-web-ui/constants';
+import { NOTIFICATION_MODAL, NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import NotificationSetting from '../../../../Popup/Settings/Notifications/NotificationSetting';
 import SelectAccount from '../SelectAccount';
 import LockStatus from './parts/LockStatus';
 import Networks from './parts/Networks';
@@ -57,8 +58,16 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   }, [inactiveModal]);
 
   const onNotificationConfig = useCallback(() => {
-    navigate('/settings/notification-config');
-  }, [navigate]);
+    if (isWebUI) {
+      activeModal(NOTIFICATION_SETTING_MODAL);
+    } else {
+      navigate('/settings/notification-config');
+    }
+  }, [activeModal, isWebUI, navigate]);
+
+  const onCancelNotificationSetting = useCallback(() => {
+    inactiveModal(NOTIFICATION_SETTING_MODAL);
+  }, [inactiveModal]);
 
   const backButton = useMemo(() => {
     if (showBackButton && onBack) {
@@ -119,7 +128,7 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
           <LockStatus />
         </div>
         <BaseModal
-          className={'right-side-modal'}
+          className={'notification-modal'}
           destroyOnClose={true}
           id={NOTIFICATION_MODAL}
           onCancel={onCancelNotification}
@@ -137,6 +146,19 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
           title={t('Notifications')}
         >
           <Notification
+            modalContent={isWebUI}
+          />
+        </BaseModal>
+
+        <BaseModal
+          className={'notification-setting-modal'}
+          destroyOnClose={true}
+          id={NOTIFICATION_SETTING_MODAL}
+          onCancel={onCancelNotificationSetting}
+          title={t('Notifications')}
+        >
+          <NotificationSetting
+            className={className}
             modalContent={isWebUI}
           />
         </BaseModal>
