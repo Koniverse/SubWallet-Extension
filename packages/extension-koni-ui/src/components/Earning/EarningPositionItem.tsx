@@ -51,6 +51,10 @@ const Component: React.FC<Props> = (props: Props) => {
     return chainInfoMap[positionInfo.chain].isTestnet;
   }, [chainInfoMap, positionInfo.chain]);
 
+  const subnetShortName = useMemo(() => {
+    return positionInfo.subnetData?.subnetShortName ? `(${positionInfo.subnetData.subnetShortName})` : '';
+  }, [positionInfo.subnetData?.subnetShortName]);
+
   return (
     <div
       className={CN(className)}
@@ -67,7 +71,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
-            <div className='__item-name'>{poolName}</div>
+            <div className='__item-name'> { positionInfo.subnetData?.subnetName || poolName }
+              <span className='__subnet-short-name'> {subnetShortName} </span>
+            </div>
 
             {
               !_isRelatedToAstar && (
@@ -188,6 +194,9 @@ const EarningPositionItem = styled(Component)<Props>(({ theme: { token } }: Prop
       fontWeight: token.headingFontWeight,
       overflow: 'hidden',
       textOverflow: 'ellipsis'
+    },
+    '.__subnet-short-name': {
+      color: token.colorTextLight4
     },
 
     '.__item-balance-value': {

@@ -30,7 +30,7 @@ function Component ({ className, compound,
 
   const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
   const haveNomination = useMemo(() => {
-    return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
+    return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.DYNAMIC_STAKING].includes(poolInfo.type);
   }, [poolInfo.type]);
 
   const noNomination = useMemo(

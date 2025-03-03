@@ -115,7 +115,9 @@ const Component: React.FC = () => {
 
   const bondedValue = useMemo((): string => {
     switch (poolInfo.type) {
-      case YieldPoolType.NATIVE_STAKING:
+      case YieldPoolType.NATIVE_STAKING: // fallthrough
+
+      case YieldPoolType.DYNAMIC_STAKING:
         if (!mustChooseValidator) {
           return positionInfo?.activeStake || '0';
         } else {
@@ -337,7 +339,7 @@ const Component: React.FC = () => {
   }, [poolType, setCustomScreenTitle, t]);
 
   const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING) {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.DYNAMIC_STAKING) {
       return ExtrinsicType.STAKING_UNBOND;
     }
 

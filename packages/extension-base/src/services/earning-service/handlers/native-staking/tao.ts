@@ -190,7 +190,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         }
 
         const minDelegatorStake = await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-
+        const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
         const data: NativeYieldPoolInfo = {
@@ -206,7 +206,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                 slug: this.nativeToken.slug
               }
             ],
-            maxCandidatePerFarmer: 16,
+            maxCandidatePerFarmer: Number(maxValidatorPerNominator),
             maxWithdrawalRequestPerFarmer: 1,
             earningThreshold: {
               join: BNminDelegatorStake.toString(),
@@ -349,14 +349,17 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             const hotkey = delegate.hotkey;
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
-            const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
 
-            const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+            if (netuid === 0) {
+              const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
 
-            if (totalDelegate[hotkey]) {
-              totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
-            } else {
-              totalDelegate[hotkey] = taoStake;
+              const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+
+              if (totalDelegate[hotkey]) {
+                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
+              } else {
+                totalDelegate[hotkey] = taoStake;
+              }
             }
           }
 

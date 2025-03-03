@@ -184,7 +184,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
+    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('Dynamic staking'), value: YieldPoolType.DYNAMIC_STAKING }
   ];
 
   const filterFunction = useMemo<(items: ExtraYieldPositionInfo) => boolean>(() => {
@@ -205,6 +206,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         } else if (filter === YieldPoolType.LIQUID_STAKING && item.type === YieldPoolType.LIQUID_STAKING) {
           return true;
         } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
+          return true;
+        } else if (filter === YieldPoolType.DYNAMIC_STAKING && item.type === YieldPoolType.DYNAMIC_STAKING) {
           return true;
         }
         // Uncomment the following code block if needed
@@ -304,9 +307,14 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     );
   }, [setEntryView, t]);
 
-  const searchFunction = useCallback(({ balanceToken, chain: _chain }: ExtraYieldPositionInfo, searchText: string) => {
+  // SEARCH LOGIC HERE
+  const searchFunction = useCallback(({ balanceToken, chain: _chain, subnetData }: ExtraYieldPositionInfo, searchText: string) => {
     const chainInfo = chainInfoMap[_chain];
     const assetInfo = assetInfoMap[balanceToken];
+
+    if (subnetData) {
+      return subnetData?.subnetShortName.toLowerCase().includes(searchText.toLowerCase()) || subnetData.subnetName.toLowerCase().includes(searchText.toLowerCase());
+    }
 
     return (
       chainInfo?.name.replace(' Relay Chain', '').toLowerCase().includes(searchText.toLowerCase()) ||
