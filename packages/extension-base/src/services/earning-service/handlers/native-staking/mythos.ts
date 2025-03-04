@@ -114,7 +114,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
             }
           ],
           maxCandidatePerFarmer: parseInt(maxStakedCandidates),
-          maxWithdrawalRequestPerFarmer: 3, // todo: recheck
+          maxWithdrawalRequestPerFarmer: 3,
           earningThreshold: {
             join: minStake,
             defaultUnstake: '0',
