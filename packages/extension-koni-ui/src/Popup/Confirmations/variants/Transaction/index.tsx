@@ -6,8 +6,7 @@ import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
-import { FAQ_URL } from '@subwallet/extension-koni-ui/constants';
+import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
@@ -113,7 +112,6 @@ const Component: React.FC<Props> = (props: Props) => {
   const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
 
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
-  const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(transaction.chain);
 
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
 
@@ -161,34 +159,32 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [transaction.data, transaction.extrinsicType, transaction.process]);
 
+  const isAddressFormatInfoBoxVisible = useMemo(() => {
+    if ([ExtrinsicType.TRANSFER_BALANCE, ExtrinsicType.TRANSFER_TOKEN].includes(transaction.extrinsicType)) {
+      const targetChain = transaction.chain;
+
+      return checkIsPolkadotUnifiedChain(targetChain);
+    }
+
+    return false;
+  }, [checkIsPolkadotUnifiedChain, transaction.chain, transaction.extrinsicType]);
+
   return (
     <>
       <div className={CN(className, 'confirmation-content')}>
         {renderContent(transaction)}
+        {isAddressFormatInfoBoxVisible && (
+          <AlertBoxInstant
+            className={'address-format-info-box'}
+            type={'new-address-format'}
+          />
+        )}
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
             description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: network?.name } })}
             title={t('Pay attention!')}
             type='warning'
-          />
-        )}
-        {isShowAddressFormatInfoBox && (
-          <AlertBox
-            className='address-format-info-box'
-            description={
-              <>
-                {t('This network has 2 address formats, a Legacy format and a New format that starts with 1. SubWallet automatically transforms Legacy formats into New one without affecting your transfer. ')}
-                <a
-                  href={FAQ_URL}
-                  rel='noreferrer'
-                  style={{ textDecoration: 'underline' }}
-                  target={'_blank'}
-                >Learn more</a>
-              </>
-            }
-            title={t('New address format')}
-            type={'info'}
           />
         )}
       </div>
