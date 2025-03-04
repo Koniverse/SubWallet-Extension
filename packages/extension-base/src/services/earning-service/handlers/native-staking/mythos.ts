@@ -312,14 +312,16 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const apiPromise = await this.substrateApi.isReady;
-    const { amount, selectedValidators } = data;
+    const { address, amount, selectedValidators } = data;
     const selectedValidatorInfo = selectedValidators[0];
+    const _hasReward = await apiPromise.api.call?.collatorStakingApi?.shouldClaim(address);
+    const hasReward = _hasReward?.toPrimitive();
 
     let tx: SubmittableExtrinsic<'promise'>;
 
-    if (positionInfo?.isBondedBefore) {
+    if (positionInfo?.isBondedBefore && hasReward) {
       tx = apiPromise.api.tx.utility.batchAll([
-        apiPromise.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
+        apiPromise.api.tx.collatorStaking.claimRewards(),
         apiPromise.api.tx.collatorStaking.lock(amount),
         apiPromise.api.tx.collatorStaking.stake([{
           candidate: selectedValidatorInfo.address,
@@ -391,11 +393,18 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
 
   async handleYieldUnstake (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]> {
     const substrateApi = await this.substrateApi.isReady;
-    const extrinsicList = [
-      substrateApi.api.tx.collatorStaking.claimRewards(), // todo: improve by checking has reward
+    const _hasReward = await substrateApi.api.call?.collatorStakingApi?.shouldClaim(address);
+    const hasReward = _hasReward?.toPrimitive();
+    const extrinsicList: SubmittableExtrinsic<'promise'>[] = [];
+
+    if (hasReward) {
+      extrinsicList.push(substrateApi.api.tx.collatorStaking.claimRewards());
+    }
+
+    extrinsicList.push(...[
       substrateApi.api.tx.collatorStaking.unstakeFrom(selectedTarget),
       substrateApi.api.tx.collatorStaking.unlock(null) // ignore amount to unlock all
-    ];
+    ]);
 
     return [ExtrinsicType.STAKING_UNBOND, substrateApi.api.tx.utility.batchAll(extrinsicList)];
   }
@@ -403,7 +412,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   /* Leave pool action */
 
   /* Get pool reward */
-  override async getPoolReward (useAddresses: string[], callBack: (rs: EarningRewardItem) => void): Promise<VoidFunction> {
+  override async getPoolReward (useAddresses: string[], callback: (rs: EarningRewardItem) => void): Promise<VoidFunction> {
     let cancel = false;
     const substrateApi = this.substrateApi;
 
@@ -411,21 +420,22 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
 
     if (substrateApi.api.call.collatorStakingApi) {
       await Promise.all(useAddresses.map(async (address) => {
-        const _unclaimedReward = await substrateApi.api.call.collatorStakingApi.totalRewards(address);
+        if (!cancel) {
+          const _unclaimedReward = await substrateApi.api.call.collatorStakingApi.totalRewards(address);
+          const earningRewardItem = {
+            ...this.baseInfo,
+            address: address,
+            type: this.type,
+            unclaimedReward: _unclaimedReward?.toString() || '0',
+            state: APIItemState.READY
+          };
 
-        if (cancel) {
-          return;
+          if (_unclaimedReward.toString() !== '0') {
+            await this.createClaimNotification(earningRewardItem, this.nativeToken);
+          }
+
+          callback(earningRewardItem);
         }
-
-        const earningRewardItem = {
-          ...this.baseInfo,
-          address: address,
-          type: this.type,
-          unclaimedReward: _unclaimedReward?.toString() || '0',
-          state: APIItemState.READY
-        };
-
-        callBack(earningRewardItem);
       }));
     }
 
