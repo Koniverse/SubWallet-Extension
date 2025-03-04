@@ -18,6 +18,7 @@ import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCac
 import { BehaviorSubject } from 'rxjs';
 
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, DynamicTaoStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
+import { dynamicTaoSlug, isDynamicStaking } from './utils';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -323,6 +324,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
+    if (isDynamicStaking(slug)) {
+      return false;
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -887,6 +892,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params.data;
+
+    if (isDynamicStaking(slug)) {
+      return Promise.resolve([]);
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -899,7 +909,12 @@ export default class EarningService implements StoppableServiceInterface, Persis
   public async handleYieldJoin (params: HandleYieldStepParams): Promise<HandleYieldStepData> {
     await this.eventService.waitChainReady;
 
-    const { slug } = params.data;
+    let { slug } = params.data;
+
+    if (isDynamicStaking(slug)) {
+      slug = dynamicTaoSlug;
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -918,7 +933,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
 
-    if (slug.includes('dynamic_staking')) {
+    if (isDynamicStaking(slug)) {
       return Promise.resolve([]);
     }
 

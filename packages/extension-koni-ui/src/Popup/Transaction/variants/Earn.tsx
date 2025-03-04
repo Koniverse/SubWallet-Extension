@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
+import { dynamicTaoSlug, isDynamicStaking, isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
@@ -452,6 +452,7 @@ const Component = () => {
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
+  const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
@@ -460,17 +461,19 @@ const Component = () => {
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
-        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type) && target) {
+        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.DYNAMIC_STAKING].includes(poolInfo.type) && target) {
           const targets = poolTargets;
 
-          if (poolInfo.type === YieldPoolType.NOMINATION_POOL) {
+          if (poolInfo.type === YieldPoolType.NOMINATION_POOL || YieldPoolType.DYNAMIC_STAKING) {
             const selectedPool = targets[0];
 
             return {
               slug: slug,
               address: from,
               amount: _currentAmount,
-              selectedPool
+              selectedPool,
+              selectedValidators: targets,
+              netuid: netuid
             } as SubmitJoinNominationPool;
           } else {
             return {
@@ -612,7 +615,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -864,11 +867,18 @@ const Component = () => {
 
   useEffect(() => {
     if (currentStep === 0) {
+      let originSlug = slug;
+
+      if (isDynamicStaking(slug)) {
+        originSlug = dynamicTaoSlug;
+      }
+
       const submitData: OptimalYieldPathParams = {
         address: fromValue,
         amount: amountValue,
-        slug: slug,
-        targets: poolTargetValue ? poolTargets : undefined
+        slug: originSlug,
+        targets: poolTargetValue ? poolTargets : undefined,
+        netuid: netuid
       };
 
       const newData = JSON.stringify(submitData);
@@ -915,7 +925,7 @@ const Component = () => {
         );
       }
     }
-  }, [submitString, currentStep, chainInfoMap, slug, fromValue, amountValue, notify, poolTargetValue, poolTargets]);
+  }, [submitString, currentStep, chainInfoMap, slug, fromValue, amountValue, notify, poolTargetValue, poolTargets, netuid]);
 
   // useEffect(() => {
   //   setCheckMintLoading(true);

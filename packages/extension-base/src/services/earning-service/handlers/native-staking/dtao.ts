@@ -14,7 +14,7 @@ import BigN from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { calculateReward } from '../../utils';
+import { calculateReward, dynamicTaoSlug } from '../../utils';
 import { fetchDelegates, getTaoToAlphaMapping, TaoStakeInfo } from './tao';
 
 interface Owner {
@@ -78,11 +78,14 @@ interface PoolApiResponse {
   data: PoolData[];
 }
 
+const SUBNET_API_URL = 'https://dash.taostats.io/api/subnet';
+const POOL_API_URL = 'https://dash.taostats.io/api/dtao/pool';
+
 export async function fetchSubnetData () {
   try {
     const [subnetResponse, poolResponse] = await Promise.all([
-      fetch('https://dash.taostats.io/api/subnet').then((res) => res.json()) as Promise<ApiResponse>,
-      fetch('https://dash.taostats.io/api/dtao/pool').then((res) => res.json()) as Promise<PoolApiResponse>
+      fetch(SUBNET_API_URL).then((res) => res.json()) as Promise<ApiResponse>,
+      fetch(POOL_API_URL).then((res) => res.json()) as Promise<PoolApiResponse>
     ]);
 
     const poolMap = new Map(poolResponse.data.map((pool) => [pool.netuid, pool]));
@@ -123,7 +126,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   constructor (state: KoniState, chain: string) {
     super(state, chain);
     this.subnetName = 'dTAO';
-    this.slug = `TAO___dynamic_staking___${chain}__subnet`;
+    this.slug = dynamicTaoSlug;
     this.name = 'Dynamic Tao Staking';
     this.shortName = 'dTAO Staking';
     this.init().catch(console.error);
@@ -446,8 +449,8 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
   /* Join pool action */
 
-  async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked', netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]> {
-    const { amount, selectedValidators: targetValidators } = data;
+  async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
+    const { amount, netuid, selectedValidators: targetValidators } = data;
     const chainApi = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
     const selectedValidatorInfo = targetValidators[0];
