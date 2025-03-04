@@ -107,6 +107,8 @@ const Component = () => {
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
+
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
       return {
@@ -232,6 +234,7 @@ const Component = () => {
             </MetaInfo>
           </Form.Item>
           <Form.Item
+            hidden={isMythosStaking}
             name={'bondReward'}
             valuePropName='checked'
           >

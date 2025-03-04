@@ -3,6 +3,7 @@
 
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
 import { Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
@@ -99,3 +100,27 @@ export function autoSelectValidatorOptimally (validators: ValidatorInfo[], maxCo
 
   return result;
 }
+
+export const getEarningTimeText = (timeNumber?: number) => {
+  if (timeNumber !== undefined) {
+    const isDay = timeNumber > 24;
+    const isHour = timeNumber >= 1 && !isDay;
+
+    let time, unit;
+
+    if (isDay) {
+      time = Math.floor(timeNumber / 24);
+      unit = detectTranslate(time > 1 ? 'days' : 'day');
+    } else if (isHour) {
+      time = timeNumber;
+      unit = detectTranslate(time > 1 ? 'hours' : 'hour');
+    } else {
+      time = timeNumber * 60;
+      unit = detectTranslate(time > 1 ? 'minutes' : 'minute');
+    }
+
+    return [time, unit].join(' ');
+  } else {
+    return detectTranslate('unknown time');
+  }
+};

@@ -6,6 +6,7 @@ import { SpecialYieldPoolInfo, SubmitYieldStepData, YieldPoolInfo, YieldTokenBas
 import humanizeDuration from 'humanize-duration';
 import { TFunction } from 'react-i18next';
 
+// deprecated
 export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
   if (unstakingPeriod) {
     const days = unstakingPeriod / 24;
