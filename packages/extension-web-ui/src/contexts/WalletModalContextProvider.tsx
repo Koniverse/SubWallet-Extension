@@ -76,6 +76,7 @@ export interface WalletModalContextType {
   },
   alertModal: {
     open: (props: AlertDialogProps) => void,
+    updatePartially: (alertProps: Partial<AlertDialogProps>) => void,
     close: VoidFunction
   },
   deriveModal: {
@@ -104,6 +105,8 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
+    updatePartially: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: () => {}
   },
   deriveModal: {
@@ -120,7 +123,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const { hasMasterPassword, isLocked } = useSelector((state: RootState) => state.accountState);
   const { getConfig } = useGetConfig();
   const { onHandleSessionLatest, setTimeBackUp } = useSetSessionLatest();
-  const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
+  const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
 
   useExcludeModal(CONFIRMATION_MODAL);
   useExcludeModal(TRANSACTION_TRANSFER_MODAL);
@@ -208,12 +211,13 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     },
     alertModal: {
       open: openAlert,
+      updatePartially: updateAlertProps,
       close: closeAlert
     },
     deriveModal: {
       open: openDeriveModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, onCancelTonWalletContractSelectorModal, openAddressQrModal, openAlert, openDeriveModal, openTonWalletContractSelectorModal]);
+  }), [checkAddressQrModalActive, updateAlertProps, closeAddressQrModal, closeAlert, onCancelTonWalletContractSelectorModal, openAddressQrModal, openAlert, openDeriveModal, openTonWalletContractSelectorModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {

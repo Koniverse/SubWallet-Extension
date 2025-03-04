@@ -1,10 +1,8 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseModal, PageWrapper } from '@subwallet/extension-web-ui/components';
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
-import { NOTIFICATION_MODAL, NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
-import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
+import { NOTIFICATION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
@@ -12,13 +10,11 @@ import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { BellSimpleRinging, CaretLeft, GearSix } from 'phosphor-react';
+import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import NotificationSetting from '../../../../Popup/Settings/Notifications/NotificationSetting';
 import SelectAccount from '../SelectAccount';
 import LockStatus from './parts/LockStatus';
 import Networks from './parts/Networks';
@@ -30,7 +26,6 @@ export type Props = ThemeProps & {
 }
 
 function Component ({ className, onBack, showBackButton, title = '' }: Props): React.ReactElement<Props> {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { isWebUI } = useContext(ScreenContext);
   const { activeModal, inactiveModal } = useContext(ModalContext);
@@ -38,7 +33,6 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
   const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(false);
-  const [isNotificationSettingVisible, setIsNotificationSettingVisible] = useState<boolean>(false);
 
   const unreadNotificationCount = useMemo(() => {
     if (!currentAccountProxy || !unreadNotificationCountMap) {
@@ -49,35 +43,13 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   }, [currentAccountProxy, isAllAccount, unreadNotificationCountMap]);
 
   const onOpenNotification = useCallback(() => {
-    if (isWebUI) {
-      setIsNotificationVisible(true);
-      setIsNotificationSettingVisible(false);
-      activeModal(NOTIFICATION_MODAL);
-      inactiveModal(NOTIFICATION_SETTING_MODAL);
-    } else {
-      navigate('/settings/notification');
-    }
-  }, [activeModal, inactiveModal, isWebUI, navigate]);
+    setIsNotificationVisible(true);
+    activeModal(NOTIFICATION_MODAL);
+  }, [activeModal]);
 
   const onCancelNotification = useCallback(() => {
-    setIsNotificationVisible(false);
     inactiveModal(NOTIFICATION_MODAL);
-  }, [inactiveModal]);
-
-  const onNotificationConfig = useCallback(() => {
-    if (isWebUI) {
-      setIsNotificationSettingVisible(true);
-      setIsNotificationVisible(false);
-      activeModal(NOTIFICATION_SETTING_MODAL);
-      inactiveModal(NOTIFICATION_MODAL);
-    } else {
-      navigate('/settings/notification-config');
-    }
-  }, [activeModal, inactiveModal, isWebUI, navigate]);
-
-  const onCancelNotificationSetting = useCallback(() => {
-    setIsNotificationSettingVisible(false);
-    inactiveModal(NOTIFICATION_SETTING_MODAL);
+    setIsNotificationVisible(false);
   }, [inactiveModal]);
 
   const backButton = useMemo(() => {
@@ -102,8 +74,13 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
     return null;
   }, [onBack, showBackButton]);
 
+  const notificationModalProps = useMemo(() => ({
+    modalId: NOTIFICATION_MODAL,
+    onCancel: onCancelNotification
+  }), [onCancelNotification]);
+
   return (
-    <div className={'header-controller-wrapper'}>
+    <div className={CN(className)}>
       <div className='common-header'>
         <div className='title-group'>
           {backButton}
@@ -130,94 +107,29 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
               </div>
             }
             onClick={onOpenNotification}
-            tooltip={t('Notifications')}
-            tooltipPlacement={'bottomRight'}
             schema={'secondary'}
             shape={'circle'}
             size={'xs'}
+            tooltip={t('Notifications')}
+            tooltipPlacement={'bottomRight'}
           >
           </Button>
 
           <LockStatus />
         </div>
-        {isWebUI && isNotificationVisible && <BaseModal
-          className={CN(className, 'notification-modal')}
-          destroyOnClose={true}
-          id={NOTIFICATION_MODAL}
-          onCancel={onCancelNotification}
-          rightIconProps={{
-            icon: (
-              <Icon
-                customSize={'24px'}
-                phosphorIcon={GearSix}
-                type='phosphor'
-                weight={'bold'}
-              />
-            ),
-            onClick: onNotificationConfig
-          }}
-          title={t('Notifications')}
-        >
+        {isWebUI && isNotificationVisible && (
           <Notification
-            modalContent={isWebUI}
+            isModal={true}
+            modalProps={notificationModalProps}
           />
-        </BaseModal>
-        }
-
-        {isWebUI && isNotificationSettingVisible && <BaseModal
-          className={CN(className, 'notification-setting-modal')}
-          destroyOnClose={true}
-          id={NOTIFICATION_SETTING_MODAL}
-          onCancel={onCancelNotificationSetting}
-          rightIconProps={{
-            icon: (
-              <Icon
-                customSize={'24px'}
-                phosphorIcon={CaretLeft}
-                type='phosphor'
-                weight={'bold'}
-              />
-            ),
-            onClick: onOpenNotification
-          }}
-          title={t('Notifications')}
-        >
-          <NotificationSetting
-            className={'notification-setting-wrapper'}
-            modalContent={isWebUI}
-          />
-        </BaseModal>
-        }
+        )}
       </div>
     </div>
   );
 }
 
-const Wrapper = (props: Props) => {
-  const dataContext = useContext(DataContext);
-
-  return (
-    <PageWrapper
-      className={CN(props.className)}
-      resolve={dataContext.awaitStores(['notification'])}
-    >
-      <Component {...props} />
-    </PageWrapper>
-  );
-};
-
-const Controller = styled(Wrapper)<Props>(({ theme: { token } }: Props) => ({
+const Controller = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   width: '100%',
-
-  '&.notification-setting-modal': {
-    '.ant-sw-modal-body.ant-sw-modal-body': {
-      height: '100%'
-    },
-    '.ant-sw-sub-header-container': {
-      display: 'flex',
-      flexDirection: 'row-reverse'
-    }
-  },
 
   '.common-header': {
     display: 'flex',

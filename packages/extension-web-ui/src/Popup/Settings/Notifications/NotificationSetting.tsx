@@ -2,21 +2,32 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { BaseModal, CloseIcon } from '@subwallet/extension-web-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { saveNotificationSetup } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { BackgroundIcon, Button, Checkbox, SettingItem, Switch, SwSubHeader } from '@subwallet/react-ui';
+import { BackgroundIcon, Button, Checkbox, Icon, SettingItem, Switch, SwSubHeader } from '@subwallet/react-ui';
 import { CheckboxChangeEvent } from '@subwallet/react-ui/es/checkbox';
 import CN from 'classnames';
-import { BellSimpleRinging } from 'phosphor-react';
+import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
 
-type Props = ThemeProps & {
-  modalContent?: boolean;
+type Props = {
+  isInModal?: boolean;
+  modalProps?: WrapperProps['modalProps'];
+};
+
+type WrapperProps = ThemeProps & {
+  isModal?: boolean;
+  modalProps?: {
+    modalId: string;
+    onCancel: VoidFunction;
+    onBack?: VoidFunction;
+  };
   className?: string;
 };
 
@@ -32,13 +43,21 @@ interface ShowNoticeOption {
 
 const CAN_NOT_CHANGE_SETTING: Array<keyof NotificationSetup['showNotice']> = ['earningClaim', 'earningWithdraw', 'availBridgeClaim', 'polygonBridgeClaim'];
 
-const Component = ({ className = '', modalContent }: Props): React.ReactElement<Props> => {
+const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> => {
   const { token } = useTheme() as Theme;
   const { t } = useTranslation();
-  const { goBack } = useDefaultNavigate();
+  const { goBack: originGoBack } = useDefaultNavigate();
   const { notificationSetup } = useSelector((state: RootState) => state.settings);
   const [currentNotificationSetting, setCurrentNotificationSetting] = useState<NotificationSetup>(notificationSetup);
   const [loadingNotification, setLoadingNotification] = useState(false);
+
+  const goBack = useCallback(() => {
+    if (isInModal && modalProps) {
+      (modalProps.onBack || modalProps.onCancel)();
+    } else {
+      originGoBack();
+    }
+  }, [isInModal, modalProps, originGoBack]);
 
   const notificationOptions = useMemo((): ShowNoticeOption[] => {
     return [
@@ -116,17 +135,17 @@ const Component = ({ className = '', modalContent }: Props): React.ReactElement<
   }, [notificationSetup]);
 
   return (
-    <div className={CN(className, 'notification-setting', {
-      '__web-wrapper': modalContent
-    })}>
-      {!modalContent && <SwSubHeader
-        background={'transparent'}
-        center
-        onBack={goBack}
-        paddingVertical
-        showBackButton
-        title={t('Notification settings')}
-      />}
+    <>
+      {!isInModal && (
+        <SwSubHeader
+          background={'transparent'}
+          center
+          onBack={goBack}
+          paddingVertical
+          showBackButton
+          title={t('Notification settings')}
+        />
+      )}
 
       <div className={'body-container'}>
         <div>
@@ -182,11 +201,60 @@ const Component = ({ className = '', modalContent }: Props): React.ReactElement<
           {t('Save settings')}
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 
-const NotificationSetting = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const Wrapper = (props: WrapperProps) => {
+  const { className, isModal, modalProps } = props;
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {
+        isModal && !!modalProps
+          ? (
+            <BaseModal
+              className={CN(className)}
+              closeIcon={
+                modalProps.onBack
+                  ? (
+                    <Icon
+                      phosphorIcon={CaretLeft}
+                      size='md'
+                    />
+                  )
+                  : undefined
+              }
+              destroyOnClose={true}
+              id={modalProps.modalId}
+              onCancel={modalProps.onBack || modalProps.onCancel}
+              rightIconProps={modalProps.onBack
+                ? {
+                  icon: <CloseIcon />,
+                  onClick: modalProps.onCancel
+                }
+                : undefined
+              }
+              title={t('Notifications')}
+            >
+              <Component
+                isInModal
+                modalProps={modalProps}
+              />
+            </BaseModal>
+          )
+          : (
+            <div className={className}>
+              <Component />
+            </div>
+          )
+      }
+    </>
+  );
+};
+
+const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
     height: '100%',
     backgroundColor: token.colorBgDefault,

@@ -2,24 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { NOTIFICATION_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { switchReadNotificationStatus } from '@subwallet/extension-web-ui/messaging/transaction/notification';
 import { NotificationInfoItem } from '@subwallet/extension-web-ui/Popup/Settings/Notifications';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { BackgroundIcon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { BackgroundIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import { Checks, Coins, DownloadSimple, Eye, Gift, X } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
-type Props = ThemeProps & {
-  onCancel?: () => void;
+export type NotificationItemActionsModalProps = {
+  onCancel: () => void;
   notificationItem: NotificationInfoItem;
-  isTrigger: boolean;
-  setTrigger: (value: boolean) => void;
-  onClickAction: () => void;
+  refreshNotifications: VoidFunction;
+  onClickAction: VoidFunction;
 };
+
+type Props = ThemeProps & NotificationItemActionsModalProps;
 
 export interface ActionInfo {
   title: string;
@@ -37,17 +39,10 @@ export interface BriefActionInfo {
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isTrigger, notificationItem, onCancel, onClickAction, setTrigger } = props;
+  const { className, notificationItem, onCancel, onClickAction, refreshNotifications } = props;
   const [readNotification, setReadNotification] = useState<boolean>(notificationItem.isRead);
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
-  const { inactiveModal } = useContext(ModalContext);
-
-  const _onCancel = useCallback(() => {
-    inactiveModal(NOTIFICATION_DETAIL_MODAL);
-
-    onCancel && onCancel();
-  }, [inactiveModal, onCancel]);
 
   const getNotificationAction = (type: ExtrinsicType): BriefActionInfo => {
     switch (type) {
@@ -94,16 +89,16 @@ function Component (props: Props): React.ReactElement<Props> {
     })
       .catch(console.error)
       .finally(() => {
-        _onCancel();
-        setTrigger(!isTrigger);
+        onCancel();
+        refreshNotifications();
       });
-  }, [_onCancel, isTrigger, notificationItem, readNotification, setTrigger]);
+  }, [onCancel, notificationItem.id, notificationItem.isRead, readNotification, refreshNotifications]);
 
   return (
-    <SwModal
+    <BaseModal
       className={className}
       id={NOTIFICATION_DETAIL_MODAL}
-      onCancel={_onCancel}
+      onCancel={onCancel}
       title={t('Actions')}
     >
       <div className={'__button-container'}>
@@ -128,7 +123,7 @@ function Component (props: Props): React.ReactElement<Props> {
           <div className={'__left-part'}>
             <BackgroundIcon
               backgroundColor={readNotification ? token['gray-3'] : token['green-6']}
-              phosphorIcon={readNotification ? Checks : X}
+              phosphorIcon={readNotification ? X : Checks}
               size='sm'
               weight='fill'
             />
@@ -137,11 +132,11 @@ function Component (props: Props): React.ReactElement<Props> {
         </div>
       </div>
 
-    </SwModal>
+    </BaseModal>
   );
 }
 
-const NotificationDetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const NotificationItemActionsModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.__mark-read-button, .__mark-action-details': {
       display: 'flex',
@@ -161,5 +156,3 @@ const NotificationDetailModal = styled(Component)<Props>(({ theme: { token } }: 
     }
   });
 });
-
-export default NotificationDetailModal;

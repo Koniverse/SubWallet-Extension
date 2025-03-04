@@ -8,17 +8,18 @@ import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-s
 import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { BaseModal, EmptyList, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-web-ui/components/FilterTabs';
-import NotificationDetailModal from '@subwallet/extension-web-ui/components/Modal/NotificationDetailModal';
 import Search from '@subwallet/extension-web-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
-import { useAlert, useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
+import { useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-web-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-web-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-web-ui/messaging/transaction/notification';
-import { NotificationItem } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/index';
+import { NotificationItem, NotificationSetting } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/index';
+import { NotificationItemActionsModal, NotificationItemActionsModalProps } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/NotificationItemActionsModal';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getTotalWidrawable, getYieldRewardTotal } from '@subwallet/extension-web-ui/utils/notification';
@@ -33,11 +34,23 @@ import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = {
-  modalContent?: boolean;
-  className?: string;
+  isInModal?: boolean;
+  refreshNotifications: VoidFunction;
+  refreshNotificationsTriggerKey: string;
+  notificationItemActionsModal: {
+    open: (props: NotificationItemActionsModalProps) => void;
+    close: VoidFunction;
+  },
+  openNotificationSettingModal: VoidFunction;
 };
 
-type WrapperProps = ThemeProps & Props;
+type WrapperProps = ThemeProps & {
+  isModal?: boolean;
+  modalProps?: {
+    modalId: string;
+    onCancel: VoidFunction;
+  };
+};
 
 export interface NotificationInfoItem extends _NotificationInfo {
   backgroundColor: string;
@@ -65,16 +78,14 @@ export const NotificationIconMap = {
   CLAIM_POLYGON_BRIDGE: Coins
 };
 
-const alertModalId = 'notification-alert-modal';
-
-function Component ({ className = '', modalContent }: Props): React.ReactElement<Props> {
-  const { activeModal, checkActive } = useContext(ModalContext);
-
+function Component ({ isInModal,
+  notificationItemActionsModal, openNotificationSettingModal,
+  refreshNotifications, refreshNotificationsTriggerKey }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
-  const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
+  const { alertModal } = useContext(WalletModalContext);
   const chainsByAccountType = useGetChainSlugsByAccount();
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
@@ -104,18 +115,15 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
   }, [t]);
 
   const [selectedFilterTab, setSelectedFilterTab] = useState<NotificationTab>(NotificationTab.ALL);
-  const [viewDetailItem, setViewDetailItem] = useState<NotificationInfoItem | undefined>(undefined);
   const [notifications, setNotifications] = useState<_NotificationInfo[]>([]);
   const [currentProxyId] = useState<string | undefined>(currentAccountProxy?.id);
   const [loadingNotification, setLoadingNotification] = useState<boolean>(false);
-  const [isTrigger, setTrigger] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
 
   const enableNotification = notificationSetup.isEnabled;
-  const isNotificationDetailModalVisible = checkActive(NOTIFICATION_DETAIL_MODAL);
 
   const notificationItems = useMemo((): NotificationInfoItem[] => {
     const filterTabFunction = (item: NotificationInfoItem) => {
@@ -158,6 +166,14 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
     });
   }, [currentSearchText, notificationItems]);
 
+  const openNotificationSetting = useCallback(() => {
+    if (isInModal) {
+      openNotificationSettingModal();
+    } else {
+      navigate('/settings/notification-config');
+    }
+  }, [isInModal, navigate, openNotificationSettingModal]);
+
   const onEnableNotification = useCallback(() => {
     const newNotificationSetup: NotificationSetup = {
       ...notificationSetup,
@@ -168,18 +184,14 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
     saveNotificationSetup(newNotificationSetup)
       .catch(console.error)
       .finally(() => {
+        openNotificationSetting();
         setLoadingNotification(false);
       });
-    navigate('/settings/notification-config');
-  }, [navigate, notificationSetup]);
+  }, [notificationSetup, openNotificationSetting]);
 
   const handleSearch = useCallback((value: string) => {
     setCurrentSearchText(value);
   }, []);
-
-  const onNotificationConfig = useCallback(() => {
-    navigate('/settings/notification-config');
-  }, [navigate]);
 
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value as NotificationTab);
@@ -195,14 +207,6 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
       .catch(console.error);
   }, [currentProxyId]);
 
-  const onClickMore = useCallback((item: NotificationInfoItem) => {
-    return (e: SyntheticEvent) => {
-      e.stopPropagation();
-      setViewDetailItem(item);
-      activeModal(NOTIFICATION_DETAIL_MODAL);
-    };
-  }, [activeModal]);
-
   const onClickBack = useCallback(() => {
     setCurrentSearchText('');
     goBack();
@@ -210,7 +214,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
 
   const showActiveChainModal = useCallback((chainSlug: string, action: NotificationActionType.WITHDRAW | NotificationActionType.CLAIM) => {
     const onOk = () => {
-      updateAlertProps({
+      alertModal.updatePartially({
         okLoading: true,
         cancelDisabled: true
       });
@@ -218,15 +222,15 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
       enableChain(chainSlug, false)
         .then(() => {
           setTimeout(() => {
-            updateAlertProps({
+            alertModal.updatePartially({
               okLoading: false,
               cancelDisabled: false
             });
-            closeAlert();
+            alertModal.close();
           }, 2000);
         })
         .catch(() => {
-          updateAlertProps({
+          alertModal.updatePartially({
             okLoading: false,
             cancelDisabled: false
           });
@@ -239,7 +243,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
       ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
       : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
 
-    openAlert({
+    alertModal.open({
       title: t('Enable network'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
@@ -247,7 +251,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
       maskClosable: false,
       cancelButton: {
         icon: XCircle,
-        onClick: closeAlert,
+        onClick: alertModal.close,
         schema: 'secondary',
         text: t('Cancel')
       },
@@ -257,24 +261,23 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
         text: t('Enable')
       }
     });
-  }, [closeAlert, openAlert, t, updateAlertProps, chainInfoMap]);
+  }, [chainInfoMap, alertModal, t]);
 
   const showWarningModal = useCallback((action: string) => {
-    openAlert({
+    alertModal.open({
       title: t('You’ve {{action}} tokens', { replace: { action: action } }),
       type: NotificationType.INFO,
       content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
       okButton: {
         text: t('I understand'),
-        onClick: closeAlert,
+        onClick: alertModal.close,
         icon: CheckCircle
       }
     });
-  }, [closeAlert, openAlert, t]);
+  }, [alertModal, t]);
 
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
-      console.log('item', item);
       const slug = (item.metadata as WithdrawClaimNotificationMetadata).stakingSlug;
       const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs);
       const switchStatusParams: RequestSwitchStatusParams = {
@@ -417,11 +420,24 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
         switchReadNotificationStatus(item)
           .catch(console.error)
           .finally(() => {
-            setTrigger(!isTrigger);
+            refreshNotifications();
           });
       }
     };
-  }, [accounts, showActiveChainModal, chainStateMap, chainsByAccountType, currentAccountProxy, currentTimestampMs, earningRewards, isAllAccount, isTrigger, navigate, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showWarningModal, yieldPositions]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, refreshNotifications]);
+
+  const onClickMore = useCallback((item: NotificationInfoItem) => {
+    return (e: SyntheticEvent) => {
+      e.stopPropagation();
+
+      notificationItemActionsModal.open({
+        onCancel: notificationItemActionsModal.close,
+        notificationItem: item,
+        refreshNotifications,
+        onClickAction: onClickItem(item)
+      });
+    };
+  }, [notificationItemActionsModal, onClickItem, refreshNotifications]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -503,7 +519,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
         setNotifications(rs);
       })
       .catch(console.error);
-  }, [currentProxyId, isAllAccount, isTrigger]);
+  }, [currentProxyId, isAllAccount, refreshNotificationsTriggerKey]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -516,30 +532,30 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
   }, []);
 
   return (
-    <PageWrapper className={CN(className, 'notification-container', {
-      '__web-wrapper': modalContent
-    })}>
-      {!modalContent && (<SwSubHeader
-        background={'transparent'}
-        center
-        onBack={onClickBack}
-        paddingVertical
-        rightButtons={[
-          {
-            icon: (
-              <Icon
-                customSize={'24px'}
-                phosphorIcon={GearSix}
-                type='phosphor'
-                weight={'bold'}
-              />
-            ),
-            onClick: onNotificationConfig
-          }
-        ]}
-        showBackButton
-        title={t('Notifications')}
-      />)}
+    <>
+      {!isInModal && (
+        <SwSubHeader
+          background={'transparent'}
+          center
+          onBack={onClickBack}
+          paddingVertical
+          rightButtons={[
+            {
+              icon: (
+                <Icon
+                  customSize={'24px'}
+                  phosphorIcon={GearSix}
+                  type='phosphor'
+                  weight={'bold'}
+                />
+              ),
+              onClick: openNotificationSetting
+            }
+          ]}
+          showBackButton
+          title={t('Notifications')}
+        />
+      )}
 
       <div className={'tool-area'}>
         <FilterTabs
@@ -575,6 +591,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
                 onSearch={handleSearch}
                 placeholder={t<string>('Search notification')}
                 searchValue={currentSearchText}
+                simpleLayout
               />
               {loading
                 ? <div className={'indicator-wrapper'}><ActivityIndicator size={32} /></div>
@@ -588,54 +605,128 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
                   />
                 )}
             </div>
-            {viewDetailItem && isNotificationDetailModalVisible && (
-              <NotificationDetailModal
-                isTrigger={isTrigger}
-                notificationItem={viewDetailItem}
-                onClickAction={onClickItem(viewDetailItem)}
-                setTrigger={setTrigger}
-              />
-            )}
-            {
-              !!alertProps && (
-                <AlertModal
-                  modalId={alertModalId}
-                  {...alertProps}
-                />
-              )
-            }
           </>
         )
         : (
           renderEnableNotification()
         )}
-
-    </PageWrapper>
+    </>
   );
 }
 
 const Wrapper = (props: WrapperProps) => {
   const dataContext = useContext(DataContext);
-  const { className, modalContent } = props;
+  const { className, isModal, modalProps } = props;
+  const { t } = useTranslation();
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const [refreshNotificationsTriggerKey, setRefreshNotificationsTriggerKey] = useState('');
+  const [notificationItemActionsModalProps, setNotificationItemActionsModalProps] = useState<NotificationItemActionsModalProps | undefined>();
+  const [isNotificationSettingModalVisible, setIsNotificationSettingModalVisible] = useState<boolean>(false);
 
-  if (modalContent) {
-    return (
-      <Component
-        className={className}
-        modalContent={modalContent}
-      />
+  const refreshNotifications = useCallback(() => {
+    setRefreshNotificationsTriggerKey(`${Date.now()}`);
+  }, []);
 
-    );
-  }
+  const openNotificationItemActionsModal = useCallback((_props: NotificationItemActionsModalProps) => {
+    setNotificationItemActionsModalProps(_props);
+    activeModal(NOTIFICATION_DETAIL_MODAL);
+  }, [activeModal]);
 
-  return (
+  const closeNotificationItemActionsModal = useCallback(() => {
+    inactiveModal(NOTIFICATION_DETAIL_MODAL);
+    setNotificationItemActionsModalProps(undefined);
+  }, [inactiveModal]);
+
+  const notificationItemActionsModalHandler = useMemo<Props['notificationItemActionsModal']>(() => ({
+    open: openNotificationItemActionsModal,
+    close: closeNotificationItemActionsModal
+  }), [closeNotificationItemActionsModal, openNotificationItemActionsModal]);
+
+  const notificationSettingModalId = useMemo(() => {
+    return `${modalProps?.modalId || ''}_setting`;
+  }, [modalProps?.modalId]);
+
+  const openNotificationSettingModal = useCallback(() => {
+    setIsNotificationSettingModalVisible(true);
+    activeModal(notificationSettingModalId);
+  }, [activeModal, notificationSettingModalId]);
+
+  const closeNotificationSettingModal = useCallback(() => {
+    inactiveModal(notificationSettingModalId);
+    setIsNotificationSettingModalVisible(true);
+  }, [inactiveModal, notificationSettingModalId]);
+
+  const notificationSettingModalProps = useMemo(() => ({
+    modalId: notificationSettingModalId,
+    onBack: closeNotificationSettingModal,
+    onCancel: () => {
+      closeNotificationSettingModal();
+      modalProps?.onCancel();
+    }
+  }), [closeNotificationSettingModal, modalProps, notificationSettingModalId]);
+
+  const mainComponent = (
     <PageWrapper
-      className={CN(props.className)}
+      className={isModal ? undefined : CN(className)}
       hideLoading={true}
       resolve={dataContext.awaitStores(['earning'])}
     >
-      <Component {...props} />
+      <Component
+        isInModal={isModal}
+        notificationItemActionsModal={notificationItemActionsModalHandler}
+        openNotificationSettingModal={openNotificationSettingModal}
+        refreshNotifications={refreshNotifications}
+        refreshNotificationsTriggerKey={refreshNotificationsTriggerKey}
+      />
     </PageWrapper>
+  );
+
+  return (
+    <>
+      {
+        isModal && !!modalProps
+          ? (
+            <BaseModal
+              className={CN(className, 'notification-modal')}
+              destroyOnClose={true}
+              id={modalProps.modalId}
+              onCancel={modalProps.onCancel}
+              rightIconProps={{
+                icon: (
+                  <Icon
+                    customSize={'24px'}
+                    phosphorIcon={GearSix}
+                    type='phosphor'
+                    weight={'bold'}
+                  />
+                ),
+                onClick: openNotificationSettingModal
+              }}
+              title={t('Notifications')}
+            >
+              {mainComponent}
+            </BaseModal>
+          )
+          : mainComponent
+      }
+
+      {
+        !!notificationItemActionsModalProps && (
+          <NotificationItemActionsModal
+            {...notificationItemActionsModalProps}
+          />
+        )
+      }
+
+      {
+        isNotificationSettingModalVisible && (
+          <NotificationSetting
+            isModal
+            modalProps={notificationSettingModalProps}
+          />
+        )
+      }
+    </>
   );
 };
 
