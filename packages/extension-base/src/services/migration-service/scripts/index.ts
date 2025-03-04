@@ -4,6 +4,7 @@
 import BaseMigrationJob from '../Base';
 import AutoEnableSomeTokens from './databases/AutoEnableSomeTokens';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
+import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
 import MigrateAssetSetting from './databases/MigrateAssetSetting';
 import MigrateEarningVersion from './databases/MigrateEarningVersion';
 import ReloadMetadata from './databases/ReloadMetadata';
@@ -64,7 +65,8 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.2.13-01': ReloadMetadata,
   '1.2.32-01': MigratePairData,
   '1.3.6-01': MigrateTransactionHistoryBridge,
-  '1.3.10-01': ClearMetadataDatabase
+  '1.3.10-01': ClearMetadataDatabase,
+  '1.3.21-01': ClearMetadataForMythos
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
 };
