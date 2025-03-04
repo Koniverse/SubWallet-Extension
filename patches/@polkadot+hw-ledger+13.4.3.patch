@@ -1,8 +1,8 @@
 diff --git a/node_modules/@polkadot/hw-ledger/defaults.js b/node_modules/@polkadot/hw-ledger/defaults.js
-index 9f06432..4daa29a 100644
+index ed833ba..6929f9e 100644
 --- a/node_modules/@polkadot/hw-ledger/defaults.js
 +++ b/node_modules/@polkadot/hw-ledger/defaults.js
-@@ -37,5 +37,7 @@ export const ledgerApps = {
+@@ -38,7 +38,9 @@ export const prevLedgerRecord = {
      unique: 'Unique',
      vtb: 'VTB',
      xxnetwork: 'XXNetwork',
@@ -11,3 +11,5 @@ index 9f06432..4daa29a 100644
 +    avail: 'Avail',
 +    availRecovery: 'AvailRecovery',
  };
+ export const genericLedgerApps = {
+     bittensor: 'Bittensor',
