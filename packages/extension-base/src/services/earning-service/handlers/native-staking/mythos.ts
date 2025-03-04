@@ -213,7 +213,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
     const unstakings = _unstaking.toPrimitive() as unknown as PalletCollatorStakingReleaseRequest[];
     const currentBlock = _currentBlock.toPrimitive() as number;
     const currentTimestamp = _currentTimestamp.toPrimitive() as number;
-    const blockDurationMs = substrateApi.api.consts.aura.slotDuration.toPrimitive() as number;
+    const blockDuration = _EXPECTED_BLOCK_TIME[chainInfo.slug];
 
     if (candidates.length) {
       await Promise.all(candidates.map(async (collatorAddress) => {
@@ -241,7 +241,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
         const releaseBlock = unstaking.block;
         const unstakeAmount = unstaking.amount;
         const isClaimable = currentBlock >= releaseBlock;
-        const targetTimestampMs = (releaseBlock - currentBlock) * blockDurationMs + currentTimestamp;
+        const targetTimestampMs = (releaseBlock - currentBlock) * blockDuration * 1000 + currentTimestamp;
 
         unstakingBalance = unstakingBalance + BigInt(unstakeAmount);
 
