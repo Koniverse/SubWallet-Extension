@@ -157,21 +157,21 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [transaction.data, transaction.extrinsicType, transaction.process]);
 
-  const isShowAddressFormatInfoBox = useMemo(() => {
-    if (transaction.extrinsicType === ExtrinsicType.SWAP) {
-      return false;
+  const isAddressFormatInfoBoxVisible = useMemo(() => {
+    if ([ExtrinsicType.TRANSFER_BALANCE, ExtrinsicType.TRANSFER_TOKEN].includes(transaction.extrinsicType)) {
+      const targetChain = transaction.chain;
+
+      return checkIsPolkadotUnifiedChain(targetChain);
     }
 
-    const targetChain = transaction.chain;
-
-    return checkIsPolkadotUnifiedChain(targetChain);
+    return false;
   }, [checkIsPolkadotUnifiedChain, transaction.chain, transaction.extrinsicType]);
 
   return (
     <>
       <div className={CN(className, 'confirmation-content')}>
         {renderContent(transaction)}
-        {isShowAddressFormatInfoBox && (
+        {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant type={'new-address-format'} />
         )}
         {!!transaction.estimateFee?.tooHigh && (
