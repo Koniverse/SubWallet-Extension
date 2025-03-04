@@ -85,12 +85,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       return undefined;
     }
   }, [assetRegistry, compound]);
+  const isDynamicStaking = useMemo(() => [YieldPoolType.DYNAMIC_STAKING].includes(type), [type]);
 
   const subnetData = useMemo(() => {
-    const position = compound as DynamicYieldPositionInfo;
+    if (isDynamicStaking && 'subnetData' in compound) {
+      const position = compound;
 
-    return position.subnetData;
-  }, [compound]);
+      return position.subnetData || { originalTotalStake: '0', subnetSymbol: '' };
+    }
+
+    return undefined;
+  }, [compound, isDynamicStaking]);
 
   const earningTagType: EarningTagType = useMemo(() => {
     return createEarningTypeTags(compound.chain)[compound.type];
@@ -98,7 +103,6 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
-  const isDynamicStaking = useMemo(() => [YieldPoolType.DYNAMIC_STAKING].includes(type), [type]);
 
   const haveNomination = useMemo(() => {
     return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
@@ -156,9 +160,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
             label: t('Derivative token balance'),
-            value: subnetData.originalTotalStake,
+            value: subnetData?.originalTotalStake,
             decimals: inputAsset?.decimals || 0,
-            suffix: subnetData.subnetSymbol
+            suffix: subnetData?.subnetSymbol
           }
         ]
         : !isSpecial
@@ -250,7 +254,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isDynamicStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, subnetData.originalTotalStake, subnetData.subnetSymbol, t]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isDynamicStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, subnetData?.originalTotalStake, subnetData?.subnetSymbol, t]);
 
   return (
     <>

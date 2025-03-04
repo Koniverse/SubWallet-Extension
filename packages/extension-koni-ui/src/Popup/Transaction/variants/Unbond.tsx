@@ -92,7 +92,7 @@ const Component: React.FC = () => {
 
   const bondedAsset = useGetChainAssetInfo(bondedSlug || poolInfo.metadata.inputAsset);
   const decimals = bondedAsset?.decimals || 0;
-  const symbol = (positionInfo as DynamicYieldPositionInfo).subnetData.subnetSymbol || bondedAsset?.symbol || '';
+  const symbol = (positionInfo as DynamicYieldPositionInfo).subnetData?.subnetSymbol || bondedAsset?.symbol || '';
   const altAsset = useGetChainAssetInfo((poolInfo?.metadata as SpecialYieldPoolMetadata)?.altInputAssets);
   const altSymbol = altAsset?.symbol || '';
 

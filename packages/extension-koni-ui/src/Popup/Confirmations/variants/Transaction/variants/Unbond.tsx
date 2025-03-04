@@ -20,7 +20,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const subnetSymbol = data.poolInfo?.metadata.subnetData.subnetSymbol;
+  const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
 
   return (
     <div className={CN(className)}>
