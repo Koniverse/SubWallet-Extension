@@ -302,35 +302,26 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   /* Join pool action */
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo): Promise<[TransactionData, YieldTokenBaseInfo]> {
-    const apiPromise = await this.substrateApi.isReady;
+    const substrateApi = await this.substrateApi.isReady;
     const { address, amount, selectedValidators } = data;
     const selectedValidatorInfo = selectedValidators[0];
-    const _hasReward = await apiPromise.api.call?.collatorStakingApi?.shouldClaim(address);
+    const _hasReward = await substrateApi.api.call?.collatorStakingApi?.shouldClaim(address);
     const hasReward = _hasReward?.toPrimitive();
+    const extrinsicList: SubmittableExtrinsic<'promise'>[] = [];
 
-    let tx: SubmittableExtrinsic<'promise'>;
-
-    // todo: refactor list tx
     if (positionInfo?.isBondedBefore && hasReward) {
-      tx = apiPromise.api.tx.utility.batchAll([
-        apiPromise.api.tx.collatorStaking.claimRewards(),
-        apiPromise.api.tx.collatorStaking.lock(amount),
-        apiPromise.api.tx.collatorStaking.stake([{
-          candidate: selectedValidatorInfo.address,
-          stake: amount
-        }])
-      ]);
-    } else {
-      tx = apiPromise.api.tx.utility.batchAll([
-        apiPromise.api.tx.collatorStaking.lock(amount),
-        apiPromise.api.tx.collatorStaking.stake([{
-          candidate: selectedValidatorInfo.address,
-          stake: amount
-        }])
-      ]);
+      extrinsicList.push(substrateApi.api.tx.collatorStaking.claimRewards());
     }
 
-    return [tx, { slug: this.nativeToken.slug, amount: '0' }];
+    extrinsicList.push(...[
+      substrateApi.api.tx.collatorStaking.lock(amount),
+      substrateApi.api.tx.collatorStaking.stake([{
+        candidate: selectedValidatorInfo.address,
+        stake: amount
+      }])
+    ]);
+
+    return [substrateApi.api.tx.utility.batchAll(extrinsicList), { slug: this.nativeToken.slug, amount: '0' }];
   }
 
   /* Join pool action */
@@ -398,9 +389,9 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   }
 
   async handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo) {
-    const apiPromise = await this.substrateApi.isReady;
+    const substrateApi = await this.substrateApi.isReady;
 
-    return apiPromise.api.tx.collatorStaking.release();
+    return substrateApi.api.tx.collatorStaking.release();
   }
 
   override async handleYieldClaimReward (address: string, bondReward?: boolean) {
