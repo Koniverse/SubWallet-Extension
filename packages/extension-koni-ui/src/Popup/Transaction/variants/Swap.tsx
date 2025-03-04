@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -102,7 +102,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [quoteOptions, setQuoteOptions] = useState<SwapQuote[]>([]);
   const [currentQuote, setCurrentQuote] = useState<SwapQuote | undefined>(undefined);
-  const [tempQuote, setTempQuote] = useState<SwapQuote | undefined>(undefined);
+  const [swapQuotesSelectorModalRenderKey, setSwapQuotesSelectorModalRenderKey] = useState<string>(SWAP_ALL_QUOTES_MODAL);
 
   const [quoteAliveUntil, setQuoteAliveUntil] = useState<number | undefined>(undefined);
   const [currentQuoteRequest, setCurrentQuoteRequest] = useState<SwapRequest | undefined>(undefined);
@@ -113,8 +113,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
 
-  console.log('currentOptimalSwapPath', currentOptimalSwapPath);
-
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
   const optimalQuoteRef = useRef<SwapQuote | undefined>(undefined);
@@ -124,7 +122,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [handleRequestLoading, setHandleRequestLoading] = useState(true);
   const [requestUserInteractToContinue, setRequestUserInteractToContinue] = useState<boolean>(false);
   const [isScrollEnd, setIsScrollEnd] = useState<boolean>(false);
-  const [confirmQuoteLoading, setConfirmQuoteLoading] = useState(false);
 
   const continueRefreshQuoteRef = useRef<boolean>(false);
   const { token } = useTheme() as Theme;
@@ -379,14 +376,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return currentQuote?.provider.id ? unsupportedProviders.includes(currentQuote.provider.id) : false;
   }, [currentQuote?.provider.id]);
 
-  const isSimpleSwapSlippage = useMemo(() => {
-    if (currentQuote?.provider.id === SwapProviderId.SIMPLE_SWAP) {
-      return true;
-    }
-
-    return false;
-  }, [currentQuote?.provider.id]);
-
   const onOpenSlippageModal = useCallback(() => {
     if (!notSupportSlippageSelection) {
       activeModal(SWAP_SLIPPAGE_MODAL);
@@ -394,7 +383,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [activeModal, notSupportSlippageSelection]);
 
   const openAllQuotesModal = useCallback(() => {
-    activeModal(SWAP_ALL_QUOTES_MODAL);
+    setSwapQuotesSelectorModalRenderKey(`${SWAP_ALL_QUOTES_MODAL}_${Date.now()}`);
+
+    setTimeout(() => {
+      activeModal(SWAP_ALL_QUOTES_MODAL);
+    }, 100);
   }, [activeModal]);
 
   const openChooseFeeToken = useCallback(() => {
@@ -428,9 +421,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     [fromValue, currentSlippage.slippage, recipientValue]
   );
 
-  const onConfirmationItem = useCallback(
+  const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      setConfirmQuoteLoading(true);
       const processResult = await handleGenerateOptimalProcess(quote);
 
       if (!processResult) {
@@ -460,16 +452,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           currentQuote: quote.provider
         };
       });
-
-      setConfirmQuoteLoading(false);
-      inactiveModal(SWAP_ALL_QUOTES_MODAL);
     },
-    [handleGenerateOptimalProcess, inactiveModal]
+    [handleGenerateOptimalProcess]
   );
-
-  const onSelectQuote = useCallback((quote: SwapQuote) => {
-    setTempQuote(quote);
-  }, []);
 
   const onSelectFeeOption = useCallback((slug: string) => {
     setCurrentFeeOption(slug);
@@ -864,10 +849,18 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return undefined;
   }, [currentPair]);
 
-  const slippageTitle = isSimpleSwapSlippage ? 'Slippage can be up to 5% due to market conditions' : '';
-  const slippageContent = isSimpleSwapSlippage ? `Up to ${((slippage * 100).toString()).toString()}%` : `${((slippage * 100).toString()).toString()}%`;
+  const isSimpleSwapSlippage = useMemo(() => {
+    if (currentQuote?.provider.id === SwapProviderId.SIMPLE_SWAP) {
+      return true;
+    }
+
+    return false;
+  }, [currentQuote?.provider.id]);
 
   const renderSlippage = () => {
+    const slippageTitle = isSimpleSwapSlippage ? 'Slippage can be up to 5% due to market conditions' : '';
+    const slippageContent = isSimpleSwapSlippage ? `Up to ${((slippage * 100).toString()).toString()}%` : `${((slippage * 100).toString()).toString()}%`;
+
     return (
       <>
         <div className='__slippage-action-wrapper'>
@@ -1081,7 +1074,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
               setQuoteOptions(result.quote.quotes);
               setCurrentQuote(result.quote.optimalQuote);
-              setTempQuote(result.quote.optimalQuote);
               setQuoteAliveUntil(result.quote.aliveUntil);
               setFeeOptions(result.quote.optimalQuote?.feeInfo?.feeOptions || []);
               setCurrentFeeOption(result.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
@@ -1693,12 +1685,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       />
       <SwapQuotesSelectorModal
         items={quoteOptions}
-        loading={confirmQuoteLoading}
+        key={swapQuotesSelectorModalRenderKey} // trick to reinit this modal
         modalId={SWAP_ALL_QUOTES_MODAL}
-        onConfirmationItem={onConfirmationItem}
-        onSelectItem={onSelectQuote}
+        onConfirmItem={onConfirmSelectedQuote}
         optimalQuoteItem={optimalQuoteRef.current}
-        selectedItem={tempQuote}
+        selectedItem={currentQuote}
       />
       <SwapTermsOfServiceModal onOk={onAfterConfirmTermModal} />
       <SwapIdleWarningModal
