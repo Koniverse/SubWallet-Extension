@@ -101,21 +101,21 @@ export function autoSelectValidatorOptimally (validators: ValidatorInfo[], maxCo
   return result;
 }
 
-export const getEarningTimeText = (timeNumber?: number) => {
-  if (timeNumber !== undefined) {
-    const isDay = timeNumber > 24;
-    const isHour = timeNumber >= 1 && !isDay;
+export const getEarningTimeText = (hours?: number) => {
+  if (hours !== undefined) {
+    const isDay = hours > 24;
+    const isHour = hours >= 1 && !isDay;
 
     let time, unit;
 
     if (isDay) {
-      time = Math.floor(timeNumber / 24);
+      time = Math.floor(hours / 24);
       unit = detectTranslate(time > 1 ? 'days' : 'day');
     } else if (isHour) {
-      time = timeNumber;
+      time = hours;
       unit = detectTranslate(time > 1 ? 'hours' : 'hour');
     } else {
-      time = timeNumber * 60;
+      time = hours * 60;
       unit = detectTranslate(time > 1 ? 'minutes' : 'minute');
     }
 
