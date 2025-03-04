@@ -123,7 +123,7 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
               <div className={'notification-icon'}>
                 <Icon
                   phosphorIcon={BellSimpleRinging}
-                  size='md'
+                  size='sm'
                 />
                 {notiEnable && !!unreadNotificationCount &&
                   <div className={CN('__unread-count')}>{unreadNotificationCount}</div>}
@@ -132,7 +132,9 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
             onClick={onOpenNotification}
             tooltip={t('Notifications')}
             tooltipPlacement={'bottomRight'}
-            type={'ghost'}
+            schema={'secondary'}
+            shape={'circle'}
+            size={'xs'}
           >
           </Button>
 

@@ -549,17 +549,17 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
           selectedItem={selectedFilterTab}
         />
         <Button
+          className={'__filter-tab-mark-read-button'}
           icon={ (
             <Icon
               phosphorIcon={Checks}
               weight={'fill'}
             />
           )}
-          // TODO: This is for development. It will be removed when done.
           onClick={handleSwitchClick}
+          schema={'secondary'}
           size='xs'
           type='ghost'
-          className={'__filter-tab-mark-read-button'}
         >
           {t('Mark all as read')}
         </Button>
@@ -654,13 +654,14 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
 
     '&.notification-container': {
       '.filter-tabs-container': {
-        marginLeft: 0
+        marginLeft: 0,
+        alignItems: 'center'
       },
       '.__tab-item-label': {
         fontSize: token.fontSize,
         lineHeight: token.lineHeight,
         paddingTop: 0,
-        paddingBottom: 4
+        paddingBottom: 6
       },
 
       '.__filter-tab-mark-read-button': {
