@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes'
+import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
 import { ENABLE_LANGUAGES, languageOptions } from '@subwallet/extension-base/constants/i18n';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
@@ -10,14 +10,14 @@ import { BaseSelectModal } from '@subwallet/extension-web-ui/components/Modal/Ba
 import { NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import useDefaultNavigate from '@subwallet/extension-web-ui/hooks/router/useDefaultNavigate';
-import { saveBrowserConfirmationType, saveLanguage, savePriceCurrency, saveTheme } from '@subwallet/extension-web-ui/messaging'
+import { saveBrowserConfirmationType, saveLanguage, savePriceCurrency, saveTheme } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { PhosphorIcon, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { noop } from '@subwallet/extension-web-ui/utils';
 import { getCurrencySymbol } from '@subwallet/extension-web-ui/utils/currency';
 import { BackgroundIcon, Icon, Image, ModalContext, SettingItem, SwIconProps } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowSquareUpRight, BellSimpleRinging, CaretRight, CheckCircle, CornersOut, CurrencyCircleDollar, GlobeHemisphereEast, ImageSquare, Layout as LayoutIcon, MoonStars, Sun } from 'phosphor-react'
+import { ArrowSquareUpRight, BellSimpleRinging, CaretRight, CheckCircle, CornersOut, CurrencyCircleDollar, GlobeHemisphereEast, ImageSquare, Layout as LayoutIcon, MoonStars, Sun } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -141,7 +141,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { currency } = useSelector((state: RootState) => state.price);
   const navigate = useNavigate();
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const {isWebUI} = useContext(ScreenContext);
+  const { isWebUI } = useContext(ScreenContext);
   const theme = useSelector((state: RootState) => state.settings.theme);
   const _language = useSelector((state: RootState) => state.settings.language);
   const _browserConfirmationType = useSelector((state: RootState) => state.settings.browserConfirmationType);
@@ -411,7 +411,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             )}
           />
 
-          <BaseModal
+          {isWebUI && <BaseModal
             className={'right-side-modal'}
             destroyOnClose={true}
             id={NOTIFICATION_SETTING_MODAL}
@@ -419,10 +419,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             title={t('Notifications')}
           >
             <NotificationSetting
-              modalContent={isWebUI}
               className={className}
+              modalContent={isWebUI}
             />
-          </BaseModal>
+          </BaseModal>}
         </div>
       </Layout.WithSubHeaderOnly>
     </PageWrapper>

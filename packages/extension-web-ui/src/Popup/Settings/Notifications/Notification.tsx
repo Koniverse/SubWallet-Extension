@@ -274,6 +274,7 @@ function Component ({ className = '', modalContent }: Props): React.ReactElement
 
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
+      console.log('item', item);
       const slug = (item.metadata as WithdrawClaimNotificationMetadata).stakingSlug;
       const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs);
       const switchStatusParams: RequestSwitchStatusParams = {
