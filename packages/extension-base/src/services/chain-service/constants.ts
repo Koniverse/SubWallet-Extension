@@ -104,7 +104,9 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   polkadex: 24,
   avail_mainnet: 24,
   cere: 24,
-  analog_timechain: 12
+  analog_timechain: 12,
+  muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
+  mythos: 24
 };
 
 export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
@@ -136,7 +138,9 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   enjin_relaychain: 6,
   availTuringTest: 20,
   avail_mainnet: 20,
-  dentnet: 3
+  dentnet: 3,
+  muse_testnet: 6,
+  mythos: 6
 };
 
 export const _PARACHAIN_INFLATION_DISTRIBUTION: Record<string, Record<string, number>> = {
@@ -234,7 +238,7 @@ export const _TRANSFER_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   // crab: ['crab', 'pangolin'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
