@@ -113,6 +113,7 @@ export interface DynamicYieldPositionInfo extends AbstractYieldPositionInfo {
     subnetName: string;
     subnetSymbol: string;
     subnetShortName: string;
+    originalTotalStake: string;
   };
 }
 

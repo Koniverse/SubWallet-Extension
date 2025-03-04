@@ -51,6 +51,7 @@ interface MergeSubnetData extends SubnetData {
 interface TaoStakingStakeOption {
   owner: string;
   amount: string;
+  stake?: string;
   // identity: string
 }
 
@@ -179,7 +180,8 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
               description: subnet.metadata?.description || 'Stake TAO to earn rewards',
               subnetData: {
                 subnetName: this.subnetName,
-                netuid: subnet.netuid
+                netuid: subnet.netuid,
+                subnetSymbol: subnet.symbol || 'dTAO'
               }
             },
             statistic: {
@@ -245,8 +247,8 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
           chain: chainInfo.slug,
           validatorAddress: delegate.owner,
           activeStake: activeStake,
-          validatorMinStake: minDelegatorStake
-          // validatorIdentity: delegate.identity
+          validatorMinStake: minDelegatorStake,
+          originActiveStake: delegate.stake
         });
       }
     }
@@ -274,7 +276,9 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
-        useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
+        useAddresses.map(async (address) =>
+          (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON()
+        )
       );
       const price = await getTaoToAlphaMapping(this.substrateApi);
 
@@ -283,7 +287,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
           const owner = reformatAddress(useAddresses[i], 42);
           const delegateStateInfo = rawDelegateStateInfo as unknown as TaoStakeInfo[];
 
-          const subnetPositions: Record<number, { delegatorState: TaoStakingStakeOption[], totalBalance: BN }> = {};
+          const subnetPositions: Record<number, { delegatorState: TaoStakingStakeOption[], totalBalance: BN, originalTotalStake: BN }> = {};
 
           for (const delegate of delegateStateInfo) {
             const hotkey = delegate.hotkey;
@@ -296,25 +300,25 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
               const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
 
               if (!subnetPositions[netuid]) {
-                subnetPositions[netuid] = { delegatorState: [], totalBalance: BN_ZERO };
+                subnetPositions[netuid] = {
+                  delegatorState: [],
+                  totalBalance: BN_ZERO,
+                  originalTotalStake: BN_ZERO
+                };
               }
 
-              const existingStake = subnetPositions[netuid].delegatorState.find((d) => d.owner === hotkey);
-
-              if (existingStake) {
-                existingStake.amount = new BigN(existingStake.amount).plus(taoStake).toString();
-              } else {
-                subnetPositions[netuid].delegatorState.push({
-                  owner: hotkey,
-                  amount: taoStake
-                });
-              }
+              subnetPositions[netuid].delegatorState.push({
+                owner: hotkey,
+                amount: taoStake,
+                stake: stake.toString()
+              });
 
               subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(taoStake));
+              subnetPositions[netuid].originalTotalStake = subnetPositions[netuid].originalTotalStake.add(new BN(stake.toString()));
             }
           }
 
-          Object.entries(subnetPositions).forEach(([netuid, { delegatorState }]) => {
+          Object.entries(subnetPositions).forEach(([netuid, { delegatorState, originalTotalStake }]) => {
             const subnet = this.getSubnetByNetuid(parseInt(netuid));
 
             if (!subnet) {
@@ -337,7 +341,8 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
                     subnetData: {
                       subnetName: this.subnetName,
                       subnetSymbol: subnetSymbol,
-                      subnetShortName: subnetName
+                      subnetShortName: subnetName,
+                      originalTotalStake: originalTotalStake.toString()
                     }
                   });
                 })
@@ -359,7 +364,8 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
                 subnetData: {
                   subnetName: this.subnetName,
                   subnetSymbol: subnetSymbol,
-                  subnetShortName: subnetName
+                  subnetShortName: subnetName,
+                  originalTotalStake: '0'
                 }
               });
             }

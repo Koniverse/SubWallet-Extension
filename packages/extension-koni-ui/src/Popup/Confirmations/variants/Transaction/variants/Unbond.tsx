@@ -20,6 +20,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const subnetSymbol = data.poolInfo?.metadata.subnetData.subnetSymbol;
 
   return (
     <div className={CN(className)}>
@@ -34,7 +35,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <MetaInfo.Number
           decimals={decimals}
           label={t('Unstake amount')}
-          suffix={symbol}
+          suffix={subnetSymbol || symbol}
           value={data.amount}
         />
 
