@@ -656,6 +656,13 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
       '.filter-tabs-container': {
         marginLeft: 0
       },
+      '.__tab-item-label': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        paddingTop: 0,
+        paddingBottom: 4
+      },
+
       '.__filter-tab-mark-read-button': {
         paddingRight: 0
       },

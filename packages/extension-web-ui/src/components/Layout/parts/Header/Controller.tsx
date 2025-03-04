@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseModal } from '@subwallet/extension-web-ui/components';
+import { BaseModal, PageWrapper } from '@subwallet/extension-web-ui/components';
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
 import { NOTIFICATION_MODAL, NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
+import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
@@ -12,7 +13,7 @@ import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { BellSimpleRinging, CaretLeft, GearSix } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -36,6 +37,8 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
+  const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(false);
+  const [isNotificationSettingVisible, setIsNotificationSettingVisible] = useState<boolean>(false);
 
   const unreadNotificationCount = useMemo(() => {
     if (!currentAccountProxy || !unreadNotificationCountMap) {
@@ -47,25 +50,33 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
   const onOpenNotification = useCallback(() => {
     if (isWebUI) {
+      setIsNotificationVisible(true);
+      setIsNotificationSettingVisible(false);
       activeModal(NOTIFICATION_MODAL);
+      inactiveModal(NOTIFICATION_SETTING_MODAL);
     } else {
       navigate('/settings/notification');
     }
-  }, [activeModal, isWebUI, navigate]);
+  }, [activeModal, inactiveModal, isWebUI, navigate]);
 
   const onCancelNotification = useCallback(() => {
+    setIsNotificationVisible(false);
     inactiveModal(NOTIFICATION_MODAL);
   }, [inactiveModal]);
 
   const onNotificationConfig = useCallback(() => {
     if (isWebUI) {
+      setIsNotificationSettingVisible(true);
+      setIsNotificationVisible(false);
       activeModal(NOTIFICATION_SETTING_MODAL);
+      inactiveModal(NOTIFICATION_MODAL);
     } else {
       navigate('/settings/notification-config');
     }
-  }, [activeModal, isWebUI, navigate]);
+  }, [activeModal, inactiveModal, isWebUI, navigate]);
 
   const onCancelNotificationSetting = useCallback(() => {
+    setIsNotificationSettingVisible(false);
     inactiveModal(NOTIFICATION_SETTING_MODAL);
   }, [inactiveModal]);
 
@@ -92,7 +103,7 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   }, [onBack, showBackButton]);
 
   return (
-    <div className={CN(className)}>
+    <div className={'header-controller-wrapper'}>
       <div className='common-header'>
         <div className='title-group'>
           {backButton}
@@ -127,8 +138,8 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
           <LockStatus />
         </div>
-        <BaseModal
-          className={'notification-modal'}
+        {isWebUI && isNotificationVisible && <BaseModal
+          className={CN(className, 'notification-modal')}
           destroyOnClose={true}
           id={NOTIFICATION_MODAL}
           onCancel={onCancelNotification}
@@ -149,26 +160,62 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
             modalContent={isWebUI}
           />
         </BaseModal>
+        }
 
-        <BaseModal
-          className={'notification-setting-modal'}
+        {isWebUI && isNotificationSettingVisible && <BaseModal
+          className={CN(className, 'notification-setting-modal')}
           destroyOnClose={true}
           id={NOTIFICATION_SETTING_MODAL}
           onCancel={onCancelNotificationSetting}
+          rightIconProps={{
+            icon: (
+              <Icon
+                customSize={'24px'}
+                phosphorIcon={CaretLeft}
+                type='phosphor'
+                weight={'bold'}
+              />
+            ),
+            onClick: onOpenNotification
+          }}
           title={t('Notifications')}
         >
           <NotificationSetting
-            className={className}
+            className={'notification-setting-wrapper'}
             modalContent={isWebUI}
           />
         </BaseModal>
+        }
       </div>
     </div>
   );
 }
 
-const Controller = styled(Component)<Props>(({ theme: { token } }: Props) => ({
+const Wrapper = (props: Props) => {
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      className={CN(props.className)}
+      resolve={dataContext.awaitStores(['notification'])}
+    >
+      <Component {...props} />
+    </PageWrapper>
+  );
+};
+
+const Controller = styled(Wrapper)<Props>(({ theme: { token } }: Props) => ({
   width: '100%',
+
+  '&.notification-setting-modal': {
+    '.ant-sw-modal-body.ant-sw-modal-body': {
+      height: '100%'
+    },
+    '.ant-sw-sub-header-container': {
+      display: 'flex',
+      flexDirection: 'row-reverse'
+    }
+  },
 
   '.common-header': {
     display: 'flex',

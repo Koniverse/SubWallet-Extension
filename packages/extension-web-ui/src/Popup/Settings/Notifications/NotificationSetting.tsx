@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { PageWrapper } from '@subwallet/extension-web-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { saveNotificationSetup } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -117,7 +116,7 @@ const Component = ({ className = '', modalContent }: Props): React.ReactElement<
   }, [notificationSetup]);
 
   return (
-    <PageWrapper className={CN(className, 'notification-setting', {
+    <div className={CN(className, 'notification-setting', {
       '__web-wrapper': modalContent
     })}>
       {!modalContent && <SwSubHeader
@@ -183,7 +182,7 @@ const Component = ({ className = '', modalContent }: Props): React.ReactElement<
           {t('Save settings')}
         </Button>
       </div>
-    </PageWrapper>
+    </div>
   );
 };
 
@@ -201,7 +200,6 @@ const NotificationSetting = styled(Component)<Props>(({ theme: { token } }: Prop
     },
 
     '.body-container': {
-      padding: token.padding,
       justifyContent: 'space-between',
       display: 'flex',
       height: '100%',
@@ -223,7 +221,7 @@ const NotificationSetting = styled(Component)<Props>(({ theme: { token } }: Prop
     },
 
     '.option-title': {
-      marginBottom: token.marginSM,
+      marginBottom: token.margin,
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
       fontWeight: token.fontWeightStrong,
