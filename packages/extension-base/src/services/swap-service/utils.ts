@@ -4,7 +4,9 @@
 import { Asset, Assets, Chain, Chains } from '@chainflip/sdk/swap';
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals, _getFungibleAssetType, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -116,4 +118,67 @@ export function getChainflipBroker (isTestnet: boolean) { // noted: currently no
       url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
     };
   }
+}
+
+export function generateSwapPairs (substrateApi: _SubstrateApi, chainService: ChainService, fromAsset: _ChainAsset, maxPathLength = 1) {
+  let currentTargets: _ChainAsset[] = [];
+  let newTargets: _ChainAsset[] = [];
+
+  if (maxPathLength < 1) {
+    return currentTargets;
+  }
+
+  const xcmTargets = findXcmDestinations(chainService, fromAsset);
+  const swapTargets = findSwapDestinations(chainService, fromAsset);
+
+  newTargets = Array.from(new Set([...xcmTargets, ...swapTargets]));
+  currentTargets = Array.from(new Set([...currentTargets, ...newTargets]));
+
+  return currentTargets;
+}
+
+export function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const xcmTargets: _ChainAsset[] = [];
+  const multichainAssetSlug = _getMultiChainAsset(chainAsset);
+
+  if (!multichainAssetSlug) {
+    return xcmTargets;
+  }
+
+  const assetRegistry = chainService.getAssetRegistry();
+
+  for (const asset of Object.values(assetRegistry)) {
+    if (multichainAssetSlug === _getMultiChainAsset(asset)) {
+      xcmTargets.push(asset);
+    }
+  }
+
+  return xcmTargets;
+}
+
+export function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const swapTargets: _ChainAsset[] = [];
+  const chain = chainAsset.originChain;
+
+  const availableChains = Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).reduce((remainChains, currentChains) => {
+    if (currentChains.includes(chain)) {
+      currentChains.forEach((candidate) => {
+        remainChains.add(candidate);
+      });
+    }
+
+    return remainChains;
+  }, new Set<string>());
+
+  availableChains.forEach((candidate) => {
+    const assets = chainService.getAssetByChainAndType(candidate, _getFungibleAssetType()); // todo: recheck assetType
+
+    swapTargets.push(...Object.values(assets));
+  });
+
+  return swapTargets;
+}
+
+export function isHasChannel (subtrateApi: _SubstrateApi, fromChain: _ChainAsset, toChain: _ChainAsset) {
+  return true;
 }

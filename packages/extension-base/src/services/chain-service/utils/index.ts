@@ -486,6 +486,10 @@ export function _isAssetFungibleToken (chainAsset: _ChainAsset): boolean {
   return ![_AssetType.ERC721, _AssetType.PSP34, _AssetType.UNKNOWN].includes(chainAsset.assetType);
 }
 
+export function _getFungibleAssetType () {
+  return [_AssetType.NATIVE, _AssetType.LOCAL, _AssetType.ERC20, _AssetType.GRC20, _AssetType.TEP74, _AssetType.PSP22, _AssetType.VFT];
+}
+
 export const _isAssetAutoEnable = (chainAsset: _ChainAsset): boolean => {
   return chainAsset.metadata ? !!chainAsset.metadata.autoEnable : false;
 };

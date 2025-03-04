@@ -46,6 +46,7 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
+import { generateSwapPairs } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -1324,6 +1325,10 @@ export default class KoniExtension {
 
     const warnings: TransactionWarning[] = [];
     const chainInfo = this.#koniState.getChainInfo(chain);
+
+    const test = generateSwapPairs(this.#koniState.getSubstrateApi(chain), this.#koniState.chainService, transferTokenInfo).map((asset) => asset.slug);
+
+    console.log('test', test);
 
     const nativeTokenInfo = this.#koniState.getNativeTokenInfo(chain);
     const nativeTokenSlug: string = nativeTokenInfo.slug;
