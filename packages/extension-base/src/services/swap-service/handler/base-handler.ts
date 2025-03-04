@@ -7,6 +7,7 @@ import { _validateBalanceToSwap, _validateSwapRecipient } from '@subwallet/exten
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
@@ -37,7 +38,8 @@ export interface SwapBaseHandlerInitParams {
   providerSlug: SwapProviderId,
   providerName: string,
   chainService: ChainService,
-  balanceService: BalanceService
+  balanceService: BalanceService,
+  feeService: FeeService;
 }
 
 export class SwapBaseHandler {
@@ -45,12 +47,14 @@ export class SwapBaseHandler {
   private readonly providerName: string;
   public chainService: ChainService;
   public balanceService: BalanceService;
+  public feeService: FeeService;
 
-  public constructor ({ balanceService, chainService, providerName, providerSlug }: SwapBaseHandlerInitParams) {
+  public constructor ({ balanceService, chainService, feeService, providerName, providerSlug }: SwapBaseHandlerInitParams) {
     this.providerName = providerName;
     this.providerSlug = providerSlug;
     this.chainService = chainService;
     this.balanceService = balanceService;
+    this.feeService = feeService;
   }
 
   // public abstract getSwapQuote(request: SwapRequest): Promise<SwapQuote | SwapError>;
@@ -62,7 +66,7 @@ export class SwapBaseHandler {
 
     try {
       for (const genStepFunc of genStepFuncList) {
-        const step = await genStepFunc.bind(this, params)();
+        const step = await genStepFunc(params);
 
         if (step) {
           result.steps.push({

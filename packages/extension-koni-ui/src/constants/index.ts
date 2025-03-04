@@ -19,3 +19,4 @@ export * from './strings';
 export * from './transaction';
 export * from './earning';
 export * from './session';
+export * from './chain';

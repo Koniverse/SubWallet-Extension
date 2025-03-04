@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningRewardItem, YieldPoolType } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
@@ -27,7 +28,7 @@ const useYieldRewardTotal = (slug: string): string | undefined => {
     const poolInfo = poolInfoMap[slug];
 
     if (poolInfo) {
-      if (poolInfo.type !== YieldPoolType.NOMINATION_POOL) {
+      if (poolInfo.type !== YieldPoolType.NOMINATION_POOL && !_STAKING_CHAIN_GROUP.mythos.includes(poolInfo.chain)) {
         return '0';
       } else {
         if (earningRewards.length) {

@@ -165,33 +165,36 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     _SUPPORTED_SWAP_PROVIDERS.forEach((providerId) => {
       switch (providerId) {
         case SwapProviderId.CHAIN_FLIP_TESTNET:
-          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService);
+          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
 
           break;
         case SwapProviderId.CHAIN_FLIP_MAINNET:
-          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, false);
+          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
 
           break;
 
         case SwapProviderId.HYDRADX_TESTNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService);
+          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService);
           break;
 
         case SwapProviderId.HYDRADX_MAINNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, false);
+          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
           break;
 
         case SwapProviderId.POLKADOT_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'statemint');
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemint');
           break;
         case SwapProviderId.KUSAMA_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'statemine');
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemine');
           break;
         case SwapProviderId.ROCOCO_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'rococo_assethub');
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'rococo_assethub');
+          break;
+        case SwapProviderId.WESTEND_ASSET_HUB:
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'westend_assethub');
           break;
         case SwapProviderId.SIMPLE_SWAP:
-          this.handlers[providerId] = new SimpleSwapHandler(this.chainService, this.state.balanceService);
+          this.handlers[providerId] = new SimpleSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
           break;
 
         default:

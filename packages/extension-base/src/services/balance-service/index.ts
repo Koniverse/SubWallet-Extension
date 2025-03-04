@@ -321,6 +321,23 @@ export class BalanceService implements StoppableServiceInterface {
     return await this.state.dbService.stores.balance.getBalanceMapByAddresses(address);
   }
 
+  public async getTokensHasBalance (address: string, chain: string, tokenSlug?: string): Promise<Record<string, BalanceItem>> {
+    const balanceItems = await this.state.dbService.stores.balance.getBalanceHasAmount(address, chain);
+    const tokenHasBalanceInfoMap: Record<string, BalanceItem> = {};
+
+    balanceItems.forEach((balanceItem) => {
+      tokenHasBalanceInfoMap[balanceItem.tokenSlug] = balanceItem;
+    });
+
+    if (tokenSlug) {
+      return {
+        [tokenSlug]: tokenHasBalanceInfoMap[tokenSlug]
+      };
+    }
+
+    return tokenHasBalanceInfoMap;
+  }
+
   public async handleResetBalance (forceRefresh?: boolean) {
     if (forceRefresh) {
       this.balanceMap.setData({});

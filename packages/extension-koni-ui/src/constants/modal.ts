@@ -39,7 +39,7 @@ export const ACCOUNT_NAME_MODAL = 'account-name-modal';
 export const GLOBAL_ALERT_MODAL = 'global-alert-modal';
 export const TON_WALLET_CONTRACT_SELECTOR_MODAL = 'ton-wallet-contract-selector-modal';
 export const TON_ACCOUNT_SELECTOR_MODAL = 'ton-account-selector-modal';
-
+export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
 /* Campaign */
@@ -79,3 +79,8 @@ export const WARNING_LEDGER_RECEIVE_MODAL = 'warning-ledger-receive-modal';
 export const DERIVE_ACCOUNT_LIST_MODAL = 'derive-account-list-modal';
 export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 /* Derive */
+
+/* Process */
+export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
+export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
+/* Process */
