@@ -86,7 +86,7 @@ export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): 
 
 export const fetchSubWalletFeeData = async (chainId: number, networkKey: string): Promise<EvmFeeInfo | null> => {
   return await new Promise<EvmFeeInfo | null>((resolve) => {
-    const baseUrl = 'https://api-cache.subwallet.app/sw-evm-gas/{{chain}}';
+    const baseUrl = 'https://api-cache-hetzner.subwallet.app/sw-evm-gas/{{chain}}';
     const url = baseUrl.replaceAll('{{chain}}', networkKey);
 
     // TODO: Update the logo to follow the new estimateFee format or move the logic to the backend

@@ -857,7 +857,7 @@ export class ChainService {
       const isLightRpc = endpoint.startsWith('light');
 
       if (isActive && isConnectProblem && !isLightRpc) {
-        const reportApiUrl = 'https://api-cache.subwallet.app/api/health-check/report-rpc';
+        const reportApiUrl = 'https://api-cache-hetzner.subwallet.app/api/health-check/report-rpc';
         const requestBody = {
           chainSlug: slug,
           chainStatus: status,

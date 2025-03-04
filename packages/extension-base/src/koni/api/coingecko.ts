@@ -42,7 +42,7 @@ export const getTokenPrice = async (priceIds: Set<string>, currencyCode: Currenc
 
       if (useBackupApi || rs?.status !== 200) {
         useBackupApi = true;
-        rs = await axios.get(`https://chain-data.subwallet.app/api/price/get?ids=${idStr}`);
+        rs = await axios.get(`https://api-cache-hetzner.subwallet.app/api/price/get?ids=${idStr}`);
       }
 
       if (rs?.status !== 200) {
@@ -56,7 +56,7 @@ export const getTokenPrice = async (priceIds: Set<string>, currencyCode: Currenc
       let rs: AxiosResponse<any, any> | undefined;
 
       try {
-        rs = await axios.get('https://api-cache.subwallet.app/exchange-rate');
+        rs = await axios.get('https://api-cache-hetzner.subwallet.app/exchange-rate');
       } catch (e) {
         console.warn('Failed to get exchange rate');
       }

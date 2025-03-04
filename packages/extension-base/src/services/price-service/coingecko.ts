@@ -32,7 +32,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
   try {
     try {
-      response = await fetch('https://api-cache.subwallet.app/exchange-rate');
+      response = await fetch('https://api-cache-hetzner.subwallet.app/exchange-rate');
     } catch (e) {}
 
     if (response?.status !== 200) {
@@ -80,7 +80,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       useBackupApi = true;
 
       try {
-        response = await fetch(`https://api-cache.subwallet.app/api/price/get?ids=${idStr}`);
+        response = await fetch(`https://api-cache-hetzner.subwallet.app/api/price/get?ids=${idStr}`);
       } catch (e) {}
 
       if (response?.status !== 200) {
