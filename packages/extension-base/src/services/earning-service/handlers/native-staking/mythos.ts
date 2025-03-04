@@ -15,18 +15,9 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
 
-// todo: improve to check current lock amount, create an enum store CollatorStaking state
-// @ts-ignore
-interface FrameSupportTokensMiscIdAmountRuntimeFreezeReason {
-  id: {
-    CollatorStaking: string
-  },
-  amount: string
-}
-
 interface PalletCollatorStakingCandidateInfo {
   stake: string,
-  stakers: string
+  stakers: string // number of stakers
 }
 
 interface PalletCollatorStakingUserStakeInfo {
@@ -319,6 +310,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
 
     let tx: SubmittableExtrinsic<'promise'>;
 
+    // todo: refactor list tx
     if (positionInfo?.isBondedBefore && hasReward) {
       tx = apiPromise.api.tx.utility.batchAll([
         apiPromise.api.tx.collatorStaking.claimRewards(),
@@ -340,52 +332,6 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
 
     return [tx, { slug: this.nativeToken.slug, amount: '0' }];
   }
-
-  // todo: improve in this way
-  // async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo): Promise<[TransactionData, YieldTokenBaseInfo]> {
-  //   // todo: review lock in freezes
-  //   const apiPromise = await this.substrateApi.isReady;
-  //   const { address, amount, selectedValidators } = data;
-  //
-  //   let lockTx: SubmittableExtrinsic<'promise'> | undefined;
-  //   let stakeTx: SubmittableExtrinsic<'promise'> | undefined;
-  //
-  //   const selectedValidatorInfo = selectedValidators[0];
-  //
-  //   const compoundTransactions = (bondTx: SubmittableExtrinsic<'promise'>, nominateTx: SubmittableExtrinsic<'promise'>): [TransactionData, YieldTokenBaseInfo] => {
-  //     const extrinsic = apiPromise.api.tx.utility.batchAll([bondTx, nominateTx]);
-  //
-  //     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
-  //   };
-  //
-  //   const _accountFreezes = await apiPromise.api.query.balances.freezes(address);
-  //   const accountFreezes = _accountFreezes.toPrimitive() as unknown as FrameSupportTokensMiscIdAmountRuntimeFreezeReason[];
-  //   const accountLocking = accountFreezes.filter((accountFreeze) => accountFreeze.id.CollatorStaking === 'Staking');
-  //
-  //   if (!accountLocking || !accountLocking.length) {
-  //     lockTx = apiPromise.api.tx.collatorStaking.lock(amount);
-  //     stakeTx = apiPromise.api.tx.collatorStaking.stake([{
-  //       candidate: selectedValidatorInfo.address,
-  //       stake: amount
-  //     }]);
-  //   } else {
-  //     const bnTotalLocking = accountLocking.reduce((old, currentLockAmount) => {
-  //       const bnCurrentLockAmount = BigInt(currentLockAmount.amount);
-  //
-  //       return old + bnCurrentLockAmount;
-  //     }, BigInt(0));
-  //
-  //     const lockAmount = (BigInt(amount) - bnTotalLocking).toString();
-  //
-  //     lockTx = apiPromise.api.tx.collatorStaking.lock(lockAmount);
-  //     stakeTx = apiPromise.api.tx.collatorStaking.stake([{
-  //       candidate: selectedValidatorInfo.address,
-  //       stake: amount
-  //     }]);
-  //   }
-  //
-  //   return compoundTransactions(lockTx, stakeTx);
-  // }
 
   /* Join pool action */
 
