@@ -3,6 +3,6 @@
 
 import ClearMetadataForChains from './ClearMetadataForChains';
 
-export default class ClearMetadataDatabase extends ClearMetadataForChains {
-  chains: string[] = [];
+export default class ClearMetadataForMythos extends ClearMetadataForChains {
+  chains: string[] = ['mythos', 'muse_testnet'];
 }
