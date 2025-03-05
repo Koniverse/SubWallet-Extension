@@ -18,35 +18,12 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { calculateReward, dynamicTaoSlug } from '../../utils';
 import { fetchDelegates, TaoStakeInfo } from './tao';
 
-interface Owner {
-  ss58: string;
-  hex: string;
-}
-
-interface Metadata {
-  bittensor_id: string;
-  name: string;
-  owner: string;
-  github: string;
-  hw_requirements: string;
-  image_url: string;
-  description: string;
-}
-
 export interface SubnetData {
   netuid: number;
-  owner: Owner;
-  max_validators: number;
-  metadata?: Metadata;
-}
-
-interface ApiResponse {
-  data: SubnetData[];
-}
-
-interface MergeSubnetData extends SubnetData {
   name: string;
   symbol: string;
+  ownerHotkey: string;
+  maxAllowedValidators: number;
 }
 
 interface TaoStakingStakeOption {
@@ -70,43 +47,47 @@ export interface RawDelegateState {
   }>;
 }
 
-interface PoolData {
-  netuid: number;
-  name: string;
-  symbol: string;
-}
+// interface ApiResponse {
+//   data: SubnetData[];
+// }
 
-interface PoolApiResponse {
-  data: PoolData[];
-}
+// interface PoolData {
+//   netuid: number;
+//   name: string;
+//   symbol: string;
+// }
 
-const SUBNET_API_URL = 'https://dash.taostats.io/api/subnet';
-const POOL_API_URL = 'https://dash.taostats.io/api/dtao/pool';
+// interface PoolApiResponse {
+//   data: PoolData[];
+// }
 
-export async function fetchSubnetData () {
-  try {
-    const [subnetResponse, poolResponse] = await Promise.all([
-      fetch(SUBNET_API_URL).then((res) => res.json()) as Promise<ApiResponse>,
-      fetch(POOL_API_URL).then((res) => res.json()) as Promise<PoolApiResponse>
-    ]);
+// const SUBNET_API_URL = 'https://dash.taostats.io/api/subnet';
+// const POOL_API_URL = 'https://dash.taostats.io/api/dtao/pool';
 
-    const poolMap = new Map(poolResponse.data.map((pool) => [pool.netuid, pool]));
+// export async function fetchSubnetData () {
+//   try {
+//     const [subnetResponse, poolResponse] = await Promise.all([
+//       fetch(SUBNET_API_URL).then((res) => res.json()) as Promise<ApiResponse>,
+//       fetch(POOL_API_URL).then((res) => res.json()) as Promise<PoolApiResponse>
+//     ]);
 
-    const filteredSubnets = subnetResponse.data.filter((subnet) => subnet.netuid !== 0);
+//     const poolMap = new Map(poolResponse.data.map((pool) => [pool.netuid, pool]));
 
-    const mergedData = filteredSubnets.map((subnet) => ({
-      ...subnet,
-      name: poolMap.get(subnet.netuid)?.name || 'Unknown',
-      symbol: poolMap.get(subnet.netuid)?.symbol || 'Unknown'
-    }));
+//     const filteredSubnets = subnetResponse.data.filter((subnet) => subnet.netuid !== 0);
 
-    return mergedData;
-  } catch (err) {
-    console.error('Error:', err);
+//     const mergedData = filteredSubnets.map((subnet) => ({
+//       ...subnet,
+//       name: poolMap.get(subnet.netuid)?.name || 'Unknown',
+//       symbol: poolMap.get(subnet.netuid)?.symbol || 'Unknown'
+//     }));
 
-    return [];
-  }
-}
+//     return mergedData;
+//   } catch (err) {
+//     console.error('Error:', err);
+
+//     return [];
+//   }
+// }
 
 interface RateSubnetData {
   netuid: number;
@@ -114,8 +95,22 @@ interface RateSubnetData {
   alphaIn: string;
 }
 
+interface DynamicInfo {
+  netuid: number;
+  ownerHotkey: string;
+  subnetName: number[];
+  tokenSymbol: number[];
+}
+
+interface SubnetsInfo {
+  netuid: number;
+  maxAllowedValidators: number;
+}
+
 export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
+
+  console.log('allSubnets', allSubnets);
 
   if (!allSubnets) {
     return {};
@@ -153,7 +148,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   protected override name: string;
   protected override shortName: string;
   public subnetName: string;
-  public subnetData: MergeSubnetData[] = [];
+  public subnetData: SubnetData[] = [];
 
   constructor (state: KoniState, chain: string) {
     super(state, chain);
@@ -166,10 +161,31 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
   private async init () {
     try {
-      const data = await fetchSubnetData();
+      const substrateApi = await this.substrateApi.isReady;
+      const dynamicInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as DynamicInfo[] | undefined;
+      const subnetsInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getSubnetsInfoV2()).toJSON() as SubnetsInfo[] | undefined;
 
-      if (data.length > 0) {
-        this.subnetData = data;
+      if (dynamicInfo && subnetsInfo) {
+        const mergedData = dynamicInfo
+          .filter((dynInfo) => dynInfo.netuid !== 0)
+          .map((dynInfo) => {
+            const extraInfo = subnetsInfo.find((subnet) => subnet.netuid === dynInfo.netuid);
+
+            const nameRaw = String.fromCharCode(...dynInfo.subnetName);
+            const name = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
+
+            const symbol = new TextDecoder('utf-8').decode(Uint8Array.from(dynInfo.tokenSymbol));
+
+            return {
+              netuid: dynInfo.netuid,
+              name,
+              symbol,
+              ownerHotkey: dynInfo.ownerHotkey,
+              maxAllowedValidators: extraInfo ? extraInfo.maxAllowedValidators : 0
+            };
+          });
+
+        this.subnetData = mergedData;
       }
     } catch (err) {
       console.error(err);
@@ -180,7 +196,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
     return 'Stake TAO to earn rewards from subnet';
   }
 
-  private getSubnetByNetuid (netuid: number): MergeSubnetData | undefined {
+  private getSubnetByNetuid (netuid: number): SubnetData | undefined {
     return this.subnetData.find((subnet) => subnet.netuid === netuid);
   }
 
@@ -202,7 +218,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
         this.subnetData.forEach((subnet) => {
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid}`;
-          const subnetName = `${subnet.metadata?.name || 'Unknown'} ${netuid}`;
+          const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
 
           const data: NativeYieldPoolInfo = {
             ...this.baseInfo,
@@ -212,7 +228,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
               ...this.metadataInfo,
               name: subnetName,
               shortName: subnetName,
-              description: subnet.metadata?.description || 'Stake TAO to earn rewards',
+              description: 'Stake TAO to earn rewards',
               subnetData: {
                 subnetName: this.subnetName,
                 netuid: subnet.netuid,
@@ -225,7 +241,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
                   slug: this.nativeToken.slug
                 }
               ],
-              maxCandidatePerFarmer: subnet.max_validators,
+              maxCandidatePerFarmer: subnet.maxAllowedValidators,
               maxWithdrawalRequestPerFarmer: 1,
               earningThreshold: {
                 join: BNminDelegatorStake.toString(),
@@ -362,7 +378,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
             }
 
             const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid.padStart(2, '0')}`;
-            const subnetName = `${subnet.metadata?.name || 'Unknown'} ${netuid}`;
+            const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
             const subnetSymbol = subnet.symbol || 'dTAO';
 
             if (delegatorState.length > 0) {
