@@ -105,6 +105,10 @@ const Component: FC<Props> = (props: Props) => {
       return t('Stake token');
     }
 
+    if (currentStep.type === SwapStepType.PERMIT) {
+      return t('Sign message');
+    }
+
     // if (processData.type === ProcessType.SWAP) {
     //   //
     // }

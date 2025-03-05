@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConfirmationsQueue, ConfirmationsQueueTon } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -31,6 +31,10 @@ const initialState: RequestState = {
   tonSendTransactionRequest: {},
   tonWatchTransactionRequest: {},
 
+  cardanoSignatureRequest: {},
+  cardanoSendTransactionRequest: {},
+  cardanoWatchTransactionRequest: {},
+
   aliveProcess: {},
 
   // Summary Info
@@ -53,6 +57,9 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'tonSignatureRequest',
   'tonSendTransactionRequest',
   'tonWatchTransactionRequest',
+  'cardanoSignatureRequest',
+  'cardanoSendTransactionRequest',
+  'tonWatchTransactionRequest',
   'connectWCRequest',
   'notSupportWCRequest'
 ];
@@ -70,6 +77,7 @@ const readyMap = {
   updateSigningRequests: false,
   updateConfirmationRequests: false,
   updateConfirmationRequestsTon: false,
+  updateConfirmationRequestCardano: false,
   updateConnectWalletConnect: false,
   updateNotSupportWalletConnect: false
 };
@@ -134,6 +142,11 @@ const requestStateSlice = createSlice({
     updateConfirmationRequestsTon (state, action: PayloadAction<Partial<ConfirmationsQueueTon>>) {
       Object.assign(state, action.payload);
       readyMap.updateConfirmationRequestsTon = true;
+      computeStateSummary(state as RequestState);
+    },
+    updateConfirmationRequestsCardano (state, action: PayloadAction<Partial<ConfirmationsQueueCardano>>) {
+      Object.assign(state, action.payload);
+      readyMap.updateConfirmationRequestCardano = true;
       computeStateSummary(state as RequestState);
     },
     updateWCNotSupportRequests (state, { payload }: PayloadAction<Record<string, WalletConnectNotSupportRequest>>) {

@@ -59,12 +59,16 @@ const useGetTransactionProcessStepText = () => {
           const { fromAmount, pair, toAmount } = processStep.metadata as unknown as BriefSwapStep;
           const fromAsset = assetRegistry[pair.from];
           const toAsset = assetRegistry[pair.to];
+          const fromChain = chainInfoMap[fromAsset.originChain];
+          const toChain = chainInfoMap[toAsset.originChain];
 
           return {
             fromTokenValue: toDisplayNumber(fromAmount, _getAssetDecimals(fromAsset)),
             fromTokenSymbol: _getAssetSymbol(fromAsset),
+            fromChainName: fromChain.name,
             toTokenValue: toDisplayNumber(toAmount, _getAssetDecimals(toAsset)),
-            toTokenSymbol: _getAssetSymbol(toAsset)
+            toTokenSymbol: _getAssetSymbol(toAsset),
+            toChainName: toChain.name
           };
         } catch (e) {
           console.log('analysisMetadata error', e);
@@ -72,13 +76,15 @@ const useGetTransactionProcessStepText = () => {
           return {
             fromTokenValue: '',
             fromTokenSymbol: '',
+            fromChainName: '',
             toTokenValue: '',
-            toTokenSymbol: ''
+            toTokenSymbol: '',
+            toChainName: ''
           };
         }
       };
 
-      return t('Swap {{fromTokenValue}} {{fromTokenSymbol}} for {{toTokenValue}} {{toTokenSymbol}}', {
+      return t('Swap {{fromTokenValue}} {{fromTokenSymbol}} on {{fromChainName}} for {{toTokenValue}} {{toTokenSymbol}} on {{toChainName}}', {
         replace: {
           ...analysisMetadata()
         }
@@ -111,11 +117,28 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
+      /**
+       * TODO: Improve check process type
+       * At the moment, only swap use `CommonStepType.TOKEN_APPROVAL`.
+       * So simple check with this type is enough
+       * */
+      if (processStep.type === CommonStepType.TOKEN_APPROVAL) {
+        return t('Approve {{tokenSymbol}} on {{chainName}} for swap', {
+          replace: {
+            ...analysisMetadata()
+          }
+        });
+      }
+
       return t('Approve {{tokenSymbol}} on {{chainName}} for transfer', {
         replace: {
           ...analysisMetadata()
         }
       });
+    }
+
+    if (processStep.type === SwapStepType.PERMIT) {
+      return t('Sign message to authorize provider');
     }
 
     if (([
