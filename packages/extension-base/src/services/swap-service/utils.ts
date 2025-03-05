@@ -121,23 +121,41 @@ export function getChainflipBroker (isTestnet: boolean) { // noted: currently no
 }
 
 export function generateSwapPairs (substrateApi: _SubstrateApi, chainService: ChainService, fromAsset: _ChainAsset, maxPathLength = 1) {
-  let currentTargets: _ChainAsset[] = [];
-  let newTargets: _ChainAsset[] = [];
-
   if (maxPathLength < 1) {
-    return currentTargets;
+    return [];
   }
 
-  const xcmTargets = findXcmDestinations(chainService, fromAsset);
-  const swapTargets = findSwapDestinations(chainService, fromAsset);
+  let currentTargets: _ChainAsset[] = [];
+  let newTargets: _ChainAsset[] = [];
+  let currentStep = 1;
 
-  newTargets = Array.from(new Set([...xcmTargets, ...swapTargets]));
-  currentTargets = Array.from(new Set([...currentTargets, ...newTargets]));
+  // step 1:
+  newTargets = findDestinations(chainService, fromAsset);
+  currentTargets = mergeWithoutDuplicate<_ChainAsset>(currentTargets, newTargets);
+  currentStep += 1;
+
+  // step 2 - n
+  while (currentStep <= maxPathLength) { // todo: improve by stop when nothing new
+    newTargets = Array.from(newTargets.reduce((farChildTargets, currentTarget) => {
+      const farChildTargetsLocal = findDestinations(chainService, currentTarget);
+
+      return new Set([...farChildTargets, ...farChildTargetsLocal]);
+    }, new Set<_ChainAsset>()));
+    currentTargets = mergeWithoutDuplicate<_ChainAsset>(currentTargets, newTargets);
+    currentStep += 1;
+  }
 
   return currentTargets;
 }
 
-export function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+function findDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const xcmTargets = findXcmDestinations(chainService, chainAsset);
+  const swapTargets = findSwapDestinations(chainService, chainAsset);
+
+  return mergeWithoutDuplicate<_ChainAsset>(xcmTargets, swapTargets);
+}
+
+function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
   const xcmTargets: _ChainAsset[] = [];
   const multichainAssetSlug = _getMultiChainAsset(chainAsset);
 
@@ -156,9 +174,9 @@ export function findXcmDestinations (chainService: ChainService, chainAsset: _Ch
   return xcmTargets;
 }
 
-export function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
-  const swapTargets: _ChainAsset[] = [];
+function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
   const chain = chainAsset.originChain;
+  const swapTargets: _ChainAsset[] = [];
 
   const availableChains = Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).reduce((remainChains, currentChains) => {
     if (currentChains.includes(chain)) {
@@ -179,6 +197,34 @@ export function findSwapDestinations (chainService: ChainService, chainAsset: _C
   return swapTargets;
 }
 
-export function isHasChannel (subtrateApi: _SubstrateApi, fromChain: _ChainAsset, toChain: _ChainAsset) {
+export function findSwapDestinationsV2 (chainService: ChainService, chainAsset: _ChainAsset) {
+  const chain = chainAsset.originChain;
+  const swapTargets: _ChainAsset[] = [];
+
+  // Convert to Set once at the start
+  const availableChains = new Set<string>(
+    Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)
+      .filter((chains) => chains.includes(chain))
+      .flat()
+  );
+
+  // Use Set for O(1) lookup instead of includes()
+  for (const candidate of availableChains) {
+    const assets = chainService.getAssetByChainAndType(
+      candidate,
+      _getFungibleAssetType()
+    );
+
+    swapTargets.push(...Object.values(assets));
+  }
+
+  return swapTargets;
+}
+
+function isHasChannel (subtrateApi: _SubstrateApi, fromChain: _ChainAsset, toChain: _ChainAsset) {
   return true;
+}
+
+function mergeWithoutDuplicate<T> (arr1: T[], arr2: T[]): T[] {
+  return Array.from(new Set([...arr1, ...arr2]));
 }

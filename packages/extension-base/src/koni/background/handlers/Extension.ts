@@ -1326,7 +1326,7 @@ export default class KoniExtension {
     const warnings: TransactionWarning[] = [];
     const chainInfo = this.#koniState.getChainInfo(chain);
 
-    const test = generateSwapPairs(this.#koniState.getSubstrateApi(chain), this.#koniState.chainService, transferTokenInfo).map((asset) => asset.slug);
+    const test = generateSwapPairs(this.#koniState.getSubstrateApi(chain), this.#koniState.chainService, transferTokenInfo, 3).map((asset) => asset.slug);
 
     console.log('test', test);
 
