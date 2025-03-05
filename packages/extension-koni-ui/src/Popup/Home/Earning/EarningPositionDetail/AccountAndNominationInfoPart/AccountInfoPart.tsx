@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { DynamicYieldPositionInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
@@ -160,7 +160,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
             label: t('Derivative token balance'),
-            value: subnetData?.originalTotalStake,
+            value: subnetData?.originalTotalStake || '',
             decimals: inputAsset?.decimals || 0,
             suffix: subnetData?.subnetSymbol
           }

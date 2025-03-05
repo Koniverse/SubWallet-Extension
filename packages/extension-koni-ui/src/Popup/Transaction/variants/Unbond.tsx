@@ -130,7 +130,7 @@ const Component: React.FC = () => {
       }
 
       case YieldPoolType.DYNAMIC_STAKING: {
-        return selectedValidator?.originActiveStake || '0';
+        return selectedValidator?.activeStake || '0';
       }
 
       case YieldPoolType.LIQUID_STAKING:
@@ -138,7 +138,7 @@ const Component: React.FC = () => {
       default:
         return positionInfo?.activeStake || '0';
     }
-  }, [mustChooseValidator, poolInfo.metadata.inputAsset, poolInfo.statistic?.assetEarning, poolInfo.type, positionInfo?.activeStake, selectedValidator?.activeStake, selectedValidator?.originActiveStake]);
+  }, [mustChooseValidator, poolInfo.metadata.inputAsset, poolInfo.statistic?.assetEarning, poolInfo.type, positionInfo?.activeStake, selectedValidator?.activeStake]);
 
   const [isChangeData, setIsChangeData] = useState(false);
 

@@ -7,15 +7,16 @@ import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/backgro
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import BigN from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward, dynamicTaoSlug } from '../../utils';
-import { fetchDelegates, getTaoToAlphaMapping, TaoStakeInfo } from './tao';
+import { fetchDelegates, TaoStakeInfo } from './tao';
 
 interface Owner {
   ss58: string;
@@ -51,7 +52,7 @@ interface MergeSubnetData extends SubnetData {
 interface TaoStakingStakeOption {
   owner: string;
   amount: string;
-  stake?: string;
+  rate?: BigNumber;
   // identity: string
 }
 
@@ -107,6 +108,36 @@ export async function fetchSubnetData () {
   }
 }
 
+interface RateSubnetData {
+  netuid: number;
+  taoIn: string;
+  alphaIn: string;
+}
+
+export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
+  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
+
+  if (!allSubnets) {
+    return {};
+  }
+
+  return allSubnets.reduce((acc, subnet) => {
+    const netuid = subnet?.netuid;
+    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
+    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
+
+    if (netuid === 0) {
+      acc[netuid] = '1';
+    } else if (alphaIn.gt(0)) {
+      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
+    } else {
+      acc[netuid] = '1';
+    }
+
+    return acc;
+  }, {} as Record<number, string>);
+};
+
 export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
     throw new Error('Method not implemented.');
@@ -134,10 +165,14 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   }
 
   private async init () {
-    const data = await fetchSubnetData();
+    try {
+      const data = await fetchSubnetData();
 
-    if (data.length > 0) {
-      this.subnetData = data;
+      if (data.length > 0) {
+        this.subnetData = data;
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -234,8 +269,10 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
     let allActiveStake = BN_ZERO;
 
     for (const delegate of delegatorState) {
-      const activeStake = delegate.amount;
-      const bnActiveStake = new BN(activeStake);
+      const stake = new BigN(delegate.amount);
+      const originActiveStake = stake.multipliedBy(delegate.rate || new BigN(1)).toFixed(0).toString();
+
+      const bnActiveStake = new BN(originActiveStake);
 
       if (bnActiveStake.gt(BN_ZERO)) {
         const delegationStatus = EarningStatus.EARNING_REWARD;
@@ -246,9 +283,9 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
           status: delegationStatus,
           chain: chainInfo.slug,
           validatorAddress: delegate.owner,
-          activeStake: activeStake,
+          activeStake: delegate.amount,
           validatorMinStake: minDelegatorStake,
-          originActiveStake: delegate.stake
+          originActiveStake: originActiveStake
         });
       }
     }
@@ -296,8 +333,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
             const subnet = this.getSubnetByNetuid(netuid);
 
             if (subnet) {
-              const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
-              const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+              const taoToAlphaPrice = new BigN(price[netuid]);
 
               if (!subnetPositions[netuid]) {
                 subnetPositions[netuid] = {
@@ -309,11 +345,11 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
               subnetPositions[netuid].delegatorState.push({
                 owner: hotkey,
-                amount: taoStake,
-                stake: stake.toString()
+                amount: stake.toString(),
+                rate: taoToAlphaPrice
               });
 
-              subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(taoStake));
+              subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));
               subnetPositions[netuid].originalTotalStake = subnetPositions[netuid].originalTotalStake.add(new BN(stake.toString()));
             }
           }

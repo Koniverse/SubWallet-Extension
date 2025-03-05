@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { DynamicYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetChainPrefixBySlug, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -42,6 +42,8 @@ function Component ({ className, compound,
     return null;
   }
 
+  const symbol = (compound as DynamicYieldPositionInfo).subnetData?.subnetSymbol || inputAsset?.symbol || '';
+
   return (
     <CollapsiblePanel
       className={CN(className)}
@@ -72,7 +74,7 @@ function Component ({ className, compound,
                   </div>
                 </>
               )}
-              suffix={inputAsset?.symbol}
+              suffix={symbol}
               value={item.activeStake}
               valueColorSchema='even-odd'
             />

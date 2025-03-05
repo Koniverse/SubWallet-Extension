@@ -6,7 +6,6 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
@@ -57,36 +56,6 @@ interface Validator {
   take: string;
   apr: string;
 }
-
-interface SubnetData {
-  netuid: number;
-  taoIn: string; // Dữ liệu từ JSON thường là string số lớn
-  alphaIn: string;
-}
-
-export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
-  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as SubnetData[] | undefined;
-
-  if (!allSubnets) {
-    return {};
-  }
-
-  return allSubnets.reduce((acc, subnet) => {
-    const netuid = subnet?.netuid;
-    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
-    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
-
-    if (netuid === 0) {
-      acc[netuid] = '1';
-    } else if (alphaIn.gt(0)) {
-      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
-    } else {
-      acc[netuid] = '1';
-    }
-
-    return acc;
-  }, {} as Record<number, string>);
-};
 
 export const BITTENSOR_API_KEY_1 = process.env.BITTENSOR_API_KEY_1 || '';
 export const BITTENSOR_API_KEY_2 = process.env.BITTENSOR_API_KEY_2 || '';
@@ -333,8 +302,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
       );
 
-      const price = await getTaoToAlphaMapping(this.substrateApi);
-
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
           const owner = reformatAddress(useAddresses[i], 42);
@@ -351,12 +318,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             const stake = new BigN(delegate.stake);
 
             if (netuid === 0) {
-              const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
-
-              const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+              const taoStake = stake.toFixed(0);
 
               if (totalDelegate[hotkey]) {
-                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
+                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toFixed();
               } else {
                 totalDelegate[hotkey] = taoStake;
               }
