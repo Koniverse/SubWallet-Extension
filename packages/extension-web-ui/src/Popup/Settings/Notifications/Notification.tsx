@@ -13,6 +13,7 @@ import { FilterTabItemType, FilterTabs } from '@subwallet/extension-web-ui/compo
 import Search from '@subwallet/extension-web-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
+import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-web-ui/hooks/common/useLocalStorage';
@@ -87,6 +88,7 @@ function Component ({ isInModal,
   const { token } = useTheme() as Theme;
   const { alertModal } = useContext(WalletModalContext);
   const chainsByAccountType = useGetChainSlugsByAccount();
+  const { claimBridgeModal, claimRewardModal, withdrawModal } = useContext(TransactionModalContext);
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
@@ -315,7 +317,11 @@ function Component ({ isInModal,
               from: item.address
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
-              navigate('/transaction/withdraw');
+              if (isInModal) {
+                withdrawModal.open();
+              } else {
+                navigate('/transaction/withdraw');
+              }
             }).catch(console.error);
           } else {
             showWarningModal('withdrawn');
@@ -337,7 +343,11 @@ function Component ({ isInModal,
               from: item.address
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
-              navigate('/transaction/claim-reward');
+              if (isInModal) {
+                claimRewardModal.open();
+              } else {
+                navigate('/transaction/claim-reward');
+              }
             }).catch(console.error);
           } else {
             if (chainStateMap[chainSlug]?.active) {
@@ -376,7 +386,12 @@ function Component ({ isInModal,
                 });
 
                 await switchReadNotificationStatus(switchStatusParams);
-                navigate('/transaction/claim-bridge');
+
+                if (isInModal) {
+                  claimBridgeModal.open();
+                } else {
+                  navigate('/transaction/claim-bridge');
+                }
               } else {
                 showWarningModal('claimed');
               }
@@ -406,7 +421,11 @@ function Component ({ isInModal,
               from: item.address
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
-              navigate('/transaction/claim-bridge');
+              if (isInModal) {
+                claimBridgeModal.open();
+              } else {
+                navigate('/transaction/claim-bridge');
+              }
             }).catch(console.error);
           } else {
             showWarningModal('claimed');
@@ -424,7 +443,7 @@ function Component ({ isInModal,
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, refreshNotifications]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, refreshNotifications]);
 
   const onClickMore = useCallback((item: NotificationInfoItem) => {
     return (e: SyntheticEvent) => {

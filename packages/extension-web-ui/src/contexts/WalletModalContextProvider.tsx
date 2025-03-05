@@ -6,7 +6,7 @@ import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Accoun
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
 import { AddressQrModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AddressQrModal';
-import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { useAlert, useGetConfig, useSetSessionLatest, useSwitchModal } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -126,12 +126,6 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
 
   useExcludeModal(CONFIRMATION_MODAL);
-  useExcludeModal(TRANSACTION_TRANSFER_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_UNSTAKE_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_FAST_WITHDRAW_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_CLAIM_MODAL);
   useExcludeModal(BUY_TOKEN_MODAL);
   useExcludeModal(EARNING_INSTRUCTION_MODAL);
 

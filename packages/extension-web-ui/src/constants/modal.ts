@@ -103,6 +103,7 @@ export const TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL = 'transaction-yield-cancel-
 export const TRANSACTION_YIELD_WITHDRAW_MODAL = 'transaction-yield-withdraw-modal';
 export const TRANSACTION_YIELD_FAST_WITHDRAW_MODAL = 'transaction-yield-fast-withdraw-modal';
 export const TRANSACTION_YIELD_CLAIM_MODAL = 'transaction-yield-claim-modal';
+export const TRANSACTION_CLAIM_BRIDGE = 'transaction-claim-bridge-modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';

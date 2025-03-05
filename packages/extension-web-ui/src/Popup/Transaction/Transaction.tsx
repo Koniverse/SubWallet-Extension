@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-web-ui/components';
-import { DEFAULT_TRANSACTION_PARAMS, OFF_RAMP_DATA, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_TRANSACTION_PARAMS, OFF_RAMP_DATA, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-web-ui/contexts/TransactionContext';
@@ -58,6 +58,8 @@ function Component ({ children, className, modalContent, modalId }: Props) {
       return ExtrinsicType.REDEEM_LDOT;
     } else if (checkActive(TRANSACTION_YIELD_CLAIM_MODAL)) {
       return ExtrinsicType.STAKING_CLAIM_REWARD;
+    } else if (checkActive(TRANSACTION_CLAIM_BRIDGE)) {
+      return ExtrinsicType.CLAIM_BRIDGE;
     }
 
     switch (action) {
@@ -77,6 +79,8 @@ function Component ({ children, className, modalContent, modalId }: Props) {
         return ExtrinsicType.SEND_NFT;
       case 'swap':
         return ExtrinsicType.SWAP;
+      case 'claim-bridge':
+        return ExtrinsicType.CLAIM_BRIDGE;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -169,6 +173,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
   }, [navigate, recheckingChain]);
 
   const contextValues = useMemo((): TransactionContextProps => ({
+    isInModal: modalContent,
     defaultData,
     needPersistData,
     persistData: setStorage,
@@ -182,7 +187,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
     openRecheckChainConnectionModal,
     closeRecheckChainConnectionModal,
     modalId
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalContent, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
 
   useEffect(() => {
     chain !== '' && chainChecker(chain);

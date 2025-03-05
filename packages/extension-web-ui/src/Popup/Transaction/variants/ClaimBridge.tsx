@@ -32,7 +32,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   const navigate = useNavigate();
   const { notification } = props;
 
-  const { defaultData, persistData } = useTransactionContext<ClaimBridgeParams>();
+  const { defaultData, isInModal, persistData } = useTransactionContext<ClaimBridgeParams>();
 
   const [form] = Form.useForm<ClaimBridgeParams>();
   const formDefault = useMemo((): ClaimBridgeParams => ({ ...defaultData }), [defaultData]);
@@ -181,19 +181,23 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
         </Form>
       </TransactionContent>
       <TransactionFooter>
-        <Button
-          disabled={loading}
-          icon={(
-            <Icon
-              phosphorIcon={XCircle}
-              weight='fill'
-            />
-          )}
-          onClick={goHome}
-          schema={'secondary'}
-        >
-          {t('Cancel')}
-        </Button>
+        {
+          !isInModal && (
+            <Button
+              disabled={loading}
+              icon={(
+                <Icon
+                  phosphorIcon={XCircle}
+                  weight='fill'
+                />
+              )}
+              onClick={goHome}
+              schema={'secondary'}
+            >
+              {t('Cancel')}
+            </Button>
+          )
+        }
 
         <Button
           disabled={isDisable || !isBalanceReady}
