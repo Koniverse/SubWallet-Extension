@@ -41,54 +41,56 @@ function Component ({ className = '' }: Props) {
 
   return (
     <PageWrapper className={CN('main-page-container', className)}>
-      <SwHeader
-        className={'error-fallback-header'}
-      >
-        {t('Unknown error')}
-      </SwHeader>
-      <div className={'__body-area'}>
-        <PageIcon
-          color={token.colorError}
-          iconProps={{
-            phosphorIcon: Robot
-          }}
-        />
-        <div className={'__title'}>{t('Oops, an error occurred!')}</div>
-        <div className={'__content'}>
-          <span>{t('Something went wrong. Help us fix the problem by sending a report anonymously!')}</span>
+      <div className={'main-layout-content'}>
+        <SwHeader
+          className={'error-fallback-header'}
+        >
+          {t('Unknown error')}
+        </SwHeader>
+        <div className={'__body-area'}>
+          <PageIcon
+            color={token.colorError}
+            iconProps={{
+              phosphorIcon: Robot
+            }}
+          />
+          <div className={'__title'}>{t('Oops, an error occurred!')}</div>
+          <div className={'__content'}>
+            <span>{t('Something went wrong. Help us fix the problem by sending a report anonymously!')}</span>
+          </div>
         </div>
-      </div>
 
-      <div className={'__footer-area'}>
-        <Button
-          block={true}
-          icon={(
-            <Icon
-              className={'icon-submit'}
-              phosphorIcon={Share}
-              weight='fill'
-            />
-          )}
-          loading={isUploading}
-          onClick={uploadCrashLog}
-        >
-          {t('Send report')}
-        </Button>
-        <Button
-          block={true}
-          disabled={isUploading}
-          icon={(
-            <Icon
-              className={'icon-submit'}
-              phosphorIcon={House}
-              weight='fill'
-            />
-          )}
-          onClick={goHome}
-          schema={'secondary'}
-        >
-          {t('Back to home')}
-        </Button>
+        <div className={'__footer-area'}>
+          <Button
+            block={true}
+            icon={(
+              <Icon
+                className={'icon-submit'}
+                phosphorIcon={Share}
+                weight='fill'
+              />
+            )}
+            loading={isUploading}
+            onClick={uploadCrashLog}
+          >
+            {t('Send report')}
+          </Button>
+          <Button
+            block={true}
+            disabled={isUploading}
+            icon={(
+              <Icon
+                className={'icon-submit'}
+                phosphorIcon={House}
+                weight='fill'
+              />
+            )}
+            onClick={goHome}
+            schema={'secondary'}
+          >
+            {t('Back to home')}
+          </Button>
+        </div>
       </div>
     </PageWrapper>
   );
@@ -96,12 +98,25 @@ function Component ({ className = '' }: Props) {
 
 const ErrorFallback = styled(Component)<Props>(({ theme: { extendToken, token } }: Props) => {
   return ({
-    backgroundColor: token.colorBgDefault,
-    paddingLeft: token.padding,
-    paddingRight: token.padding,
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
+    '.main-layout-content': {
+      backgroundColor: token.colorBgDefault,
+      paddingLeft: token.padding,
+      paddingRight: token.padding,
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative'
+    },
+
+    '.main-layout-content:before': {
+      content: '""',
+      backgroundImage: extendToken.tokensScreenDangerBackgroundColor,
+      height: 180,
+      position: 'absolute',
+      display: 'block',
+      top: 0,
+      left: 0,
+      right: 0
+    },
 
     '.ant-sw-header-container': {
       paddingTop: token.padding,
@@ -113,17 +128,6 @@ const ErrorFallback = styled(Component)<Props>(({ theme: { extendToken, token } 
       color: token.colorTextLight1,
       fontSize: token.fontSizeHeading4,
       lineHeight: token.lineHeightHeading4
-    },
-
-    '&:before': {
-      content: '""',
-      backgroundImage: extendToken.tokensScreenDangerBackgroundColor,
-      height: 180,
-      position: 'absolute',
-      display: 'block',
-      top: 0,
-      left: 0,
-      right: 0
     },
 
     '.__body-area': {
