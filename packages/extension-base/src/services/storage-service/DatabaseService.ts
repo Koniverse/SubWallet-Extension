@@ -679,6 +679,10 @@ export default class DatabaseService {
     return JSON.parse(await this.exportDB()) as DexieExportJsonStructure;
   }
 
+  public hasRunScript (key: string): Promise<boolean> {
+    return this.stores.migration.hasRunScript(key);
+  }
+
   // public setAssetRef (assetRef: Record<string, _AssetRef>) {
   //   const assetRefList = Object.entries(assetRef).map(([slug, item]) => {
   //     return {
