@@ -100,6 +100,9 @@ interface DynamicInfo {
   ownerHotkey: string;
   subnetName: number[];
   tokenSymbol: number[];
+  subnetIdentity?: {
+    subnetName: `0x${string}`;
+  }
 }
 
 interface SubnetsInfo {
@@ -169,8 +172,16 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
           .map((dynInfo) => {
             const extraInfo = subnetsInfo.find((subnet) => subnet.netuid === dynInfo.netuid);
 
-            const nameRaw = String.fromCharCode(...dynInfo.subnetName);
-            const name = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
+            const nameRaw = dynInfo.subnetIdentity?.subnetName || String.fromCharCode(...dynInfo.subnetName);
+
+            const identityName = dynInfo.subnetIdentity?.subnetName
+              ? Buffer.from(dynInfo.subnetIdentity.subnetName.slice(2), 'hex').toString('utf-8')
+              : '';
+
+            const formattedIdentityName = identityName
+              ? identityName.charAt(0).toUpperCase() + identityName.slice(1).toLowerCase()
+              : '';
+            const name = formattedIdentityName || nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
 
             const symbol = new TextDecoder('utf-8').decode(Uint8Array.from(dynInfo.tokenSymbol));
 
