@@ -9,7 +9,6 @@ import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
-import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-web-ui/messaging';
 import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -18,7 +17,7 @@ import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -82,9 +81,8 @@ const filterAccount = (
 
 const Component = () => {
   const navigate = useNavigate();
-  const { isWebUI } = useContext(ScreenContext);
 
-  const { defaultData, persistData } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, isInModal, persistData } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
@@ -243,7 +241,7 @@ const Component = () => {
       </TransactionContent>
       <TransactionFooter>
         {
-          !isWebUI && (
+          !isInModal && (
             <Button
               disabled={loading}
               icon={(

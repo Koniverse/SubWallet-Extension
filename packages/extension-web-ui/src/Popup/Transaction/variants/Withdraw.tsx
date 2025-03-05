@@ -8,7 +8,6 @@ import { getAstarWithdrawable } from '@subwallet/extension-base/services/earning
 import { AccountJson, RequestYieldWithdrawal, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-web-ui/components';
-import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useGetChainAssetInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { yieldSubmitStakingWithdrawal } from '@subwallet/extension-web-ui/messaging';
 import { accountFilterFunc } from '@subwallet/extension-web-ui/Popup/Transaction/helper';
@@ -17,7 +16,7 @@ import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -49,9 +48,8 @@ const filterAccount = (
 const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isWebUI } = useContext(ScreenContext);
 
-  const { defaultData, persistData } = useTransactionContext<WithdrawParams>();
+  const { defaultData, isInModal, persistData } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
@@ -231,7 +229,7 @@ const Component = () => {
       </TransactionContent>
       <TransactionFooter>
         {
-          !isWebUI && (
+          !isInModal && (
             <Button
               disabled={loading}
               icon={(

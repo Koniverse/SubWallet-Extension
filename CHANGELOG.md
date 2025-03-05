@@ -1,5 +1,65 @@
 # CHANGELOG
 
+## 1.3.17
+Build date: Feb 18, 2025.
+
+Features & Update:
+- Show well-known tokens on top (#3920)
+- Unable to load TAO balance (#4032)
+
+Bug fixed:
+- Fixed bug Show incorrect APY for some chains (#4026)
+- Fixed rate limit api key for Bittensor(TAO) (#4029)
+
+
+## 1.3.16
+Build date: Feb 10, 2025.
+
+Features & Update:
+- Add in-app staking for Analog
+
+
+## 1.3.15
+Build date: Feb 06, 2025.
+
+Bug fixed:
+- Fix issue Don't open the extension related to Patch feature (#4002)
+- Fix bug Do not show earning position for Bittensor (#4006)
+
+
+## 1.3.14
+Build date: Jan 24, 2025.
+
+Features & Update:
+- Update chain-list stable (#3974)
+- Add staking support for CERE (#360)
+
+
+## 1.3.13
+Build date: Jan 21, 2025.
+
+Features & Update:
+- Re-enable search token feature (#3958)
+- Update signing flow with metadata (#3306)
+
+Bug fixed:
+- Fix bug setup validator related maxCount (#3971)
+
+
+## 1.3.12
+Build date: Jan 06, 2025.
+
+Features & Update:
+- Add referral code for Bifrost Liquid Staking (vDOT, vMANTA)
+- Support bridge ETH <-> POS (#3893)
+- Support Avail Recovery app (#3915)
+- Set up SubWallet validators (#2533)
+- Update chain-list (#3897)
+
+Bug fixed:
+- Fix max transferable for Avail Bridge (#3911)
+
+
 ## 1.3.11
 Build date: Dec 23, 2024.
 
@@ -9,6 +69,7 @@ Features & Update:
 
 Bug fixed:
 - Fix errors when making transactions on Tangle mainnet (#3861)
+
 
 ## 1.3.10
 Build date: Dec 12, 2024.

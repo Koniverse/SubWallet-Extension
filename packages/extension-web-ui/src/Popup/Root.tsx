@@ -9,6 +9,7 @@ import { Logo2D } from '@subwallet/extension-web-ui/components/Logo';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { TransactionModalContextProvider } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { WalletModalContextProvider } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useSubscribeLanguage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
@@ -339,11 +340,13 @@ export function Root (): React.ReactElement {
   return (
     <WebUIContextProvider>
       <WalletModalContextProvider>
-        <DefaultRoute>
-          <BaseWeb>
-            <Outlet />
-          </BaseWeb>
-        </DefaultRoute>
+        <TransactionModalContextProvider>
+          <DefaultRoute>
+            <BaseWeb>
+              <Outlet />
+            </BaseWeb>
+          </DefaultRoute>
+        </TransactionModalContextProvider>
       </WalletModalContextProvider>
     </WebUIContextProvider>
   );

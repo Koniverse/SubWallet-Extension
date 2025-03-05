@@ -8,17 +8,16 @@ import { EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/
 import { AlertModal, BaseModal, EarningInstructionModal, EarningPositionDesktopItem, EarningPositionItem, EmptyList, FilterModal, Layout } from '@subwallet/extension-web-ui/components';
 import { FilterTabsNode } from '@subwallet/extension-web-ui/components/FilterTabsNode';
 import BannerGenerator from '@subwallet/extension-web-ui/components/StaticContent/BannerGenerator';
-import { ASTAR_PORTAL_URL, BN_TEN, CANCEL_UN_STAKE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, EARNING_INSTRUCTION_MODAL, EARNING_WARNING_ANNOUNCEMENT, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { ASTAR_PORTAL_URL, BN_TEN, CANCEL_UN_STAKE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, EARNING_INSTRUCTION_MODAL, EARNING_WARNING_ANNOUNCEMENT, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { useAlert, useFilterModal, useGetBannerByScreen, useGetYieldPositionForSpecificAccount, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron } from '@subwallet/extension-web-ui/messaging';
 import EarningPositionBalance from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningEntry/EarningPositions/EarningPositionsBalance';
 import { Toolbar } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/Toolbar';
 import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transaction';
 import CancelUnstake from '@subwallet/extension-web-ui/Popup/Transaction/variants/CancelUnstake';
-import ClaimReward from '@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimReward';
 import Unbond from '@subwallet/extension-web-ui/Popup/Transaction/variants/Unbond';
-import Withdraw from '@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw';
 import { EarningEntryView, EarningPositionDetailParam, ExtraYieldPositionInfo, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getTransactionFromAccountProxyValue, isAccountAll, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, ModalContext, SwIconProps, SwList } from '@subwallet/react-ui';
@@ -63,6 +62,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const navigate = useNavigate();
 
   const { activeModal } = useContext(ModalContext);
+  const { claimRewardModal, withdrawModal } = useContext(TransactionModalContext);
 
   const isShowBalance = useSelector((state) => state.settings.isShowBalance);
   const { currencyData, priceMap } = useSelector((state) => state.price);
@@ -335,9 +335,9 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
 
-      activeModal(TRANSACTION_YIELD_CLAIM_MODAL);
+      claimRewardModal.open();
     };
-  }, [activeModal, currentAccountProxy, setClaimRewardStorage]);
+  }, [claimRewardModal, currentAccountProxy, setClaimRewardStorage]);
 
   const onClickStakeButton = useCallback((item: ExtraYieldPositionInfo) => {
     return () => {
@@ -403,9 +403,9 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
 
-      activeModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
+      withdrawModal.open();
     };
-  }, [activeModal, currentAccountProxy, onClickUnStakeButton, setWithdrawStorage]);
+  }, [currentAccountProxy, onClickUnStakeButton, setWithdrawStorage, withdrawModal]);
 
   const onClickItem = useCallback((item: ExtraYieldPositionInfo) => {
     return () => {
@@ -569,10 +569,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     inactiveModal(TRANSACTION_YIELD_UNSTAKE_MODAL);
   }, [inactiveModal]);
 
-  const handleCloseClaim = useCallback(() => {
-    inactiveModal(TRANSACTION_YIELD_CLAIM_MODAL);
-  }, [inactiveModal]);
-
   const handleCloseCancelUnstake = useCallback(() => {
     inactiveModal(TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL);
   }, [inactiveModal]);
@@ -584,9 +580,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     },
     [activeModal]
   );
-  const handleCloseWithdraw = useCallback(() => {
-    inactiveModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
-  }, [inactiveModal]);
 
   const addMore = useCallback(() => {
     setEntryView(EarningEntryView.OPTIONS);
@@ -757,20 +750,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
       <BaseModal
         className={'right-side-modal'}
         destroyOnClose={true}
-        id={TRANSACTION_YIELD_CLAIM_MODAL}
-        onCancel={handleCloseClaim}
-        title={t('Claim rewards')}
-      >
-        <Transaction
-          modalContent={isWebUI}
-          modalId={TRANSACTION_YIELD_CLAIM_MODAL}
-        >
-          <ClaimReward />
-        </Transaction>
-      </BaseModal>
-      <BaseModal
-        className={'right-side-modal'}
-        destroyOnClose={true}
         id={TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL}
         onCancel={handleCloseCancelUnstake}
         title={t('Cancel unstake')}
@@ -780,20 +759,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           modalId={TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL}
         >
           <CancelUnstake />
-        </Transaction>
-      </BaseModal>
-      <BaseModal
-        className={'right-side-modal'}
-        destroyOnClose={true}
-        id={TRANSACTION_YIELD_WITHDRAW_MODAL}
-        onCancel={handleCloseWithdraw}
-        title={t('Withdraw')}
-      >
-        <Transaction
-          modalContent={isWebUI}
-          modalId={TRANSACTION_YIELD_WITHDRAW_MODAL}
-        >
-          <Withdraw />
         </Transaction>
       </BaseModal>
       {

@@ -26,4 +26,3 @@ export * from './Wallet';
 export * from './Common';
 export * from './Swap';
 export * from './Selector';
-// export * from './NotificationDetailModal';
