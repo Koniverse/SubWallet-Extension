@@ -14,7 +14,9 @@ interface Result {
   loadingChain: boolean;
 }
 
-export default function useMetadata (genesisHash?: string | null, isPartial?: boolean): Result {
+const WAITING_TIME = 3 * 1000;
+
+export default function useMetadata (genesisHash?: string | null, specVersion?: number): Result {
   const [chain, setChain] = useState<Chain | null>(null);
   const [loadingChain, setLoadingChain] = useState(true);
   const _chainInfo = useGetChainInfoByGenesisHash(genesisHash || '');
@@ -29,15 +31,15 @@ export default function useMetadata (genesisHash?: string | null, isPartial?: bo
     }
   }, [_chainInfo, chainString]);
 
-  useEffect((): void => {
+  useEffect(() => {
+    let cancel = false;
+
     setLoadingChain(true);
 
     if (genesisHash) {
       const getChainByMetaStore = async () => {
         try {
-          const chain = await getMetadata(genesisHash, isPartial);
-
-          return chain;
+          return await getMetadata(genesisHash);
         } catch (error) {
           console.error(error);
 
@@ -45,42 +47,87 @@ export default function useMetadata (genesisHash?: string | null, isPartial?: bo
         }
       };
 
-      const fetchData = async () => {
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 5000)); // wait metadata ready to avoid spamming warning alert
+      const fetchChain = async () => {
+        const [chainFromRaw, chainFromMetaStore] = await Promise.all([getMetadataRaw(chainInfo, genesisHash), getChainByMetaStore()]);
 
-          const chainFromRaw = await getMetadataRaw(chainInfo, genesisHash);
-          const chainFromMetaStore = await getChainByMetaStore();
+        let chain: Chain | null;
 
-          if (chainFromRaw && chainFromMetaStore) {
-            if (chainFromRaw.specVersion >= chainFromMetaStore.specVersion) {
-              setChain(chainFromRaw);
-            } else {
-              setChain(chainFromMetaStore);
-            }
-
-            setLoadingChain(false);
-          } else {
-            setChain(chainFromRaw || chainFromMetaStore || null);
-            setLoadingChain(false);
-          }
-        } catch (error) {
-          console.error(error);
-          setChain(null);
-          setLoadingChain(false);
+        if (cancel) {
+          return null;
         }
+
+        if (chainFromRaw && chainFromMetaStore) {
+          if (chainFromRaw.specVersion >= chainFromMetaStore.specVersion) {
+            chain = chainFromRaw;
+          } else {
+            chain = chainFromMetaStore;
+          }
+        } else {
+          chain = chainFromRaw || chainFromMetaStore || null;
+        }
+
+        return chain;
       };
 
-      fetchData().catch((error) => {
-        console.error(error);
-        setChain(null);
-        setLoadingChain(false);
-      });
-    } else {
-      setLoadingChain(false);
-      setChain(null);
+      fetchChain()
+        .then(async (chain): Promise<boolean> => {
+          if (cancel) {
+            return false;
+          }
+
+          setChain(chain);
+
+          if (specVersion) {
+            if (chain?.specVersion === specVersion) {
+              return false;
+            }
+
+            return new Promise<boolean>((resolve) => setTimeout(() => {
+              return resolve(true);
+            }, WAITING_TIME)); // wait metadata ready to avoid spamming warning alert
+          } else {
+            return false;
+          }
+        })
+        .then((needRetry) => {
+          if (needRetry) {
+            fetchChain()
+              .then((chain) => {
+                if (cancel) {
+                  return;
+                }
+
+                setChain(chain);
+                setLoadingChain(false);
+              })
+              .catch(() => {
+                if (cancel) {
+                  return;
+                }
+
+                setChain(null);
+                setLoadingChain(false);
+              });
+          } else {
+            setLoadingChain(false);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+
+          if (cancel) {
+            return;
+          }
+
+          setChain(null);
+          setLoadingChain(false);
+        });
     }
-  }, [chainInfo, genesisHash, isPartial]);
+
+    return () => {
+      cancel = true;
+    };
+  }, [chainInfo, genesisHash, specVersion]);
 
   return useMemo(() => ({ chain, loadingChain }), [chain, loadingChain]);
 }
