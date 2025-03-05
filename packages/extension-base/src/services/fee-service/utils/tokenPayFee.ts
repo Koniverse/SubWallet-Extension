@@ -62,7 +62,7 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
 }
 
 export async function getHydrationTokensCanPayFee (request: RequestHydrationTokensCanPayFee): Promise<TokenHasBalanceInfo[]> {
-  const { chainService, defaultTokenSlug, nativeBalanceInfo, nativeTokenInfo, priceMap, substrateApi, tokensHasBalanceInfoMap } = request;
+  const { chainService, nativeBalanceInfo, nativeTokenInfo, priceMap, substrateApi, tokensHasBalanceInfoMap } = request;
   const tokensList: TokenHasBalanceInfo[] = [nativeBalanceInfo];
   const _acceptedCurrencies = await substrateApi.api.query.multiTransactionPayment.acceptedCurrencies.entries();
 
@@ -109,23 +109,23 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     }
   });
 
-  // case defaultTokenSlug does not have balance
-  const candidateSlugs = tokensList.map((token) => token.slug);
-
-  if (!_isNativeTokenBySlug(defaultTokenSlug) && !candidateSlugs.includes(defaultTokenSlug)) {
-    const defaultTokenInfo = chainService.getAssetBySlug(defaultTokenSlug);
-    const priceId = _getAssetPriceId(defaultTokenInfo); // todo: handle exception token do not have priceId
-    const tokenPrice = priceMap[priceId];
-    const tokenDecimals = _getAssetDecimals(defaultTokenInfo);
-
-    const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
-
-    tokensList.push({
-      slug: defaultTokenSlug,
-      free: '0',
-      rate: rate
-    });
-  }
+  // todo: this handle case defaultTokenSlug does not have balance -> push that token with free = 0
+  // const candidateSlugs = tokensList.map((token) => token.slug);
+  //
+  // if (!_isNativeTokenBySlug(defaultTokenSlug) && !candidateSlugs.includes(defaultTokenSlug)) {
+  //   const defaultTokenInfo = chainService.getAssetBySlug(defaultTokenSlug);
+  //   const priceId = _getAssetPriceId(defaultTokenInfo); // todo: handle exception token do not have priceId
+  //   const tokenPrice = priceMap[priceId];
+  //   const tokenDecimals = _getAssetDecimals(defaultTokenInfo);
+  //
+  //   const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
+  //
+  //   tokensList.push({
+  //     slug: defaultTokenSlug,
+  //     free: '0',
+  //     rate: rate
+  //   });
+  // }
 
   return tokensList;
 }

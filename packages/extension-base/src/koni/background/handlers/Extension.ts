@@ -1679,6 +1679,10 @@ export default class KoniExtension {
         }
       }
 
+      if (!Object.keys(tokensHasBalanceInfoMap).includes(defaultTokenSlug)) {
+        defaultTokenSlug = nativeBalanceInfo.slug;
+      }
+
       tokensCanPayFee = await getHydrationTokensCanPayFee({
         substrateApi,
         chainService,
@@ -1686,7 +1690,6 @@ export default class KoniExtension {
         nativeTokenInfo,
         nativeBalanceInfo,
         tokensHasBalanceInfoMap,
-        defaultTokenSlug,
         feeAmount
       });
     }

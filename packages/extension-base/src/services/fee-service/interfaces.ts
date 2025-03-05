@@ -33,6 +33,5 @@ export interface RequestHydrationTokensCanPayFee {
   nativeBalanceInfo: TokenHasBalanceInfo;
   tokensHasBalanceInfoMap: Record<string, BalanceItem>;
   priceMap: Record<string, number>;
-  defaultTokenSlug: string;
   feeAmount?: string;
 }
