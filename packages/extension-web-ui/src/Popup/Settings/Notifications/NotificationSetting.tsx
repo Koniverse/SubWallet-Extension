@@ -215,7 +215,7 @@ const Wrapper = (props: WrapperProps) => {
         isModal && !!modalProps
           ? (
             <BaseModal
-              className={CN(className)}
+              className={CN(className, '-modal-container')}
               closeIcon={
                 modalProps.onBack
                   ? (
@@ -245,7 +245,7 @@ const Wrapper = (props: WrapperProps) => {
             </BaseModal>
           )
           : (
-            <div className={className}>
+            <div className={CN(className, '-screen-container')}>
               <Component />
             </div>
           )
@@ -256,18 +256,8 @@ const Wrapper = (props: WrapperProps) => {
 
 const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
-    height: '100%',
-    backgroundColor: token.colorBgDefault,
-    display: 'flex',
-    flexDirection: 'column',
-
-    '.notification-setting-modal': {
-      '.ant-sw-modal-body': {
-        padding: 0
-      }
-    },
-
     '.body-container': {
+      padding: token.padding,
       justifyContent: 'space-between',
       display: 'flex',
       height: '100%',
@@ -299,6 +289,7 @@ const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
     '.option-item + .option-item': {
       marginTop: token.marginMD
     },
+
     '.option-item': {
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
@@ -306,6 +297,7 @@ const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
       color: token.colorWhite,
       marginLeft: token.marginSM
     },
+
     '.ant-radio-group': {
       backgroundColor: 'transparent'
     },
@@ -314,6 +306,7 @@ const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
       display: 'flex',
       alignItems: 'center'
     },
+
     '.time-title': {
       marginBottom: token.margin,
       marginTop: token.margin,
@@ -322,6 +315,7 @@ const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
       fontWeight: token.fontWeightStrong,
       color: token.colorWhite
     },
+
     '.radio-wrapper': {
       display: 'flex',
       justifyContent: 'space-between',
@@ -331,17 +325,36 @@ const NotificationSetting = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
       color: token.colorWhite,
       marginLeft: token.marginSM
     },
+
     '.security-item': {
       marginBottom: token.margin,
       '.ant-web3-block-right-item': {
         marginRight: 0
       }
     },
+
     '.ant-checkbox-disabled': {
       '.ant-checkbox-inner': {
         backgroundColor: token.colorPrimary,
         borderColor: token.colorPrimary
       }
+    },
+
+    '&.-modal-container': {
+      '.ant-sw-modal-body': {
+        flex: 1
+      },
+
+      '.body-container': {
+        padding: 0
+      }
+    },
+
+    '&.-screen-container': {
+      height: '100%',
+      backgroundColor: token.colorBgDefault,
+      display: 'flex',
+      flexDirection: 'column'
     }
   });
 });

@@ -118,7 +118,7 @@ function Component ({ isInModal,
   const [notifications, setNotifications] = useState<_NotificationInfo[]>([]);
   const [currentProxyId] = useState<string | undefined>(currentAccountProxy?.id);
   const [loadingNotification, setLoadingNotification] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
@@ -499,6 +499,8 @@ function Component ({ isInModal,
       .catch(console.error);
 
     setLoading(true);
+
+    // todo: refactor this logic, may not have to place fetchInappNotifications here
     fetchInappNotifications({
       proxyId: currentProxyId,
       notificationTab: selectedFilterTab
@@ -511,14 +513,24 @@ function Component ({ isInModal,
   }, [currentProxyId, selectedFilterTab]);
 
   useEffect(() => {
+    let isSync = true;
+
+    setLoading(true);
     fetchInappNotifications({
       proxyId: currentProxyId,
       notificationTab: NotificationTab.ALL
     } as GetNotificationParams)
       .then((rs) => {
-        setNotifications(rs);
+        if (isSync) {
+          setNotifications(rs);
+          setTimeout(() => setLoading(false), 300);
+        }
       })
       .catch(console.error);
+
+    return () => {
+      isSync = false;
+    };
   }, [currentProxyId, isAllAccount, refreshNotificationsTriggerKey]);
 
   useEffect(() => {
@@ -667,7 +679,7 @@ const Wrapper = (props: WrapperProps) => {
 
   const mainComponent = (
     <PageWrapper
-      className={isModal ? undefined : CN(className)}
+      className={isModal ? '__layout-container' : CN(className, '-screen-container')}
       hideLoading={true}
       resolve={dataContext.awaitStores(['earning'])}
     >
@@ -687,7 +699,7 @@ const Wrapper = (props: WrapperProps) => {
         isModal && !!modalProps
           ? (
             <BaseModal
-              className={CN(className, 'notification-modal')}
+              className={CN(className, '-modal-container')}
               destroyOnClose={true}
               id={modalProps.modalId}
               onCancel={modalProps.onCancel}
@@ -732,47 +744,27 @@ const Wrapper = (props: WrapperProps) => {
 
 const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
-    height: '100%',
-    backgroundColor: token.colorBgDefault,
-    display: 'flex',
-    flexDirection: 'column',
-
-    '.notification-modal': {
-      '.ant-sw-modal-body': {
-        padding: 0
-      }
+    '.tool-area': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
     },
 
-    '&.notification-container': {
-      '.filter-tabs-container': {
-        marginLeft: 0,
-        alignItems: 'center'
-      },
+    '.filter-tabs-container': {
       '.__tab-item-label': {
         fontSize: token.fontSize,
         lineHeight: token.lineHeight,
         paddingTop: 0,
-        paddingBottom: 6
+        paddingBottom: 4
+      },
+
+      '.__tab-item:after': {
+        borderColor: token.colorSecondary
       },
 
       '.__filter-tab-mark-read-button': {
         paddingRight: 0
-      },
-      '.right-section': {
-        justifySelf: 'normal'
-      },
-      '.ant-input-search': {
-        flex: 1,
-        width: 'auto'
       }
-    },
-
-    '.tool-area': {
-      display: 'flex',
-      justifyContent: 'space-between'
-    },
-    '.filter-tabs-container': {
-      marginLeft: token.margin
     },
 
     '.ant-sw-list-section': {
@@ -819,6 +811,44 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center'
+    },
+
+    '&.-modal-container': {
+      '.__layout-container': {
+        display: 'flex',
+        height: '100%',
+        flexDirection: 'column',
+        overflow: 'auto'
+      },
+
+      '.ant-sw-modal-body': {
+        flex: 1
+      },
+
+      '.tool-area': {
+        marginRight: -token.margin
+      },
+
+      '.list-container-wrapper': {
+        paddingTop: token.paddingSM
+      }
+    },
+
+    '&.-screen-container': {
+      height: '100%',
+      backgroundColor: token.colorBgDefault,
+      display: 'flex',
+      flexDirection: 'column',
+
+      '.tool-area': {
+        paddingLeft: token.padding
+      },
+
+      '.list-container-wrapper': {
+        paddingLeft: token.padding,
+        paddingRight: token.padding,
+        paddingBottom: token.padding
+      }
     }
   });
 });

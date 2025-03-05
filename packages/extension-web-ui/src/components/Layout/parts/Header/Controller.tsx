@@ -8,7 +8,7 @@ import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, Typography, useExcludeModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
@@ -73,6 +73,8 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
     return null;
   }, [onBack, showBackButton]);
+
+  useExcludeModal(NOTIFICATION_MODAL);
 
   const notificationModalProps = useMemo(() => ({
     modalId: NOTIFICATION_MODAL,

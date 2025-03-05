@@ -5,7 +5,7 @@ import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, Them
 import { ENABLE_LANGUAGES, languageOptions } from '@subwallet/extension-base/constants/i18n';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
-import { BaseModal, GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BaseSelectModal } from '@subwallet/extension-web-ui/components/Modal/BaseSelectModal';
 import { NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -145,6 +145,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const theme = useSelector((state: RootState) => state.settings.theme);
   const _language = useSelector((state: RootState) => state.settings.language);
   const _browserConfirmationType = useSelector((state: RootState) => state.settings.browserConfirmationType);
+  const [isNotificationSettingModalVisible, setIsNotificationSettingModalVisible] = useState<boolean>(false);
   const [loadingMap, setLoadingMap] = useState<LoadingMap>({
     browserConfirmationType: false,
     language: false,
@@ -278,13 +279,28 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     saveTheme(value as ThemeNames).finally(noop);
   }, []);
 
-  const onClickEnableNotification = useCallback(() => {
+  const openNotificationSettingModal = useCallback(() => {
+    setIsNotificationSettingModalVisible(true);
     activeModal(NOTIFICATION_SETTING_MODAL);
   }, [activeModal]);
 
-  const onCancelNotificationSetting = useCallback(() => {
+  const closeNotificationSettingModal = useCallback(() => {
     inactiveModal(NOTIFICATION_SETTING_MODAL);
+    setIsNotificationSettingModalVisible(true);
   }, [inactiveModal]);
+
+  const onClickEnableNotification = useCallback(() => {
+    if (isWebUI) {
+      openNotificationSettingModal();
+    } else {
+      navigate('/settings/notification-config');
+    }
+  }, [isWebUI, navigate, openNotificationSettingModal]);
+
+  const notificationSettingModalProps = useMemo(() => ({
+    modalId: NOTIFICATION_SETTING_MODAL,
+    onCancel: closeNotificationSettingModal
+  }), [closeNotificationSettingModal]);
 
   return (
     <PageWrapper className={`general-setting ${className}`}>
@@ -411,18 +427,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             )}
           />
 
-          {isWebUI && <BaseModal
-            className={'right-side-modal'}
-            destroyOnClose={true}
-            id={NOTIFICATION_SETTING_MODAL}
-            onCancel={onCancelNotificationSetting}
-            title={t('Notifications')}
-          >
-            <NotificationSetting
-              className={className}
-              modalContent={isWebUI}
-            />
-          </BaseModal>}
+          {
+            isWebUI && isNotificationSettingModalVisible && (
+              <NotificationSetting
+                isModal
+                modalProps={notificationSettingModalProps}
+              />
+            )
+          }
         </div>
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
