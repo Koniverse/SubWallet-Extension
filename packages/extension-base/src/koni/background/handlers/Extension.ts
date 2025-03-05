@@ -1413,7 +1413,12 @@ export default class KoniExtension {
         if (isCustomTokenPayFeeHydration) {
           const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
 
-          transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
+          const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
+          const feeSetting = _feeSetting?.toPrimitive() as number;
+
+          if (feeSetting.toString() !== hydrationFeeAssetId) {
+            transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
+          }
         }
       }
     } catch (e) {
