@@ -130,16 +130,53 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
   return tokensList;
 }
 
-export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: SubmittableExtrinsic | null, assetId?: string): SubmittableExtrinsic | null {
+export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: SubmittableExtrinsic | null, feeSetting: number | null, assetId?: string): SubmittableExtrinsic | null {
   const api = substrateApi.api;
 
-  if (!assetId || assetId === '0' || !tx) {
+  const isSettingLocalFee = feeSetting && feeSetting !== 0;
+  const isAttendToSetLocalFee = assetId && assetId !== '0';
+
+  if (!tx) {
     return tx;
   }
 
-  return api.tx.utility.batch([
-    api.tx.multiTransactionPayment.setCurrency(assetId),
-    tx,
-    api.tx.multiTransactionPayment.setCurrency('0') // set HDX
-  ]);
+  // current native - set native
+  if (!isSettingLocalFee && !isAttendToSetLocalFee) {
+    return tx;
+  }
+
+  // current native - set local
+  if (!isSettingLocalFee && isAttendToSetLocalFee) {
+    return api.tx.utility.batchAll([
+      api.tx.multiTransactionPayment.setCurrency(assetId),
+      tx,
+      api.tx.multiTransactionPayment.setCurrency('0')
+    ]);
+  }
+
+  // current local - set native
+  if (isSettingLocalFee && !isAttendToSetLocalFee) {
+    return api.tx.utility.batchAll([
+      api.tx.multiTransactionPayment.setCurrency('0'),
+      tx
+    ]);
+  }
+
+  // current local - set local
+  if (isSettingLocalFee && isAttendToSetLocalFee) {
+    if (assetId === feeSetting.toString()) { // current local = set local
+      return api.tx.utility.batchAll([
+        tx,
+        api.tx.multiTransactionPayment.setCurrency('0')
+      ]);
+    } else { // current local != set local
+      return api.tx.utility.batchAll([
+        api.tx.multiTransactionPayment.setCurrency(assetId),
+        tx,
+        api.tx.multiTransactionPayment.setCurrency('0')
+      ]);
+    }
+  }
+
+  return tx;
 }

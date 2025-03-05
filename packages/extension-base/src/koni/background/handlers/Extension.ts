@@ -1412,13 +1412,10 @@ export default class KoniExtension {
 
         if (isCustomTokenPayFeeHydration) {
           const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
-
           const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
-          const feeSetting = _feeSetting?.toPrimitive() as number;
+          const feeSetting = _feeSetting.toPrimitive() as number | null;
 
-          if (feeSetting.toString() !== hydrationFeeAssetId) {
-            transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, hydrationFeeAssetId);
-          }
+          transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, feeSetting, hydrationFeeAssetId);
         }
       }
     } catch (e) {
@@ -1672,7 +1669,7 @@ export default class KoniExtension {
         this.getPrice(),
         substrateApi.api.query.multiTransactionPayment.accountCurrencyMap(address)
       ]);
-      const assetId = _assetId.toPrimitive() as number;
+      const assetId = _assetId.toPrimitive() as number | null;
       const hydrationAssets = this.#koniState.chainService.getHydrationAssetIdMap(chain);
 
       for (const [key, value] of Object.entries(hydrationAssets)) {
