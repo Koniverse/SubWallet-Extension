@@ -110,8 +110,6 @@ interface SubnetsInfo {
 export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
-  console.log('allSubnets', allSubnets);
-
   if (!allSubnets) {
     return {};
   }

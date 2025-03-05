@@ -874,6 +874,13 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = request;
+
+    if (isDynamicStaking(slug)) {
+      return Promise.resolve({
+        passed: true
+      });
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
