@@ -385,7 +385,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
     const chainApi = await this.substrateApi.isReady;
     const derivativeTokenSlug = this.derivativeAssets[0];
     const derivativeTokenInfo = this.state.getAssetBySlug(derivativeTokenSlug);
-    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(_getTokenOnChainInfo(derivativeTokenInfo), amount);
+    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(null, _getTokenOnChainInfo(derivativeTokenInfo), amount);
 
     return [ExtrinsicType.UNSTAKE_VDOT, extrinsic];
   }

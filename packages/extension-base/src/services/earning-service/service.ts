@@ -9,6 +9,7 @@ import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface }
 import { _isChainEnabled, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
+import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
@@ -91,6 +92,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
         }
 
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
+      }
+
+      if (_STAKING_CHAIN_GROUP.mythos.includes(chain)) {
+        handlers.push(new MythosNativeStakingPoolHandler(this.state, chain));
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {

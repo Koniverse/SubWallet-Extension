@@ -804,6 +804,10 @@ export default class DatabaseService {
     return this.stores.processTransactions.delete(processId);
   }
 
+  public hasRunScript (key: string): Promise<boolean> {
+    return this.stores.migration.hasRunScript(key);
+  }
+
   // public setAssetRef (assetRef: Record<string, _AssetRef>) {
   //   const assetRefList = Object.entries(assetRef).map(([slug, item]) => {
   //     return {

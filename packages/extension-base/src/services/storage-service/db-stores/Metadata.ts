@@ -20,4 +20,8 @@ export default class MetadataStore extends BaseStoreWithChain<IMetadataItem> {
   updateMetadataByGenesisHash (genesisHash: string, metadata: IMetadataItem) {
     return this.table.put(metadata, genesisHash);
   }
+
+  clearByChains (chains: string[]) {
+    return this.table.where('chain').anyOf(chains).delete();
+  }
 }
