@@ -18,7 +18,7 @@ import { BalanceService } from '../../balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '../../balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '../../balance-service/transfer/token';
 import { ChainService } from '../../chain-service';
-import { SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING } from '../utils';
+import { SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING, validateSwapParams } from '../utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
 
 interface ExchangeSimpleSwapData{
@@ -187,10 +187,15 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     const toChainInfo = this.chainService.getChainInfoByKey(toAsset.originChain);
     const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : ChainType.EVM;
     const sender = _reformatAddressWithChain(address, chainInfo);
-    const receiver = _reformatAddressWithChain(recipient ?? sender, toChainInfo);
+    const receiver = _reformatAddressWithChain(recipient || sender, toChainInfo);
 
     const fromSymbol = SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING[fromAsset.slug];
     const toSymbol = SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING[toAsset.slug];
+
+    validateSwapParams('sender', sender);
+    validateSwapParams('receiver', receiver);
+    validateSwapParams('amount', quote.fromAmount);
+    validateSwapParams('pair', pair);
 
     const { fromAmount } = quote;
     const { addressFrom, amountTo, id } = await createSwapRequest({ fromSymbol, toSymbol, fromAmount, fromAsset, receiver, sender, toAsset });

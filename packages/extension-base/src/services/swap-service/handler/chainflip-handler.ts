@@ -11,7 +11,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
+import { getChainflipSwap, validateSwapParams } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { ChainflipSwapTxData, OptimalSwapPathParams, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -128,9 +128,14 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : ChainType.EVM;
-    const receiver = _reformatAddressWithChain(recipient ?? address, toChainInfo);
+    const receiver = _reformatAddressWithChain(recipient || address, toChainInfo);
     const fromAssetId = _getAssetSymbol(fromAsset);
     const toAssetId = _getAssetSymbol(toAsset);
+
+    validateSwapParams('sender', address);
+    validateSwapParams('receiver', receiver);
+    validateSwapParams('amount', quote.fromAmount);
+    validateSwapParams('pair', pair);
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 

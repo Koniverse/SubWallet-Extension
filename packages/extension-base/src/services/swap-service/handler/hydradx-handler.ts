@@ -13,7 +13,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { getSwapAlternativeAsset, validateSwapParams } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -355,6 +355,10 @@ export class HydradxHandler implements SwapBaseInterface {
     if (!this.isReady || !this.tradeRouter) {
       return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
     }
+
+    validateSwapParams('sender', params.address);
+    validateSwapParams('amount', params.quote.fromAmount);
+    validateSwapParams('pair', params.quote.pair);
 
     const parsedFromAmount = new BigNumber(params.quote.fromAmount).shiftedBy(-1 * _getAssetDecimals(fromAsset)).toString();
     const quoteResponse = await this.tradeRouter.getBestSell(fromAssetId, toAssetId, parsedFromAmount);

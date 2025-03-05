@@ -10,7 +10,7 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { getSwapAlternativeAsset, validateSwapParams } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -260,6 +260,10 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
+
+    validateSwapParams('sender', params.address);
+    validateSwapParams('amount', params.quote.fromAmount);
+    validateSwapParams('pair', params.quote.pair);
 
     const txData: SwapBaseTxData = {
       provider: this.providerInfo,

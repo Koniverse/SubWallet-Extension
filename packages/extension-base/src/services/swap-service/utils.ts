@@ -3,8 +3,10 @@
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
+import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -100,3 +102,9 @@ export function getChainflipSwap (isTestnet: boolean) {
     return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
   }
 }
+
+export const validateSwapParams = (key: string, value: any | undefined | null) => {
+  if (value === undefined || value === null || value === '') {
+    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, `Swap - ${key} is required`);
+  }
+};
