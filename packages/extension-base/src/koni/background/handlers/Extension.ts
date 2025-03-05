@@ -1445,7 +1445,7 @@ export default class KoniExtension {
       if (isCustomTokenPayFeeAssetHub || isCustomTokenPayFeeHydration) {
         const nonNativeFee = BigInt(inputTransaction.estimateFee?.value || '0'); // todo: estimateFee should be must-have, need to refactor interface
         const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, tokenPayFeeSlug);
-        const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[tokenPayFeeSlug].free);
+        const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[tokenPayFeeSlug]?.free || '0');
 
         if (nonNativeFee > nonNativeTokenPayFeeBalance) {
           inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
@@ -1649,17 +1649,24 @@ export default class KoniExtension {
 
     const tokensHasBalanceInfoMap = await this.#koniState.balanceService.getTokensHasBalance(address, chain);
     const nativeTokenInfo = chainService.getNativeTokenInfo(chain);
-    const nativeTokenBalanceInfo = {
+    const nativeBalanceInfo = {
       slug: nativeTokenInfo.slug,
       free: tokensHasBalanceInfoMap[nativeTokenInfo.slug]?.free || '0',
       rate: '1'
     } as TokenHasBalanceInfo;
 
-    let tokensCanPayFee: TokenHasBalanceInfo[] = [nativeTokenBalanceInfo];
-    let defaultTokenSlug: string = nativeTokenBalanceInfo.slug;
+    let tokensCanPayFee: TokenHasBalanceInfo[] = [nativeBalanceInfo];
+    let defaultTokenSlug: string = nativeBalanceInfo.slug;
 
     if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain)) {
-      tokensCanPayFee = await getAssetHubTokensCanPayFee(substrateApi, chainService, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
+      tokensCanPayFee = await getAssetHubTokensCanPayFee({
+        substrateApi,
+        chainService,
+        nativeTokenInfo,
+        nativeBalanceInfo,
+        tokensHasBalanceInfoMap,
+        feeAmount
+      });
     } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
       const [priceInfo, _assetId] = await Promise.all([
         this.getPrice(),
@@ -1675,7 +1682,16 @@ export default class KoniExtension {
         }
       }
 
-      tokensCanPayFee = await getHydrationTokensCanPayFee(substrateApi, chainService, priceInfo.priceMap, nativeTokenInfo, nativeTokenBalanceInfo, tokensHasBalanceInfoMap, feeAmount);
+      tokensCanPayFee = await getHydrationTokensCanPayFee({
+        substrateApi,
+        chainService,
+        priceMap: priceInfo.priceMap,
+        nativeTokenInfo,
+        nativeBalanceInfo,
+        tokensHasBalanceInfoMap,
+        defaultTokenSlug,
+        feeAmount
+      });
     }
 
     return {
