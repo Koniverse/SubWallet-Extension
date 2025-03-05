@@ -3,9 +3,11 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getBlockExplorerFromChain, _isChainTestNet, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getBlockExplorerFromChain, _isChainTestNet, _isPureCardanoChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
 import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
+
+import { hexAddPrefix, isHex } from '@polkadot/util';
 
 // @ts-ignore
 export function parseTransactionData<T extends ExtrinsicType> (data: unknown): ExtrinsicDataTypeMap[T] {
@@ -63,6 +65,10 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'tx';
   }
 
+  if (_isPureCardanoChain(chainInfo)) {
+    return 'transaction';
+  }
+
   if (['aventus', 'deeper_network'].includes(chainInfo.slug)) {
     return 'transaction';
   }
@@ -83,7 +89,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
     return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`;
   }
 
-  if (explorerLink && value.startsWith('0x')) {
+  if (explorerLink && isHex(hexAddPrefix(value))) {
     if (chainInfo.slug === 'bittensor') {
       return undefined;
     }

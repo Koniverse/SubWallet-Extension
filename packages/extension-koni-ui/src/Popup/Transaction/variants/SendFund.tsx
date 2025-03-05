@@ -11,24 +11,24 @@ import { getAvailBridgeGatewayContract, getSnowBridgeGatewayContract } from '@su
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, TransactionFee } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetBalance, useHandleSubmitMultiTransaction, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, getReformatedAddressRelatedToChain, noop } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, noop } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
@@ -128,6 +128,8 @@ const evmAccountSlug = 'ethereum-NATIVE-ETH';
 const tonAccountSlug = 'ton-NATIVE-TON';
 const defaultAddressInputRenderKey = 'address-input-render-key';
 
+const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
+
 const Component = ({ className = '', isAllAccount, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
   useSetCurrentPage('/transaction/send-fund');
   const { t } = useTranslation();
@@ -153,6 +155,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const assetValue = useWatchTransaction('asset', form, defaultData);
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
+  const getReformatAddress = useReformatAddress();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
 
   const { chainInfoMap, chainStateMap, chainStatusMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
@@ -163,6 +166,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [listTokensCanPayFee, setListTokensCanPayFee] = useState<TokenHasBalanceInfo[]>([]);
   const [defaultTokenPayFee, setDefaultTokenPayFee] = useState<string | undefined>(undefined);
   const [currentTokenPayFee, setCurrentTokenPayFee] = useState<string | undefined>(undefined);
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
@@ -183,7 +188,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       return true;
     }
 
-    return !!chainInfo && !!assetInfo && _isChainEvmCompatible(chainInfo) && destChainValue === chainValue && _isNativeToken(assetInfo);
+    return !!chainInfo && !!assetInfo && destChainValue === chainValue && _isNativeToken(assetInfo) && (_isChainEvmCompatible(chainInfo) || _isChainCardanoCompatible(chainInfo));
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
 
   const disabledToAddressInput = useMemo(() => {
@@ -273,7 +278,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
-        const address = getReformatedAddressRelatedToChain(a, chainInfo);
+        const address = getReformatAddress(a, chainInfo);
 
         if (address) {
           result.push({
@@ -304,7 +309,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, chainValue, targetAccountProxy]);
+  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
@@ -1038,7 +1043,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           </Form.Item>
         </Form>
 
-        {!TON_CHAINS.includes(chainValue) && !!toValue && !!transferAmountValue && nativeTokenSlug && (
+        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && (
           <FeeEditor
             chainValue={chainValue}
             currentTokenPayFee={currentTokenPayFee}
@@ -1066,6 +1071,13 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 title={t('Pay attention!')}
                 type={'warning'}
               />
+            </div>
+          )
+        }
+        {
+          !(chainValue !== destChainValue) && isShowAddressFormatInfoBox && (
+            <div className={'__warning_message_cross_chain'}>
+              <AlertBoxInstant type={'new-address-format'} />
             </div>
           )
         }

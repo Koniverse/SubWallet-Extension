@@ -5,22 +5,24 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
+import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
-import { createTransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
+import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
-import { isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
+import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
-import { isTonAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import BigN from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -39,6 +41,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   substrateApi: _SubstrateApi;
   evmApi: _EvmApi;
   tonApi: _TonApi;
+  cardanoApi: _CardanoApi;
   isTransferLocalTokenAndPayThatTokenAsFee: boolean;
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
@@ -59,6 +62,8 @@ export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo
       return 'evm';
     } else if (_isChainTonCompatible(srcChain) && _isTokenTransferredByTon(srcToken)) {
       return 'ton';
+    } else if (_isChainCardanoCompatible(srcChain) && _isTokenTransferredByCardano(srcToken)) {
+      return 'cardano';
     } else {
       return 'substrate';
     }
@@ -83,7 +88,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, tonApi } = request;
+  const { address, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, tonApi } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
@@ -138,8 +143,22 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         transferAll: false, // currently not used
         tonApi
       });
+    } else if (isCardanoAddress(address) && _isTokenTransferredByCardano(srcToken)) {
+      const isTransferNativeToken = _isNativeToken(srcToken);
+
+      [transaction] = await createCardanoTransaction({
+        tokenInfo: srcToken,
+        from: address,
+        to: address,
+        networkKey: srcChain.slug,
+        value: isTransferNativeToken ? '1000000' : '1',
+        cardanoTtlOffset: DEFAULT_CARDANO_TTL_OFFSET,
+        transferAll: false,
+        cardanoApi,
+        nativeTokenInfo: nativeToken
+      });
     } else {
-      [transaction] = await createTransferExtrinsic({
+      [transaction] = await createSubstrateExtrinsic({
         transferAll: false,
         value: '0',
         from: address,
@@ -192,12 +211,27 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         estimatedFee
       };
     } else {
-      if (transaction && (isTonTransaction(transaction))) {
-        estimatedFee = transaction.estimateFee;
-        feeOptions = {
-          ...fee,
-          estimatedFee: estimatedFee
-        };
+      if (transaction) {
+        if (isTonTransaction(transaction)) {
+          estimatedFee = transaction.estimateFee;
+          feeOptions = {
+            ...fee,
+            estimatedFee: estimatedFee
+          };
+        } else if (isCardanoTransaction(transaction)) {
+          estimatedFee = transaction.estimateCardanoFee;
+          feeOptions = {
+            ...fee,
+            estimatedFee: estimatedFee
+          };
+        } else {
+          // Not implemented yet
+          estimatedFee = '0';
+          feeOptions = {
+            ...fee,
+            estimatedFee: '0'
+          };
+        }
       } else {
         // Not implemented yet
         estimatedFee = '0';
