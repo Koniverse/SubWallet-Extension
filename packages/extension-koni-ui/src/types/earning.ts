@@ -27,7 +27,7 @@ export type ExtraYieldPositionInfo = YieldPositionInfo & {
   price: number;
   currency?: CurrencyJson;
   // exchangeRate: number;
-  subnetData?: { // for Dynamic Staking
+  subnetData?: { // for Subnet staking
     subnetName: string;
     subnetSymbol: string;
     subnetShortName: string;

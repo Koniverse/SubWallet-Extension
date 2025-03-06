@@ -18,8 +18,8 @@ import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler,
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
-import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, DynamicTaoStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
-import { dynamicTaoSlug, isDynamicStaking } from './utils';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
+import { isSubnetStaking, subnetTaoSlug } from './utils';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -88,7 +88,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         // todo: check support for testnet
         // Mainnet only
         if (chain === 'bittensor') {
-          handlers.push(new DynamicTaoStakingPoolHandler(this.state, chain));
+          handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
         }
 
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
@@ -329,7 +329,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
-    if (isDynamicStaking(slug)) {
+    if (isSubnetStaking(slug)) {
       return false;
     }
 
@@ -875,7 +875,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = request;
 
-    if (isDynamicStaking(slug)) {
+    if (isSubnetStaking(slug)) {
       return Promise.resolve({
         passed: true
       });
@@ -908,7 +908,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params.data;
 
-    if (isDynamicStaking(slug)) {
+    if (isSubnetStaking(slug)) {
       return Promise.resolve([]);
     }
 
@@ -926,8 +926,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     let { slug } = params.data;
 
-    if (isDynamicStaking(slug)) {
-      slug = dynamicTaoSlug;
+    if (isSubnetStaking(slug)) {
+      slug = subnetTaoSlug;
     }
 
     const handler = this.getPoolHandler(slug);
@@ -948,7 +948,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
 
-    if (isDynamicStaking(slug)) {
+    if (isSubnetStaking(slug)) {
       return Promise.resolve([]);
     }
 

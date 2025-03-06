@@ -59,8 +59,8 @@ export const createEarningTypeTags = (chain: string): Record<YieldPoolType, Earn
       color: 'gold',
       weight: 'fill'
     },
-    [YieldPoolType.DYNAMIC_STAKING]: {
-      label: 'Dynamic staking',
+    [YieldPoolType.SUBNET_STAKING]: {
+      label: 'Subnet staking',
       icon: CirclesThreePlus,
       color: 'blue',
       weight: 'fill'

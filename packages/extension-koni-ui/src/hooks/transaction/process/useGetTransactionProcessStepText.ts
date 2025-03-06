@@ -164,7 +164,7 @@ const useGetTransactionProcessStepText = () => {
             [`${YieldPoolType.LENDING}`]: t('Lending'),
             [`${YieldPoolType.PARACHAIN_STAKING}`]: t('Parachain staking'),
             [`${YieldPoolType.SINGLE_FARMING}`]: t('Single farming'),
-            [`${YieldPoolType.DYNAMIC_STAKING}`]: t('Dynamic staking')
+            [`${YieldPoolType.SUBNET_STAKING}`]: t('Subnet staking')
           };
 
           return {

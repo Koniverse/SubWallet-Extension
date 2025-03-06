@@ -85,17 +85,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       return undefined;
     }
   }, [assetRegistry, compound]);
-  const isDynamicStaking = useMemo(() => [YieldPoolType.DYNAMIC_STAKING].includes(type), [type]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
   const subnetData = useMemo(() => {
-    if (isDynamicStaking && 'subnetData' in compound) {
+    if (isSubnetStaking && 'subnetData' in compound) {
       const position = compound;
 
       return position.subnetData || { originalTotalStake: '0', subnetSymbol: '' };
     }
 
     return undefined;
-  }, [compound, isDynamicStaking]);
+  }, [compound, isSubnetStaking]);
 
   const earningTagType: EarningTagType = useMemo(() => {
     return createEarningTypeTags(compound.chain)[compound.type];
@@ -155,7 +155,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoNumber = (labelKey: string, value: string | number | BigN, asset = inputAsset) => ({ label: t(labelKey), value, decimals: asset?.decimals || 0, suffix: asset?.symbol });
 
-      const metaInfoItems = isDynamicStaking
+      const metaInfoItems = isSubnetStaking
         ? [
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
@@ -254,7 +254,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isDynamicStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, subnetData?.originalTotalStake, subnetData?.subnetSymbol, t]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, subnetData?.originalTotalStake, subnetData?.subnetSymbol, t]);
 
   return (
     <>

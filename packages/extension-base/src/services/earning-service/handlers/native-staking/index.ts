@@ -6,4 +6,4 @@ export { default as AstarNativeStakingPoolHandler } from './astar';
 export { default as RelayNativeStakingPoolHandler } from './relay-chain';
 export { default as ParaNativeStakingPoolHandler } from './para-chain';
 export { default as TaoNativeStakingPoolHandler } from './tao';
-export { default as DynamicTaoStakingPoolHandler } from './dtao';
+export { default as SubnetTaoStakingPoolHandler } from './dtao';

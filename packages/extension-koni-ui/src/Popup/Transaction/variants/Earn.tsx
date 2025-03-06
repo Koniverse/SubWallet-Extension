@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { dynamicTaoSlug, isDynamicStaking, isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
+import { isLendingPool, isLiquidPool, isSubnetStaking, subnetTaoSlug } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
@@ -260,7 +260,7 @@ const Component = () => {
         }
 
         return [];
-      } else if (YieldPoolType.NATIVE_STAKING === poolType || YieldPoolType.DYNAMIC_STAKING === poolType) {
+      } else if (YieldPoolType.NATIVE_STAKING === poolType || YieldPoolType.SUBNET_STAKING === poolType) {
         const validatorList = _poolTargets as ValidatorInfo[];
 
         if (!validatorList) {
@@ -462,10 +462,10 @@ const Component = () => {
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
-        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.DYNAMIC_STAKING].includes(poolInfo.type) && target) {
+        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && target) {
           const targets = poolTargets;
 
-          if (poolInfo.type === YieldPoolType.NOMINATION_POOL || YieldPoolType.DYNAMIC_STAKING) {
+          if (poolInfo.type === YieldPoolType.NOMINATION_POOL || YieldPoolType.SUBNET_STAKING) {
             const selectedPool = targets[0];
 
             return {
@@ -870,8 +870,8 @@ const Component = () => {
     if (currentStep === 0) {
       let originSlug = slug;
 
-      if (isDynamicStaking(slug)) {
-        originSlug = dynamicTaoSlug;
+      if (isSubnetStaking(slug)) {
+        originSlug = subnetTaoSlug;
       }
 
       const submitData: OptimalYieldPathParams = {
@@ -1124,7 +1124,7 @@ const Component = () => {
                   </Form.Item>
                 )}
 
-                {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.DYNAMIC_STAKING) && (
+                {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
                   <Form.Item
                     name={'target'}
                   >

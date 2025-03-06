@@ -15,7 +15,7 @@ import BigN, { BigNumber } from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { calculateReward, dynamicTaoSlug } from '../../utils';
+import { calculateReward, subnetTaoSlug } from '../../utils';
 import { fetchDelegates, TaoStakeInfo } from './tao';
 
 export interface SubnetData {
@@ -134,7 +134,7 @@ export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
   }, {} as Record<number, string>);
 };
 
-export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
+export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
     throw new Error('Method not implemented.');
   }
@@ -144,23 +144,23 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   }
 
   // @ts-ignore
-  public override readonly type = YieldPoolType.DYNAMIC_STAKING;
+  public override readonly type = YieldPoolType.SUBNET_STAKING;
   public override slug: string;
   protected override name: string;
   protected override shortName: string;
   public subnetName: string;
   public subnetData: SubnetData[] = [];
+  private isInit = false;
 
   constructor (state: KoniState, chain: string) {
     super(state, chain);
-    this.subnetName = 'dTAO';
-    this.slug = dynamicTaoSlug;
-    this.name = 'Dynamic Tao Staking';
+    this.subnetName = 'TAO';
+    this.slug = subnetTaoSlug;
+    this.name = 'Subnet Tao Staking';
     this.shortName = 'dTAO Staking';
-    this.init().catch(console.error);
   }
 
-  private async init () {
+  private async init (): Promise<void> {
     try {
       const substrateApi = await this.substrateApi.isReady;
       const dynamicInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as DynamicInfo[] | undefined;
@@ -173,16 +173,13 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
             const extraInfo = subnetsInfo.find((subnet) => subnet.netuid === dynInfo.netuid);
 
             const nameRaw = dynInfo.subnetIdentity?.subnetName || String.fromCharCode(...dynInfo.subnetName);
-
             const identityName = dynInfo.subnetIdentity?.subnetName
               ? Buffer.from(dynInfo.subnetIdentity.subnetName.slice(2), 'hex').toString('utf-8')
               : '';
-
             const formattedIdentityName = identityName
               ? identityName.charAt(0).toUpperCase() + identityName.slice(1).toLowerCase()
               : '';
             const name = formattedIdentityName || nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
-
             const symbol = new TextDecoder('utf-8').decode(Uint8Array.from(dynInfo.tokenSymbol));
 
             return {
@@ -195,9 +192,11 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
           });
 
         this.subnetData = mergedData;
+        this.isInit = true;
       }
     } catch (err) {
       console.error(err);
+      this.isInit = false;
     }
   }
 
@@ -212,6 +211,10 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
+    if (!this.isInit) {
+      await this.init();
+    }
+
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
 
@@ -226,7 +229,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
 
         this.subnetData.forEach((subnet) => {
           const netuid = subnet.netuid.toString().padStart(2, '0');
-          const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid}`;
+          const subnetSlug = `TAO___subnet_staking___${this.chain}__subnet_${netuid}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
 
           const data: NativeYieldPoolInfo = {
@@ -330,6 +333,10 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   }
 
   override async subscribePoolPosition (useAddresses: string[], rsCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
+    if (!this.isInit) {
+      await this.init();
+    }
+
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
 
@@ -386,7 +393,7 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
               return;
             }
 
-            const subnetSlug = `TAO___dynamic_staking___${this.chain}__subnet_${netuid.padStart(2, '0')}`;
+            const subnetSlug = `TAO___subnet_staking___${this.chain}__subnet_${netuid.padStart(2, '0')}`;
             const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
             const subnetSymbol = subnet.symbol || 'dTAO';
 
@@ -464,7 +471,6 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
     const _topValidator = await fetchDelegates();
 
-    console.log('topValidator', _topValidator);
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
     const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
@@ -509,6 +515,10 @@ export default class DynamicTaoStakingPoolHandler extends BaseParaStakingPoolHan
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
+    if (!this.isInit) {
+      await this.init();
+    }
+
     return this.getMainnetPoolTargets();
   }
 

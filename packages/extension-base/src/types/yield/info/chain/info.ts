@@ -322,7 +322,7 @@ export interface NominationYieldPoolInfo extends AbstractYieldPoolInfo {
  * @prop {NormalYieldPoolStatistic} [statistic] - Pool's metadata
  * */
 export interface NativeYieldPoolInfo extends AbstractYieldPoolInfo {
-  type: YieldPoolType.NATIVE_STAKING | YieldPoolType.DYNAMIC_STAKING;
+  type: YieldPoolType.NATIVE_STAKING | YieldPoolType.SUBNET_STAKING;
   metadata: NormalYieldPoolMetadata;
   statistic?: NormalYieldPoolStatistic;
   maxPoolMembers?: number;

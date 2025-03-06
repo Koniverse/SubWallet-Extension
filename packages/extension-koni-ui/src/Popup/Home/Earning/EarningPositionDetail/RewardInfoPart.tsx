@@ -53,7 +53,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
       case YieldPoolType.LENDING:
       case YieldPoolType.LIQUID_STAKING:
         return false;
-      case YieldPoolType.DYNAMIC_STAKING:
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NATIVE_STAKING:
         return isDAppStaking || isMythosStaking;
       case YieldPoolType.NOMINATION_POOL:

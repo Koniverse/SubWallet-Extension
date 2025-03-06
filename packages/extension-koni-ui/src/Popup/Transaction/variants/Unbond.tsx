@@ -5,8 +5,8 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { dynamicTaoSlug, isActionFromValidator, isDynamicStaking } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, DynamicYieldPositionInfo, RequestYieldLeave, SpecialYieldPoolMetadata, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { isActionFromValidator, isSubnetStaking, subnetTaoSlug } from '@subwallet/extension-base/services/earning-service/utils';
+import { AccountJson, RequestYieldLeave, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, NominationSelector } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -94,7 +94,7 @@ const Component: React.FC = () => {
 
   const bondedAsset = useGetChainAssetInfo(bondedSlug || poolInfo.metadata.inputAsset);
   const decimals = bondedAsset?.decimals || 0;
-  const symbol = (positionInfo as DynamicYieldPositionInfo).subnetData?.subnetSymbol || bondedAsset?.symbol || '';
+  const symbol = (positionInfo as SubnetYieldPositionInfo).subnetData?.subnetSymbol || bondedAsset?.symbol || '';
   const altAsset = useGetChainAssetInfo((poolInfo?.metadata as SpecialYieldPoolMetadata)?.altInputAssets);
   const altSymbol = altAsset?.symbol || '';
 
@@ -131,7 +131,7 @@ const Component: React.FC = () => {
         return new BigN(positionInfo?.activeStake || '0').multipliedBy(exchaneRate).toFixed(0);
       }
 
-      case YieldPoolType.DYNAMIC_STAKING: {
+      case YieldPoolType.SUBNET_STAKING: {
         return selectedValidator?.activeStake || '0';
       }
 
@@ -233,8 +233,8 @@ const Component: React.FC = () => {
 
     let { fastLeave, from, slug, value } = values;
 
-    if (isDynamicStaking(slug)) {
-      slug = dynamicTaoSlug;
+    if (isSubnetStaking(slug)) {
+      slug = subnetTaoSlug;
     }
 
     const request: RequestYieldLeave = {
@@ -346,7 +346,7 @@ const Component: React.FC = () => {
   }, [poolType, setCustomScreenTitle, t]);
 
   const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.DYNAMIC_STAKING) {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
       return ExtrinsicType.STAKING_UNBOND;
     }
 
