@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
-import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
+import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-koni-ui/stores/base/RequestState';
@@ -87,6 +88,7 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
   }
 };
 
+// TODO: NEED TO MERGE THESE COMPONENTS TO COMPONENTS IN THE PROCESS DIRECTORY
 const getProcessComponent = (processType: ProcessType): typeof BaseProcessConfirmation => {
   switch (processType) {
     case ProcessType.SWAP:
@@ -108,6 +110,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
 
   const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
+
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
 
@@ -155,10 +159,26 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [transaction.data, transaction.extrinsicType, transaction.process]);
 
+  const isAddressFormatInfoBoxVisible = useMemo(() => {
+    if ([ExtrinsicType.TRANSFER_BALANCE, ExtrinsicType.TRANSFER_TOKEN].includes(transaction.extrinsicType)) {
+      const targetChain = transaction.chain;
+
+      return checkIsPolkadotUnifiedChain(targetChain);
+    }
+
+    return false;
+  }, [checkIsPolkadotUnifiedChain, transaction.chain, transaction.extrinsicType]);
+
   return (
     <>
       <div className={CN(className, 'confirmation-content')}>
         {renderContent(transaction)}
+        {isAddressFormatInfoBoxVisible && (
+          <AlertBoxInstant
+            className={'address-format-info-box'}
+            type={'new-address-format'}
+          />
+        )}
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
@@ -201,6 +221,17 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )
       }
+      {
+        (type === 'cardanoSendTransactionRequest' || type === 'cardanoWatchTransactionRequest') && (
+          <CardanoSignArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitionsCardano['cardanoSendTransactionRequest' | 'cardanoWatchTransactionRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
     </>
   );
 };
@@ -210,7 +241,7 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
     '--content-gap': 0,
     marginTop: token.marginXS,
 
-    '.network-box': {
+    '.network-box, .address-format-info-box': {
       marginTop: token.marginSM
     },
 

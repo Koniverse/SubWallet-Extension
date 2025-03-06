@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 1.3.23
+Build date: Mar 05, 2025.
+
+Features & Update:
+- Support Uniswap (#3977)
+- Support Cardano (#3816, #3924, #3925, #3942)
+- Support Migrate account feature (#3926, #4016)
+- Unified address format integration (#3864)
+
+Bug fixed:
+- Fix Bug when unstaking vDOT, vMANTA (#4054)
+
+## 1.3.22
+Build date: Mar 04, 2025.
+
+Features & Update:
+- Support staking for Mythos (#3984)
+
+
+## 1.3.21
+Build date: Feb 28, 2025.
+
+Features & Update:
+- Allow signing once for multiple transactions (#3901)
+- Update chain-list stable v0.2.99 (#4007)
+
+
 ## 1.3.20
 Build date: Feb 24, 2025.
 
@@ -9,11 +36,13 @@ Features & Update:
 Bug fixed:
 - Fixed bug Unable to estimate fee when signing for dApp (#4050)
 
+
 ## 1.3.19
 Build date: Feb 21, 2025.
 
 Bug fixed:
 - Fixed bug related to custom token to paid fee
+
 
 ## 1.3.18
 Build date: Feb 20, 2025.
