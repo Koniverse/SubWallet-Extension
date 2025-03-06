@@ -1,10 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SupportService } from '@subwallet/extension-base/types';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
-import { SupportService, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, Logo, SelectModal, SelectModalItem, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -34,6 +35,11 @@ export const baseServiceItems: ServiceItem[] = [
   {
     key: 'coinbase',
     name: 'Coinbase Pay',
+    disabled: false
+  },
+  {
+    key: 'meld',
+    name: 'Meld',
     disabled: false
   },
   {
