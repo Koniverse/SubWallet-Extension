@@ -48,8 +48,8 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
+import { generateAllDestinations } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWPermitTransaction, SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
-import { generateSwapPairs } from '@subwallet/extension-base/services/swap-service/utils';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
@@ -1345,7 +1345,8 @@ export default class KoniExtension {
     const warnings: TransactionWarning[] = [];
     const chainInfo = this.#koniState.getChainInfo(chain);
 
-    const test = generateSwapPairs(this.#koniState.getSubstrateApi(chain), this.#koniState.chainService, transferTokenInfo, 3).map((asset) => asset.slug);
+    // todo: remove test:
+    const test = generateAllDestinations(this.#koniState.getSubstrateApi(chain), this.#koniState.chainService, transferTokenInfo, 3).map((asset) => asset.slug);
 
     console.log('test', test);
 
@@ -4069,6 +4070,16 @@ export default class KoniExtension {
   }
 
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
+    // todo: remove test:
+    const testSwapRequest = this.#koniState.swapService.handleSwapRequestV2({
+      address: '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx',
+      fromAmount: '1',
+      fromToken: 'hydradx_main-LOCAL-PINK',
+      toToken: 'ethereum-NATIVE-ETH'
+    });
+
+    console.log('testSwapRequest', testSwapRequest);
+
     return this.#koniState.swapService.handleSwapRequest(request);
   }
 

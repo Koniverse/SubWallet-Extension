@@ -103,7 +103,7 @@ export function getChainflipSwap (isTestnet: boolean) {
   }
 }
 
-export function generateSwapPairs (substrateApi: _SubstrateApi, chainService: ChainService, fromAsset: _ChainAsset, maxPathLength = 1) {
+export function generateAllDestinations (substrateApi: _SubstrateApi, chainService: ChainService, fromAsset: _ChainAsset, maxPathLength = 1) {
   if (maxPathLength < 1) {
     return [];
   }
@@ -138,7 +138,7 @@ function findDestinations (chainService: ChainService, chainAsset: _ChainAsset) 
   return mergeWithoutDuplicate<_ChainAsset>(xcmTargets, swapTargets);
 }
 
-function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+export function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
   const xcmTargets: _ChainAsset[] = [];
   const multichainAssetSlug = _getMultiChainAsset(chainAsset);
 
@@ -154,10 +154,10 @@ function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsse
     }
   }
 
-  return xcmTargets;
+  return xcmTargets.filter((candidate) => candidate.slug !== chainAsset.slug);
 }
 
-function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+export function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
   const chain = chainAsset.originChain;
   const swapTargets: _ChainAsset[] = [];
 
@@ -177,7 +177,7 @@ function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAss
     swapTargets.push(...Object.values(assets));
   });
 
-  return swapTargets;
+  return swapTargets.filter((candidate) => candidate.slug !== chainAsset.slug);
 }
 
 // @ts-ignore
@@ -229,4 +229,36 @@ export async function getAllXcmChannelSubstrate (substrateApi: _SubstrateApi) {
 
 function mergeWithoutDuplicate<T> (arr1: T[], arr2: T[]): T[] {
   return Array.from(new Set([...arr1, ...arr2]));
+}
+
+export enum DynamicSwapType {
+  INIT = 'INIT',
+  SWAP = 'SWAP',
+  XCM = 'XCM' // todo: rename XCM to a better name to describe cross chain transfer action;
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  toToken: string;
+}
+
+export function getInitStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.INIT,
+    toToken: tokenSlug
+  };
+}
+
+export function getXcmStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.XCM,
+    toToken: tokenSlug
+  };
+}
+
+export function getSwapStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.SWAP,
+    toToken: tokenSlug
+  };
 }
