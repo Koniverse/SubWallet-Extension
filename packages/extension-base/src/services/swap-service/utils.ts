@@ -3,7 +3,7 @@
 
 import { Asset, Assets, Chain, Chains } from '@chainflip/sdk/swap';
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getFungibleAssetType, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
@@ -197,6 +197,7 @@ function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAss
   return swapTargets;
 }
 
+// @ts-ignore
 export function findSwapDestinationsV2 (chainService: ChainService, chainAsset: _ChainAsset) {
   const chain = chainAsset.originChain;
   const swapTargets: _ChainAsset[] = [];
@@ -221,9 +222,27 @@ export function findSwapDestinationsV2 (chainService: ChainService, chainAsset: 
   return swapTargets;
 }
 
-function isHasChannel (subtrateApi: _SubstrateApi, fromChain: _ChainAsset, toChain: _ChainAsset) {
-  return true;
+// @ts-ignore
+async function isHasXcmChannelSubstrate (substrateApi: _SubstrateApi, fromChain: _ChainInfo, toChain: _ChainInfo) {
+  const channel = await substrateApi.api.query.hrmp.hrmpChainnels(fromChain.substrateInfo?.paraId, toChain.substrateInfo?.paraId);
+
+  return !!channel.toPrimitive();
 }
+
+// @ts-ignore
+export async function getAllXcmChannelSubstrate (substrateApi: _SubstrateApi) {
+  const channels = await substrateApi.api.query.hrmp?.hrmpChannels?.keys();
+  const allKeys = [];
+
+  for (const key of channels) {
+    allKeys.push(key.args[0].toPrimitive());
+  }
+
+  return allKeys;
+}
+
+// todo: improve
+// function isHasBridgeChanel ()
 
 function mergeWithoutDuplicate<T> (arr1: T[], arr2: T[]): T[] {
   return Array.from(new Set([...arr1, ...arr2]));
