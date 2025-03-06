@@ -144,11 +144,10 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [chainValue, destChainValue]);
 
   const isEditButton = useMemo(() => {
-    const isChainSupport = !!(chainValue && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue)));
-    const isSubstrateFeeType = feeType === 'substrate';
-    const isHasTokenCanPayFee = !!listTokensCanPayFee.length;
+    const isSubstrateSupport = !!(chainValue && feeType === 'evm' && listTokensCanPayFee.length && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue)));
+    const isEvmSupport = !!(chainValue && feeType === 'evm');
 
-    return isChainSupport && isSubstrateFeeType && isHasTokenCanPayFee && !isXcm;
+    return (isSubstrateSupport || isEvmSupport) && !isXcm;
   }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
 
   const rateValue = useMemo(() => {
@@ -199,7 +198,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                   <Number
                     className={'__fee-price-value'}
                     decimal={0}
-                    prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                    prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
                     value={convertedFeeValueToUSD}
                   />
 
