@@ -10,5 +10,6 @@ export const DEFAULT_SERVICE_INFO: Record<SupportService, BuyService> = {
   banxa: { ...DEFAULT_BUY_SERVICE },
   coinbase: { ...DEFAULT_BUY_SERVICE },
   onramper: { ...DEFAULT_BUY_SERVICE },
-  moonpay: { ...DEFAULT_BUY_SERVICE }
+  moonpay: { ...DEFAULT_BUY_SERVICE },
+  meld: { ...DEFAULT_BUY_SERVICE }
 };
