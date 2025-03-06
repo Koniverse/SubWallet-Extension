@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
 import EventEmitter from 'eventemitter3';
@@ -33,6 +34,10 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   step?: BriefProcessStep;
 }
 
+export interface SWPermitTransaction extends Omit<SWTransaction, 'transaction'> {
+  transaction: SignTypedDataMessageV3V4;
+}
+
 export interface SWTransactionResult extends Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {
   process?: ProcessTransactionData;
 }
@@ -50,6 +55,10 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   isTransferLocalTokenAndPayThatTokenAsFee?: boolean;
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
+}
+
+export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
+  transaction?: SWPermitTransaction['transaction'] | null;
 }
 
 export type SWTransactionResponse = SwInputBase & Pick<SWTransaction, 'warnings' | 'errors'> & Partial<Pick<SWTransaction, 'id' | 'extrinsicHash' | 'status' | 'estimateFee'>> & TransactionFee & {
