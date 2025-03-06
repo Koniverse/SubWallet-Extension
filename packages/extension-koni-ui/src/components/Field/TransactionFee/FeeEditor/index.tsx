@@ -9,6 +9,7 @@ import { BN_ZERO } from '@subwallet/extension-base/utils';
 import ChooseFeeTokenModal from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/ChooseFeeTokenModal';
 import { BN_TEN, CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -64,6 +65,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   // @ts-ignore
   const priceMap = useSelector((state) => state.price.priceMap);
   const [feeEditorModalRenderKey, setFeeEditorModalRenderKey] = useState<string>(modalId);
+  const { currencyData } = useSelector((state: RootState) => state.price);
 
   const tokenAsset = (() => {
     return assetRegistry[tokenPayFeeSlug] || undefined;
@@ -197,13 +199,12 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                   <Number
                     className={'__fee-price-value'}
                     decimal={0}
-                    prefix={'~ $'}
+                    prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                     value={convertedFeeValueToUSD}
                   />
 
                   <Button
                     className={'__fee-editor-button'}
-                    loading={isLoadingToken}
                     disabled={!isDataReady}
                     icon={
                       <Icon
@@ -211,6 +212,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                         size='sm'
                       />
                     }
+                    loading={isLoadingToken}
                     onClick={isEditButton ? onClickEdit : undefined}
                     size='xs'
                     tooltip={isEditButton ? undefined : t('Coming soon!')}

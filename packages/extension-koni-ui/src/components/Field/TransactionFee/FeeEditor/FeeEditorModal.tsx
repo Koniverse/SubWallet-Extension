@@ -8,6 +8,8 @@ import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { AmountInput, BasicInputEvent, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { FeeOptionItem } from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/FeeOptionItem';
 import { CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Form, Icon, Input, Logo, ModalContext, Number, SwModal } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
@@ -63,6 +65,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, decimals, feeOpt
   const [currentViewMode, setViewMode] = useState<ViewMode>(selectedFeeOption?.feeOption === 'custom' ? ViewMode.CUSTOM : ViewMode.RECOMMENDED);
   const [form] = Form.useForm<FormProps>();
   const [optionSelected, setOptionSelected] = useState<TransactionFee | undefined>(selectedFeeOption);
+  const { currencyData } = useSelector((state: RootState) => state.price);
 
   useEffect(() => {
     if (feeType === 'substrate') {
@@ -257,7 +260,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, decimals, feeOpt
       <Number
         className='__converted-custom-value'
         decimal={decimals}
-        prefix='~ $'
+        prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
         value={transformAmount}
       />
       <Form.Item
