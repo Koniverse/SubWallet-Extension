@@ -103,8 +103,8 @@ export function getChainflipSwap (isTestnet: boolean) {
   }
 }
 
-export const validateSwapParams = (key: string, value: any | undefined | null) => {
+export const validateSwapParams = (key: string, value: unknown | undefined | null, message?: string) => {
   if (value === undefined || value === null || value === '') {
-    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, `Swap - ${key} is required`);
+    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, message || `Swap - ${key} is required`);
   }
 };
