@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.22
+Build date: Mar 04, 2025.
+
+Features & Update:
+- Support staking for Mythos (#3984)
+
+
 ## 1.3.21
 Build date: Feb 28, 2025.
 
