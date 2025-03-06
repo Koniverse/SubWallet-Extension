@@ -4,6 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
+import { validateSwapParams } from '@subwallet/extension-base/services/swap-service/utils';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import BigNumber from 'bignumber.js';
@@ -311,6 +312,10 @@ export class UniswapHandler implements SwapBaseInterface {
     const processId = params.cacheProcessId;
 
     let signature: string | undefined;
+
+    validateSwapParams('sender', params.address);
+    validateSwapParams('amount', params.quote.fromAmount);
+    validateSwapParams('pair', params.quote.pair);
 
     if (permitData) {
       signature = this.transactionService.getCacheInfo(processId, SwapStepType.PERMIT);
