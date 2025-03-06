@@ -447,9 +447,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
         return;
       }
 
-      if (this.chain === 'bittensor') {
-        await getPoolPosition();
-      }
+      await getPoolPosition();
     };
 
     getStakingPositionInterval().catch(console.error);
@@ -467,6 +465,39 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Subscribe pool position */
 
   /* Get pool targets */
+  // eslint-disable-next-line @typescript-eslint/require-await
+  private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
+    const testnetDelegate = {
+      '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL': {
+        name: '0x436c6f776e4e616d65f09fa4a1',
+        url: 'https://example.com  ',
+        image: 'https://example.com/image.png',
+        discord: '0xe28094446973636f7264',
+        description: 'This is an example identity.',
+        additional: ''
+      }
+    };
+    const _topValidator = testnetDelegate;
+    const validatorAddresses = Object.keys(_topValidator);
+
+    return validatorAddresses.map((address) => {
+      return {
+        address: address,
+        totalStake: '0',
+        ownStake: '0',
+        otherStake: '0',
+        minBond: '0',
+        nominatorCount: 0,
+        commission: '0',
+        expectedReturn: 0,
+        blocked: false,
+        isVerified: false,
+        chain: this.chain,
+        isCrowded: false,
+        identity: address
+      } as unknown as ValidatorInfo;
+    });
+  }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
     const _topValidator = await fetchDelegates();
@@ -519,7 +550,11 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       await this.init();
     }
 
-    return this.getMainnetPoolTargets();
+    if (this.chain === 'bittensor_devnet') {
+      return this.getDevnetPoolTargets();
+    } else {
+      return this.getMainnetPoolTargets();
+    }
   }
 
   /* Get pool targets */
