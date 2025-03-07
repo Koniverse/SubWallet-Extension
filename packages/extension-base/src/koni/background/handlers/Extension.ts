@@ -1444,8 +1444,8 @@ export default class KoniExtension {
           substrateApi
         });
 
-        if (isCustomTokenPayFeeHydration) {
-          const hydrationFeeAssetId = this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
+        if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
+          const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
           const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
           const feeSetting = _feeSetting.toPrimitive() as number | null;
 
