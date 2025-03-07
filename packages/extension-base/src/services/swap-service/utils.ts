@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getFungibleAssetType, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -99,4 +101,172 @@ export function getChainflipSwap (isTestnet: boolean) {
   } else {
     return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
   }
+}
+
+export function generateAllDestinations (substrateApi: _SubstrateApi, chainService: ChainService, fromAsset: _ChainAsset, maxPathLength = 1) {
+  if (maxPathLength < 1) {
+    return [];
+  }
+
+  let currentTargets: _ChainAsset[] = [];
+  let newTargets: _ChainAsset[] = [];
+  let currentStep = 1;
+
+  // step 1:
+  newTargets = findDestinations(chainService, fromAsset);
+  currentTargets = mergeWithoutDuplicate<_ChainAsset>(currentTargets, newTargets);
+  currentStep += 1;
+
+  // step 2 - n
+  while (currentStep <= maxPathLength) { // todo: improve by stop when nothing new
+    newTargets = Array.from(newTargets.reduce((farChildTargets, currentTarget) => {
+      const farChildTargetsLocal = findDestinations(chainService, currentTarget);
+
+      return new Set([...farChildTargets, ...farChildTargetsLocal]);
+    }, new Set<_ChainAsset>()));
+    currentTargets = mergeWithoutDuplicate<_ChainAsset>(currentTargets, newTargets);
+    currentStep += 1;
+  }
+
+  return currentTargets;
+}
+
+function findDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const xcmTargets = findXcmDestinations(chainService, chainAsset);
+  const swapTargets = findSwapDestinations(chainService, chainAsset);
+
+  return mergeWithoutDuplicate<_ChainAsset>(xcmTargets, swapTargets);
+}
+
+export function findXcmDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const xcmTargets: _ChainAsset[] = [];
+  const multichainAssetSlug = _getMultiChainAsset(chainAsset);
+
+  if (!multichainAssetSlug) {
+    return xcmTargets;
+  }
+
+  const assetRegistry = chainService.getAssetRegistry();
+
+  for (const asset of Object.values(assetRegistry)) {
+    if (multichainAssetSlug === _getMultiChainAsset(asset)) {
+      xcmTargets.push(asset);
+    }
+  }
+
+  return xcmTargets.filter((candidate) => candidate.slug !== chainAsset.slug);
+}
+
+export function findSwapDestinations (chainService: ChainService, chainAsset: _ChainAsset) {
+  const chain = chainAsset.originChain;
+  const swapTargets: _ChainAsset[] = [];
+
+  const availableChains = Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).reduce((remainChains, currentChains) => {
+    if (currentChains.includes(chain)) {
+      currentChains.forEach((candidate) => {
+        remainChains.add(candidate);
+      });
+    }
+
+    return remainChains;
+  }, new Set<string>());
+
+  availableChains.forEach((candidate) => {
+    const assets = chainService.getAssetByChainAndType(candidate, _getFungibleAssetType()); // todo: recheck assetType
+
+    swapTargets.push(...Object.values(assets));
+  });
+
+  return swapTargets.filter((candidate) => candidate.slug !== chainAsset.slug);
+}
+
+// @ts-ignore
+export function findSwapDestinationsV2 (chainService: ChainService, chainAsset: _ChainAsset) {
+  const chain = chainAsset.originChain;
+  const swapTargets: _ChainAsset[] = [];
+
+  // Convert to Set once at the start
+  const availableChains = new Set<string>(
+    Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)
+      .filter((chains) => chains.includes(chain))
+      .flat()
+  );
+
+  // Use Set for O(1) lookup instead of includes()
+  for (const candidate of availableChains) {
+    const assets = chainService.getAssetByChainAndType(
+      candidate,
+      _getFungibleAssetType()
+    );
+
+    swapTargets.push(...Object.values(assets));
+  }
+
+  return swapTargets;
+}
+
+// @ts-ignore
+async function isHasXcmChannelSubstrate (substrateApi: _SubstrateApi, fromChain: _ChainInfo, toChain: _ChainInfo) {
+  const channel = await substrateApi.api.query.hrmp.hrmpChainnels(fromChain.substrateInfo?.paraId, toChain.substrateInfo?.paraId);
+
+  return !!channel.toPrimitive();
+}
+
+// @ts-ignore
+export async function getAllXcmChannelSubstrate (substrateApi: _SubstrateApi) {
+  const channels = await substrateApi.api.query.hrmp?.hrmpChannels?.keys();
+  const allKeys = [];
+
+  for (const key of channels) {
+    allKeys.push(key.args[0].toPrimitive());
+  }
+
+  return allKeys;
+}
+
+// todo: improve
+// function isHasBridgeChanel ()
+
+function mergeWithoutDuplicate<T> (arr1: T[], arr2: T[]): T[] {
+  return Array.from(new Set([...arr1, ...arr2]));
+}
+
+export enum DynamicSwapType {
+  INIT = 'INIT',
+  SWAP = 'SWAP',
+  XCM = 'XCM' // todo: rename XCM to a better name to describe cross chain transfer action;
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  toToken: string;
+}
+
+export function getInitStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.INIT,
+    toToken: tokenSlug
+  };
+}
+
+export function getXcmStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.XCM,
+    toToken: tokenSlug
+  };
+}
+
+export function getSwapStep (tokenSlug: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.SWAP,
+    toToken: tokenSlug
+  };
+}
+
+export function isEquiValentAsset (from: _ChainAsset, to: _ChainAsset) {
+  return (
+    _getMultiChainAsset(from) === _getMultiChainAsset(to) ||
+    _getAssetPriceId(from) === _getAssetPriceId(to) ||
+    _getAssetSymbol(from) === _getAssetSymbol(to)
+  );
 }

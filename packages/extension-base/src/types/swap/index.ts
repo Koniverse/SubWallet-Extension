@@ -169,6 +169,13 @@ export interface SwapRequest {
   currentQuote?: SwapProvider
 }
 
+export interface SwapRequestV2 {
+  address: string;
+  fromAmount: string;
+  fromToken: string;
+  toToken: string;
+}
+
 export interface SwapRequestResult {
   process: CommonOptimalPath;
   quote: SwapQuoteResponse;
