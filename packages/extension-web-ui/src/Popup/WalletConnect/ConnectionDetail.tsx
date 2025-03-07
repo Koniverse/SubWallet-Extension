@@ -202,11 +202,9 @@ const Component: React.FC<ComponentProps> = (props) => {
       </div>
       <SwList.Section
         className='account-list'
-        displayRow
         list={accountProxyItems}
         renderItem={renderAccountProxyItem}
         renderWhenEmpty={renderAccountEmpty}
-        rowGap='var(--row-gap)'
       />
       <BaseModal
         className={CN(className, 'network-modal')}

@@ -701,6 +701,10 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { extendToken, token } }:
         left: token.size,
         right: token.size,
         top: 0
+      },
+
+      '.account-detail-form': {
+        paddingTop: 0
       }
     }
   };

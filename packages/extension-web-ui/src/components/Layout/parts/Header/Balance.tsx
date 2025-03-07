@@ -207,7 +207,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const actions: Action[] = [
     {
-      label: 'Get address',
+      label: 'Receive',
       type: 'receive',
       icon: CopySimple,
       onClick: onOpenReceive
