@@ -60,7 +60,7 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
       result.label = t('Watch-only account');
       result.icon.phosphorIcon = Eye;
     } else if (type === AccountProxyType.INJECTED) {
-      result.label = t('injected account');
+      result.label = t('Extension account');
       result.icon.phosphorIcon = Needle;
     } else if (type === AccountProxyType.UNKNOWN) {
       result.label = t('Unknown account');
