@@ -108,11 +108,11 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
   /**
    * @todo Recheck
    * */
-  async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string): Promise<TransactionError[]> {
+  async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string): Promise<TransactionError[]> {
     const errors: TransactionError[] = [];
 
-    const poolInfo = await this.getPoolInfo();
-    const poolPosition = await this.getPoolPosition(address);
+    const poolInfo = await this.getPoolInfo(slug);
+    const poolPosition = await this.getPoolPosition(address, slug);
 
     if (!poolInfo || !poolInfo.statistic || !poolPosition || fastLeave || !selectedTarget) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];

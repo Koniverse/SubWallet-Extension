@@ -142,14 +142,14 @@ export default abstract class BasePoolHandler {
     return false;
   }
 
-  public async getPoolInfo (): Promise<YieldPoolInfo | undefined> {
-    return await this.state.earningService.getYieldPool(this.slug);
+  public async getPoolInfo (slug: string = this.slug): Promise<YieldPoolInfo | undefined> {
+    return await this.state.earningService.getYieldPool(slug);
   }
 
-  public async getPoolPosition (address: string): Promise<YieldPositionInfo | undefined> {
+  public async getPoolPosition (address: string, slug: string = this.slug): Promise<YieldPositionInfo | undefined> {
     const originAddress = reformatAddress(address);
 
-    return await this.state.earningService.getYieldPosition(originAddress, this.slug);
+    return await this.state.earningService.getYieldPosition(originAddress, slug);
   }
 
   /* Subscribe data */
@@ -329,7 +329,7 @@ export default abstract class BasePoolHandler {
   /* Leave action */
 
   /** Validate param to leave the pool */
-  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string): Promise<TransactionError[]>
+  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string): Promise<TransactionError[]>
   /** Create `transaction` to leave the pool normal (default unstake) */
   protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool fast (swap token) */
@@ -354,5 +354,9 @@ export default abstract class BasePoolHandler {
   /** Create `transaction` to claim reward */
   public abstract handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData>;
 
+  /** Check handler can handle slug */
+  public canHandleSlug (slug: string): boolean {
+    return this.slug === slug;
+  }
   /* Other actions */
 }

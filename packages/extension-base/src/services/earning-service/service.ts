@@ -30,6 +30,8 @@ const fetchPoolsData = async () => {
 export default class EarningService implements StoppableServiceInterface, PersistDataServiceInterface {
   protected readonly state: KoniState;
   protected handlers: Record<string, BasePoolHandler> = {};
+  private handlerCache: Map<string, BasePoolHandler | undefined> = new Map();
+
   private earningRewardSubject: BehaviorSubject<EarningRewardJson> = new BehaviorSubject<EarningRewardJson>({ ready: false, data: {} });
   private earningRewardHistorySubject: BehaviorSubject<Record<string, EarningRewardHistoryItem>> = new BehaviorSubject<Record<string, EarningRewardHistoryItem>>({});
   private minAmountPercentSubject: BehaviorSubject<Record<string, number>> = new BehaviorSubject<Record<string, number>>({});
@@ -323,7 +325,17 @@ export default class EarningService implements StoppableServiceInterface, Persis
   /* Pools' info methods */
 
   public getPoolHandler (slug: string): BasePoolHandler | undefined {
-    return this.handlers[slug];
+    if (this.handlerCache.has(slug)) {
+      return this.handlerCache.get(slug);
+    }
+
+    const handler = Object.values<BasePoolHandler>(this.handlers).find(
+      (h) => h.canHandleSlug(slug)
+    );
+
+    this.handlerCache.set(slug, handler);
+
+    return handler;
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
@@ -946,14 +958,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
 
-    if (isSubnetStaking(slug)) {
-      return Promise.resolve([]);
-    }
-
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

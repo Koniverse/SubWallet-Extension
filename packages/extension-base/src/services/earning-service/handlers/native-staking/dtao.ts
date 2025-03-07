@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN, { BigNumber } from 'bignumber.js';
 
@@ -110,6 +110,17 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
+const getChainSuffix = (chain: string): string => {
+  switch (chain) {
+    case 'bittensor_devnet':
+      return '__devnet';
+    case 'bittensor_testnet':
+      return '__testnet';
+    default:
+      return '';
+  }
+};
+
 export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
@@ -135,6 +146,7 @@ export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
 };
 
 export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
+  /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
     throw new Error('Method not implemented.');
   }
@@ -142,6 +154,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   public override handleYieldCancelUnstake (params: StakeCancelWithdrawalParams): Promise<TransactionData> {
     throw new Error('Method not implemented.');
   }
+  /* Unimplemented function  */
 
   // @ts-ignore
   public override readonly type = YieldPoolType.SUBNET_STAKING;
@@ -152,10 +165,23 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   public subnetData: SubnetData[] = [];
   private isInit = false;
 
+  override readonly availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: false,
+    withdraw: false,
+    claimReward: false
+  };
+
+  public override canHandleSlug (slug: string): boolean {
+    return slug.startsWith(`TAO___subnet_staking___bittensor${getChainSuffix(this.chain)}`);
+  }
+
   constructor (state: KoniState, chain: string) {
     super(state, chain);
     this.subnetName = 'TAO';
-    this.slug = subnetTaoSlug;
+    this.slug = `${subnetTaoSlug}${getChainSuffix(chain)}`;
     this.name = 'Subnet Tao Staking';
     this.shortName = 'dTAO Staking';
   }
@@ -229,7 +255,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
         this.subnetData.forEach((subnet) => {
           const netuid = subnet.netuid.toString().padStart(2, '0');
-          const subnetSlug = `TAO___subnet_staking___${this.chain}__subnet_${netuid}`;
+          const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
 
           const data: NativeYieldPoolInfo = {
@@ -240,7 +266,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               ...this.metadataInfo,
               name: subnetName,
               shortName: subnetName,
-              description: 'Stake TAO to earn rewards',
+              description: this.getDescription(),
               subnetData: {
                 subnetName: this.subnetName,
                 netuid: subnet.netuid,
@@ -393,7 +419,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               return;
             }
 
-            const subnetSlug = `TAO___subnet_staking___${this.chain}__subnet_${netuid.padStart(2, '0')}`;
+            const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
             const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
             const subnetSymbol = subnet.symbol || 'dTAO';
 

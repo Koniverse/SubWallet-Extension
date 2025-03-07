@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { isActionFromValidator, isSubnetStaking, subnetTaoSlug } from '@subwallet/extension-base/services/earning-service/utils';
+import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountJson, RequestYieldLeave, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, NominationSelector } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
@@ -231,11 +231,7 @@ const Component: React.FC = () => {
       return;
     }
 
-    let { fastLeave, from, slug, value } = values;
-
-    if (isSubnetStaking(slug)) {
-      slug = subnetTaoSlug;
-    }
+    const { fastLeave, from, slug, value } = values;
 
     const request: RequestYieldLeave = {
       address: from,
