@@ -98,8 +98,8 @@ export default class RequestService {
     return this.#metadataRequestHandler.numMetaRequests;
   }
 
-  public injectMetadata (url: string, request: MetadataDef): Promise<boolean> {
-    return this.#metadataRequestHandler.injectMetadata(url, request);
+  public injectMetadata (request: MetadataDef): boolean {
+    return this.#metadataRequestHandler.injectMetadata(request);
   }
 
   public getMetaRequest (id: string): MetaRequest {
