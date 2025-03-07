@@ -5,7 +5,7 @@ import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getFungibleAssetType, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getFungibleAssetType, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -261,4 +261,12 @@ export function getSwapStep (tokenSlug: string): DynamicSwapAction {
     action: DynamicSwapType.SWAP,
     toToken: tokenSlug
   };
+}
+
+export function isEquiValentAsset (from: _ChainAsset, to: _ChainAsset) {
+  return (
+    _getMultiChainAsset(from) === _getMultiChainAsset(to) ||
+    _getAssetPriceId(from) === _getAssetPriceId(to) ||
+    _getAssetSymbol(from) === _getAssetSymbol(to)
+  );
 }
