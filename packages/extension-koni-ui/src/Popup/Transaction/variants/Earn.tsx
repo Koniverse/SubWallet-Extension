@@ -868,16 +868,10 @@ const Component = () => {
 
   useEffect(() => {
     if (currentStep === 0) {
-      let originSlug = slug;
-
-      if (isSubnetStaking(slug)) {
-        originSlug = subnetTaoSlug;
-      }
-
       const submitData: OptimalYieldPathParams = {
         address: fromValue,
         amount: amountValue,
-        slug: originSlug,
+        slug: slug,
         targets: poolTargetValue ? poolTargets : undefined,
         netuid: netuid
       };

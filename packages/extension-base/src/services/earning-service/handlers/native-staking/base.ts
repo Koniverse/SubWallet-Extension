@@ -135,8 +135,8 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
 
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNativeStaking;
-    const { address, amount, selectedValidators } = data;
-    const positionInfo = await this.getPoolPosition(address);
+    const { address, amount, selectedValidators, slug } = data;
+    const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
     const bondingData: RequestBondingSubmit = {

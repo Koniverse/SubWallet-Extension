@@ -339,10 +339,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
-    if (isSubnetStaking(slug)) {
-      return false;
-    }
-
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -885,12 +881,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = request;
 
-    if (isSubnetStaking(slug)) {
-      return Promise.resolve({
-        passed: true
-      });
-    }
-
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -918,10 +908,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params.data;
 
-    if (isSubnetStaking(slug)) {
-      return Promise.resolve([]);
-    }
-
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -934,11 +920,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
   public async handleYieldJoin (params: HandleYieldStepParams): Promise<HandleYieldStepData> {
     await this.eventService.waitChainReady;
 
-    let { slug } = params.data;
-
-    if (isSubnetStaking(slug)) {
-      slug = subnetTaoSlug;
-    }
+    const { slug } = params.data;
 
     const handler = this.getPoolHandler(slug);
 
