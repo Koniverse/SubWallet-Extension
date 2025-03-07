@@ -144,7 +144,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [chainValue, destChainValue]);
 
   const isEditButton = useMemo(() => {
-    const isSubstrateSupport = !!(chainValue && feeType === 'evm' && listTokensCanPayFee.length && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue)));
+    const isSubstrateSupport = !!(chainValue && feeType === 'substrate' && listTokensCanPayFee.length && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue)));
     const isEvmSupport = !!(chainValue && feeType === 'evm');
 
     return (isSubstrateSupport || isEvmSupport) && !isXcm;
