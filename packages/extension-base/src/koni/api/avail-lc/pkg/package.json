@@ -1,0 +1,21 @@
+{
+  "name": "avail-light-web",
+  "collaborators": [
+    "Avail Team"
+  ],
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/availproject/avail-light"
+  },
+  "files": [
+    "avail_light_web_bg.wasm",
+    "avail_light_web.js",
+    "avail_light_web.d.ts"
+  ],
+  "module": "avail_light_web.js",
+  "types": "avail_light_web.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

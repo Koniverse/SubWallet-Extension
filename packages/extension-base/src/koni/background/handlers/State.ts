@@ -286,6 +286,26 @@ export default class KoniState {
     this.subscanService.setSubscanChainMap(this.chainService.getSubscanChainMap());
   }
 
+  private runAvaiLC () {
+    const worker = new Worker(new URL('./api/avail-lc/avail-light.js', import.meta.url));
+
+    worker.onmessage = (event: MessageEvent) => {
+      // console.log(event.data);
+      // const { message, topic } = JSON.parse(event.data);
+      //
+      // if (topic === 'status') {
+      //   console.log(message);
+      // }
+
+      console.log(event);
+    };
+
+    setInterval(() => {
+      console.log('pinging');
+      worker.postMessage('ping');
+    }, 10000);
+  }
+
   public async init () {
     await this.eventService.waitCryptoReady;
     await this.chainService.init();
@@ -305,6 +325,7 @@ export default class KoniState {
 
     // TODO: consider moving this to a separate service
     await this.dbService.stores.crowdloan.removeEndedCrowdloans();
+    await this.runAvaiLC();
 
     await this.startSubscription();
     this.chainOnlineService.checkLatestData();
