@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 
 export * from './authorizeAccountProxy';
 
@@ -10,5 +11,9 @@ export function isSoloTonAccountProxy (accountProxy: AccountProxy | null | undef
     return false;
   }
 
-  return accountProxy.accountType === AccountProxyType.SOLO && accountProxy.chainTypes.includes(AccountChainType.TON);
+  if (isAccountAll(accountProxy.id)) {
+    return accountProxy.chainTypes.length === 1 && accountProxy.chainTypes.includes(AccountChainType.TON);
+  }
+
+  return accountProxy.accounts.length === 1 && accountProxy.chainTypes.includes(AccountChainType.TON);
 }
