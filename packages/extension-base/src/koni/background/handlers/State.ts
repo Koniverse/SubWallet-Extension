@@ -52,6 +52,7 @@ import BN from 'bn.js';
 import { t } from 'i18next';
 import { interfaces } from 'manta-extension-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
+import {run as startALC} from '@subwallet/avail-light-web';
 
 import { JsonRpcResponse, ProviderInterface, ProviderInterfaceCallback } from '@polkadot/rpc-provider/types';
 import { assert, logger as createLogger, noop } from '@polkadot/util';
@@ -1531,6 +1532,9 @@ export default class KoniState {
 
     // Start services
     await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+
+    // Start Avail LC
+    startALC();
 
     // Complete starting
     starting.resolve();
