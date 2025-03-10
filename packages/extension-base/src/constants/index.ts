@@ -57,6 +57,16 @@ export const getSupportTokenPayFeeChain = () => {
   return Object.values(_SUPPORT_TOKEN_PAY_FEE_GROUP).flat();
 };
 
+export const isChainSupportTokenPayFee = (chainSlug: string): boolean => {
+  if (!chainSlug) {
+    console.error('You must provide chain slug!');
+
+    return false;
+  }
+
+  return getSupportTokenPayFeeChain().includes(chainSlug);
+};
+
 export * from './blocked-actions';
 export * from './environment';
 export * from './signing';
