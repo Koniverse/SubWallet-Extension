@@ -34,7 +34,9 @@ export interface ActionTypeToMetadataMap {
   [NotificationActionType.CLAIM]: WithdrawClaimNotificationMetadata,
   [NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_AVAIL]: ClaimAvailBridgeNotificationMetadata,
   [NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_ETHEREUM]: ClaimAvailBridgeNotificationMetadata,
-  [NotificationActionType.CLAIM_POLYGON_BRIDGE]: ClaimPolygonBridgeNotificationMetadata
+  [NotificationActionType.CLAIM_POLYGON_BRIDGE]: ClaimPolygonBridgeNotificationMetadata,
+  [NotificationActionType.SWAP]: ProcessNotificationMetadata,
+  [NotificationActionType.EARNING]: ProcessNotificationMetadata,
 }
 
 export interface SendReceiveNotificationMetadata {
@@ -70,16 +72,21 @@ export interface ClaimPolygonBridgeNotificationMetadata {
   tokenSlug: string;
   _id: string;
   amounts: string[];
-  counter: number;
+  bridgeType: string;
+  counter?: number;
   destinationNetwork: number;
-  originTokenAddress: string;
-  originTokenNetwork: number;
-  receiver: string;
-  sourceNetwork: number;
+  originTokenAddress?: string;
+  originTokenNetwork?: number;
+  receiver?: string;
+  sourceNetwork?: number;
   status: BridgeTransactionStatus;
   transactionHash: string;
-  transactionInitiator: string;
+  transactionInitiator?: string;
   userAddress: string;
+}
+
+export interface ProcessNotificationMetadata {
+  processId: string;
 }
 
 export enum NotificationTimePeriod {
@@ -95,7 +102,9 @@ export enum NotificationActionType {
   CLAIM = 'CLAIM', // Claim reward
   CLAIM_AVAIL_BRIDGE_ON_AVAIL = 'CLAIM_AVAIL_BRIDGE_ON_AVAIL',
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'CLAIM_AVAIL_BRIDGE_ON_ETHEREUM',
-  CLAIM_POLYGON_BRIDGE = 'CLAIM_POLYGON_BRIDGE'
+  CLAIM_POLYGON_BRIDGE = 'CLAIM_POLYGON_BRIDGE',
+  SWAP = 'SWAP',
+  EARNING = 'EARNING'
 }
 
 export enum NotificationTab {

@@ -127,6 +127,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const maxPoolMembers = _maxPoolMember ? parseInt(_maxPoolMember.toString()) : undefined;
 
       const [_totalEraStake, _lastTotalStaked] = _EraStakeInfo;
+
       const validatorEraReward = getAvgValidatorEraReward(supportedDays, _eraReward[0]);
       const lastTotalStaked = _lastTotalStaked.toString();
       const rawTotalEraStake = _totalEraStake.toString();

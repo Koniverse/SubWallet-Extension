@@ -16,7 +16,17 @@ import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
+
+import { SimpleSwapHandler } from './handler/simpleswap-handler';
+import { UniswapHandler } from './handler/uniswap-handler';
+
+export const _isChainSupportedByProvider = (providerSlug: SwapProviderId, chain: string) => {
+  const supportedChains = _PROVIDER_TO_SUPPORTED_PAIR_MAP[providerSlug];
+
+  return supportedChains ? supportedChains.includes(chain) : false;
+};
 
 export class SwapService implements ServiceWithProcessInterface, StoppableServiceInterface {
   protected readonly state: KoniState;
@@ -35,34 +45,36 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     this.chainService = state.chainService;
   }
 
-  private async askProvidersForQuote (request: SwapRequest): Promise<QuoteAskResponse[]> {
+  private async askProvidersForQuote (request: SwapRequest) {
     const availableQuotes: QuoteAskResponse[] = [];
-    const swappingSrcChain = this.chainService.getAssetBySlug(request.pair.from).originChain;
 
     await Promise.all(Object.values(this.handlers).map(async (handler) => {
       // temporary solution to reduce number of requests to providers, will work as long as there's only 1 provider for 1 chain
-      if (!_PROVIDER_TO_SUPPORTED_PAIR_MAP[handler.providerSlug].includes(swappingSrcChain)) {
-        return;
-      }
 
       if (handler.init && handler.isReady === false) {
         await handler.init();
       }
-
-      const quote = await handler.getSwapQuote(request);
-
-      if (!(quote instanceof SwapError)) { // todo: can do better
-        availableQuotes.push({
-          quote
-        });
-      } else {
-        availableQuotes.push({
-          error: quote
-        });
-      }
     }));
 
-    return availableQuotes; // todo: need to propagate error for further handling
+    const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
+
+    if (Array.isArray(quotes)) {
+      quotes.forEach((quoteData) => {
+        if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
+          return;
+        }
+
+        if (!('errorClass' in quoteData.quote)) {
+          availableQuotes.push({ quote: quoteData.quote as SwapQuote | undefined });
+        } else {
+          availableQuotes.push({
+            error: new SwapError(quoteData.quote.errorType as SwapErrorType, quoteData.quote.message)
+          });
+        }
+      });
+    }
+
+    return availableQuotes;
   }
 
   private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
@@ -89,7 +101,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
     } else {
-      const providerId = params.selectedQuote.provider.id;
+      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
       const handler = this.handlers[providerId];
 
       if (handler) {
@@ -106,7 +118,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 2. Select the best quote
     * 3. Generate optimal process for that quote
     * */
-
     const swapQuoteResponse = await this.getLatestQuotes(request);
 
     const optimalProcess = await this.generateOptimalProcess({
@@ -141,7 +152,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
       quoteError = preferredErrorResp?.error || defaultErrorResp?.error;
     } else {
-      selectedQuote = availableQuotes[0];
+      selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0];
       aliveUntil = selectedQuote?.aliveUntil || (+Date.now() + SWAP_QUOTE_TIMEOUT_MAP.default);
     }
 
@@ -157,32 +168,40 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     _SUPPORTED_SWAP_PROVIDERS.forEach((providerId) => {
       switch (providerId) {
         case SwapProviderId.CHAIN_FLIP_TESTNET:
-          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService);
+          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
 
           break;
         case SwapProviderId.CHAIN_FLIP_MAINNET:
-          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, false);
+          this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
 
           break;
 
         case SwapProviderId.HYDRADX_TESTNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService);
+          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService);
           break;
 
         case SwapProviderId.HYDRADX_MAINNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, false);
+          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
           break;
 
         case SwapProviderId.POLKADOT_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'statemint');
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemint');
           break;
         case SwapProviderId.KUSAMA_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'statemine');
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemine');
           break;
-        case SwapProviderId.ROCOCO_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, 'rococo_assethub');
+        // case SwapProviderId.ROCOCO_ASSET_HUB:
+        //   this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'rococo_assethub');
+        //   break;
+        case SwapProviderId.WESTEND_ASSET_HUB:
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'westend_assethub');
           break;
-
+        case SwapProviderId.SIMPLE_SWAP:
+          this.handlers[providerId] = new SimpleSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
+          break;
+        case SwapProviderId.UNISWAP:
+          this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
         default:
           throw new Error('Unsupported provider');
       }

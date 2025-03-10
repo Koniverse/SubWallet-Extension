@@ -11,7 +11,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { BaseDetailModal, EvmMessageDetail, EvmSignArea } from '../parts';
+import { BaseDetailModal, EvmMessageDetail, EvmSignArea } from '../../parts';
 
 interface Props extends ThemeProps {
   type: EvmSignatureSupportType

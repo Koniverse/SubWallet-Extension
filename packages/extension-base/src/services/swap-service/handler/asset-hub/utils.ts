@@ -13,6 +13,7 @@ import { StagingXcmV3MultiLocation } from '@polkadot/types/lookup';
 export const _getPoolInfo = async (api: ApiPromise, asset1: _ChainAsset, asset2: _ChainAsset): Promise<[string, string]> => {
   const assetLocation1 = _getXcmAssetMultilocation(asset1) as StagingXcmV3MultiLocation;
   const assetLocation2 = _getXcmAssetMultilocation(asset2) as StagingXcmV3MultiLocation;
+  // @ts-ignore - Type auto detect incorrect
   const rs = await api.call.assetConversionApi.getReserves(assetLocation1, assetLocation2);
 
   if (!rs) {
@@ -50,7 +51,7 @@ export const getReserveForPath = async (api: ApiPromise, paths: _ChainAsset[]): 
 };
 
 export const estimateTokensForPool = (amount: string, reserves: [string, string]): string => {
-  if (amount === '0') {
+  if (!amount || amount === '0') {
     return '0';
   }
 
@@ -96,7 +97,7 @@ export const estimateActualRate = (amount: string, reserves: Array<[string, stri
   return result.toString();
 };
 
-export const estimateRateAfter = (amount: string, reserves: Array<[string, string]>): string => {
+export const estimateRateAfterForPath = (amount: string, reserves: Array<[string, string]>): string => {
   const m = new BigN(amount);
 
   const reserve = reserves[0];

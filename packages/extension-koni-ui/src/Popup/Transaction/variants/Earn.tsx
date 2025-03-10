@@ -7,27 +7,29 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { EARNING_INSTRUCTION_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useIsPopup, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, validateYieldProcess } from '@subwallet/extension-koni-ui/messaging';
+import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getReformatedAddressRelatedToChain, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { getJoinYieldParams } from '../helper';
@@ -48,6 +50,8 @@ const Component = () => {
   const { t } = useTranslation();
   const notify = useNotification();
   const { activeModal } = useContext(ModalContext);
+  const navigate = useNavigate();
+  const isPopup = useIsPopup();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone,
     openAlert, persistData,
@@ -71,7 +75,9 @@ const Component = () => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const poolTargetValue = useWatchTransaction('target', form, defaultData);
 
+  const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
+  const getReformatAddress = useReformatAddress();
 
   const isClickInfoButtonRef = useRef<boolean>(false);
 
@@ -106,6 +112,19 @@ const Component = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(true);
 
   const chainState = useFetchChainState(poolInfo?.chain || '');
+
+  const onHandleOneSignConfirmation = useCallback((transactionProcessId: string) => {
+    if (isPopup) {
+      windowOpen({
+        allowedPath: '/transaction-submission',
+        params: {
+          'transaction-process-id': transactionProcessId
+        }
+      }).then(window.close).catch(console.log);
+    } else {
+      navigate(`/transaction-submission?transaction-process-id=${transactionProcessId}`);
+    }
+  }, [isPopup, navigate]);
 
   const currentConfirmation = useMemo(() => {
     if (slug) {
@@ -285,7 +304,7 @@ const Component = () => {
       }
 
       ap.accounts.forEach((a) => {
-        const address = getReformatedAddressRelatedToChain(a, chainInfo);
+        const address = getReformatAddress(a, chainInfo);
 
         if (address) {
           result.push({
@@ -300,7 +319,7 @@ const Component = () => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, fromAccountProxy, poolChain]);
+  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
@@ -383,7 +402,7 @@ const Component = () => {
   const onSuccess = useCallback(
     (lastStep: boolean, needRollback: boolean): ((rs: SWTransactionResponse) => boolean) => {
       return (rs: SWTransactionResponse): boolean => {
-        const { errors: _errors, id, warnings } = rs;
+        const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
           const error = _errors[0]; // we only handle the first error for now
@@ -420,7 +439,7 @@ const Component = () => {
           });
 
           if (lastStep) {
-            onDone(id);
+            processId ? onHandleOneSignConfirmation(processId) : onDone(id);
 
             return false;
           }
@@ -431,7 +450,7 @@ const Component = () => {
         }
       };
     },
-    [notify, onDone, onError, t]
+    [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
@@ -439,6 +458,7 @@ const Component = () => {
       setSubmitLoading(true);
       setIsDisableHeader(true);
       const { from, slug, target, value: _currentAmount } = values;
+      let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
         if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type) && target) {
@@ -472,14 +492,19 @@ const Component = () => {
       };
 
       const submitData = async (step: number): Promise<boolean> => {
-        dispatchProcessState({
-          type: EarningActionType.STEP_SUBMIT,
-          payload: null
-        });
         const isFirstStep = step === 0;
         const isLastStep = step === processState.steps.length - 1;
         const needRollback = step === 1;
         const data = getData(step);
+
+        if (isFirstStep) {
+          processId = getId();
+        }
+
+        dispatchProcessState({
+          type: EarningActionType.STEP_SUBMIT,
+          payload: isFirstStep ? { processId } : null
+        });
 
         try {
           if (isFirstStep) {
@@ -507,19 +532,38 @@ const Component = () => {
               return await submitData(step + 1);
             }
           } else {
-            const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
-              path: path,
-              data: data,
-              currentStep: step
-            });
+            if (oneSign && path.steps.length > 2) {
+              const submitPromise: Promise<SWTransactionResponse> = submitProcess({
+                address: from,
+                id: processId,
+                type: ProcessType.EARNING,
+                request: {
+                  path: path,
+                  data: data,
+                  currentStep: step
+                }
+              });
 
-            const rs = await submitPromise;
-            const success = onSuccess(isLastStep, needRollback)(rs);
+              const rs = await submitPromise;
 
-            if (success) {
-              return await submitData(step + 1);
+              onSuccess(true, needRollback)(rs);
+
+              return true;
             } else {
-              return false;
+              const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
+                path: path,
+                data: data,
+                currentStep: step
+              });
+
+              const rs = await submitPromise;
+              const success = onSuccess(isLastStep, needRollback)(rs);
+
+              if (success) {
+                return await submitData(step + 1);
+              } else {
+                return false;
+              }
             }
           }
         } catch (e) {
@@ -569,7 +613,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, onError, onSuccess, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {

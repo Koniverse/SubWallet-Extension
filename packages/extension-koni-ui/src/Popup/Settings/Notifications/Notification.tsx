@@ -1,10 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _POLYGON_BRIDGE_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
-import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -13,22 +15,23 @@ import NotificationDetailModal from '@subwallet/extension-koni-ui/components/Mod
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
 import NotificationItem from '@subwallet/extension-koni-ui/Popup/Settings/Notifications/NotificationItem';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { NotificationScreenParam, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getTotalWidrawable, getYieldRewardTotal } from '@subwallet/extension-koni-ui/utils/notification';
 import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps;
@@ -46,7 +49,9 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM = 'yellow-7',
   CLAIM_AVAIL_BRIDGE_ON_AVAIL = 'yellow-7', // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
-  CLAIM_POLYGON_BRIDGE = 'yellow-7'
+  CLAIM_POLYGON_BRIDGE = 'yellow-7',
+  SWAP = 'blue-8',
+  EARNING = 'blue-8'
 }
 
 export const NotificationIconMap = {
@@ -56,17 +61,23 @@ export const NotificationIconMap = {
   CLAIM: Gift,
   CLAIM_AVAIL_BRIDGE_ON_AVAIL: Coins, // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
-  CLAIM_POLYGON_BRIDGE: Coins
+  CLAIM_POLYGON_BRIDGE: Coins,
+  SWAP: ArrowsLeftRight,
+  EARNING: Database
 };
 
 const alertModalId = 'notification-alert-modal';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
+  const locationState = useLocation().state as NotificationScreenParam | undefined;
+  const paramTransactionProcess = locationState?.transactionProcess;
+  const paramTransactionProcessId = paramTransactionProcess?.processId;
   const { activeModal, checkActive } = useContext(ModalContext);
+  const { transactionProcessDetailModal: { open: openTransactionProcessModal } } = useContext(WalletModalContext);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { goBack } = useDefaultNavigate();
+  const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
   const chainsByAccountType = useGetChainSlugsByAccount();
@@ -199,8 +210,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const onClickBack = useCallback(() => {
     setCurrentSearchText('');
-    goBack();
-  }, [goBack]);
+    goHome();
+  }, [goHome]);
 
   const showActiveChainModal = useCallback((chainSlug: string, action: NotificationActionType.WITHDRAW | NotificationActionType.CLAIM) => {
     const onOk = () => {
@@ -346,7 +357,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           const handleClaimPolygonBridge = async () => {
             try {
               const metadata = item.metadata as ClaimPolygonBridgeNotificationMetadata;
-              const isClaimed = await getIsClaimNotificationStatus({ chainslug: metadata.chainSlug, counter: metadata.counter, sourceNetwork: metadata.sourceNetwork });
+              let isClaimed = false;
+
+              if (metadata.bridgeType === 'POS') {
+                const isTestnet = metadata.chainSlug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA;
+
+                isClaimed = await isClaimedPosBridge(metadata._id, metadata.userAddress, isTestnet) || false;
+              } else {
+                isClaimed = await getIsClaimNotificationStatus({ chainslug: metadata.chainSlug, counter: metadata.counter ?? 0, sourceNetwork: metadata.sourceNetwork ?? 0 });
+              }
 
               if (!isClaimed) {
                 setClaimAvailBridgeStorage({
@@ -396,6 +415,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           break;
         }
+
+        case NotificationActionType.EARNING:
+
+        // eslint-disable-next-line no-fallthrough
+        case NotificationActionType.SWAP: {
+          const metadata = item.metadata as ProcessNotificationMetadata;
+
+          openTransactionProcessModal(metadata.processId);
+
+          break;
+        }
       }
 
       if (!item.isRead) {
@@ -406,7 +436,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [accounts, showActiveChainModal, chainStateMap, chainsByAccountType, currentAccountProxy, currentTimestampMs, earningRewards, isAllAccount, isTrigger, navigate, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showWarningModal, yieldPositions]);
+  }, [accounts, showActiveChainModal, chainStateMap, chainsByAccountType, currentAccountProxy, currentTimestampMs, earningRewards, isAllAccount, isTrigger, navigate, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showWarningModal, yieldPositions, openTransactionProcessModal]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -499,6 +529,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       clearInterval(timer);
     };
   }, []);
+
+  useEffect(() => {
+    // todo: may have more conditions
+    if (paramTransactionProcessId) {
+      openTransactionProcessModal(paramTransactionProcessId);
+    }
+    // need paramTransactionProcess?.triggerTime to re-run this useEffect
+  }, [openTransactionProcessModal, paramTransactionProcessId, paramTransactionProcess?.triggerTime]);
 
   return (
     <PageWrapper className={`manage-website-access ${className}`}>
@@ -603,7 +641,7 @@ const Wrapper = (props: Props) => {
     <PageWrapper
       className={CN(props.className)}
       hideLoading={true}
-      resolve={dataContext.awaitStores(['earning'])}
+      resolve={dataContext.awaitStores(['earning', 'price'])}
     >
       <Component {...props} />
     </PageWrapper>

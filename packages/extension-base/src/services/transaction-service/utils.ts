@@ -3,9 +3,11 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getBlockExplorerFromChain, _isChainTestNet, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
-import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
-import { ChainflipSwapTxData } from '@subwallet/extension-base/types/swap';
+import { _getBlockExplorerFromChain, _isChainTestNet, _isPureCardanoChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
+import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
+
+import { hexAddPrefix, isHex } from '@polkadot/util';
 
 // @ts-ignore
 export function parseTransactionData<T extends ExtrinsicType> (data: unknown): ExtrinsicDataTypeMap[T] {
@@ -43,6 +45,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
+  if (explorerLink.includes('laos.statescan.io')) {
+    return '#/accounts';
+  }
+
   if (explorerLink.includes('explorer.zkverify.io')) {
     return 'account';
   }
@@ -59,11 +65,15 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'tx';
   }
 
+  if (_isPureCardanoChain(chainInfo)) {
+    return 'transaction';
+  }
+
   if (['aventus', 'deeper_network'].includes(chainInfo.slug)) {
     return 'transaction';
   }
 
-  if (['invarch'].includes(chainInfo.slug)) {
+  if (['invarch', 'tangle'].includes(chainInfo.slug)) {
     return '#/extrinsics';
   }
 
@@ -79,12 +89,16 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
     return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`;
   }
 
-  if (explorerLink && value.startsWith('0x')) {
+  if (explorerLink && isHex(hexAddPrefix(value))) {
     if (chainInfo.slug === 'bittensor') {
       return undefined;
     }
 
     const route = getBlockExplorerTxRoute(chainInfo);
+
+    if (chainInfo.slug === 'tangle') {
+      return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}extrinsic/${value}${route}/${value}`);
+    }
 
     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`);
   }
@@ -96,4 +110,10 @@ export function getChainflipExplorerLink (data: ChainflipSwapTxData, chainInfo: 
   const chainflipDomain = _isChainTestNet(chainInfo) ? CHAIN_FLIP_TESTNET_EXPLORER : CHAIN_FLIP_MAINNET_EXPLORER;
 
   return `${chainflipDomain}/channels/${data.depositChannelId}`;
+}
+
+export function getSimpleSwapExplorerLink (data: SimpleSwapTxData) {
+  const simpleswapDomain = SIMPLE_SWAP_EXPLORER;
+
+  return `${simpleswapDomain}/exchange?id=${data.id}`;
 }

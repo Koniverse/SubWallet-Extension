@@ -11,5 +11,8 @@ export { default as TransactionStore } from './Transaction';
 export { default as MigrationStore } from './Migration';
 
 export { default as MetadataStore } from './Metadata';
+export { default as MetadataV15Store } from './MetadataV15';
+
 export { default as ChainStore } from './Chain';
 export { default as AssetStore } from './Asset';
+export { default as ProcessTransactionStore } from './ProcessTransaction';
