@@ -909,8 +909,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const handler = this.getPoolHandler(slug);
 
-    console.log('handler2', handler);
-
     if (handler) {
       return handler.validateYieldJoin(params.data, params.path);
     } else {
@@ -924,8 +922,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const { slug } = params.data;
 
     const handler = this.getPoolHandler(slug);
-
-    console.log('handler1', handler);
 
     if (handler) {
       return handler.handleYieldJoin(params.data, params.path, params.currentStep);
