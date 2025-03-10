@@ -88,6 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const getOrigin = () => {
       switch (type) {
+        case YieldPoolType.SUBNET_STAKING:
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
@@ -157,6 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const { type } = poolInfo;
 
     switch (type) {
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NOMINATION_POOL:
       case YieldPoolType.NATIVE_STAKING:
       case YieldPoolType.LIQUID_STAKING:
@@ -240,6 +242,8 @@ const Component: React.FC<Props> = (props: Props) => {
           return [];
         }
       }
+
+      case YieldPoolType.SUBNET_STAKING: // fallthrough
 
       case YieldPoolType.NATIVE_STAKING: {
         const _label = getValidatorLabel(poolInfo.chain);
