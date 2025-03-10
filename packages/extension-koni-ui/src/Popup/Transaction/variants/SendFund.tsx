@@ -387,7 +387,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setForceUpdateMaxValue(undefined);
         setSelectedTransactionFee(undefined);
 
-        setCurrentTokenPayFee(undefined);
+        if (values.chain !== chain) {
+          setCurrentTokenPayFee(undefined);
+        }
       }
 
       if (part.destChain || part.chain || part.value || part.asset) {
