@@ -25,3 +25,4 @@ export const NotificationDescriptionMap = {
 };
 
 export const ONE_DAY_MILLISECOND = 1000 * 24 * 60 * 60;
+export const REMIND_TIME_FETCHING_INTERVAL = 120000;

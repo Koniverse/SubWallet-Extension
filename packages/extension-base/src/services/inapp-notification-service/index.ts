@@ -10,7 +10,7 @@ import { CronServiceInterface, ServiceStatus } from '@subwallet/extension-base/s
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND } from '@subwallet/extension-base/services/inapp-notification-service/consts';
+import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND, REMIND_TIME_FETCHING_INTERVAL } from '@subwallet/extension-base/services/inapp-notification-service/consts';
 import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
@@ -19,10 +19,14 @@ import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBas
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
+import { BehaviorSubject } from 'rxjs';
 
 export class InappNotificationService implements CronServiceInterface {
   status: ServiceStatus;
   private refeshAvailBridgeClaimTimeOut: NodeJS.Timeout | undefined;
+
+  private refreshRemindTimeTimeout: NodeJS.Timeout | undefined;
+  private remindTimeSubject: BehaviorSubject<Record<NotificationActionType, number>> = new BehaviorSubject<Record<NotificationActionType, number>>({} as Record<NotificationActionType, number>);
 
   constructor (
     private readonly dbService: DatabaseService,
@@ -33,14 +37,22 @@ export class InappNotificationService implements CronServiceInterface {
     this.status = ServiceStatus.NOT_INITIALIZED;
   }
 
+  public get values () {
+    const remindTimeSubject = this.remindTimeSubject;
+
+    return {
+      get remindTime () {
+        return remindTimeSubject.value;
+      }
+    };
+  }
+
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
 
     await this.eventService.waitAccountReady;
 
     this.status = ServiceStatus.INITIALIZED;
-
-    await this.start();
 
     this.onAccountProxyRemove();
   }
@@ -184,10 +196,8 @@ export class InappNotificationService implements CronServiceInterface {
     const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
     const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
     const passNotifications: _NotificationInfo[] = [];
-    const [comparedNotifications, remindTimeConfig] = await Promise.all([
-      this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
-      await fetchLastestRemindNotificationTime()
-    ]);
+    const remindTimeConfig = this.values.remindTime;
+    const comparedNotifications = await this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId });
 
     for (const candidateNotification of notifications) {
       candidateNotification.title = candidateNotification.title.replace('{{accountName}}', accountName);
@@ -468,6 +478,22 @@ export class InappNotificationService implements CronServiceInterface {
     await this.validateAndWriteNotificationsToDB([notification], process.address);
   }
 
+  async cronFetchRemindTime () {
+    clearInterval(this.refreshRemindTimeTimeout);
+
+    const fetchRemindTime = async () => {
+      const remindTimeConfig = await fetchLastestRemindNotificationTime();
+
+      this.remindTimeSubject.next(remindTimeConfig);
+    };
+
+    await fetchRemindTime();
+
+    this.refreshRemindTimeTimeout = setTimeout(() => {
+      fetchRemindTime.bind(this)().catch(console.error);
+    }, REMIND_TIME_FETCHING_INTERVAL);
+  }
+
   // Polygon Claimable Handle
 
   async start (): Promise<void> {
@@ -485,11 +511,11 @@ export class InappNotificationService implements CronServiceInterface {
   }
 
   async startCron (): Promise<void> {
+    await this.cronFetchRemindTime();
+
     this.cleanUpOldNotifications()
       .catch(console.error);
     this.cronCreateBridgeClaimNotification();
-
-    return Promise.resolve();
   }
 
   async stop (): Promise<void> {
