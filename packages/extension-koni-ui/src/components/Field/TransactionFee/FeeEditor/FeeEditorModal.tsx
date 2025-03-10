@@ -276,6 +276,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         className='__converted-custom-value'
         decimal={decimals}
         prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+        suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
         value={transformAmount}
       />
       <Form.Item
@@ -348,6 +349,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
           className={'__fee-price-value'}
           decimal={0}
           prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+          suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={convertedCustomEvmFeeToUSD}
         />
       </div>

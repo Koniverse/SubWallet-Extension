@@ -3,7 +3,7 @@
 
 import { _AssetType } from '@subwallet/chain-list/types';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
 import BigN from 'bignumber.js';

@@ -478,7 +478,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
 
   const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
 
-  if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) {
+  if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
   }
 
