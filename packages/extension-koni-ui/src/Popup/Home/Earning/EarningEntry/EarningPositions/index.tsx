@@ -313,7 +313,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     const assetInfo = assetInfoMap[balanceToken];
 
     if (subnetData) {
-      return subnetData?.subnetShortName.toLowerCase().includes(searchText.toLowerCase()) || subnetData.subnetName.toLowerCase().includes(searchText.toLowerCase());
+      return subnetData?.subnetShortName.toLowerCase().includes(searchText.toLowerCase());
     }
 
     return (

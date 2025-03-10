@@ -23,7 +23,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { className, onClick, poolInfo } = props;
   const { chain, metadata, type } = poolInfo;
-  const { inputAsset, logo, shortName, subnetData } = metadata;
+  const { inputAsset, logo, shortName } = metadata;
   const totalApy = poolInfo.statistic?.totalApy;
   const totalApr = poolInfo.statistic?.totalApr;
   const tvl = poolInfo.statistic?.tvl;
@@ -80,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
             <div className={'__item-name'}>
-              <span className='__symbol'>{subnetData?.subnetName || asset?.symbol || ''}</span>
+              <span className='__symbol'>{asset?.symbol || ''}</span>
               <span className={'__chain-wrapper'}>
                   (<span className={'__chain'}>
                   {shortName}

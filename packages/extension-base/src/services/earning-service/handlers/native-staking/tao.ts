@@ -14,6 +14,7 @@ import BigN from 'bignumber.js';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
+import { TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -115,16 +116,16 @@ export async function fetchDelegates (): Promise<ValidatorResponse> {
 
 /* Fetch data */
 
-const testnetDelegate = {
-  '5G6wdAdS7hpBuH1tjuZDhpzrGw9Wf71WEVakDCxHDm1cxEQ2': {
-    name: '0x436c6f776e4e616d65f09fa4a1',
-    url: 'https://example.com  ',
-    image: 'https://example.com/image.png',
-    discord: '0xe28094446973636f7264',
-    description: 'This is an example identity.',
-    additional: ''
-  }
-};
+// const testnetDelegate = {
+//   '5G6wdAdS7hpBuH1tjuZDhpzrGw9Wf71WEVakDCxHDm1cxEQ2': {
+//     name: '0x436c6f776e4e616d65f09fa4a1',
+//     url: 'https://example.com  ',
+//     image: 'https://example.com/image.png',
+//     discord: '0xe28094446973636f7264',
+//     description: 'This is an example identity.',
+//     additional: ''
+//   }
+// };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
   protected override readonly availableMethod: YieldPoolMethodInfo = {
@@ -135,10 +136,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     withdraw: false,
     claimReward: false
   };
-
-  protected override getDescription (): string {
-    return 'Stake TAO to earn rewards from root';
-  }
 
   /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
@@ -270,47 +267,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
 
-    const getDevnetPoolPosition = async () => {
-      const testnetAddress = Object.keys(testnetDelegate)[0];
-      const delegatorState: TaoStakingStakeOption[] = [];
-      let bnTotalBalance = BN_ZERO;
-
-      const stakePromises = useAddresses.map(async (address) => {
-        const stakeAmount = (await substrateApi.api.query.subtensorModule.stake(testnetAddress, address)).toString();
-        const bnStakeAmount = new BN(stakeAmount);
-
-        bnTotalBalance = bnTotalBalance.add(bnStakeAmount);
-
-        delegatorState.push({
-          owner: testnetAddress,
-          amount: bnStakeAmount.toString()
-          // identity: testnetAddress
-        });
-
-        rsCallback({
-          ...defaultInfo,
-          type: this.type,
-          address: address,
-          balanceToken: this.nativeToken.slug,
-          totalStake: bnTotalBalance.toString(),
-          activeStake: bnStakeAmount.toString(),
-          unstakeBalance: '0',
-          status: EarningStatus.EARNING_REWARD,
-          isBondedBefore: true,
-          nominations: delegatorState.map((delegate) => ({
-            chain: this.chain,
-            validatorAddress: delegate.owner,
-            activeStake: delegate.amount,
-            status: EarningStatus.EARNING_REWARD
-          })),
-          unstakings: []
-        });
-      });
-
-      await Promise.all(stakePromises);
-    };
-
-    const getMainnetPoolPosition = async () => {
+    const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
         useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
       );
@@ -439,11 +396,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         return;
       }
 
-      if (this.chain === 'bittensor_devnet') {
-        await getDevnetPoolPosition();
-      } else {
-        await getMainnetPoolPosition();
-      }
+      await getPoolPosition();
     };
 
     getStakingPositionInterval().catch(console.error);
@@ -464,26 +417,25 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = testnetDelegate;
-    const validatorAddresses = Object.keys(_topValidator);
+    const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
+    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
+    const bnMinBond = new BN(nominatorMinRequiredStake);
 
-    return validatorAddresses.map((address) => {
-      return {
-        address: address,
-        totalStake: '0',
-        ownStake: '0',
-        otherStake: '0',
-        minBond: '0',
-        nominatorCount: 0,
-        commission: '0',
-        expectedReturn: 0,
-        blocked: false,
-        isVerified: false,
-        chain: this.chain,
-        isCrowded: false,
-        identity: address
-      } as unknown as ValidatorInfo;
-    });
+    return testnetDelegate.map((delegate) => ({
+      address: delegate.delegateSs58,
+      totalStake: '0',
+      ownStake: '0',
+      otherStake: '0',
+      minBond: bnMinBond.toString(),
+      nominatorCount: delegate.nominators.length,
+      commission: delegate.take / 1000,
+      expectedReturn: 0,
+      blocked: false,
+      isVerified: false,
+      chain: this.chain,
+      isCrowded: false
+    }) as unknown as ValidatorInfo);
   }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
@@ -533,10 +485,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
-    if (this.chain === 'bittensor_devnet') {
-      return this.getDevnetPoolTargets();
-    } else {
+    if (this.chain === 'bittensor') {
       return this.getMainnetPoolTargets();
+    } else {
+      return this.getDevnetPoolTargets();
     }
   }
 

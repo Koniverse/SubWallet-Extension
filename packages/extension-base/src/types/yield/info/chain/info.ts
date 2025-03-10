@@ -116,7 +116,6 @@ export interface BaseYieldPoolMetadata {
 
   /* Special info */
   subnetData?: {
-    subnetName: string;
     netuid: number;
     subnetSymbol: string;
   };

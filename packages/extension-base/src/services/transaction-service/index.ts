@@ -666,6 +666,12 @@ export default class TransactionService {
         {
           const data = parseTransactionData<ExtrinsicType.STAKING_UNBOND>(transaction.data);
 
+          if (data.poolInfo?.metadata.subnetData) {
+            historyItem.additionalInfo = {
+              symbol: data.poolInfo.metadata.subnetData.subnetSymbol
+            };
+          }
+
           if (data.isLiquidStaking && data.derivativeTokenInfo && data.exchangeRate && data.inputTokenInfo) {
             historyItem.amount = {
               decimals: _getAssetDecimals(data.derivativeTokenInfo),

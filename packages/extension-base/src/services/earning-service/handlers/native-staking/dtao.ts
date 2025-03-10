@@ -13,9 +13,9 @@ import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPool
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN, { BigNumber } from 'bignumber.js';
 
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
-import { calculateReward, subnetTaoSlug } from '../../utils';
+import { calculateReward } from '../../utils';
 import { fetchDelegates, TaoStakeInfo } from './tao';
 
 export interface SubnetData {
@@ -46,8 +46,13 @@ export interface RawDelegateState {
     stake: string;
   }>;
 }
-interface TestnetDelegateInfo {
+
+type Nominators = [Array<[number, number]>]
+
+export interface TestnetBittensorDelegateInfo {
   delegateSs58: string;
+  take: number;
+  nominators: Nominators
 }
 // interface ApiResponse {
 //   data: SubnetData[];
@@ -112,17 +117,6 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
-const getChainSuffix = (chain: string): string => {
-  switch (chain) {
-    case 'bittensor_devnet':
-      return '__devnet';
-    case 'bittensor_testnet':
-      return '__testnet';
-    default:
-      return '__mainnet';
-  }
-};
-
 export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
@@ -163,7 +157,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   public override slug: string;
   protected override name: string;
   protected override shortName: string;
-  public subnetName: string;
   public subnetData: SubnetData[] = [];
   private isInit = false;
 
@@ -176,16 +169,29 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     claimReward: false
   };
 
-  public override canHandleSlug (slug: string): boolean {
-    return slug.startsWith(`TAO___subnet_staking___bittensor${getChainSuffix(this.chain)}`);
-  }
-
   constructor (state: KoniState, chain: string) {
     super(state, chain);
-    this.subnetName = 'TAO';
-    this.slug = `${subnetTaoSlug}${getChainSuffix(chain)}`;
+    const _chainAsset = this.nativeToken;
+    const _chainInfo = this.chainInfo;
+
+    const symbol = _chainAsset.symbol;
+
+    this.slug = this.slug = `${symbol}___subnet_staking___${_chainInfo.slug}`;
     this.name = 'Subnet Tao Staking';
     this.shortName = 'dTAO Staking';
+  }
+
+  public override canHandleSlug (slug: string): boolean {
+    return slug.startsWith(`${this.slug}__`);
+  }
+
+  public override get maintainBalance (): string {
+    const ed = new BN(this.nativeToken.minAmount || '0');
+    const calculateMaintainBalance = new BN(15).mul(ed).div(BN_TEN);
+
+    const maintainBalance = calculateMaintainBalance;
+
+    return maintainBalance.toString();
   }
 
   private async init (): Promise<void> {
@@ -229,7 +235,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   protected override getDescription (): string {
-    return 'Stake TAO to earn rewards from subnet';
+    return 'Stake TAO to earn yield on dTAO';
   }
 
   private getSubnetByNetuid (netuid: number): SubnetData | undefined {
@@ -270,7 +276,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               shortName: subnetName,
               description: this.getDescription(),
               subnetData: {
-                subnetName: this.subnetName,
                 netuid: subnet.netuid,
                 subnetSymbol: subnet.symbol || 'dTAO'
               }
@@ -390,28 +395,25 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             const hotkey = delegate.hotkey;
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
-            const subnet = this.getSubnetByNetuid(netuid);
 
-            if (subnet) {
-              const taoToAlphaPrice = new BigN(price[netuid]);
+            const taoToAlphaPrice = new BigN(price[netuid]);
 
-              if (!subnetPositions[netuid]) {
-                subnetPositions[netuid] = {
-                  delegatorState: [],
-                  totalBalance: BN_ZERO,
-                  originalTotalStake: BN_ZERO
-                };
-              }
-
-              subnetPositions[netuid].delegatorState.push({
-                owner: hotkey,
-                amount: stake.toString(),
-                rate: taoToAlphaPrice
-              });
-
-              subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));
-              subnetPositions[netuid].originalTotalStake = subnetPositions[netuid].originalTotalStake.add(new BN(stake.toString()));
+            if (!subnetPositions[netuid]) {
+              subnetPositions[netuid] = {
+                delegatorState: [],
+                totalBalance: BN_ZERO,
+                originalTotalStake: BN_ZERO
+              };
             }
+
+            subnetPositions[netuid].delegatorState.push({
+              owner: hotkey,
+              amount: stake.toString(),
+              rate: taoToAlphaPrice
+            });
+
+            subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));
+            subnetPositions[netuid].originalTotalStake = subnetPositions[netuid].originalTotalStake.add(new BN(stake.toString()));
           }
 
           Object.entries(subnetPositions).forEach(([netuid, { delegatorState, originalTotalStake }]) => {
@@ -435,7 +437,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
                     type: this.type,
                     slug: subnetSlug,
                     subnetData: {
-                      subnetName: this.subnetName,
                       subnetSymbol: subnetSymbol,
                       subnetShortName: subnetName,
                       originalTotalStake: originalTotalStake.toString()
@@ -458,7 +459,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
                 unstakings: [],
                 slug: subnetSlug,
                 subnetData: {
-                  subnetName: this.subnetName,
                   subnetSymbol: subnetSymbol,
                   subnetShortName: subnetName,
                   originalTotalStake: '0'
@@ -495,19 +495,19 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Get pool targets */
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetDelegateInfo[];
-
-    console.log('testnetDelegate');
+    const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
+    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
+    const bnMinBond = new BN(nominatorMinRequiredStake);
 
     return testnetDelegate.map((delegate) => ({
       address: delegate.delegateSs58,
       totalStake: '0',
       ownStake: '0',
       otherStake: '0',
-      minBond: '0',
-      nominatorCount: 0,
-      commission: '0',
-      expectedReturn: 0,
+      minBond: bnMinBond.toString(),
+      nominatorCount: delegate.nominators.length,
+      commission: delegate.take / 1000,
       blocked: false,
       isVerified: false,
       chain: this.chain,

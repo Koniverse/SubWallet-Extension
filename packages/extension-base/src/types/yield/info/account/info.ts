@@ -109,8 +109,7 @@ export interface NativeYieldPositionInfo extends AbstractYieldPositionInfo {
 
 export interface SubnetYieldPositionInfo extends AbstractYieldPositionInfo {
   type: YieldPoolType.SUBNET_STAKING;
-  subnetData: {
-    subnetName: string;
+  subnetData?: {
     subnetSymbol: string;
     subnetShortName: string;
     originalTotalStake: string;
