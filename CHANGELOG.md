@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 1.3.23
+Build date: Mar 05, 2025.
+
+Features & Update:
+- Support Uniswap (#3977)
+- Support Cardano (#3816, #3924, #3925, #3942)
+- Support Migrate account feature (#3926, #4016)
+- Unified address format integration (#3864)
+
+Bug fixed:
+- Fix Bug when unstaking vDOT, vMANTA (#4054)
+
+## 1.3.22
+Build date: Mar 04, 2025.
+
+Features & Update:
+- Support staking for Mythos (#3984)
+
+
 ## 1.3.21
 Build date: Feb 28, 2025.
 
