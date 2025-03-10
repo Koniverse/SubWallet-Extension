@@ -172,7 +172,7 @@ export default abstract class BasePoolHandler {
   /* Early validate */
 
   public async earlyValidate (request: RequestEarlyValidateYield): Promise<ResponseEarlyValidateYield> {
-    const poolInfo = await this.getPoolInfo();
+    const poolInfo = await this.getPoolInfo(request.slug);
 
     if (!poolInfo || !poolInfo.statistic?.earningThreshold.join) {
       return {

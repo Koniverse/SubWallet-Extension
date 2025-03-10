@@ -19,7 +19,6 @@ import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCac
 import { BehaviorSubject } from 'rxjs';
 
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
-import { isSubnetStaking, subnetTaoSlug } from './utils';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -910,6 +909,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const handler = this.getPoolHandler(slug);
 
+    console.log('handler2', handler);
+
     if (handler) {
       return handler.validateYieldJoin(params.data, params.path);
     } else {
@@ -923,6 +924,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const { slug } = params.data;
 
     const handler = this.getPoolHandler(slug);
+
+    console.log('handler1', handler);
 
     if (handler) {
       return handler.handleYieldJoin(params.data, params.path, params.currentStep);

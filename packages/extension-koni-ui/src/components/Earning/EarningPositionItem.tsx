@@ -71,7 +71,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
-            <div className='__item-name'> { positionInfo.subnetData?.subnetName || poolName }
+            <div className='__item-name'> { poolName }
               <span className='__subnet-short-name'> {subnetShortName} </span>
             </div>
 

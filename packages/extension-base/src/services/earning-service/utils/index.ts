@@ -156,9 +156,3 @@ export function applyDecimal (bnNumber: BN, decimals: number) {
 
   return bnNumber.div(bnDecimals);
 }
-
-export const subnetTaoSlug = 'TAO___subnet_staking___bittensor';
-
-export const isSubnetStaking = (slug: string) => {
-  return slug.includes('subnet_staking');
-};

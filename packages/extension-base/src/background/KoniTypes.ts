@@ -1528,6 +1528,9 @@ export interface UnbondingSubmitParams extends BaseRequestSign {
   exchangeRate?: number;
   inputTokenInfo?: _ChainAsset;
   isFastUnbond: boolean;
+  poolInfo?: {
+    metadata: SubnetYieldPositionInfo,
+  },
 }
 
 export type RequestUnbondingSubmit = InternalRequestSign<UnbondingSubmitParams>;

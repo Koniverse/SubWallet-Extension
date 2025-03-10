@@ -28,9 +28,9 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
   }
 
   async validateYieldJoin (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
-    const { address, amount, selectedValidators } = data as SubmitJoinNativeStaking;
-    const poolInfo = await this.getPoolInfo();
-    const poolPosition = await this.getPoolPosition(address);
+    const { address, amount, selectedValidators, slug } = data as SubmitJoinNativeStaking;
+    const poolInfo = await this.getPoolInfo(slug);
+    const poolPosition = await this.getPoolPosition(address, slug);
     const chainInfo = this.chainInfo;
     const bnAmount = new BN(amount);
 
