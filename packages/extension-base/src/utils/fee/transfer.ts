@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
-import { XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
@@ -77,7 +77,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
   let maxTransferableAmount: ResponseSubscribeTransfer;
 
   if (isXcmTransfer) {
-    maxTransferableAmount = await calculateXCMMaxTransferable(id, request, freeBalance, fee);
+    maxTransferableAmount = await calculateXcmMaxTransferable(id, request, freeBalance, fee);
   } else {
     maxTransferableAmount = await calculateTransferMaxTransferable(id, request, freeBalance, fee);
   }
@@ -108,7 +108,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       // todo: refactor: merge getERC20TransactionObject & getEVMTransactionObject
       // Estimate with EVM API
       if (_isTokenEvmSmartContract(srcToken) || _isLocalToken(srcToken)) {
-        [transaction] = await getERC20TransactionObject({
+        [transaction, , error] = await getERC20TransactionObject({
           assetAddress: _getContractAddressOfToken(srcToken),
           chain: srcChain.slug,
           evmApi,
@@ -118,10 +118,11 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           from: address,
           to: recipient,
           transferAll: false,
-          value: '0'
+          value: '0',
+          fallbackFee: true
         });
       } else {
-        [transaction] = await getEVMTransactionObject({
+        [transaction, , error] = await getEVMTransactionObject({
           chain: srcChain.slug,
           evmApi,
           feeCustom,
@@ -130,7 +131,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           from: address,
           to: recipient,
           transferAll: false,
-          value: '0'
+          value: '0',
+          fallbackFee: true
         });
       }
     } else if (isTonAddress(address) && _isTokenTransferredByTon(srcToken)) {
@@ -262,7 +264,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
     console.warn('Unable to estimate fee', e);
   }
 
-  if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
+  if (isTransferLocalTokenAndPayThatTokenAsFee && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug) && feeChainType === 'substrate') {
     const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
     const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
 
@@ -286,7 +288,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
   };
 };
 
-export const calculateXCMMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
+export const calculateXcmMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
   const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
@@ -414,7 +416,7 @@ export const calculateXCMMaxTransferable = async (id: string, request: Calculate
 
   if (!destToken) {
     maxTransferable = BN_ZERO;
-  } else if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
+  } else if (isTransferLocalTokenAndPayThatTokenAsFee && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug) && feeChainType === 'substrate') {
     const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
     const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
 

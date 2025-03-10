@@ -28,7 +28,7 @@ interface CreateTransferExtrinsicProps {
   from: string,
   value: string,
   transferAll: boolean,
-  tokenInfo: _ChainAsset,
+  tokenInfo: _ChainAsset
 }
 
 export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {

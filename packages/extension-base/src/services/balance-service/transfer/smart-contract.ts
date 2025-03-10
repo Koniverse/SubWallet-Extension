@@ -12,6 +12,7 @@ import { combineEthFee } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { TransactionConfig } from 'web3-core';
+import { ContractSendMethod } from 'web3-eth-contract';
 
 interface TransferEvmProps extends TransactionFee {
   chain: string;
@@ -21,21 +22,24 @@ interface TransferEvmProps extends TransactionFee {
   transferAll: boolean;
   value: string;
   evmApi: _EvmApi;
+  fallbackFee?: boolean;
 }
 
 export async function getEVMTransactionObject ({ chain,
   evmApi,
+  fallbackFee,
   feeCustom: _feeCustom,
   feeInfo: _feeInfo,
   feeOption,
   from,
   to,
   transferAll,
-  value }: TransferEvmProps): Promise<[TransactionConfig, string]> {
+  value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
 
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
+  let errorOnEstimateFee = '';
 
   const transactionObject = {
     to: to,
@@ -44,7 +48,17 @@ export async function getEVMTransactionObject ({ chain,
     ...feeCombine
   } as TransactionConfig;
 
-  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject);
+  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
+    console.log('Cannot estimate fee with native transfer on', chain, e);
+
+    if (fallbackFee) {
+      errorOnEstimateFee = e.message;
+
+      return 21000;
+    } else {
+      throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+    }
+  });
 
   transactionObject.gas = gasLimit;
 
@@ -66,12 +80,14 @@ export async function getEVMTransactionObject ({ chain,
     transactionObject.value = transactionObject.value.substring(0, transactionObject.value.length - 6) + new Array(numberReplace).fill('0').join('');
   }
 
-  return [transactionObject, transactionObject.value.toString()];
+  return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
 }
 
 export async function getERC20TransactionObject (
   { assetAddress,
+    chain,
     evmApi,
+    fallbackFee,
     feeCustom: _feeCustom,
     feeInfo: _feeInfo,
     feeOption,
@@ -79,12 +95,13 @@ export async function getERC20TransactionObject (
     to,
     transferAll,
     value }: TransferERC20Props
-): Promise<[TransactionConfig, string]> {
+): Promise<[TransactionConfig, string, string]> {
   const erc20Contract = getERC20Contract(assetAddress, evmApi);
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
 
   let freeAmount = new BigN(0);
   let transferValue = value;
+  let errorOnEstimateFee = '';
 
   if (transferAll) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -101,7 +118,18 @@ export async function getERC20TransactionObject (
 
   const transferData = generateTransferData(to, transferValue);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  const gasLimit = await erc20Contract.methods.transfer(to, transferValue).estimateGas({ from }) as number;
+  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
+    .catch((e: Error) => {
+      console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
+
+      if (fallbackFee) {
+        errorOnEstimateFee = e.message;
+
+        return 70000;
+      } else {
+        throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+      }
+    });
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
 
@@ -119,7 +147,7 @@ export async function getERC20TransactionObject (
     transactionObject.data = generateTransferData(to, transferValue);
   }
 
-  return [transactionObject, transferValue];
+  return [transactionObject, transferValue, errorOnEstimateFee];
 }
 
 interface TransferERC20Props extends TransactionFee {
@@ -131,6 +159,7 @@ interface TransferERC20Props extends TransactionFee {
   to: string;
   transferAll: boolean;
   value: string;
+  fallbackFee?: boolean;
 }
 
 export async function getERC721Transaction (
