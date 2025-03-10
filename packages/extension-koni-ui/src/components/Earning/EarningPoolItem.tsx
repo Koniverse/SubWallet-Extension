@@ -23,7 +23,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { className, onClick, poolInfo } = props;
   const { chain, metadata, type } = poolInfo;
-  const { inputAsset, logo, shortName } = metadata;
+  const { inputAsset, logo, shortName, subnetData } = metadata;
   const totalApy = poolInfo.statistic?.totalApy;
   const totalApr = poolInfo.statistic?.totalApr;
   const tvl = poolInfo.statistic?.tvl;

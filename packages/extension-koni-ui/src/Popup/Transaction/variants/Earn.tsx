@@ -260,7 +260,7 @@ const Component = () => {
         }
 
         return [];
-      } else if (YieldPoolType.NATIVE_STAKING === poolType) {
+      } else if (YieldPoolType.NATIVE_STAKING === poolType || YieldPoolType.SUBNET_STAKING === poolType) {
         const validatorList = _poolTargets as ValidatorInfo[];
 
         if (!validatorList) {
@@ -453,6 +453,7 @@ const Component = () => {
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
+  const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
@@ -461,17 +462,19 @@ const Component = () => {
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
-        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type) && target) {
+        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && target) {
           const targets = poolTargets;
 
-          if (poolInfo.type === YieldPoolType.NOMINATION_POOL) {
+          if (poolInfo.type === YieldPoolType.NOMINATION_POOL || YieldPoolType.SUBNET_STAKING) {
             const selectedPool = targets[0];
 
             return {
               slug: slug,
               address: from,
               amount: _currentAmount,
-              selectedPool
+              selectedPool,
+              selectedValidators: targets,
+              netuid: netuid
             } as SubmitJoinNominationPool;
           } else {
             return {
@@ -613,7 +616,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -869,7 +872,8 @@ const Component = () => {
         address: fromValue,
         amount: amountValue,
         slug: slug,
-        targets: poolTargetValue ? poolTargets : undefined
+        targets: poolTargetValue ? poolTargets : undefined,
+        netuid: netuid
       };
 
       const newData = JSON.stringify(submitData);
@@ -916,7 +920,7 @@ const Component = () => {
         );
       }
     }
-  }, [submitString, currentStep, chainInfoMap, slug, fromValue, amountValue, notify, poolTargetValue, poolTargets]);
+  }, [submitString, currentStep, chainInfoMap, slug, fromValue, amountValue, notify, poolTargetValue, poolTargets, netuid]);
 
   // useEffect(() => {
   //   setCheckMintLoading(true);
@@ -1114,7 +1118,7 @@ const Component = () => {
                   </Form.Item>
                 )}
 
-                {poolType === YieldPoolType.NATIVE_STAKING && (
+                {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
                   <Form.Item
                     name={'target'}
                   >

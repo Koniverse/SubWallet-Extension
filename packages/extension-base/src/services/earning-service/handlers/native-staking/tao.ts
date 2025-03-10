@@ -6,15 +6,15 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
+import { TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -58,37 +58,7 @@ interface Validator {
   apr: string;
 }
 
-interface SubnetData {
-  netuid: number;
-  taoIn: string; // Dữ liệu từ JSON thường là string số lớn
-  alphaIn: string;
-}
-
-export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
-  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as SubnetData[] | undefined;
-
-  if (!allSubnets) {
-    return {};
-  }
-
-  return allSubnets.reduce((acc, subnet) => {
-    const netuid = subnet?.netuid;
-    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
-    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
-
-    if (netuid === 0) {
-      acc[netuid] = '1';
-    } else if (alphaIn.gt(0)) {
-      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
-    } else {
-      acc[netuid] = '1';
-    }
-
-    return acc;
-  }, {} as Record<number, string>);
-};
-
-export const BITTENSOR_API_KEY_1 = process.env.BITTENSOR_API_KEY_1 || '';
+export const BITTENSOR_API_KEY_1 = process.env.BITTENSOR_API_KEY_1 || 'tao-9b2604da-a579-437e-98b3-23e2a1d37f91:ab0423fe';
 export const BITTENSOR_API_KEY_2 = process.env.BITTENSOR_API_KEY_2 || '';
 export const BITTENSOR_API_KEY_3 = process.env.BITTENSOR_API_KEY_3 || '';
 export const BITTENSOR_API_KEY_4 = process.env.BITTENSOR_API_KEY_4 || '';
@@ -158,6 +128,15 @@ const testnetDelegate = {
 };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
+  protected override readonly availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: false,
+    withdraw: false,
+    claimReward: false
+  };
+
   /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
@@ -190,7 +169,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         }
 
         const minDelegatorStake = await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-
+        const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
         const data: NativeYieldPoolInfo = {
@@ -198,7 +177,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           type: this.type,
           metadata: {
             ...this.metadataInfo,
-            description: this.getDescription('0')
+            description: this.getDescription()
           },
           statistic: {
             assetEarning: [
@@ -206,7 +185,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                 slug: this.nativeToken.slug
               }
             ],
-            maxCandidatePerFarmer: 16,
+            maxCandidatePerFarmer: Number(maxValidatorPerNominator),
             maxWithdrawalRequestPerFarmer: 1,
             earningThreshold: {
               join: BNminDelegatorStake.toString(),
@@ -288,52 +267,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
 
-    const getDevnetPoolPosition = async () => {
-      const testnetAddress = Object.keys(testnetDelegate)[0];
-      const delegatorState: TaoStakingStakeOption[] = [];
-      let bnTotalBalance = BN_ZERO;
-
-      const stakePromises = useAddresses.map(async (address) => {
-        const stakeAmount = (await substrateApi.api.query.subtensorModule.stake(testnetAddress, address)).toString();
-        const bnStakeAmount = new BN(stakeAmount);
-
-        bnTotalBalance = bnTotalBalance.add(bnStakeAmount);
-
-        delegatorState.push({
-          owner: testnetAddress,
-          amount: bnStakeAmount.toString()
-          // identity: testnetAddress
-        });
-
-        rsCallback({
-          ...defaultInfo,
-          type: this.type,
-          address: address,
-          balanceToken: this.nativeToken.slug,
-          totalStake: bnTotalBalance.toString(),
-          activeStake: bnStakeAmount.toString(),
-          unstakeBalance: '0',
-          status: EarningStatus.EARNING_REWARD,
-          isBondedBefore: true,
-          nominations: delegatorState.map((delegate) => ({
-            chain: this.chain,
-            validatorAddress: delegate.owner,
-            activeStake: delegate.amount,
-            status: EarningStatus.EARNING_REWARD
-          })),
-          unstakings: []
-        });
-      });
-
-      await Promise.all(stakePromises);
-    };
-
-    const getMainnetPoolPosition = async () => {
+    const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
         useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
       );
-
-      const price = await getTaoToAlphaMapping(this.substrateApi);
 
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
@@ -349,14 +286,15 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             const hotkey = delegate.hotkey;
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
-            const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
 
-            const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+            if (netuid === 0) {
+              const taoStake = stake.toFixed(0);
 
-            if (totalDelegate[hotkey]) {
-              totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
-            } else {
-              totalDelegate[hotkey] = taoStake;
+              if (totalDelegate[hotkey]) {
+                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toFixed();
+              } else {
+                totalDelegate[hotkey] = taoStake;
+              }
             }
           }
 
@@ -458,11 +396,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         return;
       }
 
-      if (this.chain === 'bittensor_devnet') {
-        await getDevnetPoolPosition();
-      } else {
-        await getMainnetPoolPosition();
-      }
+      await getPoolPosition();
     };
 
     getStakingPositionInterval().catch(console.error);
@@ -483,26 +417,25 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = testnetDelegate;
-    const validatorAddresses = Object.keys(_topValidator);
+    const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
+    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
+    const bnMinBond = new BN(nominatorMinRequiredStake);
 
-    return validatorAddresses.map((address) => {
-      return {
-        address: address,
-        totalStake: '0',
-        ownStake: '0',
-        otherStake: '0',
-        minBond: '0',
-        nominatorCount: 0,
-        commission: '0',
-        expectedReturn: 0,
-        blocked: false,
-        isVerified: false,
-        chain: this.chain,
-        isCrowded: false,
-        identity: address
-      } as unknown as ValidatorInfo;
-    });
+    return testnetDelegate.map((delegate) => ({
+      address: delegate.delegateSs58,
+      totalStake: '0',
+      ownStake: '0',
+      otherStake: '0',
+      minBond: bnMinBond.toString(),
+      nominatorCount: delegate.nominators.length,
+      commission: delegate.take / 1000,
+      expectedReturn: 0,
+      blocked: false,
+      isVerified: false,
+      chain: this.chain,
+      isCrowded: false
+    }) as unknown as ValidatorInfo);
   }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
@@ -552,10 +485,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
-    if (this.chain === 'bittensor_devnet') {
-      return this.getDevnetPoolTargets();
-    } else {
+    if (this.chain === 'bittensor') {
       return this.getMainnetPoolTargets();
+    } else {
+      return this.getDevnetPoolTargets();
     }
   }
 

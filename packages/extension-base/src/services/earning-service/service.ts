@@ -18,7 +18,7 @@ import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler,
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
-import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -29,6 +29,8 @@ const fetchPoolsData = async () => {
 export default class EarningService implements StoppableServiceInterface, PersistDataServiceInterface {
   protected readonly state: KoniState;
   protected handlers: Record<string, BasePoolHandler> = {};
+  private handlerCache: Map<string, BasePoolHandler | undefined> = new Map();
+
   private earningRewardSubject: BehaviorSubject<EarningRewardJson> = new BehaviorSubject<EarningRewardJson>({ ready: false, data: {} });
   private earningRewardHistorySubject: BehaviorSubject<Record<string, EarningRewardHistoryItem>> = new BehaviorSubject<Record<string, EarningRewardHistoryItem>>({});
   private minAmountPercentSubject: BehaviorSubject<Record<string, number>> = new BehaviorSubject<Record<string, number>>({});
@@ -40,7 +42,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   private dbService: DatabaseService;
   private eventService: EventService;
-  private useOnlineCacheOnly = true;
+  private useOnlineCacheOnly = false;
 
   constructor (state: KoniState) {
     this.state = state;
@@ -84,6 +86,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+        // todo: check support for testnet
+        // Mainnet only
+        handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
+
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
       }
 
@@ -318,7 +324,17 @@ export default class EarningService implements StoppableServiceInterface, Persis
   /* Pools' info methods */
 
   public getPoolHandler (slug: string): BasePoolHandler | undefined {
-    return this.handlers[slug];
+    if (this.handlerCache.has(slug)) {
+      return this.handlerCache.get(slug);
+    }
+
+    const handler = Object.values<BasePoolHandler>(this.handlers).find(
+      (h) => h.canHandleSlug(slug)
+    );
+
+    this.handlerCache.set(slug, handler);
+
+    return handler;
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
@@ -863,6 +879,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = request;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -889,7 +906,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params.data;
+
     const handler = this.getPoolHandler(slug);
+
+    console.log('handler2', handler);
 
     if (handler) {
       return handler.validateYieldJoin(params.data, params.path);
@@ -902,7 +922,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params.data;
+
     const handler = this.getPoolHandler(slug);
+
+    console.log('handler1', handler);
 
     if (handler) {
       return handler.handleYieldJoin(params.data, params.path, params.currentStep);
@@ -919,10 +942,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -933,14 +957,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
     const handler = this.getPoolHandler(slug);
+    const netuid = params.poolInfo.metadata.subnetData?.netuid;
 
     if (handler) {
-      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget);
+      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
   }
-
   /* Leave */
 
   /* Other */
