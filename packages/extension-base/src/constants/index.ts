@@ -47,7 +47,25 @@ export const ORDINAL_COLLECTION = '__Ordinal__';
 export const ORDINAL_METHODS = ['drc-20', 'pol-20'];
 
 export const PERMISSIONS_TO_REVOKE = ['eth_accounts'];
-export const ASSET_HUB_CHAIN_SLUGS = ['paseo_assethub', 'westend_assethub', 'rococo_assethub', 'statemine', 'statemint'];
+
+export const _SUPPORT_TOKEN_PAY_FEE_GROUP = {
+  assetHub: ['paseo_assethub', 'westend_assethub', 'rococo_assethub', 'statemine', 'statemint'],
+  hydration: ['hydradx_main', 'hydradx_rococo']
+};
+
+export const getSupportTokenPayFeeChain = () => {
+  return Object.values(_SUPPORT_TOKEN_PAY_FEE_GROUP).flat();
+};
+
+export const isChainSupportTokenPayFee = (chainSlug: string): boolean => {
+  if (!chainSlug) {
+    console.error('You must provide chain slug!');
+
+    return false;
+  }
+
+  return getSupportTokenPayFeeChain().includes(chainSlug);
+};
 
 export * from './blocked-actions';
 export * from './environment';
