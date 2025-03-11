@@ -16,13 +16,13 @@ import useUILock from '@subwallet/extension-web-ui/hooks/common/useUILock';
 import { subscribeNotifications } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { OffRampParams, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isNoAccount as _isNoAccount, removeStorage } from '@subwallet/extension-web-ui/utils';
+import { removeStorage } from '@subwallet/extension-web-ui/utils';
 import { changeHeaderLogo, ModalContext } from '@subwallet/react-ui';
 import { NotificationProps } from '@subwallet/react-ui/es/notification/NotificationProvider';
 import CN from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -127,20 +127,9 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
   const initDataRef = useRef<Promise<boolean>>(dataContext.awaitStores(['accountState', 'chainStore', 'assetRegistry', 'requestState', 'settings', 'mantaPay']));
   const firstRender = useRef(true);
 
-  const navigate = useNavigate();
   // Pathname query
   const [, setStorage] = useLocalStorage(OFF_RAMP_DATA, DEFAULT_OFF_RAMP_PARAMS);
   const [searchParams] = useSearchParams();
-
-  const details = useMemo((): OffRampParams | null => {
-    const orderId = searchParams.get('orderId') || '';
-
-    if (orderId) {
-      return getOffRampData(orderId, searchParams);
-    } else {
-      return null;
-    }
-  }, [searchParams]);
 
   useSubscribeLanguage();
 
@@ -148,15 +137,12 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
 
   const { unlockType } = useSelector((state: RootState) => state.settings);
   const { hasConfirmations, hasInternalConfirmations } = useSelector((state: RootState) => state.requestState);
-  const { accounts, currentAccount, hasMasterPassword, isLocked } = useSelector((state: RootState) => state.accountState);
+  const { accounts, currentAccount, hasMasterPassword, isLocked, isNoAccount } = useSelector((state: RootState) => state.accountState);
   const [initAccount, setInitAccount] = useState(currentAccount);
   const { isUILocked } = useUILock();
   const needUnlock = isUILocked || (isLocked && unlockType === WalletUnlockType.ALWAYS_REQUIRED);
-
-  // todo: need recheck this logic after updating unified account feature completely
-  const isNoAccount = useMemo(() => {
-    return _isNoAccount(accounts);
-  }, [accounts]);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const navigate = useNavigate();
 
   const needMigrate = useMemo(
     () => !!accounts
@@ -166,15 +152,25 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
     , [accounts]
   );
 
+  const offRampParamDetails = useMemo((): OffRampParams | null => {
+    const orderId = searchParams.get('orderId') || '';
+
+    if (orderId) {
+      return getOffRampData(orderId, searchParams);
+    } else {
+      return null;
+    }
+  }, [searchParams]);
+
   useEffect(() => {
-    if (details) {
-      setStorage(details);
+    if (offRampParamDetails) {
+      setStorage(offRampParamDetails);
 
       if (isNoAccount) {
         navigate(offRampLoading);
       }
     }
-  }, [isNoAccount, details, setStorage, navigate]);
+  }, [isNoAccount, offRampParamDetails, setStorage, navigate]);
 
   useEffect(() => {
     initDataRef.current.then(() => {
@@ -324,12 +320,30 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
     }
   }, [currentAccount, initAccount]);
 
-  if (rootLoading || redirectTarget.redirect) {
-    return <>{redirectTarget.redirect && <Navigate to={redirectTarget.redirect} />}</>;
+  const redirectPath = redirectTarget.redirect;
+
+  useEffect(() => {
+    if (rootLoading || redirectPath) {
+      setShouldRedirect(true);
+    } else {
+      setShouldRedirect(false);
+    }
+  }, [rootLoading, redirectPath]);
+
+  useEffect(() => {
+    if (shouldRedirect && redirectPath) {
+      navigate(redirectPath);
+    }
+  }, [shouldRedirect, redirectPath, navigate]);
+
+  if (rootLoading || redirectPath) {
+    return <></>;
   } else {
-    return <MainWrapper className={CN('main-page-container', `screen-size-${screenContext.screenType}`, { 'web-ui-enable': screenContext.isWebUI })}>
-      {children}
-    </MainWrapper>;
+    return (
+      <MainWrapper className={CN('main-page-container', `screen-size-${screenContext.screenType}`, { 'web-ui-enable': screenContext.isWebUI })}>
+        {children}
+      </MainWrapper>
+    );
   }
 }
 

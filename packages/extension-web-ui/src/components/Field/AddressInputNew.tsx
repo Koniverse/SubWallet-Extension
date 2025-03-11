@@ -401,6 +401,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     <>
       <div className={CN(className, '-input-container')}>
         <AutoComplete
+          disabled={disabled}
           dropdownRender={dropdownRender}
           fieldNames={autoCompleteFieldNames}
           listHeight={dropdownListHeight}

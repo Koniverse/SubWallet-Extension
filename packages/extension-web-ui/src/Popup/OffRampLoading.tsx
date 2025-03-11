@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BN_TEN } from '@subwallet/extension-base/utils';
-import { DEFAULT_OFF_RAMP_PARAMS, DEFAULT_TRANSFER_PARAMS, NO_ACCOUNT_MODAL, OFF_RAMP_DATA, REDIRECT_TRANSAK_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_OFF_RAMP_PARAMS, DEFAULT_TRANSFER_PARAMS, OFF_RAMP_DATA, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { OffRampParams, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { OffRampParams, Theme, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
 import { Button, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
@@ -18,7 +18,7 @@ import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { LoadingScreen } from '../components';
-import { removeStorage } from '../utils';
+import { findAccountByAddress, removeStorage } from '../utils';
 
 type Props = ThemeProps;
 
@@ -29,8 +29,8 @@ const toBNString = (input: string | number | BigNumber, decimal: number): string
   return raw.multipliedBy(BN_TEN.pow(decimal)).toFixed();
 };
 
-const noAccountModalId = NO_ACCOUNT_MODAL;
-const redirectTransakModalId = REDIRECT_TRANSAK_MODAL;
+const noAccountModalId = 'no-account-modal';
+const redirectTransakModalId = 'redirect-transak-modal';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { token } = useTheme() as Theme;
@@ -44,24 +44,35 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const addresses = useMemo(() => accounts.map((account) => account.address), [accounts]);
   const { isWebUI } = useContext(ScreenContext);
 
-  const TokenInfo = useGetChainAssetInfo(offRampData.slug);
+  const tokenInfo = useGetChainAssetInfo(offRampData.slug);
   const navigate = useNavigate();
 
-  const onOpenSellToken = useCallback((data: OffRampParams) => {
+  const openTransfer = useCallback((data: OffRampParams) => {
     const partnerCustomerId = data.partnerCustomerId;
     const walletAddress = data.walletAddress;
     const slug = data.slug;
-    const address = partnerCustomerId;
-    const bnAmount = toBNString(data.numericCryptoAmount.toString(), TokenInfo?.decimals || 0);
-    const transferParams = {
+    const bnAmount = toBNString(data.numericCryptoAmount.toString(), tokenInfo?.decimals || 0);
+
+    const targetAccount = findAccountByAddress(accounts, partnerCustomerId);
+
+    // will not happen, this is just for backup
+    if (!targetAccount) {
+      return;
+    }
+
+    const transferParams: TransferParams = {
       ...DEFAULT_TRANSFER_PARAMS,
-      chain: TokenInfo?.originChain || '',
-      destChain: TokenInfo?.originChain || '',
-      asset: TokenInfo?.slug || '',
-      from: address,
+      fromAccountProxy: targetAccount.proxyId || '',
+      from: partnerCustomerId,
+      chain: tokenInfo?.originChain || '',
+      destChain: tokenInfo?.originChain || '',
+      asset: tokenInfo?.slug || '',
       defaultSlug: slug || '',
       to: walletAddress,
-      value: bnAmount.toString()
+      value: bnAmount.toString(),
+      orderId: data.orderId,
+      service: 'transak',
+      isReadonly: true
     };
 
     setStorage(transferParams);
@@ -69,9 +80,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     if (!isWebUI) {
       navigate('/transaction/off-ramp-send-fund');
     } else {
-      navigate('/home/tokens?onOpen=true');
+      navigate('/home/tokens?openSendFund=true');
     }
-  }, [TokenInfo?.decimals, TokenInfo?.originChain, TokenInfo?.slug, setStorage, isWebUI, navigate]);
+  }, [tokenInfo?.decimals, tokenInfo?.originChain, tokenInfo?.slug, accounts, setStorage, isWebUI, navigate]);
 
   useEffect(() => {
     if (offRampData.orderId) {
@@ -81,16 +92,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         activeModal(noAccountModalId);
       }
     }
-  }, [activeModal, addresses, offRampData, onOpenSellToken]);
+  }, [activeModal, addresses, offRampData, openTransfer]);
 
-  const onClick = useCallback(() => {
+  const onBackToHome = useCallback(() => {
     removeStorage(OFF_RAMP_DATA);
     navigate('/home/tokens');
   }, [navigate]);
 
-  const onRedirectclick = useCallback(() => {
-    onOpenSellToken(offRampData);
-  }, [offRampData, onOpenSellToken]);
+  const onRedirectToTransfer = useCallback(() => {
+    openTransfer(offRampData);
+    removeStorage(OFF_RAMP_DATA);
+  }, [offRampData, openTransfer]);
 
   const { t } = useTranslation();
   const footerModal = useMemo(() => {
@@ -98,33 +110,33 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <>
         <Button
           block={true}
-          onClick={onClick}
+          onClick={onBackToHome}
         >
           {t('I understand')}
         </Button>
       </>
     );
-  }, [onClick, t]);
+  }, [onBackToHome, t]);
 
   const redirectFooterModal = useMemo(() => {
     return (
       <>
         <Button
           block={true}
-          onClick={onClick}
+          onClick={onBackToHome}
           schema={'secondary'}
         >
           {t('Cancel')}
         </Button>
         <Button
           block={true}
-          onClick={onRedirectclick}
+          onClick={onRedirectToTransfer}
         >
           {t('Continue')}
         </Button>
       </>
     );
-  }, [onClick, onRedirectclick, t]);
+  }, [onBackToHome, onRedirectToTransfer, t]);
 
   return (
     <>
@@ -133,7 +145,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         className={CN(className)}
         footer={footerModal}
         id={noAccountModalId}
-        onCancel={onClick}
+        onCancel={onBackToHome}
         title={t('Unable to sell tokens')}
       >
         <div className={'__modal-content'}>
@@ -151,9 +163,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       </SwModal>
       <SwModal
         className={CN(className)}
+        closable={false}
         footer={redirectFooterModal}
         id={redirectTransakModalId}
-        onCancel={onRedirectclick}
+        maskClosable={false}
         title={t('Action needed')}
       >
         <div className={'__modal-content'}>
