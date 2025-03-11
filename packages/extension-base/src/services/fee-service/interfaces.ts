@@ -32,6 +32,6 @@ export interface RequestHydrationTokensCanPayFee {
   nativeTokenInfo: _ChainAsset;
   nativeBalanceInfo: TokenHasBalanceInfo;
   tokensHasBalanceInfoMap: Record<string, BalanceItem>;
-  priceMap: Record<string, number>;
+  address: string;
   feeAmount?: string;
 }

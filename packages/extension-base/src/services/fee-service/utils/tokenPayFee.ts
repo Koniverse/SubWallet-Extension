@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType } from '@subwallet/chain-list/types';
+import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -62,7 +63,7 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
 }
 
 export async function getHydrationTokensCanPayFee (request: RequestHydrationTokensCanPayFee): Promise<TokenHasBalanceInfo[]> {
-  const { chainService, nativeBalanceInfo, nativeTokenInfo, priceMap, substrateApi, tokensHasBalanceInfoMap } = request;
+  const { address, chainService, nativeBalanceInfo, nativeTokenInfo, substrateApi, tokensHasBalanceInfoMap } = request;
   const tokensList: TokenHasBalanceInfo[] = [nativeBalanceInfo];
   const _acceptedCurrencies = await substrateApi.api.query.multiTransactionPayment.acceptedCurrencies.entries();
 
@@ -78,8 +79,6 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     return tokensList;
   }
 
-  const nativePrice = priceMap[nativePriceId];
-  const nativeDecimals = _getAssetDecimals(nativeTokenInfo);
   const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
     token.originChain === substrateApi.chainSlug &&
     token.assetType !== _AssetType.NATIVE &&
@@ -87,45 +86,27 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     !!token.metadata.assetId
   ));
 
-  tokenInfos.forEach((tokenInfo) => {
+  for (const tokenInfo of tokenInfos) {
     const priceId = _getAssetPriceId(tokenInfo);
 
     if (!priceId) {
-      return;
+      continue;
     }
 
-    const tokenPrice = priceMap[priceId];
-    const tokenDecimals = _getAssetDecimals(tokenInfo);
+    const rate = await getHydrationRate(address, nativeTokenInfo, tokenInfo);
 
-    const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
+    if (!rate) {
+      continue;
+    }
 
-    // @ts-ignore
     if (supportedAssetIds.includes(_getTokenOnChainAssetId(tokenInfo))) {
       tokensList.push({
         slug: tokenInfo.slug,
         free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
-        rate: rate
+        rate: rate.toString()
       });
     }
-  });
-
-  // todo: this handle case defaultTokenSlug does not have balance -> push that token with free = 0
-  // const candidateSlugs = tokensList.map((token) => token.slug);
-  //
-  // if (!_isNativeTokenBySlug(defaultTokenSlug) && !candidateSlugs.includes(defaultTokenSlug)) {
-  //   const defaultTokenInfo = chainService.getAssetBySlug(defaultTokenSlug);
-  //   const priceId = _getAssetPriceId(defaultTokenInfo); // todo: handle exception token do not have priceId
-  //   const tokenPrice = priceMap[priceId];
-  //   const tokenDecimals = _getAssetDecimals(defaultTokenInfo);
-  //
-  //   const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
-  //
-  //   tokensList.push({
-  //     slug: defaultTokenSlug,
-  //     free: '0',
-  //     rate: rate
-  //   });
-  // }
+  }
 
   return tokensList;
 }
@@ -179,4 +160,24 @@ export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: 
   }
 
   return tx;
+}
+
+export async function getHydrationRate (address: string, hdx: _ChainAsset, desToken: _ChainAsset) {
+  const quoteRate = await subwalletApiSdk.swapApi?.getHydrationRate({
+    address,
+    pair: {
+      slug: `${hdx.slug}___${desToken.slug}`,
+      from: hdx.slug,
+      to: desToken.slug
+    }
+  });
+
+  if (!quoteRate) {
+    return undefined;
+  } else {
+    const hdxDecimal = _getAssetDecimals(hdx);
+    const desTokenDecimal = _getAssetDecimals(desToken);
+
+    return new BigN(quoteRate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
+  }
 }

@@ -39,6 +39,11 @@ export interface SwapRequest {
   currentQuote?: SwapProvider
 }
 
+export interface HydrationRateRequest {
+  address: string;
+  pair: SwapPair;
+}
+
 export type SwapRate = number;
 
 export interface QuoteAskResponse {
@@ -123,6 +128,31 @@ export class SwapApi {
       }
 
       return response.result;
+    } catch (error) {
+      throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
+    }
+  }
+
+  async getHydrationRate (hydrationRateRequest: HydrationRateRequest): Promise<number> {
+    const url = `${this.baseUrl}/swap/hydration-rate`;
+
+    try {
+      const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hydrationRateRequest })
+      });
+
+      const response = await rawResponse.json() as SubWalletResponse<{ rate: number }>;
+
+      if (response.statusCode !== 200) {
+        throw new Error(response.message);
+      }
+
+      return response.result.rate;
     } catch (error) {
       throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
     }

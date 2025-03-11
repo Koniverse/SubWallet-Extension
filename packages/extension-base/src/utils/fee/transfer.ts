@@ -17,6 +17,7 @@ import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-se
 import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
+import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
@@ -264,11 +265,25 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
     console.warn('Unable to estimate fee', e);
   }
 
-  if (isTransferLocalTokenAndPayThatTokenAsFee && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug) && feeChainType === 'substrate') {
-    const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
-    const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
+  if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
+    if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug)) {
+      const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
+      const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
 
-    maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+      maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+    } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(srcChain.slug)) {
+      const rate = await getHydrationRate(address, nativeToken, srcToken);
+
+      if (rate) {
+        const estimatedFeeLocal = new BigN(estimatedFee).multipliedBy(rate).integerValue(BigN.ROUND_UP).toString();
+
+        maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+      } else {
+        throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
+      }
+    } else {
+      throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
+    }
   } else if (isTransferNativeTokenAndPayLocalTokenAsFee) {
     maxTransferable = BigN(freeBalance.value);
   } else {
@@ -416,11 +431,25 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
   if (!destToken) {
     maxTransferable = BN_ZERO;
-  } else if (isTransferLocalTokenAndPayThatTokenAsFee && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug) && feeChainType === 'substrate') {
-    const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
-    const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
+  } else if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
+    if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug)) {
+      const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
+      const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
 
-    maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+      maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+    } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(srcChain.slug)) {
+      const rate = await getHydrationRate(address, nativeToken, srcToken);
+
+      if (rate) {
+        const estimatedFeeLocal = new BigN(estimatedFee).multipliedBy(rate).integerValue(BigN.ROUND_UP).toString();
+
+        maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+      } else {
+        throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
+      }
+    } else {
+      throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
+    }
   } else if (isTransferNativeTokenAndPayLocalTokenAsFee) {
     maxTransferable = BigN(freeBalance.value);
   } else {

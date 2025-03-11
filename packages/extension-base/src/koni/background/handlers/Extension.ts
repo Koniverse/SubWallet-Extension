@@ -1607,6 +1607,15 @@ export default class KoniExtension {
 
       extrinsic = await funcCreateExtrinsic(params);
 
+      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {
+        const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
+        const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
+        const feeSetting = _feeSetting.toPrimitive() as number | null;
+        const _extrinsic = extrinsic as SubmittableExtrinsic<'promise'> | null;
+
+        extrinsic = batchExtrinsicSetFeeHydration(substrateApi, _extrinsic, feeSetting, hydrationFeeAssetId);
+      }
+
       additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
         const { value: senderTransferable } = await this.getAddressTransferableBalance({ address: from, networkKey: originNetworkKey, token: originTokenInfo.slug });
         const isSnowBridge = _isSnowBridgeXcm(chainInfoMap[originNetworkKey], chainInfoMap[destinationNetworkKey]);
@@ -1699,10 +1708,7 @@ export default class KoniExtension {
         feeAmount
       });
     } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
-      const [priceInfo, _assetId] = await Promise.all([
-        this.getPrice(),
-        substrateApi.api.query.multiTransactionPayment.accountCurrencyMap(address)
-      ]);
+      const _assetId = await substrateApi.api.query.multiTransactionPayment.accountCurrencyMap(address);
       const assetId = _assetId.toPrimitive() as number | null;
       const hydrationAssets = this.#koniState.chainService.getHydrationAssetIdMap(chain);
 
@@ -1720,10 +1726,10 @@ export default class KoniExtension {
       tokensCanPayFee = await getHydrationTokensCanPayFee({
         substrateApi,
         chainService,
-        priceMap: priceInfo.priceMap,
         nativeTokenInfo,
         nativeBalanceInfo,
         tokensHasBalanceInfoMap,
+        address,
         feeAmount
       });
     }
