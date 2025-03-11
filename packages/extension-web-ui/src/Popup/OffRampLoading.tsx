@@ -78,7 +78,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setStorage(transferParams);
 
     if (!isWebUI) {
-      navigate('/transaction/off-ramp-send-fund');
+      navigate('/transaction/send-fund');
     } else {
       navigate('/home/tokens?openSendFund=true');
     }

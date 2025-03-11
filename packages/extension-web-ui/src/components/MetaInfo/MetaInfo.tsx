@@ -142,8 +142,10 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
     '.__col.-to-right': {
       flex: 1,
-      alignItems: 'flex-end'
+      alignItems: 'flex-end',
+      textAlign: 'right'
     },
+
     '.__row.-type-transfer .__col': {
       flex: 1
     },
