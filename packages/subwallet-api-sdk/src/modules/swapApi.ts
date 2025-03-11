@@ -133,7 +133,7 @@ export class SwapApi {
     }
   }
 
-  async getHydrationRate (hydrationRateRequest: HydrationRateRequest): Promise<number> {
+  async getHydrationRate (hydrationRateRequest: HydrationRateRequest): Promise<number | undefined> {
     const url = `${this.baseUrl}/swap/hydration-rate`;
 
     try {
@@ -149,12 +149,16 @@ export class SwapApi {
       const response = await rawResponse.json() as SubWalletResponse<{ rate: number }>;
 
       if (response.statusCode !== 200) {
-        throw new Error(response.message);
+        console.error(response.message);
+
+        return undefined;
       }
 
       return response.result.rate;
     } catch (error) {
-      throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
+      console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+
+      return undefined;
     }
   }
 }
