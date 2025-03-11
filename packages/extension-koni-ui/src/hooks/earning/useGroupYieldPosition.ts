@@ -62,7 +62,8 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
           nominations: [],
           status: EarningStatus.NOT_STAKING,
           unstakings: [],
-          isBondedBefore: false
+          isBondedBefore: false,
+          subnetData: positionInfo.subnetData
         };
 
         let rs: YieldPositionInfo;

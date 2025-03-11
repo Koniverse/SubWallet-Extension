@@ -634,6 +634,8 @@ const Component = () => {
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+
   const renderMetaInfo = useCallback(() => {
     const value = amountValue ? parseFloat(amountValue) / 10 ** assetDecimals : 0;
     const assetSymbol = inputAsset.symbol;
@@ -696,11 +698,25 @@ const Component = () => {
           />
         )}
 
-        <MetaInfo.Chain
-          chain={chainValue}
-          label={t('Network')}
-        />
-
+        {!isSubnetStaking
+          ? (
+            <MetaInfo.Chain
+              chain={chainValue}
+              label={t('Network')}
+            />
+          )
+          : (
+            <MetaInfo.Default
+              label={t('Subnet')}
+            >
+              <div className='__subnet-wrapper'>
+                <div
+                  className='__subnet-logo'
+                >{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+                <span className='chain-name'>{poolInfo.metadata.shortName}</span>
+              </div>
+            </MetaInfo.Default>
+          )}
         {showFee && (
           <MetaInfo.Number
             decimals={0}
@@ -712,7 +728,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
+  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo, t, isSubnetStaking, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -1222,6 +1238,23 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
 
     '.__alert-box': {
       marginTop: token.marginSM
+    },
+    '.__subnet-wrapper': {
+      display: 'flex',
+      gap: token.sizeXS
+    },
+    '.__subnet-logo': {
+      width: 24,
+      height: 24,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'white',
+      color: '#292929',
+      fontWeight: token.headingFontWeight,
+      borderRadius: '50%',
+      fontSize: token.fontSize,
+      pointerEvents: 'none'
     }
   };
 });
