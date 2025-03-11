@@ -84,16 +84,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
   }, [tokenInfo?.decimals, tokenInfo?.originChain, tokenInfo?.slug, accounts, setStorage, isWebUI, navigate]);
 
-  useEffect(() => {
-    if (offRampData.orderId) {
-      if (addresses.includes(offRampData.partnerCustomerId)) {
-        activeModal(redirectTransakModalId);
-      } else {
-        activeModal(noAccountModalId);
-      }
-    }
-  }, [activeModal, addresses, offRampData, openTransfer]);
-
   const onBackToHome = useCallback(() => {
     removeStorage(OFF_RAMP_DATA);
     navigate('/home/tokens');
@@ -137,6 +127,22 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       </>
     );
   }, [onBackToHome, onRedirectToTransfer, t]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (offRampData.orderId) {
+        if (addresses.includes(offRampData.partnerCustomerId)) {
+          activeModal(redirectTransakModalId);
+        } else {
+          activeModal(noAccountModalId);
+        }
+      }
+    }, 1800);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [activeModal, addresses, offRampData.orderId, offRampData.partnerCustomerId]);
 
   return (
     <>

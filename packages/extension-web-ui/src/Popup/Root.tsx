@@ -60,7 +60,7 @@ const offRampLoading = '/off-ramp-loading';
 
 const allowImportAccountUrls = allowImportAccountPaths.map((path) => `${baseAccountPath}/${path}`);
 const allowPreventWelcomeUrls = [...allowImportAccountUrls, welcomeUrl, createPasswordUrl, securityUrl,
-  earningOptionsPreviewUrl, earningPoolsPreviewUrl, checkCrowdloanUrl, crowdloanResultUrl];
+  earningOptionsPreviewUrl, earningPoolsPreviewUrl, checkCrowdloanUrl, crowdloanResultUrl, offRampLoading];
 
 export const MainWrapper = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
   display: 'flex',
@@ -163,14 +163,10 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
   }, [searchParams]);
 
   useEffect(() => {
-    if (offRampParamDetails) {
+    if (offRampParamDetails && !rootLoading) {
       setStorage(offRampParamDetails);
-
-      if (isNoAccount) {
-        navigate(offRampLoading);
-      }
     }
-  }, [isNoAccount, offRampParamDetails, setStorage, navigate]);
+  }, [offRampParamDetails, rootLoading, setStorage]);
 
   useEffect(() => {
     initDataRef.current.then(() => {
