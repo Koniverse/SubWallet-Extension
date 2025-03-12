@@ -4064,7 +4064,7 @@ export default class KoniExtension {
   }
 
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
-    return this.#koniState.swapService.handleSwapRequest(request);
+    return this.#koniState.swapService.handleSwapRequestV2(request);
   }
 
   private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {

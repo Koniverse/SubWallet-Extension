@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
@@ -204,6 +205,7 @@ export interface SwapSubmitStepData {
 export interface OptimalSwapPathParams {
   request: SwapRequest;
   selectedQuote?: SwapQuote;
+  path?: DynamicSwapAction[];
 }
 
 export interface SwapEarlyValidation {
