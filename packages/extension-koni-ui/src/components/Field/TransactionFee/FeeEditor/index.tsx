@@ -93,7 +93,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return BN_ZERO;
   }, []);
 
-  const isDataReady = !isLoadingFee && !isLoadingFee && !!feeOptionsInfo;
+  const isDataReady = !isLoadingFee && !isLoadingToken && !!feeOptionsInfo;
 
   const convertedFeeValueToUSD = useMemo(() => {
     if (!isDataReady) {

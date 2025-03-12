@@ -386,10 +386,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setIsTransferAll(false);
         setForceUpdateMaxValue(undefined);
         setSelectedTransactionFee(undefined);
-
-        if (values.chain !== chain) {
-          setCurrentTokenPayFee(undefined);
-        }
+        setCurrentTokenPayFee(values.chain === chain ? defaultTokenPayFee : undefined);
       }
 
       if (part.destChain || part.chain || part.value || part.asset) {
@@ -1101,7 +1098,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         className={`${className} -transaction-footer`}
       >
         <Button
-          disabled={!isBalanceReady || (isTransferAll ? isFetchingInfo : false)}
+          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false)}
           icon={(
             <Icon
               phosphorIcon={PaperPlaneTilt}
