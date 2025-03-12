@@ -78,7 +78,13 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
   let maxTransferableAmount: ResponseSubscribeTransfer;
 
   if (isXcmTransfer) {
-    maxTransferableAmount = await calculateXcmMaxTransferable(id, request, freeBalance, fee);
+    const _request: CalculateMaxTransferable = { // todo: temp not support pay local fee with xcm
+      ...request,
+      isTransferLocalTokenAndPayThatTokenAsFee: false,
+      isTransferNativeTokenAndPayLocalTokenAsFee: false
+    };
+
+    maxTransferableAmount = await calculateXcmMaxTransferable(id, _request, freeBalance, fee);
   } else {
     maxTransferableAmount = await calculateTransferMaxTransferable(id, request, freeBalance, fee);
   }
