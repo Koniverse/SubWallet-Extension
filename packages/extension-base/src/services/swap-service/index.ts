@@ -11,8 +11,8 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, getSwapAltToken, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
+import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, DynamicSwapAction, findSwapDestinations, findXcmDestinations, getInitStep, getSwapAltToken, getSwapStep, getXcmStep, isEquiValentAsset, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { BasicTxErrorType, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -129,6 +129,103 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       process: optimalProcess,
       quote: swapQuoteResponse
     } as SwapRequestResult;
+  }
+
+  public handleSwapRequestV2 (request: SwapRequestV2): DynamicSwapAction[][] {
+    const { fromToken, toToken } = request;
+    const fromTokenInfo = this.chainService.getAssetBySlug(fromToken);
+    const toTokenInfo = this.chainService.getAssetBySlug(toToken);
+    const fromChain = fromTokenInfo.originChain;
+    const toChain = toTokenInfo.originChain;
+
+    const firstSwapDes = findSwapDestinations(this.chainService, fromTokenInfo);
+    const firstXcmDes = findXcmDestinations(this.chainService, fromTokenInfo);
+
+    if (!firstSwapDes.length && !firstXcmDes.length) {
+      return [];
+    }
+
+    const routes: DynamicSwapAction[][] = [];
+    let steps: DynamicSwapAction[] = [];
+
+    // try find swap
+    if (fromChain === toChain) {
+      if (firstSwapDes.includes(toTokenInfo)) {
+        steps.push(getInitStep(fromToken));
+        steps.push(getSwapStep(toToken));
+        routes.push(steps);
+
+        return routes;
+      }
+    }
+
+    // try find xcm
+    if (isEquiValentAsset(fromTokenInfo, toTokenInfo)) {
+      if (firstXcmDes.includes(toTokenInfo)) {
+        steps.push(getInitStep(fromToken));
+        steps.push(getXcmStep(toToken));
+        routes.push(steps);
+
+        return routes;
+      }
+    }
+
+    // brute force to find nested routes
+    for (const xcmAsset of firstXcmDes) {
+      const swapDesChild = findSwapDestinations(this.chainService, xcmAsset);
+
+      if (!swapDesChild.length) {
+        /* empty */
+      } else if (swapDesChild.includes(toTokenInfo)) {
+        steps = [];
+        steps.push(getInitStep(fromToken));
+        steps.push(getXcmStep(xcmAsset.slug));
+        steps.push(getSwapStep(toToken));
+        routes.push(steps);
+      } else {
+        for (const swapAsset of swapDesChild) {
+          const xcmDesChild = findXcmDestinations(this.chainService, swapAsset);
+
+          if (xcmDesChild.includes(toTokenInfo)) {
+            steps = [];
+            steps.push(getInitStep(fromToken));
+            steps.push(getXcmStep(xcmAsset.slug));
+            steps.push(getSwapStep(swapAsset.slug));
+            steps.push(getXcmStep(toToken));
+            routes.push(steps);
+          }
+        }
+      }
+    }
+
+    for (const swapAsset of firstSwapDes) {
+      const xcmDesChild = findXcmDestinations(this.chainService, swapAsset);
+
+      if (!xcmDesChild.length) {
+        /* empty */
+      } else if (xcmDesChild.includes(toTokenInfo)) {
+        steps = [];
+        steps.push(getInitStep(fromToken));
+        steps.push(getSwapStep(swapAsset.slug));
+        steps.push(getXcmStep(toToken));
+        routes.push(steps);
+      } else {
+        for (const xcmAsset of xcmDesChild) {
+          const swapDesChild = findSwapDestinations(this.chainService, xcmAsset);
+
+          if (swapDesChild.includes(toTokenInfo)) {
+            steps = [];
+            steps.push(getInitStep(fromToken));
+            steps.push(getSwapStep(swapAsset.slug));
+            steps.push(getXcmStep(xcmAsset.slug));
+            steps.push(getSwapStep(toToken));
+            routes.push(steps);
+          }
+        }
+      }
+    }
+
+    return routes;
   }
 
   public async getLatestQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
