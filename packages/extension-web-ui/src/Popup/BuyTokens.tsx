@@ -69,13 +69,6 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
 
   const [buyForm, setBuyForm] = useState(true);
 
-  const handleForm = useCallback((mode: string) => {
-    setBuyForm(mode === 'BUY');
-  }, []);
-
-  const handleBuyForm = useCallback(() => handleForm('BUY'), [handleForm]);
-  const handleSellForm = useCallback(() => handleForm('SELL'), [handleForm]);
-
   const currentSymbol = slug || _currentSymbol;
 
   const notify = useNotification();
@@ -194,6 +187,35 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   }, [allowedChains, assetRegistry, currentSymbol, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
+
+  const isSellTabDisabled = useMemo(() => {
+    if (tokenItems.length > 1) {
+      return false;
+    }
+
+    const tokenInfo = tokenItems[0]?.slug ? tokens[tokenItems[0].slug] : undefined;
+
+    for (const serviceItem of baseServiceItems) {
+      if (tokenInfo?.serviceInfo[serviceItem.key]?.supportSell) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [tokenItems, tokens]);
+
+  const handleForm = useCallback((mode: string) => {
+    setBuyForm(mode === 'BUY');
+  }, []);
+
+  const handleBuyForm = useCallback(() => handleForm('BUY'), [handleForm]);
+  const handleSellForm = useCallback(() => {
+    if (isSellTabDisabled) {
+      return;
+    }
+
+    handleForm('SELL');
+  }, [handleForm, isSellTabDisabled]);
 
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
@@ -421,7 +443,9 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               Buy
           </div>
           <div
-            className='__service-selector'
+            className={CN('__service-selector', {
+              '-disabled': isSellTabDisabled
+            })}
             onClick={handleSellForm}
           >
               Sell
@@ -568,7 +592,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
 }
 
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
-  const { className, modalContent } = props;
+  const { modalContent } = props;
   const { goHome } = useDefaultNavigate();
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
@@ -587,9 +611,9 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   if (modalContent) {
     return (
       <Component
-        className={className}
+        {...props}
         currentAccountProxy={currentAccountProxy}
-        modalContent={modalContent}
+        modalContent={true}
       />
     );
   }
@@ -660,6 +684,10 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       alignItems: 'center',
       position: 'relative',
       zIndex: 1
+    },
+
+    '.__service-selector.-disabled': {
+      cursor: 'not-allowed'
     },
 
     '.__buy-icon-wrapper': {

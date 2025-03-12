@@ -165,8 +165,15 @@ export const ServiceSelector = styled(forwardRef(Component))<Props>(({ theme: { 
         display: 'flex',
         color: token.colorTextLight1,
         whiteSpace: 'nowrap',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        marginTop: -1,
+        marginBottom: -1
       },
+
+      '.__selected-item-logo': {
+        fontSize: 0
+      },
+
       '.__selected-item-name': {
         textOverflow: 'ellipsis',
         fontWeight: token.headingFontWeight,
