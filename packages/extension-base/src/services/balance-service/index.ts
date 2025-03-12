@@ -599,8 +599,6 @@ export class BalanceService implements StoppableServiceInterface {
       const addresses = keyring.getPairs().map((account) => account.address);
       const cache = this.balanceDetectSubject.value;
 
-      console.log('addresscache', addresses);
-      console.log('cachee', cache);
       const now = Date.now();
       const needDetectAddresses: string[] = [];
 
