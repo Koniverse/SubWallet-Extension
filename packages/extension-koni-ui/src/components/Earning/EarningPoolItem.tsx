@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -64,6 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
       return '';
     }
   }, [asset, priceMap, tvl]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <div
@@ -71,11 +72,16 @@ const Component: React.FC<Props> = (props: Props) => {
       onClick={onClick}
     >
       <div className={'__item-upper-part'}>
-        <Logo
-          className={'__item-logo'}
-          network={logo || chain}
-          size={40}
-        />
+        {!isSubnetStaking
+          ? (
+            <Logo
+              className={'__item-logo'}
+              network={logo || chain}
+              size={40}
+            />)
+          : (
+            <div className='__subnet-logo'>{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+          )}
 
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
@@ -266,6 +272,21 @@ const EarningPoolItem = styled(Component)<Props>(({ theme: { token } }: Props) =
       borderTop: '2px solid rgba(33, 33, 33, 0.80)',
       display: 'flex',
       alignItems: 'center'
+    },
+    '.__subnet-logo': {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '37px',
+      height: '37px',
+      lineHeight: '37px',
+      textAlign: 'center',
+      background: 'white',
+      color: '#292929',
+      fontWeight: token.headingFontWeight,
+      borderRadius: '36%',
+      fontSize: token.fontSizeXL,
+      marginRight: '12px'
     }
   });
 });

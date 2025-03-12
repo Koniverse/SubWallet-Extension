@@ -16,7 +16,7 @@ import BigN, { BigNumber } from 'bignumber.js';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import { fetchDelegates, TaoStakeInfo } from './tao';
+import { cachedDelegateInfo, fetchDelegates, TaoStakeInfo } from './tao';
 
 export interface SubnetData {
   netuid: number;
@@ -31,7 +31,7 @@ interface TaoStakingStakeOption {
   owner: string;
   amount: string;
   rate?: BigNumber;
-  // identity: string
+  identity?: string
 }
 
 interface Hotkey {
@@ -351,7 +351,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           validatorAddress: delegate.owner,
           activeStake: delegate.amount,
           validatorMinStake: minDelegatorStake,
-          originActiveStake: originActiveStake
+          originActiveStake: originActiveStake,
+          validatorIdentity: delegate.identity
         });
       }
     }
@@ -380,6 +381,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
+    const _delegateInfo = cachedDelegateInfo;
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
@@ -387,6 +389,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON()
         )
       );
+
       const price = await getTaoToAlphaMapping(this.substrateApi);
 
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
@@ -411,10 +414,19 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               };
             }
 
+            let identity = '';
+
+            if (_delegateInfo) {
+              const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
+
+              identity = delegateInfo ? delegateInfo.name : '';
+            }
+
             subnetPositions[netuid].delegatorState.push({
               owner: hotkey,
               amount: stake.toString(),
-              rate: taoToAlphaPrice
+              rate: taoToAlphaPrice,
+              identity: identity
             });
 
             subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));

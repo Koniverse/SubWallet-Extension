@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
 import { NetworkTag } from '@subwallet/extension-koni-ui/components';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
@@ -55,20 +56,28 @@ const Component: React.FC<Props> = (props: Props) => {
     return positionInfo.subnetData?.subnetShortName ? `(${positionInfo.subnetData.subnetShortName})` : '';
   }, [positionInfo.subnetData?.subnetShortName]);
 
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+
+  console.log('Checking', poolInfo.metadata.subnetData?.subnetSymbol);
+
   return (
     <div
       className={CN(className)}
       onClick={onClick}
     >
       <div className={'__item-left-part'}>
-        <Logo
-          className={'__item-logo'}
-          isShowSubLogo={true}
-          size={40}
-          subNetwork={poolInfo.metadata.logo || poolInfo.chain}
-          token={balanceToken.toLowerCase()}
-        />
-
+        {!isSubnetStaking
+          ? (
+            <Logo
+              className={'__item-logo'}
+              isShowSubLogo={true}
+              size={40}
+              subNetwork={poolInfo.metadata.logo || poolInfo.chain}
+              token={balanceToken.toLowerCase()}
+            />)
+          : (
+            <div className='__subnet-logo'>{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+          )}
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
             <div className='__item-name'> { poolName }
@@ -241,6 +250,21 @@ const EarningPositionItem = styled(Component)<Props>(({ theme: { token } }: Prop
       color: token.colorTextLight4,
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM
+    },
+    '.__subnet-logo': {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '37px',
+      height: '37px',
+      lineHeight: '37px',
+      textAlign: 'center',
+      background: 'white',
+      color: '#292929',
+      fontWeight: token.headingFontWeight,
+      borderRadius: '36%',
+      fontSize: token.fontSizeXL,
+      marginRight: '12px'
     }
   });
 });

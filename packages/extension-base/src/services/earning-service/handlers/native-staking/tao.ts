@@ -25,7 +25,7 @@ export interface TaoStakeInfo {
 interface TaoStakingStakeOption {
   owner: string;
   amount: string;
-  // identity: string
+  identity?: string
 }
 
 interface Hotkey {
@@ -81,21 +81,36 @@ export const bittensorApiKey = (): string => {
 };
 
 /* Fetch data */
+export let cachedDelegateInfo: ValidatorResponse | null = null;
 
 export async function fetchDelegates (): Promise<ValidatorResponse> {
   const apiKey = bittensorApiKey();
 
-  return new Promise(function (resolve) {
-    fetch('https://api.taostats.io/api/validator/latest/v1', {
+  try {
+    const resp = await fetch('https://api.taostats.io/api/validator/latest/v1', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `${apiKey}`
       }
-    }).then((resp) => {
-      resolve(resp.json());
-    }).catch(console.error);
-  });
+    });
+
+    if (!resp.ok) {
+      console.error('Fetch bittensor delegates fail:', resp.status);
+
+      return { data: [] };
+    }
+
+    const data = await resp.json() as ValidatorResponse;
+
+    cachedDelegateInfo = data;
+
+    return data || { data: [] };
+  } catch (error) {
+    console.error(error);
+
+    return { data: [] };
+  }
 }
 
 // export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
@@ -245,8 +260,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           chain: chainInfo.slug,
           validatorAddress: delegate.owner,
           activeStake: activeStake,
-          validatorMinStake: minDelegatorStake
-          // validatorIdentity: delegate.identity
+          validatorMinStake: minDelegatorStake,
+          validatorIdentity: delegate.identity
         });
       }
     }
@@ -270,6 +285,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const substrateApi = await this.substrateApi.isReady;
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
+    const _delegateInfo = await fetchDelegates();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
@@ -304,10 +320,18 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
           for (const hotkey in totalDelegate) {
             bnTotalBalance = bnTotalBalance.add(new BN(totalDelegate[hotkey]));
+            let identity = '';
+
+            if (_delegateInfo) {
+              const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
+
+              identity = delegateInfo ? delegateInfo.name : '';
+            }
 
             delegatorState.push({
               owner: hotkey,
-              amount: totalDelegate[hotkey]
+              amount: totalDelegate[hotkey],
+              identity: identity
             });
           }
 
