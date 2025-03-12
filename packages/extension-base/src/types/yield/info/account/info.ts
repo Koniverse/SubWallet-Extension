@@ -58,8 +58,10 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
 
   /* Special info */
   subnetData?: {
-    subnetShortName: string
-  }
+    subnetSymbol: string;
+    subnetShortName: string;
+    originalTotalStake: string;
+  };
 }
 
 /**

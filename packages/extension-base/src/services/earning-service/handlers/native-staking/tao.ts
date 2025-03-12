@@ -170,6 +170,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         const minDelegatorStake = await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
         const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
+        const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
+
+        const bnTaoIn = new BN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
         const data: NativeYieldPoolInfo = {
@@ -194,7 +197,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             },
             eraTime: 1.2,
             era: 0,
-            unstakingPeriod: 1.2
+            unstakingPeriod: 1.2,
+            tvl: bnTaoIn.toString()
           }
         };
 

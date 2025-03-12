@@ -1254,7 +1254,8 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       fontWeight: token.headingFontWeight,
       borderRadius: '50%',
       fontSize: token.fontSize,
-      pointerEvents: 'none'
+      pointerEvents: 'none',
+      userSelect: 'none'
     }
   };
 });

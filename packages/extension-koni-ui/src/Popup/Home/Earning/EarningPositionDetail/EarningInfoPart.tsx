@@ -36,6 +36,7 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
       return undefined;
     }
   }, [poolInfo.statistic]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <CollapsiblePanel
@@ -48,11 +49,25 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         spaceSize='sm'
         valueColorScheme='light'
       >
-        <MetaInfo.Chain
-          chain={poolInfo.chain}
-          label={t('Network')}
-          valueColorSchema='gray'
-        />
+        {!isSubnetStaking
+          ? (
+            <MetaInfo.Chain
+              chain={poolInfo.chain}
+              label={t('Network')}
+            />
+          )
+          : (
+            <MetaInfo.Default
+              label={t('Subnet')}
+            >
+              <div className='__subnet-wrapper'>
+                <div
+                  className='__subnet-logo'
+                >{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+                <span className='chain-name'>{poolInfo.metadata.shortName}</span>
+              </div>
+            </MetaInfo.Default>
+          )}
         {totalApy !== undefined && (
           <MetaInfo.Number
             label={t('Estimated earnings')}
@@ -83,6 +98,23 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
 export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   '.__label': {
     paddingRight: token.paddingXXS
+  },
+  '.__subnet-wrapper': {
+    display: 'flex',
+    gap: token.sizeXS
+  },
+  '.__subnet-logo': {
+    width: 24,
+    height: 24,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'white',
+    color: '#292929',
+    fontWeight: token.headingFontWeight,
+    borderRadius: '50%',
+    fontSize: token.fontSize,
+    pointerEvents: 'none',
+    userSelect: 'none'
   }
-
 }));

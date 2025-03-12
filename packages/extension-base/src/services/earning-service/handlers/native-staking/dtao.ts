@@ -24,6 +24,7 @@ export interface SubnetData {
   symbol: string;
   ownerHotkey: string;
   maxAllowedValidators: number;
+  taoIn: number;
 }
 
 interface TaoStakingStakeOption {
@@ -109,7 +110,8 @@ interface DynamicInfo {
   tokenSymbol: number[];
   subnetIdentity?: {
     subnetName: `0x${string}`;
-  }
+  },
+  taoIn: number
 }
 
 interface SubnetsInfo {
@@ -221,7 +223,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               name,
               symbol,
               ownerHotkey: dynInfo.ownerHotkey,
-              maxAllowedValidators: extraInfo ? extraInfo.maxAllowedValidators : 0
+              maxAllowedValidators: extraInfo ? extraInfo.maxAllowedValidators : 0,
+              taoIn: dynInfo.taoIn
             };
           });
 
@@ -265,6 +268,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
+          const bnTaoIn = new BN(subnet.taoIn);
 
           const data: NativeYieldPoolInfo = {
             ...this.baseInfo,
@@ -295,7 +299,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               },
               eraTime: 1.2,
               era: 0,
-              unstakingPeriod: 1.2
+              unstakingPeriod: 1.2,
+              tvl: bnTaoIn.toString()
             }
           };
 
