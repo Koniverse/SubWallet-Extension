@@ -3,7 +3,7 @@
 
 import { BalanceError } from '@subwallet/extension-base/background/errors/BalanceError';
 import { AmountData, APIItemState, BalanceErrorType, DetectBalanceCache, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, BACKEND_API_URL } from '@subwallet/extension-base/constants';
 import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
@@ -16,6 +16,7 @@ import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base'
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import { SWApiResponse } from '@subwallet/subwallet-api-sdk/types';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -457,6 +458,23 @@ export class BalanceService implements StoppableServiceInterface {
 
   /** Subscribe area */
 
+  private async getEvmTokenBalanceSlug (address: string) {
+    const baseUrl = BACKEND_API_URL;
+
+    const url = `${baseUrl}/balance-detection/get-token-slug?address=${address}`;
+
+    const rawResponse = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const response = await rawResponse.json() as SWApiResponse<string[]>;
+
+    return response.data;
+  }
+
   public async autoEnableChains (addresses: string[]) {
     this.setBalanceDetectCache(addresses);
     const assetMap = this.state.chainService.getAssetRegistry();
@@ -476,9 +494,26 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    const evmPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return this.getEvmTokenBalanceSlug(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
     const balanceDataList = await Promise.all(promiseList);
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -520,6 +555,21 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        balanceData.forEach((slug) => {
+          const chainSlug = slug.split('-')[0];
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            needEnableChains.push(chainSlug);
+            needActiveTokens.push(existedKey);
+            currentAssetSettings[existedKey] = { visible: true };
+          }
+        });
+      }
+    }
+
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
@@ -548,6 +598,9 @@ export class BalanceService implements StoppableServiceInterface {
     const scanBalance = () => {
       const addresses = keyring.getPairs().map((account) => account.address);
       const cache = this.balanceDetectSubject.value;
+
+      console.log('addresscache', addresses);
+      console.log('cachee', cache);
       const now = Date.now();
       const needDetectAddresses: string[] = [];
 
