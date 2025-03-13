@@ -190,6 +190,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         case SwapProviderId.ROCOCO_ASSET_HUB:
           this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'rococo_assethub');
           break;
+        case SwapProviderId.WESTEND_ASSET_HUB:
+          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'westend_assethub');
+          break;
         case SwapProviderId.SIMPLE_SWAP:
           this.handlers[providerId] = new SimpleSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
           break;

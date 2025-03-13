@@ -9,7 +9,7 @@ import { AuthUrls } from '@subwallet/extension-base/services/request-service/typ
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountRefStore } from '@subwallet/extension-base/stores';
 import { AccountMetadataData, AccountProxy, AccountProxyData, AccountProxyMap, AccountProxyStoreData, AccountProxyType, CurrentAccountInfo, ModifyPairStoreData } from '@subwallet/extension-base/types';
-import { addLazy, combineAccountsWithSubjectInfo, isAddressValidWithAuthType, isSameAddress, parseUnifiedSuriToDerivationPath } from '@subwallet/extension-base/utils';
+import { addLazy, combineAccountsWithSubjectInfo, isAddressValidWithAuthType, isSameAddress, parseUnifiedSuriToDerivationPath, reformatAddress } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { EthereumKeypairTypes } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -433,10 +433,10 @@ export class AccountState {
     return Object.values(accountProxies).some((value) => value.accountType === AccountProxyType.UNIFIED && value.id === proxyId);
   }
 
-  public belongUnifiedAccount (address: string): string | undefined {
+  public belongUnifiedAccount (_address: string): string | undefined {
     const modifyPairs = this.modifyPairs;
     const accountProxies = this.accountProxies;
-
+    const address = reformatAddress(_address);
     const proxyId = modifyPairs[address]?.accountProxyId;
 
     if (proxyId) {

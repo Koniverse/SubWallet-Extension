@@ -12,6 +12,8 @@ export { default as RequestCameraAccessModal } from './RequestCameraAccessModal'
 export { default as RequestCreatePasswordModal } from './RequestCreatePasswordModal';
 export { default as ResetWalletModal } from './ResetWalletModal';
 export { default as TonWalletContractSelectorModal } from './TonWalletContractSelectorModal';
+export { default as TransactionProcessDetailModal } from './TransactionProcessDetailModal';
+export { default as TransactionStepsModal } from './TransactionStepsModal';
 
 export { SortingModal } from './SortingModal';
 

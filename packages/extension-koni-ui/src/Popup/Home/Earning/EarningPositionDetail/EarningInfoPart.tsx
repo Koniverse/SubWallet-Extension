@@ -6,8 +6,8 @@ import { calculateReward } from '@subwallet/extension-base/services/earning-serv
 import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { getUnstakingPeriod } from '@subwallet/extension-koni-ui/Popup/Transaction/helper';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getEarningTimeText } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -72,7 +72,7 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         {unstakePeriod !== undefined && (
           <MetaInfo.Default label={t('Unstaking period')}>
             {poolInfo.type === YieldPoolType.LIQUID_STAKING && <span className={'__label'}>Up to</span>}
-            {getUnstakingPeriod(t, unstakePeriod)}
+            {getEarningTimeText(unstakePeriod)}
           </MetaInfo.Default>
         )}
       </MetaInfo>

@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountJson, RequestYieldLeave, SpecialYieldPoolMetadata, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, NominationSelector } from '@subwallet/extension-koni-ui/components';
@@ -13,7 +14,7 @@ import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckActi
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getBannerButtonIcon, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import BigN from 'bignumber.js';
@@ -61,6 +62,7 @@ const Component: React.FC = () => {
   const poolType = poolInfo.type;
   const poolChain = poolInfo.chain;
   const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
 
   const [form] = Form.useForm<UnStakeParams>();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -154,14 +156,7 @@ const Component: React.FC = () => {
     ) {
       const time = poolInfo.statistic.unstakingPeriod;
 
-      if (time >= 24) {
-        const days = Math.floor(time / 24);
-        const hours = time - days * 24;
-
-        return `${days} ${t('days')}${hours ? ` ${hours} ${t('hours')}` : ''}`;
-      } else {
-        return `${time} ${t('hours')}`;
-      }
+      return getEarningTimeText(time);
     } else {
       return t('unknown time');
     }
@@ -321,6 +316,12 @@ const Component: React.FC = () => {
   }, [poolChain, form]);
 
   useEffect(() => {
+    if (isMythosStaking) {
+      form.setFieldValue('value', bondedValue);
+    }
+  }, [poolChain, form, isMythosStaking, bondedValue]);
+
+  useEffect(() => {
     if (!fromValue && accountList.length === 1) {
       form.setFieldValue('from', accountList[0].address);
     }
@@ -421,6 +422,7 @@ const Component: React.FC = () => {
           }
 
           <Form.Item
+            hidden={isMythosStaking}
             name={'value'}
             statusHelpAsTooltip={true}
           >

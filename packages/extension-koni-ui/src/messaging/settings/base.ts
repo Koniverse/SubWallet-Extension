@@ -61,6 +61,10 @@ export async function saveUnlockType (value: WalletUnlockType): Promise<boolean>
   return sendMessage('pri(settings.saveUnlockType)', { unlockType: value });
 }
 
+export async function saveAllowOneSign (value: boolean): Promise<boolean> {
+  return sendMessage('pri(settings.update.allowOneSign)', { allowOneSign: value });
+}
+
 export function saveAppConfig (request: RequestSaveAppConfig): Promise<boolean> {
   return sendMessage('pri(settings.saveAppConfig)', request);
 }

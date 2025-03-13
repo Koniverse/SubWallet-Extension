@@ -59,7 +59,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <MetaInfo className={CN(className)}>
       <SwapTransactionBlock
-        data={swapInfo}
+        quote={swapInfo.quote}
       />
       <MetaInfo.Transfer
         destinationChain={{

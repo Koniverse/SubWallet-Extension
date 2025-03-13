@@ -159,13 +159,11 @@ export class EvmApi implements _EvmApi {
   }
 
   onConnect (): void {
+    this.isReadyHandler.resolve(this);
+
     if (!this.isApiConnected) {
       console.log(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
       this.isApiReady = true;
-
-      if (this.isApiReadyOnce) {
-        this.isReadyHandler.resolve(this);
-      }
     }
 
     this.updateConnectionStatus(_ChainConnectionStatus.CONNECTED);

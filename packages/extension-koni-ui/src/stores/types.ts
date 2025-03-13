@@ -9,7 +9,7 @@ import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/ext
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountProxy, BalanceMap, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardItem, NominationPoolInfo, YieldPoolInfo, YieldPoolTarget, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, AccountProxy, BalanceMap, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardItem, NominationPoolInfo, ProcessTransactionData, YieldPoolInfo, YieldPoolTarget, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
@@ -103,6 +103,7 @@ export interface RequestState extends ConfirmationsQueue, ConfirmationsQueueTon,
   signingRequest: Record<string, SigningRequest>;
   hasConfirmations: boolean;
   hasInternalConfirmations: boolean;
+  aliveProcess: Record<string, ProcessTransactionData>;
   numberOfConfirmations: number;
   transactionRequest: Record<string, SWTransactionResult>;
   connectWCRequest: Record<string, WalletConnectSessionRequest>;

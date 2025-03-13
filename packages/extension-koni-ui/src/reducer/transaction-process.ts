@@ -25,6 +25,7 @@ export interface CommonProcessState {
   feeStructure: CommonStepFeeInfo[];
   currentStep: number; // Current step
   stepResults: Record<number, StepResult>;
+  processId: string;
 }
 
 export enum CommonActionType {
@@ -47,7 +48,8 @@ export const DEFAULT_COMMON_PROCESS: CommonProcessState = {
   steps: [],
   feeStructure: [],
   currentStep: 0,
-  stepResults: {}
+  stepResults: {},
+  processId: ''
 };
 
 interface InitAction extends CommonStepAction {
@@ -99,15 +101,19 @@ const handleStepCreateAction: ActionHandler<StepCreateAction> = (oldState, { pay
 
 interface StepSubmitAction extends CommonStepAction {
   type: CommonActionType.STEP_SUBMIT;
-  payload: null;
+  payload: { processId: string } | null;
 }
 
-const handleStepSubmitAction: ActionHandler<StepSubmitAction> = (oldState) => {
+const handleStepSubmitAction: ActionHandler<StepSubmitAction> = (oldState, { payload }) => {
   const result: CommonProcessState = { ...oldState };
   const currentStep = oldState.currentStep;
 
   result.stepResults = { ...oldState.stepResults };
   result.stepResults[currentStep].status = CommonStepStatus.SUBMITTING;
+
+  if (payload?.processId) {
+    result.processId = payload.processId;
+  }
 
   return result;
 };

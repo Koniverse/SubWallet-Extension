@@ -65,3 +65,10 @@ export type AccountDetailParam = {
   requestViewDerivedAccounts?: boolean
   requestViewDerivedAccountDetails?: boolean
 }
+
+export type NotificationScreenParam = {
+  transactionProcess?: {
+    processId: string,
+    triggerTime: string
+  }
+};

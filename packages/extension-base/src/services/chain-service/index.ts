@@ -13,6 +13,7 @@ import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chai
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
 import { _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
@@ -2193,5 +2194,15 @@ export class ChainService {
     return Object.values(this.getAssetRegistry()).filter((chainAsset) => {
       return chainAsset.originChain === chainSlug && (chainAsset.assetType === _AssetType.NATIVE || _isAssetCanPayTxFee(chainAsset));
     }).map((chainAsset) => chainAsset.slug);
+  }
+
+  public async isUseMetadataToCreateApi (chain: string): Promise<boolean> {
+    const isMythos = ['mythos', 'muse_testnet'].includes(chain);
+
+    if (isMythos) {
+      return this.dbService.hasRunScript(MYTHOS_MIGRATION_KEY);
+    } else {
+      return true;
+    }
   }
 }
