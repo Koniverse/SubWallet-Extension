@@ -255,11 +255,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const renderItem = useCallback(
     (item: ExtraYieldPositionInfo) => {
       return (
-        <>
+        <React.Fragment key={item.slug}>
           <EarningPositionItem
             className={'earning-position-item'}
             isShowBalance={isShowBalance}
-            key={item.slug}
             onClick={onClickItem(item)}
             positionInfo={item}
           />
@@ -278,7 +277,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
               {t('Explore earning options')}
             </Button>
           </div>}
-        </>
+        </React.Fragment>
       );
     },
     [lastItem.slug, isShowBalance, onClickItem, onClickExploreEarning, t]
