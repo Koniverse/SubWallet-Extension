@@ -262,7 +262,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           return;
         }
 
-        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toJSON() || 0;
+        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
         this.subnetData.forEach((subnet) => {

@@ -141,7 +141,6 @@ export class BittensorCache {
 
       this.cacheTimeout = setTimeout(() => {
         this.cache = null;
-        this.promise = null;
       }, 60 * 1000);
 
       this.promise = null;
@@ -232,7 +231,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           return;
         }
 
-        const minDelegatorStake = await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
         const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
         const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
 
