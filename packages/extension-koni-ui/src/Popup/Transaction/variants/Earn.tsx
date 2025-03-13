@@ -10,6 +10,7 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
@@ -23,7 +24,7 @@ import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwa
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Button, ButtonProps, Form, Icon, ModalContext, Number } from '@subwallet/react-ui';
+import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, PlusCircle } from 'phosphor-react';
@@ -635,6 +636,11 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+  const networkKey = useMemo(() => {
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+
+    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
+  }, [poolInfo.metadata.subnetData?.netuid]);
 
   const renderMetaInfo = useCallback(() => {
     const value = amountValue ? parseFloat(amountValue) / 10 ** assetDecimals : 0;
@@ -710,9 +716,13 @@ const Component = () => {
               label={t('Subnet')}
             >
               <div className='__subnet-wrapper'>
-                <div
-                  className='__subnet-logo'
-                >{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+                <Logo
+                  className='__item-logo'
+                  isShowSubLogo={false}
+                  network={networkKey}
+                  shape='circle'
+                  size={24}
+                />
                 <span className='chain-name'>{poolInfo.metadata.shortName}</span>
               </div>
             </MetaInfo.Default>
@@ -728,7 +738,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo, t, isSubnetStaking, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
+  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -1244,21 +1254,6 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       alignItems: 'center',
       gap: token.sizeXS,
       minWidth: 0
-    },
-    '.__subnet-logo': {
-      width: 24,
-      height: 24,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'white',
-      color: '#292929',
-      fontWeight: token.headingFontWeight,
-      borderRadius: '50%',
-      fontSize: token.fontSize,
-      pointerEvents: 'none',
-      userSelect: 'none',
-      flexShrink: 0
     }
   };
 });

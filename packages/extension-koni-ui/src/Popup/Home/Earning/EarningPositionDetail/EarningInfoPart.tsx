@@ -4,10 +4,12 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getEarningTimeText } from '@subwallet/extension-koni-ui/utils';
+import { Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -38,6 +40,12 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
   }, [poolInfo.statistic]);
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
+  const networkKey = useMemo(() => {
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+
+    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
+  }, [poolInfo.metadata.subnetData?.netuid]);
+
   return (
     <CollapsiblePanel
       className={CN(className)}
@@ -61,9 +69,13 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
               label={t('Subnet')}
             >
               <div className='__subnet-wrapper'>
-                <div
-                  className='__subnet-logo'
-                >{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+                <Logo
+                  className='__item-logo'
+                  isShowSubLogo={false}
+                  network={networkKey}
+                  shape='circle'
+                  size={24}
+                />
                 <span className='chain-name'>{poolInfo.metadata.shortName}</span>
               </div>
             </MetaInfo.Default>
@@ -104,20 +116,5 @@ export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: P
     alignItems: 'center',
     gap: token.sizeXS,
     minWidth: 0
-  },
-  '.__subnet-logo': {
-    width: 24,
-    height: 24,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'white',
-    color: '#292929',
-    fontWeight: token.headingFontWeight,
-    borderRadius: '50%',
-    fontSize: token.fontSize,
-    pointerEvents: 'none',
-    userSelect: 'none',
-    flexShrink: 0
   }
 }));

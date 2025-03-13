@@ -3,6 +3,7 @@
 
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { NetworkTag } from '@subwallet/extension-koni-ui/components';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -56,27 +57,32 @@ const Component: React.FC<Props> = (props: Props) => {
     return positionInfo.subnetData?.subnetShortName ? `(${positionInfo.subnetData.subnetShortName})` : '';
   }, [positionInfo.subnetData?.subnetShortName]);
 
-  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
-
-  console.log('Checking', poolInfo.metadata.subnetData?.subnetSymbol);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
 
   return (
     <div
       className={CN(className)}
       onClick={onClick}
     >
-      <div className={'__item-left-part'}>
-        {!isSubnetStaking
+      <div className='__item-left-part'>
+        {!isSubnetStaking || !DefaultLogosMap[`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`]
           ? (
             <Logo
-              className={'__item-logo'}
+              className='__item-logo'
               isShowSubLogo={true}
               size={40}
               subNetwork={poolInfo.metadata.logo || poolInfo.chain}
               token={balanceToken.toLowerCase()}
-            />)
+            />
+          )
           : (
-            <div className='__subnet-logo'>{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={false}
+              network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
+              shape='squircle'
+              size={40}
+            />
           )}
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
@@ -250,21 +256,6 @@ const EarningPositionItem = styled(Component)<Props>(({ theme: { token } }: Prop
       color: token.colorTextLight4,
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM
-    },
-    '.__subnet-logo': {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '37px',
-      height: '37px',
-      lineHeight: '37px',
-      textAlign: 'center',
-      background: 'white',
-      color: '#292929',
-      fontWeight: token.headingFontWeight,
-      borderRadius: '36%',
-      fontSize: token.fontSizeXL,
-      marginRight: '12px'
     }
   });
 });

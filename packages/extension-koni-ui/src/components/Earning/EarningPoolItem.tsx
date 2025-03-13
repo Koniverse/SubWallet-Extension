@@ -3,6 +3,7 @@
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -64,7 +65,8 @@ const Component: React.FC<Props> = (props: Props) => {
       return '';
     }
   }, [asset, priceMap, tvl]);
-  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
 
   return (
     <div
@@ -72,7 +74,7 @@ const Component: React.FC<Props> = (props: Props) => {
       onClick={onClick}
     >
       <div className={'__item-upper-part'}>
-        {!isSubnetStaking
+        {!isSubnetStaking || !DefaultLogosMap[`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`]
           ? (
             <Logo
               className={'__item-logo'}
@@ -80,7 +82,13 @@ const Component: React.FC<Props> = (props: Props) => {
               size={40}
             />)
           : (
-            <div className='__subnet-logo'>{poolInfo.metadata.subnetData?.subnetSymbol || ''}</div>
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={false}
+              network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
+              shape='squircle'
+              size={40}
+            />
           )}
 
         <div className='__item-lines-container'>
@@ -272,21 +280,6 @@ const EarningPoolItem = styled(Component)<Props>(({ theme: { token } }: Props) =
       borderTop: '2px solid rgba(33, 33, 33, 0.80)',
       display: 'flex',
       alignItems: 'center'
-    },
-    '.__subnet-logo': {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '37px',
-      height: '37px',
-      lineHeight: '37px',
-      textAlign: 'center',
-      background: 'white',
-      color: '#292929',
-      fontWeight: token.headingFontWeight,
-      borderRadius: '36%',
-      fontSize: token.fontSizeXL,
-      marginRight: '12px'
     }
   });
 });

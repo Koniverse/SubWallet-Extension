@@ -65,7 +65,8 @@ const useYieldPositionDetail = (slug: string, address?: string): Result => {
           nominations: [],
           status: EarningStatus.NOT_STAKING, // TODO
           unstakings: [],
-          isBondedBefore: false
+          isBondedBefore: false,
+          subnetData: positionInfo.subnetData
         };
 
         let rs: YieldPositionInfo;
