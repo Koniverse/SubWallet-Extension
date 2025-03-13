@@ -20,6 +20,12 @@ export interface SwapPair {
   metadata?: Record<string, any>;
 }
 
+export interface ActionPair {
+  slug: string;
+  from: string;
+  to: string;
+}
+
 export interface SwapQuote {
   pair: SwapPair;
   fromAmount: string;
@@ -130,6 +136,7 @@ export interface HydradxSwapTxData extends SwapBaseTxData {
 
 // parameters & responses
 export type GenSwapStepFunc = (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
+export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
 export interface ChainflipPreValidationMetadata {
   minSwap: AmountData;
@@ -205,7 +212,12 @@ export interface SwapSubmitStepData {
 export interface OptimalSwapPathParams {
   request: SwapRequest;
   selectedQuote?: SwapQuote;
-  path?: DynamicSwapAction[];
+}
+
+export interface OptimalSwapPathParamsV2 {
+  request: SwapRequest;
+  selectedQuote?: SwapQuote;
+  path: DynamicSwapAction[];
 }
 
 export interface SwapEarlyValidation {

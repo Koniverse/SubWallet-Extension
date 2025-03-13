@@ -22,7 +22,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SW
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequest, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -1059,7 +1059,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             recipient: recipientValue || undefined
           };
 
-          handleSwapRequest(currentRequest).then((result) => {
+          handleSwapRequestV2(currentRequest).then((result) => {
             if (sync) {
               setCurrentQuoteRequest(currentRequest);
               setOptimalSwapPath(result.process);

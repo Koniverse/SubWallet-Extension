@@ -10,8 +10,9 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
+import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -189,11 +190,116 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
+  async getXcmStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    // todo: improve this function for Round 2
+
+    const xcmPairInfo = params.path.find((step) => step.action === DynamicSwapType.BRIDGE)?.pair;
+
+    if (!xcmPairInfo) {
+      return undefined;
+    }
+
+    try {
+      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
+      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
+      const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+      const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
+      const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
+
+      const id = getId();
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
+
+      const xcmTransfer = await createXcmExtrinsic({
+        originTokenInfo: fromTokenInfo,
+        destinationTokenInfo: toTokenInfo,
+        // Mock sending value to get payment info
+        sendingValue: params.request.fromAmount,
+        recipient: params.request.address,
+        substrateApi: substrateApi,
+        sender: params.request.address,
+        originChain: fromChainInfo,
+        destinationChain: toChainInfo,
+        feeInfo
+      });
+
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
+      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
+      const fee: CommonStepFeeInfo = {
+        feeComponent: [{
+          feeType: SwapFeeType.NETWORK_FEE,
+          amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString(),
+          tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
+        }],
+        defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
+        feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
+      };
+
+      const bnTransferAmount = BigN(params.request.fromAmount).plus(BigN(fee.feeComponent[0].amount));
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: fromTokenInfo,
+          destinationTokenInfo: toTokenInfo
+        },
+        name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
+        type: CommonStepType.XCM
+      };
+
+      return [step, fee];
+    } catch (e) {
+      console.error('Error creating xcm step', e);
+
+      return undefined;
+    }
+  }
+
+  async getSwapStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const swapPairInfo = params.path.find((step) => step.action === DynamicSwapType.SWAP)?.pair;
+
+    if (!swapPairInfo) {
+      return Promise.resolve(undefined);
+    }
+
+    if (params.selectedQuote) {
+      const submitStep: BaseStepDetail = {
+        name: 'Swap',
+        type: SwapStepType.SWAP,
+        metadata: {
+          sendingValue: params.request.fromAmount.toString(),
+          originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
+          destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
+        }
+      };
+
+      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    }
+
+    return Promise.resolve(undefined);
+  }
+
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getXcmStep.bind(this),
       this.getSubmitStep.bind(this)
     ]);
+  }
+
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+    const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
+      if (step.action === DynamicSwapType.BRIDGE) {
+        return this.getXcmStepV2.bind(this);
+      }
+
+      if (step.action === DynamicSwapType.SWAP) {
+        return this.getSwapStepV2.bind(this);
+      }
+
+      throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);
+    });
+
+    return this.swapBaseHandler.generateOptimalProcessV2(params, stepFuncList);
   }
 
   public async handleXcmStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {

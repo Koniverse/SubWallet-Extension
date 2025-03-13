@@ -4064,6 +4064,10 @@ export default class KoniExtension {
   }
 
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
+    return this.#koniState.swapService.handleSwapRequest(request);
+  }
+
+  private async handleSwapRequestV2 (request: SwapRequest): Promise<SwapRequestResult> {
     return this.#koniState.swapService.handleSwapRequestV2(request);
   }
 
@@ -5272,6 +5276,8 @@ export default class KoniExtension {
         return this.generateOptimalProcess(request as OptimalSwapPathParams);
       case 'pri(swapService.handleSwapRequest)':
         return this.handleSwapRequest(request as SwapRequest);
+      case 'pri(swapService.handleSwapRequestV2)':
+        return this.handleSwapRequestV2(request as SwapRequest);
       case 'pri(swapService.getLatestQuote)':
         return this.getLatestSwapQuote(request as SwapRequest);
       case 'pri(swapService.validateSwapProcess)':

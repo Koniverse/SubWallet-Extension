@@ -14,7 +14,7 @@ import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-se
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -99,6 +99,33 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
+  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalPath {
+    const result: CommonOptimalPath = {
+      totalFee: [MOCK_STEP_FEE],
+      steps: [DEFAULT_FIRST_STEP]
+    };
+
+    const swapPairInfo = params.path[0].pair; // todo: improve for Round 2
+
+    result.totalFee.push({
+      feeComponent: [],
+      feeOptions: [params.request.pair.from],
+      defaultFeeToken: params.request.pair.from
+    });
+    result.steps.push({
+      id: result.steps.length,
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      metadata: {
+        sendingValue: params.request.fromAmount.toString(),
+        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
+      }
+    });
+
+    return result;
+  }
+
   public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
@@ -110,6 +137,21 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         return handler.generateOptimalProcess(params);
       } else {
         return this.getDefaultProcess(params);
+      }
+    }
+  }
+
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+    if (!params.selectedQuote) {
+      return this.getDefaultProcessV2(params);
+    } else {
+      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+      const handler = this.handlers[providerId];
+
+      if (handler) {
+        return handler.generateOptimalProcessV2(params);
+      } else {
+        return this.getDefaultProcessV2(params);
       }
     }
   }
@@ -131,7 +173,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return {
       process: optimalProcess,
       quote: swapQuoteResponse
-    } as SwapRequestResult;
+    };
   }
 
   public async handleSwapRequestV2 (request: SwapRequest): Promise<SwapRequestResult> {
@@ -146,13 +188,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const _request: SwapRequest = {
       ...request,
       pair: {
-        slug: 'polkadot-NATIVE-DOT___hydradx_main-NATIVE-HDX',
+        slug: 'polkadot-NATIVE-DOT___statemint-LOCAL-USDt',
         from: 'polkadot-NATIVE-DOT',
-        to: 'hydradx_main-NATIVE-HDX'
+        to: 'statemint-LOCAL-USDt'
       }
     };
 
-    const path = this.getAvailablePathV2(_request); // todo: will be a list of path in Round 2
+    const path = this.getAvailablePath(_request); // todo: will be a list of path in Round 2
     const swapPair = path.find((action) => action.action === DynamicSwapType.SWAP);
 
     if (!swapPair) {
@@ -164,20 +206,21 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       pair: swapPair.pair
     };
     const swapQuoteResponse = await this.getLatestQuotes(directSwapRequest);
-
-    const optimalProcess = await this.generateOptimalProcess({
+    const optimalProcess = await this.generateOptimalProcessV2({
       request,
       selectedQuote: swapQuoteResponse.optimalQuote,
       path
     });
 
+    console.log('optimalProcess', optimalProcess);
+
     return {
       process: optimalProcess,
       quote: swapQuoteResponse
-    } as SwapRequestResult;
+    };
   }
 
-  public getAvailablePathV2 (request: SwapRequest) {
+  public getAvailablePath (request: SwapRequest): DynamicSwapAction[] {
     const { pair } = request;
     const providers = [...new Set(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
     const fromToken = this.chainService.getAssetBySlug(pair.from);

@@ -149,6 +149,12 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     ]);
   }
 
+  generateOptimalProcessV2 (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+    return this.swapBaseHandler.generateOptimalProcess(params, [
+      this.getSubmitStep.bind(this)
+    ]);
+  }
+
   async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
       const submitStep = {

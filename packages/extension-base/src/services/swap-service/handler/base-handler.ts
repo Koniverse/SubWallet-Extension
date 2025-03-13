@@ -8,7 +8,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { formatNumber } from '@subwallet/extension-base/utils';
@@ -19,6 +19,7 @@ export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
 
   generateOptimalProcess: (params: OptimalSwapPathParams) => Promise<CommonOptimalPath>;
+  generateOptimalProcessV2: (params: OptimalSwapPathParamsV2) => Promise<CommonOptimalPath>;
 
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
@@ -56,6 +57,31 @@ export class SwapBaseHandler {
 
   // public abstract getSwapQuote(request: SwapRequest): Promise<SwapQuote | SwapError>;
   public async generateOptimalProcess (params: OptimalSwapPathParams, genStepFuncList: GenSwapStepFunc[]): Promise<CommonOptimalPath> {
+    const result: CommonOptimalPath = {
+      totalFee: [MOCK_STEP_FEE],
+      steps: [DEFAULT_FIRST_STEP]
+    };
+
+    try {
+      for (const genStepFunc of genStepFuncList) {
+        const step = await genStepFunc(params);
+
+        if (step) {
+          result.steps.push({
+            id: result.steps.length,
+            ...step[0]
+          });
+          result.totalFee.push(step[1]);
+        }
+      }
+
+      return result;
+    } catch (e) {
+      return result;
+    }
+  }
+
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2, genStepFuncList: GenSwapStepFuncV2[]): Promise<CommonOptimalPath> {
     const result: CommonOptimalPath = {
       totalFee: [MOCK_STEP_FEE],
       steps: [DEFAULT_FIRST_STEP]
