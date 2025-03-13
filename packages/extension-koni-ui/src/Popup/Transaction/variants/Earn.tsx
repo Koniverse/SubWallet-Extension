@@ -1241,7 +1241,9 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
     '.__subnet-wrapper': {
       display: 'flex',
-      gap: token.sizeXS
+      alignItems: 'center',
+      gap: token.sizeXS,
+      minWidth: 0
     },
     '.__subnet-logo': {
       width: 24,
@@ -1255,7 +1257,8 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       borderRadius: '50%',
       fontSize: token.fontSize,
       pointerEvents: 'none',
-      userSelect: 'none'
+      userSelect: 'none',
+      flexShrink: 0
     }
   };
 });

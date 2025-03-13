@@ -101,7 +101,9 @@ export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: P
   },
   '.__subnet-wrapper': {
     display: 'flex',
-    gap: token.sizeXS
+    alignItems: 'center',
+    gap: token.sizeXS,
+    minWidth: 0
   },
   '.__subnet-logo': {
     width: 24,
@@ -115,6 +117,7 @@ export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: P
     borderRadius: '50%',
     fontSize: token.fontSize,
     pointerEvents: 'none',
-    userSelect: 'none'
+    userSelect: 'none',
+    flexShrink: 0
   }
 }));

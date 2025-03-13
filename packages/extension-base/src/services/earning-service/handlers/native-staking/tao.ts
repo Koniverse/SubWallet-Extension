@@ -259,7 +259,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
               defaultUnstake: '0',
               fastUnstake: '0'
             },
-            eraTime: 1.2,
+            eraTime: 24,
             era: 0,
             unstakingPeriod: 1.2,
             tvl: bnTaoIn.toString()
