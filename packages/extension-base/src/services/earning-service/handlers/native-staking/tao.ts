@@ -6,6 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
@@ -81,35 +82,77 @@ export const bittensorApiKey = (): string => {
 };
 
 /* Fetch data */
-export let cachedDelegateInfo: ValidatorResponse | null = null;
+export class BittensorCache {
+  private static instance: BittensorCache | null = null;
+  private cache: ValidatorResponse | null = null;
+  private cacheTimeout: NodeJS.Timeout | null = null;
+  private promise: Promise<ValidatorResponse> | null = null;
 
-export async function fetchDelegates (): Promise<ValidatorResponse> {
-  const apiKey = bittensorApiKey();
+  // eslint-disable-next-line no-useless-constructor, @typescript-eslint/no-empty-function
+  private constructor () {}
 
-  try {
-    const resp = await fetch('https://api.taostats.io/api/validator/latest/v1', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${apiKey}`
+  public static getInstance (): BittensorCache {
+    if (!BittensorCache.instance) {
+      BittensorCache.instance = new BittensorCache();
+    }
+
+    return BittensorCache.instance;
+  }
+
+  public async get (): Promise<ValidatorResponse> {
+    if (this.cache) {
+      return this.cache;
+    }
+
+    if (this.promise) {
+      return this.promise;
+    }
+
+    this.promise = this.fetchData();
+
+    return this.promise;
+  }
+
+  private async fetchData (): Promise<ValidatorResponse> {
+    const apiKey = bittensorApiKey();
+
+    try {
+      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${apiKey}`
+        }
+      });
+
+      if (!resp.ok) {
+        console.error('Fetch bittensor delegates fail:', resp.status);
+
+        return { data: [] };
       }
-    });
 
-    if (!resp.ok) {
-      console.error('Fetch bittensor delegates fail:', resp.status);
+      const data = await resp.json() as ValidatorResponse;
+
+      this.cache = data;
+
+      if (this.cacheTimeout) {
+        clearTimeout(this.cacheTimeout);
+      }
+
+      this.cacheTimeout = setTimeout(() => {
+        this.cache = null;
+        this.promise = null;
+      }, 60 * 1000);
+
+      this.promise = null;
+
+      return data;
+    } catch (error) {
+      console.error(error);
+      this.promise = null;
 
       return { data: [] };
     }
-
-    const data = await resp.json() as ValidatorResponse;
-
-    cachedDelegateInfo = data;
-
-    return data || { data: [] };
-  } catch (error) {
-    console.error(error);
-
-    return { data: [] };
   }
 }
 
@@ -151,6 +194,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     withdraw: false,
     claimReward: false
   };
+
+  private bittensorCache: BittensorCache;
+  constructor (state: KoniState, chain: string) {
+    super(state, chain);
+    this.bittensorCache = BittensorCache.getInstance();
+  }
 
   /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
@@ -285,7 +334,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const substrateApi = await this.substrateApi.isReady;
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
-    const _delegateInfo = await fetchDelegates();
+    const _delegateInfo = await this.bittensorCache.get();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
@@ -467,7 +516,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = await fetchDelegates();
+    const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();

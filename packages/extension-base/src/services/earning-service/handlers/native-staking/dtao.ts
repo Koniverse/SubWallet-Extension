@@ -16,7 +16,7 @@ import BigN, { BigNumber } from 'bignumber.js';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import { cachedDelegateInfo, fetchDelegates, TaoStakeInfo } from './tao';
+import { BittensorCache, TaoStakeInfo } from './tao';
 
 export interface SubnetData {
   netuid: number;
@@ -161,7 +161,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   protected override shortName: string;
   public subnetData: SubnetData[] = [];
   private isInit = false;
-
+  private bittensorCache: BittensorCache;
   override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
@@ -181,6 +181,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     this.slug = this.slug = `${symbol}___subnet_staking___${_chainInfo.slug}`;
     this.name = 'Subnet Tao Staking';
     this.shortName = 'dTAO Staking';
+    this.bittensorCache = BittensorCache.getInstance();
   }
 
   public override canHandleSlug (slug: string): boolean {
@@ -381,7 +382,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
-    const _delegateInfo = cachedDelegateInfo;
+    const _delegateInfo = await this.bittensorCache.get();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
@@ -533,7 +534,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = await fetchDelegates();
+    const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
