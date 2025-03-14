@@ -149,7 +149,7 @@ const createSwapRequest = async (params: {fromSymbol: string; toSymbol: string; 
   );
 
   const depositAddressResponse = await response.json() as ExchangeSimpleSwapData;
-
+  console.log('depositAddressResponse', depositAddressResponse);
   return {
     id: depositAddressResponse.id,
     addressFrom: depositAddressResponse.address_from,

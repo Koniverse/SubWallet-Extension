@@ -2737,6 +2737,7 @@ export default class KoniExtension {
     }
 
     const result = request.sign(registry as unknown as TypeRegistry, pair);
+    console.log('result', result);
 
     resolve({
       id,
