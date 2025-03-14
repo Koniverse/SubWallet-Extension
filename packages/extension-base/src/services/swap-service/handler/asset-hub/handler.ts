@@ -470,14 +470,19 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     }
 
     let isXcmOk = false;
+    const currentStep = params.currentStep;
 
     for (const [index, step] of params.process.steps.entries()) {
+      if (currentStep > index) {
+        continue;
+      }
+
       const getErrors = async (): Promise<TransactionError[]> => {
         switch (step.type) {
           case CommonStepType.DEFAULT:
             return Promise.resolve([]);
           case CommonStepType.XCM:
-            return this.swapBaseHandler.validateXcmStep(params, index);
+            return this.swapBaseHandler.validateXcmStepV2(params, index);
           case SwapStepType.SWAP:
             return this.validateSwapStep(params, isXcmOk, index);
           default:
