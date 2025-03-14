@@ -184,7 +184,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
+    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
   ];
 
   const filterFunction = useMemo<(items: ExtraYieldPositionInfo) => boolean>(() => {
@@ -205,6 +206,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         } else if (filter === YieldPoolType.LIQUID_STAKING && item.type === YieldPoolType.LIQUID_STAKING) {
           return true;
         } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
+          return true;
+        } else if (filter === YieldPoolType.SUBNET_STAKING && item.type === YieldPoolType.SUBNET_STAKING) {
           return true;
         }
         // Uncomment the following code block if needed
@@ -252,11 +255,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const renderItem = useCallback(
     (item: ExtraYieldPositionInfo) => {
       return (
-        <>
+        <React.Fragment key={item.slug}>
           <EarningPositionItem
             className={'earning-position-item'}
             isShowBalance={isShowBalance}
-            key={item.slug}
             onClick={onClickItem(item)}
             positionInfo={item}
           />
@@ -275,7 +277,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
               {t('Explore earning options')}
             </Button>
           </div>}
-        </>
+        </React.Fragment>
       );
     },
     [lastItem.slug, isShowBalance, onClickItem, onClickExploreEarning, t]
@@ -304,14 +306,17 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     );
   }, [setEntryView, t]);
 
-  const searchFunction = useCallback(({ balanceToken, chain: _chain }: ExtraYieldPositionInfo, searchText: string) => {
+  // SEARCH LOGIC HERE
+  const searchFunction = useCallback(({ balanceToken, chain: _chain, subnetData }: ExtraYieldPositionInfo, searchText: string) => {
     const chainInfo = chainInfoMap[_chain];
     const assetInfo = assetInfoMap[balanceToken];
+    const search = searchText.toLowerCase();
 
-    return (
-      chainInfo?.name.replace(' Relay Chain', '').toLowerCase().includes(searchText.toLowerCase()) ||
-      assetInfo?.symbol.toLowerCase().includes(searchText.toLowerCase())
-    );
+    return [
+      chainInfo?.name.replace(' Relay Chain', '').toLowerCase(),
+      assetInfo?.symbol.toLowerCase(),
+      subnetData?.subnetShortName?.toLowerCase()
+    ].some((value) => value?.includes(search));
   }, [assetInfoMap, chainInfoMap]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {

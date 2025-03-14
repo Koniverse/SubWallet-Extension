@@ -4,10 +4,12 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getEarningTimeText } from '@subwallet/extension-koni-ui/utils';
+import { Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -36,6 +38,13 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
       return undefined;
     }
   }, [poolInfo.statistic]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+
+  const networkKey = useMemo(() => {
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+
+    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
+  }, [poolInfo.metadata.subnetData?.netuid]);
 
   return (
     <CollapsiblePanel
@@ -48,11 +57,29 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         spaceSize='sm'
         valueColorScheme='light'
       >
-        <MetaInfo.Chain
-          chain={poolInfo.chain}
-          label={t('Network')}
-          valueColorSchema='gray'
-        />
+        {!isSubnetStaking
+          ? (
+            <MetaInfo.Chain
+              chain={poolInfo.chain}
+              label={t('Network')}
+            />
+          )
+          : (
+            <MetaInfo.Default
+              label={t('Subnet')}
+            >
+              <div className='__subnet-wrapper'>
+                <Logo
+                  className='__item-logo'
+                  isShowSubLogo={false}
+                  network={networkKey}
+                  shape='circle'
+                  size={24}
+                />
+                <span className='chain-name'>{poolInfo.metadata.shortName}</span>
+              </div>
+            </MetaInfo.Default>
+          )}
         {totalApy !== undefined && (
           <MetaInfo.Number
             label={t('Estimated earnings')}
@@ -71,7 +98,7 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         />
         {unstakePeriod !== undefined && (
           <MetaInfo.Default label={t('Unstaking period')}>
-            {poolInfo.type === YieldPoolType.LIQUID_STAKING && <span className={'__label'}>Up to</span>}
+            {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING) && <span className={'__label'}>Up to</span>}
             {getEarningTimeText(unstakePeriod)}
           </MetaInfo.Default>
         )}
@@ -83,6 +110,11 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
 export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   '.__label': {
     paddingRight: token.paddingXXS
+  },
+  '.__subnet-wrapper': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: token.sizeXS,
+    minWidth: 0
   }
-
 }));
