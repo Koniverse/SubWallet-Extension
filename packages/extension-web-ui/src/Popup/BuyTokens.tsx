@@ -168,7 +168,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     promiseRef.current.reject(new Error('User reject'));
   }, []);
 
-  const tokenItems = useMemo<TokenItemType[]>(() => {
+  const buyTokenItems = useMemo<TokenItemType[]>(() => {
     const result: TokenItemType[] = [];
 
     const convertToItem = (info: BuyTokenInfo): TokenItemType => {
@@ -192,6 +192,39 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
 
     return result;
   }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+
+  const sellTokenItems = useMemo<TokenItemType[]>(() => {
+    const result: TokenItemType[] = [];
+
+    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
+      return {
+        name: assetRegistry[info.slug]?.name || info.symbol,
+        slug: info.slug,
+        symbol: info.symbol,
+        originChain: info.network
+      };
+    };
+
+    const sellList = [...Object.values(tokens)].filter((token) => token.supportSell);
+
+    const filtered = currentSymbol
+      ? sellList.filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol)
+      : sellList;
+
+    Object.values(filtered).forEach((item) => {
+      if (!allowedChains.includes(item.network)) {
+        return;
+      }
+
+      result.push(convertToItem(item));
+    });
+
+    return result;
+  }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+
+  const tokenItems = useMemo<TokenItemType[]>(() => {
+    return buyForm ? buyTokenItems : sellTokenItems;
+  }, [buyForm, buyTokenItems, sellTokenItems]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 
