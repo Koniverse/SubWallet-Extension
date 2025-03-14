@@ -13,7 +13,7 @@ import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams, ValidateSwapProcessParamsV2 } from '@subwallet/extension-base/types/swap';
+import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
@@ -26,7 +26,7 @@ export interface SwapBaseInterface {
 
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
-  validateSwapProcess: (params: ValidateSwapProcessParamsV2) => Promise<TransactionError[]>;
+  validateSwapProcess: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
   handleSwapProcess: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
   handleSubmitStep: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
 
@@ -211,7 +211,7 @@ export class SwapBaseHandler {
      * Validate like transfer
      * Need review, maybe remove this
      * */
-    const [toAssetBalance, toChainNativeAssetBalance] = await Promise.all([
+    const [, toChainNativeAssetBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(receiver, toAsset.originChain, toAsset.slug, ExtrinsicType.SWAP), // TODO: REVIEW
       this.balanceService.getTransferableBalance(receiver, toAsset.originChain, toChainNativeAsset.slug, ExtrinsicType.TRANSFER_BALANCE) // TODO: REVIEW
     ]);
