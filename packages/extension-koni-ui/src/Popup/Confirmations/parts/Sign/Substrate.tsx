@@ -417,9 +417,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [account?.address, address, isMessage, onApproveSignature, payload, request.payload, substrateWallet]);
 
   const onConfirm = useCallback(() => {
-
     removeTransactionPersist(extrinsicType);
-
 
     if (txExpirationTime) {
       const currentTime = +Date.now();

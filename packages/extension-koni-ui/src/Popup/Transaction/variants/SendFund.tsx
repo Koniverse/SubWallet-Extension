@@ -467,18 +467,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
     if (chain === destChain) {
       // Transfer token or send fund
-      console.log('run to this', {
-        from,
-        chain,
-        to: to,
-        tokenSlug: asset,
-        value: value,
-        transferAll: options.isTransferAll,
-        transferBounceable: options.isTransferBounceable,
-        feeOption: selectedTransactionFee?.feeOption,
-        feeCustom: selectedTransactionFee?.feeCustom,
-        nonNativeTokenPayFeeSlug: nonNativeTokenPayFeeSlug
-      });
+
       sendPromise = makeTransfer({
         from,
         chain,
