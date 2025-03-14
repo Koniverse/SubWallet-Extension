@@ -75,6 +75,7 @@ const Component = (props: Props) => {
   const renderItem = useCallback((item: TokenSelectorItemType) => {
     return (
       <TokenSelectorItem
+        balanceInfo={item.balanceInfo}
         chainName={_getChainName(chainInfoMap[item.originChain])}
         chainSlug={item.originChain}
         className={CN('token-selector-item', {
@@ -82,6 +83,7 @@ const Component = (props: Props) => {
         })}
         key={item.slug}
         onClick={onClickItem(item)}
+        showBalance={true}
         tokenSlug={item.slug}
         tokenSymbol={item.symbol}
       />
