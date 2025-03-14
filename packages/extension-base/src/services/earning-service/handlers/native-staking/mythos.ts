@@ -303,16 +303,18 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const substrateApi = await this.substrateApi.isReady;
 
-    const [_allCollators, _minStake, _commission] = await Promise.all([
+    const [_allCollators, _minStake, _commission, _desiredCandidates] = await Promise.all([
       substrateApi.api.query.collatorStaking.candidates.entries(),
       substrateApi.api.query.collatorStaking.minStake(),
-      substrateApi.api.query.collatorStaking.collatorRewardPercentage()
+      substrateApi.api.query.collatorStaking.collatorRewardPercentage(),
+      substrateApi.api.query.collatorStaking.desiredCandidates()
     ]);
 
     const maxStakersPerCollator = substrateApi.api.consts.collatorStaking.maxStakers.toPrimitive() as number;
+    const numberOfRewardCollators = parseInt(_desiredCandidates.toString());
     const numberOfCollators = _allCollators.length;
 
-    return _allCollators.map((_collator) => {
+    const allTargets = _allCollators.map((_collator) => {
       const _collatorAddress = _collator[0].toHuman() as unknown as string[];
       const collatorAddress = _collatorAddress[0];
       const collatorInfo = _collator[1].toPrimitive() as unknown as PalletCollatorStakingCandidateInfo;
@@ -335,6 +337,21 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
         isCrowded,
         expectedReturn: calculateCollatorApy(numberOfCollators, totalStake)
       } as ValidatorInfo;
+    });
+
+    const sortTargetsByStake = allTargets.sort((a, b) => (BigN(b.totalStake).minus(BigN(a.totalStake))).toNumber());
+
+    return sortTargetsByStake.map((target, rank) => {
+      let expectedReturn = target.expectedReturn;
+
+      if (rank >= numberOfRewardCollators) {
+        expectedReturn = 0.000000000000001;
+      }
+
+      return {
+        ...target,
+        expectedReturn
+      };
     });
   }
 
