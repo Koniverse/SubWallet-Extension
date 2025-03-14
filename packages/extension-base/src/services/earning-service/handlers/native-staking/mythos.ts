@@ -10,7 +10,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
-import BigN, { BigNumber } from 'bignumber.js';
+import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
@@ -339,26 +339,20 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
       } as ValidatorInfo;
     });
 
-    const sortTargetsByStake = allTargets.sort((a, b) => (BigNumber(b.totalStake).minus(BigNumber(a.totalStake))).toNumber());
+    const sortTargetsByStake = allTargets.sort((a, b) => (BigN(b.totalStake).minus(BigN(a.totalStake))).toNumber());
 
-    // todo: remove
-    // return sortTargetsByStake.map((target, rank) => {
-    //   let blocked = target.blocked;
-    //   let expectedReturn = target.expectedReturn;
-    //
-    //   if (rank >= numberOfRewardCollators) {
-    //     blocked = true;
-    //     expectedReturn = undefined;
-    //   }
-    //
-    //   return {
-    //     ...target,
-    //     blocked,
-    //     expectedReturn
-    //   };
-    // });
+    return sortTargetsByStake.map((target, rank) => {
+      let expectedReturn = target.expectedReturn;
 
-    return sortTargetsByStake.filter((target, rank) => rank < numberOfRewardCollators);
+      if (rank >= numberOfRewardCollators) {
+        expectedReturn = 0.000000000000001;
+      }
+
+      return {
+        ...target,
+        expectedReturn
+      };
+    });
   }
 
   /* Get pool targets */
