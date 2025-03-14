@@ -14,9 +14,9 @@ import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-se
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';

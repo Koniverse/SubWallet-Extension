@@ -234,6 +234,7 @@ export interface ValidateSwapProcessParams {
   process: CommonOptimalPath;
   selectedQuote: SwapQuote;
   recipient?: string;
+  currentStep: number;
 }
 
 export interface SlippageType {

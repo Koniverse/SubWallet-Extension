@@ -2,16 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { additionalValidateXcmTransfer } from '@subwallet/extension-base/core/logic-validation';
 import { _validateBalanceToSwap, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2 } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
-import { formatNumber } from '@subwallet/extension-base/utils';
+import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams, ValidateSwapProcessParamsV2 } from '@subwallet/extension-base/types/swap';
+import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
 
@@ -23,8 +26,7 @@ export interface SwapBaseInterface {
 
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
-  validateSwapProcess: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
-
+  validateSwapProcess: (params: ValidateSwapProcessParamsV2) => Promise<TransactionError[]>;
   handleSwapProcess: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
   handleSubmitStep: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
 
@@ -174,6 +176,63 @@ export class SwapBaseHandler {
     }
 
     return [];
+  }
+
+  public async validateXcmStepV2 (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
+    const currentStep = params.process.steps[stepIndex];
+    const metadata = currentStep.metadata as unknown as BriefXCMStep;
+    const bnAmount = new BigNumber(metadata.sendingValue);
+
+    const fromAsset = metadata?.originTokenInfo;
+    const toAsset = metadata?.destinationTokenInfo;
+
+    if (!fromAsset || !toAsset) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const fromChain = this.chainService.getChainInfoByKey(fromAsset.originChain);
+    const toChain = this.chainService.getChainInfoByKey(toAsset.originChain);
+    const toChainNativeAsset = this.chainService.getNativeTokenInfo(toAsset.originChain);
+    const sender = _reformatAddressWithChain(params.address, fromChain);
+    const receiver = _reformatAddressWithChain(params.recipient ?? sender, toChain);
+
+    const [fromAssetBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(sender, fromAsset.originChain, fromAsset.slug, ExtrinsicType.SWAP) // TODO: REVIEW
+    ]);
+
+    const bnFromAssetBalance = new BigNumber(fromAssetBalance.value);
+    const isSnowBridge = _isSnowBridgeXcm(fromChain, toChain);
+
+    if (bnFromAssetBalance.lt(bnAmount)) {
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${fromAsset.symbol} and try again.`))];
+    }
+
+    /**
+     * Validate like transfer
+     * Need review, maybe remove this
+     * */
+    const [toAssetBalance, toChainNativeAssetBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(receiver, toAsset.originChain, toAsset.slug, ExtrinsicType.SWAP), // TODO: REVIEW
+      this.balanceService.getTransferableBalance(receiver, toAsset.originChain, toChainNativeAsset.slug, ExtrinsicType.TRANSFER_BALANCE) // TODO: REVIEW
+    ]);
+
+    const [warning, error] = additionalValidateXcmTransfer(fromAsset, toAsset, metadata.sendingValue, fromAssetBalance.value, toChainNativeAssetBalance.value, toChain, isSnowBridge);
+
+    const errors: TransactionError[] = [];
+
+    if (warning) {
+      const convert = warning.toError();
+
+      if (convert) {
+        errors.push(convert);
+      }
+    }
+
+    if (error) {
+      errors.push(error);
+    }
+
+    return errors;
   }
 
   public async validateTokenApproveStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {

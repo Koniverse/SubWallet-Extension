@@ -4103,7 +4103,7 @@ export default class KoniExtension {
 
     const isLastStep = inputData.currentStep + 1 === process.steps.length;
 
-    const swapValidations: TransactionError[] = await this.#koniState.swapService.validateSwapProcess({ address, process, selectedQuote: quote, recipient });
+    const swapValidations: TransactionError[] = await this.#koniState.swapService.validateSwapProcess({ address, process, selectedQuote: quote, recipient, currentStep: inputData.currentStep });
 
     if (swapValidations.length > 0) {
       if (step) {

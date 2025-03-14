@@ -688,6 +688,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               address: from,
               process: currentOptimalSwapPath,
               selectedQuote: currentQuote,
+              currentStep: 1,
               recipient // Need to assign format address with toChainInfo in case there's no recipient
             });
 

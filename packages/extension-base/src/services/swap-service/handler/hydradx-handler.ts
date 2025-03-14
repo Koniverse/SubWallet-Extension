@@ -15,9 +15,9 @@ import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 
@@ -550,14 +550,21 @@ export class HydradxHandler implements SwapBaseInterface {
     }
 
     let isXcmOk = false;
+    const currentStep = params.currentStep;
 
     for (const [index, step] of params.process.steps.entries()) {
+      if (currentStep > index) {
+        continue;
+      }
+
       const getErrors = async (): Promise<TransactionError[]> => {
+        console.log('step', step);
+
         switch (step.type) {
           case CommonStepType.DEFAULT:
             return Promise.resolve([]);
           case CommonStepType.XCM:
-            return this.swapBaseHandler.validateXcmStep(params, index);
+            return this.swapBaseHandler.validateXcmStepV2(params, index);
           case CommonStepType.SET_FEE_TOKEN:
             return this.swapBaseHandler.validateSetFeeTokenStep(params, index);
           default:
