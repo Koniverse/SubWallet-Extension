@@ -432,7 +432,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         onCancel={onCancelSelectValidator}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),

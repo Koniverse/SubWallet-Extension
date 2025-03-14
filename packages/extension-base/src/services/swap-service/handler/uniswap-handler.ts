@@ -124,6 +124,14 @@ export class UniswapHandler implements SwapBaseInterface {
     ]);
   }
 
+  generateOptimalProcessV2 (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+    return this.swapBaseHandler.generateOptimalProcess(params, [
+      this.getApprovalStep.bind(this),
+      this.getPermitStep.bind(this),
+      this.getSubmitStep.bind(this)
+    ]);
+  }
+
   async getApprovalStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
       const walletAddress = params.request.address;

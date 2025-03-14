@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
@@ -17,6 +18,12 @@ export interface SwapPair {
   from: string;
   to: string;
   metadata?: Record<string, any>;
+}
+
+export interface ActionPair {
+  slug: string;
+  from: string;
+  to: string;
 }
 
 export interface SwapQuote {
@@ -129,6 +136,7 @@ export interface HydradxSwapTxData extends SwapBaseTxData {
 
 // parameters & responses
 export type GenSwapStepFunc = (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
+export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
 export interface ChainflipPreValidationMetadata {
   minSwap: AmountData;
@@ -206,6 +214,12 @@ export interface OptimalSwapPathParams {
   selectedQuote?: SwapQuote;
 }
 
+export interface OptimalSwapPathParamsV2 {
+  request: SwapRequest;
+  selectedQuote?: SwapQuote;
+  path: DynamicSwapAction[];
+}
+
 export interface SwapEarlyValidation {
   error?: SwapErrorType;
   metadata?: ChainflipPreValidationMetadata | HydradxPreValidationMetadata | AssetHubPreValidationMetadata;
@@ -220,6 +234,7 @@ export interface ValidateSwapProcessParams {
   process: CommonOptimalPath;
   selectedQuote: SwapQuote;
   recipient?: string;
+  currentStep: number;
 }
 
 export interface SlippageType {

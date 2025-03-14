@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
+import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
+import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -99,4 +101,41 @@ export function getChainflipSwap (isTestnet: boolean) {
   } else {
     return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
   }
+}
+
+export function getBridgeStep (from: string, to: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.BRIDGE,
+    pair: {
+      slug: `${from}___${to}`,
+      from,
+      to
+    }
+  };
+}
+
+export function getSwapStep (from: string, to: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.SWAP,
+    pair: {
+      slug: `${from}___${to}`,
+      from,
+      to
+    }
+  };
+}
+
+export function findXcmDestination (chainService: ChainService, chainAsset: _ChainAsset, destChain: string) {
+  const assetRefMap = chainService.getAssetRefMap();
+  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
+    assetRef.srcAsset === chainAsset.slug &&
+    assetRef.destChain === destChain &&
+    assetRef.path === _AssetRefPath.XCM
+  );
+
+  if (foundAssetRef) {
+    return foundAssetRef.destAsset;
+  }
+
+  return undefined;
 }

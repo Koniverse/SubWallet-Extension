@@ -256,4 +256,10 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       this.getSubmitStep.bind(this)
     ]);
   }
+
+  generateOptimalProcessV2 (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+    return this.swapBaseHandler.generateOptimalProcess(params, [
+      this.getSubmitStep.bind(this)
+    ]);
+  }
 }
