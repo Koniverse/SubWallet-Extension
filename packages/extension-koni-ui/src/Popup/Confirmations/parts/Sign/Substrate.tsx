@@ -74,8 +74,27 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [account?.genesisHash, chainInfoMap.polkadot.substrateInfo?.genesisHash, request.payload]);
   const signMode = useMemo(() => getSignMode(account), [account]);
   const isLedger = useMemo(() => signMode === AccountSignMode.LEGACY_LEDGER || signMode === AccountSignMode.GENERIC_LEDGER, [signMode]);
+  const isRuntimeUpdated = useMemo(() => {
+    const _payload = request.payload;
 
-  const { chain, loadingChain } = useMetadata(genesisHash);
+    if (isRawPayload(_payload)) {
+      return false;
+    } else {
+      return _isRuntimeUpdated(_payload.signedExtensions);
+    }
+  }, [request.payload]);
+  const requireMetadata = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER || (signMode === AccountSignMode.LEGACY_LEDGER && isRuntimeUpdated), [isRuntimeUpdated, signMode]);
+  const requireSpecVersion = useMemo((): number | undefined => {
+    const _payload = request.payload;
+
+    if (isRawPayload(_payload)) {
+      return undefined;
+    } else {
+      return Number(_payload.specVersion);
+    }
+  }, [request.payload]);
+
+  const { chain, loadingChain } = useMetadata(genesisHash, requireSpecVersion);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
   const accountChainInfo = useGetChainInfoByGenesisHash(account?.genesisHash || '');
   const { addExtraData, hashLoading, isMissingData, payload } = useParseSubstrateRequestPayload(chain, request, isLedger);
@@ -97,16 +116,6 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [signMode]);
   const chainSlug = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER ? account?.originGenesisHash ? SUBSTRATE_MIGRATION_KEY : SUBSTRATE_GENERIC_KEY : (accountChainInfo?.slug || ''), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
   const networkName = useMemo(() => chainInfo?.name || chain?.name || toShort(genesisHash), [chainInfo, genesisHash, chain]);
-  const isRuntimeUpdated = useMemo(() => {
-    const _payload = request.payload;
-
-    if (isRawPayload(_payload)) {
-      return false;
-    } else {
-      return _isRuntimeUpdated(_payload.signedExtensions);
-    }
-  }, [request.payload]);
-  const requireMetadata = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER || (signMode === AccountSignMode.LEGACY_LEDGER && isRuntimeUpdated), [isRuntimeUpdated, signMode]);
 
   const isMetadataOutdated = useMemo(() => {
     const _payload = request.payload;

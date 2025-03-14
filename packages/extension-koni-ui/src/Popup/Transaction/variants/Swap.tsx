@@ -6,6 +6,7 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
+import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -27,9 +28,9 @@ import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter }
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, BackgroundIcon, Button, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -42,6 +43,8 @@ import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+import useGetCurrentAccountTokenBalance from '../../../hooks/balance/useGetCurrentAccountTokenBalance';
 
 type WrapperProps = ThemeProps;
 
@@ -57,22 +60,57 @@ interface FeeItem {
   suffix?: string
 }
 
+type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
+
 const hideFields: Array<keyof SwapParams> = ['fromAmount', 'fromTokenSlug', 'toTokenSlug', 'chain', 'fromAccountProxy'];
 
-function getTokenSelectorItem (tokenSlugs: string[], assetRegistryMap: Record<string, _ChainAsset>): TokenSelectorItemType[] {
-  const result: TokenSelectorItemType[] = [];
+function getTokenSelectorItem (
+  tokenSlugs: string[],
+  assetRegistryMap: Record<string, _ChainAsset>,
+  tokenBalanceMap: Record<string, TokenBalanceItemType | undefined>,
+  chainState: Record<string, _ChainState>
+): SortableTokenSelectorItemType[] {
+  const result: SortableTokenSelectorItemType[] = [];
 
   tokenSlugs.forEach((slug) => {
     const asset = assetRegistryMap[slug];
 
-    if (asset) {
-      result.push({
-        originChain: asset.originChain,
-        slug,
-        symbol: asset.symbol,
-        name: asset.name
-      });
+    if (!asset) {
+      return;
     }
+
+    const originChain = asset.originChain;
+
+    const balanceInfo = (() => {
+      if (!chainState[originChain]?.active) {
+        return undefined;
+      }
+
+      const tokenBalanceInfo = tokenBalanceMap[slug];
+
+      if (!tokenBalanceInfo) {
+        return undefined;
+      }
+
+      return {
+        isReady: tokenBalanceInfo.isReady,
+        isNotSupport: tokenBalanceInfo.isNotSupport,
+        free: tokenBalanceInfo.free,
+        locked: tokenBalanceInfo.locked,
+        total: tokenBalanceInfo.total,
+        currency: tokenBalanceInfo.currency
+      };
+    })();
+
+    result.push({
+      originChain,
+      slug,
+      symbol: asset.symbol,
+      name: asset.name,
+      balanceInfo,
+      showBalance: true,
+      total: balanceInfo?.free
+    });
   });
 
   return result;
@@ -94,8 +132,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
   const swapPairs = useSelector((state) => state.swap.swapPairs);
   const { currencyData, priceMap } = useSelector((state) => state.price);
-  const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
+  const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
   const hasInternalConfirmations = useSelector((state: RootState) => state.requestState.hasInternalConfirmations);
+  const priorityTokens = useSelector((root: RootState) => root.chainStore.priorityTokens);
   const { multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const [form] = Form.useForm<SwapParams>();
   const formDefault = useMemo((): SwapParams => ({ ...defaultData }), [defaultData]);
@@ -182,6 +221,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [swapPairs]);
 
+  const getCurrentAccountTokenBalance = useGetCurrentAccountTokenBalance();
+
   const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     const rawTokenSlugs = Object.keys(fromAndToTokenMap);
     let targetTokenSlugs: string[] = [];
@@ -229,15 +270,25 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     })();
 
     if (targetTokenSlugs.length) {
-      return getTokenSelectorItem(targetTokenSlugs, assetRegistryMap);
+      const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getCurrentAccountTokenBalance(targetTokenSlugs), chainStateMap);
+
+      sortTokensByStandard(result, priorityTokens);
+
+      return result;
     }
 
     return [];
-  }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, fromAndToTokenMap, isAllAccount, targetAccountProxy]);
+  }, [accountProxies, assetRegistryMap, chainInfoMap, chainStateMap, defaultSlug, fromAndToTokenMap, getCurrentAccountTokenBalance, isAllAccount, priorityTokens, targetAccountProxy]);
 
   const toTokenItems = useMemo<TokenSelectorItemType[]>(() => {
-    return getTokenSelectorItem(fromAndToTokenMap[fromTokenSlugValue] || [], assetRegistryMap);
-  }, [assetRegistryMap, fromAndToTokenMap, fromTokenSlugValue]);
+    const targetTokenSlugs = fromAndToTokenMap[fromTokenSlugValue] || [];
+
+    const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getCurrentAccountTokenBalance(targetTokenSlugs), chainStateMap);
+
+    sortTokensByStandard(result, priorityTokens);
+
+    return result;
+  }, [assetRegistryMap, chainStateMap, fromAndToTokenMap, fromTokenSlugValue, getCurrentAccountTokenBalance, priorityTokens]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
