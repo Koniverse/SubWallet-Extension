@@ -10,7 +10,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
-import BigN from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
@@ -303,16 +303,18 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const substrateApi = await this.substrateApi.isReady;
 
-    const [_allCollators, _minStake, _commission] = await Promise.all([
+    const [_allCollators, _minStake, _commission, _desiredCandidates] = await Promise.all([
       substrateApi.api.query.collatorStaking.candidates.entries(),
       substrateApi.api.query.collatorStaking.minStake(),
-      substrateApi.api.query.collatorStaking.collatorRewardPercentage()
+      substrateApi.api.query.collatorStaking.collatorRewardPercentage(),
+      substrateApi.api.query.collatorStaking.desiredCandidates()
     ]);
 
     const maxStakersPerCollator = substrateApi.api.consts.collatorStaking.maxStakers.toPrimitive() as number;
+    const numberOfRewardCollators = parseInt(_desiredCandidates.toString());
     const numberOfCollators = _allCollators.length;
 
-    return _allCollators.map((_collator) => {
+    const allTargets = _allCollators.map((_collator) => {
       const _collatorAddress = _collator[0].toHuman() as unknown as string[];
       const collatorAddress = _collatorAddress[0];
       const collatorInfo = _collator[1].toPrimitive() as unknown as PalletCollatorStakingCandidateInfo;
@@ -336,6 +338,27 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
         expectedReturn: calculateCollatorApy(numberOfCollators, totalStake)
       } as ValidatorInfo;
     });
+
+    const sortTargetsByStake = allTargets.sort((a, b) => (BigNumber(b.totalStake).minus(BigNumber(a.totalStake))).toNumber());
+
+    // todo: remove
+    // return sortTargetsByStake.map((target, rank) => {
+    //   let blocked = target.blocked;
+    //   let expectedReturn = target.expectedReturn;
+    //
+    //   if (rank >= numberOfRewardCollators) {
+    //     blocked = true;
+    //     expectedReturn = undefined;
+    //   }
+    //
+    //   return {
+    //     ...target,
+    //     blocked,
+    //     expectedReturn
+    //   };
+    // });
+
+    return sortTargetsByStake.filter((target, rank) => rank < numberOfRewardCollators);
   }
 
   /* Get pool targets */
