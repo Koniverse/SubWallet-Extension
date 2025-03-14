@@ -310,15 +310,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const searchFunction = useCallback(({ balanceToken, chain: _chain, subnetData }: ExtraYieldPositionInfo, searchText: string) => {
     const chainInfo = chainInfoMap[_chain];
     const assetInfo = assetInfoMap[balanceToken];
+    const search = searchText.toLowerCase();
 
-    if (subnetData) {
-      return subnetData?.subnetShortName.toLowerCase().includes(searchText.toLowerCase());
-    }
-
-    return (
-      chainInfo?.name.replace(' Relay Chain', '').toLowerCase().includes(searchText.toLowerCase()) ||
-      assetInfo?.symbol.toLowerCase().includes(searchText.toLowerCase())
-    );
+    return [
+      chainInfo?.name.replace(' Relay Chain', '').toLowerCase(),
+      assetInfo?.symbol.toLowerCase(),
+      subnetData?.subnetShortName?.toLowerCase()
+    ].some((value) => value?.includes(search));
   }, [assetInfoMap, chainInfoMap]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {

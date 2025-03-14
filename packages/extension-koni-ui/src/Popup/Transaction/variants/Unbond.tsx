@@ -369,7 +369,7 @@ const Component: React.FC = () => {
 
   const unstakeAlertData = poolChain === 'bifrost_dot'
     ? UNSTAKE_BIFROST_ALERT_DATA
-    : poolChain === 'bittensor' ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
+    : poolChain.startsWith('bittensor') ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
 
   return (
     <>
@@ -414,6 +414,7 @@ const Component: React.FC = () => {
               label={t(`Select ${handleValidatorLabel}`)}
               networkPrefix={networkPrefix}
               nominators={nominators}
+              poolInfo={poolInfo}
             />
           </Form.Item>
 

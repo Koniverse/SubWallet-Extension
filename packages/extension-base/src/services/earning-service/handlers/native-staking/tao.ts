@@ -128,29 +128,32 @@ export class BittensorCache {
       if (!resp.ok) {
         console.error('Fetch bittensor delegates fail:', resp.status);
 
-        return { data: [] };
+        return this.cache || { data: [] };
       }
 
       const data = await resp.json() as ValidatorResponse;
 
       this.cache = data;
+      this.promise = null;
 
       if (this.cacheTimeout) {
         clearTimeout(this.cacheTimeout);
       }
 
       this.cacheTimeout = setTimeout(() => {
-        this.cache = null;
-      }, 60 * 1000);
-
-      this.promise = null;
+        this.fetchData().then((newData) => {
+          if (newData.data.length > 0) {
+            this.cache = newData;
+          }
+        }).catch(console.error);
+      }, 60 * 2000);
 
       return data;
     } catch (error) {
       console.error(error);
       this.promise = null;
 
-      return { data: [] };
+      return this.cache || { data: [] };
     }
   }
 }

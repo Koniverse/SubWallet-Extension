@@ -87,16 +87,6 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   }, [assetRegistry, compound]);
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
-  const subnetData = useMemo(() => {
-    if (isSubnetStaking && 'subnetData' in compound) {
-      const position = compound;
-
-      return position.subnetData || { originalTotalStake: '0', subnetSymbol: '' };
-    }
-
-    return undefined;
-  }, [compound, isSubnetStaking]);
-
   const earningTagType: EarningTagType = useMemo(() => {
     return createEarningTypeTags(compound.chain)[compound.type];
   }, [compound.chain, compound.type]);
@@ -160,9 +150,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
             label: t('Derivative token balance'),
-            value: subnetData?.originalTotalStake || '',
+            value: item.subnetData?.originalTotalStake || '',
             decimals: inputAsset?.decimals || 0,
-            suffix: subnetData?.subnetSymbol
+            suffix: item.subnetData?.subnetSymbol
           }
         ]
         : !isSpecial
@@ -254,7 +244,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, subnetData?.originalTotalStake, subnetData?.subnetSymbol, t]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, t]);
 
   return (
     <>
