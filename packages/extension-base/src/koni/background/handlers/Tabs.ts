@@ -591,7 +591,7 @@ export default class KoniTabs {
           chainId: chainId,
           rpcUrls: onlineData.rpc.filter((url) => (url.startsWith('https://'))),
           chainName: onlineData.name,
-          blockExplorerUrls: onlineData.explorers.map((explorer) => explorer.url),
+          blockExplorerUrls: onlineData.explorers?.map((explorer) => explorer.url),
           nativeCurrency: onlineData.nativeCurrency,
           requestId: id
         };
