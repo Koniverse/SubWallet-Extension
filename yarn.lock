@@ -6797,15 +6797,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.101":
-  version: 0.2.101
-  resolution: "@subwallet/chain-list@npm:0.2.101"
+"@subwallet/chain-list@npm:0.2.102-beta.6":
+  version: 0.2.102-beta.6
+  resolution: "@subwallet/chain-list@npm:0.2.102-beta.6"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: db339ac5de8ccad4a61eca4e658ee3981bd8a5d9cde404948123c51434ce908a7df9bfe0e078d1c5c68614882d894bc4f741c8e5a6626f143f3274a072da8610
+  checksum: 6732b4eddaef9f837d47bae9ce0c1e8a155a1b41d0cebc3a147f2875ffe50783dc7443ad2756ebf0cdeddcf6f0ad1bd62370746958aeca1e46e4c887c5f16a14
   languageName: node
   linkType: hard
 
