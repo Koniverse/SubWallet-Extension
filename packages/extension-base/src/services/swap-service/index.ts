@@ -214,6 +214,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
   public getAvailablePath (request: SwapRequest): [DynamicSwapAction[], SwapRequest | undefined] {
     const { pair } = request;
+    // todo: control provider tighter
     const supportSwapChains = getSupportSwapChain();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
@@ -221,6 +222,14 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const toChain = _getAssetOriginChain(toToken);
     const toChainInfo = this.chainService.getChainInfoByKey(toChain);
     const process: DynamicSwapAction[] = [];
+
+    if (!fromToken || !toToken) {
+      throw Error('Token not found');
+    }
+
+    if (!fromChain || !toChain) {
+      throw Error('Token metadata error');
+    }
 
     // SWAP: 2 tokens in the same chain and chain has dex
     if (fromChain && fromChain === toChain && supportSwapChains.includes(toChain)) {
