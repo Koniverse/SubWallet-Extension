@@ -6,18 +6,18 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ServiceStatus, ServiceWithProcessInterface, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/asset-hub';
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
-import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
+import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
 
@@ -184,27 +184,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 4. Generate optimal process for that quote
     * */
 
-    // todo: fake data
-    const _request: SwapRequest = {
-      ...request,
-      pair: {
-        slug: 'polkadot-NATIVE-DOT___statemint-LOCAL-USDt',
-        from: 'polkadot-NATIVE-DOT',
-        to: 'statemint-LOCAL-USDt'
-      }
-    };
+    // todo: path will become a list of path in Round 2
+    const [path, directSwapRequest] = this.getAvailablePath(request);
 
-    const path = this.getAvailablePath(_request); // todo: will be a list of path in Round 2
-    const swapPair = path.find((action) => action.action === DynamicSwapType.SWAP);
-
-    if (!swapPair) {
+    if (!directSwapRequest) {
       throw Error('Swap pair not found');
     }
 
-    const directSwapRequest: SwapRequest = {
-      ..._request, // todo: handle reformat address
-      pair: swapPair.pair
-    };
     const swapQuoteResponse = await this.getLatestQuotes(directSwapRequest);
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
@@ -220,35 +206,48 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     };
   }
 
-  public getAvailablePath (request: SwapRequest): DynamicSwapAction[] {
+  public getAvailablePath (request: SwapRequest): [DynamicSwapAction[], SwapRequest | undefined] {
     const { pair } = request;
     const providers = [...new Set(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
     const fromChain = _getAssetOriginChain(fromToken);
     const toChain = _getAssetOriginChain(toToken);
+    const toChainInfo = this.chainService.getChainInfoByKey(toChain);
     const process: DynamicSwapAction[] = [];
 
     // SWAP: 2 tokens in the same chain and chain has dex
     if (fromChain && fromChain === toChain && providers.includes(toChain)) {
-      process.push(getSwapStep(fromToken.slug, toToken.slug));
+      const swapStep = getSwapStep(fromToken.slug, toToken.slug);
 
-      return process;
+      process.push(swapStep);
+
+      return [process, {
+        ...request,
+        pair: swapStep.pair
+      }];
     }
 
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
     const bridgeDestination = findXcmDestination(this.chainService, fromToken, toChain);
 
     if (bridgeDestination && providers.includes(toChain)) {
-      process.push(getBridgeStep(fromToken.slug, bridgeDestination));
-      process.push(getSwapStep(bridgeDestination, toToken.slug));
+      const bridgeStep = getBridgeStep(fromToken.slug, bridgeDestination);
+      const swapStep = getSwapStep(bridgeDestination, toToken.slug);
 
-      return process;
+      process.push(bridgeStep);
+      process.push(swapStep);
+
+      return [process, {
+        ...request,
+        address: reformatAddress(request.address, _getChainSubstrateAddressPrefix(toChainInfo)),
+        pair: swapStep.pair
+      }];
     }
 
     // todo: improve to support SWAP -> BRIDGE and BRIDGE -> SWAP -> BRIDGE
 
-    return [];
+    return [[], undefined];
   }
 
   public async getLatestQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {

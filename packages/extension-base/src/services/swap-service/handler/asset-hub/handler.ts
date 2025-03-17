@@ -235,7 +235,15 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
       };
 
-      const bnTransferAmount = BigN(params.request.fromAmount).plus(BigN(fee.feeComponent[0].amount));
+      let bnTransferAmount = new BigN(params.request.fromAmount);
+
+      if (_isNativeToken(fromTokenInfo)) {
+        // xcm fee is paid in native token but swap token is not always native token
+        // add amount of fee into sending value to ensure has enough token to swap
+        const bnXcmFee = new BigN(fee.feeComponent[0].amount);
+
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      }
 
       const step: BaseStepDetail = {
         metadata: {
