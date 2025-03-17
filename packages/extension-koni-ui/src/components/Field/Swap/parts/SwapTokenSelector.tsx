@@ -167,6 +167,12 @@ const Component = (props: Props) => {
   const listItems = useMemo(() => {
     let result = items;
 
+    if (selectedItem) {
+      result = result.filter((i) => i.slug !== selectedItem.slug);
+
+      result.unshift(selectedItem);
+    }
+
     const needToFilter = !!currentSearchText || hasAnyFilterValue;
 
     if (needToFilter) {
@@ -176,7 +182,7 @@ const Component = (props: Props) => {
     }
 
     return result;
-  }, [currentSearchText, filterFunction, items, searchFunction, hasAnyFilterValue]);
+  }, [items, selectedItem, currentSearchText, hasAnyFilterValue, filterFunction, searchFunction]);
 
   return (
     <>
