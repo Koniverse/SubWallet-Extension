@@ -249,16 +249,17 @@ export class HydradxHandler implements SwapBaseInterface {
 
   async getXcmStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // todo: improve this function for Round 2
-
-    const xcmPairInfo = params.path.find((step) => step.action === DynamicSwapType.BRIDGE)?.pair;
+    const { path, request: { address, fromAmount }, selectedQuote } = params;
+    const xcmStepIndex = path.findIndex((step) => step.action === DynamicSwapType.BRIDGE); // index = 1 => XCM first; index = 2 => SWAP first
+    const xcmPairInfo = xcmStepIndex !== -1 ? path[xcmStepIndex] : undefined;
 
     if (!xcmPairInfo) {
       return undefined;
     }
 
     try {
-      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
-      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
+      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.from);
+      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.to);
       const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
       const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
@@ -270,16 +271,16 @@ export class HydradxHandler implements SwapBaseInterface {
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
         // Mock sending value to get payment info
-        sendingValue: params.request.fromAmount,
-        recipient: params.request.address,
+        sendingValue: fromAmount, // todo: recheck amount xcm step with amount init
+        recipient: address,
         substrateApi: substrateApi,
-        sender: params.request.address,
+        sender: address,
         originChain: fromChainInfo,
         destinationChain: toChainInfo,
         feeInfo
       });
 
-      const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
       const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
 
       const fee: CommonStepFeeInfo = {
@@ -292,7 +293,11 @@ export class HydradxHandler implements SwapBaseInterface {
         feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
       };
 
-      let bnTransferAmount = new BigNumber(params.request.fromAmount);
+      let bnTransferAmount = new BigNumber(params.request.fromAmount); // todo: get xcm amount
+
+      if (xcmStepIndex === 1 || xcmStepIndex === 2) {
+        bnTransferAmount = new BigNumber(selectedQuote?.toAmount || '0');
+      }
 
       if (_isNativeToken(fromTokenInfo)) {
         // xcm fee is paid in native token but swap token is not always native token
@@ -323,11 +328,9 @@ export class HydradxHandler implements SwapBaseInterface {
   async getSwapStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const swapPairInfo = params.path.find((step) => step.action === DynamicSwapType.SWAP)?.pair;
 
-    if (!swapPairInfo) {
+    if (!swapPairInfo || !params.selectedQuote) {
       return Promise.resolve(undefined);
-    }
-
-    if (params.selectedQuote) {
+    } else {
       const submitStep: BaseStepDetail = {
         name: 'Swap',
         type: SwapStepType.SWAP,
@@ -340,8 +343,6 @@ export class HydradxHandler implements SwapBaseInterface {
 
       return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
     }
-
-    return Promise.resolve(undefined);
   }
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {

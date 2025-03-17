@@ -4061,7 +4061,17 @@ export default class KoniExtension {
   }
 
   private async handleSwapRequestV2 (request: SwapRequest): Promise<SwapRequestResult> {
-    return this.#koniState.swapService.handleSwapRequestV2(request);
+    // todo: fake data
+    const _request: SwapRequest = {
+      ...request,
+      pair: {
+        slug: 'hydradx_main-NATIVE-HDX___polkadot-NATIVE-DOT',
+        from: 'hydradx_main-NATIVE-HDX',
+        to: 'polkadot-NATIVE-DOT'
+      }
+    };
+
+    return this.#koniState.swapService.handleSwapRequestV2(_request);
   }
 
   private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {

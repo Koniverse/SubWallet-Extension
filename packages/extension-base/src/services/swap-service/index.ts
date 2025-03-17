@@ -12,8 +12,8 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -105,7 +105,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       steps: [DEFAULT_FIRST_STEP]
     };
 
-    const swapPairInfo = params.path[0].pair; // todo: improve for Round 2
+    const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
+
+    if (!swapPairInfo) {
+      console.error('No swap info');
+
+      return result;
+    }
 
     result.totalFee.push({
       feeComponent: [],
@@ -118,8 +124,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       type: SwapStepType.SWAP,
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
-        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
+        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.pair.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.pair.to)
       }
     });
 
@@ -208,7 +214,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
   public getAvailablePath (request: SwapRequest): [DynamicSwapAction[], SwapRequest | undefined] {
     const { pair } = request;
-    const providers = [...new Set(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
+    const supportSwapChains = getSupportSwapChain();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
     const fromChain = _getAssetOriginChain(fromToken);
@@ -217,7 +223,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const process: DynamicSwapAction[] = [];
 
     // SWAP: 2 tokens in the same chain and chain has dex
-    if (fromChain && fromChain === toChain && providers.includes(toChain)) {
+    if (fromChain && fromChain === toChain && supportSwapChains.includes(toChain)) {
       const swapStep = getSwapStep(fromToken.slug, toToken.slug);
 
       process.push(swapStep);
@@ -228,10 +234,26 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
-    // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeDestination = findXcmDestination(this.chainService, fromToken, toChain);
+    // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
+    const swapDestination = findSwapTransitDestination(this.chainService, fromToken, toToken);
 
-    if (bridgeDestination && providers.includes(toChain)) {
+    if (swapDestination && supportSwapChains.includes(fromChain)) {
+      const swapStep = getSwapStep(fromToken.slug, swapDestination);
+      const bridgeStep = getBridgeStep(swapDestination, toToken.slug);
+
+      process.push(swapStep);
+      process.push(bridgeStep);
+
+      return [process, {
+        ...request,
+        pair: swapStep.pair
+      }];
+    }
+
+    // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
+    const bridgeDestination = findXcmTransitDestination(this.chainService, fromToken, toToken);
+
+    if (bridgeDestination && supportSwapChains.includes(toChain)) {
       const bridgeStep = getBridgeStep(fromToken.slug, bridgeDestination);
       const swapStep = getSwapStep(bridgeDestination, toToken.slug);
 
@@ -245,7 +267,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
-    // todo: improve to support SWAP -> BRIDGE and BRIDGE -> SWAP -> BRIDGE
+    // todo: BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
+    // todo: encapsulate each route type to function
 
     return [[], undefined];
   }

@@ -4,7 +4,7 @@
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
@@ -40,6 +40,10 @@ export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub'],
   [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT]
 };
+
+export function getSupportSwapChain (): string[] {
+  return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
+}
 
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
   return swapPair?.metadata?.alternativeAsset as string;
@@ -125,16 +129,31 @@ export function getSwapStep (from: string, to: string): DynamicSwapAction {
   };
 }
 
-export function findXcmDestination (chainService: ChainService, chainAsset: _ChainAsset, destChain: string) {
+export function findXcmTransitDestination (chainService: ChainService, fromToken: _ChainAsset, toToken: _ChainAsset) {
   const assetRefMap = chainService.getAssetRefMap();
   const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
-    assetRef.srcAsset === chainAsset.slug &&
-    assetRef.destChain === destChain &&
+    assetRef.srcAsset === fromToken.slug &&
+    assetRef.destChain === _getAssetOriginChain(toToken) &&
     assetRef.path === _AssetRefPath.XCM
   );
 
   if (foundAssetRef) {
     return foundAssetRef.destAsset;
+  }
+
+  return undefined;
+}
+
+export function findSwapTransitDestination (chainService: ChainService, fromToken: _ChainAsset, toToken: _ChainAsset) {
+  const assetRefMap = chainService.getAssetRefMap();
+  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
+    assetRef.destAsset === toToken.slug &&
+    assetRef.srcChain === _getAssetOriginChain(fromToken) &&
+    assetRef.path === _AssetRefPath.XCM
+  );
+
+  if (foundAssetRef) {
+    return foundAssetRef.srcAsset;
   }
 
   return undefined;
