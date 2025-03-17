@@ -15,6 +15,7 @@ jobs:
     if: "! startsWith(github.event.head_commit.message, '[CI Skip]') || github.ref == 'refs/heads/webapp'"
     name: Deploy WebApp Preview
     runs-on: ubuntu-22.04
+    environment: 'webapp'
     steps:
     - name: Checkout
       uses: actions/checkout@v3
