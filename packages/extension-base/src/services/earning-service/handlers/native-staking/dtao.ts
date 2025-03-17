@@ -53,7 +53,8 @@ type Nominators = [Array<[number, number]>]
 export interface TestnetBittensorDelegateInfo {
   delegateSs58: string;
   take: number;
-  nominators: Nominators
+  nominators: Nominators;
+  returnPer1000: number
 }
 // interface ApiResponse {
 //   data: SubnetData[];
@@ -518,7 +519,11 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
     const bnMinBond = new BN(nominatorMinRequiredStake);
 
-    return testnetDelegate.map((delegate) => ({
+    const filteredDelegates = testnetDelegate.filter((delegate) => {
+      return delegate.returnPer1000 !== 0;
+    });
+
+    return filteredDelegates.map((delegate) => ({
       address: delegate.delegateSs58,
       totalStake: '0',
       ownStake: '0',

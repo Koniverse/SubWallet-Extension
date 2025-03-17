@@ -117,7 +117,7 @@ export class BittensorCache {
     const apiKey = bittensorApiKey();
 
     try {
-      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1', {
+      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1?limit=200', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,10 @@ export class BittensorCache {
         return this.cache || { data: [] };
       }
 
-      const data = await resp.json() as ValidatorResponse;
+      const rawData = await resp.json() as ValidatorResponse;
+      const data = {
+        data: rawData.data.filter((validator) => parseFloat(validator.apr) > 0.0001)
+      };
 
       this.cache = data;
       this.promise = null;
@@ -509,7 +512,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       minBond: bnMinBond.toString(),
       nominatorCount: delegate.nominators.length,
       commission: delegate.take / 1000,
-      expectedReturn: 0,
       blocked: false,
       isVerified: false,
       chain: this.chain,
