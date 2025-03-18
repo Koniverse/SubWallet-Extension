@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessType } from '@subwallet/extension-base/types';
-import { ProcessStepItemType } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
+import { TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { InfoItemBase } from './types';
 
 export interface TransactionProcessItemType extends Omit<InfoItemBase, 'value'> {
-  items: ProcessStepItemType[];
+  items: TransactionProcessStepItemType[];
   type: ProcessType;
 }
 
