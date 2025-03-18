@@ -6,7 +6,7 @@ import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
-import { Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
+import { CirclesThreePlus, Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
 
 // todo: after supporting Astar v3, remove this
 export function isRelatedToAstar (slug: string) {
@@ -57,6 +57,12 @@ export const createEarningTypeTags = (chain: string): Record<YieldPoolType, Earn
       label: _STAKING_CHAIN_GROUP.astar.includes(chain) ? 'dApp staking' : 'Direct nomination',
       icon: Database,
       color: 'gold',
+      weight: 'fill'
+    },
+    [YieldPoolType.SUBNET_STAKING]: {
+      label: 'Subnet staking',
+      icon: CirclesThreePlus,
+      color: 'blue',
       weight: 'fill'
     }
   };
