@@ -4,11 +4,14 @@
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 
 export interface XcmApiResponse {
-  data: {
+  data?: {
     sender: string;
     to: string;
     transferEncodedCall: string;
     value: string;
+  };
+  error?: {
+    message: string;
   };
   status: string;
 }

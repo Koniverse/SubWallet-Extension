@@ -155,6 +155,7 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
 };
 
 export const createAcrossBridgeExtrinsic = async ({ destinationChain,
+  destinationTokenInfo,
   evmApi,
   feeCustom,
   feeInfo,
@@ -178,13 +179,12 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     throw new Error('Sender is required');
   }
 
-  console.log('evmApi', [originTokenInfo.slug, recipient, sender, sendingValue]);
   const bodyData = {
     quoteRequest: {
-      address: '0x9A80af5b81E9792E641A4761BC28fE4309A156dA',
-      from: 'sepolia_ethereum-ERC20-WETH-0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
-      to: 'base_sepolia-ERC20-WETH-0x4200000000000000000000000000000000000006',
-      recipient: '0x9A80af5b81E9792E641A4761BC28fE4309A156dA',
+      address: sender,
+      from: originTokenInfo.slug,
+      to: destinationTokenInfo.slug,
+      recipient: recipient,
       value: sendingValue
     }
   };
@@ -201,17 +201,19 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     const data = await response.json() as XcmApiResponse;
 
     if (data.status === 'error') {
-      return Promise.reject(new Error(data.error.message));
+      return Promise.reject(new Error(data.error?.message));
     }
 
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
 
+    const isNative = _isNativeToken(originTokenInfo);
+
     const transactionConfig: TransactionConfig = {
-      from: data.data.sender,
-      to: data.data.to,
-      value: data.data.value,
-      data: data.data.transferEncodedCall,
+      from: data.data?.sender,
+      to: data.data?.to,
+      value: isNative ? sendingValue : '0',
+      data: data.data?.transferEncodedCall,
       ...feeCombine
     };
 
