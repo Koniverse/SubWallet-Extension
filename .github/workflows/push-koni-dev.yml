@@ -16,6 +16,7 @@ jobs:
     if: "! startsWith(github.event.head_commit.message, '[CI Skip]')"
     runs-on: ubuntu-22.04
     name: Build Development Preview
+    environment: 'extension'
     steps:
     - uses: actions/checkout@v3
       with:

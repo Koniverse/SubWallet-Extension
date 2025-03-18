@@ -19,7 +19,7 @@ import { AccountDetailParam, ThemeProps } from '@subwallet/extension-web-ui/type
 import { isAccountAll, shouldShowAccountAll } from '@subwallet/extension-web-ui/utils';
 import { Icon, ModalContext, SwList, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Circle, Export, SignOut } from 'phosphor-react';
+import { Circle, Export } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -174,7 +174,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('Extension account')
       });
 
       result.push(...injectedAccounts);
@@ -269,6 +269,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     activeModal(DISCONNECT_EXTENSION_MODAL);
   }, [activeModal]);
 
+  const onClickAccountItemLastButton = useCallback((accountProxy: AccountProxy) => {
+    return () => {
+      if (accountProxy.accountType === AccountProxyType.INJECTED) {
+        openDisconnectExtensionModal();
+      } else {
+        onViewAccountDetail(accountProxy)();
+      }
+    };
+  }, [onViewAccountDetail, openDisconnectExtensionModal]);
+
   const renderItem = useCallback((item: ListItem): React.ReactNode => {
     if ((item as ListItemGroupLabel).groupLabel) {
       return (
@@ -298,22 +308,19 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       }
     }
 
-    const isInjected = (item as AccountProxy).accountType === AccountProxyType.INJECTED;
-
     return (
       <AccountProxySelectorItem
         accountProxy={item as AccountProxy}
         className='account-selection'
         isSelected={item.id === currentAccountProxy?.id}
         key={item.id}
-        moreIcon={!isInjected ? undefined : SignOut}
         onClick={onSelect(item as AccountProxy)}
         onClickCopyButton={onViewChainAddresses(item as AccountProxy)}
         onClickDeriveButton={onViewAccountDetail(item as AccountProxy, true)}
-        onClickMoreButton={isInjected ? openDisconnectExtensionModal : onViewAccountDetail(item as AccountProxy)}
+        onClickLastButton={onClickAccountItemLastButton(item as AccountProxy)}
       />
     );
-  }, [currentAccountProxy?.id, onSelect, onViewAccountDetail, onViewChainAddresses, openDisconnectExtensionModal, showAllAccount]);
+  }, [currentAccountProxy?.id, onClickAccountItemLastButton, onSelect, onViewAccountDetail, onViewChainAddresses, showAllAccount]);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);

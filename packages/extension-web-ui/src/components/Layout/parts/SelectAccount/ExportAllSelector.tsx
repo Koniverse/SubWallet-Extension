@@ -143,6 +143,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       if (showAccountAll) {
         return (
           <AccountProxySelectorAllItem
+            accountProxies={items}
             className='all-account-selection'
             isSelected={selected}
             key={item.id}
@@ -165,7 +166,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         showUnSelectedIcon
       />
     );
-  }, [changeAccounts, className, onAccountSelect, onClickItem, showAccountAll]);
+  }, [changeAccounts, className, items, onAccountSelect, onClickItem, showAccountAll]);
 
   const onClickFilterButton = useCallback(
     (e?: SyntheticEvent) => {

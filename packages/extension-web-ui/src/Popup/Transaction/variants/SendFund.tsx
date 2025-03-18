@@ -40,7 +40,7 @@ import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
@@ -55,7 +55,6 @@ type ComponentProps = {
   modalContent?: boolean;
   className?: string;
   targetAccountProxy: AccountProxy;
-  isAllAccount?: boolean
 };
 
 interface TransferOptions {
@@ -128,23 +127,23 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
   return result;
 }
 
-const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug'];
+const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug', 'isReadonly', 'orderId', 'service'];
 const alertModalId = 'confirmation-alert-modal';
 const substrateAccountSlug = 'polkadot-NATIVE-DOT';
 const evmAccountSlug = 'ethereum-NATIVE-ETH';
 const tonAccountSlug = 'ton-NATIVE-TON';
 const defaultAddressInputRenderKey = 'address-input-render-key';
 
-const Component = ({ className = '', isAllAccount, modalContent, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
+const Component = ({ className = '', modalContent, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
   useSetCurrentPage('/transaction/send-fund');
   const { t } = useTranslation();
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
   const { defaultData, persistData } = useTransactionContext<TransferParams>();
-  const { defaultSlug: sendFundSlug } = defaultData;
-  const isFirstRender = useIsFirstRender();
+  const { defaultSlug: sendFundSlug, isReadonly, orderId, service } = defaultData;
   const { isWebUI } = useContext(ScreenContext);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
 
   const [form] = Form.useForm<TransferParams>();
 
@@ -172,6 +171,8 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
   const [maxTransfer, setMaxTransfer] = useState<string>('0');
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
   const checkAction = usePreCheckAction(fromValue, true, detectTranslate('The account you are using is {{accountTitle}}, you cannot send assets with it'));
+
+  const [currentChainAsset, setCurrentChainAsset] = useState<_ChainAsset | undefined>(assetRegistry[defaultData.asset]);
 
   const currentConfirmation = useMemo(() => {
     if (chainValue && destChainValue) {
@@ -225,12 +226,6 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
   const destChainItems = useMemo<ChainItemType[]>(() => {
     return getTokenAvailableDestinations(assetValue, xcmRefMap, chainInfoMap);
   }, [chainInfoMap, assetValue, xcmRefMap]);
-
-  const currentChainAsset = useMemo(() => {
-    const _asset = isFirstRender ? defaultData.asset : assetValue;
-
-    return _asset ? assetRegistry[_asset] : undefined;
-  }, [isFirstRender, defaultData.asset, assetValue, assetRegistry]);
 
   const decimals = useMemo(() => {
     return currentChainAsset ? _getAssetDecimals(currentChainAsset) : 0;
@@ -306,7 +301,13 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
     return result;
   }, [accountProxies, chainInfoMap, chainValue, targetAccountProxy]);
 
-  const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
+  const isAccountSelectorVisible = useMemo(() => {
+    if (currentAccountProxy?.id !== targetAccountProxy.id) {
+      return true;
+    }
+
+    return isAccountAll(targetAccountProxy.id) || accountAddressItems.length > 1;
+  }, [accountAddressItems.length, currentAccountProxy?.id, targetAccountProxy.id]);
 
   const addressInputRef = useRef<AddressInputRef>(null);
   const addressInputCurrent = addressInputRef.current;
@@ -345,6 +346,10 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
       return Promise.reject(t('Amount is required'));
     }
 
+    if (!isBalanceReady) {
+      return Promise.resolve();
+    }
+
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
       return Promise.reject(t('You don\'t have enough tokens to proceed'));
     }
@@ -360,7 +365,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
     }
 
     return Promise.resolve();
-  }, [decimals, maxTransfer, t]);
+  }, [decimals, isBalanceReady, maxTransfer, t]);
 
   const onValuesChange: FormCallbacks<TransferParams>['onValuesChange'] = useCallback(
     (part: Partial<TransferParams>, values: TransferParams) => {
@@ -469,7 +474,9 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
         tokenSlug: asset,
         value: value,
         transferAll: options.isTransferAll,
-        transferBounceable: options.isTransferBounceable
+        transferBounceable: options.isTransferBounceable,
+        orderId,
+        service
       });
     } else {
       // Make cross chain transfer
@@ -486,7 +493,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
     }
 
     return sendPromise;
-  }, []);
+  }, [orderId, service]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
@@ -708,6 +715,13 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
+  useEffect(() => {
+    // Hotfix in case the form is disabled; useWatch may delay showing the latest result
+    if (assetValue !== undefined) {
+      setCurrentChainAsset(assetRegistry[assetValue] || undefined);
+    }
+  }, [assetRegistry, assetValue]);
+
   // todo: recheck with ledger account
   useEffect(() => {
     const updateInfoWithTokenSlug = (tokenSlug: string) => {
@@ -866,6 +880,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
 
         <Form
           className={'form-container form-space-sm'}
+          disabled={isReadonly}
           form={form}
           initialValues={formDefault}
           onFinish={onClickSubmit}
@@ -876,7 +891,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
           <div className={'form-row'}>
             <Form.Item name={'asset'}>
               <TokenSelector
-                disabled={!tokenItems.length}
+                disabled={isReadonly || !tokenItems.length}
                 items={tokenItems}
                 placeholder={t('Select token')}
                 showChainInSelected
@@ -892,7 +907,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
 
             <Form.Item name={'destChain'}>
               <ChainSelector
-                disabled={!destChainItems.length}
+                disabled={isReadonly || !destChainItems.length}
                 items={destChainItems}
                 title={t('Select destination chain')}
                 tooltip={isWebUI ? t('Select destination chain') : undefined}
@@ -901,11 +916,12 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
           </div>
 
           <Form.Item
-            className={CN({ hidden: isNotShowAccountSelector })}
+            className={CN({ hidden: !isAccountSelectorVisible })}
             name={'from'}
             statusHelpAsTooltip={true}
           >
             <AccountAddressSelector
+              disabled={isReadonly}
               items={accountAddressItems}
               label={`${t('From')}:`}
               labelStyle={'horizontal'}
@@ -924,16 +940,16 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
           >
             <AddressInputNew
               chainSlug={destChainValue}
-              disabled={disabledToAddressInput}
-              dropdownHeight={isNotShowAccountSelector ? 317 : 257}
+              disabled={isReadonly || disabledToAddressInput}
+              dropdownHeight={!isAccountSelectorVisible ? 317 : 257}
               key={addressInputRenderKey}
               label={`${t('To')}:`}
               labelStyle={'horizontal'}
               placeholder={t('Enter address')}
               ref={addressInputRef}
               saveAddress={true}
-              showAddressBook={true}
-              showScanner={true}
+              showAddressBook={!isReadonly}
+              showScanner={!isReadonly}
             />
           </Form.Item>
 
@@ -958,6 +974,7 @@ const Component = ({ className = '', isAllAccount, modalContent, targetAccountPr
           >
             <AmountInput
               decimals={decimals}
+              disabled={isReadonly}
               forceUpdateMaxValue={forceUpdateMaxValue}
               maxValue={maxTransfer}
               onSetMax={onSetMaxTransferable}
@@ -1015,7 +1032,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className } = props;
   const { defaultData } = useTransactionContext<TransferParams>();
   const { goHome } = useDefaultNavigate();
-  const { accountProxies, isAllAccount } = useSelector((state) => state.accountState);
+  const accountProxies = useSelector((state) => state.accountState.accountProxies);
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1042,7 +1059,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   return (
     <Component
       className={className}
-      isAllAccount={isAllAccount}
       targetAccountProxy={targetAccountProxy}
     />
   );

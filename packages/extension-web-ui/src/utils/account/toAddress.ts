@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // import { keyring } from '@subwallet/ui-keyring';
+import { decodeAddress } from '@subwallet/keyring';
+
 import { assert, hexToU8a, isHex } from '@polkadot/util';
-import { decodeAddress, encodeAddress, ethereumEncode } from '@polkadot/util-crypto';
+import { encodeAddress, ethereumEncode } from '@polkadot/util-crypto';
 
 export function toAddress (value?: string | Uint8Array | null, allowIndices = false): string | undefined {
   if (value) {

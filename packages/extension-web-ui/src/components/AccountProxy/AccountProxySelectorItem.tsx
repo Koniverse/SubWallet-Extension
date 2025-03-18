@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { PREDEFINED_WALLETS } from '@subwallet/extension-web-ui/constants';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { Theme } from '@subwallet/extension-web-ui/themes';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, Copy, Eye, GitCommit, GitMerge, Needle, PencilSimpleLine, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
+import { CheckCircle, Copy, Eye, GitCommit, GitMerge, PencilSimpleLine, PuzzlePiece, QrCode, Question, SignOut, Strategy, Swatches } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { Context, useContext, useMemo } from 'react';
 import styled, { ThemeContext } from 'styled-components';
@@ -22,7 +23,7 @@ type Props = ThemeProps & {
   onClick?: VoidFunction;
   onClickCopyButton?: VoidFunction;
   onClickDeriveButton?: VoidFunction;
-  onClickMoreButton?: VoidFunction;
+  onClickLastButton?: VoidFunction;
   moreIcon?: PhosphorIcon;
 }
 
@@ -35,11 +36,9 @@ type AccountProxyTypeIcon = {
 function Component (props: Props): React.ReactElement<Props> {
   const { accountProxy,
     isSelected,
-    moreIcon,
     onClick,
     onClickCopyButton,
-    onClickDeriveButton,
-    onClickMoreButton, showDerivedPath } = props;
+    onClickDeriveButton, onClickLastButton, showDerivedPath } = props;
 
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const logoMap = useContext<Theme>(ThemeContext as Context<Theme>).logoMap;
@@ -65,10 +64,22 @@ function Component (props: Props): React.ReactElement<Props> {
     onClickCopyButton?.();
   }, [onClickCopyButton]);
 
-  const _onClickMoreButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
+  const _onClickLastButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
     event.stopPropagation();
-    onClickMoreButton?.();
-  }, [onClickMoreButton]);
+    onClickLastButton?.();
+  }, [onClickLastButton]);
+
+  const isInjectedAccountProxy = accountProxy.accountType === AccountProxyType.INJECTED;
+
+  const extensionLogoSrc = (() => {
+    if (!isInjectedAccountProxy) {
+      return undefined;
+    }
+
+    const source = accountProxy.accounts[0].source;
+
+    return source && PREDEFINED_WALLETS[source] ? PREDEFINED_WALLETS[source].mcicon : undefined;
+  })();
 
   const accountProxyTypeIconProps = ((): AccountProxyTypeIcon | null => {
     if (accountProxy.accountType === AccountProxyType.UNIFIED) {
@@ -110,7 +121,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
     if (accountProxy.accountType === AccountProxyType.INJECTED) {
       return {
-        value: Needle,
+        value: PuzzlePiece,
         weight: 'fill'
       };
     }
@@ -205,6 +216,9 @@ function Component (props: Props): React.ReactElement<Props> {
               )
             }
             <Button
+              className={CN({
+                '-show-on-hover': isInjectedAccountProxy
+              })}
               icon={
                 <Icon
                   phosphorIcon={Copy}
@@ -219,13 +233,13 @@ function Component (props: Props): React.ReactElement<Props> {
             <Button
               icon={
                 <Icon
-                  phosphorIcon={moreIcon || PencilSimpleLine}
+                  phosphorIcon={isInjectedAccountProxy ? SignOut : PencilSimpleLine}
                   size='sm'
                 />
               }
-              onClick={_onClickMoreButton}
+              onClick={_onClickLastButton}
               size='xs'
-              tooltip={t('View details')}
+              tooltip={isInjectedAccountProxy ? undefined : t('View details')}
               type='ghost'
             />
           </div>
@@ -247,6 +261,18 @@ function Component (props: Props): React.ReactElement<Props> {
                 type='ghost'
               />
             )}
+
+            {
+              extensionLogoSrc && (
+                <div className='__item-extension-logo-wrapper'>
+                  <img
+                    alt='Extension Logo'
+                    className={'__item-extension-logo -hide-on-hover'}
+                    src={extensionLogoSrc}
+                  />
+                </div>
+              )
+            }
           </div>
         </div>
       </div>
@@ -352,16 +378,34 @@ const AccountProxySelectorItem = styled(Component)<Props>(({ theme }) => {
       pointerEvents: 'none',
       position: 'absolute',
       inset: 0,
+      right: 'auto',
       opacity: 1,
       alignItems: 'center',
       justifyContent: 'flex-end',
-      marginRight: 80,
       transition: `opacity ${token.motionDurationMid} ease-in-out`
     },
+
+    '.__item-extension-logo-wrapper': {
+      position: 'absolute',
+      width: 40,
+      top: 0,
+      bottom: 0,
+      left: 40,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+
+    '.__item-extension-logo': {
+      height: 20,
+      width: 'auto'
+    },
+
     '.-show-on-hover': {
       opacity: 0,
       transition: `opacity ${token.motionDurationMid} ease-in-out`
     },
+
     '.-hide-on-hover': {
       opacity: 1,
       transition: `opacity ${token.motionDurationMid} ease-in-out`

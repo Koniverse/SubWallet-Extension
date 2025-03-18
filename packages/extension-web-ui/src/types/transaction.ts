@@ -25,6 +25,9 @@ export interface TransferParams extends TransactionFormBaseProps {
   destChain: string;
   value: string;
   defaultSlug: string;
+  orderId?: string;
+  service?: string;
+  isReadonly?: boolean;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {

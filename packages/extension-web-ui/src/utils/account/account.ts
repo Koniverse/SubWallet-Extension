@@ -13,10 +13,10 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-web-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-web-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-web-ui/utils/types';
-import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { decodeAddress, encodeAddress, isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 
-import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { isChainInfoAccordantAccountChainType } from '../chain';
 import { getLogoByNetworkKey } from '../common';

@@ -76,7 +76,7 @@ function Component ({ accountProxy, className }: Props) {
           accountProxy={item}
           className={'account-item'}
           onClickCopyButton={onCopyAddress(item)}
-          onClickMoreButton={onViewAccountDetail(item)}
+          onClickLastButton={onViewAccountDetail(item)}
           showDerivedPath={!!item.parentId}
         />
       );

@@ -140,7 +140,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('Extension account')
       });
 
       result.push(...injectedAccounts);

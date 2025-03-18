@@ -10,8 +10,9 @@ import { AccountJson } from '@subwallet/extension-base/types';
 import { Recoded } from '@subwallet/extension-web-ui/types';
 import { isAccountAll } from '@subwallet/extension-web-ui/utils/account/accountAll';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
+import { decodeAddress } from '@subwallet/keyring';
 
-import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 import { KeypairType } from '@polkadot/util-crypto/types';
 
 import { findAccountByAddress } from './account/account';

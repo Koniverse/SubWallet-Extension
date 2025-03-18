@@ -3,11 +3,12 @@
 
 import { CMD, CRYPTO_ETHEREUM, CRYPTO_SR25519, ETHEREUM_ID, SUBSTRATE_ID } from '@subwallet/extension-web-ui/constants';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { decodeAddress } from '@subwallet/keyring';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { numberToU8a, u8aConcat, u8aToU8a } from '@polkadot/util';
-import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import BytesQr from './BytesQr';
 

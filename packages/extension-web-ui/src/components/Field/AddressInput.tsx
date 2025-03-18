@@ -9,13 +9,14 @@ import { useForwardInputRef, useOpenQrScanner, useSelector, useTranslation } fro
 import { resolveAddressToDomain, resolveDomainToAddress, saveRecentAccount } from '@subwallet/extension-web-ui/messaging';
 import { ScannerResult, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { findContactByAddress, toShort } from '@subwallet/extension-web-ui/utils';
+import { decodeAddress, isAddress } from '@subwallet/keyring';
 import { Button, Icon, Input, InputRef, ModalContext, SwQrScanner } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Book, Scan } from 'phosphor-react';
 import React, { ChangeEventHandler, ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import { decodeAddress, isAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { Avatar } from '../Avatar';
 import { QrScannerErrorNotice } from '../Qr';
