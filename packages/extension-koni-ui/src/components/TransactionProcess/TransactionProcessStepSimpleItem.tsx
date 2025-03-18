@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { StepStatus } from '@subwallet/extension-base/types';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
@@ -11,14 +10,7 @@ import { CheckCircle, ProhibitInset, SpinnerGap } from 'phosphor-react';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 
-export type ProcessStepItemType = {
-  status: StepStatus;
-  text: string;
-  index: number,
-  isLastItem?: boolean;
-}
-
-type Props = ThemeProps & ProcessStepItemType;
+type Props = ThemeProps & TransactionProcessStepItemType;
 
 const Component: FC<Props> = (props: Props) => {
   const { className, index, isLastItem, status, text } = props;
@@ -91,7 +83,7 @@ const Component: FC<Props> = (props: Props) => {
   );
 };
 
-export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const TransactionProcessStepSimpleItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
     gap: token.sizeXS,

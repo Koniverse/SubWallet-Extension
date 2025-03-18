@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessType } from '@subwallet/extension-base/types';
-import { ProcessStepItem, ProcessStepItemType } from '@subwallet/extension-koni-ui/components';
+import { TransactionProcessStepSimpleItem } from '@subwallet/extension-koni-ui/components';
 import { TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { Button, SwModal } from '@subwallet/react-ui';
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import styled from 'styled-components';
 
 export interface TransactionStepsModalProps {
   type: ProcessType;
-  items: ProcessStepItemType[]
+  items: TransactionProcessStepItemType[]
 }
 
 type Props = ThemeProps & TransactionStepsModalProps & {
@@ -56,7 +56,7 @@ const Component: FC<Props> = (props: Props) => {
       <div className='__list-container'>
         {
           items.map((item) => (
-            <ProcessStepItem
+            <TransactionProcessStepSimpleItem
               {...item}
               className={'__process-step-item'}
               key={item.index}

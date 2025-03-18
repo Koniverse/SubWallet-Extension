@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessStep, StepStatus } from '@subwallet/extension-base/types';
-import { ProcessStepItemType } from '@subwallet/extension-koni-ui/components';
 import { useGetTransactionProcessStepText } from '@subwallet/extension-koni-ui/hooks';
+import { TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { useCallback } from 'react';
 
 const useGetTransactionProcessSteps = () => {
   const getStepText = useGetTransactionProcessStepText();
 
-  return useCallback((processStep: ProcessStep[], combineInfo: unknown, fillStepStatus = true): ProcessStepItemType[] => {
+  return useCallback((processStep: ProcessStep[], combineInfo: unknown, fillStepStatus = true): TransactionProcessStepItemType[] => {
     return processStep.map((ps, index) => ({
       status: fillStepStatus ? ps.status : StepStatus.QUEUED,
       text: getStepText(ps, combineInfo),
