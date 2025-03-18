@@ -12,3 +12,9 @@ export interface DynamicSwapAction {
   action: DynamicSwapType;
   pair: ActionPair;
 }
+
+export const enum XcmStepPosition {
+  FIRST = 0,
+  AFTER_SWAP = 1,
+  AFTER_XCM_SWAP = 2
+}

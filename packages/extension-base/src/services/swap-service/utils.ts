@@ -54,8 +54,8 @@ export function getSwapAltToken (chainAsset: _ChainAsset): string | undefined {
 }
 
 export function calculateSwapRate (fromAmount: string, toAmount: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
-  const bnFromAmount = new BigN(fromAmount);
-  const bnToAmount = new BigN(toAmount);
+  const bnFromAmount = BigN(fromAmount);
+  const bnToAmount = BigN(toAmount);
 
   const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
   const bnRate = bnFromAmount.div(bnToAmount);
@@ -65,7 +65,7 @@ export function calculateSwapRate (fromAmount: string, toAmount: string, fromAss
 
 export function convertSwapRate (rate: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
   const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
-  const bnRate = new BigN(rate);
+  const bnRate = BigN(rate);
 
   return bnRate.times(10 ** decimalDiff).pow(-1).toNumber();
 }
@@ -111,7 +111,7 @@ export function getBridgeStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.BRIDGE,
     pair: {
-      slug: `${from}___${to}`,
+      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
       from,
       to
     }
@@ -122,7 +122,7 @@ export function getSwapStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.SWAP,
     pair: {
-      slug: `${from}___${to}`,
+      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
       from,
       to
     }
@@ -157,4 +157,8 @@ export function findSwapTransitDestination (chainService: ChainService, fromToke
   }
 
   return undefined;
+}
+
+export function getAmountAfterSlippage (amount: string, slippage: number) {
+  return BigN(amount).multipliedBy(BigN(1).minus(BigN(slippage))).integerValue(BigN.ROUND_DOWN).toString();
 }

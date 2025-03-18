@@ -10,8 +10,8 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { DynamicSwapType, XcmStepPosition } from '@subwallet/extension-base/services/swap-service/interface';
+import { getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -92,12 +92,12 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getXcmStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const bnAmount = new BigN(params.request.fromAmount);
+    const bnAmount = BigN(params.request.fromAmount);
     const fromAsset = this.chainService.getAssetBySlug(params.request.pair.from);
 
     const fromAssetBalance = await this.balanceService.getTransferableBalance(params.request.address, fromAsset.originChain, fromAsset.slug);
 
-    const bnFromAssetBalance = new BigN(fromAssetBalance.value);
+    const bnFromAssetBalance = BigN(fromAssetBalance.value);
 
     if (bnFromAssetBalance.gte(bnAmount)) {
       return undefined; // enough balance, no need to xcm
@@ -111,7 +111,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     const alternativeAsset = this.chainService.getAssetBySlug(alternativeAssetSlug);
     const alternativeAssetBalance = await this.balanceService.getTransferableBalance(params.request.address, alternativeAsset.originChain, alternativeAsset.slug);
-    const bnAlternativeAssetBalance = new BigN(alternativeAssetBalance.value);
+    const bnAlternativeAssetBalance = BigN(alternativeAssetBalance.value);
 
     if (bnAlternativeAssetBalance.lte(0)) {
       return undefined;
@@ -154,7 +154,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       let bnTransferAmount = bnAmount.minus(bnFromAssetBalance);
 
       if (_isNativeToken(alternativeAsset)) {
-        const bnXcmFee = new BigN(fee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
+        const bnXcmFee = BigN(fee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
 
         bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
       }
@@ -191,17 +191,17 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getXcmStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: improve this function for Round 2
-
-    const xcmPairInfo = params.path.find((step) => step.action === DynamicSwapType.BRIDGE)?.pair;
+    const { path, request: { address, fromAmount, slippage }, selectedQuote } = params;
+    const xcmStepIndex = path.findIndex((step) => step.action === DynamicSwapType.BRIDGE); // index = 0 => XCM first; index = 1 => SWAP first
+    const xcmPairInfo = xcmStepIndex !== -1 ? path[xcmStepIndex] : undefined;
 
     if (!xcmPairInfo) {
       return undefined;
     }
 
     try {
-      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
-      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
+      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.from);
+      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.to);
       const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
       const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
@@ -213,42 +213,47 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
         // Mock sending value to get payment info
-        sendingValue: params.request.fromAmount,
-        recipient: params.request.address,
+        sendingValue: fromAmount, // todo: recheck amount xcm step with amount init
+        recipient: address,
         substrateApi: substrateApi,
-        sender: params.request.address,
+        sender: address,
         originChain: fromChainInfo,
         destinationChain: toChainInfo,
         feeInfo
       });
 
-      const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
       const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+      const estimatedXcmFee = Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString(),
+          amount: estimatedXcmFee,
           tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
         feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
       };
 
-      let bnTransferAmount = new BigN(params.request.fromAmount);
+      let bnTransferAmount = BigN(fromAmount);
+      const isXcmNativeToken = _isNativeToken(fromTokenInfo);
 
-      if (_isNativeToken(fromTokenInfo)) {
+      if (xcmStepIndex === XcmStepPosition.AFTER_SWAP || xcmStepIndex === XcmStepPosition.AFTER_XCM_SWAP) {
+        bnTransferAmount = BigN(getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage));
+      }
+
+      if (xcmStepIndex === XcmStepPosition.FIRST && isXcmNativeToken) {
         // xcm fee is paid in native token but swap token is not always native token
         // add amount of fee into sending value to ensure has enough token to swap
-        const bnXcmFee = new BigN(fee.feeComponent[0].amount);
-
-        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+        bnTransferAmount = bnTransferAmount.plus(BigN(estimatedXcmFee));
       }
 
       const step: BaseStepDetail = {
         metadata: {
           sendingValue: bnTransferAmount.toString(),
           originTokenInfo: fromTokenInfo,
+          destinationValue: isXcmNativeToken ? bnTransferAmount.minus(BigN(estimatedXcmFee)).toString() : bnTransferAmount.toString(),
           destinationTokenInfo: toTokenInfo
         },
         name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
@@ -264,27 +269,25 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getSwapStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const swapPairInfo = params.path.find((step) => step.action === DynamicSwapType.SWAP)?.pair;
+    const { path, request: { fromAmount, slippage }, selectedQuote } = params;
+    const swapPairInfo = path.find((step) => step.action === DynamicSwapType.SWAP)?.pair;
 
-    if (!swapPairInfo) {
+    if (!swapPairInfo || !selectedQuote) {
       return Promise.resolve(undefined);
-    }
-
-    if (params.selectedQuote) {
+    } else {
       const submitStep: BaseStepDetail = {
         name: 'Swap',
         type: SwapStepType.SWAP,
         metadata: {
-          sendingValue: params.request.fromAmount.toString(),
+          sendingValue: fromAmount.toString(),
           originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
+          destinationValue: getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage),
           destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
         }
       };
 
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+      return Promise.resolve([submitStep, selectedQuote.feeInfo]);
     }
-
-    return Promise.resolve(undefined);
   }
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
@@ -327,15 +330,15 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     const destinationAssetBalance = await this.balanceService.getTransferableBalance(params.address, destinationAsset.originChain, destinationAsset.slug);
     const xcmFee = params.process.totalFee[params.currentStep];
 
-    const bnAmount = new BigN(params.quote.fromAmount);
-    const bnDestinationAssetBalance = new BigN(destinationAssetBalance.value);
+    const bnAmount = BigN(params.quote.fromAmount);
+    const bnDestinationAssetBalance = BigN(destinationAssetBalance.value);
     const id = getId();
     const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, originChain.slug, 'substrate');
 
     let bnTotalAmount = bnAmount.minus(bnDestinationAssetBalance);
 
     if (_isNativeToken(originAsset)) {
-      const bnXcmFee = new BigN(xcmFee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
+      const bnXcmFee = BigN(xcmFee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
 
       bnTotalAmount = bnTotalAmount.plus(bnXcmFee);
     }
@@ -386,7 +389,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     const paths = params.quote.route.path.map((slug) => this.chainService.getAssetBySlug(slug));
     const { fromAmount, toAmount } = params.quote;
 
-    const minReceive = new BigN(1 - params.slippage).times(toAmount).integerValue(BigN.ROUND_DOWN);
+    const minReceive = BigN(getAmountAfterSlippage(toAmount, params.slippage));
 
     const extrinsic = await this.router?.buildSwapExtrinsic(paths, params.address, fromAmount, minReceive.toString());
 
@@ -471,7 +474,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
   async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const amount = params.selectedQuote.fromAmount;
-    const bnAmount = new BigN(amount);
+    const bnAmount = BigN(amount);
 
     if (bnAmount.lte(0)) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
