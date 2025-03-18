@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
@@ -12,11 +12,13 @@ import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
+import { XcmApiResponse } from './acrossBridge';
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
 
 export type CreateXcmExtrinsicProps = {
@@ -150,4 +152,77 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
       : _createPosBridgeL1toL2Extrinsic;
 
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createAcrossBridgeExtrinsic = async ({ destinationChain,
+  evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
+
+  if (!isAcrossBridgeXcm) {
+    throw new Error('This is not a valid AcrossBridge transfer');
+  }
+
+  if (!evmApi) {
+    throw new Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw new Error('Sender is required');
+  }
+
+  console.log('evmApi', [originTokenInfo.slug, recipient, sender, sendingValue]);
+  const bodyData = {
+    quoteRequest: {
+      address: '0x9A80af5b81E9792E641A4761BC28fE4309A156dA',
+      from: 'sepolia_ethereum-ERC20-WETH-0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
+      to: 'base_sepolia-ERC20-WETH-0x4200000000000000000000000000000000000006',
+      recipient: '0x9A80af5b81E9792E641A4761BC28fE4309A156dA',
+      value: sendingValue
+    }
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/api/xcm', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyData)
+    });
+
+    const data = await response.json() as XcmApiResponse;
+
+    if (data.status === 'error') {
+      return Promise.reject(new Error(data.error.message));
+    }
+
+    const _feeCustom = feeCustom as EvmEIP1559FeeOption;
+    const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
+
+    const transactionConfig: TransactionConfig = {
+      from: data.data.sender,
+      to: data.data.to,
+      value: data.data.value,
+      data: data.data.transferEncodedCall,
+      ...feeCombine
+    };
+
+    const gasLimit = await evmApi.api.eth.estimateGas(transactionConfig).catch(() => 200000);
+
+    transactionConfig.gas = gasLimit.toString();
+
+    return transactionConfig;
+  } catch (error) {
+    console.error('Error:', error);
+
+    return Promise.reject(error);
+  }
 };
