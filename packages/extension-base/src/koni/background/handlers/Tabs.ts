@@ -598,7 +598,7 @@ export default class KoniTabs {
 
         await this.addEvmChain(id, url, { method: 'wallet_addEthereumChain', params: [chainData] });
       } else {
-        throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'This network is currently not supported');
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
       }
     }
 
