@@ -25,6 +25,7 @@ export interface TransactionModalContextType {
   withdrawModal: {
     open: VoidFunction;
   },
+  closeTransactionModalById: (id: string) => void,
 }
 
 export const TransactionModalContext = React.createContext<TransactionModalContextType>({
@@ -39,7 +40,9 @@ export const TransactionModalContext = React.createContext<TransactionModalConte
   withdrawModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: () => {}
-  }
+  },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  closeTransactionModalById: () => {}
 });
 
 // todo: need add follow transactions:
@@ -106,6 +109,16 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
 
   /* Withdraw Modal */
 
+  const closeTransactionModalById = useCallback((id: string) => {
+    if (id === TRANSACTION_YIELD_CLAIM_MODAL) {
+      closeClaimRewardModal();
+    } else if (id === TRANSACTION_CLAIM_BRIDGE) {
+      closeClaimBridgeModal();
+    } else if (id === TRANSACTION_YIELD_WITHDRAW_MODAL) {
+      closeWithdrawModal();
+    }
+  }, [closeClaimBridgeModal, closeClaimRewardModal, closeWithdrawModal]);
+
   const contextValue: TransactionModalContextType = useMemo(() => ({
     claimRewardModal: {
       open: openClaimRewardModal
@@ -115,8 +128,9 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
     },
     withdrawModal: {
       open: openWithdrawModal
-    }
-  }), [openClaimBridgeModal, openClaimRewardModal, openWithdrawModal]);
+    },
+    closeTransactionModalById
+  }), [closeTransactionModalById, openClaimBridgeModal, openClaimRewardModal, openWithdrawModal]);
 
   return (
     <TransactionModalContext.Provider value={contextValue}>

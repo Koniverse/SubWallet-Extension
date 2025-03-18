@@ -7,6 +7,7 @@ import { DEFAULT_TRANSACTION_PARAMS, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-web-ui/contexts/TransactionContext';
+import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-web-ui/types';
 import { detectTransactionPersistKey } from '@subwallet/extension-web-ui/utils';
@@ -34,6 +35,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
   const navigate = useNavigate();
 
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { closeTransactionModalById } = useContext(TransactionModalContext);
   const { isWebUI } = useContext(ScreenContext);
   const dataContext = useContext(DataContext);
 
@@ -148,9 +150,14 @@ function Component ({ children, className, modalContent, modalId }: Props) {
   // Navigate to finish page
   const onDone = useCallback(
     (extrinsicHash: string) => {
+      if (modalId) {
+        // note: this method can only apply to transaction modals that is in TransactionModalContextProvider
+        closeTransactionModalById(modalId);
+      }
+
       navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
     },
-    [from, chain, navigate]
+    [modalId, navigate, from, chain, closeTransactionModalById]
   );
 
   const openRecheckChainConnectionModal = useCallback((chainName: string) => {

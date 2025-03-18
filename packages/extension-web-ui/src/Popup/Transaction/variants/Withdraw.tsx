@@ -69,7 +69,7 @@ const Component = () => {
   const { list: allPositionInfos } = useYieldPositionDetail(slug);
   const { list: yieldPositions } = useYieldPositionDetail(slug, fromValue);
   const yieldPosition = yieldPositions[0];
-  const type = yieldPosition.type;
+  const type = yieldPosition?.type || undefined;
 
   const poolInfo = useMemo(() => poolInfoMap[slug], [poolInfoMap, slug]);
   const stakingChain = useMemo(() => poolInfo?.chain || '', [poolInfo?.chain]);

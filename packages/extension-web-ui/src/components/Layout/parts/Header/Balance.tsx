@@ -408,6 +408,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           >
             <Transaction
               modalContent={isWebUI}
+              modalId={TRANSACTION_TRANSFER_MODAL}
             >
               <SendFund
                 modalContent={isWebUI}

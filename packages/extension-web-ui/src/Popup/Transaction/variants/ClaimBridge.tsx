@@ -53,6 +53,10 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   }, [isPolygonBridge, notification]);
 
   const amountValue = useMemo(() => {
+    if (!metadata) {
+      return 0;
+    }
+
     if (!isPolygonBridge && 'amount' in metadata) {
       return metadata.amount;
     } else if ('amounts' in metadata) {
@@ -65,7 +69,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const networkPrefix = useGetChainPrefixBySlug(chainValue);
-  const { decimals: _decimals, symbol } = useGetChainAssetInfo(metadata.tokenSlug) as _ChainAsset;
+  const { decimals: _decimals, symbol } = useGetChainAssetInfo(metadata?.tokenSlug) as _ChainAsset;
   const decimals = _decimals || 0;
 
   const [isDisable, setIsDisable] = useState(true);
