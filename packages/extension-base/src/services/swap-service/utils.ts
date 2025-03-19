@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
@@ -31,14 +30,17 @@ export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in millisecon
 
 export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
-  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
-  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
   [SwapProviderId.POLKADOT_ASSET_HUB]: [COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB],
   [SwapProviderId.KUSAMA_ASSET_HUB]: [COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB],
+  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT],
+  [SwapProviderId.UNISWAP]: [COMMON_CHAIN_SLUGS.ETHEREUM],
+
+  // testnet
+  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
+  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.ROCOCO_ASSET_HUB]: [COMMON_CHAIN_SLUGS.ROCOCO_ASSET_HUB],
-  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub'],
-  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT]
+  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub']
 };
 
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
@@ -125,8 +127,7 @@ export function getSwapStep (from: string, to: string): DynamicSwapAction {
   };
 }
 
-export function findXcmDestination (chainService: ChainService, chainAsset: _ChainAsset, destChain: string) {
-  const assetRefMap = chainService.getAssetRefMap();
+export function findXcmDestination (assetRefMap: Record<string, _AssetRef>, chainAsset: _ChainAsset, destChain: string) {
   const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
     assetRef.srcAsset === chainAsset.slug &&
     assetRef.destChain === destChain &&
@@ -141,6 +142,7 @@ export function findXcmDestination (chainService: ChainService, chainAsset: _Cha
 }
 
 export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+  // todo: a provider may support multiple chains but not cross-chain swaps
   for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
     if (group.includes(fromChain) && group.includes(toChain)) {
       return true;
