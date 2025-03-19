@@ -14,6 +14,15 @@ interface GeckoItem {
   symbol: string
 }
 
+interface DerivativeTokenPrice {
+  id: string;
+  origin_id: string;
+  origin_price: number;
+  rate: number;
+  derived_price: number;
+  cached_at: number;
+}
+
 interface ExchangeRateItem {
   result: string,
   time_last_update_unix: number,
@@ -24,6 +33,7 @@ interface ExchangeRateItem {
   conversion_rates: Record<string, number>
 }
 const DEFAULT_CURRENCY = 'USD';
+const DERIVATIVE_TOKEN_SLUG_LIST = ['susds'];
 
 let useBackupApi = false;
 
@@ -68,6 +78,28 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
   let response: Response | undefined;
 
   try {
+    const derivativePriceMap: Record<string, number> = {};
+    let derivativeApiError = false;
+
+    try {
+      const responseDerivativeTokens = await fetch('https://api-cache.subwallet.app/api/price/derivative-get');
+      const generateDerivativePriceRaw = await responseDerivativeTokens?.json() as unknown || [];
+
+      if (Array.isArray(generateDerivativePriceRaw)) {
+        generateDerivativePriceRaw.forEach((token: DerivativeTokenPrice) => {
+          if (token.id) {
+            derivativePriceMap[token.id] = token.derived_price;
+          }
+        });
+      } else {
+        console.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
+        derivativeApiError = true;
+      }
+    } catch (error) {
+      console.error('Error fetching derivative API:', error);
+      derivativeApiError = true;
+    }
+
     if (!useBackupApi) {
       try {
         response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.toLowerCase()}&per_page=250&ids=${idStr}`);
@@ -105,6 +137,18 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       priceMap[val.id] = currentPrice;
       price24hMap[val.id] = price24h;
     });
+
+    const derivativeTokenSlugs = new Set(DERIVATIVE_TOKEN_SLUG_LIST);
+
+    if (derivativeApiError) {
+      derivativeTokenSlugs.forEach((slug) => {
+        priceMap[slug] = 0;
+      });
+    } else {
+      Object.entries(derivativePriceMap).forEach(([slug, derivedPrice]) => {
+        priceMap[slug] = derivedPrice;
+      });
+    }
 
     return {
       currency,
