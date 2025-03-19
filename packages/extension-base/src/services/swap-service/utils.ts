@@ -139,3 +139,13 @@ export function findXcmDestination (chainService: ChainService, chainAsset: _Cha
 
   return undefined;
 }
+
+export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+  for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
+    if (group.includes(fromChain) && group.includes(toChain)) {
+      return true;
+    }
+  }
+
+  return false;
+}
