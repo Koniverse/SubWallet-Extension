@@ -126,6 +126,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
+  // deprecated
   public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
@@ -203,7 +204,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       path
     });
 
-    console.log('optimalProcess', optimalProcess);
+    console.log('optimalProcess----------------', optimalProcess);
 
     return {
       process: optimalProcess,
@@ -273,8 +274,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
 
-    console.log('swap path', path, swapQuoteResponse);
-
     return {
       path,
       swapQuoteResponse
@@ -282,7 +281,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   private async getLatestDirectQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
-    request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // deprecated
+    // request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // deprecated
     const quoteAskResponses = await this.askProvidersForQuote(request);
 
     // todo: handle error to return back to UI
@@ -305,8 +304,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0]; // todo: choose best quote based on rate
       aliveUntil = selectedQuote?.aliveUntil || (+Date.now() + SWAP_QUOTE_TIMEOUT_MAP.default);
     }
-
-    console.log(availableQuotes);
 
     return {
       optimalQuote: selectedQuote,
@@ -433,9 +430,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
   }
 
-  private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
-    return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
-  }
+  // private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
+  //   return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
+  // }
 
   public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const providerId = params.selectedQuote.provider.id;

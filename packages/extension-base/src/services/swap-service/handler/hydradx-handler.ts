@@ -10,18 +10,19 @@ import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { isHex } from '@polkadot/util';
 
 const HYDRADX_SUBWALLET_REFERRAL_CODE = 'WALLET';
 const HYDRADX_SUBWALLET_REFERRAL_ACCOUNT = '7PCsCpkgsHdNaZhv79wCCQ5z97uxVbSeSCtDMUa1eZHKXy4a';
@@ -250,17 +251,22 @@ export class HydradxHandler implements SwapBaseInterface {
   async getXcmStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // todo: improve this function for Round 2
 
-    const xcmPairInfo = params.path.find((step) => step.action === DynamicSwapType.BRIDGE)?.pair;
+    const xcmPairInfo = params.path.find((step, i) => i === 0 && step.action === DynamicSwapType.BRIDGE)?.pair;
 
     if (!xcmPairInfo) {
       return undefined;
     }
 
+    const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
+    const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
+    const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+    const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
+
+    if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
+      throw Error('Token and chain not found');
+    }
+
     try {
-      const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
-      const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
-      const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
-      const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
 
       const id = getId();
@@ -285,7 +291,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString(),
+          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString(),
           tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
@@ -294,6 +300,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
       let bnTransferAmount = new BigNumber(params.request.fromAmount);
 
+      // todo: increase transfer amount when XCM local token
       if (_isNativeToken(fromTokenInfo)) {
         // xcm fee is paid in native token but swap token is not always native token
         // add amount of fee into sending value to ensure has enough token to swap
@@ -327,21 +334,31 @@ export class HydradxHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    if (params.selectedQuote) {
-      const submitStep: BaseStepDetail = {
-        name: 'Swap',
-        type: SwapStepType.SWAP,
-        metadata: {
-          sendingValue: params.request.fromAmount.toString(),
-          originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-          destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
-        }
-      };
-
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    if (!params.selectedQuote) {
+      return Promise.resolve(undefined);
     }
 
-    return Promise.resolve(undefined);
+    const txHex: `0x${string}` = params.selectedQuote.metadata as `0x${string}`;
+
+    if (!txHex || isHex(txHex)) {
+      return Promise.resolve(undefined);
+    }
+
+    const metadata: HydrationSwapStepMetadata = {
+      sendingValue: params.request.fromAmount.toString(),
+      originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
+      destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to),
+      txHex
+    };
+
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      // @ts-ignore
+      metadata
+    };
+
+    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]); // review fee
   }
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
@@ -369,39 +386,25 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   public async handleXcmStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const pair = params.quote.pair;
-    const alternativeAssetSlug = getSwapAlternativeAsset(pair) as string;
+    const briefXcmStep = params.process.steps[params.currentStep].metadata as unknown as BriefXCMStep;
 
-    const originAsset = this.chainService.getAssetBySlug(alternativeAssetSlug);
-    const destinationAsset = this.chainService.getAssetBySlug(pair.from);
+    if (!briefXcmStep || !briefXcmStep.originTokenInfo || !briefXcmStep.destinationTokenInfo || !briefXcmStep.sendingValue) {
+      throw new Error('XCM metadata error');
+    }
 
+    const originAsset = briefXcmStep.originTokenInfo;
+    const destinationAsset = briefXcmStep.destinationTokenInfo;
     const originChain = this.chainService.getChainInfoByKey(originAsset.originChain);
     const destinationChain = this.chainService.getChainInfoByKey(destinationAsset.originChain);
-
     const substrateApi = this.chainService.getSubstrateApi(originAsset.originChain);
-
     const chainApi = await substrateApi.isReady;
-
-    const destinationAssetBalance = await this.balanceService.getTransferableBalance(params.address, destinationAsset.originChain, destinationAsset.slug);
-    const xcmFee = params.process.totalFee[params.currentStep];
-
-    const bnAmount = new BigNumber(params.quote.fromAmount);
-    const bnDestinationAssetBalance = new BigNumber(destinationAssetBalance.value);
-
-    let bnTotalAmount = bnAmount.minus(bnDestinationAssetBalance);
-
-    if (_isNativeToken(originAsset)) {
-      const bnXcmFee = new BigNumber(xcmFee.feeComponent[0].amount); // xcm fee is paid in native token but swap token is not always native token
-
-      bnTotalAmount = bnTotalAmount.plus(bnXcmFee);
-    }
 
     const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originAsset.originChain, 'substrate');
 
     const xcmTransfer = await createXcmExtrinsic({
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
-      sendingValue: bnTotalAmount.toString(),
+      sendingValue: briefXcmStep.sendingValue,
       recipient: params.address,
       substrateApi: chainApi,
       sender: params.address,
@@ -415,7 +418,7 @@ export class HydradxHandler implements SwapBaseInterface {
       destinationNetworkKey: destinationAsset.originChain,
       from: params.address,
       to: params.address,
-      value: bnTotalAmount.toString(),
+      value: briefXcmStep.sendingValue,
       tokenSlug: originAsset.slug,
       showExtraWarning: true
     };
@@ -423,7 +426,7 @@ export class HydradxHandler implements SwapBaseInterface {
     return {
       txChain: originAsset.originChain,
       extrinsic: xcmTransfer,
-      transferNativeAmount: _isNativeToken(originAsset) ? bnTotalAmount.toString() : '0',
+      transferNativeAmount: _isNativeToken(originAsset) ? briefXcmStep.sendingValue : '0',
       extrinsicType: ExtrinsicType.TRANSFER_XCM,
       chainType: ChainType.SUBSTRATE,
       txData: xcmData
@@ -461,25 +464,19 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
-    const toAsset = this.chainService.getAssetBySlug(params.quote.pair.to);
-    const fromAssetId = _getTokenOnChainAssetId(fromAsset);
-    const toAssetId = _getTokenOnChainAssetId(toAsset);
+    const metadata = params.process.steps[params.currentStep].metadata as unknown as HydrationSwapStepMetadata;
+
+    if (!metadata || !metadata.sendingValue || !metadata.txHex || !metadata.destinationTokenInfo || !metadata.originTokenInfo) {
+      throw new Error('Swap metadata error');
+    }
+
+    const fromAsset = metadata.originTokenInfo;
 
     if (!this.isReady || !this.tradeRouter) {
       return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
     }
 
-    const parsedFromAmount = new BigNumber(params.quote.fromAmount).shiftedBy(-1 * _getAssetDecimals(fromAsset)).toString();
-    const quoteResponse = await this.tradeRouter.getBestSell(fromAssetId, toAssetId, parsedFromAmount);
-
-    const toAmount = quoteResponse.amountOut;
-
-    const minReceive = toAmount.times(1 - params.slippage).integerValue();
-    const txHex = quoteResponse.toTx(minReceive).hex;
-
     const substrateApi = this.chainService.getSubstrateApi(this.chain());
-
     const chainApi = await substrateApi.isReady;
 
     const txData: HydradxSwapTxData = {
@@ -487,7 +484,7 @@ export class HydradxHandler implements SwapBaseInterface {
       quote: params.quote,
       address: params.address,
       slippage: params.slippage,
-      txHex,
+      txHex: metadata.txHex,
       process: params.process
     };
 
@@ -495,7 +492,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
     const txList: SubmittableExtrinsic<'promise'>[] = [];
 
-    const swapTx = chainApi.api.tx(txHex);
+    const swapTx = chainApi.api.tx(metadata.txHex);
 
     const _referral = await chainApi.api.query.referrals.linkedAccounts(params.address);
     const referral = _referral?.toString();
@@ -525,7 +522,7 @@ export class HydradxHandler implements SwapBaseInterface {
       txChain: fromAsset.originChain,
       txData,
       extrinsic,
-      transferNativeAmount: _isNativeToken(fromAsset) ? params.quote.fromAmount : '0', // todo
+      transferNativeAmount: _isNativeToken(fromAsset) ? metadata.sendingValue : '0',
       extrinsicType: ExtrinsicType.SWAP,
       chainType: ChainType.SUBSTRATE
     } as SwapSubmitStepData;
@@ -534,6 +531,8 @@ export class HydradxHandler implements SwapBaseInterface {
   handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const { currentStep, process } = params;
     const type = process.steps[currentStep].type;
+
+    console.log('params', params);
 
     switch (type) {
       case CommonStepType.DEFAULT:

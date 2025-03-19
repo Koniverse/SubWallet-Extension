@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
@@ -249,3 +249,17 @@ export interface PermitSwapData {
 
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
 export const SIMPLE_SWAP_SLIPPAGE = 0.05;
+
+export interface BriefXCMStep {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationTokenInfo: _ChainAsset;
+}
+
+// Hydration
+export interface HydrationSwapStepMetadata {
+  sendingValue: string,
+  originTokenInfo: _ChainAsset,
+  destinationTokenInfo: _ChainAsset,
+  txHex: `0x${string}`
+}

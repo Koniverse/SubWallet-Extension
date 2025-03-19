@@ -43,6 +43,12 @@ export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub']
 };
 
+export const FEE_RATE_MULTIPLIER: Record<string, number> = {
+  default: 1,
+  medium: 1.2,
+  high: 2
+};
+
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
   return swapPair?.metadata?.alternativeAsset as string;
 }
