@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType, TokenPriorityDetails } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
@@ -21,7 +21,7 @@ import { AddMoreBalanceModal, ChooseFeeTokenModal, SlippageModal, SwapIdleWarnin
 import { QuoteResetTime, SwapRoute } from '@subwallet/extension-koni-ui/components/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_MORE_BALANCE_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -30,7 +30,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, BackgroundIcon, Button, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -43,8 +43,6 @@ import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
-
-import useGetCurrentAccountTokenBalance from '../../../hooks/balance/useGetCurrentAccountTokenBalance';
 
 type WrapperProps = ThemeProps;
 
@@ -109,11 +107,63 @@ function getTokenSelectorItem (
       name: asset.name,
       balanceInfo,
       showBalance: true,
-      total: balanceInfo?.free
+      total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
     });
   });
 
   return result;
+}
+
+function sortTokens (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails) {
+  const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
+
+  targetTokens.sort((a, b) => {
+    const getTokenGroupLevel = (token: SortableTokenItem): number => {
+      if (token.total) {
+        const value = token.total.value.toNumber();
+
+        if (value > 0) {
+          return 1;
+        } // Group 1: Has total.value > 0
+
+        return 2; // Group 2: Has total.value == 0
+      }
+
+      return 3; // Group 3: No total
+    };
+
+    const aLevel = getTokenGroupLevel(a);
+    const bLevel = getTokenGroupLevel(b);
+
+    // Different group levels → sort by group level
+    if (aLevel !== bLevel) {
+      return aLevel - bLevel;
+    }
+
+    // Same group
+    if (aLevel === 1) {
+      return sortTokenByValue(a, b); // Group 1: sort by value
+    }
+
+    // Group 2 or 3: sort by priority
+    const aSlug = a.slug;
+    const bSlug = b.slug;
+
+    const aIsPrioritized = priorityTokenKeys.includes(aSlug);
+    const bIsPrioritized = priorityTokenKeys.includes(bSlug);
+
+    const aPriority = aIsPrioritized ? priorityTokenGroups.token[aSlug] : 0;
+    const bPriority = bIsPrioritized ? priorityTokenGroups.token[bSlug] : 0;
+
+    return sortTokenByPriority(
+      a.symbol,
+      b.symbol,
+      aIsPrioritized,
+      bIsPrioritized,
+      aPriority,
+      bPriority
+    );
+  });
 }
 
 const numberMetadata = { maxNumberFormat: 8 };
@@ -220,7 +270,53 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [swapPairs]);
 
-  const getCurrentAccountTokenBalance = useGetCurrentAccountTokenBalance();
+  const getAccountTokenBalance = useGetAccountTokenBalance();
+
+  const accountAddressItems = useMemo(() => {
+    const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
+
+    if (!chainInfo) {
+      return [];
+    }
+
+    const result: AccountAddressItemType[] = [];
+
+    accountProxies.forEach((ap) => {
+      if (!(isAccountAll(targetAccountProxy.id) || ap.id === targetAccountProxy.id)) {
+        return;
+      }
+
+      if ([AccountProxyType.READ_ONLY, AccountProxyType.LEDGER].includes(ap.accountType)) {
+        return;
+      }
+
+      ap.accounts.forEach((a) => {
+        const address = getReformatAddress(a, chainInfo);
+
+        if (address) {
+          result.push({
+            accountName: ap.name,
+            accountProxyId: ap.id,
+            accountProxyType: ap.accountType,
+            accountType: a.type,
+            address
+          });
+        }
+      });
+    });
+
+    return result;
+  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
+
+  const targetAccountProxyIdForGetBalance = useMemo(() => {
+    if (!isAccountAll(targetAccountProxy.id) || !fromValue) {
+      return targetAccountProxy.id;
+    }
+
+    const accountProxyByFromValue = accountAddressItems.find((a) => a.address === fromValue);
+
+    return accountProxyByFromValue?.accountProxyId || targetAccountProxy.id;
+  }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
   const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     const rawTokenSlugs = Object.keys(fromAndToTokenMap);
@@ -269,25 +365,25 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     })();
 
     if (targetTokenSlugs.length) {
-      const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getCurrentAccountTokenBalance(targetTokenSlugs), chainStateMap);
+      const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
 
-      sortTokensByStandard(result, priorityTokens);
+      sortTokens(result, priorityTokens);
 
       return result;
     }
 
     return [];
-  }, [accountProxies, assetRegistryMap, chainInfoMap, chainStateMap, defaultSlug, fromAndToTokenMap, getCurrentAccountTokenBalance, isAllAccount, priorityTokens, targetAccountProxy]);
+  }, [accountProxies, assetRegistryMap, chainInfoMap, chainStateMap, defaultSlug, fromAndToTokenMap, getAccountTokenBalance, isAllAccount, priorityTokens, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const toTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     const targetTokenSlugs = fromAndToTokenMap[fromTokenSlugValue] || [];
 
-    const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getCurrentAccountTokenBalance(targetTokenSlugs), chainStateMap);
+    const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
 
-    sortTokensByStandard(result, priorityTokens);
+    sortTokens(result, priorityTokens);
 
     return result;
-  }, [assetRegistryMap, chainStateMap, fromAndToTokenMap, fromTokenSlugValue, getCurrentAccountTokenBalance, priorityTokens]);
+  }, [assetRegistryMap, chainStateMap, fromAndToTokenMap, fromTokenSlugValue, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -354,42 +450,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
   }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
-
-  const accountAddressItems = useMemo(() => {
-    const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
-
-    if (!chainInfo) {
-      return [];
-    }
-
-    const result: AccountAddressItemType[] = [];
-
-    accountProxies.forEach((ap) => {
-      if (!(isAccountAll(targetAccountProxy.id) || ap.id === targetAccountProxy.id)) {
-        return;
-      }
-
-      if ([AccountProxyType.READ_ONLY, AccountProxyType.LEDGER].includes(ap.accountType)) {
-        return;
-      }
-
-      ap.accounts.forEach((a) => {
-        const address = getReformatAddress(a, chainInfo);
-
-        if (address) {
-          result.push({
-            accountName: ap.name,
-            accountProxyId: ap.id,
-            accountProxyType: ap.accountType,
-            accountType: a.type,
-            address
-          });
-        }
-      });
-    });
-
-    return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 

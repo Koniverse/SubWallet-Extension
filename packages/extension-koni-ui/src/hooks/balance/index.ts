@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as useGetBalance } from './useGetBalance';
-export { default as useGetCurrentAccountTokenBalance } from './useGetCurrentAccountTokenBalance';
+export { default as useGetAccountTokenBalance } from './useGetAccountTokenBalance';
