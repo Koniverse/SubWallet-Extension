@@ -206,6 +206,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     console.log('optimalProcess', optimalProcess);
 
+    // todo: can also return a chain route
     return {
       process: optimalProcess,
       quote: swapQuoteResponse
@@ -213,7 +214,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   public getAvailablePath (request: SwapRequest): [DynamicSwapAction[], SwapRequest | undefined] {
-    const { pair } = request;
+    const { address, pair } = request;
     // todo: control provider tighter
     const supportSwapChains = getSupportSwapChain();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
@@ -244,11 +245,11 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
-    const swapDestination = findSwapTransitDestination(this.chainService, fromToken, toToken);
+    const swapTransit = findSwapTransitDestination(this.chainService, fromToken, toToken);
 
-    if (swapDestination && supportSwapChains.includes(fromChain)) {
-      const swapStep = getSwapStep(fromToken.slug, swapDestination);
-      const bridgeStep = getBridgeStep(swapDestination, toToken.slug);
+    if (swapTransit && supportSwapChains.includes(fromChain)) {
+      const swapStep = getSwapStep(fromToken.slug, swapTransit);
+      const bridgeStep = getBridgeStep(swapTransit, toToken.slug);
 
       process.push(swapStep);
       process.push(bridgeStep);
@@ -260,18 +261,18 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeDestination = findXcmTransitDestination(this.chainService, fromToken, toToken);
+    const bridgeTransit = findXcmTransitDestination(this.chainService, fromToken, toToken);
 
-    if (bridgeDestination && supportSwapChains.includes(toChain)) {
-      const bridgeStep = getBridgeStep(fromToken.slug, bridgeDestination);
-      const swapStep = getSwapStep(bridgeDestination, toToken.slug);
+    if (bridgeTransit && supportSwapChains.includes(toChain)) {
+      const bridgeStep = getBridgeStep(fromToken.slug, bridgeTransit);
+      const swapStep = getSwapStep(bridgeTransit, toToken.slug);
 
       process.push(bridgeStep);
       process.push(swapStep);
 
       return [process, {
         ...request,
-        address: reformatAddress(request.address, _getChainSubstrateAddressPrefix(toChainInfo)),
+        address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
         pair: swapStep.pair
       }];
     }

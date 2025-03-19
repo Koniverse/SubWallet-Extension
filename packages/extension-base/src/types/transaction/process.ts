@@ -73,9 +73,10 @@ export interface BriefProcessStep {
   stepId: number;
 }
 
-export interface BriefXCMStep {
+export interface BriefXcmStep {
   sendingValue: string;
   originTokenInfo: _ChainAsset;
+  destinationValue: string;
   destinationTokenInfo: _ChainAsset;
 }
 

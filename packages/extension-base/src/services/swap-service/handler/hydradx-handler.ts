@@ -553,24 +553,21 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigN(amount);
+    const { currentStep, process, selectedQuote } = params;
+    const bnAmount = BigN(selectedQuote.fromAmount);
 
     if (bnAmount.lte(0)) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
     let isXcmOk = false;
-    const currentStep = params.currentStep;
 
-    for (const [index, step] of params.process.steps.entries()) {
+    for (const [index, step] of process.steps.entries()) {
       if (currentStep > index) {
         continue;
       }
 
       const getErrors = async (): Promise<TransactionError[]> => {
-        console.log('step', step);
-
         switch (step.type) {
           case CommonStepType.DEFAULT:
             return Promise.resolve([]);
