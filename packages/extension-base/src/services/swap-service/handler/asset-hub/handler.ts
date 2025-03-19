@@ -512,4 +512,45 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     return [];
   }
+
+  async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    const amount = params.selectedQuote.fromAmount;
+    const bnAmount = BigN(amount);
+
+    if (bnAmount.lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    let isXcmOk = false;
+    const currentStep = params.currentStep;
+
+    for (const [index, step] of params.process.steps.entries()) {
+      if (currentStep > index) {
+        continue;
+      }
+
+      const getErrors = async (): Promise<TransactionError[]> => {
+        switch (step.type) {
+          case CommonStepType.DEFAULT:
+            return Promise.resolve([]);
+          case CommonStepType.XCM:
+            return this.swapBaseHandler.validateXcmStepV2(params, index);
+          case SwapStepType.SWAP:
+            return this.validateSwapStep(params, isXcmOk, index);
+          default:
+            return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+        }
+      };
+
+      const errors = await getErrors();
+
+      if (errors.length) {
+        return errors;
+      } else if (step.type === CommonStepType.XCM) {
+        isXcmOk = true;
+      }
+    }
+
+    return [];
+  }
 }

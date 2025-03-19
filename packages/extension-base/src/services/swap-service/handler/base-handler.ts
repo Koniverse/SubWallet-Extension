@@ -29,6 +29,7 @@ export interface SwapBaseInterface {
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
   validateSwapProcess: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
+  validateSwapProcessV2: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
   handleSwapProcess: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
   handleSubmitStep: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
 
@@ -278,6 +279,12 @@ export class SwapBaseHandler {
 
     return [];
   }
+
+  // public async validateSwapV2
+
+  // public async validateXcmSwapV2
+
+  // public async validateSwapXcmV2
 
   public async validateTokenApproveStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
     return Promise.resolve([]);

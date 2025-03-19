@@ -592,6 +592,46 @@ export class HydradxHandler implements SwapBaseInterface {
     return [];
   }
 
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    const { currentStep, process, selectedQuote } = params;
+    const bnAmount = BigN(selectedQuote.fromAmount);
+
+    if (bnAmount.lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    let isXcmOk = false;
+
+    for (const [index, step] of process.steps.entries()) {
+      if (currentStep > index) {
+        continue;
+      }
+
+      const getErrors = async (): Promise<TransactionError[]> => {
+        switch (step.type) {
+          case CommonStepType.DEFAULT:
+            return Promise.resolve([]);
+          case CommonStepType.XCM:
+            return this.swapBaseHandler.validateXcmStepV2(params, index);
+          case CommonStepType.SET_FEE_TOKEN:
+            return this.swapBaseHandler.validateSetFeeTokenStep(params, index);
+          default:
+            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
+        }
+      };
+
+      const errors = await getErrors();
+
+      if (errors.length) {
+        return errors;
+      } else if (step.type === CommonStepType.XCM) {
+        isXcmOk = true;
+      }
+    }
+
+    return [];
+  }
+
   get referralCode () {
     if (this.isTestnet) {
       return HYDRADX_TESTNET_SUBWALLET_REFERRAL_CODE;

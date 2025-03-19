@@ -448,6 +448,17 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    const providerId = params.selectedQuote.provider.id;
+    const handler = this.handlers[providerId];
+
+    if (handler) {
+      return handler.validateSwapProcessV2(params);
+    } else {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+  }
+
   public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const handler = this.handlers[params.quote.provider.id];
 
