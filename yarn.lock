@@ -6799,13 +6799,13 @@ __metadata:
 
 "@subwallet/chain-list@file:/home/tug/Subwallet/SubWallet-ChainList/packages/chain-list/build::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.2.102-beta.6
-  resolution: "@subwallet/chain-list@file:/home/tug/Subwallet/SubWallet-ChainList/packages/chain-list/build#/home/tug/Subwallet/SubWallet-ChainList/packages/chain-list/build::hash=5073f8&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/chain-list@file:/home/tug/Subwallet/SubWallet-ChainList/packages/chain-list/build#/home/tug/Subwallet/SubWallet-ChainList/packages/chain-list/build::hash=d99e7d&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: 117dbea3880178daf4280ed574bf9dab7856747268a29fd15927e86b4962304a8662c51f2e750a544ac2098744937ca6eeff53f35a3a70bf129728e7f07a2f2c
+  checksum: 02258635badd4ecd418c8fc66bac56929a9595dc1ba70f371187fb7978a258376ad7f7e7683162a9fa114d6a8cdb85e85ece1347d21edaefa7f8c200a078f0b3
   languageName: node
   linkType: hard
 

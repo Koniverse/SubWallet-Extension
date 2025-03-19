@@ -14,11 +14,11 @@ import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { XcmApiResponse } from './acrossBridge';
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
 
 export type CreateXcmExtrinsicProps = {
@@ -179,41 +179,17 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     throw new Error('Sender is required');
   }
 
-  const bodyData = {
-    quoteRequest: {
-      address: sender,
-      from: originTokenInfo.slug,
-      to: destinationTokenInfo.slug,
-      recipient: recipient,
-      value: sendingValue
-    }
-  };
-
   try {
-    const response = await fetch('http://localhost:3000/api/xcm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(bodyData)
-    });
-
-    const data = await response.json() as XcmApiResponse;
-
-    if (data.status === 'error') {
-      return Promise.reject(new Error(data.error?.message));
-    }
+    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
 
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
 
-    const isNative = _isNativeToken(originTokenInfo);
-
     const transactionConfig: TransactionConfig = {
-      from: data.data?.sender,
-      to: data.data?.to,
-      value: isNative ? sendingValue : '0',
-      data: data.data?.transferEncodedCall,
+      from: data?.sender,
+      to: data?.to,
+      value: data?.value,
+      data: data?.transferEncodedCall,
       ...feeCombine
     };
 
