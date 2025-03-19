@@ -162,3 +162,13 @@ export function findSwapTransitDestination (chainService: ChainService, fromToke
 export function getAmountAfterSlippage (amount: string, slippage: number) {
   return BigN(amount).multipliedBy(BigN(1).minus(BigN(slippage))).integerValue(BigN.ROUND_DOWN).toString();
 }
+
+export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+  for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
+    if (group.includes(fromChain) && group.includes(toChain)) {
+      return true;
+    }
+  }
+
+  return false;
+}

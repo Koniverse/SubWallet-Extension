@@ -13,7 +13,7 @@ import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-servi
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -232,7 +232,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // SWAP: 2 tokens in the same chain and chain has dex
-    if (fromChain && fromChain === toChain && supportSwapChains.includes(toChain)) {
+    if (isChainsHasSameProvider(fromChain, toChain)) {
       const swapStep = getSwapStep(fromToken.slug, toToken.slug);
 
       process.push(swapStep);

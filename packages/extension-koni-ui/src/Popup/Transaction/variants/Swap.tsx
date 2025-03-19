@@ -135,7 +135,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
   const hasInternalConfirmations = useSelector((state: RootState) => state.requestState.hasInternalConfirmations);
   const priorityTokens = useSelector((root: RootState) => root.chainStore.priorityTokens);
-  const { multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const [form] = Form.useForm<SwapParams>();
   const formDefault = useMemo((): SwapParams => ({ ...defaultData }), [defaultData]);
 
@@ -955,39 +954,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return processState.steps.some((item) => item.type === CommonStepType.XCM);
   }, [processState.steps]);
 
-  const isSwapAssetHub = useMemo(() => {
-    const providerId = currentQuote?.provider?.id;
-
-    return providerId ? [SwapProviderId.KUSAMA_ASSET_HUB, SwapProviderId.POLKADOT_ASSET_HUB, SwapProviderId.ROCOCO_ASSET_HUB].includes(providerId) : false;
-  }, [currentQuote?.provider?.id]);
-
-  const renderAlertBox = useCallback(() => {
-    const multichainAsset = fromAssetInfo?.multiChainAsset;
-    const fromAssetName = multichainAsset && multiChainAssetMap[multichainAsset]?.name;
-    const toAssetName = chainInfoMap[toAssetInfo?.originChain]?.name;
-
-    return (
-      <>
-        {isSwapAssetHub && !isFormInvalid && (
-          <AlertBox
-            className={'__assethub-notification'}
-            description={'Swapping on Asset Hub is in beta with a limited number of pairs and low liquidity. Continue at your own risk'}
-            title={'Pay attention!'}
-            type='warning'
-          />
-        )}
-        {isSwapXCM && fromAssetName && toAssetName && !isFormInvalid && (
-          <AlertBox
-            className={'__xcm-notification'}
-            description={`The amount you entered is higher than your available balance on ${toAssetName} network. You need to first transfer cross-chain from ${fromAssetName} network to ${toAssetName} network to continue swapping`}
-            title={'Action needed'}
-            type='warning'
-          />
-        )}
-      </>
-    );
-  }, [chainInfoMap, fromAssetInfo?.multiChainAsset, isFormInvalid, isSwapAssetHub, isSwapXCM, multiChainAssetMap, toAssetInfo?.originChain]);
-
   const xcmBalanceTokens = useMemo(() => {
     if (!isSwapXCM || !fromAssetInfo || !currentPair) {
       return [];
@@ -1506,8 +1472,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                         </div>
                       )
                     }
-                    {renderAlertBox()}
-
                   </>
                 )
               }
