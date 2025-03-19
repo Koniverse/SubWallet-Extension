@@ -7,11 +7,12 @@ import { TokenSelectorItem } from '@subwallet/extension-koni-ui/components';
 import TokenEmptyList from '@subwallet/extension-koni-ui/components/EmptyList/TokenEmptyList';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
-import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useIsModalInactive, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ModalContext, SwList, SwModal } from '@subwallet/react-ui';
-import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
+import { SwList, SwModal } from '@subwallet/react-ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -27,10 +28,11 @@ const renderEmpty = () => <TokenEmptyList modalId={modalId} />;
 // todo : will move to Modal/Selector if is necessary
 function Component ({ className = '', items, onCancel, onSelectItem }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { checkActive } = useContext(ModalContext);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // @ts-ignore
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
+  const isModalInactive = useIsModalInactive(modalId);
 
   const listItems = useMemo(() => {
     const filteredList = items.filter((item) => {
@@ -38,6 +40,12 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
 
       return item.symbol.toLowerCase().includes(currentSearchText.toLowerCase()) || chainName.toLowerCase().includes(currentSearchText.toLowerCase());
     });
+
+    if (!currentSearchText) {
+      sortTokensByStandard(filteredList, priorityTokens);
+
+      return filteredList;
+    }
 
     if (currentSearchText.toLowerCase() === 'ton') {
       const tonItemIndex = filteredList.findIndex((item) => item.slug === 'ton-NATIVE-TON');
@@ -51,14 +59,10 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
       }
 
       return filteredList;
-    } else {
-      return filteredList;
     }
-  }, [chainInfoMap, currentSearchText, items]);
 
-  const isActive = checkActive(modalId);
-
-  const sectionRef = useRef<SwListSectionRef>(null);
+    return filteredList;
+  }, [chainInfoMap, currentSearchText, items, priorityTokens]);
 
   const handleSearch = useCallback((value: string) => {
     setCurrentSearchText(value);
@@ -85,12 +89,12 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
   }, [chainInfoMap, onSelect]);
 
   useEffect(() => {
-    if (!isActive) {
+    if (isModalInactive) {
       setTimeout(() => {
-        sectionRef.current?.setSearchValue('');
+        setCurrentSearchText('');
       }, 100);
     }
-  }, [isActive]);
+  }, [isModalInactive]);
 
   const onPressCancel = useCallback(() => {
     setCurrentSearchText('');

@@ -8,11 +8,11 @@ import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useGetChainSlugsByAccount, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAssetChecker, useDefaultNavigate, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, BuyServiceInfo, CreateBuyOrderFunction, SupportService, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createTransakOrder, getReformatedAddressRelatedToChain, noop, openInNewTab } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createTransakOrder, noop, openInNewTab } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -74,6 +74,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const { services, tokens } = useSelector((state: RootState) => state.buyService);
   const checkAsset = useAssetChecker();
   const allowedChains = useGetChainSlugsByAccount();
+  const getReformatAddress = useReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {
@@ -191,7 +192,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
-        const address = getReformatedAddressRelatedToChain(a, chainInfo);
+        const address = getReformatAddress(a, chainInfo);
 
         if (address) {
           result.push({
@@ -218,7 +219,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, selectedTokenSlug]);
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
     if (selectedService && selectedTokenSlug && selectedAddress) {

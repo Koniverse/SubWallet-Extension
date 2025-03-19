@@ -12,21 +12,19 @@ import styled from 'styled-components';
 interface Props extends ThemeProps{
   address: string;
   network: string;
+  onlyReturnInnerContent?: boolean;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { address, className, network } = props;
+  const { address, className, network, onlyReturnInnerContent } = props;
 
   const { t } = useTranslation();
 
   const account = useGetAccountByAddress(address);
   const networkPrefix = useGetChainPrefixBySlug(network);
 
-  return (
-    <MetaInfo
-      className={CN(className)}
-      hasBackgroundWrapper={true}
-    >
+  const innerContent = (
+    <>
       <MetaInfo.Account
         address={account?.address || address}
         chainSlug={network}
@@ -38,6 +36,19 @@ const Component: React.FC<Props> = (props: Props) => {
         chain={network}
         label={t('Network')}
       />
+    </>
+  );
+
+  if (onlyReturnInnerContent) {
+    return innerContent;
+  }
+
+  return (
+    <MetaInfo
+      className={CN(className)}
+      hasBackgroundWrapper={true}
+    >
+      {innerContent}
     </MetaInfo>
   );
 };

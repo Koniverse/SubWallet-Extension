@@ -71,6 +71,22 @@ export class ChainOnlineService {
     return true;
   }
 
+  mergeChainList (oldChainInfoMap: Record<string, _ChainInfo>, latestChainInfo: Record<string, _ChainInfo>) {
+    const rs: Record<string, _ChainInfo> = structuredClone(oldChainInfoMap);
+
+    for (const [slug, _info] of Object.entries(latestChainInfo)) {
+      const { providers: _providers, ...info } = _info;
+      const providers = Object.assign(rs[slug]?.providers || {}, _providers);
+
+      rs[slug] = {
+        ...info,
+        providers
+      };
+    }
+
+    return rs;
+  }
+
   async handleLatestPatch (latestPatch: PatchInfo) {
     try {
       // 1. validate fetch data with its hash
@@ -95,7 +111,7 @@ export class ChainOnlineService {
 
         // 2. merge data map
         if (latestChainInfo && Object.keys(latestChainInfo).length > 0) {
-          chainInfoMap = Object.assign({}, oldChainInfoMap, latestChainInfo);
+          chainInfoMap = this.mergeChainList(oldChainInfoMap, latestChainInfo);
 
           const [currentChainStateKey, newChainKey] = [Object.keys(currentChainStateMap), Object.keys(chainInfoMap)];
 

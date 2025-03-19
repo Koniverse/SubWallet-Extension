@@ -5,6 +5,7 @@ import { _Address } from '@subwallet/extension-base/background/KoniTypes';
 import { _ERC20_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
 
@@ -38,6 +39,7 @@ export async function getERC20SpendingApprovalTx (spender: _Address, owner: _Add
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   const gasLimit = await approveCall.estimateGas({ from: owner }) as number;
   const priority = await calculateGasFeeParams(evmApi, evmApi.chainSlug);
+  const feeCombine = combineEthFee(priority);
 
   return {
     from: owner,
@@ -45,7 +47,6 @@ export async function getERC20SpendingApprovalTx (spender: _Address, owner: _Add
     data: approveEncodedCall,
     gas: gasLimit,
     gasPrice: priority.gasPrice,
-    maxFeePerGas: priority.maxFeePerGas?.toString(),
-    maxPriorityFeePerGas: priority.maxPriorityFeePerGas?.toString()
+    ...feeCombine
   } as TransactionConfig;
 }

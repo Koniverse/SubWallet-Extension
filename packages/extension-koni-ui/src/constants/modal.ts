@@ -30,7 +30,7 @@ export const ADD_CONNECTION_MODAL = 'add-connection-modal';
 export const DISCONNECT_EXTENSION_MODAL = 'disconnect-extension-modal';
 export const REMIND_BACKUP_SEED_PHRASE_MODAL = 'remind-backup-seed-phrase-modal';
 export const REMIND_UPGRADE_FIREFOX_VERSION = 'remind-update-firefox-version';
-export const REMIND_DUPLICATE_ACCOUNT_NAME_MODAL = 'remind-update-unified-account';
+export const REMIND_DUPLICATE_ACCOUNT_NAME_MODAL = 'remind-duplicate-account-name-modal';
 export const EXPORT_ACCOUNTS_PASSWORD_MODAL = 'export-accounts-password-modal';
 export const ADD_NETWORK_WALLET_CONNECT_MODAL = 'add-network-wallet-connect-modal';
 export const ADDRESS_QR_MODAL = 'address-qr-modal';
@@ -39,6 +39,9 @@ export const ACCOUNT_NAME_MODAL = 'account-name-modal';
 export const GLOBAL_ALERT_MODAL = 'global-alert-modal';
 export const TON_WALLET_CONTRACT_SELECTOR_MODAL = 'ton-wallet-contract-selector-modal';
 export const TON_ACCOUNT_SELECTOR_MODAL = 'ton-account-selector-modal';
+export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
+export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
+export const ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL = 'account-migration-in-progress-warning-modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
@@ -79,3 +82,8 @@ export const WARNING_LEDGER_RECEIVE_MODAL = 'warning-ledger-receive-modal';
 export const DERIVE_ACCOUNT_LIST_MODAL = 'derive-account-list-modal';
 export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 /* Derive */
+
+/* Process */
+export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
+export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
+/* Process */

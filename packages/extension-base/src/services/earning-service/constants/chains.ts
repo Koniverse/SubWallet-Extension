@@ -7,7 +7,7 @@ export const _STAKING_CHAIN_GROUP = {
   astar: ['astar', 'shiden', 'shibuya'],
   amplitude: ['amplitude', 'amplitude_test', 'kilt', 'kilt_peregrine', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
   kilt: ['kilt', 'kilt_peregrine'],
-  nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet'],
+  nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'cere', 'analog_timechain'],
   bifrost: ['bifrost', 'bifrost_testnet'],
   aleph: ['aleph', 'alephTest'], // A0 has distinct tokenomics
   ternoa: ['ternoa'],
@@ -15,7 +15,8 @@ export const _STAKING_CHAIN_GROUP = {
   lending: ['interlay'],
   krest_network: ['krest_network'],
   manta: ['manta_network'],
-  bittensor: ['bittensor', 'bittensor_devnet']
+  bittensor: ['bittensor', 'bittensor_devnet'],
+  mythos: ['mythos', 'muse_testnet']
 };
 
 export const TON_CHAINS = ['ton', 'ton_testnet'];

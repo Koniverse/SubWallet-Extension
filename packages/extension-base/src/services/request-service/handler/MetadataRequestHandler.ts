@@ -6,7 +6,6 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import { extractMetadata } from '@subwallet/extension-base/services/request-service/helper';
 import { MetaRequest } from '@subwallet/extension-base/services/request-service/types';
 import { MetadataStore } from '@subwallet/extension-base/stores';
-import { getId } from '@subwallet/extension-base/utils/getId';
 import { addMetadata, knownMetadata } from '@subwallet/extension-chains';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { BehaviorSubject } from 'rxjs';
@@ -52,6 +51,7 @@ export default class MetadataRequestHandler {
     this.#requestService.updateIconV2(shouldClose);
   }
 
+  // @ts-ignore
   private metaComplete = (id: string, resolve: (result: boolean) => void, reject: (error: Error) => void): Resolver<boolean> => {
     const complete = (): void => {
       delete this.#metaRequests[id];
@@ -70,20 +70,10 @@ export default class MetadataRequestHandler {
     };
   };
 
-  public injectMetadata (url: string, request: MetadataDef): Promise<boolean> {
-    return new Promise((resolve, reject): void => {
-      const id = getId();
+  public injectMetadata (request: MetadataDef): boolean {
+    this.saveMetadata(request);
 
-      this.#metaRequests[id] = {
-        ...this.metaComplete(id, resolve, reject),
-        id,
-        request,
-        url
-      };
-
-      this.updateIconMeta();
-      this.#requestService.popupOpen();
-    });
+    return true;
   }
 
   public resetWallet () {
