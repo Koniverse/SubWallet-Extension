@@ -340,7 +340,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
     const txHex: `0x${string}` = params.selectedQuote.metadata as `0x${string}`;
 
-    if (!txHex || isHex(txHex)) {
+    if (!txHex || !isHex(txHex)) {
       return Promise.resolve(undefined);
     }
 
@@ -465,6 +465,11 @@ export class HydradxHandler implements SwapBaseInterface {
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const metadata = params.process.steps[params.currentStep].metadata as unknown as HydrationSwapStepMetadata;
+    const txHex = params.quote.metadata as string;
+
+    if (!txHex || !isHex(txHex)) {
+      return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
+    }
 
     if (!metadata || !metadata.sendingValue || !metadata.txHex || !metadata.destinationTokenInfo || !metadata.originTokenInfo) {
       throw new Error('Swap metadata error');
@@ -484,7 +489,7 @@ export class HydradxHandler implements SwapBaseInterface {
       quote: params.quote,
       address: params.address,
       slippage: params.slippage,
-      txHex: metadata.txHex,
+      txHex: txHex,
       process: params.process
     };
 
@@ -492,7 +497,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
     const txList: SubmittableExtrinsic<'promise'>[] = [];
 
-    const swapTx = chainApi.api.tx(metadata.txHex);
+    const swapTx = chainApi.api.tx(txHex);
 
     const _referral = await chainApi.api.query.referrals.linkedAccounts(params.address);
     const referral = _referral?.toString();
@@ -532,8 +537,6 @@ export class HydradxHandler implements SwapBaseInterface {
     const { currentStep, process } = params;
     const type = process.steps[currentStep].type;
 
-    console.log('params', params);
-
     switch (type) {
       case CommonStepType.DEFAULT:
         return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
@@ -556,6 +559,12 @@ export class HydradxHandler implements SwapBaseInterface {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
+    const swapStep = params.process.steps.find((item) => item.type === SwapStepType.SWAP);
+
+    if (!swapStep) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Swap step not found')];
+    }
+
     let isXcmOk = false;
     const currentStep = params.currentStep;
 
@@ -565,8 +574,6 @@ export class HydradxHandler implements SwapBaseInterface {
       }
 
       const getErrors = async (): Promise<TransactionError[]> => {
-        console.log('step', step);
-
         switch (step.type) {
           case CommonStepType.DEFAULT:
             return Promise.resolve([]);

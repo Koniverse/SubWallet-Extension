@@ -60,6 +60,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
+    console.log('quotes from API', quotes);
+
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
