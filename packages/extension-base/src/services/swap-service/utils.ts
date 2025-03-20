@@ -6,6 +6,7 @@ import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/typ
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { BriefXCMStep, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -156,4 +157,34 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   }
 
   return false;
+}
+
+export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  if (!mainSteps.length) {
+    return undefined;
+  }
+
+  if (mainSteps.length === 1) {
+    const metadata = mainSteps[0].metadata as unknown as BriefXCMStep; // todo: temp for round 1, the exact interface is handle in round 2
+
+    return {
+      from: metadata.originTokenInfo.slug,
+      to: metadata.destinationTokenInfo.slug,
+      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+    };
+  }
+
+  const firstStep = mainSteps[0];
+  const lastStep = mainSteps[mainSteps.length - 1];
+
+  const firstMetadata = firstStep.metadata as unknown as BriefXCMStep;
+  const lastMetadata = lastStep.metadata as unknown as BriefXCMStep;
+
+  return {
+    from: firstMetadata.originTokenInfo.slug,
+    to: lastMetadata.destinationTokenInfo.slug,
+    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+  };
 }
