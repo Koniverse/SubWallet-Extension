@@ -86,8 +86,6 @@ const fetchDerivativeTokenSlugs = async () => {
       ? (data as string[])
       : [];
 
-    console.log('apiSlugs', apiSlugs);
-
     return new Set(apiSlugs.length > 0 ? apiSlugs : DERIVATIVE_TOKEN_SLUG_LIST);
   } catch (error) {
     console.error('Error fetching derivative token slugs from API:', error);
