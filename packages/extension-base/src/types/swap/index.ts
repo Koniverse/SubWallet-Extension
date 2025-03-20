@@ -256,10 +256,15 @@ export interface BriefXCMStep {
   destinationTokenInfo: _ChainAsset;
 }
 
-// Hydration
 export interface HydrationSwapStepMetadata {
   sendingValue: string,
   originTokenInfo: _ChainAsset,
   destinationTokenInfo: _ChainAsset,
   txHex: `0x${string}`
+}
+
+export interface AssetHubSwapStepMetadata {
+  sendingValue: string,
+  originTokenInfo: _ChainAsset,
+  destinationTokenInfo: _ChainAsset
 }
