@@ -12,6 +12,7 @@ jobs:
         step: ['build:release']
     name: ${{ matrix.step }}
     runs-on: ubuntu-22.04
+    environment: 'extension'
     steps:
     - uses: actions/checkout@v3
       with:

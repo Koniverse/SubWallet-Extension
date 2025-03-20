@@ -189,8 +189,8 @@ export default class KoniState {
     return this.requestService.knownMetadata;
   }
 
-  public injectMetadata (url: string, request: MetadataDef): Promise<boolean> {
-    return this.requestService.injectMetadata(url, request);
+  public injectMetadata (request: MetadataDef): boolean {
+    return this.requestService.injectMetadata(request);
   }
 
   public getMetaRequest (id: string): MetaRequest {

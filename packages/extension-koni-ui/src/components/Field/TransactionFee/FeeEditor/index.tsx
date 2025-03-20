@@ -1,13 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeToken, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, isChainSupportTokenPayFee } from '@subwallet/extension-base/constants';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { FeeChainType, FeeDetail, TransactionFee } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import ChooseFeeTokenModal from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/ChooseFeeTokenModal';
-import { ASSET_HUB_CHAIN_SLUGS, BN_TEN, CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { BN_TEN, CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -63,6 +65,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   // @ts-ignore
   const priceMap = useSelector((state) => state.price.priceMap);
   const [feeEditorModalRenderKey, setFeeEditorModalRenderKey] = useState<string>(modalId);
+  const { currencyData } = useSelector((state: RootState) => state.price);
 
   const tokenAsset = (() => {
     return assetRegistry[tokenPayFeeSlug] || undefined;
@@ -90,7 +93,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return BN_ZERO;
   }, []);
 
-  const isDataReady = !isLoadingFee && !isLoadingFee && !!feeOptionsInfo;
+  const isDataReady = !isLoadingFee && !isLoadingToken && !!feeOptionsInfo;
 
   const convertedFeeValueToUSD = useMemo(() => {
     if (!isDataReady) {
@@ -104,7 +107,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [estimateFee, isDataReady, nativeTokenDecimals, priceNativeValue]);
 
   const onClickEdit = useCallback(() => {
-    if (chainValue && ASSET_HUB_CHAIN_SLUGS.includes(chainValue)) {
+    if (chainValue && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue))) {
       activeModal(CHOOSE_FEE_TOKEN_MODAL);
     } else {
       setFeeEditorModalRenderKey(`${modalId}_${Date.now()}`);
@@ -141,7 +144,10 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   }, [chainValue, destChainValue]);
 
   const isEditButton = useMemo(() => {
-    return !!(chainValue && (ASSET_HUB_CHAIN_SLUGS.includes(chainValue) && feeType === 'substrate' && listTokensCanPayFee.length)) && !isXcm;
+    const isSubstrateSupport = !!(chainValue && feeType === 'substrate' && listTokensCanPayFee.length && (isChainSupportTokenPayFee(chainValue)));
+    const isEvmSupport = !!(chainValue && feeType === 'evm');
+
+    return (isSubstrateSupport || isEvmSupport) && !isXcm;
   }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
 
   const rateValue = useMemo(() => {
@@ -192,13 +198,13 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                   <Number
                     className={'__fee-price-value'}
                     decimal={0}
-                    prefix={'~ $'}
+                    prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                    suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
                     value={convertedFeeValueToUSD}
                   />
 
                   <Button
                     className={'__fee-editor-button'}
-                    loading={isLoadingToken}
                     disabled={!isDataReady}
                     icon={
                       <Icon
@@ -206,6 +212,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                         size='sm'
                       />
                     }
+                    loading={isLoadingToken}
                     onClick={isEditButton ? onClickEdit : undefined}
                     size='xs'
                     tooltip={isEditButton ? undefined : t('Coming soon!')}
