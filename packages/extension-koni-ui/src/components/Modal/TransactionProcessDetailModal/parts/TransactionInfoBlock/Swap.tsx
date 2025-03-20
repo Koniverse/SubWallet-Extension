@@ -62,6 +62,7 @@ const Component: FC<Props> = (props: Props) => {
     >
       <SwapTransactionBlock
         logoSize={36}
+        process={data.process}
         quote={data.quote}
       />
       <MetaInfo
