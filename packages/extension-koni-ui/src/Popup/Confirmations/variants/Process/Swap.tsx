@@ -4,7 +4,7 @@
 import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { SwapBaseTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { SwapRoute, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
+import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { Number } from '@subwallet/react-ui';
@@ -106,6 +106,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock
+        process={data.process}
         quote={data.quote}
       />
       <MetaInfo
@@ -113,6 +114,7 @@ const Component: React.FC<Props> = (props: Props) => {
         hasBackgroundWrapper={false}
         labelColorScheme={'gray'}
         labelFontWeight={'regular'}
+        spaceSize={'sm'}
       >
         <MetaInfo.Account
           address={recipientAddress}
@@ -136,12 +138,6 @@ const Component: React.FC<Props> = (props: Props) => {
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}
         />
-        <MetaInfo.Default
-          className={'-d-column'}
-          label={t('Swap route')}
-        >
-        </MetaInfo.Default>
-        <SwapRoute swapRoute={data.quote.route} />
 
         <MetaInfo.TransactionProcess
           items={stepItems}
