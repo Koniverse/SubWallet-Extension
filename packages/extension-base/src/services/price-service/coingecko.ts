@@ -33,7 +33,7 @@ interface ExchangeRateItem {
   conversion_rates: Record<string, number>
 }
 const DEFAULT_CURRENCY = 'USD';
-const DERIVATIVE_TOKEN_SLUG_LIST = ['susds'];
+const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
 
 let useBackupApi = false;
 
@@ -70,6 +70,29 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
     return exchangeRateMap;
   } catch (e) {
     return {} as Record<CurrencyType, ExchangeRateJSON>;
+  }
+};
+
+const fetchDerivativeTokenSlugs = async () => {
+  try {
+    const response = await fetch('https://api-cache.subwallet.app/api/price/derivative-list');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data: unknown = await response.json();
+    const apiSlugs: string[] = Array.isArray(data) && data.every((item) => typeof item === 'string')
+      ? (data as string[])
+      : [];
+
+    console.log('apiSlugs', apiSlugs);
+
+    return new Set(apiSlugs.length > 0 ? apiSlugs : DERIVATIVE_TOKEN_SLUG_LIST);
+  } catch (error) {
+    console.error('Error fetching derivative token slugs from API:', error);
+
+    return new Set(DERIVATIVE_TOKEN_SLUG_LIST);
   }
 };
 
@@ -138,8 +161,9 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       price24hMap[val.id] = price24h;
     });
 
-    const derivativeTokenSlugs = new Set(DERIVATIVE_TOKEN_SLUG_LIST);
+    const derivativeTokenSlugs = await fetchDerivativeTokenSlugs();
 
+    // TODO: The API for derivatives does not provide a 24-hour price change value.
     if (derivativeApiError) {
       derivativeTokenSlugs.forEach((slug) => {
         priceMap[slug] = 0;
