@@ -11,12 +11,17 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { DynamicSwapType, XcmStepPosition } from '@subwallet/extension-base/services/swap-service/interface';
-import { getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { AssetHubSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
+import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import {
+  AssetHubSwapStepMetadata,
+  BasicTxErrorType,
+  BriefXCMStep, DynamicSwapType,
+  GenSwapStepFuncV2,
+  OptimalSwapPathParamsV2,
+  RequestCrossChainTransfer,
+  RuntimeDispatchInfo,
+  XcmStepPosition
+} from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -514,7 +519,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
           case CommonStepType.DEFAULT:
             return Promise.resolve([]);
           case CommonStepType.XCM:
-            return this.swapBaseHandler.validateXcmStepV2(params, index);
+            return this.swapBaseHandler.validateBridgeStep(params, index);
           case SwapStepType.SWAP:
             return this.validateSwapStep(params, isXcmOk, index);
           default:

@@ -12,9 +12,13 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import {
+  BasicTxErrorType,
+  DynamicSwapAction, DynamicSwapType,
+  OptimalSwapPathParamsV2,
+  ValidateSwapProcessParams
+} from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -197,14 +201,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 4. Generate optimal process for that quote
     * */
 
-    // todo: path will become a list of path in Round 2
-    // const [path, directSwapRequest] = this.getAvailablePath(request);
-    //
-    // if (!directSwapRequest) {
-    //   throw Error('Swap pair not found');
-    // }
-
-    // const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
@@ -213,6 +209,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
 
     // todo: can also return a chain route
+    console.log('path--------------------------', path);
     console.log('optimalProcess----------------', optimalProcess);
 
     return {
@@ -230,6 +227,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const fromChain = _getAssetOriginChain(fromToken);
     const toChain = _getAssetOriginChain(toToken);
     const toChainInfo = this.chainService.getChainInfoByKey(toChain);
+    const assetRefMap = this.chainService.getAssetRefMap();
     const process: DynamicSwapAction[] = [];
 
     if (!fromToken || !toToken) {
@@ -253,7 +251,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
-    const swapTransit = findSwapTransitDestination(this.chainService, fromToken, toToken);
+    const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
 
     if (swapTransit && supportSwapChains.includes(fromChain)) {
       const swapStep = getSwapStep(fromToken.slug, swapTransit);
@@ -269,7 +267,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeTransit = findXcmTransitDestination(this.chainService, fromToken, toToken);
+    const bridgeTransit = findXcmTransitDestination(assetRefMap, fromToken, toToken);
 
     if (bridgeTransit && supportSwapChains.includes(toChain)) {
       const bridgeStep = getBridgeStep(fromToken.slug, bridgeTransit);
