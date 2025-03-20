@@ -201,6 +201,10 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     const { fromAmount } = quote;
     const { addressFrom, amountTo, id } = await createSwapRequest({ fromSymbol, toSymbol, fromAmount, fromAsset, receiver, sender, toAsset });
 
+    if (!id || id.length === 0 || !addressFrom || addressFrom.length === 0) {
+      throw new SwapError(SwapErrorType.UNKNOWN);
+    }
+
     // Validate the amount to be swapped
     const rate = BigN(amountTo).div(BigN(quote.toAmount)).multipliedBy(100);
 
