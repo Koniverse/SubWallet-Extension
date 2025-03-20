@@ -7,11 +7,10 @@ import { ExtrinsicType, NotificationType, TokenPriorityDetails } from '@subwalle
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
-import { CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -23,12 +22,12 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
-import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenAvailable, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -55,20 +54,14 @@ type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
 const hideFields: Array<keyof SwapParams> = ['fromAmount', 'fromTokenSlug', 'toTokenSlug', 'chain', 'fromAccountProxy'];
 
 function getTokenSelectorItem (
-  tokenSlugs: string[],
-  assetRegistryMap: Record<string, _ChainAsset>,
+  assetItem: _ChainAsset[],
   tokenBalanceMap: Record<string, TokenBalanceItemType | undefined>,
   chainState: Record<string, _ChainState>
 ): SortableTokenSelectorItemType[] {
   const result: SortableTokenSelectorItemType[] = [];
 
-  tokenSlugs.forEach((slug) => {
-    const asset = assetRegistryMap[slug];
-
-    if (!asset) {
-      return;
-    }
-
+  assetItem.forEach((asset) => {
+    const slug = asset.slug;
     const originChain = asset.originChain;
 
     const balanceInfo = (() => {
@@ -170,7 +163,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
-  const swapPairs = useSelector((state) => state.swap.swapPairs);
+  const assetSettingMap = useSelector((state) => state.assetRegistry.assetSettingMap);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
   const hasInternalConfirmations = useSelector((state: RootState) => state.requestState.hasInternalConfirmations);
@@ -244,22 +237,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
 
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const getAccountTokenBalance = useGetAccountTokenBalance();
-
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
 
@@ -306,72 +283,58 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return accountProxyByFromValue?.accountProxyId || targetAccountProxy.id;
   }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
-  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
-    const rawTokenSlugs = Object.keys(fromAndToTokenMap);
-    let targetTokenSlugs: string[] = [];
+  const assetItems = useMemo<_ChainAsset[]>(() => {
+    const result: _ChainAsset[] = [];
 
-    (() => {
-      // defaultSlug is just TokenSlug
-      if (defaultSlug && rawTokenSlugs.includes(defaultSlug)) {
-        if (isTokenCompatibleWithAccountChainTypes(defaultSlug, targetAccountProxy.chainTypes, chainInfoMap)) {
-          targetTokenSlugs.push(defaultSlug);
-        }
-
-        return;
+    Object.values(assetRegistryMap).forEach((chainAsset) => {
+      if (isTokenAvailable(chainAsset, assetSettingMap, {}, false)) {
+        result.push(chainAsset);
       }
+    });
 
-      rawTokenSlugs.forEach((rts) => {
-        const assetInfo = assetRegistryMap[rts];
+    return result;
+  }, [assetRegistryMap, assetSettingMap]);
 
-        if (!assetInfo) {
-          return;
-        }
+  const getAccountTokenBalance = useGetAccountTokenBalance();
 
-        if (defaultSlug) {
-          // defaultSlug is MultiChainAssetSlug
-          if (_getMultiChainAsset(assetInfo) === defaultSlug && isTokenCompatibleWithAccountChainTypes(rts, targetAccountProxy.chainTypes, chainInfoMap)) {
-            targetTokenSlugs.push(rts);
-          }
-
-          return;
-        }
-
-        if (isTokenCompatibleWithAccountChainTypes(rts, targetAccountProxy.chainTypes, chainInfoMap)) {
-          targetTokenSlugs.push(rts);
-        }
-
-        if (isAllAccount) {
-          const allowChainSlug = getChainsByAccountAll(targetAccountProxy, accountProxies, chainInfoMap);
-
-          targetTokenSlugs = targetTokenSlugs.filter((tokenSlug) => {
-            const chainSlug = _getOriginChainOfAsset(tokenSlug);
-
-            return allowChainSlug.includes(chainSlug);
-          });
-        }
-      });
-    })();
-
-    if (targetTokenSlugs.length) {
-      const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
-
-      sortTokens(result, priorityTokens);
-
-      return result;
-    }
-
-    return [];
-  }, [accountProxies, assetRegistryMap, chainInfoMap, chainStateMap, defaultSlug, fromAndToTokenMap, getAccountTokenBalance, isAllAccount, priorityTokens, targetAccountProxy, targetAccountProxyIdForGetBalance]);
-
-  const toTokenItems = useMemo<TokenSelectorItemType[]>(() => {
-    const targetTokenSlugs = fromAndToTokenMap[fromTokenSlugValue] || [];
-
-    const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
+  const tokenSelectorItems = useMemo<TokenSelectorItemType[]>(() => {
+    const result = getTokenSelectorItem(assetItems, getAccountTokenBalance(assetItems, targetAccountProxyIdForGetBalance), chainStateMap);
 
     sortTokens(result, priorityTokens);
 
     return result;
-  }, [assetRegistryMap, chainStateMap, fromAndToTokenMap, fromTokenSlugValue, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
+  }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
+
+  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
+    const allowChainSlugs = isAccountAll(targetAccountProxy.id)
+      ? getChainsByAccountAll(targetAccountProxy, accountProxies, chainInfoMap)
+      : undefined;
+
+    return tokenSelectorItems.filter((item) => {
+      const slug = item.slug;
+      const assetInfo = assetRegistryMap[slug];
+
+      if (!assetInfo) {
+        return false;
+      }
+
+      if (allowChainSlugs && !allowChainSlugs.includes(assetInfo.originChain)) {
+        return false;
+      }
+
+      if (!isTokenCompatibleWithAccountChainTypes(slug, targetAccountProxy.chainTypes, chainInfoMap)) {
+        return false;
+      }
+
+      if (!defaultSlug) {
+        return true;
+      }
+
+      return defaultSlug === slug || _getMultiChainAsset(assetInfo) === defaultSlug;
+    });
+  }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, targetAccountProxy, tokenSelectorItems]);
+
+  const toTokenItems = tokenSelectorItems;
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -384,12 +347,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
-    if (!fromAndToTokenMap[toTokenSlugValue]) {
-      return false;
-    }
-
     return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap);
-  }, [chainInfoMap, fromAndToTokenMap, targetAccountProxy.chainTypes, toTokenSlugValue]);
+  }, [chainInfoMap, targetAccountProxy.chainTypes, toTokenSlugValue]);
 
   // Unable to use useEffect due to infinity loop caused by conflict setCurrentSlippage and currentQuote
   const slippage = useMemo(() => {
@@ -762,70 +721,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return setConfirmedTerm('swap-term-confirmed');
   }, [setConfirmedTerm]);
 
-  const currentPair = useMemo(() => {
-    if (fromTokenSlugValue && toTokenSlugValue) {
-      const pairSlug = _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue);
-
-      return swapPairs.find((item) => item.slug === pairSlug);
-    }
-
-    return undefined;
-  }, [fromTokenSlugValue, swapPairs, toTokenSlugValue]);
-
-  const altChain = useMemo(() => {
-    if (currentPair) {
-      const alternativeAssetSlug = getSwapAlternativeAsset(currentPair);
-
-      if (alternativeAssetSlug) {
-        return _getOriginChainOfAsset(alternativeAssetSlug);
-      }
-    }
-
-    return undefined;
-  }, [currentPair]);
-
-  const isSwapXCM = useMemo(() => {
-    return processState.steps.some((item) => item.type === CommonStepType.XCM);
-  }, [processState.steps]);
-
-  const xcmBalanceTokens = useMemo(() => {
-    if (!isSwapXCM || !fromAssetInfo || !currentPair) {
-      return [];
-    }
-
-    const result: {
-      token: string;
-      chain: string;
-    }[] = [{
-      token: fromAssetInfo.slug,
-      chain: fromAssetInfo.originChain
-    }];
-
-    const chainInfo = chainInfoMap[fromAssetInfo.originChain];
-
-    if (chainInfo) {
-      const _nativeSlug = _getChainNativeTokenSlug(chainInfo);
-
-      if (_nativeSlug !== fromAssetInfo.slug) {
-        result.push({
-          token: _getChainNativeTokenSlug(chainInfo),
-          chain: fromAssetInfo.originChain
-        });
-      }
-    }
-
-    const alternativeAssetSlug = getSwapAlternativeAsset(currentPair);
-
-    if (alternativeAssetSlug) {
-      result.push({
-        token: alternativeAssetSlug,
-        chain: _getOriginChainOfAsset(alternativeAssetSlug)
-      });
-    }
-
-    return result;
-  }, [chainInfoMap, currentPair, fromAssetInfo, isSwapXCM]);
-
   const openSwapQuotesModal = useCallback(() => {
     setIsSwapQuotesSelectorModalVisible(true);
     activeModal(SWAP_ALL_QUOTES_MODAL);
@@ -1096,6 +991,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
   }, [form, toTokenItems, toTokenSlugValue]);
 
+  const altChain = useMemo(() => {
+    // todo: fill logic to get altChain here
+
+    return undefined;
+  }, []);
+
   useEffect(() => {
     if (altChain && !checkChainConnected(altChain)) {
       turnOnChain(altChain);
@@ -1222,17 +1123,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 </Form.Item>
               )}
               <div className={'__balance-display-area'}>
-                <FreeBalanceToEarn
-                  address={fromValue}
-                  hidden={!canShowAvailableBalance || !isSwapXCM}
-                  label={`${t('Available balance')}:`}
-                  tokens={xcmBalanceTokens}
-                />
-
                 <FreeBalance
                   address={fromValue}
                   chain={chainValue}
-                  hidden={!canShowAvailableBalance || isSwapXCM}
+                  hidden={!canShowAvailableBalance}
                   isSubscribe={true}
                   label={`${t('Available balance')}:`}
                   tokenSlug={fromTokenSlugValue}

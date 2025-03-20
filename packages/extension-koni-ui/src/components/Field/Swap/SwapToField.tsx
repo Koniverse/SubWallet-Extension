@@ -114,7 +114,9 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
     '.__input-container': {
-      display: 'flex'
+      display: 'flex',
+      paddingLeft: token.padding,
+      paddingRight: token.padding
     },
     '.__label': {
       fontSize: token.fontSizeSM,
@@ -126,15 +128,22 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       paddingBottom: 8
     },
 
+    '.__token-selector-wrapper': {
+      flex: 1,
+      paddingTop: 1,
+      overflow: 'hidden',
+
+      '.-modal-trigger': {
+        paddingRight: 24
+      }
+    },
+
     '.__amount-wrapper': {
       flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'flex-end',
-      paddingRight: 16,
-      overflow: 'hidden'
+      overflow: 'hidden',
+      textAlign: 'right'
     },
+
     '.__amount-destination': {
       maxHeight: 24,
       maxWidth: 170,
@@ -146,6 +155,7 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       lineHeight: token.lineHeightLG,
       color: token.colorWhite
     },
+
     '.__amount-convert': {
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
