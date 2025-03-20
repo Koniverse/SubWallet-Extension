@@ -550,12 +550,6 @@ export class BalanceService implements StoppableServiceInterface {
             currentAssetSettings[existedKey] = { visible: true };
           }
         });
-
-        Object.keys(currentAssetSettings).forEach((tokenSlug) => {
-          if (!balanceData.includes(tokenSlug)) {
-            currentAssetSettings[tokenSlug] = { visible: false };
-          }
-        });
       }
     }
 
