@@ -90,24 +90,35 @@ const Component = (props: Props) => {
     );
   }, [chainInfoMap, onClickItem, value]);
 
-  const filterOptions: FilterOption[] = useMemo(() => ([
-    {
-      label: t('Polkadot'),
-      value: 'polkadot'
-    },
-    {
-      label: t('Polkadot Asset Hub'),
-      value: 'statemint'
-    },
-    {
-      label: t('Hydration'),
-      value: 'hydradx_main'
-    },
-    {
-      label: t('Arbitrum'),
-      value: 'arbitrum' // note: it represents for arbitrum_one, arbitrum_sepolia
-    }
-  ]), [t]);
+  const filterOptions: FilterOption[] = useMemo(() => {
+    const uniqueOriginChains = Array.from(new Set(items.map((item) => item.originChain)));
+
+    const result = uniqueOriginChains.map((originChain) => {
+      return {
+        label: _getChainName(chainInfoMap[originChain]),
+        value: originChain
+      };
+    });
+
+    result.sort((a, b) => {
+      const priority: Record<string, number> = {
+        polkadot: 0,
+        ethereum: 1
+      };
+
+      const aPriority = priority[a.value] ?? 2;
+      const bPriority = priority[b.value] ?? 2;
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority; // Sort by priority first
+      }
+
+      // If both have same priority (i.e., both are not polkadot/ethereum), sort by label
+      return a.label.localeCompare(b.label);
+    });
+
+    return result;
+  }, [chainInfoMap, items]);
 
   const openFilter = useCallback(() => {
     activeModal(filterModalId);
@@ -150,10 +161,6 @@ const Component = (props: Props) => {
 
       for (const filter of selectedFilters) {
         if (item.originChain === filter) {
-          return true;
-        }
-
-        if (filter === 'arbitrum' && ['arbitrum_one', 'arbitrum_sepolia'].includes(item.originChain)) {
           return true;
         }
       }
@@ -270,7 +277,6 @@ const Component = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter address')}
       />
     </>
   );

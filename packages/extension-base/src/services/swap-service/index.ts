@@ -60,6 +60,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
+    console.log('quotes from API', quotes);
+
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
@@ -132,6 +134,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
+  // deprecated
   public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
@@ -162,6 +165,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
+  // deprecated
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
     /*
     * 1. Ask swap quotes from providers
@@ -169,16 +174,18 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 3. Generate optimal process for that quote
     * */
 
-    const swapQuoteResponse = await this.getLatestQuotes(request);
+    // const swapQuoteResponse = await this.getLatestDirectQuotes(request);
 
-    const optimalProcess = await this.generateOptimalProcess({
-      request,
-      selectedQuote: swapQuoteResponse.optimalQuote
-    });
+    // const optimalProcess = await this.generateOptimalProcess({
+    //   request,
+    //   selectedQuote: swapQuoteResponse.optimalQuote
+    // });
 
     return {
-      process: optimalProcess,
-      quote: swapQuoteResponse
+      // @ts-ignore
+      process: null,
+      // @ts-ignore
+      quote: null
     };
   }
 
@@ -191,13 +198,14 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * */
 
     // todo: path will become a list of path in Round 2
-    const [path, directSwapRequest] = this.getAvailablePath(request);
+    // const [path, directSwapRequest] = this.getAvailablePath(request);
+    //
+    // if (!directSwapRequest) {
+    //   throw Error('Swap pair not found');
+    // }
 
-    if (!directSwapRequest) {
-      throw Error('Swap pair not found');
-    }
-
-    const swapQuoteResponse = await this.getLatestQuotes(directSwapRequest);
+    // const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
+    const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
       selectedQuote: swapQuoteResponse.optimalQuote,
@@ -205,6 +213,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
 
     // todo: can also return a chain route
+    console.log('optimalProcess----------------', optimalProcess);
+
     return {
       process: optimalProcess,
       quote: swapQuoteResponse
@@ -231,7 +241,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // SWAP: 2 tokens in the same chain and chain has dex
-    if (isChainsHasSameProvider(fromChain, toChain)) {
+    if (isChainsHasSameProvider(fromChain, toChain)) { // there's a dex that can support direct swapping
       const swapStep = getSwapStep(fromToken.slug, toToken.slug);
 
       process.push(swapStep);
@@ -281,8 +291,23 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return [[], undefined];
   }
 
-  public async getLatestQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
-    request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // todo: improve this
+  public async getLatestQuoteFromSwapRequest (request: SwapRequest): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
+    const [path, directSwapRequest] = this.getAvailablePath(request);
+
+    if (!directSwapRequest) {
+      throw Error('Swap pair not found');
+    }
+
+    const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
+
+    return {
+      path,
+      swapQuoteResponse
+    };
+  }
+
+  private async getLatestDirectQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
+    // request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // deprecated
     const quoteAskResponses = await this.askProvidersForQuote(request);
 
     // todo: handle error to return back to UI
@@ -302,7 +327,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
       quoteError = preferredErrorResp?.error || defaultErrorResp?.error;
     } else {
-      selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0];
+      selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0]; // todo: choose best quote based on rate
       aliveUntil = selectedQuote?.aliveUntil || (+Date.now() + SWAP_QUOTE_TIMEOUT_MAP.default);
     }
 
@@ -431,9 +456,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
   }
 
-  private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
-    return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
-  }
+  // private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
+  //   return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
+  // }
 
   public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const providerId = params.selectedQuote.provider.id;

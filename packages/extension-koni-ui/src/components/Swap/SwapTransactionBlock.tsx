@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
+import { CommonOptimalPath } from '@subwallet/extension-base/types';
 import { SwapQuote } from '@subwallet/extension-base/types/swap';
 import { swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -14,21 +16,26 @@ import styled from 'styled-components';
 
 interface Props extends ThemeProps{
   quote: SwapQuote,
+  process: CommonOptimalPath;
   logoSize?: number
 }
 const numberMetadata = { maxNumberFormat: 8 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, logoSize = 24, quote } = props;
+  const { className, logoSize = 24, process, quote } = props;
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
 
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(process.steps);
+  }, [process]);
+
   const toAssetInfo = useMemo(() => {
-    return assetRegistryMap[quote.pair.to] || undefined;
-  }, [assetRegistryMap, quote.pair.to]);
+    return originSwapPair ? assetRegistryMap[originSwapPair.to] : undefined;
+  }, [assetRegistryMap, originSwapPair]);
 
   const fromAssetInfo = useMemo(() => {
-    return assetRegistryMap[quote.pair.from] || undefined;
-  }, [assetRegistryMap, quote.pair.from]);
+    return originSwapPair ? assetRegistryMap[originSwapPair.from] : undefined;
+  }, [assetRegistryMap, originSwapPair]);
 
   return (
     <div className={CN(className, 'swap-confirmation-container')}>

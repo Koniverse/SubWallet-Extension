@@ -165,19 +165,18 @@ function getTokenBalanceMap (
   return result;
 }
 
-// note: string in Record<string, TokenBalanceItemType | undefined> is token slug
-const useGetCurrentAccountTokenBalance = () => {
+const useGetAccountTokenBalance = () => {
   const balanceMap = useSelector((state: RootState) => state.balance.balanceMap);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const priceMap = useSelector((state: RootState) => state.price.priceMap);
   const price24hMap = useSelector((state: RootState) => state.price.price24hMap);
   const currency = useSelector((state: RootState) => state.price.currencyData);
   const assetRegistryMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
-  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
-  return useCallback((tokenItems: TokenItem[] | string[]): Record<string, TokenBalanceItemType | undefined> => {
+  // note: string in Record<string, TokenBalanceItemType | undefined> is token slug
+  return useCallback((tokenItems: TokenItem[] | string[], accountProxyId: string): Record<string, TokenBalanceItemType | undefined> => {
     return getTokenBalanceMap(
-      currentAccountProxy?.id || '',
+      accountProxyId,
       tokenItems,
       balanceMap,
       priceMap,
@@ -186,7 +185,7 @@ const useGetCurrentAccountTokenBalance = () => {
       chainInfoMap,
       currency
     );
-  }, [assetRegistryMap, balanceMap, chainInfoMap, currency, currentAccountProxy?.id, price24hMap, priceMap]);
+  }, [assetRegistryMap, balanceMap, chainInfoMap, currency, price24hMap, priceMap]);
 };
 
-export default useGetCurrentAccountTokenBalance;
+export default useGetAccountTokenBalance;

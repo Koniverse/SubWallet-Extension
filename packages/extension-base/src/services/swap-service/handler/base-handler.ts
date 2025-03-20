@@ -3,7 +3,6 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { _validateBalanceToSwap, _validateBalanceToSwapV2, _validateQuoteV2, _validateSwapRecipient, _validateSwapRecipientV2 } from '@subwallet/extension-base/core/logic-validation/swap';
 import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
@@ -12,7 +11,7 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getTokenMinAmount, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, BriefSwapStepV2, BriefXcmStep, BriefXcmStepV2, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -185,8 +184,13 @@ export class SwapBaseHandler {
     const currentStep = params.process.steps[stepIndex];
     const currentFee = params.process.totalFee[stepIndex];
     const feeToken = currentFee.selectedFeeToken || currentFee.defaultFeeToken;
-    const feeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount || '0';
-    const metadata = currentStep.metadata as unknown as BriefXcmStep;
+    const feeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount;
+
+    if (!feeAmount) {
+      throw new Error('Fee not found for XCM step');
+    }
+
+    const metadata = currentStep.metadata as unknown as BriefXCMStep;
     const sendingAmount = metadata.sendingValue;
     const bnAmount = new BigN(sendingAmount);
 
@@ -234,7 +238,7 @@ export class SwapBaseHandler {
 
     const destMinAmount = _getTokenMinAmount(toAsset);
     // TODO: Need to update with new logic, calculate fee to claim on dest chain
-    const minSendingRequired = new BigN(destMinAmount).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+    const minSendingRequired = new BigN(destMinAmount).multipliedBy(FEE_RATE_MULTIPLIER.high);
 
     // Check sending token ED for receiver
     if (bnAmount.lt(minSendingRequired)) {

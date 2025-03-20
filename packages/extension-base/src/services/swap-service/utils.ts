@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { BriefXCMStep, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
 import { BriefStepV2, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -32,14 +32,23 @@ export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in millisecon
 
 export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
-  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
-  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
   [SwapProviderId.POLKADOT_ASSET_HUB]: [COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB],
   [SwapProviderId.KUSAMA_ASSET_HUB]: [COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB],
+  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT],
+  [SwapProviderId.UNISWAP]: [COMMON_CHAIN_SLUGS.ETHEREUM],
+
+  // testnet
+  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
+  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.ROCOCO_ASSET_HUB]: [COMMON_CHAIN_SLUGS.ROCOCO_ASSET_HUB],
-  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub'],
-  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT]
+  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub']
+};
+
+export const FEE_RATE_MULTIPLIER: Record<string, number> = {
+  default: 1,
+  medium: 1.2,
+  high: 2
 };
 
 export function getSupportSwapChain (): string[] {
@@ -165,6 +174,7 @@ export function getAmountAfterSlippage (amount: string, slippage: number) {
 }
 
 export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+  // todo: a provider may support multiple chains but not cross-chain swaps
   for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
     if (group.includes(fromChain) && group.includes(toChain)) {
       return true;
@@ -172,6 +182,36 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   }
 
   return false;
+}
+
+export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  if (!mainSteps.length) {
+    return undefined;
+  }
+
+  if (mainSteps.length === 1) {
+    const metadata = mainSteps[0].metadata as unknown as BriefXCMStep; // todo: temp for round 1, the exact interface is handle in round 2
+
+    return {
+      from: metadata.originTokenInfo.slug,
+      to: metadata.destinationTokenInfo.slug,
+      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+    };
+  }
+
+  const firstStep = mainSteps[0];
+  const lastStep = mainSteps[mainSteps.length - 1];
+
+  const firstMetadata = firstStep.metadata as unknown as BriefXCMStep;
+  const lastMetadata = lastStep.metadata as unknown as BriefXCMStep;
+
+  return {
+    from: firstMetadata.originTokenInfo.slug,
+    to: lastMetadata.destinationTokenInfo.slug,
+    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+  };
 }
 
 export function getLastAmountFromSteps (steps: CommonStepDetail[]): string {
