@@ -3,14 +3,16 @@
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 
-export function _isAcrossChainBridge (srcChain: string, destChain: string): boolean {
-  if (srcChain === 'base_sepolia' && destChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
-    return true;
-  } else if (srcChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA && destChain === 'base_sepolia') {
-    return true;
-  }
+const acrossPairsMap = new Map([
+  [COMMON_CHAIN_SLUGS.ETHEREUM, new Set(['optimism', 'base_mainnet'])],
+  ['optimism', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
+  ['base_mainnet', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
+  [COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA, new Set(['base_sepolia'])], // TESTNET START HERE
+  ['base_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA])]
+]);
 
-  return false;
+export function _isAcrossChainBridge (srcChain: string, destChain: string): boolean {
+  return acrossPairsMap.get(srcChain)?.has(destChain) ?? false;
 }
 
 export const SpokePoolMapping: Record<number, { SpokePool: { address: string; blockNumber: number } }> = {
