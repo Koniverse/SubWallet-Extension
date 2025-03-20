@@ -18,3 +18,7 @@ export const enum XcmStepPosition {
   AFTER_SWAP = 1,
   AFTER_XCM_SWAP = 2
 }
+
+export interface PairSlug {
+  fromTokenSlug: string,
+}

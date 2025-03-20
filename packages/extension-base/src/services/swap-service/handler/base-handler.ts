@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
-import { _validateBalanceToSwap, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
+import { _validateBalanceToSwap, _validateBalanceToSwapV2, _validateQuoteV2, _validateSwapRecipient, _validateSwapRecipientV2 } from '@subwallet/extension-base/core/logic-validation/swap';
 import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
@@ -13,7 +13,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getTokenMinAmount, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, BriefXcmStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, BriefSwapStepV2, BriefXcmStep, BriefXcmStepV2, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -280,11 +280,348 @@ export class SwapBaseHandler {
     return [];
   }
 
-  // public async validateSwapV2
+  public async validateSwapV2 (params: ValidateSwapProcessParams, swapIndex: number): Promise<TransactionError[]> {
+    const { address, process, recipient, selectedQuote } = params;
 
-  // public async validateXcmSwapV2
+    // Validate quote
+    const quoteError = _validateQuoteV2(selectedQuote);
 
-  // public async validateSwapXcmV2
+    if (quoteError) {
+      return Promise.resolve([quoteError]);
+    }
+
+    const swapFee = process.totalFee[swapIndex];
+    const swapInfo = process.steps[swapIndex].metadata as unknown as BriefSwapStepV2;
+    const networkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!networkFee) {
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
+    }
+
+    const fromToken = swapInfo.originTokenInfo;
+    const fromChain = this.chainService.getChainInfoByKey(fromToken.originChain);
+    const feeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const [feeTokenBalance, fromTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(address, fromToken.originChain, feeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(address, fromToken.originChain, fromToken.slug, ExtrinsicType.SWAP)
+    ]);
+
+    // Validate balance
+    const balanceError = _validateBalanceToSwapV2({
+      chainInfo: fromChain,
+      fromToken: fromToken,
+      fromTokenBalance: fromTokenBalance.value,
+      feeToken: feeToken,
+      feeTokenBalance: feeTokenBalance.value,
+      feeAmount: networkFee.amount,
+      swapAmount: swapInfo.sendingValue,
+      minSwapAmount: selectedQuote.minSwap
+    });
+
+    if (balanceError) {
+      return Promise.resolve([balanceError]);
+    }
+
+    // Validate recipient
+    const toChain = this.chainService.getChainInfoByKey(swapInfo.destinationTokenInfo.originChain);
+    const recipientError = _validateSwapRecipientV2(toChain, recipient);
+
+    if (recipientError) {
+      return Promise.resolve([recipientError]);
+    }
+
+    return Promise.resolve([]);
+  }
+
+  public async validateSwapXcmV2 (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
+    // -- SWAP -- //
+
+    const swapInfo = params.process.steps[swapIndex].metadata as unknown as BriefSwapStepV2;
+    const swapFee = params.process.totalFee[xcmIndex];
+
+    // Validate quote
+    const quoteError = _validateQuoteV2(params.selectedQuote);
+
+    if (quoteError) {
+      return Promise.resolve([quoteError]);
+    }
+
+    const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!swapNetworkFee) {
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
+    }
+
+    const swapFromToken = swapInfo.originTokenInfo;
+    const swapFromChain = this.chainService.getChainInfoByKey(swapFromToken.originChain);
+    const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFromToken.slug, ExtrinsicType.SWAP)
+    ]);
+
+    // Validate balance
+    const balanceError = _validateBalanceToSwapV2({
+      chainInfo: swapFromChain,
+      fromToken: swapFromToken,
+      fromTokenBalance: swapFromTokenBalance.value,
+      feeToken: swapFeeToken,
+      feeTokenBalance: swapFeeTokenBalance.value,
+      feeAmount: swapNetworkFee.amount,
+      swapAmount: swapInfo.sendingValue,
+      minSwapAmount: params.selectedQuote.minSwap
+    });
+
+    if (balanceError) {
+      return Promise.resolve([balanceError]);
+    }
+
+    // Validate recipient
+    const swapToChain = this.chainService.getChainInfoByKey(swapInfo.destinationTokenInfo.originChain);
+    const recipientError = _validateSwapRecipientV2(swapToChain, params.recipient);
+
+    if (recipientError) {
+      return Promise.resolve([recipientError]);
+    }
+
+    // -- XCM -- //
+
+    const xcmInfo = params.process.steps[xcmIndex].metadata as unknown as BriefXcmStepV2;
+    const xcmFee = params.process.totalFee[xcmIndex];
+    const xcmFeeToken = xcmFee.selectedFeeToken || xcmFee.defaultFeeToken;
+    const xcmNetworkFee = xcmFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!xcmNetworkFee) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const xcmFeeAmount = xcmNetworkFee.amount;
+    const bnXcmSendingAmount = BigN(xcmInfo.sendingValue);
+    const xcmFromToken = xcmInfo?.originTokenInfo;
+    const xcmToToken = xcmInfo?.destinationTokenInfo;
+
+    if (!xcmFromToken || !xcmToToken) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const xcmFromChain = this.chainService.getChainInfoByKey(xcmFromToken.originChain);
+    const xcmToChain = this.chainService.getChainInfoByKey(xcmToToken.originChain);
+    const xcmToChainNativeToken = this.chainService.getNativeTokenInfo(xcmToToken.originChain);
+    const xcmSender = _reformatAddressWithChain(params.address, xcmFromChain);
+    const xcmReceiver = _reformatAddressWithChain(params.recipient ?? xcmSender, xcmToChain);
+
+    /* Get transferable balance */
+    const [xcmFromTokenBalance, xcmFeeTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
+    ]);
+
+    const bnXcmFromTokenBalance = BigN(xcmFromTokenBalance.value);
+    const bnXcmFeeTokenBalance = BigN(xcmFeeTokenBalance.value);
+
+    /* Compare transferable balance with amount xcm */
+    if (bnXcmFromTokenBalance.lt(bnXcmSendingAmount)) {
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${xcmFromToken.symbol} and try again.`))];
+    }
+
+    /**
+     * Calculate fee token keep alive after xcm
+     * If fee token is the same as from token, need to subtract sending amount
+     * @TODO: Need to update logic if change fee token (multi with rate)
+     * */
+    const xcmFeeBalanceAfterTransfer = bnXcmFeeTokenBalance.minus(xcmFeeAmount).minus(xcmFromToken.slug === xcmFeeToken ? bnXcmSendingAmount : 0);
+
+    /**
+     * Check fee token balance after transfer.
+     * Because the balance had subtracted with existence deposit, so only need to check if it's less than 0
+     * */
+    if (xcmFeeBalanceAfterTransfer.lt(0)) {
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t(`Insufficient balance. Deposit ${xcmFromToken.symbol} and try again.`))];
+    }
+
+    const destMinAmount = _getTokenMinAmount(xcmToToken);
+    // TODO: Need to update with new logic, calculate fee to claim on dest chain
+    const minSendingRequired = BigN(destMinAmount).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+
+    // Check sending token ED for receiver
+    if (bnXcmSendingAmount.lt(minSendingRequired)) {
+      const atLeastStr = formatNumber(minSendingRequired, _getAssetDecimals(xcmToToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(xcmToToken) || 6 });
+
+      return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: xcmFromToken.symbol } }))];
+    }
+
+    // Check keepAlive on dest chain for receiver
+    if (!_isNativeToken(xcmToToken)) {
+      const toChainApi = this.chainService.getSubstrateApi(xcmToToken.originChain);
+
+      // TODO: Need to update, currently only support substrate xcm
+      if (!toChainApi) {
+        return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Destination chain is not active'))];
+      }
+
+      const isSendingTokenSufficient = await _isSufficientToken(xcmToToken, toChainApi);
+
+      if (!isSendingTokenSufficient) {
+        const toChainNativeAssetBalance = await this.balanceService.getTotalBalance(xcmReceiver, xcmToToken.originChain, xcmToChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+
+        const isReceiverAliveByNativeToken = _isAccountActive(toChainNativeAssetBalance.metadata as FrameSystemAccountInfo);
+
+        if (!isReceiverAliveByNativeToken) {
+          // TODO: Update message
+          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeAssetBalance.value, nativeSymbol: xcmToChainNativeToken.symbol, localSymbol: xcmToToken.symbol } }))];
+        }
+      }
+    }
+
+    return Promise.resolve([]);
+  }
+
+  public async validateXcmSwapV2 (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
+    // -- XCM -- //
+
+    const xcmInfo = params.process.steps[xcmIndex].metadata as unknown as BriefXcmStepV2;
+    const xcmFee = params.process.totalFee[xcmIndex];
+    const xcmFeeToken = xcmFee.selectedFeeToken || xcmFee.defaultFeeToken;
+    const xcmNetworkFee = xcmFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!xcmNetworkFee) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const xcmFeeAmount = xcmNetworkFee.amount;
+    const bnXcmSendingAmount = BigN(xcmInfo.sendingValue);
+    const xcmFromToken = xcmInfo?.originTokenInfo;
+    const xcmToToken = xcmInfo?.destinationTokenInfo;
+
+    if (!xcmFromToken || !xcmToToken) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const xcmFromChain = this.chainService.getChainInfoByKey(xcmFromToken.originChain);
+    const xcmToChain = this.chainService.getChainInfoByKey(xcmToToken.originChain);
+    const xcmToChainNativeToken = this.chainService.getNativeTokenInfo(xcmToToken.originChain);
+    const xcmSender = _reformatAddressWithChain(params.address, xcmFromChain);
+    const xcmReceiver = _reformatAddressWithChain(params.recipient ?? xcmSender, xcmToChain);
+
+    /* Get transferable balance */
+    const [xcmFromTokenBalance, xcmFeeTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
+    ]);
+
+    const bnXcmFromTokenBalance = BigN(xcmFromTokenBalance.value);
+    const bnXcmFeeTokenBalance = BigN(xcmFeeTokenBalance.value);
+
+    /* Compare transferable balance with amount xcm */
+    if (bnXcmFromTokenBalance.lt(bnXcmSendingAmount)) {
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${xcmFromToken.symbol} and try again.`))];
+    }
+
+    /**
+     * Calculate fee token keep alive after xcm
+     * If fee token is the same as from token, need to subtract sending amount
+     * @TODO: Need to update logic if change fee token (multi with rate)
+     * */
+    const xcmFeeBalanceAfterTransfer = bnXcmFeeTokenBalance.minus(xcmFeeAmount).minus(xcmFromToken.slug === xcmFeeToken ? bnXcmSendingAmount : 0);
+
+    /**
+     * Check fee token balance after transfer.
+     * Because the balance had subtracted with existence deposit, so only need to check if it's less than 0
+     * */
+    if (xcmFeeBalanceAfterTransfer.lt(0)) {
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t(`Insufficient balance. Deposit ${xcmFromToken.symbol} and try again.`))];
+    }
+
+    const destMinAmount = _getTokenMinAmount(xcmToToken);
+    // TODO: Need to update with new logic, calculate fee to claim on dest chain
+    const minSendingRequired = BigN(destMinAmount).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+
+    // Check sending token ED for receiver
+    if (bnXcmSendingAmount.lt(minSendingRequired)) {
+      const atLeastStr = formatNumber(minSendingRequired, _getAssetDecimals(xcmToToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(xcmToToken) || 6 });
+
+      return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: xcmFromToken.symbol } }))];
+    }
+
+    // Check keepAlive on dest chain for receiver
+    if (!_isNativeToken(xcmToToken)) {
+      const toChainApi = this.chainService.getSubstrateApi(xcmToToken.originChain);
+
+      // TODO: Need to update, currently only support substrate xcm
+      if (!toChainApi) {
+        return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Destination chain is not active'))];
+      }
+
+      const isSendingTokenSufficient = await _isSufficientToken(xcmToToken, toChainApi);
+
+      if (!isSendingTokenSufficient) {
+        const toChainNativeAssetBalance = await this.balanceService.getTotalBalance(xcmReceiver, xcmToToken.originChain, xcmToChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+
+        const isReceiverAliveByNativeToken = _isAccountActive(toChainNativeAssetBalance.metadata as FrameSystemAccountInfo);
+
+        if (!isReceiverAliveByNativeToken) {
+          // TODO: Update message
+          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeAssetBalance.value, nativeSymbol: xcmToChainNativeToken.symbol, localSymbol: xcmToToken.symbol } }))];
+        }
+      }
+    }
+
+    // -- SWAP -- //
+
+    const swapInfo = params.process.steps[swapIndex].metadata as unknown as BriefSwapStepV2;
+    const swapFee = params.process.totalFee[xcmIndex];
+
+    // Validate quote
+    const quoteError = _validateQuoteV2(params.selectedQuote);
+
+    if (quoteError) {
+      return Promise.resolve([quoteError]);
+    }
+
+    const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!swapNetworkFee) {
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
+    }
+
+    const swapFromToken = swapInfo.originTokenInfo;
+    const swapFromChain = this.chainService.getChainInfoByKey(swapFromToken.originChain);
+    const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFromToken.slug, ExtrinsicType.SWAP)
+    ]);
+
+    // Validate balance
+    const balanceError = _validateBalanceToSwapV2({
+      chainInfo: swapFromChain,
+      fromToken: swapFromToken,
+      fromTokenBalance: swapFromTokenBalance.value,
+      feeToken: swapFeeToken,
+      feeTokenBalance: swapFeeTokenBalance.value,
+      feeAmount: swapNetworkFee.amount,
+      swapAmount: swapInfo.sendingValue,
+      minSwapAmount: params.selectedQuote.minSwap
+    });
+
+    if (balanceError) {
+      return Promise.resolve([balanceError]);
+    }
+
+    // Validate recipient
+    const swapToChain = this.chainService.getChainInfoByKey(swapInfo.destinationTokenInfo.originChain);
+    const recipientError = _validateSwapRecipientV2(swapToChain, params.recipient);
+
+    if (recipientError) {
+      return Promise.resolve([recipientError]);
+    }
+
+    return Promise.resolve([]);
+  }
+
+  public async validateXcmSwapXcmV2 (params: ValidateSwapProcessParams, swapIndex: number, firstXcmIndex: number, lastXcmIndex: number): Promise<TransactionError[]> {
+    return Promise.resolve([]);
+  }
 
   public async validateTokenApproveStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
     return Promise.resolve([]);

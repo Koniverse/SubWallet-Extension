@@ -204,8 +204,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       path
     });
 
-    console.log('optimalProcess', optimalProcess);
-
     // todo: can also return a chain route
     return {
       process: optimalProcess,

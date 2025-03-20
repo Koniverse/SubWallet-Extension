@@ -514,43 +514,38 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigN(amount);
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
 
-    if (bnAmount.lte(0)) {
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigN(selectedQuote.fromAmount).lte(0)) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
-    let isXcmOk = false;
-    const currentStep = params.currentStep;
+    const actionList = process.steps.map((step) => step.type);
+    const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
+    const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
+    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
+    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
+    const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
 
-    for (const [index, step] of params.process.steps.entries()) {
-      if (currentStep > index) {
-        continue;
-      }
-
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.XCM:
-            return this.swapBaseHandler.validateXcmStepV2(params, index);
-          case SwapStepType.SWAP:
-            return this.validateSwapStep(params, isXcmOk, index);
-          default:
-            return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
+    if (swap) {
+      return this.swapBaseHandler.validateSwapV2(params, 1); // todo: create interface for input request
     }
 
-    return [];
+    if (swapXcm) {
+      return this.swapBaseHandler.validateSwapXcmV2(params, 1, 2);
+    }
+
+    if (xcmSwap) {
+      return this.swapBaseHandler.validateXcmSwapV2(params, 2, 1);
+    }
+
+    if (xcmSwapXcm) {
+      return this.swapBaseHandler.validateXcmSwapXcmV2(params, 2, 1, 3);
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
   }
 }

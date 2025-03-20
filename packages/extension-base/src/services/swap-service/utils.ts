@@ -7,6 +7,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { BriefStepV2, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -171,4 +172,58 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   }
 
   return false;
+}
+
+export function getLastAmountFromSteps (steps: CommonStepDetail[]): string {
+  const lastStep = steps[steps.length - 1];
+  const lastAmount = lastStep?.metadata?.destinationValue as string;
+
+  return lastAmount ?? '0';
+}
+
+export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  return mainSteps.reduce((chainRoute, currentStep, currentIndex) => {
+    const metadata = currentStep.metadata as unknown as BriefStepV2;
+
+    if (currentIndex === 0) {
+      chainRoute.push(metadata.originTokenInfo.originChain);
+      chainRoute.push(metadata.destinationTokenInfo.originChain);
+    } else {
+      chainRoute.push(metadata.destinationTokenInfo.originChain);
+    }
+
+    return chainRoute;
+  }, [] as string[]);
+}
+
+export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  if (!mainSteps.length) {
+    return undefined;
+  }
+
+  if (mainSteps.length === 1) {
+    const metadata = mainSteps[0].metadata as unknown as BriefStepV2;
+
+    return {
+      from: metadata.originTokenInfo.slug,
+      to: metadata.destinationTokenInfo.slug,
+      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+    };
+  }
+
+  const firstStep = mainSteps[0];
+  const lastStep = mainSteps[mainSteps.length - 1];
+
+  const firstMetadata = firstStep.metadata as unknown as BriefStepV2;
+  const lastMetadata = lastStep.metadata as unknown as BriefStepV2;
+
+  return {
+    from: firstMetadata.originTokenInfo.slug,
+    to: lastMetadata.destinationTokenInfo.slug,
+    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+  };
 }
