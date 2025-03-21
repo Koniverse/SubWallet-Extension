@@ -180,41 +180,18 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   return false;
 }
 
-// export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
-//   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
-//
-//   if (!mainSteps.length) {
-//     return undefined;
-//   }
-//
-//   if (mainSteps.length === 1) {
-//     const metadata = mainSteps[0].metadata as unknown as BriefXCMStep; // todo: temp for round 1, the exact interface is handle in round 2
-//
-//     return {
-//       from: metadata.originTokenInfo.slug,
-//       to: metadata.destinationTokenInfo.slug,
-//       slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
-//     };
-//   }
-//
-//   const firstStep = mainSteps[0];
-//   const lastStep = mainSteps[mainSteps.length - 1];
-//
-//   const firstMetadata = firstStep.metadata as unknown as BriefXCMStep;
-//   const lastMetadata = lastStep.metadata as unknown as BriefXCMStep;
-//
-//   return {
-//     from: firstMetadata.originTokenInfo.slug,
-//     to: lastMetadata.destinationTokenInfo.slug,
-//     slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
-//   };
-// }
-
-export function getLastAmountFromSteps (steps: CommonStepDetail[]): string {
+export function getLastAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
   const lastStep = steps[steps.length - 1];
   const lastAmount = lastStep?.metadata?.destinationValue as string;
 
-  return lastAmount ?? '0';
+  return lastAmount ?? undefined;
+}
+
+export function getFirstAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
+  const firstStep = steps[1];
+  const firstAmount = firstStep?.metadata?.sendingValue as string;
+
+  return firstAmount ?? undefined;
 }
 
 export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
@@ -235,6 +212,8 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
 }
 
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
+  // todo: opt2: make data about sending and receiving token is required.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   if (!mainSteps.length) {

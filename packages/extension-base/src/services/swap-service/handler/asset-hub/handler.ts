@@ -12,16 +12,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import {
-  AssetHubSwapStepMetadata,
-  BasicTxErrorType,
-  BriefXCMStep, DynamicSwapType,
-  GenSwapStepFuncV2,
-  OptimalSwapPathParamsV2,
-  RequestCrossChainTransfer,
-  RuntimeDispatchInfo,
-  XcmStepPosition
-} from '@subwallet/extension-base/types';
+import { AssetHubSwapStepMetadata, BasicTxErrorType, BriefXCMStep, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, XcmStepPosition } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';

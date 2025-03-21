@@ -13,12 +13,7 @@ import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-servi
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import {
-  BasicTxErrorType,
-  DynamicSwapAction, DynamicSwapType,
-  OptimalSwapPathParamsV2,
-  ValidateSwapProcessParams
-} from '@subwallet/extension-base/types';
+import { BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -197,7 +192,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     /*
     * 1. Find available path
     * 2. Ask swap quotes from providers
-    * 3. Select the best quote
+    * 3. Select the best quote @Todo: handle this better
     * 4. Generate optimal process for that quote
     * */
 
