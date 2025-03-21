@@ -146,7 +146,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
   let bittensorStakingBalances: BigN[] = new Array<BigN>(addresses.length).fill(new BigN(0));
 
-  if (['bittensor'].includes(chainInfo.slug)) {
+  if (['bittensor', 'bittensor_testnet'].includes(chainInfo.slug)) {
     bittensorStakingBalances = await Promise.all(addresses.map(async (address) => {
       const stakeInfo = (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON() as Record<string, TaoStakeInfo> | undefined;
       const price = await getTaoToAlphaMapping(substrateApi);
