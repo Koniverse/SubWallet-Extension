@@ -34,6 +34,7 @@ export interface OptimalYieldPathParams {
   address: string;
   amount: string;
   targets?: YieldPoolTarget[];
+  netuid?: number;
 }
 
 /**
