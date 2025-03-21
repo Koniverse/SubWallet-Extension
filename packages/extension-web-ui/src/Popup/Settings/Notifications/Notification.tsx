@@ -513,6 +513,7 @@ function Component ({ isInModal,
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
+        className={'notification-empty-list'}
         emptyMessage={t('Your notifications will appear here')}
         emptyTitle={t('No notifications yet')}
         phosphorIcon={ListBullets}
@@ -526,6 +527,7 @@ function Component ({ isInModal,
         buttonProps={{
           icon: (
             <Icon
+              customSize={'20px'}
               phosphorIcon={BellSimpleRinging}
               weight={'fill'}
             />),
@@ -535,6 +537,7 @@ function Component ({ isInModal,
           shape: 'circle',
           children: t('Enable notifications')
         }}
+        className={'notification-empty-with-button'}
         emptyMessage={t('Enable notifications now to not miss anything!')}
         emptyTitle={t('Notifications are disabled')}
         phosphorIcon={BellSimpleSlash}
@@ -813,6 +816,26 @@ const Notification = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrappe
 
       '.__filter-tab-mark-read-button': {
         paddingRight: 0
+      }
+    },
+
+    '.notification-empty-with-button': {
+      '.empty-list-inner': {
+        gap: 0
+      },
+      '.empty_icon_wrapper': {
+        paddingBottom: 26
+      },
+      '.empty_text_container': {
+        paddingBottom: 24
+      }
+    },
+
+    '.notification-empty-list': {
+      marginTop: 4,
+      flexDirection: 'row',
+      '.empty-list-inner': {
+        gap: 26
       }
     },
 

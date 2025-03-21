@@ -24,15 +24,15 @@ export type TransactionModalProps = {
 
 export interface TransactionModalContextType {
   claimRewardModal: {
-    open: (props: TransactionModalProps) => void;
+    open: (props?: TransactionModalProps) => void;
     close: VoidFunction;
   },
   claimBridgeModal: {
-    open: (props: TransactionModalProps) => void;
+    open: (props?: TransactionModalProps) => void;
     close: VoidFunction;
   },
   withdrawModal: {
-    open: (props: TransactionModalProps) => void;
+    open: (props?: TransactionModalProps) => void;
     close: VoidFunction;
   },
   closeTransactionModalById: (id: string) => void,

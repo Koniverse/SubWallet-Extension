@@ -7,9 +7,9 @@ import { NOTIFICATION_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants
 import { switchReadNotificationStatus } from '@subwallet/extension-web-ui/messaging/transaction/notification';
 import { NotificationInfoItem } from '@subwallet/extension-web-ui/Popup/Settings/Notifications';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { BackgroundIcon } from '@subwallet/react-ui';
+import { BackgroundIcon, Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
-import { Checks, Coins, DownloadSimple, Eye, Gift, X } from 'phosphor-react';
+import { CaretLeft, Checks, Coins, DownloadSimple, Eye, Gift, X } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -97,6 +97,14 @@ function Component (props: Props): React.ReactElement<Props> {
   return (
     <BaseModal
       className={className}
+      closeIcon={
+        (
+          <Icon
+            phosphorIcon={CaretLeft}
+            size='md'
+          />
+        )
+      }
       id={NOTIFICATION_DETAIL_MODAL}
       onCancel={onCancel}
       title={t('Actions')}
