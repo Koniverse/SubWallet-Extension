@@ -180,11 +180,18 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   return false;
 }
 
-export function getLastAmountFromSteps (steps: CommonStepDetail[]): string {
+export function getLastAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
   const lastStep = steps[steps.length - 1];
   const lastAmount = lastStep?.metadata?.destinationValue as string;
 
-  return lastAmount ?? '0';
+  return lastAmount ?? undefined;
+}
+
+export function getFirstAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
+  const firstStep = steps[1];
+  const firstAmount = firstStep?.metadata?.sendingValue as string;
+
+  return firstAmount ?? undefined;
 }
 
 export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
@@ -206,6 +213,7 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
 
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
   // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
+  // todo: opt2: make data about sending and receiving token is required.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   if (!mainSteps.length) {
