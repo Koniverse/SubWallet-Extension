@@ -4,14 +4,13 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
-import { swapCustomFormatter } from '@subwallet/extension-base/utils';
+import { CommonOptimalPath, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Icon, Number, Tooltip } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, Number as UiNumber, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
@@ -20,7 +19,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  currentQuote: SwapQuote | undefined
+  currentQuote: SwapQuote | undefined;
+  currentOptimalSwapPath: CommonOptimalPath | undefined;
   isFormInvalid: boolean;
   estimatedFeeValue: BigN;
   handleRequestLoading: boolean;
@@ -33,12 +33,71 @@ type Props = ThemeProps & {
   openSlippageModal: VoidFunction;
 };
 
-const numberMetadata = { maxNumberFormat: 8 };
+type DecimalParts = {
+  integerPart: string;
+  subZeroCount?: number;
+  fractionPart?: string;
+};
+
+function analyzeDecimal (value: number): DecimalParts {
+  const str = new BigN(value).toFixed();
+  const [intPart, fracPartRaw = ''] = str.split('.');
+
+  if (!fracPartRaw) {
+    return { integerPart: intPart };
+  }
+
+  const zeroMatch = fracPartRaw.match(/^(0{3,})/);
+  const subCount = zeroMatch?.[1].length;
+  const rest = subCount ? fracPartRaw.slice(subCount) : fracPartRaw;
+
+  const maxLen = subCount ? 2 : 4;
+  const roundPart = rest.slice(0, maxLen + 1);
+
+  let roundedStr = roundPart;
+
+  if (roundPart.length > maxLen) {
+    const num = Number(`0.${roundPart}`);
+    const rounded = Math.round(num * Math.pow(10, maxLen));
+
+    roundedStr = String(rounded).padStart(maxLen, '0');
+  }
+
+  return {
+    integerPart: intPart,
+    subZeroCount: subCount,
+    fractionPart: roundedStr.length > 0 ? roundedStr : subCount ? '' : undefined
+  };
+}
+
+function renderRateNumber (value: number): React.ReactNode {
+  const parsed = analyzeDecimal(value);
+
+  if (parsed.fractionPart === undefined) {
+    return <>{parsed.integerPart}</>;
+  }
+
+  const { fractionPart, integerPart, subZeroCount } = parsed;
+
+  if (subZeroCount !== undefined) {
+    return (
+      <>
+        {integerPart}.0<sub>{subZeroCount}</sub>{fractionPart}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {integerPart}.{fractionPart}
+    </>
+  );
+}
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, currentQuote, estimatedFeeValue, fromAssetInfo,
-    handleRequestLoading, isFormInvalid, openSlippageModal,
-    openSwapQuotesModal, quoteAliveUntil, slippage, swapError,
+  const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
+    fromAssetInfo, handleRequestLoading, isFormInvalid,
+    openSlippageModal, openSwapQuotesModal, quoteAliveUntil, slippage, swapError,
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
@@ -50,22 +109,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return (
       <div className={'__quote-estimate-swap-value'}>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(fromAssetInfo)}
-          unitOpacity={0.45}
-          value={1}
-        />
+        <span>
+          1 {_getAssetSymbol(fromAssetInfo)}
+        </span>
         <span>&nbsp;~&nbsp;</span>
-        <Number
-          customFormatter={swapCustomFormatter}
-          decimal={0}
-          formatType={'custom'}
-          metadata={numberMetadata}
-          suffix={_getAssetSymbol(toAssetInfo)}
-          unitOpacity={0.45}
-          value={currentQuote.rate}
-        />
+        <span>
+          {renderRateNumber(currentQuote.rate)}
+          {` ${_getAssetSymbol(toAssetInfo)}`}
+        </span>
       </div>
     );
   };
@@ -186,13 +237,11 @@ const Component: React.FC<Props> = (props: Props) => {
           </Tooltip>
 
           {!notSupportSlippageSelection && (
-            <div className='__slippage-editor-button'>
-              <Icon
-                className='__slippage-editor-button-icon'
-                customSize={'16px'}
-                phosphorIcon={PencilSimpleLine}
-              />
-            </div>
+            <Icon
+              className='__slippage-editor-icon'
+              customSize={'16px'}
+              phosphorIcon={PencilSimpleLine}
+            />
           )}
         </div>
       </>
@@ -235,7 +284,12 @@ const Component: React.FC<Props> = (props: Props) => {
                 label={t('Process')}
               >
                 <div className={'__swap-process-modal-trigger'}>
-                  <TransactionProcessPreview />
+
+                  {
+                    currentOptimalSwapPath && (
+                      <TransactionProcessPreview steps={currentOptimalSwapPath.steps} />
+                    )
+                  }
 
                   <Icon
                     className={'__caret-icon'}
@@ -247,9 +301,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </MetaInfo.Default>
 
               <MetaInfo.Default
+                className={'__swap-estimated-fee-info'}
                 label={t('Estimated fee')}
               >
-                <Number
+                <UiNumber
                   decimal={0}
                   prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                   suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
@@ -305,6 +360,13 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       fontWeight: token.headingFontWeight
     },
 
+    '.__quote-selector-trigger': {
+      display: 'flex',
+      cursor: 'pointer',
+      alignItems: 'center',
+      gap: token.sizeXXS
+    },
+
     '.__best-tag': {
       backgroundColor: convertHexColorToRGBA(token.colorSuccess, 0.1),
       fontSize: 10,
@@ -316,18 +378,22 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       paddingRight: 6
     },
 
-    '.__item-rewards-value, .__item-total-staked-value': {
-      '.ant-number, .ant-typography': {
-        color: 'inherit !important',
-        fontSize: 'inherit !important',
-        fontWeight: 'inherit !important',
-        lineHeight: 'inherit'
-      }
-    },
-
     '.__swap-process-modal-trigger': {
       display: 'flex',
+      cursor: 'pointer',
+      alignItems: 'center',
       gap: token.sizeXXS
+    },
+
+    '.__swap-estimated-fee-info': {
+      '.ant-number': {
+        '&, .ant-typography': {
+          color: 'inherit !important',
+          fontSize: 'inherit !important',
+          fontWeight: 'inherit !important',
+          lineHeight: 'inherit'
+        }
+      }
     },
 
     '.__slippage-action': {
@@ -340,7 +406,7 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       cursor: 'pointer'
     },
 
-    '.__slippage-editor-button-icon': {
+    '.__slippage-editor-icon': {
       color: token.colorTextLight3
     },
 

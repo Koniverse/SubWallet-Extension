@@ -137,7 +137,6 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
     borderRadius: 8,
     paddingBottom: 12,
     position: 'relative',
-    marginBottom: 4,
 
     '&.swap-form-field': {
       '.ant-input-container::before': {

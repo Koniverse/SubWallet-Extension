@@ -1,26 +1,28 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getChainRouteFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
+import { CommonStepDetail } from '@subwallet/extension-base/types';
 import { NetworkGroup } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowRight } from 'phosphor-react';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+type Props = ThemeProps & {
+  steps: CommonStepDetail[];
+};
 
 const Component: FC<Props> = (props: Props) => {
-  const { className } = props;
+  const { className, steps } = props;
   const { t } = useTranslation();
 
-  const items: string[] = (() => ([
-    'polkadot',
-    'kusama',
-    'moonriver'
-  ]))();
+  const items: string[] = useMemo(() => {
+    return getChainRouteFromSteps(steps);
+  }, [steps]);
 
   const isMode1 = items.length < 4;
 
