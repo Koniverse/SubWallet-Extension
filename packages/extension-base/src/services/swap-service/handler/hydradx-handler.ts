@@ -287,7 +287,7 @@ export class HydradxHandler implements SwapBaseInterface {
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
     const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
       if (step.action === DynamicSwapType.BRIDGE) {
-        return this.swapBaseHandler.getBridgeStep.bind(this);
+        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler);
       }
 
       if (step.action === DynamicSwapType.SWAP) {
@@ -477,8 +477,8 @@ export class HydradxHandler implements SwapBaseInterface {
     const actionList = process.steps.map((step) => step.type);
     const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
     const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
-    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
-    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
+    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
+    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
     const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
 
     if (swap) {

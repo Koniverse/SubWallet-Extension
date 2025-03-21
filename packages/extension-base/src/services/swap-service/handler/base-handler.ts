@@ -440,8 +440,8 @@ export class SwapBaseHandler {
     const fromChain = this.chainService.getChainInfoByKey(fromToken.originChain);
     const feeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
     const [feeTokenBalance, fromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(address, fromToken.originChain, feeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(address, fromToken.originChain, fromToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(address, fromChain.slug, feeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(address, fromChain.slug, fromToken.slug, ExtrinsicType.SWAP)
     ]);
 
     // Validate balance
@@ -494,8 +494,8 @@ export class SwapBaseHandler {
     const swapFromChain = this.chainService.getChainInfoByKey(swapFromToken.originChain);
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFromToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(params.address, swapFromChain.slug, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapFromChain.slug, swapFromToken.slug, ExtrinsicType.SWAP)
     ]);
 
     // Validate balance
@@ -547,18 +547,17 @@ export class SwapBaseHandler {
     const xcmToChainNativeToken = this.chainService.getNativeTokenInfo(xcmToToken.originChain);
     const xcmSender = _reformatAddressWithChain(params.address, xcmFromChain);
     const xcmReceiver = _reformatAddressWithChain(params.recipient ?? xcmSender, xcmToChain);
-
-    /* Get transferable balance */
     const [xcmFromTokenBalance, xcmFeeTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromChain.slug, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromChain.slug, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
     ]);
 
-    const bnXcmFromTokenBalance = BigN(xcmFromTokenBalance.value);
-    const bnXcmFeeTokenBalance = BigN(xcmFeeTokenBalance.value);
+    // Balance adjust after previous step
+    const xcmFromTokenBalanceAfterSwap = BigN(xcmFromTokenBalance.value).plus(swapInfo.destinationValue);
+    const xcmFeeTokenBalanceAfterSwap = xcmFromToken.slug === xcmFeeToken ? BigN(xcmFeeTokenBalance.value).plus(swapInfo.destinationValue) : BigN(xcmFeeTokenBalance.value);
 
     /* Compare transferable balance with amount xcm */
-    if (bnXcmFromTokenBalance.lt(bnXcmSendingAmount)) {
+    if (xcmFromTokenBalanceAfterSwap.lt(bnXcmSendingAmount)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${xcmFromToken.symbol} and try again.`))];
     }
 
@@ -567,7 +566,7 @@ export class SwapBaseHandler {
      * If fee token is the same as from token, need to subtract sending amount
      * @TODO: Need to update logic if change fee token (multi with rate)
      * */
-    const xcmFeeBalanceAfterTransfer = bnXcmFeeTokenBalance.minus(xcmFeeAmount).minus(xcmFromToken.slug === xcmFeeToken ? bnXcmSendingAmount : 0);
+    const xcmFeeBalanceAfterTransfer = xcmFeeTokenBalanceAfterSwap.minus(xcmFeeAmount).minus(xcmFromToken.slug === xcmFeeToken ? bnXcmSendingAmount : 0);
 
     /**
      * Check fee token balance after transfer.
@@ -643,8 +642,8 @@ export class SwapBaseHandler {
 
     /* Get transferable balance */
     const [xcmFromTokenBalance, xcmFeeTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(xcmSender, xcmFromToken.originChain, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromChain.slug, xcmFromToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(xcmSender, xcmFromChain.slug, xcmFeeToken, ExtrinsicType.TRANSFER_XCM)
     ]);
 
     const bnXcmFromTokenBalance = BigN(xcmFromTokenBalance.value);
@@ -707,7 +706,7 @@ export class SwapBaseHandler {
     // -- SWAP -- //
 
     const swapInfo = params.process.steps[swapIndex].metadata as unknown as BriefSwapStepV2;
-    const swapFee = params.process.totalFee[xcmIndex];
+    const swapFee = params.process.totalFee[swapIndex];
 
     // Validate quote
     const quoteError = _validateQuoteV2(params.selectedQuote);
@@ -725,18 +724,23 @@ export class SwapBaseHandler {
     const swapFromToken = swapInfo.originTokenInfo;
     const swapFromChain = this.chainService.getChainInfoByKey(swapFromToken.originChain);
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const swapSender = _reformatAddressWithChain(params.address, swapFromChain);
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapFromToken.originChain, swapFromToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(swapSender, swapFromChain.slug, swapFeeToken.slug),
+      this.balanceService.getTransferableBalance(swapSender, swapFromChain.slug, swapFromToken.slug)
     ]);
+
+    // Balance adjust after previous step
+    const swapFromTokenBalanceAfterXcm = BigN(swapFromTokenBalance.value).plus(xcmInfo.destinationValue).toString();
+    const swapFeeTokenBalanceAfterXcm = swapFeeToken.slug === swapFromToken.slug ? BigN(swapFeeTokenBalance.value).plus(xcmInfo.destinationValue).toString() : swapFeeTokenBalance.value;
 
     // Validate balance
     const balanceError = _validateBalanceToSwapV2({
       chainInfo: swapFromChain,
       fromToken: swapFromToken,
-      fromTokenBalance: swapFromTokenBalance.value,
+      fromTokenBalance: swapFromTokenBalanceAfterXcm,
       feeToken: swapFeeToken,
-      feeTokenBalance: swapFeeTokenBalance.value,
+      feeTokenBalance: swapFeeTokenBalanceAfterXcm,
       feeAmount: swapNetworkFee.amount,
       swapAmount: swapInfo.sendingValue,
       minSwapAmount: params.selectedQuote.minSwap
