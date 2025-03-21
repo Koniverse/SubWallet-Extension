@@ -574,16 +574,17 @@ export class HydradxHandler implements SwapBaseInterface {
       }
 
       const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.XCM:
-            return this.swapBaseHandler.validateXcmStepV2(params, index);
-          case CommonStepType.SET_FEE_TOKEN:
-            return this.swapBaseHandler.validateSetFeeTokenStep(params, index);
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
+        return this.swapBaseHandler.validateProcess(params);
+        // switch (step.type) {
+        //   case CommonStepType.DEFAULT:
+        //     return Promise.resolve([]);
+        //   case CommonStepType.XCM:
+        //     return this.swapBaseHandler.validateXcmStepV2(params, index);
+        //   case CommonStepType.SET_FEE_TOKEN:
+        //     return this.swapBaseHandler.validateSetFeeTokenStep(params, index);
+        //   default:
+        //     return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
+        // }
       };
 
       const errors = await getErrors();
