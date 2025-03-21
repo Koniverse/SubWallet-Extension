@@ -3,10 +3,9 @@
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
-import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { BriefXCMStep, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
+import { BriefStepV2, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -50,6 +49,10 @@ export const FEE_RATE_MULTIPLIER: Record<string, number> = {
   high: 2
 };
 
+export function getSupportSwapChain (): string[] {
+  return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
+}
+
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
   return swapPair?.metadata?.alternativeAsset as string;
 }
@@ -59,8 +62,8 @@ export function getSwapAltToken (chainAsset: _ChainAsset): string | undefined {
 }
 
 export function calculateSwapRate (fromAmount: string, toAmount: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
-  const bnFromAmount = new BigN(fromAmount);
-  const bnToAmount = new BigN(toAmount);
+  const bnFromAmount = BigN(fromAmount);
+  const bnToAmount = BigN(toAmount);
 
   const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
   const bnRate = bnFromAmount.div(bnToAmount);
@@ -70,7 +73,7 @@ export function calculateSwapRate (fromAmount: string, toAmount: string, fromAss
 
 export function convertSwapRate (rate: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
   const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
-  const bnRate = new BigN(rate);
+  const bnRate = BigN(rate);
 
   return bnRate.times(10 ** decimalDiff).pow(-1).toNumber();
 }
@@ -116,7 +119,7 @@ export function getBridgeStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.BRIDGE,
     pair: {
-      slug: `${from}___${to}`,
+      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
       from,
       to
     }
@@ -127,17 +130,17 @@ export function getSwapStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.SWAP,
     pair: {
-      slug: `${from}___${to}`,
+      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
       from,
       to
     }
   };
 }
 
-export function findXcmDestination (assetRefMap: Record<string, _AssetRef>, chainAsset: _ChainAsset, destChain: string) {
+export function findXcmTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset) {
   const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
-    assetRef.srcAsset === chainAsset.slug &&
-    assetRef.destChain === destChain &&
+    assetRef.srcAsset === fromToken.slug &&
+    assetRef.destChain === _getAssetOriginChain(toToken) &&
     assetRef.path === _AssetRefPath.XCM
   );
 
@@ -146,6 +149,24 @@ export function findXcmDestination (assetRefMap: Record<string, _AssetRef>, chai
   }
 
   return undefined;
+}
+
+export function findSwapTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset) {
+  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
+    assetRef.destAsset === toToken.slug &&
+    assetRef.srcChain === _getAssetOriginChain(fromToken) &&
+    assetRef.path === _AssetRefPath.XCM
+  );
+
+  if (foundAssetRef) {
+    return foundAssetRef.srcAsset;
+  }
+
+  return undefined;
+}
+
+export function getAmountAfterSlippage (amount: string, slippage: number) {
+  return BigN(amount).multipliedBy(BigN(1).minus(BigN(slippage))).integerValue(BigN.ROUND_DOWN).toString();
 }
 
 export function isChainsHasSameProvider (fromChain: string, toChain: string) {
@@ -159,7 +180,40 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
   return false;
 }
 
+export function getLastAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
+  const lastStep = steps[steps.length - 1];
+  const lastAmount = lastStep?.metadata?.destinationValue as string;
+
+  return lastAmount ?? undefined;
+}
+
+export function getFirstAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
+  const firstStep = steps[1];
+  const firstAmount = firstStep?.metadata?.sendingValue as string;
+
+  return firstAmount ?? undefined;
+}
+
+export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  return mainSteps.reduce((chainRoute, currentStep, currentIndex) => {
+    const metadata = currentStep.metadata as unknown as BriefStepV2;
+
+    if (currentIndex === 0) {
+      chainRoute.push(metadata.originTokenInfo.originChain);
+      chainRoute.push(metadata.destinationTokenInfo.originChain);
+    } else {
+      chainRoute.push(metadata.destinationTokenInfo.originChain);
+    }
+
+    return chainRoute;
+  }, [] as string[]);
+}
+
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
+  // todo: opt2: make data about sending and receiving token is required.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   if (!mainSteps.length) {
@@ -167,7 +221,7 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   }
 
   if (mainSteps.length === 1) {
-    const metadata = mainSteps[0].metadata as unknown as BriefXCMStep; // todo: temp for round 1, the exact interface is handle in round 2
+    const metadata = mainSteps[0].metadata as unknown as BriefStepV2;
 
     return {
       from: metadata.originTokenInfo.slug,
@@ -179,8 +233,8 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   const firstStep = mainSteps[0];
   const lastStep = mainSteps[mainSteps.length - 1];
 
-  const firstMetadata = firstStep.metadata as unknown as BriefXCMStep;
-  const lastMetadata = lastStep.metadata as unknown as BriefXCMStep;
+  const firstMetadata = firstStep.metadata as unknown as BriefStepV2;
+  const lastMetadata = lastStep.metadata as unknown as BriefStepV2;
 
   return {
     from: firstMetadata.originTokenInfo.slug,

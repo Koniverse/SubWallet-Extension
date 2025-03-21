@@ -5,7 +5,7 @@ import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_LISTEN_AVAIL_BRIDGE_CLAIM } from '@subwallet/extension-base/constants';
-import { fetchLastestRemindNotificationTime } from '@subwallet/extension-base/constants/remind-notification-time';
+import { fetchLatestRemindNotificationTime } from '@subwallet/extension-base/constants/remind-notification-time';
 import { CronServiceInterface, ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
@@ -186,7 +186,7 @@ export class InappNotificationService implements CronServiceInterface {
     const passNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([
       this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
-      await fetchLastestRemindNotificationTime()
+      await fetchLatestRemindNotificationTime()
     ]);
 
     for (const candidateNotification of notifications) {

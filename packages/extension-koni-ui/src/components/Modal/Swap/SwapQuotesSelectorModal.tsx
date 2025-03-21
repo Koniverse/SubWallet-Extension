@@ -4,46 +4,41 @@
 import { SwapQuote } from '@subwallet/extension-base/types/swap';
 import SwapQuotesItem from '@subwallet/extension-koni-ui/components/Field/Swap/SwapQuotesItem';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
   modalId: string,
   items: SwapQuote[],
-  onConfirmItem: (quote: SwapQuote) => Promise<void>;
+  applyQuote: (quote: SwapQuote) => Promise<void>,
   selectedItem?: SwapQuote,
-  optimalQuoteItem?: SwapQuote
+  optimalQuoteItem?: SwapQuote,
+  onCancel: VoidFunction;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, items, modalId, onConfirmItem, optimalQuoteItem, selectedItem } = props;
+  const { applyQuote, className, items, modalId, onCancel, optimalQuoteItem, selectedItem } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [currentQuote, setCurrentQuote] = useState<SwapQuote | undefined>(selectedItem);
-
-  const { inactiveModal } = useContext(ModalContext);
 
   const onSelectItem = useCallback((quote: SwapQuote) => {
     setCurrentQuote(quote);
   }, []);
 
-  const onCancel = useCallback(() => {
-    inactiveModal(modalId);
-  }, [inactiveModal, modalId]);
-
   const handleApplySlippage = useCallback(() => {
     if (currentQuote) {
       setLoading(true);
-      onConfirmItem(currentQuote).catch((error) => {
+      applyQuote(currentQuote).catch((error) => {
         console.error('Error when confirm swap quote:', error);
       }).finally(() => {
         onCancel();
         setLoading(false);
       });
     }
-  }, [currentQuote, onConfirmItem, onCancel]);
+  }, [currentQuote, applyQuote, onCancel]);
 
   return (
     <>
