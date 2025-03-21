@@ -1445,7 +1445,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   <FreeBalanceToEarn
                     address={fromValue}
                     hidden={!canShowAvailableBalance || !isSwapXCM}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('Swap balance')}:`}
                     tokens={xcmBalanceTokens}
                   />
 
@@ -1454,7 +1454,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                     chain={chainValue}
                     hidden={!canShowAvailableBalance || isSwapXCM}
                     isSubscribe={true}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('Swap balance')}:`}
                     tokenSlug={fromTokenSlugValue}
                   />
                 </div>
