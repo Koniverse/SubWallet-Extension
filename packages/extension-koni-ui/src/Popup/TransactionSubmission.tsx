@@ -6,7 +6,7 @@ import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/com
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-koni-ui/messaging';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import {isStepCompleted, isStepFailed, isStepFinal, isStepTimeout} from '@subwallet/extension-koni-ui/utils';
+import { isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
 import { PageIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
@@ -107,7 +107,7 @@ const Component: React.FC<Props> = (props: Props) => {
       '-processing': !processData || !isFinal,
       '-complete': isStepCompleted(processData?.status),
       '-failed': isStepFailed(processData?.status),
-      '-timeout': isStepTimeout(processData?.status),
+      '-timeout': isStepTimeout(processData?.status)
     })}
     >
       <Layout.WithSubHeaderOnly
