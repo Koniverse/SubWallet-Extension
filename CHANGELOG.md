@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.3.24
+Build date: Mar 18, 2025.
+
+Features & Update:
+- Auto update metadata for substrate chain (#4037)
+- Allow customizing fee for substrate/evm transactions (#3658)
+- Support custom fee token when sending token on Hydration (#4045)
+
+Bug fixed:
+- Fixed bug Can't reset data when search on select token popup (#3786)
+
+
 ## 1.3.23
 Build date: Mar 05, 2025.
 
