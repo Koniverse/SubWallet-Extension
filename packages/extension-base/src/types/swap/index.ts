@@ -1,10 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
@@ -214,6 +213,26 @@ export interface OptimalSwapPathParams {
   selectedQuote?: SwapQuote;
 }
 
+export enum DynamicSwapType {
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE'
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  pair: ActionPair;
+}
+
+export const enum XcmStepPosition {
+  FIRST = 0,
+  AFTER_SWAP = 1,
+  AFTER_XCM_SWAP = 2
+}
+
+export interface PairSlug {
+  fromTokenSlug: string,
+}
+
 export interface OptimalSwapPathParamsV2 {
   request: SwapRequest;
   selectedQuote?: SwapQuote;
@@ -249,3 +268,22 @@ export interface PermitSwapData {
 
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
 export const SIMPLE_SWAP_SLIPPAGE = 0.05;
+
+export interface BriefXCMStep {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationTokenInfo: _ChainAsset;
+}
+
+export interface HydrationSwapStepMetadata {
+  sendingValue: string,
+  originTokenInfo: _ChainAsset,
+  destinationTokenInfo: _ChainAsset,
+  txHex: `0x${string}`
+}
+
+export interface AssetHubSwapStepMetadata {
+  sendingValue: string,
+  originTokenInfo: _ChainAsset,
+  destinationTokenInfo: _ChainAsset
+}

@@ -4065,11 +4065,13 @@ export default class KoniExtension {
   }
 
   private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {
-    return this.#koniState.swapService.getLatestQuotes(swapRequest);
+    const { swapQuoteResponse } = await this.#koniState.swapService.getLatestQuoteFromSwapRequest(swapRequest);
+
+    return swapQuoteResponse;
   }
 
   private async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    return this.#koniState.swapService.validateSwapProcess(params);
+    return this.#koniState.swapService.validateSwapProcessV2(params);
   }
 
   private async handleSwapStep (inputData: SwapSubmitParams): Promise<SWTransactionResponse> {
@@ -4096,7 +4098,7 @@ export default class KoniExtension {
 
     const isLastStep = inputData.currentStep + 1 === process.steps.length;
 
-    const swapValidations: TransactionError[] = await this.#koniState.swapService.validateSwapProcess({ address, process, selectedQuote: quote, recipient, currentStep: inputData.currentStep });
+    const swapValidations: TransactionError[] = await this.#koniState.swapService.validateSwapProcessV2({ address, process, selectedQuote: quote, recipient, currentStep: inputData.currentStep });
 
     if (swapValidations.length > 0) {
       if (step) {

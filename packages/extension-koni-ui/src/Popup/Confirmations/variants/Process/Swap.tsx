@@ -106,6 +106,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock
+        process={data.process}
         quote={data.quote}
       />
       <MetaInfo

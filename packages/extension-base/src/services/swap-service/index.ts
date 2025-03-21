@@ -12,9 +12,13 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import {
+  BasicTxErrorType,
+  DynamicSwapAction, DynamicSwapType,
+  OptimalSwapPathParamsV2,
+  ValidateSwapProcessParams
+} from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -59,6 +63,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }));
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
+
+    console.log('quotes from API', quotes);
 
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
@@ -105,7 +111,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       steps: [DEFAULT_FIRST_STEP]
     };
 
-    const swapPairInfo = params.path[0].pair; // todo: improve for Round 2
+    const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
+
+    if (!swapPairInfo) {
+      console.error('No swap info');
+
+      return result;
+    }
 
     result.totalFee.push({
       feeComponent: [],
@@ -118,14 +130,15 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       type: SwapStepType.SWAP,
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
-        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
+        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.pair.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.pair.to)
       }
     });
 
     return result;
   }
 
+  // deprecated
   public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
@@ -156,6 +169,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
+  // deprecated
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
     /*
     * 1. Ask swap quotes from providers
@@ -163,16 +178,18 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 3. Generate optimal process for that quote
     * */
 
-    const swapQuoteResponse = await this.getLatestQuotes(request);
+    // const swapQuoteResponse = await this.getLatestDirectQuotes(request);
 
-    const optimalProcess = await this.generateOptimalProcess({
-      request,
-      selectedQuote: swapQuoteResponse.optimalQuote
-    });
+    // const optimalProcess = await this.generateOptimalProcess({
+    //   request,
+    //   selectedQuote: swapQuoteResponse.optimalQuote
+    // });
 
     return {
-      process: optimalProcess,
-      quote: swapQuoteResponse
+      // @ts-ignore
+      process: null,
+      // @ts-ignore
+      quote: null
     };
   }
 
@@ -184,21 +201,16 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 4. Generate optimal process for that quote
     * */
 
-    // todo: path will become a list of path in Round 2
-    const [path, directSwapRequest] = this.getAvailablePath(request);
-
-    if (!directSwapRequest) {
-      throw Error('Swap pair not found');
-    }
-
-    const swapQuoteResponse = await this.getLatestQuotes(directSwapRequest);
+    const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
       selectedQuote: swapQuoteResponse.optimalQuote,
       path
     });
 
-    console.log('optimalProcess', optimalProcess);
+    // todo: can also return a chain route
+    console.log('path--------------------------', path);
+    console.log('optimalProcess----------------', optimalProcess);
 
     return {
       process: optimalProcess,
@@ -207,14 +219,15 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   public getAvailablePath (request: SwapRequest): [DynamicSwapAction[], SwapRequest | undefined] {
-    const { pair } = request;
+    const { address, pair } = request;
     // todo: control provider tighter
-    const providers = [...new Set(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
+    const supportSwapChains = getSupportSwapChain();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
     const fromChain = _getAssetOriginChain(fromToken);
     const toChain = _getAssetOriginChain(toToken);
     const toChainInfo = this.chainService.getChainInfoByKey(toChain);
+    const assetRefMap = this.chainService.getAssetRefMap();
     const process: DynamicSwapAction[] = [];
 
     if (!fromToken || !toToken) {
@@ -226,7 +239,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // SWAP: 2 tokens in the same chain and chain has dex
-    if (isChainsHasSameProvider(fromChain, toChain)) {
+    if (isChainsHasSameProvider(fromChain, toChain)) { // there's a dex that can support direct swapping
       const swapStep = getSwapStep(fromToken.slug, toToken.slug);
 
       process.push(swapStep);
@@ -237,30 +250,62 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
-    // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeDestination = findXcmDestination(this.chainService, fromToken, toChain);
+    // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
+    const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
 
-    if (bridgeDestination && providers.includes(toChain)) {
-      const bridgeStep = getBridgeStep(fromToken.slug, bridgeDestination);
-      const swapStep = getSwapStep(bridgeDestination, toToken.slug);
+    if (swapTransit && supportSwapChains.includes(fromChain)) {
+      const swapStep = getSwapStep(fromToken.slug, swapTransit);
+      const bridgeStep = getBridgeStep(swapTransit, toToken.slug);
+
+      process.push(swapStep);
+      process.push(bridgeStep);
+
+      return [process, {
+        ...request,
+        pair: swapStep.pair
+      }];
+    }
+
+    // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
+    const bridgeTransit = findXcmTransitDestination(assetRefMap, fromToken, toToken);
+
+    if (bridgeTransit && supportSwapChains.includes(toChain)) {
+      const bridgeStep = getBridgeStep(fromToken.slug, bridgeTransit);
+      const swapStep = getSwapStep(bridgeTransit, toToken.slug);
 
       process.push(bridgeStep);
       process.push(swapStep);
 
       return [process, {
         ...request,
-        address: reformatAddress(request.address, _getChainSubstrateAddressPrefix(toChainInfo)),
+        address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
         pair: swapStep.pair
       }];
     }
 
-    // todo: improve to support SWAP -> BRIDGE and BRIDGE -> SWAP -> BRIDGE
+    // todo: BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
+    // todo: encapsulate each route type to function
 
     return [[], undefined];
   }
 
-  public async getLatestQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
-    request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // todo: improve this
+  public async getLatestQuoteFromSwapRequest (request: SwapRequest): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
+    const [path, directSwapRequest] = this.getAvailablePath(request);
+
+    if (!directSwapRequest) {
+      throw Error('Swap pair not found');
+    }
+
+    const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
+
+    return {
+      path,
+      swapQuoteResponse
+    };
+  }
+
+  private async getLatestDirectQuotes (request: SwapRequest): Promise<SwapQuoteResponse> {
+    // request.pair.metadata = this.getSwapPairMetadata(request.pair.slug); // deprecated
     const quoteAskResponses = await this.askProvidersForQuote(request);
 
     // todo: handle error to return back to UI
@@ -280,7 +325,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
       quoteError = preferredErrorResp?.error || defaultErrorResp?.error;
     } else {
-      selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0];
+      selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.currentQuote?.id) || availableQuotes[0]; // todo: choose best quote based on rate
       aliveUntil = selectedQuote?.aliveUntil || (+Date.now() + SWAP_QUOTE_TIMEOUT_MAP.default);
     }
 
@@ -409,9 +454,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
   }
 
-  private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
-    return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
-  }
+  // private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
+  //   return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
+  // }
 
   public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const providerId = params.selectedQuote.provider.id;
@@ -419,6 +464,17 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     if (handler) {
       return handler.validateSwapProcess(params);
+    } else {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    const providerId = params.selectedQuote.provider.id;
+    const handler = this.handlers[providerId];
+
+    if (handler) {
+      return handler.validateSwapProcessV2(params);
     } else {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
