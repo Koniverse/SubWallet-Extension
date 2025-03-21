@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { SwapBaseTxData } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
@@ -56,14 +57,20 @@ const Component: FC<Props> = (props: Props) => {
     );
   };
 
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(data.process.steps);
+  }, [data.process.steps]);
+
   return (
     <div
       className={className}
     >
       <SwapTransactionBlock
+        fromAmount={data.quote.fromAmount}
+        fromAssetSlug={originSwapPair?.from}
         logoSize={36}
-        process={data.process}
-        quote={data.quote}
+        toAmount={data.quote.toAmount}
+        toAssetSlug={originSwapPair?.to}
       />
       <MetaInfo
         className={'__swap-confirmation-wrapper'}

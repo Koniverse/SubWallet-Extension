@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
-import { CommonOptimalPath } from '@subwallet/extension-base/types';
-import { SwapQuote } from '@subwallet/extension-base/types/swap';
 import { swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -15,27 +12,29 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps{
-  quote: SwapQuote,
-  process: CommonOptimalPath;
+  fromAssetSlug: string | undefined;
+  fromAmount: string | undefined;
+  toAssetSlug: string | undefined;
+  toAmount: string | undefined;
   logoSize?: number
 }
 const numberMetadata = { maxNumberFormat: 8 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, logoSize = 24, process, quote } = props;
+  const { className, fromAmount,
+    fromAssetSlug,
+    logoSize = 24,
+    toAmount,
+    toAssetSlug } = props;
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
 
-  const originSwapPair = useMemo(() => {
-    return getTokenPairFromStep(process.steps);
-  }, [process]);
+  const fromAssetInfo = useMemo(() => {
+    return fromAssetSlug ? assetRegistryMap[fromAssetSlug] : undefined;
+  }, [assetRegistryMap, fromAssetSlug]);
 
   const toAssetInfo = useMemo(() => {
-    return originSwapPair ? assetRegistryMap[originSwapPair.to] : undefined;
-  }, [assetRegistryMap, originSwapPair]);
-
-  const fromAssetInfo = useMemo(() => {
-    return originSwapPair ? assetRegistryMap[originSwapPair.from] : undefined;
-  }, [assetRegistryMap, originSwapPair]);
+    return toAssetSlug ? assetRegistryMap[toAssetSlug] : undefined;
+  }, [assetRegistryMap, toAssetSlug]);
 
   return (
     <div className={CN(className, 'swap-confirmation-container')}>
@@ -47,7 +46,7 @@ const Component: React.FC<Props> = (props: Props) => {
             shape='circle'
             size={logoSize}
             subNetwork={_getAssetOriginChain(fromAssetInfo)}
-            token={quote.pair.from.toLowerCase()}
+            token={fromAssetSlug?.toLowerCase()}
           />
           <Number
             className={'__amount-destination'}
@@ -55,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
             decimal={_getAssetDecimals(fromAssetInfo)}
             formatType={'custom'}
             metadata={numberMetadata}
-            value={quote.fromAmount}
+            value={fromAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(fromAssetInfo)}</span>
         </div>
@@ -71,7 +70,7 @@ const Component: React.FC<Props> = (props: Props) => {
             shape='circle'
             size={logoSize}
             subNetwork={_getAssetOriginChain(toAssetInfo)}
-            token={quote.pair.to.toLowerCase()}
+            token={toAssetSlug?.toLowerCase()}
           />
           <Number
             className={'__amount-destination'}
@@ -79,7 +78,7 @@ const Component: React.FC<Props> = (props: Props) => {
             decimal={_getAssetDecimals(toAssetInfo)}
             formatType={'custom'}
             metadata={numberMetadata}
-            value={quote.toAmount || 0}
+            value={toAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(toAssetInfo)}</span>
         </div>

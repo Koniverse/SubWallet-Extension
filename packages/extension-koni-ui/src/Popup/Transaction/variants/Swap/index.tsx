@@ -1129,7 +1129,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   chain={chainValue}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('Available balance')}:`}
+                  label={`${t('Swap balance')}:`}
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>
