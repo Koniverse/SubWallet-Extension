@@ -11,7 +11,7 @@ import { CardanoTransactionConfig } from '@subwallet/extension-base/services/bal
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
-import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
+import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { _NotificationInfo, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -2262,7 +2262,7 @@ export interface KoniRequestSignatures {
   'pri(accounts.checkCrossChainTransfer)': [RequestCheckCrossChainTransfer, ValidateTransactionResponse];
   'pri(accounts.crossChainTransfer)': [RequestCrossChainTransfer, SWTransactionResponse];
 
-  'pri(customFee.getTokensCanPayFee)': [RequestGetTokensCanPayFee, TokenHasBalanceInfo[]];
+  'pri(customFee.getTokensCanPayFee)': [RequestGetTokensCanPayFee, TokenPayFeeInfo];
   'pri(customFee.getAmountForPair)': [RequestGetAmountForPair, string];
 
   // Confirmation Queues

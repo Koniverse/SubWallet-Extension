@@ -5,14 +5,14 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _Address, AmountData, ExtrinsicDataTypeMap, ExtrinsicType, FeeData } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
-import { LEDGER_SIGNING_COMPATIBLE_MAP, SIGNING_COMPATIBLE_MAP, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, LEDGER_SIGNING_COMPATIBLE_MAP, SIGNING_COMPATIBLE_MAP, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { _canAccountBeReaped, _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { getCardanoAssetId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getChainExistentialDeposit, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainExistentialDeposit, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -368,7 +368,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, feeInfo: EvmFeeInfo, nativeTokenInfo: _ChainAsset, tokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: EvmFeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -418,12 +418,31 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
     }
   }
 
-  if (tokenPayFeeInfo) {
+  const isCustomTokenPayFeeAssetHub = !!nonNativeTokenPayFeeInfo && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(nonNativeTokenPayFeeInfo.originChain);
+  const isCustomTokenPayFeeHydration = !!nonNativeTokenPayFeeInfo && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(nonNativeTokenPayFeeInfo.originChain);
+
+  if (isCustomTokenPayFeeAssetHub) {
     const estimatedFeeAmount = isTransferLocalTokenAndPayThatTokenAsFee ? (BigInt(estimateFee.value) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString() : estimateFee.value;
 
-    estimateFee.decimals = tokenPayFeeInfo.decimals || 0;
-    estimateFee.symbol = tokenPayFeeInfo.symbol;
-    estimateFee.value = await calculateToAmountByReservePool(substrateApi.api, nativeTokenInfo, tokenPayFeeInfo, estimatedFeeAmount);
+    estimateFee.decimals = _getAssetDecimals(nonNativeTokenPayFeeInfo);
+    estimateFee.symbol = _getAssetSymbol(nonNativeTokenPayFeeInfo);
+    estimateFee.value = await calculateToAmountByReservePool(substrateApi.api, nativeTokenInfo, nonNativeTokenPayFeeInfo, estimatedFeeAmount);
+  }
+
+  if (isCustomTokenPayFeeHydration) {
+    const nativePriceId = _getAssetPriceId(nativeTokenInfo);
+    const nativeDecimals = _getAssetDecimals(nativeTokenInfo);
+    const nativePrice = priceMap[nativePriceId];
+
+    const tokenPriceId = _getAssetPriceId(nonNativeTokenPayFeeInfo);
+    const tokenDecimals = _getAssetDecimals(nonNativeTokenPayFeeInfo);
+    const tokenPrice = priceMap[tokenPriceId];
+
+    const rate = new BigN(nativePrice).div(tokenPrice).multipliedBy(10 ** (tokenDecimals - nativeDecimals)).toFixed();
+
+    estimateFee.decimals = _getAssetDecimals(nonNativeTokenPayFeeInfo);
+    estimateFee.symbol = _getAssetSymbol(nonNativeTokenPayFeeInfo);
+    estimateFee.value = new BigN(estimateFee.value).multipliedBy(rate).toFixed(0);
   }
 
   return estimateFee;
@@ -457,9 +476,9 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     return;
   }
 
-  const { edAsWarning, extrinsicType, isTransferAll, nonNativeTokenPayFeeSlug, skipFeeValidation } = transactionInput;
+  const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
 
-  if (skipFeeValidation || nonNativeTokenPayFeeSlug) {
+  if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
   }
 
