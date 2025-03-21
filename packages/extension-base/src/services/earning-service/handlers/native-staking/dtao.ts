@@ -243,10 +243,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return 'Stake TAO to earn yield on dTAO';
   }
 
-  private getSubnetByNetuid (netuid: number): SubnetData | undefined {
-    return this.subnetData.find((subnet) => subnet.netuid === netuid);
-  }
-
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
