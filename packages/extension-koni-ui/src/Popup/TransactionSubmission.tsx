@@ -6,7 +6,7 @@ import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/com
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-koni-ui/messaging';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isStepCompleted, isStepFailed } from '@subwallet/extension-koni-ui/utils';
+import {isStepCompleted, isStepFailed, isStepFinal, isStepTimeout} from '@subwallet/extension-koni-ui/utils';
 import { PageIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
@@ -56,7 +56,7 @@ const Component: React.FC<Props> = (props: Props) => {
   );
 
   const isFinal = useMemo(() => {
-    return isStepCompleted(processData?.status) || isStepFailed(processData?.status);
+    return isStepFinal(processData?.status);
   }, [processData]);
 
   const icon = useMemo<SwIconProps['phosphorIcon']>(() => {
@@ -64,7 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
       return CheckCircle;
     }
 
-    if (isStepFailed(processData?.status)) {
+    if (isStepFailed(processData?.status) || isStepTimeout(processData?.status)) {
       return ProhibitInset;
     }
 
@@ -106,7 +106,8 @@ const Component: React.FC<Props> = (props: Props) => {
     <PageWrapper className={CN(className, {
       '-processing': !processData || !isFinal,
       '-complete': isStepCompleted(processData?.status),
-      '-failed': isStepFailed(processData?.status)
+      '-failed': isStepFailed(processData?.status),
+      '-timeout': isStepTimeout(processData?.status),
     })}
     >
       <Layout.WithSubHeaderOnly
@@ -181,7 +182,7 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
       '--page-icon-color': token.colorSuccess
     },
 
-    '&.-failed': {
+    '&.-failed, &.-timeout': {
       '--page-icon-color': token.colorError
     }
   };
