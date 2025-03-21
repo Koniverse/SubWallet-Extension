@@ -1,12 +1,12 @@
-    2966	AnhMTV                        	Release version 1.3.23
+    2971	AnhMTV                        	Release version 1.3.24
     2553	Nam Phạm                      	feat: remove chainflip sdk dependency
-    2513	S2kael                        	
+    2527	S2kael                        	[Issue-4037] Update UX
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     664	bluezdot                      	[Issue-3984] feat: update param for mythos
+     706	bluezdot                      	[Issue-4045] fix: minor UX
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     244	Frenkie Nguyen                	[Issue-3864] refactor: handle gohome in QR modal
+     251	Frenkie Nguyen                	[Issue-3864] refactor: handle gohome in QR modal
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	

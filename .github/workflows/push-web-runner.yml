@@ -48,6 +48,7 @@ jobs:
         SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
         BLOCKFROST_API_KEY_MAIN: ${{ secrets.BLOCKFROST_API_KEY_MAIN }}
         BLOCKFROST_API_KEY_PREP: ${{ secrets.BLOCKFROST_API_KEY_PREP }}
+        MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
         BRANCH_NAME: master
       run: |
         yarn install --immutable | grep -v 'YN0013'
