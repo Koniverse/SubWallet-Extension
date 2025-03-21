@@ -12,6 +12,10 @@ export async function handleSwapRequest (request: SwapRequest) {
   return sendMessage('pri(swapService.handleSwapRequest)', request);
 }
 
+export async function handleSwapRequestV2 (request: SwapRequest) {
+  return sendMessage('pri(swapService.handleSwapRequestV2)', request);
+}
+
 export async function getLatestSwapQuote (request: SwapRequest) {
   return sendMessage('pri(swapService.getLatestQuote)', request);
 }

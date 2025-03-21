@@ -102,7 +102,7 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
     marginBottom: 12,
-    paddingBottom: 8,
+    paddingBottom: 12,
 
     '&.swap-to-field': {
       '.ant-select-modal-input-border-default::before': {

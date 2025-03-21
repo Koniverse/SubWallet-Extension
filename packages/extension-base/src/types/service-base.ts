@@ -46,6 +46,11 @@ export interface CommonOptimalPath { // path means the steps to complete the swa
   steps: CommonStepDetail[];
 }
 
+export interface CommonOptimalPathV2 { // path means the steps to complete the swap, not the quote itself
+  totalFee: CommonStepFeeInfo[]; // each item in the array is tx fee for a step
+  steps: CommonOptimalPath[];
+}
+
 export const DEFAULT_FIRST_STEP: CommonStepDetail = {
   id: 0,
   name: 'Fill information',

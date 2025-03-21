@@ -2381,6 +2381,7 @@ export interface KoniRequestSignatures {
   'pri(swapService.subscribePairs)': [null, SwapPair[], SwapPair[]];
   'pri(swapService.generateOptimalProcess)': [OptimalSwapPathParams, CommonOptimalPath];
   'pri(swapService.handleSwapRequest)': [SwapRequest, SwapRequestResult];
+  'pri(swapService.handleSwapRequestV2)': [SwapRequest, SwapRequestResult];
   'pri(swapService.handleSwapStep)': [SwapSubmitParams, SWTransactionResponse];
   'pri(swapService.getLatestQuote)': [SwapRequest, SwapQuoteResponse];
   'pri(swapService.validateSwapProcess)': [ValidateSwapProcessParams, TransactionError[]];

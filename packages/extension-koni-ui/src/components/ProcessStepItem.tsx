@@ -3,7 +3,7 @@
 
 import { StepStatus } from '@subwallet/extension-base/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing } from '@subwallet/extension-koni-ui/utils';
+import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
@@ -30,7 +30,7 @@ const Component: FC<Props> = (props: Props) => {
           phosphorIcon: CheckCircle,
           weight: 'fill'
         };
-      } else if (isStepFailed(status)) {
+      } else if (isStepFailed(status) || isStepTimeout(status)) {
         return {
           phosphorIcon: ProhibitInset,
           weight: 'fill'
@@ -70,7 +70,8 @@ const Component: FC<Props> = (props: Props) => {
         '-pending': isStepPending(status),
         '-processing': isStepProcessing(status),
         '-complete': isStepCompleted(status),
-        '-failed': isStepFailed(status)
+        '-failed': isStepFailed(status),
+        '-timeout': isStepTimeout(status)
       })}
       >
         <Icon
@@ -147,7 +148,7 @@ export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: P
       color: token.colorSuccess
     },
 
-    '.__item-left-part.-failed': {
+    '.__item-left-part.-failed, .__item-left-part.-timeout': {
       color: token.colorError
     },
 
