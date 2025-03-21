@@ -36,6 +36,7 @@ import styled, { useTheme } from 'styled-components';
 
 type Props = {
   isInModal?: boolean;
+  modalProps?: WrapperProps['modalProps'];
   refreshNotifications: VoidFunction;
   refreshNotificationsTriggerKey: string;
   notificationItemActionsModal: {
@@ -80,7 +81,7 @@ export const NotificationIconMap = {
 };
 
 function Component ({ isInModal,
-  notificationItemActionsModal, openNotificationSettingModal,
+  modalProps, notificationItemActionsModal, openNotificationSettingModal,
   refreshNotifications, refreshNotificationsTriggerKey }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -318,7 +319,14 @@ function Component ({ isInModal,
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               if (isInModal) {
-                withdrawModal.open();
+                withdrawModal.open({
+                  onBack: withdrawModal.close,
+                  onCancel: () => {
+                    withdrawModal.close();
+                    modalProps?.onCancel();
+                  },
+                  onDoneCallback: modalProps?.onCancel
+                });
               } else {
                 navigate('/transaction/withdraw');
               }
@@ -344,7 +352,14 @@ function Component ({ isInModal,
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               if (isInModal) {
-                claimRewardModal.open();
+                claimRewardModal.open({
+                  onBack: claimRewardModal.close,
+                  onCancel: () => {
+                    claimRewardModal.close();
+                    modalProps?.onCancel();
+                  },
+                  onDoneCallback: modalProps?.onCancel
+                });
               } else {
                 navigate('/transaction/claim-reward');
               }
@@ -388,7 +403,14 @@ function Component ({ isInModal,
                 await switchReadNotificationStatus(switchStatusParams);
 
                 if (isInModal) {
-                  claimBridgeModal.open();
+                  claimBridgeModal.open({
+                    onBack: claimBridgeModal.close,
+                    onCancel: () => {
+                      claimBridgeModal.close();
+                      modalProps?.onCancel();
+                    },
+                    onDoneCallback: modalProps?.onCancel
+                  });
                 } else {
                   navigate('/transaction/claim-bridge');
                 }
@@ -422,7 +444,14 @@ function Component ({ isInModal,
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               if (isInModal) {
-                claimBridgeModal.open();
+                claimBridgeModal.open({
+                  onBack: claimBridgeModal.close,
+                  onCancel: () => {
+                    claimBridgeModal.close();
+                    modalProps?.onCancel();
+                  },
+                  onDoneCallback: modalProps?.onCancel
+                });
               } else {
                 navigate('/transaction/claim-bridge');
               }
@@ -443,7 +472,7 @@ function Component ({ isInModal,
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, refreshNotifications]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, modalProps, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, refreshNotifications]);
 
   const onClickMore = useCallback((item: NotificationInfoItem) => {
     return (e: SyntheticEvent) => {
@@ -704,6 +733,7 @@ const Wrapper = (props: WrapperProps) => {
     >
       <Component
         isInModal={isModal}
+        modalProps={modalProps}
         notificationItemActionsModal={notificationItemActionsModalHandler}
         openNotificationSettingModal={openNotificationSettingModal}
         refreshNotifications={refreshNotifications}

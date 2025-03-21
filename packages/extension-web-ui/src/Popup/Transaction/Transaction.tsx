@@ -24,12 +24,13 @@ interface Props extends ThemeProps {
   transactionType?: string;
   modalContent?: boolean;
   modalId?: string;
+  onDoneCallback?: VoidFunction;
 }
 
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ children, className, modalContent, modalId }: Props) {
+function Component ({ children, className, modalContent, modalId, onDoneCallback }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -156,8 +157,9 @@ function Component ({ children, className, modalContent, modalId }: Props) {
       }
 
       navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
+      onDoneCallback?.();
     },
-    [modalId, navigate, from, chain, closeTransactionModalById]
+    [modalId, navigate, from, chain, onDoneCallback, closeTransactionModalById]
   );
 
   const openRecheckChainConnectionModal = useCallback((chainName: string) => {

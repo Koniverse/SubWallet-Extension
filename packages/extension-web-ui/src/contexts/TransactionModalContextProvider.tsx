@@ -1,29 +1,39 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseModal } from '@subwallet/extension-web-ui/components';
+import { BaseModal, CloseIcon } from '@subwallet/extension-web-ui/components';
 import { TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transaction';
 import ClaimBridge from '@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimBridge';
 import ClaimReward from '@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimReward';
 import Withdraw from '@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw';
-import { ModalContext, useExcludeModal } from '@subwallet/react-ui';
+import { Icon, ModalContext, useExcludeModal } from '@subwallet/react-ui';
+import { CaretLeft } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 
 interface Props {
   children: React.ReactNode;
 }
 
+export type TransactionModalProps = {
+  onBack?: VoidFunction;
+  onCancel?: VoidFunction;
+  onDoneCallback?: VoidFunction;
+}
+
 export interface TransactionModalContextType {
   claimRewardModal: {
-    open: VoidFunction;
+    open: (props: TransactionModalProps) => void;
+    close: VoidFunction;
   },
   claimBridgeModal: {
-    open: VoidFunction;
+    open: (props: TransactionModalProps) => void;
+    close: VoidFunction;
   },
   withdrawModal: {
-    open: VoidFunction;
+    open: (props: TransactionModalProps) => void;
+    close: VoidFunction;
   },
   closeTransactionModalById: (id: string) => void,
 }
@@ -31,15 +41,21 @@ export interface TransactionModalContextType {
 export const TransactionModalContext = React.createContext<TransactionModalContextType>({
   claimRewardModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    open: () => {}
+    open: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
   },
   claimBridgeModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    open: () => {}
+    open: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
   },
   withdrawModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    open: () => {}
+    open: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
   },
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   closeTransactionModalById: () => {}
@@ -55,9 +71,9 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
-  const [isClaimRewardModalVisible, setIsClaimRewardModalVisible] = useState<boolean>(false);
-  const [isClaimBridgeModalVisible, setIsClaimBridgeModalVisible] = useState<boolean>(false);
-  const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState<boolean>(false);
+  const [claimRewardModalProps, setClaimRewardModalProps] = useState<TransactionModalProps | undefined>();
+  const [claimBridgeModalProps, setClaimBridgeModalProps] = useState<TransactionModalProps | undefined>();
+  const [withdrawModalProps, setWithdrawModalProps] = useState<TransactionModalProps | undefined>();
 
   useExcludeModal(TRANSACTION_TRANSFER_MODAL);
   useExcludeModal(TRANSACTION_YIELD_UNSTAKE_MODAL);
@@ -69,42 +85,42 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
 
   /* Claim reward Modal */
 
-  const openClaimRewardModal = useCallback(() => {
-    setIsClaimRewardModalVisible(true);
+  const openClaimRewardModal = useCallback((props: TransactionModalProps = {}) => {
+    setClaimRewardModalProps(props);
     activeModal(TRANSACTION_YIELD_CLAIM_MODAL);
   }, [activeModal]);
 
   const closeClaimRewardModal = useCallback(() => {
     inactiveModal(TRANSACTION_YIELD_CLAIM_MODAL);
-    setIsClaimRewardModalVisible(false);
+    setClaimRewardModalProps(undefined);
   }, [inactiveModal]);
 
   /* Claim reward Modal */
 
   /* Claim bridge Modal */
 
-  const openClaimBridgeModal = useCallback(() => {
-    setIsClaimBridgeModalVisible(true);
+  const openClaimBridgeModal = useCallback((props: TransactionModalProps = {}) => {
+    setClaimBridgeModalProps(props);
     activeModal(TRANSACTION_CLAIM_BRIDGE);
   }, [activeModal]);
 
   const closeClaimBridgeModal = useCallback(() => {
     inactiveModal(TRANSACTION_CLAIM_BRIDGE);
-    setIsClaimBridgeModalVisible(false);
+    setClaimBridgeModalProps(undefined);
   }, [inactiveModal]);
 
   /* Claim bridge Modal */
 
   /* Withdraw Modal */
 
-  const openWithdrawModal = useCallback(() => {
-    setIsWithdrawModalVisible(true);
+  const openWithdrawModal = useCallback((props: TransactionModalProps = {}) => {
+    setWithdrawModalProps(props);
     activeModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
   }, [activeModal]);
 
   const closeWithdrawModal = useCallback(() => {
     inactiveModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
-    setIsWithdrawModalVisible(false);
+    setWithdrawModalProps(undefined);
   }, [inactiveModal]);
 
   /* Withdraw Modal */
@@ -121,33 +137,54 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
 
   const contextValue: TransactionModalContextType = useMemo(() => ({
     claimRewardModal: {
-      open: openClaimRewardModal
+      open: openClaimRewardModal,
+      close: closeClaimRewardModal
     },
     claimBridgeModal: {
-      open: openClaimBridgeModal
+      open: openClaimBridgeModal,
+      close: closeClaimBridgeModal
     },
     withdrawModal: {
-      open: openWithdrawModal
+      open: openWithdrawModal,
+      close: closeWithdrawModal
     },
     closeTransactionModalById
-  }), [closeTransactionModalById, openClaimBridgeModal, openClaimRewardModal, openWithdrawModal]);
+  }), [closeClaimBridgeModal, closeClaimRewardModal, closeTransactionModalById, closeWithdrawModal, openClaimBridgeModal, openClaimRewardModal, openWithdrawModal]);
 
   return (
     <TransactionModalContext.Provider value={contextValue}>
       {children}
 
       {
-        isClaimRewardModalVisible && (
+        claimRewardModalProps && (
           <BaseModal
             className={'right-side-modal'}
+            closeIcon={
+              claimRewardModalProps.onBack
+                ? (
+                  <Icon
+                    phosphorIcon={CaretLeft}
+                    size='md'
+                  />
+                )
+                : undefined
+            }
             destroyOnClose={true}
             id={TRANSACTION_YIELD_CLAIM_MODAL}
-            onCancel={closeClaimRewardModal}
+            onCancel={claimRewardModalProps.onBack || closeClaimRewardModal}
+            rightIconProps={claimRewardModalProps.onBack
+              ? {
+                icon: <CloseIcon />,
+                onClick: claimRewardModalProps.onCancel || closeClaimRewardModal
+              }
+              : undefined
+            }
             title={t('Claim rewards')}
           >
             <Transaction
               modalContent={true}
               modalId={TRANSACTION_YIELD_CLAIM_MODAL}
+              onDoneCallback={claimRewardModalProps.onDoneCallback}
             >
               <ClaimReward />
             </Transaction>
@@ -156,17 +193,35 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
       }
 
       {
-        isClaimBridgeModalVisible && (
+        claimBridgeModalProps && (
           <BaseModal
             className={'right-side-modal'}
+            closeIcon={
+              claimBridgeModalProps.onBack
+                ? (
+                  <Icon
+                    phosphorIcon={CaretLeft}
+                    size='md'
+                  />
+                )
+                : undefined
+            }
             destroyOnClose={true}
             id={TRANSACTION_CLAIM_BRIDGE}
-            onCancel={closeClaimBridgeModal}
+            onCancel={claimBridgeModalProps.onBack || closeClaimBridgeModal}
+            rightIconProps={claimBridgeModalProps.onBack
+              ? {
+                icon: <CloseIcon />,
+                onClick: claimBridgeModalProps.onCancel || closeClaimBridgeModal
+              }
+              : undefined
+            }
             title={t('Claim rewards')}
           >
             <Transaction
               modalContent={true}
               modalId={TRANSACTION_CLAIM_BRIDGE}
+              onDoneCallback={claimBridgeModalProps.onDoneCallback}
             >
               <ClaimBridge />
             </Transaction>
@@ -175,17 +230,35 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
       }
 
       {
-        isWithdrawModalVisible && (
+        withdrawModalProps && (
           <BaseModal
             className={'right-side-modal'}
+            closeIcon={
+              withdrawModalProps.onBack
+                ? (
+                  <Icon
+                    phosphorIcon={CaretLeft}
+                    size='md'
+                  />
+                )
+                : undefined
+            }
             destroyOnClose={true}
             id={TRANSACTION_YIELD_WITHDRAW_MODAL}
-            onCancel={closeWithdrawModal}
+            onCancel={withdrawModalProps.onBack || closeWithdrawModal}
+            rightIconProps={withdrawModalProps.onBack
+              ? {
+                icon: <CloseIcon />,
+                onClick: withdrawModalProps.onCancel || closeWithdrawModal
+              }
+              : undefined
+            }
             title={t('Withdraw')}
           >
             <Transaction
               modalContent={true}
               modalId={TRANSACTION_YIELD_WITHDRAW_MODAL}
+              onDoneCallback={withdrawModalProps.onDoneCallback}
             >
               <Withdraw />
             </Transaction>
