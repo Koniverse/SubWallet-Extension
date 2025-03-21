@@ -177,8 +177,8 @@ export default class KoniTabs {
     }
   }
 
-  private metadataProvide (url: string, request: MetadataDef): Promise<boolean> {
-    return this.#koniState.injectMetadata(url, request);
+  private metadataProvide (url: string, request: MetadataDef): boolean {
+    return this.#koniState.injectMetadata(request);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
