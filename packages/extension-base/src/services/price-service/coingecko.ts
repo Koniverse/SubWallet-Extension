@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { isProductionMode } from '@subwallet/extension-base/constants';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 
 import { isArray } from '@polkadot/util';
@@ -36,6 +37,8 @@ const DEFAULT_CURRENCY = 'USD';
 const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
 
 let useBackupApi = false;
+
+const apiCacheDomain = isProductionMode ? 'https://api-cache.subwallet.app' : 'https://api-cache-dev.subwallet.app';
 
 export const getExchangeRateMap = async (): Promise<Record<CurrencyType, ExchangeRateJSON>> => {
   let response: Response | undefined;
@@ -75,7 +78,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
 const fetchDerivativeTokenSlugs = async () => {
   try {
-    const response = await fetch('https://api-cache.subwallet.app/api/price/derivative-list');
+    const response = await fetch(`${apiCacheDomain}/api/price/derivative-list`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -103,7 +106,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
     let derivativeApiError = false;
 
     try {
-      const responseDerivativeTokens = await fetch('https://api-cache.subwallet.app/api/price/derivative-get');
+      const responseDerivativeTokens = await fetch(`${apiCacheDomain}/api/price/derivative-get`);
       const generateDerivativePriceRaw = await responseDerivativeTokens?.json() as unknown || [];
 
       if (Array.isArray(generateDerivativePriceRaw)) {
