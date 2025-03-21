@@ -160,40 +160,40 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return (
       <>
-        <div className='__slippage-action-wrapper'>
-          <div
-            className='__slippage-action'
-            onClick={onOpenSlippageModal}
+        <div
+          className={CN('__slippage-action', {
+            '-clickable': slippageTitle || !notSupportSlippageSelection
+          })}
+          onClick={onOpenSlippageModal}
+        >
+          <Tooltip
+            open={slippageTitle ? undefined : false}
+            placement={'topRight'}
+            title={slippageTitle}
           >
-            <Tooltip
-              open={slippageTitle ? undefined : false}
-              placement={'topRight'}
-              title={slippageTitle}
-            >
-              {
-                !!slippageTitle && (
-                  <Icon
-                    customSize='16px'
-                    phosphorIcon={Info}
-                    size='sm'
-                    weight='fill'
-                  />
-                )
-              }
-
-              <span>{slippageContent}</span>
-            </Tooltip>
-
-            {!notSupportSlippageSelection && (
-              <div className='__slippage-editor-button'>
+            {
+              !!slippageTitle && (
                 <Icon
-                  className='__slippage-editor-button-icon'
-                  phosphorIcon={PencilSimpleLine}
+                  customSize='16px'
+                  phosphorIcon={Info}
                   size='sm'
+                  weight='fill'
                 />
-              </div>
-            )}
-          </div>
+              )
+            }
+
+            <span>{slippageContent}</span>
+          </Tooltip>
+
+          {!notSupportSlippageSelection && (
+            <div className='__slippage-editor-button'>
+              <Icon
+                className='__slippage-editor-button-icon'
+                customSize={'16px'}
+                phosphorIcon={PencilSimpleLine}
+              />
+            </div>
+          )}
         </div>
       </>
     );
@@ -224,7 +224,6 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   </>
                 )}
-                valueColorSchema={'gray'}
               >
                 {
                   _renderRateInfo()
@@ -234,7 +233,6 @@ const Component: React.FC<Props> = (props: Props) => {
               <MetaInfo.Default
                 className={'__swap-process-info'}
                 label={t('Process')}
-                valueColorSchema={'gray'}
               >
                 <div className={'__swap-process-modal-trigger'}>
                   <TransactionProcessPreview />
@@ -262,7 +260,6 @@ const Component: React.FC<Props> = (props: Props) => {
               <MetaInfo.Default
                 className={'__slippage-info'}
                 label={t('Slippage')}
-                valueColorSchema={'gray'}
               >
                 {renderSlippageInfoContent()}
               </MetaInfo.Default>
@@ -280,6 +277,19 @@ const Component: React.FC<Props> = (props: Props) => {
 
 export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '.__quote-info-block': {
+      padding: '12px 16px',
+
+      '.__label-col': {
+        flex: '0 1 auto'
+      },
+
+      '.__label, .__value': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM
+      }
+    },
+
     '.__reset-time': {
 
     },
@@ -295,19 +305,6 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       fontWeight: token.headingFontWeight
     },
 
-    '.__quote-info-block': {
-      padding: '12px 16px',
-
-      '.__label-col': {
-        flex: '0 1 auto'
-      },
-
-      '.__label': {
-        fontSize: token.fontSizeSM,
-        lineHeight: token.lineHeightSM
-      }
-    },
-
     '.__best-tag': {
       backgroundColor: convertHexColorToRGBA(token.colorSuccess, 0.1),
       fontSize: 10,
@@ -319,10 +316,35 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       paddingRight: 6
     },
 
+    '.__item-rewards-value, .__item-total-staked-value': {
+      '.ant-number, .ant-typography': {
+        color: 'inherit !important',
+        fontSize: 'inherit !important',
+        fontWeight: 'inherit !important',
+        lineHeight: 'inherit'
+      }
+    },
+
     '.__swap-process-modal-trigger': {
       display: 'flex',
       gap: token.sizeXXS
     },
+
+    '.__slippage-action': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
+    },
+
+    '.__slippage-action.-clickable': {
+      cursor: 'pointer'
+    },
+
+    '.__slippage-editor-button-icon': {
+      color: token.colorTextLight3
+    },
+
+    // quote empty block
 
     '.__quote-empty-block': {
       background: token.colorBgSecondary,

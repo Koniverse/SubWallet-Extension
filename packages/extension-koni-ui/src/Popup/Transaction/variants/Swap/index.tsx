@@ -8,6 +8,7 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { getLastAmountFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
@@ -1075,7 +1076,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   decimals={_getAssetDecimals(toAssetInfo)}
                   loading={handleRequestLoading && showQuoteArea}
                   onSelectToken={onSelectToToken}
-                  swapValue={currentQuote?.toAmount || 0}
+                  swapValue={currentOptimalSwapPath ? getLastAmountFromSteps(currentOptimalSwapPath.steps) || 0 : 0}
                   toAsset={toAssetInfo}
                   tokenSelectorItems={toTokenItems}
                   tokenSelectorValue={toTokenSlugValue}
