@@ -6,6 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
@@ -15,9 +16,16 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
 
+export interface TaoStakeInfo {
+  hotkey: string;
+  stake: string;
+  netuid: number;
+}
+
 interface TaoStakingStakeOption {
-  owner: string,
-  amount: string,
+  owner: string;
+  amount: string;
+  // identity: string
 }
 
 interface Hotkey {
@@ -26,10 +34,11 @@ interface Hotkey {
 
 export interface RawDelegateState {
   data: Array<{
-    delegate: {
+    hotkey_name: string;
+    hotkey: {
       ss58: string;
     };
-    balance: string;
+    stake: string;
   }>;
 }
 
@@ -49,12 +58,46 @@ interface Validator {
   apr: string;
 }
 
+interface SubnetData {
+  netuid: number;
+  taoIn: string; // Dữ liệu từ JSON thường là string số lớn
+  alphaIn: string;
+}
+
+export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
+  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as SubnetData[] | undefined;
+
+  if (!allSubnets) {
+    return {};
+  }
+
+  return allSubnets.reduce((acc, subnet) => {
+    const netuid = subnet?.netuid;
+    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
+    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
+
+    if (netuid === 0) {
+      acc[netuid] = '1';
+    } else if (alphaIn.gt(0)) {
+      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
+    } else {
+      acc[netuid] = '1';
+    }
+
+    return acc;
+  }, {} as Record<number, string>);
+};
+
 export const BITTENSOR_API_KEY_1 = process.env.BITTENSOR_API_KEY_1 || '';
 export const BITTENSOR_API_KEY_2 = process.env.BITTENSOR_API_KEY_2 || '';
 export const BITTENSOR_API_KEY_3 = process.env.BITTENSOR_API_KEY_3 || '';
 export const BITTENSOR_API_KEY_4 = process.env.BITTENSOR_API_KEY_4 || '';
 export const BITTENSOR_API_KEY_5 = process.env.BITTENSOR_API_KEY_5 || '';
 export const BITTENSOR_API_KEY_6 = process.env.BITTENSOR_API_KEY_6 || '';
+export const BITTENSOR_API_KEY_7 = process.env.BITTENSOR_API_KEY_7 || '';
+export const BITTENSOR_API_KEY_8 = process.env.BITTENSOR_API_KEY_8 || '';
+export const BITTENSOR_API_KEY_9 = process.env.BITTENSOR_API_KEY_9 || '';
+export const BITTENSOR_API_KEY_10 = process.env.BITTENSOR_API_KEY_10 || '';
 
 function random (...keys: string[]) {
   const validKeys = keys.filter((key) => key);
@@ -64,7 +107,7 @@ function random (...keys: string[]) {
 }
 
 export const bittensorApiKey = (): string => {
-  return random(BITTENSOR_API_KEY_1, BITTENSOR_API_KEY_2, BITTENSOR_API_KEY_3, BITTENSOR_API_KEY_4, BITTENSOR_API_KEY_5, BITTENSOR_API_KEY_6);
+  return random(BITTENSOR_API_KEY_1, BITTENSOR_API_KEY_2, BITTENSOR_API_KEY_3, BITTENSOR_API_KEY_4, BITTENSOR_API_KEY_5, BITTENSOR_API_KEY_6, BITTENSOR_API_KEY_7, BITTENSOR_API_KEY_8, BITTENSOR_API_KEY_9, BITTENSOR_API_KEY_10);
 };
 
 /* Fetch data */
@@ -73,7 +116,7 @@ export async function fetchDelegates (): Promise<ValidatorResponse> {
   const apiKey = bittensorApiKey();
 
   return new Promise(function (resolve) {
-    fetch('https://api-prod-v2.taostats.io/api/validator/latest/v1', {
+    fetch('https://api.taostats.io/api/validator/latest/v1', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -85,21 +128,21 @@ export async function fetchDelegates (): Promise<ValidatorResponse> {
   });
 }
 
-export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
-  const apiKey = bittensorApiKey();
+// export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
+//   const apiKey = bittensorApiKey();
 
-  return new Promise(function (resolve) {
-    fetch(`https://api-prod-v2.taostats.io/api/delegation/balance/latest/v1?nominator=${address}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${apiKey}`
-      }
-    }).then((resp) => {
-      resolve(resp.json());
-    }).catch(console.error);
-  });
-}
+//   return new Promise(function (resolve) {
+//     fetch(`https://api.taostats.io/api/stake_balance/latest/v1?coldkey=${address}`, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `${apiKey}`
+//       }
+//     }).then((resp) => {
+//       resolve(resp.json());
+//     }).catch(console.error);
+//   });
+// }
 
 /* Fetch data */
 
@@ -220,6 +263,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           validatorAddress: delegate.owner,
           activeStake: activeStake,
           validatorMinStake: minDelegatorStake
+          // validatorIdentity: delegate.identity
         });
       }
     }
@@ -258,6 +302,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         delegatorState.push({
           owner: testnetAddress,
           amount: bnStakeAmount.toString()
+          // identity: testnetAddress
         });
 
         rsCallback({
@@ -285,21 +330,42 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const getMainnetPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
-        useAddresses.map((address) => fetchTaoDelegateState(address))
+        useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
       );
 
-      if (rawDelegateStateInfos.length > 0) {
+      const price = await getTaoToAlphaMapping(this.substrateApi);
+
+      if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
           const owner = reformatAddress(useAddresses[i], 42);
           const delegatorState: TaoStakingStakeOption[] = [];
           let bnTotalBalance = BN_ZERO;
-          const delegateStateInfo = rawDelegateStateInfo.data;
+
+          const delegateStateInfo = rawDelegateStateInfo as unknown as TaoStakeInfo[];
+
+          const totalDelegate: Record<string, string> = {};
 
           for (const delegate of delegateStateInfo) {
-            bnTotalBalance = bnTotalBalance.add(new BN(delegate.balance));
+            const hotkey = delegate.hotkey;
+            const netuid = delegate.netuid;
+            const stake = new BigN(delegate.stake);
+            const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
+
+            const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
+
+            if (totalDelegate[hotkey]) {
+              totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toString();
+            } else {
+              totalDelegate[hotkey] = taoStake;
+            }
+          }
+
+          for (const hotkey in totalDelegate) {
+            bnTotalBalance = bnTotalBalance.add(new BN(totalDelegate[hotkey]));
+
             delegatorState.push({
-              owner: delegate.delegate.ss58,
-              amount: delegate.balance.toString()
+              owner: hotkey,
+              amount: totalDelegate[hotkey]
             });
           }
 
@@ -332,6 +398,60 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         });
       }
     };
+
+    // const getMainnetPoolPosition = async () => {
+    //   const rawDelegateStateInfos = await Promise.all(
+    //     useAddresses.map((address) => fetchTaoDelegateState(address))
+    //   );
+
+    //   if (rawDelegateStateInfos.length > 0) {
+    //     rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
+    //       const owner = reformatAddress(useAddresses[i], 42);
+    //       const delegatorState: TaoStakingStakeOption[] = [];
+    //       let bnTotalBalance = BN_ZERO;
+    //       const delegateStateInfo = rawDelegateStateInfo.data;
+
+    //       for (const delegate of delegateStateInfo) {
+    //         const name = delegate.hotkey_name || delegate.hotkey.ss58;
+
+    //         bnTotalBalance = bnTotalBalance.add(new BN(delegate.stake));
+
+    //         delegatorState.push({
+    //           owner: delegate.hotkey.ss58,
+    //           amount: delegate.stake,
+    //           identity: name
+    //         });
+    //       }
+
+    //       if (delegateStateInfo && delegateStateInfo.length > 0) {
+    //         this.parseNominatorMetadata(chainInfo, owner, delegatorState)
+    //           .then((nominatorMetadata) => {
+    //             rsCallback({
+    //               ...defaultInfo,
+    //               ...nominatorMetadata,
+    //               address: owner,
+    //               type: this.type
+    //             });
+    //           })
+    //           .catch(console.error);
+    //       } else {
+    //         rsCallback({
+    //           ...defaultInfo,
+    //           type: this.type,
+    //           address: owner,
+    //           balanceToken: this.nativeToken.slug,
+    //           totalStake: '0',
+    //           activeStake: '0',
+    //           unstakeBalance: '0',
+    //           status: EarningStatus.NOT_STAKING,
+    //           isBondedBefore: false,
+    //           nominations: [],
+    //           unstakings: []
+    //         });
+    //       }
+    //     });
+    //   }
+    // };
 
     const getStakingPositionInterval = async () => {
       if (cancel) {
@@ -450,7 +570,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
-    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, binaryAmount);
+    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, 0, binaryAmount);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
@@ -468,7 +588,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, binaryAmount);
+    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, 0, binaryAmount);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
   }

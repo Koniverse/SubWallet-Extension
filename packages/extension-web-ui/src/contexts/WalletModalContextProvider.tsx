@@ -6,7 +6,7 @@ import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Accoun
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
 import { AddressQrModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AddressQrModal';
-import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { useAlert, useGetConfig, useSetSessionLatest, useSwitchModal } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -76,6 +76,7 @@ export interface WalletModalContextType {
   },
   alertModal: {
     open: (props: AlertDialogProps) => void,
+    updatePartially: (alertProps: Partial<AlertDialogProps>) => void,
     close: VoidFunction
   },
   deriveModal: {
@@ -104,6 +105,8 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
+    updatePartially: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: () => {}
   },
   deriveModal: {
@@ -120,15 +123,9 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const { hasMasterPassword, isLocked } = useSelector((state: RootState) => state.accountState);
   const { getConfig } = useGetConfig();
   const { onHandleSessionLatest, setTimeBackUp } = useSetSessionLatest();
-  const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
+  const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
 
   useExcludeModal(CONFIRMATION_MODAL);
-  useExcludeModal(TRANSACTION_TRANSFER_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_UNSTAKE_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_WITHDRAW_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_FAST_WITHDRAW_MODAL);
-  useExcludeModal(TRANSACTION_YIELD_CLAIM_MODAL);
   useExcludeModal(BUY_TOKEN_MODAL);
   useExcludeModal(EARNING_INSTRUCTION_MODAL);
 
@@ -208,12 +205,13 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     },
     alertModal: {
       open: openAlert,
+      updatePartially: updateAlertProps,
       close: closeAlert
     },
     deriveModal: {
       open: openDeriveModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, onCancelTonWalletContractSelectorModal, openAddressQrModal, openAlert, openDeriveModal, openTonWalletContractSelectorModal]);
+  }), [checkAddressQrModalActive, updateAlertProps, closeAddressQrModal, closeAlert, onCancelTonWalletContractSelectorModal, openAddressQrModal, openAlert, openDeriveModal, openTonWalletContractSelectorModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {

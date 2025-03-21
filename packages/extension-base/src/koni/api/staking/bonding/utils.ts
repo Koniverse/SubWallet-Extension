@@ -191,6 +191,10 @@ export function calculateChainStakedReturn (inflation: number, totalEraStake: BN
 }
 
 export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+  if (chainInfo.slug === 'analog_timechain') { // hotfix for analog
+    return 55;
+  }
+
   const DAYS_PER_YEAR = 365;
   const { decimals } = _getChainNativeTokenBasicInfo(chainInfo);
 
@@ -571,7 +575,7 @@ export function getSupportedDaysByHistoryDepth (erasPerDay: number, maxSupported
   const maxSupportDay = Math.floor(maxSupportedEras / erasPerDay);
 
   if (liveDay && liveDay <= 30) {
-    return Math.min(liveDay - 1, maxSupportDay);
+    return Math.min(Math.floor(liveDay - 1), maxSupportDay);
   }
 
   if (maxSupportDay > 30) {

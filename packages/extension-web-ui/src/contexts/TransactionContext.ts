@@ -7,6 +7,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 export interface TransactionContextProps {
   modalId?: string;
+  isInModal?: boolean;
   defaultData: TransactionFormBaseProps;
   persistData: Dispatch<SetStateAction<TransactionFormBaseProps>>;
   needPersistData: boolean;

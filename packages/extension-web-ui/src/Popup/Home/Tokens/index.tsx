@@ -13,14 +13,14 @@ import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useCoreReceiveModalHelper, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { UpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/UpperBlock';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { Button, Icon, ModalContext, Number, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -63,6 +63,7 @@ const Component = (): React.ReactElement => {
     totalBalanceInfo }, tokenGroupStructure: { sortedTokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
+  const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
 
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
@@ -318,11 +319,13 @@ const Component = (): React.ReactElement => {
     navigate('/transaction/swap');
   }, [accountProxies, currentAccountProxy, navigate, notify, setSwapStorage, t]);
 
+  const debouncedTokenGroupBalanceMap = useDebouncedValue<Record<string, TokenBalanceItemType>>(tokenGroupBalanceMap, 300);
+
   const tokenGroupBalanceItems = useMemo<TokenBalanceItemType[]>(() => {
     const result: TokenBalanceItemType[] = [];
 
     sortedTokenGroups.forEach((tokenGroupSlug) => {
-      const item = tokenGroupBalanceMap[tokenGroupSlug];
+      const item = debouncedTokenGroupBalanceMap[tokenGroupSlug];
 
       if (!item) {
         return;
@@ -337,8 +340,10 @@ const Component = (): React.ReactElement => {
       }
     });
 
-    return result.sort(sortTokenByValue);
-  }, [sortedTokenGroups, tokenGroupBalanceMap, searchInput]);
+    sortTokensByStandard(result, priorityTokens, true);
+
+    return result;
+  }, [sortedTokenGroups, priorityTokens, debouncedTokenGroupBalanceMap, searchInput]);
 
   const tokenBalanceClick = useCallback((item: TokenBalanceItemType) => {
     return () => {
