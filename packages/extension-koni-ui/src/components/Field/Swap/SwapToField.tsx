@@ -71,7 +71,9 @@ const Component = (props: Props) => {
         <div className={'__amount-wrapper'}>
           {
             loading && (
-              <ActivityIndicator size={24} />
+              <div className='__loading-wrapper'>
+                <ActivityIndicator size={24} />
+              </div>
             )
           }
           {
@@ -142,6 +144,13 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       flex: 1,
       overflow: 'hidden',
       textAlign: 'right'
+    },
+
+    '.__loading-wrapper': {
+      height: 44,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end'
     },
 
     '.__amount-destination': {
