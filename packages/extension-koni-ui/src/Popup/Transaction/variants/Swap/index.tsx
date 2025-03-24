@@ -1045,6 +1045,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               <div className={'__swap-field-area'}>
                 <SwapFromField
                   amountValue={fromAmountValue}
+                  className={'__swap-from-field'}
                   fromAsset={fromAssetInfo}
                   label={t('From')}
                   onChangeAmount={onChangeAmount}
@@ -1073,6 +1074,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 </div>
 
                 <SwapToField
+                  className={'__swap-to-field'}
                   decimals={_getAssetDecimals(toAssetInfo)}
                   loading={handleRequestLoading && showQuoteArea}
                   onSelectToken={onSelectToToken}
@@ -1129,7 +1131,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   chain={chainValue}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('Available balance')}:`}
+                  label={`${t('Swap balance')}:`}
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>
@@ -1138,6 +1140,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             {
               showQuoteArea && (
                 <QuoteInfoArea
+                  className={'__quote-info-area'}
+                  currentOptimalSwapPath={currentOptimalSwapPath}
                   currentQuote={currentQuote}
                   estimatedFeeValue={estimatedFeeValue}
                   fromAssetInfo={fromAssetInfo}
@@ -1255,6 +1259,18 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
 
     '.__transaction-form-area .ant-form-item': {
       marginBottom: 12
+    },
+
+    '.__swap-from-field': {
+      marginBottom: token.marginXXS
+    },
+
+    '.__swap-to-field': {
+      marginBottom: token.marginXS
+    },
+
+    '.__quote-info-area': {
+      marginTop: token.marginXS
     },
 
     '.__switch-side-container': {

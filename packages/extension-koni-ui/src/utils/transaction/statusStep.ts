@@ -16,5 +16,13 @@ export const isStepCompleted = (stepStatus?: StepStatus) => {
 };
 
 export const isStepFailed = (stepStatus?: StepStatus) => {
-  return !!stepStatus && [StepStatus.FAILED, StepStatus.CANCELLED, StepStatus.TIMEOUT].includes(stepStatus);
+  return !!stepStatus && [StepStatus.FAILED, StepStatus.CANCELLED].includes(stepStatus);
+};
+
+export const isStepTimeout = (stepStatus?: StepStatus) => {
+  return stepStatus === StepStatus.TIMEOUT;
+};
+
+export const isStepFinal = (stepStatus?: StepStatus) => {
+  return isStepCompleted(stepStatus) || isStepTimeout(stepStatus) || isStepFailed(stepStatus);
 };
