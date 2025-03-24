@@ -441,7 +441,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const handler = this.handlers[providerId];
 
     if (handler) {
-      return handler.validateSwapProcess(params);
+      return handler.validateSwapProcessV2(params);
     } else {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }

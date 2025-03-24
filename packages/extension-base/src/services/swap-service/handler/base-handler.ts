@@ -1,52 +1,28 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import {_ChainAsset} from '@subwallet/chain-list/types';
-import {TransactionError} from '@subwallet/extension-base/background/errors/TransactionError';
-import {ExtrinsicType} from '@subwallet/extension-base/background/KoniTypes';
-import {_validateBalanceToSwap, _validateSwapRecipient} from '@subwallet/extension-base/core/logic-validation/swap';
-import {_isAccountActive} from '@subwallet/extension-base/core/substrate/system-pallet';
-import {FrameSystemAccountInfo} from '@subwallet/extension-base/core/substrate/types';
-import {_isSnowBridgeXcm} from '@subwallet/extension-base/core/substrate/xcm-parser';
-import {_isSufficientToken} from '@subwallet/extension-base/core/utils';
-import {BalanceService} from '@subwallet/extension-base/services/balance-service';
-import {ChainService} from '@subwallet/extension-base/services/chain-service';
-import {
-  _getAssetDecimals,
-  _getTokenMinAmount,
-  _isNativeToken
-} from '@subwallet/extension-base/services/chain-service/utils';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { validateSpendingAndFeePayment } from '@subwallet/extension-base/core/logic-validation';
+import { _validateBalanceToSwap, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
+import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
+import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
+import { BalanceService } from '@subwallet/extension-base/services/balance-service';
+import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _getAssetDecimals, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import {FEE_RATE_MULTIPLIER, getSwapAlternativeAsset} from '@subwallet/extension-base/services/swap-service/utils';
-import {
-  BasicTxErrorType,
-  BriefXCMStep,
-  GenSwapStepFuncV2,
-  HydrationSwapStepMetadata,
-  OptimalSwapPathParamsV2,
-  TransferTxErrorType
-} from '@subwallet/extension-base/types';
-import {
-  BaseStepDetail,
-  CommonOptimalPath,
-  CommonStepFeeInfo,
-  DEFAULT_FIRST_STEP,
-  MOCK_STEP_FEE
-} from '@subwallet/extension-base/types/service-base';
-import {
-  GenSwapStepFunc,
-  OptimalSwapPathParams,
-  SwapErrorType,
-  SwapFeeType,
-  SwapProvider,
-  SwapProviderId,
-  SwapSubmitParams,
-  SwapSubmitStepData,
-  ValidateSwapProcessParams
-} from '@subwallet/extension-base/types/swap';
-import {_reformatAddressWithChain, balanceFormatter, formatNumber} from '@subwallet/extension-base/utils';
+import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
-import {t} from 'i18next';
+import { t } from 'i18next';
+
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -57,6 +33,7 @@ export interface SwapBaseInterface {
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
   validateSwapProcess: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
+  validateSwapProcessV2: (params: ValidateSwapProcessParams) => Promise<TransactionError[]>;
   handleSwapProcess: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
   handleSubmitStep: (params: SwapSubmitParams) => Promise<SwapSubmitStepData>;
 
@@ -391,21 +368,12 @@ export class SwapBaseHandler {
     return Promise.resolve([]);
   }
 
-  private async validateBridgeStep (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN) {
+  private async validateBridgeStep (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
+    const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
 
-    if (fromToken.slug === selectedFeeToken.slug) {
-      if (bnFromTokenBalance.lte(bnBridgeAmount.plus(bnBridgeFeeAmount).plus(_isNativeToken(fromToken) ? '0' : _getTokenMinAmount(fromToken)))) {
-        return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${fromToken.symbol} and try again.`))];
-      }
-    } else {
-      if (bnFromTokenBalance.lte(bnBridgeAmount.plus(_isNativeToken(fromToken) ? '0' : _getTokenMinAmount(fromToken)))) {
-        return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${fromToken.symbol} and try again.`))];
-      }
-
-      if (bnFeeTokenBalance.lte(bnBridgeFeeAmount.plus(_isNativeToken(selectedFeeToken) ? '0' : _getTokenMinAmount(selectedFeeToken)))) {
-        return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${selectedFeeToken.symbol} and try again.`))];
-      }
+    if (spendingAndFeePaymentValidation.length > 0) {
+      return spendingAndFeePaymentValidation;
     }
 
     if (bnBridgeAmount.lte(minBridgeAmountRequired.plus(bnBridgeDeliveryFee))) {
@@ -435,11 +403,69 @@ export class SwapBaseHandler {
     return [];
   }
 
-  public async validateProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+  private validateSwapStepV2 (swapToChain: _ChainInfo, swapToken: _ChainAsset, swapFeeToken: _ChainAsset, bnSwapValue: BigN, bnSwapFromTokenBalance: BigN, bnSwapFeeAmount: BigN, bnSwapFeeTokenBalance: BigN, recipient?: string): TransactionError[] {
+    const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance);
+
+    if (spendingAndFeePaymentValidation.length > 0) {
+      return spendingAndFeePaymentValidation;
+    }
+
+    if (recipient) {
+      const isEvmAddress = isEthereumAddress(recipient);
+      const isEvmDestChain = _isChainEvmCompatible(swapToChain);
+
+      if ((isEvmAddress && !isEvmDestChain) || (!isEvmAddress && isEvmDestChain)) { // todo: update this condition
+        return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
+      }
+    }
+
+    return [];
+  }
+
+  public async validateSwapOnlyProcess (params: ValidateSwapProcessParams, swapIndex: number): Promise<TransactionError[]> {
+    const swapStepInfo = params.process.steps[swapIndex];
+    const swapMetadata = swapStepInfo.metadata as unknown as HydrationSwapStepMetadata; // todo
+    const swapFee = params.process.totalFee[swapIndex];
+
+    // Validate quote
+    if (!params.selectedQuote) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (params.selectedQuote.aliveUntil <= +Date.now()) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
+
+    if (!swapNetworkFee) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const swapToken = swapMetadata.originTokenInfo;
+
+    const bnSwapValue = BigN(swapMetadata.sendingValue);
+    const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
+
+    const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
+
+    const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
+      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
+    ]);
+
+    const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
+    const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
+
+    return this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+  }
+
+  public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
     // Bridge
-    const currentStep = params.process.steps[0];
+    const currentStep = params.process.steps[xcmIndex];
     const metadata = currentStep.metadata as unknown as BriefXCMStep;
-    const currentFee = params.process.totalFee[0];
+    const currentFee = params.process.totalFee[xcmIndex];
     const bridgeFeeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount;
 
     if (!metadata || !metadata.destinationTokenInfo || !metadata.originTokenInfo || !metadata.sendingValue) {
@@ -486,9 +512,9 @@ export class SwapBaseHandler {
     }
 
     // Swap
-    const swapStepInfo = params.process.steps[1];
-    const swapMetadata = swapStepInfo.metadata as unknown as HydrationSwapStepMetadata;
-    const swapFee = params.process.totalFee[1];
+    const swapStepInfo = params.process.steps[swapIndex];
+    const swapMetadata = swapStepInfo.metadata as unknown as HydrationSwapStepMetadata; // todo
+    const swapFee = params.process.totalFee[swapIndex];
 
     // Validate quote
     if (!params.selectedQuote) {
@@ -511,38 +537,30 @@ export class SwapBaseHandler {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
-    swapMetadata.sendingValue
+    const bnSwapValue = BigN(swapMetadata.sendingValue);
+    const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
 
-    const swapFromChain = this.chainService.getChainInfoByKey(swapToken.originChain);
+    if (bnSwapValue.gt(bnBridgeAmount)) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
+    const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
+
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
       this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
-    // Validate balance
-    const balanceError = _validateBalanceToSwapV2({
-      chainInfo: swapFromChain,
-      fromToken: swapToken,
-      fromTokenBalance: swapFromTokenBalance.value,
-      feeToken: swapFeeToken,
-      feeTokenBalance: swapFeeTokenBalance.value,
-      feeAmount: swapNetworkFee.amount,
-      swapAmount: swapMetadata.sendingValue,
-      minSwapAmount: params.selectedQuote.minSwap
-    });
+    const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
+    const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    if (balanceError) {
-      return Promise.resolve([balanceError]);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+
+    if (swapStepValidation.length > 0) {
+      return swapStepValidation;
     }
 
-    // Validate recipient
-    const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
-    const recipientError = _validateSwapRecipientV2(swapToChain, params.recipient);
-
-    if (recipientError) {
-      return Promise.resolve([recipientError]);
-    }
     return [];
   }
 
