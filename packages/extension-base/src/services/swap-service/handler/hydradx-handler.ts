@@ -285,13 +285,17 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
-    const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
-      if (step.action === DynamicSwapType.BRIDGE) {
-        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler);
-      }
-
+    const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step, stepIndex) => {
       if (step.action === DynamicSwapType.SWAP) {
         return this.getSwapStepV2.bind(this);
+      }
+
+      if (step.action === DynamicSwapType.BRIDGE && stepIndex === 2) {
+        return this.swapBaseHandler.getLaterBridgeStep.bind(this.swapBaseHandler);
+      }
+
+      if (step.action === DynamicSwapType.BRIDGE) {
+        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler);
       }
 
       throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);

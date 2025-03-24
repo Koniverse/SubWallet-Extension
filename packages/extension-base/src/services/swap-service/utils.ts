@@ -137,7 +137,7 @@ export function getSwapStep (from: string, to: string): DynamicSwapAction {
   };
 }
 
-export function findXcmTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset) {
+export function findBridgeTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset): string | undefined {
   const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
     assetRef.srcAsset === fromToken.slug &&
     assetRef.destChain === _getAssetOriginChain(toToken) &&
@@ -151,7 +151,7 @@ export function findXcmTransitDestination (assetRefMap: Record<string, _AssetRef
   return undefined;
 }
 
-export function findSwapTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset) {
+export function findSwapTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset): string | undefined {
   const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
     assetRef.destAsset === toToken.slug &&
     assetRef.srcChain === _getAssetOriginChain(fromToken) &&
@@ -165,11 +165,20 @@ export function findSwapTransitDestination (assetRefMap: Record<string, _AssetRe
   return undefined;
 }
 
-export function getAmountAfterSlippage (amount: string, slippage: number) {
+export function findAllBridgeDestinations (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset): string[] {
+  const foundAssetRefs = Object.values(assetRefMap).filter((assetRef) =>
+    assetRef.srcAsset === fromToken.slug &&
+    assetRef.path === _AssetRefPath.XCM
+  );
+
+  return foundAssetRefs.map((assetRef) => assetRef.destAsset);
+}
+
+export function getAmountAfterSlippage (amount: string, slippage: number): string {
   return BigN(amount).multipliedBy(BigN(1).minus(BigN(slippage))).integerValue(BigN.ROUND_DOWN).toString();
 }
 
-export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+export function isChainsHasSameProvider (fromChain: string, toChain: string): boolean {
   // todo: a provider may support multiple chains but not cross-chain swaps
   for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
     if (group.includes(fromChain) && group.includes(toChain)) {
@@ -181,24 +190,31 @@ export function isChainsHasSameProvider (fromChain: string, toChain: string) {
 }
 
 export function getLastAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
-  const lastStep = steps[steps.length - 1];
+  const lastStep = steps[steps.length - 1]; // last step
   const lastAmount = lastStep?.metadata?.destinationValue as string;
 
   return lastAmount ?? undefined;
 }
 
 export function getFirstAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
-  const firstStep = steps[1];
+  const firstStep = steps[1]; // first step after default step
   const firstAmount = firstStep?.metadata?.sendingValue as string;
 
   return firstAmount ?? undefined;
 }
 
-export function getChainRouteFromSteps (steps: CommonStepDetail[]) {
+export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
+  // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   return mainSteps.reduce((chainRoute, currentStep, currentIndex) => {
     const metadata = currentStep.metadata as unknown as BriefStepV2;
+
+    if (!metadata) {
+      console.error('Step has no metadata');
+
+      return chainRoute;
+    }
 
     if (currentIndex === 0) {
       chainRoute.push(metadata.originTokenInfo.originChain);
@@ -222,6 +238,10 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
 
   if (mainSteps.length === 1) {
     const metadata = mainSteps[0].metadata as unknown as BriefStepV2;
+
+    if (!metadata) {
+      return undefined;
+    }
 
     return {
       from: metadata.originTokenInfo.slug,

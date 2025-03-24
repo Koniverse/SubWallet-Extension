@@ -168,7 +168,7 @@ export class SwapBaseHandler {
       const isXcmNativeToken = _isNativeToken(fromTokenInfo);
 
       // todo: increase transfer amount when XCM local token
-      if (xcmStepIndex === XcmStepPosition.AFTER_SWAP || xcmStepIndex === XcmStepPosition.AFTER_XCM_SWAP) {
+      if (xcmStepIndex === XcmStepPosition.AFTER_SWAP) {
         bnTransferAmount = BigN(getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage)); // todo: check exception toAmount
       }
 
@@ -177,6 +177,82 @@ export class SwapBaseHandler {
         // add amount of fee into sending value to ensure has enough token to swap
         bnTransferAmount = bnTransferAmount.plus(BigN(estimatedXcmFee));
       }
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: fromTokenInfo,
+          destinationValue: isXcmNativeToken ? bnTransferAmount.minus(BigN(estimatedXcmFee)).toString() : bnTransferAmount.toString(),
+          destinationTokenInfo: toTokenInfo
+        },
+        name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
+        type: CommonStepType.XCM
+      };
+
+      return [step, fee];
+    } catch (e) {
+      console.error('Error creating xcm step', e);
+
+      return undefined;
+    }
+  }
+
+  async getLaterBridgeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    // only xcm on substrate for now
+    const { path, request: { address, fromAmount, recipient, slippage }, selectedQuote } = params;
+    const xcmStepIndex = XcmStepPosition.AFTER_XCM_SWAP;
+    const xcmPairInfo = path[xcmStepIndex] || undefined;
+
+    if (!xcmPairInfo) {
+      return undefined;
+    }
+
+    const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.from);
+    const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.pair.to);
+    const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+    const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
+
+    if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
+      throw Error('Token and chain not found');
+    }
+
+    try {
+      const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
+
+      const id = getId();
+      const feeInfo = await this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
+
+      const xcmTransfer = await createXcmExtrinsic({
+        originTokenInfo: fromTokenInfo,
+        destinationTokenInfo: toTokenInfo,
+        // Mock sending value to get payment info
+        sendingValue: fromAmount, // todo: recheck amount xcm step with amount init
+        recipient: recipient || _reformatAddressWithChain(address, toChainInfo),
+        substrateApi: substrateApi,
+        sender: _reformatAddressWithChain(address, fromChainInfo),
+        originChain: fromChainInfo,
+        destinationChain: toChainInfo,
+        feeInfo
+      });
+
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
+      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+      const estimatedXcmFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString();
+
+      const fee: CommonStepFeeInfo = {
+        feeComponent: [{
+          feeType: SwapFeeType.NETWORK_FEE,
+          amount: estimatedXcmFee,
+          tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
+        }],
+        defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
+        feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
+      };
+
+      let bnTransferAmount = BigN(fromAmount);
+      const isXcmNativeToken = _isNativeToken(fromTokenInfo);
+
+      bnTransferAmount = BigN(getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage));
 
       const step: BaseStepDetail = {
         metadata: {

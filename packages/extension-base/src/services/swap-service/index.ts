@@ -12,8 +12,8 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findSwapTransitDestination, findXcmTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -223,7 +223,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const toChain = _getAssetOriginChain(toToken);
     const toChainInfo = this.chainService.getChainInfoByKey(toChain);
     const assetRefMap = this.chainService.getAssetRefMap();
-    const process: DynamicSwapAction[] = [];
+    let process: DynamicSwapAction[] = [];
 
     if (!fromToken || !toToken) {
       throw Error('Token not found');
@@ -262,7 +262,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
 
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeTransit = findXcmTransitDestination(assetRefMap, fromToken, toToken);
+    const bridgeTransit = findBridgeTransitDestination(assetRefMap, fromToken, toToken);
 
     if (bridgeTransit && supportSwapChains.includes(toChain)) {
       const bridgeStep = getBridgeStep(fromToken.slug, bridgeTransit);
@@ -278,7 +278,49 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
-    // todo: BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
+    // BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
+    const processList: DynamicSwapAction[][] = [];
+    const actionPairList: ActionPair[] = [];
+    const allBridgeDestinations = findAllBridgeDestinations(assetRefMap, fromToken);
+
+    // currently find first path. Todo: Return all paths or best path in getOptimalProcess.
+    for (const bridgeTransit of allBridgeDestinations) {
+      process = [];
+      const bridgeDestinationInfo = this.chainService.getAssetBySlug(bridgeTransit);
+      const swapTransit = findSwapTransitDestination(assetRefMap, bridgeDestinationInfo, toToken);
+
+      if (swapTransit && supportSwapChains.includes(bridgeDestinationInfo.originChain)) {
+        const swapStep = getSwapStep(bridgeTransit, swapTransit);
+
+        process.push(getBridgeStep(fromToken.slug, bridgeTransit));
+        process.push(swapStep);
+        process.push(getBridgeStep(swapTransit, toToken.slug));
+
+        // set the highest priority to hydration provider todo: improve
+        if (bridgeDestinationInfo.originChain === 'hydradx_main') {
+          const chainSwap = this.chainService.getChainInfoByKey(bridgeDestinationInfo.originChain);
+
+          return [process, {
+            ...request,
+            address: reformatAddress(address, _getChainSubstrateAddressPrefix(chainSwap)),
+            pair: swapStep.pair
+          }];
+        }
+
+        processList.push(process);
+        actionPairList.push(swapStep.pair);
+      }
+    }
+
+    // set the highest priority to hydration provider todo: improve
+    if (processList.length && actionPairList.length) {
+      return [processList[0], {
+        ...request,
+        address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
+        pair: actionPairList[0]
+      }];
+    }
+
     // todo: encapsulate each route type to function
 
     return [[], undefined];
