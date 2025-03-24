@@ -20,8 +20,6 @@ import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
-import MigrateAutoLock from './MigrateAutoLock';
-import MigrateChainPatrol from './MigrateChainPatrol';
 import MigrateImportedToken from './MigrateImportedToken';
 import MigrateNetworkSettings from './MigrateNetworkSettings';
 import MigrateTokenDecimals from './MigrateTokenDecimals';
@@ -39,8 +37,8 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // '1.0.1-40': AutoEnableChainsTokens,
   // '1.0.1-50': MigrateSettings,
   '1.0.1-60': MigrateAuthUrls,
-  '1.0.3-01': MigrateAutoLock,
-  '1.0.3-02': MigrateChainPatrol,
+  // '1.0.3-01': MigrateAutoLock,
+  // '1.0.3-02': MigrateChainPatrol,
   '1.0.9-01': MigrateLedgerAccount,
   '1.0.12-02': MigrateEthProvider,
   '1.1.6-01': MigrateWalletReference,
