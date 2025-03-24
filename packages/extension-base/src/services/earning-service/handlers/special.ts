@@ -3,13 +3,14 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, RuntimeDispatchInfo, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { t } from 'i18next';
 
 import { BN, BN_TEN, BN_ZERO, noop } from '@polkadot/util';
@@ -268,25 +269,21 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const altChainInfo = this.state.getChainInfo(altInputTokenInfo.originChain);
           const symbol = altInputTokenInfo.symbol;
           const networkName = altChainInfo.name;
-          const step: BaseYieldStepDetail = {
-            metadata: {
-              sendingValue: bnAmount.toString(),
-              originTokenInfo: altInputTokenInfo,
-              destinationTokenInfo: inputTokenInfo
-            },
-            name: `Transfer ${symbol} from ${networkName}`,
-            type: YieldStepType.XCM
-          };
 
           const xcmOriginSubstrateApi = await this.state.getSubstrateApi(altInputTokenInfo.originChain).isReady;
+          const id = getId();
+          const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
 
           const xcmTransfer = await createXcmExtrinsic({
+            sender: address,
             originTokenInfo: altInputTokenInfo,
             destinationTokenInfo: inputTokenInfo,
             sendingValue: bnAmount.toString(),
             recipient: address,
-            chainInfoMap: this.state.getChainInfoMap(),
-            substrateApi: xcmOriginSubstrateApi
+            destinationChain: this.chainInfo,
+            originChain: altChainInfo,
+            substrateApi: xcmOriginSubstrateApi,
+            feeInfo
           });
 
           const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
@@ -295,7 +292,25 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
           const fee: YieldTokenBaseInfo = {
             slug: altInputTokenSlug,
-            amount: Math.round(xcmFeeInfo.partialFee * 1.2).toString() // TODO
+            amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString() // TODO
+          };
+
+          let bnTransferAmount = bnAmount.sub(bnInputTokenBalance);
+
+          if (_isNativeToken(altInputTokenInfo)) {
+            const bnXcmFee = new BN(fee.amount || 0); // xcm fee is paid in native token but swap token is not always native token
+
+            bnTransferAmount = bnTransferAmount.add(bnXcmFee);
+          }
+
+          const step: BaseYieldStepDetail = {
+            metadata: {
+              sendingValue: bnTransferAmount.toString(),
+              originTokenInfo: altInputTokenInfo,
+              destinationTokenInfo: inputTokenInfo
+            },
+            name: `Transfer ${symbol} from ${networkName}`,
+            type: YieldStepType.XCM
           };
 
           return [step, fee];
@@ -534,13 +549,19 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
     const bnTotalAmount = bnAmount.sub(bnInputTokenBalance).add(bnXcmFee);
 
+    const id = getId();
+    const feeInfo = await this.state.feeService.subscribeChainFee(id, originChainInfo.slug, 'substrate');
+
     const extrinsic = await createXcmExtrinsic({
-      chainInfoMap: this.state.getChainInfoMap(),
       destinationTokenInfo,
       originTokenInfo,
       recipient: address,
       sendingValue: bnTotalAmount.toString(),
-      substrateApi
+      substrateApi,
+      sender: address,
+      originChain: originChainInfo,
+      destinationChain: this.chainInfo,
+      feeInfo
     });
 
     const xcmData: RequestCrossChainTransfer = {

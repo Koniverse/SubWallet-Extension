@@ -3,13 +3,15 @@
 
 import { AmountData, RequestMaxTransferable } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
+import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { RequestCrossChainTransfer, RequestTransfer, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
+import { RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
+import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
 
 import { sendMessage } from '../base';
 
-export async function makeTransfer (request: RequestTransfer): Promise<SWTransactionResponse> {
+export async function makeTransfer (request: RequestSubmitTransfer): Promise<SWTransactionResponse> {
   return sendMessage('pri(accounts.transfer)', request);
 }
 
@@ -25,6 +27,18 @@ export async function getMaxTransfer (request: RequestMaxTransferable): Promise<
   return sendMessage('pri(transfer.getMaxTransferable)', request);
 }
 
+export async function subscribeMaxTransfer (request: RequestSubscribeTransfer, callback: (data: ResponseSubscribeTransfer) => void): Promise<ResponseSubscribeTransfer> {
+  return sendMessage('pri(transfer.subscribe)', request, callback);
+}
+
 export async function getOptimalTransferProcess (request: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
   return sendMessage('pri(accounts.getOptimalTransferProcess)', request);
+}
+
+export async function getTokensCanPayFee (request: RequestGetTokensCanPayFee): Promise<TokenPayFeeInfo> { // can set a default fee to ED of native token
+  return sendMessage('pri(customFee.getTokensCanPayFee)', request);
+}
+
+export async function getAmountForPair (request: RequestGetAmountForPair): Promise<string> {
+  return sendMessage('pri(customFee.getAmountForPair)', request);
 }

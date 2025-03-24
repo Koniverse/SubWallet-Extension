@@ -1,5 +1,114 @@
 # CHANGELOG
 
+## 1.3.24
+Build date: Mar 18, 2025.
+
+Features & Update:
+- Auto update metadata for substrate chain (#4037)
+- Allow customizing fee for substrate/evm transactions (#3658)
+- Support custom fee token when sending token on Hydration (#4045)
+
+Bug fixed:
+- Fixed bug Can't reset data when search on select token popup (#3786)
+
+
+## 1.3.23
+Build date: Mar 05, 2025.
+
+Features & Update:
+- Support Uniswap (#3977)
+- Support Cardano (#3816, #3924, #3925, #3942)
+- Support Migrate account feature (#3926, #4016)
+- Unified address format integration (#3864)
+
+Bug fixed:
+- Fix Bug when unstaking vDOT, vMANTA (#4054)
+
+## 1.3.22
+Build date: Mar 04, 2025.
+
+Features & Update:
+- Support staking for Mythos (#3984)
+
+
+## 1.3.21
+Build date: Feb 28, 2025.
+
+Features & Update:
+- Allow signing once for multiple transactions (#3901)
+- Update chain-list stable v0.2.99 (#4007)
+
+
+## 1.3.20
+Build date: Feb 24, 2025.
+
+Features & Update:
+- Support transferring VARCH on InvArch Network
+
+Bug fixed:
+- Fixed bug Unable to estimate fee when signing for dApp (#4050)
+
+
+## 1.3.19
+Build date: Feb 21, 2025.
+
+Bug fixed:
+- Fixed bug related to custom token to paid fee
+
+
+## 1.3.18
+Build date: Feb 20, 2025.
+
+Features & Update:
+- Support paying fee with non-native tokens on Asset Hub (#3590)
+
+
+## 1.3.17
+Build date: Feb 18, 2025.
+
+Features & Update:
+- Show well-known tokens on top (#3920)
+- Unable to load TAO balance (#4032)
+
+Bug fixed:
+- Fixed bug Show incorrect APY for some chains (#4026)
+- Fixed rate limit api key for Bittensor(TAO) (#4029)
+
+
+## 1.3.16
+Build date: Feb 10, 2025.
+
+Features & Update:
+- Add in-app staking for Analog
+
+
+## 1.3.15
+Build date: Feb 06, 2025.
+
+Bug fixed:
+- Fix issue Don't open the extension related to Patch feature (#4002)
+- Fix bug Do not show earning position for Bittensor (#4006)
+
+
+## 1.3.14
+Build date: Jan 24, 2025.
+
+Features & Update:
+- Update chain-list stable (#3974)
+- Add staking support for CERE (#360)
+
+
+## 1.3.13
+Build date: Jan 21, 2025.
+
+Features & Update:
+- Re-enable search token feature (#3958)
+- Update signing flow with metadata (#3306)
+
+Bug fixed:
+- Fix bug setup validator related maxCount (#3971)
+
+
 ## 1.3.12
 Build date: Jan 06, 2025.
 

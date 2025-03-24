@@ -7,6 +7,7 @@ import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-s
 import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-service/handler/SubstrateChainHandler';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { SubstrateFeeInfo } from '@subwallet/extension-base/types';
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
@@ -56,9 +57,26 @@ describe('test token transfer', () => {
 
       const originTokenInfo = ChainAssetMap[assetRef.srcAsset];
       const destinationTokenInfo = ChainAssetMap[assetRef.destAsset];
+      const originChain = ChainInfoMap[assetRef.srcChain];
       const destChain = ChainInfoMap[assetRef.destChain];
       const isDestChainEvm = _isChainEvmCompatible(destChain);
       const destAddress = isDestChainEvm ? destAddress2 : destAddress1;
+      const feeInfo: SubstrateFeeInfo = {
+        type: 'substrate',
+        options: {
+          slow: {
+            tip: '0'
+          },
+          fast: {
+            tip: '0'
+          },
+          average: {
+            tip: '0'
+          },
+          default: 'slow'
+        },
+        busyNetwork: false
+      };
 
       try {
         await createXcmExtrinsic({
@@ -66,8 +84,11 @@ describe('test token transfer', () => {
           originTokenInfo,
           sendingValue: '0',
           recipient: destAddress,
-          chainInfoMap: ChainInfoMap,
-          substrateApi
+          substrateApi,
+          sender: '5DnokDpMdNEH8cApsZoWQnjsggADXQmGWUb6q8ZhHeEwvncL',
+          feeInfo,
+          originChain,
+          destinationChain: destChain
         });
       } catch (e) {
         console.log(e);
@@ -103,8 +124,26 @@ describe('test token transfer', () => {
         const substrateApi = await substrateApiMap[assetRef.srcChain].isReady;
         const destinationTokenInfo = ChainAssetMap[assetRef.destAsset];
         const originTokenInfo = ChainAssetMap[assetRef.srcAsset];
-        const isDestChainEvm = _isChainEvmCompatible(ChainInfoMap[assetRef.destChain]);
+        const destinationChainInfo = ChainInfoMap[assetRef.destChain];
+        const originChainInfo = ChainInfoMap[assetRef.srcChain];
+        const isDestChainEvm = _isChainEvmCompatible(destinationChainInfo);
         const destAddress = isDestChainEvm ? destAddress2 : destAddress1;
+        const feeInfo: SubstrateFeeInfo = {
+          type: 'substrate',
+          options: {
+            slow: {
+              tip: '0'
+            },
+            fast: {
+              tip: '0'
+            },
+            average: {
+              tip: '0'
+            },
+            default: 'slow'
+          },
+          busyNetwork: false
+        };
 
         try {
           const extrinsic = await createXcmExtrinsic({
@@ -112,8 +151,11 @@ describe('test token transfer', () => {
             originTokenInfo,
             sendingValue: '0',
             recipient: destAddress,
-            chainInfoMap: ChainInfoMap,
-            substrateApi
+            substrateApi,
+            sender: '5DnokDpMdNEH8cApsZoWQnjsggADXQmGWUb6q8ZhHeEwvncL',
+            feeInfo,
+            originChain: originChainInfo,
+            destinationChain: destinationChainInfo
           });
 
           console.log(assetRef, extrinsic.toHex());

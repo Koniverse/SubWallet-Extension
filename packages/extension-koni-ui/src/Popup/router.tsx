@@ -76,6 +76,7 @@ const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-k
 const GeneralSetting = new LazyLoader('GeneralSetting', () => import('@subwallet/extension-koni-ui/Popup/Settings/GeneralSetting'));
 const MissionPools = new LazyLoader('MissionPools', () => import('@subwallet/extension-koni-ui/Popup/Settings/MissionPool/index'));
 const ManageAddressBook = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-koni-ui/Popup/Settings/AddressBook'));
+const AccountSettings = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-koni-ui/Popup/Settings/AccountSettings'));
 
 const ManageChains = new LazyLoader('ManageChains', () => import('@subwallet/extension-koni-ui/Popup/Settings/Chains/ManageChains'));
 const ChainImport = new LazyLoader('ChainImport', () => import('@subwallet/extension-koni-ui/Popup/Settings/Chains/ChainImport'));
@@ -113,6 +114,7 @@ const AccountExport = new LazyLoader('AccountExport', () => import('@subwallet/e
 
 const Transaction = new LazyLoader('Transaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/Transaction'));
 const TransactionDone = new LazyLoader('TransactionDone', () => import('@subwallet/extension-koni-ui/Popup/TransactionDone'));
+const TransactionSubmission = new LazyLoader('TransactionSubmission', () => import('@subwallet/extension-koni-ui/Popup/TransactionSubmission'));
 const SendFund = new LazyLoader('SendFund', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendFund'));
 const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap'));
 const SendNFT = new LazyLoader('SendNFT', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendNFT'));
@@ -122,6 +124,7 @@ const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/e
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
+const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
 
 // Earning
 
@@ -216,6 +219,9 @@ export const router = createHashRouter([
         ]
       },
       {
+        ...TransactionSubmission.generateRouterObject('transaction-submission')
+      },
+      {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
       },
       {
@@ -234,6 +240,7 @@ export const router = createHashRouter([
         children: [
           Settings.generateRouterObject('list'),
           GeneralSetting.generateRouterObject('general'),
+          AccountSettings.generateRouterObject('account-settings'),
           Crowdloans.generateRouterObject('crowdloans'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
@@ -280,6 +287,9 @@ export const router = createHashRouter([
           AccountExport.generateRouterObject('export/:accountProxyId'),
           ExportAllDone.generateRouterObject('export-all-done')
         ]
+      },
+      {
+        ...MigrateAccount.generateRouterObject('migrate-account')
       },
       {
         path: 'wallet-connect',
