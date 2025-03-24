@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AbstractYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AbstractYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
@@ -62,7 +62,8 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
           nominations: [],
           status: EarningStatus.NOT_STAKING,
           unstakings: [],
-          isBondedBefore: false
+          isBondedBefore: false,
+          subnetData: positionInfo.subnetData
         };
 
         let rs: YieldPositionInfo;
@@ -89,6 +90,11 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
             rs = {
               ...base
             } as NominationYieldPositionInfo;
+            break;
+          case YieldPoolType.SUBNET_STAKING:
+            rs = {
+              ...base
+            } as SubnetYieldPositionInfo;
             break;
         }
 

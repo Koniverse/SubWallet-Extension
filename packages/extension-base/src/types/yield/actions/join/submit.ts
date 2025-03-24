@@ -25,6 +25,7 @@ export interface AbstractSubmitYieldJoinData {
 
 export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
   selectedValidators: ValidatorInfo[];
+  netuid?: number;
 }
 
 export interface SubmitJoinNominationPool extends AbstractSubmitYieldJoinData {

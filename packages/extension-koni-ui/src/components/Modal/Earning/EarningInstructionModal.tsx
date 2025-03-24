@@ -88,6 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const getOrigin = () => {
       switch (type) {
+        case YieldPoolType.SUBNET_STAKING:
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
@@ -157,6 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const { type } = poolInfo;
 
     switch (type) {
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NOMINATION_POOL:
       case YieldPoolType.NATIVE_STAKING:
       case YieldPoolType.LIQUID_STAKING:
@@ -241,6 +243,8 @@ const Component: React.FC<Props> = (props: Props) => {
         }
       }
 
+      case YieldPoolType.SUBNET_STAKING: // fallthrough
+
       case YieldPoolType.NATIVE_STAKING: {
         const _label = getValidatorLabel(poolInfo.chain);
         const maxCandidatePerFarmer = poolInfo.statistic?.maxCandidatePerFarmer || 0;
@@ -269,6 +273,25 @@ const Component: React.FC<Props> = (props: Props) => {
               if (paidOut !== undefined) {
                 replaceEarningValue(_item, '{paidOut}', paidOut.toString());
                 replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : 'hour');
+              }
+
+              return _item;
+            });
+          }
+
+          if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
+            return EARNING_DATA_RAW.BITTENOSR_STAKING.map((item) => {
+              const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+              replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+              replaceEarningValue(_item, '{validatorType}', label);
+              replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+              replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+              replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+              if (paidOut !== undefined) {
+                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
               }
 
               return _item;
