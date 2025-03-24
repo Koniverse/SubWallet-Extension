@@ -3,10 +3,11 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-web-ui/components';
-import { DEFAULT_TRANSACTION_PARAMS, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_TRANSACTION_PARAMS, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-web-ui/contexts/TransactionContext';
+import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-web-ui/types';
 import { detectTransactionPersistKey } from '@subwallet/extension-web-ui/utils';
@@ -23,17 +24,19 @@ interface Props extends ThemeProps {
   transactionType?: string;
   modalContent?: boolean;
   modalId?: string;
+  onDoneCallback?: VoidFunction;
 }
 
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ children, className, modalContent, modalId }: Props) {
+function Component ({ children, className, modalContent, modalId, onDoneCallback }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { closeTransactionModalById } = useContext(TransactionModalContext);
   const { isWebUI } = useContext(ScreenContext);
   const dataContext = useContext(DataContext);
 
@@ -58,6 +61,8 @@ function Component ({ children, className, modalContent, modalId }: Props) {
       return ExtrinsicType.REDEEM_LDOT;
     } else if (checkActive(TRANSACTION_YIELD_CLAIM_MODAL)) {
       return ExtrinsicType.STAKING_CLAIM_REWARD;
+    } else if (checkActive(TRANSACTION_CLAIM_BRIDGE)) {
+      return ExtrinsicType.CLAIM_BRIDGE;
     }
 
     switch (action) {
@@ -77,6 +82,8 @@ function Component ({ children, className, modalContent, modalId }: Props) {
         return ExtrinsicType.SEND_NFT;
       case 'swap':
         return ExtrinsicType.SWAP;
+      case 'claim-bridge':
+        return ExtrinsicType.CLAIM_BRIDGE;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -144,9 +151,15 @@ function Component ({ children, className, modalContent, modalId }: Props) {
   // Navigate to finish page
   const onDone = useCallback(
     (extrinsicHash: string) => {
+      if (modalId) {
+        // note: this method can only apply to transaction modals that is in TransactionModalContextProvider
+        closeTransactionModalById(modalId);
+      }
+
       navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
+      onDoneCallback?.();
     },
-    [from, chain, navigate]
+    [modalId, navigate, from, chain, onDoneCallback, closeTransactionModalById]
   );
 
   const openRecheckChainConnectionModal = useCallback((chainName: string) => {
@@ -165,6 +178,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
   }, [navigate, recheckingChain]);
 
   const contextValues = useMemo((): TransactionContextProps => ({
+    isInModal: modalContent,
     defaultData,
     needPersistData,
     persistData: setStorage,
@@ -178,7 +192,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
     openRecheckChainConnectionModal,
     closeRecheckChainConnectionModal,
     modalId
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalContent, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
 
   useEffect(() => {
     chain !== '' && chainChecker(chain);

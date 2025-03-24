@@ -98,6 +98,8 @@ const TokenDetail = new LazyLoader('TokenDetail', () => import('@subwallet/exten
 const SecurityList = new LazyLoader('SecurityList', () => import('@subwallet/extension-web-ui/Popup/Settings/Security'));
 const ManageWebsiteAccess = new LazyLoader('ManageWebsiteAccess', () => import('@subwallet/extension-web-ui/Popup/Settings/Security/ManageWebsiteAccess'));
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-web-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
+const Notifications = new LazyLoader('Notification', () => import('@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification'));
+const NotificationSetting = new LazyLoader('NotificationSetting', () => import('@subwallet/extension-web-ui/Popup/Settings/Notifications/NotificationSetting'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-web-ui/Popup/Account/NewSeedPhrase'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-web-ui/Popup/Account/ImportSeedPhrase'));
@@ -128,6 +130,7 @@ const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/e
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw'));
 const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Swap'));
+const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimBridge'));
 
 // Wallet Connect
 const ConnectWalletConnect = new LazyLoader('ConnectWalletConnect', () => import('@subwallet/extension-web-ui/Popup/WalletConnect/ConnectWalletConnect'));
@@ -249,6 +252,7 @@ export const router = createBrowserRouter([
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
           SwapTransaction.generateRouterObject('swap'),
+          ClaimBridge.generateRouterObject('claim-bridge'),
           {
             path: 'compound',
             element: <Example />
@@ -284,6 +288,8 @@ export const router = createBrowserRouter([
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
+          Notifications.generateRouterObject('notification'),
+          NotificationSetting.generateRouterObject('notification-config'),
           ManageWebsiteAccessDetail.generateRouterObject('dapp-access-edit'),
           {
             path: 'chains',

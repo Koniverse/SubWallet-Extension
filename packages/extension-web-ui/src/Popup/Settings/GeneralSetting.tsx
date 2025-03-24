@@ -1,4 +1,4 @@
-// Copyright 2019-2022 @polkadot/extension-ui authors & contributors
+// Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
@@ -7,25 +7,30 @@ import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticDat
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BaseSelectModal } from '@subwallet/extension-web-ui/components/Modal/BaseSelectModal';
+import { NOTIFICATION_SETTING_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import useDefaultNavigate from '@subwallet/extension-web-ui/hooks/router/useDefaultNavigate';
 import { saveBrowserConfirmationType, saveLanguage, savePriceCurrency, saveTheme } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { PhosphorIcon, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { noop } from '@subwallet/extension-web-ui/utils';
 import { getCurrencySymbol } from '@subwallet/extension-web-ui/utils/currency';
-import { BackgroundIcon, Icon, Image, SettingItem, SwIconProps } from '@subwallet/react-ui';
+import { BackgroundIcon, Icon, Image, ModalContext, SettingItem, SwIconProps } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowSquareUpRight, BellSimpleRinging, CaretRight, CheckCircle, CornersOut, CurrencyCircleDollar, GlobeHemisphereEast, ImageSquare, Layout as LayoutIcon, MoonStars, Sun } from 'phosphor-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+import NotificationSetting from './Notifications/NotificationSetting';
 
 type Props = ThemeProps;
 
 type SelectionItemType = {
   key: string,
-  leftIcon: SwIconProps['phosphorIcon'] | string,
+  leftIcon: SwIconProps['phosphorIcon'] | React.ReactNode,
   leftIconBgColor: string,
   title: string,
   subTitle?: string,
@@ -134,10 +139,13 @@ const showBrowserConfirmationType = false;
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { currency } = useSelector((state: RootState) => state.price);
-
+  const navigate = useNavigate();
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { isWebUI } = useContext(ScreenContext);
   const theme = useSelector((state: RootState) => state.settings.theme);
   const _language = useSelector((state: RootState) => state.settings.language);
   const _browserConfirmationType = useSelector((state: RootState) => state.settings.browserConfirmationType);
+  const [isNotificationSettingModalVisible, setIsNotificationSettingModalVisible] = useState<boolean>(false);
   const [loadingMap, setLoadingMap] = useState<LoadingMap>({
     browserConfirmationType: false,
     language: false,
@@ -271,6 +279,29 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     saveTheme(value as ThemeNames).finally(noop);
   }, []);
 
+  const openNotificationSettingModal = useCallback(() => {
+    setIsNotificationSettingModalVisible(true);
+    activeModal(NOTIFICATION_SETTING_MODAL);
+  }, [activeModal]);
+
+  const closeNotificationSettingModal = useCallback(() => {
+    inactiveModal(NOTIFICATION_SETTING_MODAL);
+    setIsNotificationSettingModalVisible(true);
+  }, [inactiveModal]);
+
+  const onClickEnableNotification = useCallback(() => {
+    if (isWebUI) {
+      openNotificationSettingModal();
+    } else {
+      navigate('/settings/notification-config');
+    }
+  }, [isWebUI, navigate, openNotificationSettingModal]);
+
+  const notificationSettingModalProps = useMemo(() => ({
+    modalId: NOTIFICATION_SETTING_MODAL,
+    onCancel: closeNotificationSettingModal
+  }), [closeNotificationSettingModal]);
+
   return (
     <PageWrapper className={`general-setting ${className}`}>
       <Layout.WithSubHeaderOnly
@@ -355,7 +386,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   key: 'browser-confirmation-type-trigger',
                   leftIcon: BellSimpleRinging,
                   leftIconBgColor: token['volcano-6'],
-                  title: t('Notifications')
+                  title: t('Browser notifications')
                 })}
                 disabled={loadingMap.browserConfirmationType}
                 id='browser-confirmation-type-select-modal'
@@ -367,7 +398,40 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 selected={_browserConfirmationType}
                 shape='round'
                 size='small'
-                title={t('Notifications')}
+                title={t('View notifications in')}
+              />
+            )
+          }
+          <SettingItem
+            className={CN('__trigger-item setting-item', 'notification-item')}
+            leftItemIcon={(
+              <BackgroundIcon
+                backgroundColor={token['magenta-7']}
+                phosphorIcon={BellSimpleRinging}
+                size='sm'
+                type='phosphor'
+                weight='fill'
+              />
+            )}
+            name={t('In-app notifications')}
+            onPressItem={onClickEnableNotification}
+            rightItem={(
+              <div className={'__trigger-right-item'}>
+                <Icon
+                  className='__right-icon'
+                  customSize={'20px'}
+                  phosphorIcon={CaretRight}
+                  type='phosphor'
+                />
+              </div>
+            )}
+          />
+
+          {
+            isWebUI && isNotificationSettingModalVisible && (
+              <NotificationSetting
+                isModal
+                modalProps={notificationSettingModalProps}
               />
             )
           }
@@ -399,6 +463,11 @@ export const GeneralSetting = styled(Component)<Props>(({ theme: { token } }: Pr
       padding: 4,
       maxHeight: 28
     },
+
+    '.notification-item': {
+      marginTop: token.marginXS
+    },
+
     '.-subTitle-container .__label-item': {
       backgroundColor: token.colorBgBorder,
       padding: 4,

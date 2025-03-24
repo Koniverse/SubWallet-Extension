@@ -1413,5 +1413,8 @@
   "Unable to send. NFT not supported on recipient address": "",
   "EVM accounts": "",
   "Substrate accounts": "",
-  "Unable to process this swap at the moment. Try again later": ""
+  "Unable to process this swap at the moment. Try again later": "",
+  "Open dApp to unstake": "",
+  "Open Taostats Dashboard and connect your SubWallet account to unstake your funds. This feature will come back to SubWallet soon!": "",
+  "Open dApp": ""
 }

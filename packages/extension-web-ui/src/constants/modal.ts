@@ -46,6 +46,8 @@ export const CONFIRMATION_MODAL = 'confirmation-modal';
 export const BUY_TOKEN_MODAL = 'buy-token-modal';
 
 export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
+export const NOTIFICATION_MODAL = 'notification-modal';
+export const NOTIFICATION_SETTING_MODAL = 'notification-setting-modal';
 export const RECEIVE_MODAL_TOKEN_SELECTOR = 'receive-modal-token-selector';
 export const RECEIVE_MODAL_ACCOUNT_SELECTOR = 'receive-modal-account-selector';
 
@@ -99,6 +101,7 @@ export const TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL = 'transaction-yield-cancel-
 export const TRANSACTION_YIELD_WITHDRAW_MODAL = 'transaction-yield-withdraw-modal';
 export const TRANSACTION_YIELD_FAST_WITHDRAW_MODAL = 'transaction-yield-fast-withdraw-modal';
 export const TRANSACTION_YIELD_CLAIM_MODAL = 'transaction-yield-claim-modal';
+export const TRANSACTION_CLAIM_BRIDGE = 'transaction-claim-bridge-modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';

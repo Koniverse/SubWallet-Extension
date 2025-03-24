@@ -21,7 +21,7 @@ import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, EarningPoolsParam, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
@@ -95,6 +95,7 @@ function Component (): React.ReactElement {
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { tokens } = useSelector((state: RootState) => state.buyService);
   const swapPairs = useSelector((state) => state.swap.swapPairs);
+  const priorityTokens = useSelector((root: RootState) => root.chainStore.priorityTokens);
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
@@ -222,7 +223,9 @@ function Component (): React.ReactElement {
           }
         });
 
-        return items.sort(sortTokenByValue);
+        sortTokensByStandard(items, priorityTokens);
+
+        return items;
       }
 
       if (tokenBalanceMap[tokenGroupSlug]) {
@@ -237,7 +240,7 @@ function Component (): React.ReactElement {
     }
 
     return [] as TokenBalanceItemType[];
-  }, [tokenGroupSlug, tokenGroupMap, tokenBalanceMap, searchInput]);
+  }, [tokenGroupSlug, tokenGroupMap, tokenBalanceMap, priorityTokens, searchInput]);
 
   const isHaveOnlyTonSoloAcc = useMemo(() => {
     const checkValidAcc = (currentAcc: AccountProxy) => {
