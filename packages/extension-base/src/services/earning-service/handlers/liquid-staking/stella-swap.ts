@@ -30,7 +30,7 @@ const SUBWALLET_REFERRAL = '0x7e6815f45E624768548d085231f2d453f16FD7DD';
 const TOP_HOLDER = '0x4300e09284e3bB4d9044DdAB31EfAF5f3301DABa';
 
 interface StellaswapApr {
-  stDOTAPR: number,
+  stDOTAPR: number
 }
 
 interface StellaswapUnbonding {
@@ -74,7 +74,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
   /* Subscribe pool info */
 
   async getPoolStat (): Promise<LiquidYieldPoolInfo> {
-    const evmApi = this.evmApi;
+    const evmApi = await this.evmApi.isReady;
     const derivativeTokenSlug = this.derivativeAssets[0];
     const derivativeTokenInfo = this.state.getAssetBySlug(derivativeTokenSlug);
     const stakingContract = getStellaswapLiquidStakingContract(this.chain, _getContractAddressOfToken(derivativeTokenInfo), evmApi);
