@@ -63,7 +63,7 @@ const Component: FC<Props> = (props: Props) => {
                 className={'__chain-logo-group'}
               />
               <div className='__steps-label'>
-                {t('steps')}
+                {`${items.length} ${t('steps')}`}
               </div>
             </>
           )
@@ -74,6 +74,9 @@ const Component: FC<Props> = (props: Props) => {
 
 export const TransactionProcessPreview = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
+    display: 'flex',
+    alignItems: 'center',
+
     '.__chain-logo': {
       '.ant-image, img': {
         display: 'block'
@@ -85,9 +88,8 @@ export const TransactionProcessPreview = styled(Component)<Props>(({ theme: { to
       paddingRight: 2
     },
 
-    '&.-mode-1': {
-      display: 'flex',
-      alignItems: 'center'
+    '&.-mode-2': {
+      gap: token.sizeXS
     }
   });
 });

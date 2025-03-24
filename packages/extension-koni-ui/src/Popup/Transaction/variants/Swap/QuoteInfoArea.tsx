@@ -39,38 +39,47 @@ type DecimalParts = {
   fractionPart?: string;
 };
 
+function roundFraction (raw: string, digits: number): string {
+  const numStr = `0.${raw}`;
+  const rounded = new BigN(numStr).decimalPlaces(digits, BigN.ROUND_HALF_UP);
+
+  return rounded.toFixed(digits).split('.')[1];
+}
+
 function analyzeDecimal (value: number): DecimalParts {
   const str = new BigN(value).toFixed();
-  const [intPart, fracPartRaw = ''] = str.split('.');
+  const [intPart, fracRaw = ''] = str.split('.');
+  const intVal = +intPart;
 
-  if (!fracPartRaw) {
+  if (!fracRaw || /^0*$/.test(fracRaw)) {
     return { integerPart: intPart };
   }
 
-  const zeroMatch = fracPartRaw.match(/^(0{3,})/);
-  const subCount = zeroMatch?.[1].length;
-  const rest = subCount ? fracPartRaw.slice(subCount) : fracPartRaw;
+  if (intVal > 0) {
+    if (/^0{3,}$/.test(fracRaw)) {
+      return { integerPart: intPart, fractionPart: '000' };
+    }
 
-  const maxLen = subCount ? 2 : 4;
-  const roundPart = rest.slice(0, maxLen + 1);
-
-  let roundedStr = roundPart;
-
-  if (roundPart.length > maxLen) {
-    const num = Number(`0.${roundPart}`);
-    const rounded = Math.round(num * Math.pow(10, maxLen));
-
-    roundedStr = String(rounded).padStart(maxLen, '0');
+    return {
+      integerPart: intPart,
+      fractionPart: roundFraction(fracRaw, 4)
+    };
   }
+
+  const zeroMatch = fracRaw.match(/^(0{3,})/);
+  const subCount = zeroMatch?.[1].length;
+  const rest = subCount ? fracRaw.slice(subCount) : fracRaw;
+  const maxLen = subCount ? 2 : 4;
+  const rounded = roundFraction(rest, maxLen);
 
   return {
     integerPart: intPart,
     subZeroCount: subCount,
-    fractionPart: roundedStr.length > 0 ? roundedStr : subCount ? '' : undefined
+    fractionPart: rounded || (subCount ? '' : undefined)
   };
 }
 
-function renderRateNumber (value: number): React.ReactNode {
+function renderRateValue (value: number): React.ReactNode {
   const parsed = analyzeDecimal(value);
 
   if (parsed.fractionPart === undefined) {
@@ -102,6 +111,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
 
+  const rateValueNode = useMemo(() => {
+    return currentQuote?.rate ? renderRateValue(currentQuote.rate) : 0;
+  }, [currentQuote?.rate]);
+
   const renderRateInfo = () => {
     if (!currentQuote) {
       return null;
@@ -114,7 +127,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </span>
         <span>&nbsp;~&nbsp;</span>
         <span>
-          {renderRateNumber(currentQuote.rate)}
+          {rateValueNode}
           {` ${_getAssetSymbol(toAssetInfo)}`}
         </span>
       </div>
