@@ -80,7 +80,7 @@ export function handleResponse<TMessageType extends MessageTypes> (data: Transpo
     // eslint-disable-next-line @typescript-eslint/ban-types
     (handler.subscriber as Function)(data.subscription);
   } else if (data.error) {
-    handler.reject(new ProviderError(ProviderErrorType.INTERNAL_ERROR, data.error, data.errorCode));
+    handler.reject(new ProviderError(ProviderErrorType.INTERNAL_ERROR, data.error, data.errorCode, data.errorCode));
   } else {
     handler.resolve(data.response);
   }
