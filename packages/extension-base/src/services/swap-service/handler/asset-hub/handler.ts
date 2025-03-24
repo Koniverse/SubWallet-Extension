@@ -278,20 +278,20 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     if (!swapPairInfo || !selectedQuote) {
       return Promise.resolve(undefined);
-    } else {
-      const submitStep: BaseStepDetail = {
-        name: 'Swap',
-        type: SwapStepType.SWAP,
-        metadata: {
-          sendingValue: fromAmount.toString(),
-          originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-          destinationValue: getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage),
-          destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
-        }
-      };
-
-      return Promise.resolve([submitStep, selectedQuote.feeInfo]);
     }
+
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      metadata: {
+        sendingValue: fromAmount,
+        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
+        destinationValue: getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage),
+        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to)
+      }
+    };
+
+    return Promise.resolve([submitStep, selectedQuote.feeInfo]);
   }
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
@@ -302,13 +302,17 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
-    const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
-      if (step.action === DynamicSwapType.BRIDGE) {
-        return this.getXcmStepV2.bind(this); // todo
-      }
-
+    const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step, stepIndex) => {
       if (step.action === DynamicSwapType.SWAP) {
         return this.getSwapStepV2.bind(this);
+      }
+
+      if (step.action === DynamicSwapType.BRIDGE && stepIndex === 2) {
+        return this.swapBaseHandler.getExtraBridgeStep.bind(this.swapBaseHandler);
+      }
+
+      if (step.action === DynamicSwapType.BRIDGE) {
+        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler); // todo
       }
 
       throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);

@@ -291,7 +291,7 @@ export class HydradxHandler implements SwapBaseInterface {
       }
 
       if (step.action === DynamicSwapType.BRIDGE && stepIndex === 2) {
-        return this.swapBaseHandler.getLaterBridgeStep.bind(this.swapBaseHandler);
+        return this.swapBaseHandler.getExtraBridgeStep.bind(this.swapBaseHandler);
       }
 
       if (step.action === DynamicSwapType.BRIDGE) {

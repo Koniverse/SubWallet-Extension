@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
@@ -16,7 +17,7 @@ import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findAllBridgeDestinations, findBridgeT
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
-import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
 
@@ -245,15 +246,15 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
+    // ------------------------
     // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
     const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
 
     if (swapTransit && supportSwapChains.includes(fromChain)) {
       const swapStep = getSwapStep(fromToken.slug, swapTransit);
-      const bridgeStep = getBridgeStep(swapTransit, toToken.slug);
 
       process.push(swapStep);
-      process.push(bridgeStep);
+      process.push(getBridgeStep(swapTransit, toToken.slug));
 
       return [process, {
         ...request,
@@ -261,14 +262,14 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
+    // ------------------------
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
     const bridgeTransit = findBridgeTransitDestination(assetRefMap, fromToken, toToken);
 
     if (bridgeTransit && supportSwapChains.includes(toChain)) {
-      const bridgeStep = getBridgeStep(fromToken.slug, bridgeTransit);
       const swapStep = getSwapStep(bridgeTransit, toToken.slug);
 
-      process.push(bridgeStep);
+      process.push(getBridgeStep(fromToken.slug, bridgeTransit));
       process.push(swapStep);
 
       return [process, {
@@ -278,12 +279,13 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       }];
     }
 
+    // ------------------------
     // BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
     const processList: DynamicSwapAction[][] = [];
-    const actionPairList: ActionPair[] = [];
+    const swapPairList: ActionPair[] = [];
     const allBridgeDestinations = findAllBridgeDestinations(assetRefMap, fromToken);
 
-    // currently find first path. Todo: Return all paths or best path in getOptimalProcess.
+    // currently find first path. Todo: return all paths or best path.
     for (const bridgeTransit of allBridgeDestinations) {
       process = [];
       const bridgeDestinationInfo = this.chainService.getAssetBySlug(bridgeTransit);
@@ -296,28 +298,29 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         process.push(swapStep);
         process.push(getBridgeStep(swapTransit, toToken.slug));
 
-        // set the highest priority to hydration provider todo: improve
-        if (bridgeDestinationInfo.originChain === 'hydradx_main') {
-          const chainSwap = this.chainService.getChainInfoByKey(bridgeDestinationInfo.originChain);
-
+        // set the highest priority to hydration provider
+        if (bridgeDestinationInfo.originChain === COMMON_CHAIN_SLUGS.HYDRADX) {
           return [process, {
             ...request,
-            address: reformatAddress(address, _getChainSubstrateAddressPrefix(chainSwap)),
+            address: _reformatAddressWithChain(address, this.chainService.getChainInfoByKey(COMMON_CHAIN_SLUGS.HYDRADX)),
             pair: swapStep.pair
           }];
         }
 
         processList.push(process);
-        actionPairList.push(swapStep.pair);
+        swapPairList.push(swapStep.pair);
       }
     }
 
-    // set the highest priority to hydration provider todo: improve
-    if (processList.length && actionPairList.length) {
-      return [processList[0], {
+    // get first process
+    if (processList.length && swapPairList.length) {
+      const [firstProcess, firstSwapPair] = [processList[0], swapPairList[0]];
+      const chainSwap = this.chainService.getAssetBySlug(firstSwapPair.from).originChain;
+
+      return [firstProcess, {
         ...request,
-        address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
-        pair: actionPairList[0]
+        address: _reformatAddressWithChain(address, this.chainService.getChainInfoByKey(chainSwap)),
+        pair: firstSwapPair
       }];
     }
 

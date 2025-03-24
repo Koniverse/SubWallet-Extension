@@ -114,9 +114,9 @@ export class SwapBaseHandler {
 
   async getBridgeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // only xcm on substrate for now
-    const { path, request: { address, fromAmount, slippage }, selectedQuote } = params;
+    const { path, request: { address, fromAmount, recipient, slippage }, selectedQuote } = params;
     const xcmStepIndex = path.findIndex((step) => step.action === DynamicSwapType.BRIDGE); // index = 0 => XCM first; index = 1 => SWAP first
-    const xcmPairInfo = xcmStepIndex !== -1 ? path[xcmStepIndex] : undefined;
+    const xcmPairInfo = xcmStepIndex === -1 ? undefined : path[xcmStepIndex];
 
     if (!xcmPairInfo) {
       return undefined;
@@ -137,17 +137,20 @@ export class SwapBaseHandler {
       const id = getId();
       const feeInfo = await this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
 
+      const mockSendingValue = xcmStepIndex === XcmStepPosition.FIRST ? fromAmount : selectedQuote?.toAmount || '0';
+      const recipientAddress = xcmStepIndex === XcmStepPosition.FIRST ? _reformatAddressWithChain(address, toChainInfo) : recipient || _reformatAddressWithChain(address, toChainInfo); // has recipient in case swap to another address
+
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
-        // Mock sending value to get payment info
-        sendingValue: fromAmount, // todo: recheck amount xcm step with amount init
-        recipient: address,
-        substrateApi: substrateApi,
-        sender: address,
         originChain: fromChainInfo,
         destinationChain: toChainInfo,
-        feeInfo
+        substrateApi: substrateApi,
+        feeInfo,
+        // Mock sending value to get payment info
+        sendingValue: mockSendingValue,
+        sender: address,
+        recipient: recipientAddress
       });
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
@@ -167,11 +170,11 @@ export class SwapBaseHandler {
       let bnTransferAmount = BigN(fromAmount);
       const isXcmNativeToken = _isNativeToken(fromTokenInfo);
 
-      // todo: increase transfer amount when XCM local token
       if (xcmStepIndex === XcmStepPosition.AFTER_SWAP) {
         bnTransferAmount = BigN(getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage)); // todo: check exception toAmount
       }
 
+      // todo: increase transfer amount when XCM local token
       if (xcmStepIndex === XcmStepPosition.FIRST && isXcmNativeToken) {
         // xcm fee is paid in native token but swap token is not always native token
         // add amount of fee into sending value to ensure has enough token to swap
@@ -197,7 +200,7 @@ export class SwapBaseHandler {
     }
   }
 
-  async getLaterBridgeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getExtraBridgeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // only xcm on substrate for now
     const { path, request: { address, fromAmount, recipient, slippage }, selectedQuote } = params;
     const xcmStepIndex = XcmStepPosition.AFTER_XCM_SWAP;
@@ -225,14 +228,14 @@ export class SwapBaseHandler {
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
-        // Mock sending value to get payment info
-        sendingValue: fromAmount, // todo: recheck amount xcm step with amount init
-        recipient: recipient || _reformatAddressWithChain(address, toChainInfo),
-        substrateApi: substrateApi,
-        sender: _reformatAddressWithChain(address, fromChainInfo),
         originChain: fromChainInfo,
         destinationChain: toChainInfo,
-        feeInfo
+        substrateApi: substrateApi,
+        feeInfo,
+        // Mock sending value to get payment info
+        sendingValue: selectedQuote?.toAmount || '0', // todo: any better way to handle than || '0'?
+        sender: _reformatAddressWithChain(address, fromChainInfo),
+        recipient: recipient || _reformatAddressWithChain(address, toChainInfo) // recipient in case swap to another address
       });
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
