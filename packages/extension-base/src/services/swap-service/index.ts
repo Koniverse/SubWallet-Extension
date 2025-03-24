@@ -81,6 +81,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return availableQuotes;
   }
 
+  // deprecated
   private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
     const result: CommonOptimalPath = {
       totalFee: [MOCK_STEP_FEE],
@@ -110,7 +111,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
 
     if (!swapPairInfo) {
-      console.error('No swap info');
+      console.error('Swap pair is not found');
 
       return result;
     }
@@ -236,14 +237,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     // SWAP: 2 tokens in the same chain and chain has dex
     if (isChainsHasSameProvider(fromChain, toChain)) { // there's a dex that can support direct swapping
-      const swapStep = getSwapStep(fromToken.slug, toToken.slug);
+      process.push(getSwapStep(fromToken.slug, toToken.slug));
 
-      process.push(swapStep);
-
-      return [process, {
-        ...request,
-        pair: swapStep.pair
-      }];
+      return [process, request];
     }
 
     // ------------------------
@@ -333,7 +329,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const [path, directSwapRequest] = this.getAvailablePath(request);
 
     if (!directSwapRequest) {
-      throw Error('Swap pair not found');
+      throw Error('Swap pair is not found');
     }
 
     const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);

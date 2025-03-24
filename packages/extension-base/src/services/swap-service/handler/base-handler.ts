@@ -128,7 +128,7 @@ export class SwapBaseHandler {
     const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
 
     if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
-      throw Error('Token and chain not found');
+      throw Error('Token or chain not found');
     }
 
     try {
@@ -201,7 +201,7 @@ export class SwapBaseHandler {
   }
 
   async getExtraBridgeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // only xcm on substrate for now
+    // todo: can merge with getBridgeStep by adding param flag to check extra bridge step
     const { path, request: { address, fromAmount, recipient, slippage }, selectedQuote } = params;
     const xcmStepIndex = XcmStepPosition.AFTER_XCM_SWAP;
     const xcmPairInfo = path[xcmStepIndex] || undefined;
@@ -216,7 +216,7 @@ export class SwapBaseHandler {
     const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
 
     if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
-      throw Error('Token and chain not found');
+      throw Error('Token or chain not found');
     }
 
     try {
