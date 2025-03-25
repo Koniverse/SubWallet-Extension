@@ -1196,6 +1196,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             modalId={SWAP_ALL_QUOTES_MODAL}
             onCancel={closeSwapQuotesModal}
             optimalQuoteItem={optimalQuoteRef.current}
+            quoteAliveUntil={quoteAliveUntil}
             selectedItem={currentQuote}
           />
         )

@@ -3,11 +3,13 @@
 
 import { SwapQuote } from '@subwallet/extension-base/types/swap';
 import SwapQuotesItem from '@subwallet/extension-koni-ui/components/Field/Swap/SwapQuotesItem';
+import { QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -17,12 +19,15 @@ type Props = ThemeProps & {
   selectedItem?: SwapQuote,
   optimalQuoteItem?: SwapQuote,
   onCancel: VoidFunction;
+  quoteAliveUntil: number | undefined;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { applyQuote, className, items, modalId, onCancel, optimalQuoteItem, selectedItem } = props;
+  const { applyQuote, className, items, modalId, onCancel, optimalQuoteItem, quoteAliveUntil, selectedItem } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [currentQuote, setCurrentQuote] = useState<SwapQuote | undefined>(selectedItem);
+
+  const { t } = useTranslation();
 
   const onSelectItem = useCallback((quote: SwapQuote) => {
     setCurrentQuote(quote);
@@ -68,7 +73,18 @@ const Component: React.FC<Props> = (props: Props) => {
         id={modalId}
         maskClosable={!loading}
         onCancel={onCancel}
-        title={'Swap quotes'}
+        title={(
+          <>
+            <span className={'__modal-title'}>
+              {t('Select provider')}
+            </span>
+
+            <QuoteResetTime
+              className={'__reset-time'}
+              quoteAliveUntilValue = {quoteAliveUntil}
+            />
+          </>
+        )}
       >
         {items.map((item) => (
           <SwapQuotesItem
@@ -91,8 +107,45 @@ const SwapQuotesSelectorModal = styled(Component)<Props>(({ theme: { token } }: 
       paddingBottom: 0
     },
 
+    '.ant-sw-header-left-part': {
+      position: 'relative',
+      zIndex: 1
+    },
+
+    '.ant-sw-header-center-part': {
+      width: 'auto'
+    },
+
     '.__swap-quote-Item + .__swap-quote-Item': {
       marginTop: token.marginXS
+    },
+
+    '.__modal-title': {
+      fontSize: token.fontSizeHeading4,
+      lineHeight: token.lineHeightHeading4
+    },
+
+    '.__reset-time': {
+      position: 'absolute',
+      width: 67,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      maxHeight: 20,
+      gap: token.sizeXXS,
+      display: 'flex',
+      alignItems: 'center',
+      marginTop: 'auto',
+      marginBottom: 'auto'
+    },
+
+    '.__reset-time-icon': {
+      fontSize: 16
+    },
+
+    '.__reset-time-text': {
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM
     },
 
     '.ant-input-container': {
