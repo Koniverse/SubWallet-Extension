@@ -15,7 +15,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -424,8 +424,12 @@ export class SwapBaseHandler {
 
   public async validateSwapOnlyProcess (params: ValidateSwapProcessParams, swapIndex: number): Promise<TransactionError[]> {
     const swapStepInfo = params.process.steps[swapIndex];
-    const swapMetadata = swapStepInfo.metadata as unknown as HydrationSwapStepMetadata; // todo
+    const swapMetadata = swapStepInfo.metadata as unknown as BaseSwapStepMetadata; // todo
     const swapFee = params.process.totalFee[swapIndex];
+
+    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
 
     // Validate quote
     if (!params.selectedQuote) {
@@ -467,8 +471,6 @@ export class SwapBaseHandler {
     const xcmMetadata = currentStep.metadata as unknown as BriefXCMStep;
     const currentFee = params.process.totalFee[xcmIndex];
     const bridgeFeeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount;
-
-    console.log(xcmMetadata);
 
     if (!xcmMetadata || !xcmMetadata.destinationTokenInfo || !xcmMetadata.originTokenInfo || !xcmMetadata.sendingValue) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
@@ -515,8 +517,12 @@ export class SwapBaseHandler {
 
     // Swap
     const swapStepInfo = params.process.steps[swapIndex];
-    const swapMetadata = swapStepInfo.metadata as unknown as HydrationSwapStepMetadata; // todo
+    const swapMetadata = swapStepInfo.metadata as unknown as BaseSwapStepMetadata; // todo
     const swapFee = params.process.totalFee[swapIndex];
+
+    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
 
     // Validate quote
     if (!params.selectedQuote) {

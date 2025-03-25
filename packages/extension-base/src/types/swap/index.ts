@@ -250,21 +250,16 @@ export interface PermitSwapData {
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
 export const SIMPLE_SWAP_SLIPPAGE = 0.05;
 
-export interface BriefXCMStep {
+export interface BaseSwapStepMetadata {
   sendingValue: string;
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
 }
 
-export interface HydrationSwapStepMetadata {
-  sendingValue: string,
-  originTokenInfo: _ChainAsset,
-  destinationTokenInfo: _ChainAsset,
-  txHex: `0x${string}`
+export interface BriefXCMStep extends BaseSwapStepMetadata {
+  expectedReceive?: string;
 }
 
-export interface AssetHubSwapStepMetadata {
-  sendingValue: string,
-  originTokenInfo: _ChainAsset,
-  destinationTokenInfo: _ChainAsset
+export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
+  txHex: `0x${string}`
 }
