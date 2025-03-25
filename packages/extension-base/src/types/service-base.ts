@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { OptimalSwapPathParams, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
 import { OptimalYieldPath, OptimalYieldPathParams, YieldStepType } from '@subwallet/extension-base/types/yield';
 
@@ -44,11 +45,7 @@ export interface CommonStepDetail extends BaseStepDetail {
 export interface CommonOptimalPath { // path means the steps to complete the swap, not the quote itself
   totalFee: CommonStepFeeInfo[]; // each item in the array is tx fee for a step
   steps: CommonStepDetail[];
-}
-
-export interface CommonOptimalPathV2 { // path means the steps to complete the swap, not the quote itself
-  totalFee: CommonStepFeeInfo[]; // each item in the array is tx fee for a step
-  steps: CommonOptimalPath[];
+  path: DynamicSwapAction[];
 }
 
 export const DEFAULT_FIRST_STEP: CommonStepDetail = {

@@ -84,7 +84,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
     const result: CommonOptimalPath = {
       totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
+      steps: [DEFAULT_FIRST_STEP],
+      path: []
     };
 
     result.totalFee.push({
@@ -104,7 +105,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalPath {
     const result: CommonOptimalPath = {
       totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
+      steps: [DEFAULT_FIRST_STEP],
+      path: []
     };
 
     const swapPairInfo = params.path[0].pair; // todo: improve for Round 2
