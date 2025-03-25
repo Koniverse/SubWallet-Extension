@@ -464,11 +464,13 @@ export class SwapBaseHandler {
   public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
     // Bridge
     const currentStep = params.process.steps[xcmIndex];
-    const metadata = currentStep.metadata as unknown as BriefXCMStep;
+    const xcmMetadata = currentStep.metadata as unknown as BriefXCMStep;
     const currentFee = params.process.totalFee[xcmIndex];
     const bridgeFeeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount;
 
-    if (!metadata || !metadata.destinationTokenInfo || !metadata.originTokenInfo || !metadata.sendingValue) {
+    console.log(xcmMetadata);
+
+    if (!xcmMetadata || !xcmMetadata.destinationTokenInfo || !xcmMetadata.originTokenInfo || !xcmMetadata.sendingValue) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
@@ -476,8 +478,8 @@ export class SwapBaseHandler {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
-    const bridgeFromToken = metadata.originTokenInfo;
-    const bridgeToToken = metadata.destinationTokenInfo;
+    const bridgeFromToken = xcmMetadata.originTokenInfo;
+    const bridgeToToken = xcmMetadata.destinationTokenInfo;
 
     const fromChain = this.chainService.getChainInfoByKey(bridgeFromToken.originChain);
     const toChain = this.chainService.getChainInfoByKey(bridgeToToken.originChain);
@@ -487,7 +489,7 @@ export class SwapBaseHandler {
     }
 
     const bnBridgeFeeAmount = BigN(bridgeFeeAmount);
-    const bnBridgeAmount = new BigN(metadata.sendingValue);
+    const bnBridgeAmount = new BigN(xcmMetadata.sendingValue);
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
 
@@ -555,7 +557,9 @@ export class SwapBaseHandler {
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    console.log(bnSwapFromTokenBalance); // todo
+
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnBridgeAmount, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
