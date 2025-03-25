@@ -10,6 +10,7 @@ import { _getAssetDecimals, _getContractAddressOfToken } from '@subwallet/extens
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { ApproveStepMetadata, BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
+import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
 
@@ -74,10 +75,14 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
   /* Subscribe pool info */
 
   async getPoolStat (): Promise<LiquidYieldPoolInfo> {
-    const evmApi = await this.evmApi.isReady;
+    const provider = new Web3.providers.WebsocketProvider('wss://moonbeam-rpc.publicnode.com');
+    const api = new Web3(provider);
+
     const derivativeTokenSlug = this.derivativeAssets[0];
     const derivativeTokenInfo = this.state.getAssetBySlug(derivativeTokenSlug);
-    const stakingContract = getStellaswapLiquidStakingContract(this.chain, _getContractAddressOfToken(derivativeTokenInfo), evmApi);
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const stakingContract = new api.eth.Contract(ST_LIQUID_TOKEN_ABI, _getContractAddressOfToken(derivativeTokenInfo));
 
     const aprPromise = new Promise(function (resolve) {
       fetch(APR_STATS_URL, {
