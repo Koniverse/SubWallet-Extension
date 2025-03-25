@@ -12,7 +12,7 @@ import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-p
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
@@ -405,11 +405,15 @@ export class SwapBaseHandler {
     return [];
   }
 
-  private validateSwapStepV2 (swapToChain: _ChainInfo, swapToken: _ChainAsset, swapFeeToken: _ChainAsset, bnSwapValue: BigN, bnSwapFromTokenBalance: BigN, bnSwapFeeAmount: BigN, bnSwapFeeTokenBalance: BigN, recipient?: string): TransactionError[] {
+  private validateSwapStepV2 (swapToChain: _ChainInfo, swapToken: _ChainAsset, receivingToken: _ChainAsset, swapFeeToken: _ChainAsset, bnSwapValue: BigN, bnExpectedReceivingAmount: BigN, bnSwapFromTokenBalance: BigN, bnSwapFeeAmount: BigN, bnSwapFeeTokenBalance: BigN, recipient?: string): TransactionError[] {
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance);
 
     if (spendingAndFeePaymentValidation.length > 0) {
       return spendingAndFeePaymentValidation;
+    }
+
+    if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Amount ${_getAssetSymbol(receivingToken)} received is too small`))];
     }
 
     if (recipient) {
@@ -449,6 +453,8 @@ export class SwapBaseHandler {
     }
 
     const swapToken = swapMetadata.originTokenInfo;
+    const swapReceivingToken = swapMetadata.destinationTokenInfo;
+    const bnSwapReceivingAmount = BigN(params.selectedQuote.toAmount);
 
     const bnSwapValue = BigN(swapMetadata.sendingValue);
     const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
@@ -464,7 +470,7 @@ export class SwapBaseHandler {
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    return this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    return this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
   }
 
   public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
@@ -542,6 +548,8 @@ export class SwapBaseHandler {
     }
 
     const swapToken = swapMetadata.originTokenInfo;
+    const swapReceivingToken = swapMetadata.destinationTokenInfo;
+    const bnSwapReceivingAmount = BigN(params.selectedQuote.toAmount);
 
     if (swapToken.slug !== bridgeToToken.slug) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
@@ -567,7 +575,7 @@ export class SwapBaseHandler {
 
     console.log(bnSwapFromTokenBalance); // todo
 
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapFeeToken, bnSwapValue, bnBridgeAmount, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnBridgeAmount, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
