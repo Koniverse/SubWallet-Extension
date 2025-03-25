@@ -35,7 +35,8 @@ export const DefaultLogosMap: Record<string, string> = {
   ton: './images/projects/ton.png',
   ...Object.fromEntries(
     Array.from({ length: 71 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
-  )
+  ),
+  meld: './images/projects/meld.png'
 };
 
 export const IconMap = {

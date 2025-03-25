@@ -243,10 +243,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return 'Stake TAO to earn yield on dTAO';
   }
 
-  private getSubnetByNetuid (netuid: number): SubnetData | undefined {
-    return this.subnetData.find((subnet) => subnet.netuid === netuid);
-  }
-
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
@@ -435,16 +431,13 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             subnetPositions[netuid].originalTotalStake = subnetPositions[netuid].originalTotalStake.add(new BN(stake.toString()));
           }
 
-          Object.entries(subnetPositions).forEach(([netuid, { delegatorState, originalTotalStake }]) => {
-            const subnet = this.getSubnetByNetuid(parseInt(netuid));
-
-            if (!subnet) {
-              return;
-            }
-
-            const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
+          Object.values(this.subnetData).forEach((subnet) => {
+            const netuid = subnet.netuid;
+            const subnetSlug = `${this.slug}__subnet_${netuid.toString().padStart(2, '0')}`;
             const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
             const subnetSymbol = subnet.symbol || 'dTAO';
+
+            const { delegatorState = [], originalTotalStake = BN_ZERO } = subnetPositions[netuid] || {};
 
             if (delegatorState.length > 0) {
               this.parseNominatorMetadata(chainInfo, owner, delegatorState)
@@ -456,7 +449,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
                     type: this.type,
                     slug: subnetSlug,
                     subnetData: {
-                      subnetSymbol: subnetSymbol,
+                      subnetSymbol,
                       subnetShortName: subnetName,
                       originalTotalStake: originalTotalStake.toString()
                     }
@@ -478,7 +471,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
                 unstakings: [],
                 slug: subnetSlug,
                 subnetData: {
-                  subnetSymbol: subnetSymbol,
+                  subnetSymbol,
                   subnetShortName: subnetName,
                   originalTotalStake: '0'
                 }

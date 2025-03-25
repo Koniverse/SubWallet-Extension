@@ -591,14 +591,14 @@ export default class KoniTabs {
           chainId: chainId,
           rpcUrls: onlineData.rpc.filter((url) => (url.startsWith('https://'))),
           chainName: onlineData.name,
-          blockExplorerUrls: onlineData.explorers.map((explorer) => explorer.url),
+          blockExplorerUrls: onlineData.explorers?.map((explorer) => explorer.url),
           nativeCurrency: onlineData.nativeCurrency,
           requestId: id
         };
 
         await this.addEvmChain(id, url, { method: 'wallet_addEthereumChain', params: [chainData] });
       } else {
-        throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'This network is currently not supported');
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
       }
     }
 

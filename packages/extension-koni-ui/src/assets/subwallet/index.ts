@@ -31,7 +31,8 @@ const SwLogosMap: Record<string, string> = {
   ton: DefaultLogosMap.ton,
   ...Object.fromEntries(
     Array.from({ length: 71 }, (_, i) => [`subnet-${i}`, `./images/bittensor/subnet-${i}.png`])
-  )
+  ),
+  meld: DefaultLogosMap.meld
 };
 
 export default SwLogosMap;
