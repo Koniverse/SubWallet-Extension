@@ -15,6 +15,8 @@ export * from './transfer';
 
 // apply for all tx: transfer, xcm, swap, earning
 export function validateSpendingAndFeePayment (spendingToken: _ChainAsset, feeToken: _ChainAsset, bnSpendingAmount: BigN, bnFromTokenBalance: BigN, bnFeeAmount: BigN, bnFeeTokenBalance: BigN): TransactionError[] {
+  console.log(bnFromTokenBalance.toString(), bnSpendingAmount.toString(), _getTokenMinAmount(spendingToken));
+
   if (spendingToken.slug === feeToken.slug) {
     if (bnFromTokenBalance.lte(bnSpendingAmount.plus(bnFeeAmount).plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t(`Insufficient balance. Deposit ${spendingToken.symbol} and try again.`))];

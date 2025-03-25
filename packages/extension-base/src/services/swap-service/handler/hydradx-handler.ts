@@ -10,7 +10,7 @@ import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _getTokenMinAmount, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
@@ -306,7 +306,7 @@ export class HydradxHandler implements SwapBaseInterface {
         // add amount of fee into sending value to ensure has enough token to swap
         const bnXcmFee = new BigNumber(fee.feeComponent[0].amount);
 
-        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee).plus(_getTokenMinAmount(toTokenInfo));
       }
 
       const step: BaseStepDetail = {
