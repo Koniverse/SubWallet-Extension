@@ -608,8 +608,6 @@ export class HydradxHandler implements SwapBaseInterface {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
-    console.log('run here');
-
     const actionList = process.steps.map((step) => step.type);
     const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
     const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;

@@ -13,9 +13,7 @@ import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-b
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { AssetHubSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 
@@ -364,7 +362,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const metadata = params.process.steps[params.currentStep].metadata as unknown as AssetHubSwapStepMetadata;
+    const metadata = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
 
     if (!metadata || !metadata.sendingValue || !metadata.destinationTokenInfo || !metadata.originTokenInfo) {
       return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
@@ -512,5 +510,41 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     }
 
     return [];
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
+
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigN(selectedQuote.fromAmount).lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    const actionList = process.steps.map((step) => step.type);
+    const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
+    const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
+    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
+    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
+    const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
+
+    if (swap) {
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, 1); // todo: create interface for input request
+    }
+
+    if (swapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwap) {
+      return this.swapBaseHandler.validateXcmSwapProcess(params, 2, 1);
+    }
+
+    if (xcmSwapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
   }
 }

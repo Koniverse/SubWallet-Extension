@@ -157,9 +157,14 @@ export class SimpleSwapHandler implements SwapBaseInterface {
 
   async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
-      const submitStep = {
+      const submitStep: BaseStepDetail = {
         name: 'Swap',
-        type: SwapStepType.SWAP
+        type: SwapStepType.SWAP,
+        metadata: {
+          sendingValue: params.request.fromAmount.toString(),
+          originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
+          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
+        }
       };
 
       return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
@@ -280,5 +285,41 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       extrinsicType: ExtrinsicType.SWAP,
       chainType
     } as SwapSubmitStepData;
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
+
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigNumber(selectedQuote.fromAmount).lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    const actionList = process.steps.map((step) => step.type);
+    const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
+    const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
+    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
+    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
+    const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
+
+    if (swap) {
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, 1); // todo: create interface for input request
+    }
+
+    if (swapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwap) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
   }
 }
