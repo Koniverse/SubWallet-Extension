@@ -682,4 +682,9 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   return AccountChainType.SUBSTRATE;
 };
 
+export const _getAssetNetuid = (assetInfo: _ChainAsset): number => {
+  // @ts-ignore
+  return assetInfo.metadata?.netuid ?? -1;
+}
+
 export * from './patch';
