@@ -6797,10 +6797,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/avail-light-web@npm:^0.1.0":
+"@subwallet/avail-light-lib@file:../../Avail/avail-light/extension/pkg/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.0
-  resolution: "@subwallet/avail-light-web@npm:0.1.0"
-  checksum: 1d335655ae3b58d0630815db06e07c713a54270521fd520039c16dc8e866ef593a25bf4b017a313fae009096ad8ba35f5cea0474ce4c6a456da699de66226a46
+  resolution: "@subwallet/avail-light-lib@file:../../Avail/avail-light/extension/pkg/#../../Avail/avail-light/extension/pkg/::hash=1d3dbd&locator=root-workspace-0b6124%40workspace%3A."
+  checksum: 804ad9daf78d609ee56646e1d5ae03bd9ee7e1764765c526a05b5d74ee238f3269a9f6dbc622c615df85d725519788b8400c56b43d57b1145a1fca17c38d2b7b
   languageName: node
   linkType: hard
 
@@ -6855,7 +6855,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/avail-light-web": ^0.1.0
+    "@subwallet/avail-light-lib": ^0.1.0
     "@subwallet/chain-list": 0.2.101
     "@subwallet/extension-base": ^1.3.23-0
     "@subwallet/extension-chains": ^1.3.23-0

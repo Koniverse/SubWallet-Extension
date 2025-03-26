@@ -1,7 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { run as startALC } from '@subwallet/avail-light-web';
+import { JsonRpcResponse, ProviderInterface, ProviderInterfaceCallback } from '@polkadot/rpc-provider/types';
+import { assert, bnToU8a, logger as createLogger, noop } from '@polkadot/util';
+import { isEthereumAddress } from '@polkadot/util-crypto';
+import { Logger } from '@polkadot/util/types';
+import { verifyCell } from '@subwallet/avail-light-lib';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
@@ -53,11 +57,6 @@ import BN from 'bn.js';
 import { t } from 'i18next';
 import { interfaces } from 'manta-extension-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
-
-import { JsonRpcResponse, ProviderInterface, ProviderInterfaceCallback } from '@polkadot/rpc-provider/types';
-import { assert, logger as createLogger, noop } from '@polkadot/util';
-import { Logger } from '@polkadot/util/types';
-import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { KoniCron } from '../cron';
 import { KoniSubscription } from '../subscription';
@@ -177,6 +176,8 @@ export default class KoniState {
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);
     this.logger = createLogger('State');
+
+    // init().catch(console.error);
 
     // Init state
     if (targetIsWeb) {
@@ -1533,9 +1534,6 @@ export default class KoniState {
     // Start services
     await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
 
-    // Start Avail LC
-    startALC('mainnet').catch((e) => console.log('Fail to run ALC', e));
-
     // Complete starting
     starting.resolve();
     this.waitStarting = null;
@@ -1886,4 +1884,131 @@ export default class KoniState {
   public getCrowdloanContributions ({ address, page, relayChain }: RequestCrowdloanContributions) {
     return this.subscanService.getCrowdloanContributions(relayChain, address, page);
   }
+
+  public async verifyLightClient () {
+    const substrateApi = this.chainService.getSubstrateApi('avail_mainnet');
+
+    if (!substrateApi) {
+      throw new Error('Avail mainnet is not available');
+    }
+
+    const api = await substrateApi.api.isReady;
+
+    return await api.rpc.chain.subscribeFinalizedHeads(async (header) => {
+      try {
+        console.log(`Started processing new block #${header.number.toNumber()}`);
+        const blockHash = (await api.rpc.chain.getBlockHash(header.number.toNumber())).toString();
+
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-assignment
+        const extension = JSON.parse(header.extension);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const commitment = extension.v3.commitment as KateCommitment;
+        const kateCommitment = commitment.commitment.split('0x')[1];
+
+        const config = {
+          COMMITMENT_SIZE: 48,
+          KATE_PROOF_SIZE: 80,
+          EXTENSION_FACTOR: 2,
+          SAMPLE_SIZE: 10,
+          BLOCK_LIST_SIZE: 5
+        };
+
+        if (kateCommitment !== '') {
+          const r = commitment.rows * config.EXTENSION_FACTOR;
+          const c = commitment.cols;
+          let sampleCount = config.SAMPLE_SIZE;
+          const totalCellCount = r * c;
+
+          if (sampleCount >= totalCellCount) {
+            sampleCount = 5;
+          }
+
+          const cells = generateRandomCells(r, c, sampleCount);
+
+          const kate_commitment = Uint8Array.from(
+            kateCommitment.match(/.{1,2}/g)!.map((byte: string) => parseInt(byte, 16))
+          );
+
+          const commitments: Uint8Array[] = [];
+
+          for (let i = 0; i < r; i++) {
+            commitments.push(
+              kate_commitment.slice(i * config.COMMITMENT_SIZE, (i + 1) * config.COMMITMENT_SIZE)
+            );
+          }
+
+          // @ts-ignore TODO: need to fix types
+          const kateProof = await api.rpc.kate.queryProof(cells, blockHash);
+          const proofs: Uint8Array[] = [];
+
+          for (let i = 0; i < sampleCount; i++) {
+            const byte32Array = bnToU8a(kateProof[i][0], { isLe: false });
+            const byte80Array = new Uint8Array(80);
+
+            byte80Array.set(kateProof[i][1], 0);
+            byte80Array.set(byte32Array, 48);
+            proofs.push(byte80Array);
+          }
+
+          const dimensions = {
+            rows: r,
+            cols: c
+          };
+
+          for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+
+            const rs = await verifyCell(
+              dimensions.rows,
+              dimensions.cols,
+              cell.row,
+              cell.col,
+              proofs[i],
+              commitments[cell.row]
+            );
+
+            console.log(cell, rs);
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  }
+}
+
+export const generateRandomCells = (rows: number, cols: number, count: number) => {
+  const cells: Cell[] = [];
+  const used = new Set<string>();
+
+  while (cells.length < count) {
+    const row = Math.floor(Math.random() * rows);
+    const col = Math.floor(Math.random() * cols);
+    const key = `${row},${col}`;
+
+    if (!used.has(key)) {
+      used.add(key);
+      cells.push({ row, col });
+    }
+  }
+
+  return cells.sort((a, b) => a.row - b.row || a.col - b.col);
+};
+
+export interface Cell {
+  row: number,
+  col: number
+}
+
+export interface Dimensions {
+  row: number,
+  col: number
+}
+
+interface KateCommitment {
+  rows: number,
+  cols: number,
+  dataRoot: string,
+  commitment: string
 }

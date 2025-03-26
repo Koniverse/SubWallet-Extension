@@ -4699,6 +4699,16 @@ export default class KoniExtension {
   }
   /* Migrate Unified Account */
 
+  /* Avail light client */
+  private async availLightClient (port: chrome.runtime.Port) {
+    const unsub = await this.#koniState.verifyLightClient();
+
+    port.onDisconnect.addListener((): void => {
+      unsub();
+    });
+  }
+  /* Avail light client */
+
   // --------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], port: chrome.runtime.Port): Promise<ResponseType<TMessageType>> {
@@ -5348,6 +5358,9 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+
+      case 'pri(avail.lightClient)':
+        return this.availLightClient(port);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);
