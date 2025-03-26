@@ -161,9 +161,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
 
       bittensorStakingBalances = values.map(([, stakes]) => {
-        const value = stakes.find((i) => i.netuid === 0)?.stake || '0';
-
-        return BigN(value);
+        return stakes.filter((i) => i.netuid === 0).reduce((previousValue, currentValue) => previousValue.plus(currentValue.stake), BigN(0));
       });
     }
 
@@ -530,50 +528,61 @@ const subscribeOrmlTokensPallet = async ({ addresses, assetMap, callback, chainI
 
 // eslint-disable-next-line @typescript-eslint/require-await
 const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chainInfo, substrateApi }: SubscribeSubstratePalletBalance): Promise<() => void> => {
-  const systemAccountKey = 'query_system_account';
+  let cancel = false;
   const tokenMap = filterAlphaAssetsByChain(assetMap, chainInfo.slug);
 
-  const params: _SubstrateAdapterSubscriptionArgs[] = [
-    {
-      section: 'query',
-      module: systemAccountKey.split('_')[1],
-      method: systemAccountKey.split('_')[2],
-      args: addresses
+  const getTokenBalances = async () => {
+    if (cancel) {
+      return;
     }
-  ];
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const subscription = substrateApi.subscribeDataWithMulti(params, async (_balances) => {
     const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
     const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-    const converted: Record<string, Record<number, TaoStakeInfo>> = {};
+    const converted: Record<string, Record<number, BigN>> = {};
 
     for (let i = 0; i < values.length; i++) {
       const [, stakes] = values[i];
       const address = addresses[i];
 
-      converted[address] = Object.fromEntries(stakes.map((value) => [value.netuid, value]));
+      converted[address] = {};
+
+      stakes.forEach((stakeInfo) => {
+        const { netuid, stake } = stakeInfo;
+
+        const currentValue = converted[address][netuid] || BigN(0);
+
+        converted[address][netuid] = currentValue.plus(stake);
+      })
     }
 
     for (const chainAsset of Object.values(tokenMap)) {
       const netuid = _getAssetNetuid(chainAsset);
       const items: BalanceItem[] = Object.entries(converted).map(([address, stakeMap]): BalanceItem => {
-        const value = stakeMap[netuid]?.stake || '0';
+        const value = stakeMap[netuid] || BigN(0);
 
         return {
           address: address,
           tokenSlug: chainAsset.slug,
           state: APIItemState.READY,
-          free: value,
+          free: value.toFixed(0),
           locked: '0'
         };
       });
 
-      callback(items);
+      if (!cancel) {
+        callback(items);
+      }
     }
-  });
+  };
+
+  getTokenBalances().catch(console.error);
+
+  const interval = setInterval(() => {
+    getTokenBalances().catch(console.error);
+  }, SUB_TOKEN_REFRESH_BALANCE_INTERVAL);
 
   return () => {
-    subscription.unsubscribe();
+    cancel = true;
+    clearInterval(interval);
   };
 };
