@@ -540,16 +540,22 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
-        balanceData.forEach((slug) => {
+        for (const slug of balanceData) {
           const chainSlug = slug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
             needEnableChains.push(chainSlug);
             needActiveTokens.push(existedKey);
             currentAssetSettings[existedKey] = { visible: true };
           }
-        });
+        }
       }
     }
 
