@@ -28,9 +28,9 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
   }
 
   async validateYieldJoin (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
-    const { address, amount, selectedValidators } = data as SubmitJoinNativeStaking;
-    const poolInfo = await this.getPoolInfo();
-    const poolPosition = await this.getPoolPosition(address);
+    const { address, amount, selectedValidators, slug } = data as SubmitJoinNativeStaking;
+    const poolInfo = await this.getPoolInfo(slug);
+    const poolPosition = await this.getPoolPosition(address, slug);
     const chainInfo = this.chainInfo;
     const bnAmount = new BN(amount);
 
@@ -108,11 +108,11 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
   /**
    * @todo Recheck
    * */
-  async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string): Promise<TransactionError[]> {
+  async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string): Promise<TransactionError[]> {
     const errors: TransactionError[] = [];
 
-    const poolInfo = await this.getPoolInfo();
-    const poolPosition = await this.getPoolPosition(address);
+    const poolInfo = await this.getPoolInfo(slug);
+    const poolPosition = await this.getPoolPosition(address, slug);
 
     if (!poolInfo || !poolInfo.statistic || !poolPosition || fastLeave || !selectedTarget) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
