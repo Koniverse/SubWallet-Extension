@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
+import { YieldPoolType } from '@subwallet/extension-base/types';
+import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -21,6 +23,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
+
+  const isSubnetStaking = useMemo(() => {
+    return data.poolInfo?.type === YieldPoolType.SUBNET_STAKING;
+  }, [data.poolInfo?.type]);
 
   return (
     <div className={CN(className)}>
@@ -46,6 +52,14 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+      {isSubnetStaking && (
+        <AlertBox
+          className={CN(className, 'alert-box')}
+          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
+          title={t('TAO staking fee')}
+          type='info'
+        />
+      )}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subw
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
@@ -121,7 +122,6 @@ interface SubnetsInfo {
 }
 
 export const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
-export const TaoToRao = 10 ** 9;
 
 export const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi) => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
@@ -190,6 +190,10 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   public override canHandleSlug (slug: string): boolean {
     return slug.startsWith(`${this.slug}__`);
+  }
+
+  public override getEarningSlippage (value: string): number {
+    return DEFAULT_BITTENSOR_SLIPPAGE;
   }
 
   public override get maintainBalance (): string {
@@ -603,7 +607,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(TaoToRao)).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
+    const limitPrice = (alphaToTaoPrice.multipliedBy(_getAssetDecimals(this.nativeToken))).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
     const BNlimitPrice = new BN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
 
     const selectedValidatorInfo = targetValidators[0];
@@ -623,7 +627,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const binaryAmount = new BN(amount);
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(TaoToRao)).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
+    const limitPrice = (alphaToTaoPrice.multipliedBy(_getAssetDecimals(this.nativeToken))).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
     const BNlimitPrice = new BN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
 
     if (!selectedTarget) {

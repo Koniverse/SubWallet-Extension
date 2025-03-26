@@ -95,3 +95,8 @@ export interface StakeClaimRewardParams extends BaseRequestSign {
 }
 
 export type RequestStakeClaimReward = InternalRequestSign<StakeClaimRewardParams>;
+
+export interface RequestEarningSlippage {
+  slug: string;
+  value: string;
+}

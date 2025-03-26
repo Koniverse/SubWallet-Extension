@@ -15,7 +15,7 @@ import BigN from 'bignumber.js';
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import { DEFAULT_BITTENSOR_SLIPPAGE, TaoToRao, TestnetBittensorDelegateInfo } from './dtao';
+import { TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -583,9 +583,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const binaryAmount = new BN(amount);
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
-    const limitPrice = new BN((TaoToRao) * (1 + DEFAULT_BITTENSOR_SLIPPAGE));
 
-    const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, 0, binaryAmount, limitPrice, false);
+    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, 0, binaryAmount);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
@@ -597,14 +596,13 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   async handleYieldUnstake (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
-    const limitPrice = new BN((TaoToRao) * (1 - DEFAULT_BITTENSOR_SLIPPAGE));
     const poolPosition = await this.getPoolPosition(address);
 
     if (!selectedTarget || !poolPosition) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(selectedTarget, 0, binaryAmount, limitPrice, false);
+    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, 0, binaryAmount);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
   }

@@ -19,7 +19,7 @@ import { EARNING_INSTRUCTION_MODAL, STAKE_ALERT_DATA } from '@subwallet/extensio
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useIsPopup, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -636,6 +636,42 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+
+  // For subnet staking
+  const [earningSlippage, setEarningSlippage] = useState<number | null>(null);
+  // const [maxSlippage] = useState<number>(0.005);
+
+  useEffect(() => {
+    if (!isSubnetStaking) {
+      return;
+    }
+
+    const data = {
+      slug: poolInfo.slug,
+      value: amountValue
+    };
+
+    getEarningSlippage(data)
+      .then((result) => {
+        console.log('Fetched earningSlippage:', result);
+        setEarningSlippage(result);
+      })
+      .catch((error) => {
+        console.error('Error fetching earning slippage:', error);
+      });
+  }, [amountValue, isSubnetStaking, poolInfo.slug]);
+
+  console.log('earningSlippage', earningSlippage);
+  // const isSlippageAcceptable = useMemo(() => {
+  //   if (earningSlippage === null) {
+  //     return;
+  //   }
+
+  //   return earningSlippage <= maxSlippage;
+  // }, [earningSlippage, maxSlippage]);
+
+  // console.log('earningSlippage', earningSlippage);
+
   const networkKey = useMemo(() => {
     const netuid = poolInfo.metadata.subnetData?.netuid || 0;
 
@@ -711,7 +747,14 @@ const Component = () => {
               label={t('Network')}
             />
           )
-          : (
+          : (<>
+            <MetaInfo.Default
+              label={t('Max slippage')}
+            >
+              <div className='__subnet-wrapper'>
+                <span className='chain-name'>0.5%</span>
+              </div>
+            </MetaInfo.Default>
             <MetaInfo.Default
               label={t('Subnet')}
             >
@@ -726,6 +769,7 @@ const Component = () => {
                 <span className='chain-name'>{poolInfo.metadata.shortName}</span>
               </div>
             </MetaInfo.Default>
+          </>
           )}
         {showFee && (
           <MetaInfo.Number

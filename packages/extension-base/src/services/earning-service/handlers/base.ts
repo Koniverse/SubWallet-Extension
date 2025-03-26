@@ -358,5 +358,9 @@ export default abstract class BasePoolHandler {
   public canHandleSlug (slug: string): boolean {
     return this.slug === slug;
   }
+
+  public getEarningSlippage (value: string): number {
+    return 0;
+  }
   /* Other actions */
 }
