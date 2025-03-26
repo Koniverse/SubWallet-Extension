@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 1.3.25
+Build date: Mar 24, 2025.
+
+Features & Update:
+- Support dTAO staking (#4036)
+- Integrate Meld All in One Wizard (#4085)
+
+Bug fixed:
+- Fixed bug integrating Wagmi into SubWallet (#4086)
+
+
 ## 1.3.24
 Build date: Mar 18, 2025.
 
