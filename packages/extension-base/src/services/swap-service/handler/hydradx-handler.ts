@@ -306,7 +306,7 @@ export class HydradxHandler implements SwapBaseInterface {
         // add amount of fee into sending value to ensure has enough token to swap
         const bnXcmFee = new BigNumber(fee.feeComponent[0].amount);
 
-        bnTransferAmount = bnTransferAmount.plus(bnXcmFee).plus(_getTokenMinAmount(toTokenInfo));
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
       }
 
       const step: BaseStepDetail = {

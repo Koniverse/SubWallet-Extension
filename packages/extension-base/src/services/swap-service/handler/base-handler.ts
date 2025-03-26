@@ -412,6 +412,10 @@ export class SwapBaseHandler {
       return spendingAndFeePaymentValidation;
     }
 
+    if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP)];
+    }
+
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
       return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Amount ${_getAssetSymbol(receivingToken)} received is too small`))];
     }
@@ -443,7 +447,7 @@ export class SwapBaseHandler {
     }
 
     if (params.selectedQuote.aliveUntil <= +Date.now()) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return [new TransactionError(SwapErrorType.QUOTE_TIMEOUT)];
     }
 
     const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
@@ -538,7 +542,7 @@ export class SwapBaseHandler {
     }
 
     if (params.selectedQuote.aliveUntil <= +Date.now()) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return [new TransactionError(SwapErrorType.QUOTE_TIMEOUT)];
     }
 
     const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
