@@ -10,7 +10,7 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, OptimalSwapPathParamsV2, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CommonFeeComponent, CommonOptimalSwapPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
@@ -23,7 +23,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SW
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { getLatestSwapQuote, getOptimalProcessOnSelectQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -504,7 +504,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     activeModal(SWAP_CHOOSE_FEE_TOKEN_MODAL);
   }, [activeModal]);
 
-  const handleGenerateOptimalProcess = useCallback(
+  const generateOptimalProcessOnSelectQuote = useCallback(
     async (quote: SwapQuote) => {
       try {
         const currentRequest: SwapRequest = {
@@ -516,12 +516,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           currentQuote: quote.provider
         };
 
-        const optimalRequest = {
+        const optimalRequest: OptimalSwapPathParamsV2 = {
           request: currentRequest,
-          selectedQuote: quote
+          selectedQuote: quote,
+          path: [] // background will generate this
         };
 
-        return await generateOptimalProcess(optimalRequest);
+        return await getOptimalProcessOnSelectQuote(optimalRequest);
       } catch (error) {
         console.error('generateOptimalProcess failed:', error);
 
@@ -533,7 +534,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      const processResult = await handleGenerateOptimalProcess(quote);
+      const processResult = await generateOptimalProcessOnSelectQuote(quote);
 
       if (!processResult) {
         return;
@@ -563,7 +564,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         };
       });
     },
-    [handleGenerateOptimalProcess]
+    [generateOptimalProcessOnSelectQuote]
   );
 
   const onSelectFeeOption = useCallback((slug: string) => {

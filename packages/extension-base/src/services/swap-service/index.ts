@@ -161,6 +161,29 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
+  public async generateOptimalProcessWithoutPath (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
+    if (!params.selectedQuote || params.path.length > 0) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    const [path, directSwapRequest] = this.getAvailablePath(params.request);
+
+    if (!directSwapRequest) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    params.path = path;
+
+    const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+    const handler = this.handlers[providerId];
+
+    if (handler) {
+      return handler.generateOptimalProcessV2(params);
+    } else {
+      return this.getDefaultProcessV2(params);
+    }
+  }
+
   // deprecated
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
