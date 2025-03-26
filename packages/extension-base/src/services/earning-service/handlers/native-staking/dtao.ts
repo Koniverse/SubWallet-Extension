@@ -634,13 +634,13 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(_getAssetDecimals(this.nativeToken))).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
+    const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
+
     const BNlimitPrice = new BN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
 
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
-    console.log('BNlimitPrice', BNlimitPrice.toString());
     const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, netuid, binaryAmount, BNlimitPrice, false);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
@@ -655,7 +655,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const binaryAmount = new BN(amount);
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(_getAssetDecimals(this.nativeToken))).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
+    const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
     const BNlimitPrice = new BN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
 
     if (!selectedTarget) {
