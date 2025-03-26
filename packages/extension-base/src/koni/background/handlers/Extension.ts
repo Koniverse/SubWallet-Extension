@@ -1341,7 +1341,6 @@ export default class KoniExtension {
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
-    const chainInfo = this.#koniState.getChainInfo(chain);
 
     const nativeTokenInfo = this.#koniState.getNativeTokenInfo(chain);
     const nativeTokenSlug: string = nativeTokenInfo.slug;
@@ -1468,7 +1467,7 @@ export default class KoniExtension {
       let senderSendingTokenTransferable: bigint | undefined;
       let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
-      if (!_isChainSubstrateCompatible(chainInfo) || _isChainEvmCompatible(chainInfo)) {
+      if (chainType !== ChainType.SUBSTRATE) {
         return undefined;
       }
 

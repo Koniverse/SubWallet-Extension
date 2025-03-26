@@ -76,7 +76,6 @@ export function additionalValidateTransferForRecipient (
   const isReceiverAliveByNativeToken = receiverSystemAccountInfo ? _isAccountActive(receiverSystemAccountInfo) : false;
   const isReceivingAmountPassED = receiverSendingTokenKeepAliveBalance + transferAmount >= sendingTokenMinAmount;
   const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(sendingTokenMinAmountXCM) : true;
-  const isReceivingNonNativeToken = extrinsicType === ExtrinsicType.TRANSFER_TOKEN || (extrinsicType === ExtrinsicType.TRANSFER_XCM && !_isNativeToken(sendingTokenInfo));
 
   if (!enoughAmountForXCM) {
     const minXCMStr = formatNumber(sendingTokenMinAmountXCM.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
@@ -89,7 +88,7 @@ export function additionalValidateTransferForRecipient (
     errors.push(error);
   }
 
-  if (isReceivingNonNativeToken) {
+  if (!_isNativeToken(sendingTokenInfo)) {
     if (!remainingSendingTokenOfSenderEnoughED) {
       const warning = new TransactionWarning(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT);
 
