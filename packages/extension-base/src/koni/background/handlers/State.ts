@@ -1314,11 +1314,8 @@ export default class KoniState {
     try {
       const parsedData = JSON.parse(data) as Record<string, string>;
 
-      console.log('parsedData__before: ', parsedData);
-
       parsedData.mv3_migration = 'done';
 
-      console.log('parsedData__after: ', parsedData);
       await SWStorage.instance.setMap(parsedData);
 
       // Reload some services use SWStorage
