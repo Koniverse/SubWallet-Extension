@@ -39,6 +39,7 @@ const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?
     case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
     case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm');
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
+    case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
   }
 
   return false;

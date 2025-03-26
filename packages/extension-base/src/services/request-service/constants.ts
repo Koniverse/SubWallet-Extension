@@ -6,7 +6,8 @@ export const EXTENSION_REQUEST_URL = 'extension';
 export const PREDEFINED_CHAIN_DAPP_CHAIN_MAP: Record<string, string[]> = {
   'portal.astar.network': ['astar', 'astarEvm'],
   'apps.moonbeam.network': ['moonbeam', 'moonriver'],
-  'app.stellaswap.com': ['moonbeam']
+  'app.stellaswap.com': ['moonbeam'],
+  'testnet-preprod.minswap.org': ['cardano_preproduction']
 };
 
 export const WEB_APP_URL = [

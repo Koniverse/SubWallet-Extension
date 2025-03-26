@@ -8,6 +8,7 @@ import { MESSAGE_ORIGIN_CONTENT, MESSAGE_ORIGIN_PAGE, PORT_CONTENT } from '@subw
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { addNotificationPopUp } from '@subwallet/extension-koni/helper/PageNotification';
 
+console.log('21312312313123');
 const handleRedirectPhishing: { id: string, resolve?: (value: (boolean | PromiseLike<boolean>)) => void, reject?: (e: Error) => void } = {
   id: 'redirect-phishing-' + getId()
 };

@@ -18,6 +18,8 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
         return chainTypes.includes(AccountChainType.ETHEREUM);
       } else if (type === 'ton') {
         return chainTypes.includes(AccountChainType.TON);
+      } else if (type === 'cardano') {
+        return chainTypes.includes(AccountChainType.CARDANO);
       }
 
       return false;

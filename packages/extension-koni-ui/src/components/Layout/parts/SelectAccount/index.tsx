@@ -118,6 +118,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             idProxiesCanConnect.add(proxyId);
           }
         });
+        console.log('idProxiesCanConnect', idProxiesCanConnect, allowedMap\);
         Object.entries(allowedMap)
           .forEach(([address, value]) => {
             if (filterType(address)) {
