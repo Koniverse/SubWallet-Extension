@@ -43,7 +43,7 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -1284,7 +1284,58 @@ export default class KoniState {
     return await this.requestService.completeConfirmationCardano(request);
   }
 
-  private onMV3Install () {
+  private async onMV3Update () {
+    const migrationStatus = await SWStorage.instance.getItem('mv3_migration');
+
+    if (!migrationStatus || migrationStatus !== 'done') {
+      if (!isManifestV3) {
+        this.migrateMV3LocalStorage(JSON.stringify(self.localStorage)).catch(console.error);
+      }
+    }
+  }
+
+  private async storePreviousVersionData (details: chrome.runtime.InstalledDetails) {
+    if (details.reason === 'update') {
+      const previousVersion = details.previousVersion;
+
+      if (!previousVersion) {
+        return;
+      }
+
+      const storedData = await SWStorage.instance.getItem('previous_version');
+
+      if (!storedData || !storedData.includes(previousVersion)) {
+        await SWStorage.instance.setItem('previous_version', previousVersion);
+      }
+    }
+  }
+
+  public async migrateMV3LocalStorage (data: string) {
+    try {
+      const parsedData = JSON.parse(data) as Record<string, string>;
+
+      console.log('parsedData__before: ', parsedData);
+
+      parsedData.mv3_migration = 'done';
+
+      console.log('parsedData__after: ', parsedData);
+      await SWStorage.instance.setMap(parsedData);
+
+      // Reload some services use SWStorage
+      // wallet connect
+      this.walletConnectService.initClient().catch(console.error);
+
+      return true;
+    } catch (e) {
+      console.error(e);
+
+      return false;
+    }
+  }
+
+  private async onMV3Install () {
+    await SWStorage.instance.setItem('mv3_migration', 'done');
+
     // Open expand page
     const url = `${chrome.runtime.getURL('index.html')}#/welcome`;
 
@@ -1294,7 +1345,10 @@ export default class KoniState {
   public onInstallOrUpdate (details: chrome.runtime.InstalledDetails) {
     // Open mv3 migration window
     if (details.reason === 'install') {
-      this.onMV3Install();
+      this.onMV3Install().catch(console.error);
+    } else if (details.reason === 'update') {
+      this.onMV3Update().catch(console.error);
+      this.storePreviousVersionData(details).catch(console.error);
     }
   }
 
