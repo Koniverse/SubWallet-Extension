@@ -38,7 +38,7 @@ export const _BALANCE_CHAIN_GROUP = {
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine'],
-  bittensor: ['bittensor', 'bittensor_testnet'],
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
 
 export const _BALANCE_TOKEN_GROUP = {

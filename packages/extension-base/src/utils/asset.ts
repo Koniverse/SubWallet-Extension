@@ -22,6 +22,7 @@ export const filterAlphaAssetsByChain = (chainAssetMap: Record<string, _ChainAss
   Object.values(chainAssetMap).forEach((assetInfo) => {
     if (assetInfo.assetType === _AssetType.LOCAL && assetInfo.originChain === chain) {
       const netuid = _getAssetNetuid(assetInfo);
+
       if (netuid !== -1) {
         result[assetInfo.slug] = assetInfo;
       }

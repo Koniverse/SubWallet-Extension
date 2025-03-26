@@ -542,6 +542,7 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
     }
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (_balances) => {
     const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
     const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
@@ -551,7 +552,7 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
       const [, stakes] = values[i];
       const address = addresses[i];
 
-      converted[address] = Object.fromEntries(stakes.map(value => [value.netuid, value]));
+      converted[address] = Object.fromEntries(stakes.map((value) => [value.netuid, value]));
     }
 
     for (const chainAsset of Object.values(tokenMap)) {
