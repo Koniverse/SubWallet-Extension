@@ -581,7 +581,7 @@ export default class KoniState {
         await this.enableChain(networkKey);
       }
 
-      authUrls[shortenUrl].currentEvmNetworkKey = networkKey;
+      authUrls[shortenUrl].currentNetworkKey = networkKey;
       this.setAuthorize(authUrls);
     } else {
       throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('Not found {{shortenUrl}} in auth list', { replace: { shortenUrl } }));

@@ -258,8 +258,8 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     errors.push(error);
   };
 
-  if (authInfo?.currentEvmNetworkKey) {
-    currentChain = authInfo?.currentEvmNetworkKey;
+  if (authInfo?.currentNetworkKey) {
+    currentChain = authInfo?.currentNetworkKey;
   }
 
   if (authInfo?.isAllowed) {

@@ -25,11 +25,12 @@ export interface AuthUrlInfo {
   url: string;
   accountAuthTypes: AccountAuthType[];
   isAllowedMap: Record<string, boolean>;
-  currentEvmNetworkKey?: string;
+  currentNetworkKey?: string;
 }
 
 export interface AuthUrlInfoNeedMigration extends Omit<AuthUrlInfo, 'accountAuthTypes'> {
   accountAuthType?: AccountAuthType | 'both';
+  currentEvmNetworkKey?: string;
 }
 
 export type AuthUrls = Record<string, AuthUrlInfo>;

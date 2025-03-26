@@ -22,11 +22,17 @@ export class CIP30Api {
     console.log('getUtxos');
   }
 
-  getUsedAddresses () {
-    console.log('getUsedAddresses');
+  async getUsedAddresses () {
+    const accounts = await this.sendMessage('pub(accounts.listV2)', { accountAuthType: 'cardano' });
+
+    return accounts.map((account) => account.address);
   }
 
-  getUnusedAddresses () {
+  getChangeAddress (x?: any) {
+    console.log('getChangeAddress');
+  }
+
+  getUnusedAddresses (x?: any) {
     console.log('getUnusedAddresses');
   }
 

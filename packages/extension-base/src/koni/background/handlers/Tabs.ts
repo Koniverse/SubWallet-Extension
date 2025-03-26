@@ -21,7 +21,7 @@ import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-s
 import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
-import { canDerive, getEVMChainInfo, stripUrl } from '@subwallet/extension-base/utils';
+import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
@@ -72,6 +72,24 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     }
   };
 
+  const authReformatAddress = ({ json: { address, meta: { genesisHash, name } }, type }: SingleAddress) => {
+    const accountRs = {
+      address,
+      genesisHash,
+      name,
+      type
+    };
+
+    if (type === 'cardano') {
+      const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isTestnet);
+
+      accountRs.address = convertCardanoAddressToHex(addressChainFormat);
+    }
+
+    return accountRs;
+  };
+
   return Object
     .values(accounts)
     .filter(({ json: { meta: { isHidden } } }) => !isHidden)
@@ -79,12 +97,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))
-    .map(({ json: { address, meta: { genesisHash, name } }, type }): InjectedAccount => ({
-      address,
-      genesisHash,
-      name,
-      type
-    }));
+    .map(authReformatAddress);
 }
 
 interface ChainPatrolResponse {
@@ -316,6 +329,14 @@ export default class KoniTabs {
       if (authInfo.accountAuthTypes.includes('evm')) {
         accountAuthTypes.push('evm');
       }
+
+      if (authInfo.accountAuthTypes.includes('ton')) {
+        accountAuthTypes.push('ton');
+      }
+
+      if (authInfo.accountAuthTypes.includes('cardano')) {
+        accountAuthTypes.push('cardano');
+      }
     }
 
     return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
@@ -439,8 +460,8 @@ export default class KoniTabs {
     if (url) {
       const authInfo = await this.getAuthInfo(url);
 
-      if (authInfo?.currentEvmNetworkKey) {
-        currentChain = authInfo?.currentEvmNetworkKey;
+      if (authInfo?.currentNetworkKey) {
+        currentChain = authInfo?.currentNetworkKey;
       }
 
       if (authInfo?.isAllowed) {

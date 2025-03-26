@@ -51,6 +51,11 @@ export default class AuthRequestHandler {
         needUpdateAuthList = true;
       }
 
+      if ((value as AuthUrlInfoNeedMigration).currentEvmNetworkKey) {
+        value.currentNetworkKey = (value as AuthUrlInfoNeedMigration).currentEvmNetworkKey;
+        needUpdateAuthList = true;
+      }
+
       acc[key] = { ...value };
 
       return acc;
@@ -277,7 +282,7 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentEvmNetworkKey: existed ? existed.currentEvmNetworkKey : defaultEvmNetworkKey
+          currentNetworkKey: existed ? existed.currentNetworkKey : defaultEvmNetworkKey
         };
 
         this.setAuthorize(authorizeList, () => {
