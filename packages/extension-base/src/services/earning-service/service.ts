@@ -1010,7 +1010,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.getEarningSlippage(params.value);
+      return handler.getEarningSlippage(params);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

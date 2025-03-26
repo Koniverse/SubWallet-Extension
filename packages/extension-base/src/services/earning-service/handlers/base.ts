@@ -9,7 +9,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { DEFAULT_YIELD_FIRST_STEP } from '@subwallet/extension-base/services/earning-service/constants';
 import { createClaimNotification, createWithdrawNotifications } from '@subwallet/extension-base/services/inapp-notification-service/utils';
-import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
 import { BN, BN_TEN } from '@polkadot/util';
@@ -359,8 +359,8 @@ export default abstract class BasePoolHandler {
     return this.slug === slug;
   }
 
-  public getEarningSlippage (value: string): number {
-    return 0;
+  public getEarningSlippage (params: RequestEarningSlippage): Promise<number> {
+    return Promise.resolve(0);
   }
   /* Other actions */
 }

@@ -14,24 +14,45 @@ type Props = ThemeProps & {
   bondedBalance?: string | number | BigN;
   decimals: number;
   symbol: string;
-}
+  maxSlippage?: number;
+  isSlippageAcceptable?: boolean;
+  isSubnetStaking?: boolean;
+};
 
-const Component = ({ bondedBalance, className, decimals, label, symbol }: Props) => {
+const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, isSubnetStaking, label, maxSlippage, symbol }: Props) => {
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
 
   return (
     <Typography.Paragraph className={CN(className, 'bonded-balance')}>
-      <Number
-        decimal={decimals}
-        decimalColor={token.colorTextTertiary}
-        intColor={token.colorTextTertiary}
-        size={14}
-        suffix={symbol}
-        unitColor={token.colorTextTertiary}
-        value={bondedBalance || 0}
-      />
-      {label || t('Staked')}
+      <div className='balance-wrapper'>
+        {/* Phần số tiền staked */}
+        <div className='balance-value'>
+          <Number
+            decimal={decimals}
+            decimalColor={token.colorTextTertiary}
+            intColor={token.colorTextTertiary}
+            size={14}
+            suffix={symbol}
+            unitColor={token.colorTextTertiary}
+            value={bondedBalance || 0}
+          />
+          {label || t('Staked')}
+        </div>
+
+        {/* Phần max slippage */}
+        {isSubnetStaking && (
+          <div className='slippage-info'>
+            <span className='slippage-label'>{t('Max slippage')}:</span>
+            <span
+              className='slippage-value'
+              style={{ color: isSlippageAcceptable ? token.colorTextTertiary : token.colorError }}
+            >
+              {maxSlippage ? (maxSlippage * 100) : 0}%
+            </span>
+          </div>
+        )}
+      </div>
     </Typography.Paragraph>
   );
 };
@@ -47,6 +68,27 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
 
     '.ant-number': {
       marginRight: '0.3em'
+    },
+
+    '.balance-wrapper': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%'
+    },
+
+    '.balance-value': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.slippage-info': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.slippage-label': {
+      marginRight: token.sizeXS
     }
   });
 });

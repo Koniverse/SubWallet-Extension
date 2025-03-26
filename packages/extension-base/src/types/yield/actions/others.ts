@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+
 import { BaseRequestSign, InternalRequestSign } from '../../transaction';
 import { BasePoolInfo, UnstakingInfo, YieldPoolInfo } from '../info';
 
@@ -99,4 +101,6 @@ export type RequestStakeClaimReward = InternalRequestSign<StakeClaimRewardParams
 export interface RequestEarningSlippage {
   slug: string;
   value: string;
+  netuid: number;
+  type: ExtrinsicType;
 }

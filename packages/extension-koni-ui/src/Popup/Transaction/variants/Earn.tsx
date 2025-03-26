@@ -189,20 +189,6 @@ const Component = () => {
     return result;
   }, [chainAsset, poolInfo]);
 
-  const isDisabledButton = useMemo(
-    () =>
-      // checkMintLoading ||
-      stepLoading ||
-      !!connectionError ||
-      !amountValue ||
-      !isBalanceReady ||
-      isFormInvalid ||
-      submitLoading ||
-      targetLoading ||
-      (mustChooseTarget && !poolTargetValue),
-    [stepLoading, connectionError, amountValue, isBalanceReady, isFormInvalid, submitLoading, targetLoading, mustChooseTarget, poolTargetValue]
-  );
-
   const inputAsset = useMemo(
     () => chainAsset[poolInfo?.metadata?.inputAsset],
     [chainAsset, poolInfo?.metadata?.inputAsset]
@@ -638,45 +624,63 @@ const Component = () => {
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
   // For subnet staking
-  const [earningSlippage, setEarningSlippage] = useState<number | null>(null);
-  // const [maxSlippage] = useState<number>(0.005);
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [maxSlippage] = useState<number>(0.005);
 
   useEffect(() => {
     if (!isSubnetStaking) {
       return;
     }
 
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
     const data = {
       slug: poolInfo.slug,
-      value: amountValue
+      value: amountValue,
+      netuid: netuid,
+      type: ExtrinsicType.STAKING_BOND
     };
 
     getEarningSlippage(data)
       .then((result) => {
-        console.log('Fetched earningSlippage:', result);
+        console.log('Actual slippage:', result * 100);
         setEarningSlippage(result);
       })
       .catch((error) => {
         console.error('Error fetching earning slippage:', error);
       });
-  }, [amountValue, isSubnetStaking, poolInfo.slug]);
+  }, [amountValue, isSubnetStaking, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
-  console.log('earningSlippage', earningSlippage);
-  // const isSlippageAcceptable = useMemo(() => {
-  //   if (earningSlippage === null) {
-  //     return;
-  //   }
+  const isSlippageAcceptable = useMemo(() => {
+    if (earningSlippage === null) {
+      return;
+    }
 
-  //   return earningSlippage <= maxSlippage;
-  // }, [earningSlippage, maxSlippage]);
+    return earningSlippage <= maxSlippage;
+  }, [earningSlippage, maxSlippage]);
 
-  // console.log('earningSlippage', earningSlippage);
+  // For subnet staking
 
   const networkKey = useMemo(() => {
     const netuid = poolInfo.metadata.subnetData?.netuid || 0;
 
     return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
   }, [poolInfo.metadata.subnetData?.netuid]);
+
+  const isDisabledButton = useMemo(
+    () =>
+      // checkMintLoading ||
+      stepLoading ||
+      !!connectionError ||
+      !amountValue ||
+      !isBalanceReady ||
+      isFormInvalid ||
+      submitLoading ||
+      targetLoading ||
+      !isSlippageAcceptable ||
+      (mustChooseTarget && !poolTargetValue),
+
+    [stepLoading, connectionError, amountValue, isBalanceReady, isFormInvalid, submitLoading, targetLoading, isSlippageAcceptable, mustChooseTarget, poolTargetValue]
+  );
 
   const renderMetaInfo = useCallback(() => {
     const value = amountValue ? parseFloat(amountValue) / 10 ** assetDecimals : 0;
@@ -748,11 +752,14 @@ const Component = () => {
             />
           )
           : (<>
-            <MetaInfo.Default
-              label={t('Max slippage')}
-            >
+            <MetaInfo.Default label={t('Max slippage')}>
               <div className='__subnet-wrapper'>
-                <span className='chain-name'>0.5%</span>
+                <span
+                  className='chain-name'
+                  style={{ color: isSlippageAcceptable ? 'inherit' : '#BF1616' }}
+                >
+                  {maxSlippage * 100}%
+                </span>
               </div>
             </MetaInfo.Default>
             <MetaInfo.Default
@@ -782,7 +789,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
+  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, isSlippageAcceptable, maxSlippage, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -1205,13 +1212,23 @@ const Component = () => {
               </Form>
 
               {renderMetaInfo()}
-
-              <AlertBox
-                className={'__alert-box'}
-                description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
-                title={STAKE_ALERT_DATA.title}
-                type={'warning'}
-              />
+              {!isSubnetStaking
+                ? (
+                  <AlertBox
+                    className='__alert-box'
+                    description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
+                    title={STAKE_ALERT_DATA.title}
+                    type='warning'
+                  />
+                )
+                : !isSlippageAcceptable && (
+                  <AlertBox
+                    className='__alert-box'
+                    description='Unable to stake as slippage is higher than maximum allowed slippage. Lower your stake amount and try again'
+                    title='Slippage too high'
+                    type='error'
+                  />
+                )}
             </TransactionContent>
             <TransactionFooter>
               <Button

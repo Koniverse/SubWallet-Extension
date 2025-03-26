@@ -10,7 +10,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN, { BigNumber } from 'bignumber.js';
 
@@ -103,6 +103,7 @@ interface RateSubnetData {
   netuid: number;
   taoIn: string;
   alphaIn: string;
+  alphaOut: string;
 }
 
 interface DynamicInfo {
@@ -192,8 +193,34 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return slug.startsWith(`${this.slug}__`);
   }
 
-  public override getEarningSlippage (value: string): number {
-    return DEFAULT_BITTENSOR_SLIPPAGE;
+  public override async getEarningSlippage (params: RequestEarningSlippage): Promise<number> {
+    const substrateApi = await this.substrateApi.isReady;
+    const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
+
+    const alphaIn = new BigNumber(subnetInfo?.alphaIn || 0);
+    const taoIn = new BigNumber(subnetInfo?.taoIn || 0);
+    const k = alphaIn.multipliedBy(taoIn);
+    const value = new BigNumber(params.value);
+
+    if (params.type === ExtrinsicType.STAKING_BOND) {
+      const newTaoIn = taoIn.plus(value);
+      const newAlphaIn = k.dividedBy(newTaoIn);
+      const alphaReturned = alphaIn.minus(newAlphaIn);
+      const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
+      const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
+
+      return slippage.toNumber();
+    } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
+      const newAlphaIn = alphaIn.plus(value);
+      const newTaoReserve = k.dividedBy(newAlphaIn);
+      const taoReturned = taoIn.minus(newTaoReserve);
+      const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
+      const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
+
+      return slippage.toNumber();
+    }
+
+    return 0;
   }
 
   public override get maintainBalance (): string {
@@ -613,6 +640,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
+    console.log('BNlimitPrice', BNlimitPrice.toString());
     const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, netuid, binaryAmount, BNlimitPrice, false);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
