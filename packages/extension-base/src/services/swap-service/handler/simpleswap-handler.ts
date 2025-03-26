@@ -8,7 +8,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { _getAssetDecimals, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN, { BigNumber } from 'bignumber.js';
@@ -144,13 +144,13 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     return this.swapBaseHandler.slug;
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getSubmitStep.bind(this)
     ]);
   }
 
-  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcessV2(params, [
       this.getSubmitStep.bind(this)
     ]);

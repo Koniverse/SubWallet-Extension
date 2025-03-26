@@ -13,7 +13,7 @@ import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-b
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 
@@ -290,14 +290,14 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getXcmStep.bind(this),
       this.getSubmitStep.bind(this)
     ]);
   }
 
-  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
       if (step.action === DynamicSwapType.BRIDGE) {
         return this.getXcmStepV2.bind(this);

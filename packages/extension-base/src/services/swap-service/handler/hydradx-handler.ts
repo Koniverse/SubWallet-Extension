@@ -16,7 +16,7 @@ import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/se
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -361,7 +361,7 @@ export class HydradxHandler implements SwapBaseInterface {
     return Promise.resolve([submitStep, params.selectedQuote.feeInfo]); // review fee
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getXcmStep.bind(this),
       // this.getFeeOptionStep.bind(this),
@@ -369,7 +369,7 @@ export class HydradxHandler implements SwapBaseInterface {
     ]);
   }
 
-  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step) => {
       if (step.action === DynamicSwapType.BRIDGE) {
         return this.getXcmStepV2.bind(this);

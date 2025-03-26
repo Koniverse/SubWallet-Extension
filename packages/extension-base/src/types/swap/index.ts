@@ -5,7 +5,7 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
-import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, BaseStepType, CommonOptimalSwapPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
 import { BaseProcessRequestSign, TransactionData } from '../transaction';
@@ -117,7 +117,7 @@ export interface SwapBaseTxData {
   address: string;
   slippage: number;
   recipient?: string;
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
 }
 
 export interface ChainflipSwapTxData extends SwapBaseTxData {
@@ -178,7 +178,7 @@ export interface SwapRequest {
 }
 
 export interface SwapRequestResult {
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
   quote: SwapQuoteResponse;
 }
 
@@ -190,7 +190,7 @@ export interface SwapQuoteResponse {
 }
 
 export interface SwapSubmitParams extends BaseProcessRequestSign {
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
   currentStep: number;
   quote: SwapQuote;
   address: string;
@@ -231,7 +231,7 @@ export interface AssetHubSwapEarlyValidation extends SwapEarlyValidation {
 
 export interface ValidateSwapProcessParams {
   address: string;
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
   selectedQuote: SwapQuote;
   recipient?: string;
   currentStep: number;

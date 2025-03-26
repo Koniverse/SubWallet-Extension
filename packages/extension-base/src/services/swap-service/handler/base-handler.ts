@@ -16,7 +16,7 @@ import { _getAssetDecimals, _getAssetSymbol, _getTokenMinAmount, _isChainEvmComp
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { GenSwapStepFunc, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -27,8 +27,8 @@ import { isEthereumAddress } from '@polkadot/util-crypto';
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
 
-  generateOptimalProcess: (params: OptimalSwapPathParams) => Promise<CommonOptimalPath>;
-  generateOptimalProcessV2: (params: OptimalSwapPathParamsV2) => Promise<CommonOptimalPath>;
+  generateOptimalProcess: (params: OptimalSwapPathParams) => Promise<CommonOptimalSwapPath>;
+  generateOptimalProcessV2: (params: OptimalSwapPathParamsV2) => Promise<CommonOptimalSwapPath>;
 
   getSubmitStep: (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
@@ -65,8 +65,8 @@ export class SwapBaseHandler {
   }
 
   // public abstract getSwapQuote(request: SwapRequest): Promise<SwapQuote | SwapError>;
-  public async generateOptimalProcess (params: OptimalSwapPathParams, genStepFuncList: GenSwapStepFunc[]): Promise<CommonOptimalPath> {
-    const result: CommonOptimalPath = {
+  public async generateOptimalProcess (params: OptimalSwapPathParams, genStepFuncList: GenSwapStepFunc[]): Promise<CommonOptimalSwapPath> {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
       steps: [DEFAULT_FIRST_STEP],
       path: []
@@ -91,8 +91,8 @@ export class SwapBaseHandler {
     }
   }
 
-  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2, genStepFuncList: GenSwapStepFuncV2[]): Promise<CommonOptimalPath> {
-    const result: CommonOptimalPath = {
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2, genStepFuncList: GenSwapStepFuncV2[]): Promise<CommonOptimalSwapPath> {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
       steps: [DEFAULT_FIRST_STEP],
       path: params.path

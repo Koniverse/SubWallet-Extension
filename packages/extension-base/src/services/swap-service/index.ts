@@ -15,7 +15,7 @@ import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/
 import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findXcmDestination, getBridgeStep, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -81,8 +81,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return availableQuotes;
   }
 
-  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
-    const result: CommonOptimalPath = {
+  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalSwapPath {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
       steps: [DEFAULT_FIRST_STEP],
       path: []
@@ -102,8 +102,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
-  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalPath {
-    const result: CommonOptimalPath = {
+  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalSwapPath {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
       steps: [DEFAULT_FIRST_STEP],
       path: []
@@ -131,7 +131,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   // deprecated
-  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
     } else {
@@ -146,7 +146,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
-  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcessV2(params);
     } else {

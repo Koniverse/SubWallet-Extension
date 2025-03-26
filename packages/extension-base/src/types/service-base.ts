@@ -7,7 +7,7 @@ import { OptimalYieldPath, OptimalYieldPathParams, YieldStepType } from '@subwal
 
 /* ServiceWithProcess */
 export type OptimalProcessParams = OptimalYieldPathParams | OptimalSwapPathParams;
-export type OptimalProcessResult = OptimalYieldPath | CommonOptimalPath;
+export type OptimalProcessResult = OptimalYieldPath | CommonOptimalSwapPath;
 
 export enum CommonStepType {
   DEFAULT = 'DEFAULT',
@@ -42,10 +42,13 @@ export interface CommonStepDetail extends BaseStepDetail {
   id: number;
 }
 
-export interface CommonOptimalPath { // path means the steps to complete the swap, not the quote itself
+export interface CommonOptimalSwapPath extends CommonOptimalTransferPath { // path means the steps to complete the swap, not the quote itself
+  path: DynamicSwapAction[];
+}
+
+export interface CommonOptimalTransferPath {
   totalFee: CommonStepFeeInfo[]; // each item in the array is tx fee for a step
   steps: CommonStepDetail[];
-  path: DynamicSwapAction[];
 }
 
 export const DEFAULT_FIRST_STEP: CommonStepDetail = {
