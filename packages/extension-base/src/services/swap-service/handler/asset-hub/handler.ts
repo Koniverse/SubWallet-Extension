@@ -9,7 +9,7 @@ import { _validateBalanceToSwapOnAssetHub, _validateSwapRecipient } from '@subwa
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _getTokenMinAmount, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
@@ -210,7 +210,10 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     try {
       const id = getId();
-      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
+      const [feeInfo, toTokenBalance] = await Promise.all([
+        this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate'),
+        this.balanceService.getTotalBalance(params.request.address, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
+      ]);
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: fromTokenInfo,
@@ -231,7 +234,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString(),
+          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.high).toString(),
           tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
@@ -246,6 +249,12 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         const bnXcmFee = new BigN(fee.feeComponent[0].amount);
 
         bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      } else {
+        bnTransferAmount = bnTransferAmount.plus(BigN(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium));
+      }
+
+      if (BigN(toTokenBalance.value).lte(0)) {
+        bnTransferAmount = bnTransferAmount.plus(_getTokenMinAmount(toTokenInfo));
       }
 
       const step: BaseStepDetail = {

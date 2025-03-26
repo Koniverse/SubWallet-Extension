@@ -270,7 +270,10 @@ export class HydradxHandler implements SwapBaseInterface {
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
 
       const id = getId();
-      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
+      const [feeInfo, toTokenBalance] = await Promise.all([
+        this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate'),
+        this.balanceService.getTotalBalance(params.request.address, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
+      ]);
 
       const xcmTransfer = await createXcmExtrinsic({
         originTokenInfo: fromTokenInfo,
@@ -291,7 +294,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString(),
+          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.high).toString(),
           tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
@@ -307,6 +310,12 @@ export class HydradxHandler implements SwapBaseInterface {
         const bnXcmFee = new BigNumber(fee.feeComponent[0].amount);
 
         bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      } else {
+        bnTransferAmount = bnTransferAmount.plus(BigNumber(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium));
+      }
+
+      if (BigNumber(toTokenBalance.value).lte(0)) {
+        bnTransferAmount = bnTransferAmount.plus(_getTokenMinAmount(toTokenInfo));
       }
 
       const step: BaseStepDetail = {

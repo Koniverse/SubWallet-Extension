@@ -413,11 +413,15 @@ export class SwapBaseHandler {
     }
 
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP)];
+      const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
+
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Swap amount too small. Increase to more than ${atLeastString} ${_getAssetSymbol(swapToken)} and try again`))];
     }
 
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Amount ${_getAssetSymbol(receivingToken)} received is too small`))];
+      const atLeastStr = formatNumber(_getTokenMinAmount(receivingToken), _getAssetDecimals(receivingToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
+
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('You can\'t receive less than {{number}} {{symbol}}', { replace: { number: atLeastStr, symbol: _getAssetSymbol(receivingToken) } }))];
     }
 
     if (recipient) {
@@ -467,7 +471,7 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
       this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
@@ -570,16 +574,14 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
       this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
-    const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
+    const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value).plus(bnBridgeAmount);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    console.log(bnSwapFromTokenBalance); // todo
-
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnBridgeAmount, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
