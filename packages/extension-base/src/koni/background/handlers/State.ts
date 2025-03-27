@@ -45,6 +45,7 @@ import WalletConnectService from '@subwallet/extension-base/services/wallet-conn
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
 import { isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -1265,7 +1266,7 @@ export default class KoniState {
     const { address, payload } = params;
 
     const payloadValidation: PayloadValidated = {
-      address,
+      address: convertCardanoHexToBech32(address),
       payloadAfterValidated: payload,
       errors: [],
       networkKey: ''

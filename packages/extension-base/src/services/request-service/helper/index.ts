@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AlgorithmId, CBORValue, COSEKey, CurveType, Int, KeyType, Label } from '@emurgo/cardano-message-signing-browser';
 import { MetadataStore } from '@subwallet/extension-base/stores';
 import { addMetadata } from '@subwallet/extension-chains';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -42,4 +43,21 @@ export const extractMetadata = (store: MetadataStore): void => {
     removals.forEach((key) => store.remove(key));
     Object.values(defs).forEach(({ def }) => addMetadata(def));
   });
+};
+
+export const CoseLabel = {
+  address: Label.new_text('address'),
+  crv: Label.new_int(Int.new_i32(-1)),
+  x: Label.new_int(Int.new_i32(-2))
+};
+
+export const createCOSEKey = (addressBytes: Uint8Array, publicKey: Uint8Array) => {
+  const coseKey = COSEKey.new(Label.from_key_type(KeyType.OKP));
+
+  coseKey.set_key_id(addressBytes);
+  coseKey.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));
+  coseKey.set_header(CoseLabel.crv, CBORValue.from_label(Label.from_curve_type(CurveType.Ed25519)));
+  coseKey.set_header(CoseLabel.x, CBORValue.new_bytes(publicKey));
+
+  return coseKey;
 };

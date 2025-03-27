@@ -2312,7 +2312,7 @@ export interface KoniRequestSignatures {
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
 
   // Cardano
-  'cardano(sign.data)': [RequestCardanoSignData, string];
+  'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
   // 'cardano(sign.tx)': [RequestSignTx, string];
   // 'cardano(submit.tx)': [RequestSignTxRaw, string];
 

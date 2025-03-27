@@ -6,5 +6,11 @@ import { Address } from '@emurgo/cardano-serialization-lib-browser';
 export const convertCardanoAddressToHex = (bech32Address: string): string => {
   const addr = Address.from_bech32(bech32Address);
 
-  return Buffer.from(addr.to_bytes()).toString('hex');
+  return addr.to_hex();
+};
+
+export const convertCardanoHexToBech32 = (hexAddress: string): string => {
+  const addr = Address.from_hex(hexAddress);
+
+  return addr.to_bech32();
 };

@@ -40,8 +40,8 @@ export class CIP30Api {
     // Implementation here
   }
 
-  signData () {
-    // Implementation here
+  async signData (address: string, payload: string) {
+    return await this.sendMessage('cardano(sign.data)', { address, payload });
   }
 
   submitTx () {
