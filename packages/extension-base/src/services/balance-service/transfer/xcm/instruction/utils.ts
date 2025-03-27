@@ -20,6 +20,19 @@ export function getReceiveTeleportedAsset (tokenInfo: _ChainAsset, value: string
   };
 }
 
+export function getReserveAssetDeposited (tokenInfo: _ChainAsset, value: string, version: number) {
+  return {
+    ReserveAssetDeposited: [
+      {
+        id: _getAssetIdentifier(tokenInfo, version),
+        fun: {
+          Fungible: value
+        }
+      }
+    ]
+  };
+}
+
 export function getClearOrigin () {
   return {
     ClearOrigin: null
