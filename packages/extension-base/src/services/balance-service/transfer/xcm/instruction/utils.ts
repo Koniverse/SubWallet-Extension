@@ -77,6 +77,67 @@ export function getSetTopic () {
   };
 }
 
+// todo
+export function getWithdrawAsset (value: string) {
+  return {
+    WithdrawAsset: [
+      {
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: 'Here'
+          }
+        },
+        fun: {
+          Fungible: value
+        }
+      }
+    ]
+  };
+}
+
+// todo
+export function getSetAppendix () {
+  return {
+    SetAppendix: [
+      {
+        DepositAsset: { // todo: use getDepositAsset
+          assets: {
+            Wild: {
+              AllCounted: 1
+            }
+          },
+          beneficiary: {
+            parent: 1,
+            interior: {
+              X1: {
+                Parachain: 1000
+              }
+            }
+          }
+        }
+      }
+    ]
+  };
+}
+
+// todo
+export function getExportMessage () {
+  return {
+    ExportMessage: {
+      xcm: [
+        {
+          // WithdrawAsset: getWithdrawAsset(),
+          // ClearOrigin: getClearOrigin(),
+          // BuyExecution: getBuyExecution(),
+          // DepositAsset: getDepositAsset()
+          // SetTopic: getSetTopic()
+        }
+      ]
+    }
+  };
+}
+
 // --- INSTRUCTIONS --- //
 
 // --- OTHERS --- //
