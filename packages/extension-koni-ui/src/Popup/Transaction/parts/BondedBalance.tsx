@@ -3,7 +3,7 @@
 
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Number, Tooltip, Typography } from '@subwallet/react-ui';
+import { Number, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React from 'react';
@@ -88,7 +88,7 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap'
-    }
+    } as const
   });
 });
 

@@ -552,7 +552,7 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
         const currentValue = converted[address][netuid] || BigN(0);
 
         converted[address][netuid] = currentValue.plus(stake);
-      })
+      });
     }
 
     for (const chainAsset of Object.values(tokenMap)) {
