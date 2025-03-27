@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
-import { YieldPoolType } from '@subwallet/extension-base/types';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -24,9 +23,9 @@ const Component: React.FC<Props> = (props: Props) => {
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
 
-  const isSubnetStaking = useMemo(() => {
-    return data.poolInfo?.type === YieldPoolType.SUBNET_STAKING;
-  }, [data.poolInfo?.type]);
+  const isBittensorChain = useMemo(() => {
+    return data.poolInfo?.chain === 'bittensor' || data.poolInfo?.chain === 'bittensor_testnet';
+  }, [data.poolInfo?.chain]);
 
   return (
     <div className={CN(className)}>
@@ -52,7 +51,7 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      {isSubnetStaking && (
+      {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
           description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}

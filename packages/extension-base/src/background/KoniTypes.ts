@@ -1510,9 +1510,10 @@ export interface BondingSubmitParams extends BaseRequestSign {
   poolInfo?: {
     metadata: SubnetYieldPositionInfo,
     type: YieldPoolType,
+    chain: string
   },
   poolPosition?: {
-    type: YieldPoolType,
+    chain: string,
   }
 }
 

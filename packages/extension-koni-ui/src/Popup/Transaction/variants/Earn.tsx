@@ -651,12 +651,12 @@ const Component = () => {
   }, [amountValue, isFormInvalid, isSubnetStaking, mustChooseTarget, poolInfo.metadata.subnetData?.netuid, poolInfo.slug, poolTargetValue]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (earningSlippage === null) {
-      return;
+    if (earningSlippage === null || !amountValue) {
+      return true;
     }
 
     return earningSlippage <= maxSlippage;
-  }, [earningSlippage, maxSlippage]);
+  }, [earningSlippage, maxSlippage, amountValue]);
 
   // For subnet staking
 

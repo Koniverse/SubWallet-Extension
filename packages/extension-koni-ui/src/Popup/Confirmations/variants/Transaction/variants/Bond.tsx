@@ -3,7 +3,6 @@
 
 import { RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { YieldPoolType } from '@subwallet/extension-base/types';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -28,9 +27,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { t } = useTranslation();
 
-  const isSubnetStaking = useMemo(() => {
-    return data.poolPosition?.type === YieldPoolType.SUBNET_STAKING;
-  }, [data.poolPosition?.type]);
+  const isBittensorChain = useMemo(() => {
+    return data.poolPosition?.chain === 'bittensor' || data.poolPosition?.chain === 'bittensor_testnet';
+  }, [data.poolPosition?.chain]);
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
@@ -65,7 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      {isSubnetStaking && (
+      {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
           description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
