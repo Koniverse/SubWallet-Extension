@@ -1140,17 +1140,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 </div>
 
                 {
-                  !!recipientAutoFilledInfo && (
+                  !!recipientAutoFilledInfo && !isRecipientFieldManuallyVisible && (
                     <div className='__address-input-toggle-container'>
                       <Button
-                        className={CN('__address-input-toggle', {
-                          '-active': isRecipientFieldManuallyVisible
-                        })}
+                        className={'__address-input-toggle'}
                         icon={(
                           <Icon
                             customSize={'16px'}
                             phosphorIcon={Book}
-                            weight={isRecipientFieldManuallyVisible ? 'fill' : undefined}
                           />
                         )}
                         onClick={toggleAddressInputManually}
