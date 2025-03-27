@@ -3,7 +3,7 @@
 
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Number, Typography } from '@subwallet/react-ui';
+import { Number, Tooltip, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React from 'react';
@@ -26,7 +26,6 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
   return (
     <Typography.Paragraph className={CN(className, 'bonded-balance')}>
       <div className='balance-wrapper'>
-        {/* Phần số tiền staked */}
         <div className='balance-value'>
           <Number
             decimal={decimals}
@@ -40,7 +39,6 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
           {label || t('Staked')}
         </div>
 
-        {/* Phần max slippage */}
         {isSubnetStaking && (
           <div className='slippage-info'>
             <span className='slippage-label'>{t('Max slippage')}:</span>
@@ -79,16 +77,17 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
 
     '.balance-value': {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      maxWidth: '10.625rem'
     },
 
     '.slippage-info': {
       display: 'flex',
-      alignItems: 'center'
-    },
-
-    '.slippage-label': {
-      marginRight: token.sizeXS
+      alignItems: 'center',
+      maxWidth: '8.4375rem',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
     }
   });
 });

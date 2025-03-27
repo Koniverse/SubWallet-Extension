@@ -65,7 +65,11 @@ const Component: React.FC<Props> = (props: Props) => {
 };
 
 const UnbondTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '&.alert-box': {
+      marginTop: token.marginSM
+    }
+  };
 });
 
 export default UnbondTransactionConfirmation;
