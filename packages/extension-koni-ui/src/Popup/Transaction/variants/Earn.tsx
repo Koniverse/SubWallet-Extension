@@ -1233,23 +1233,22 @@ const Component = () => {
               </Form>
 
               {renderMetaInfo()}
-              {!isSubnetStaking
-                ? (
-                  <AlertBox
-                    className='__alert-box'
-                    description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
-                    title={STAKE_ALERT_DATA.title}
-                    type='warning'
-                  />
-                )
-                : !isSlippageAcceptable && (
-                  <AlertBox
-                    className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
-                    title='Slippage too high'
-                    type='error'
-                  />
-                )}
+
+              <AlertBox
+                className='__alert-box'
+                description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
+                title={STAKE_ALERT_DATA.title}
+                type='warning'
+              />
+
+              {!isSlippageAcceptable && (
+                <AlertBox
+                  className='__alert-box'
+                  description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
+                  title='Slippage too high!'
+                  type='error'
+                />
+              )}
             </TransactionContent>
             <TransactionFooter>
               <Button
