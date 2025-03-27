@@ -600,7 +600,7 @@ export class BalanceService implements StoppableServiceInterface {
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       if (!_isNativeToken(tokenInfo)) {
-        return getAcrossbridgeTransferProcessFromEvm();
+        return getAcrossbridgeTransferProcessFromEvm(originChainInfo);
       }
     }
 

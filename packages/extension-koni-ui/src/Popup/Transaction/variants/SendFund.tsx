@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainInfoMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
@@ -511,7 +510,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     const tokenInfo = assetRegistry[values.asset];
 
     if (isAcrossBridge) {
-      const chainInfo = ChainInfoMap[values.chain];
+      const chainInfo = chainInfoMap[values.chain];
       const chainId = _getEvmChainId(chainInfo);
 
       if (chainId) {
@@ -534,7 +533,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       chain: values.chain,
       owner: values.from
     });
-  }, [assetRegistry]);
+  }, [assetRegistry, chainInfoMap]);
 
   // Submit transaction
   const doSubmit = useCallback((values: TransferParams, options: TransferOptions) => {
