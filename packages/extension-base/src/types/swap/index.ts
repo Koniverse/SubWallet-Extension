@@ -263,3 +263,8 @@ export interface BriefXCMStep extends BaseSwapStepMetadata {
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
   txHex: `0x${string}`
 }
+
+export interface ChainFlipSwapStepMetadata extends BaseSwapStepMetadata {
+  srcChain: string,
+  destChain: string
+}

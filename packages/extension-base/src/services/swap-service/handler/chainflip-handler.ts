@@ -13,7 +13,7 @@ import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BasicTxErrorType, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -138,13 +138,22 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
-    const metadata = params.quote.metadata as ChainFlipMetadata;
+    const processMetadata = params.process.steps[params.currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
+    const quoteMetadata = params.quote.metadata as ChainFlipMetadata;
+
+    if (!processMetadata || !quoteMetadata) {
+      throw new Error('Metadata for Chainflip not found');
+    }
+
+    if (processMetadata.destChain !== quoteMetadata.destChain || processMetadata.srcChain !== quoteMetadata.srcChain) {
+      throw new Error('Metadata for Chainflip not found');
+    }
 
     const depositParams = {
-      sourceChain: metadata.srcChain,
+      sourceChain: processMetadata.srcChain,
       destinationAddress: receiver,
       destinationAsset: toAssetId,
-      destinationChain: metadata.destChain,
+      destinationChain: processMetadata.destChain,
       minimumPrice: minReceive, // minimum accepted price for swaps through the channel
       refundAddress: address, // address to which assets are refunded
       retryDurationInBlocks: '100', // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
@@ -247,21 +256,30 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (params.selectedQuote) {
-      const submitStep: BaseStepDetail = {
-        name: 'Swap',
-        type: SwapStepType.SWAP,
-        metadata: {
-          sendingValue: params.request.fromAmount.toString(),
-          originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
-        }
-      };
+    const metadata = params.selectedQuote?.metadata as ChainFlipMetadata;
 
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    if (!params.selectedQuote) {
+      return Promise.resolve(undefined);
     }
 
-    return Promise.resolve(undefined);
+    if (!metadata || !metadata.srcChain || !metadata.destChain) {
+      return Promise.resolve(undefined);
+    }
+
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      metadata: {
+        sendingValue: params.request.fromAmount.toString(),
+        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
+
+        srcChain: metadata.srcChain,
+        destChain: metadata.destChain
+      }
+    };
+
+    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
   }
 
   generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
