@@ -37,6 +37,11 @@ interface DepositAddressResponse {
   channelOpeningFeeNative: string;
 }
 
+interface ChainFlipMetadata {
+  srcChain: string;
+  destChain: string;
+}
+
 export class ChainflipSwapHandler implements SwapBaseInterface {
   private readonly isTestnet: boolean;
   private swapBaseHandler: SwapBaseHandler;
@@ -133,9 +138,13 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
+    const metadata = params.quote.metadata as ChainFlipMetadata;
+
     const depositParams = {
+      sourceChain: metadata.srcChain,
       destinationAddress: receiver,
       destinationAsset: toAssetId,
+      destinationChain: metadata.destChain,
       minimumPrice: minReceive, // minimum accepted price for swaps through the channel
       refundAddress: address, // address to which assets are refunded
       retryDurationInBlocks: '100', // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
