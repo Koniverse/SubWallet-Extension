@@ -123,12 +123,12 @@ const Component: React.FC = () => {
   }, [amountValue, isSubnetStaking, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (earningSlippage === null) {
-      return;
+    if (earningSlippage === null || !amountValue) {
+      return true;
     }
 
     return earningSlippage <= maxSlippage;
-  }, [earningSlippage, maxSlippage]);
+  }, [amountValue, earningSlippage, maxSlippage]);
 
   // For subnet staking
 
