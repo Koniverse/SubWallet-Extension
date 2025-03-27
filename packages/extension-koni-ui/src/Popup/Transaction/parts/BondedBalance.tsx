@@ -3,7 +3,7 @@
 
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Number, Typography } from '@subwallet/react-ui';
+import { Number, Tooltip, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React from 'react';
@@ -40,15 +40,20 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
         </div>
 
         {isSubnetStaking && (
-          <div className='slippage-info'>
-            <span className='slippage-label'>{t('Max slippage')}:</span>
-            <span
-              className='slippage-value'
-              style={{ color: isSlippageAcceptable ? token.colorTextTertiary : token.colorError }}
-            >
-              {maxSlippage ? (maxSlippage * 100) : 0}%
-            </span>
-          </div>
+          <Tooltip
+            placement={'topRight'}
+            title={'If slippage exceeds this limit, transaction will not be executed'}
+          >
+            <div className='slippage-info'>
+              <span className='slippage-label'>{t('Max slippage')}:</span>
+              <span
+                className='slippage-value'
+                style={{ color: isSlippageAcceptable ? token.colorTextTertiary : token.colorError }}
+              >
+                {maxSlippage ? (maxSlippage * 100) : 0}%
+              </span>
+            </div>
+          </Tooltip>
         )}
       </div>
     </Typography.Paragraph>

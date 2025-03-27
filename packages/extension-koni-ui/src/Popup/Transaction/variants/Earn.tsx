@@ -642,7 +642,7 @@ const Component = () => {
 
     getEarningSlippage(data)
       .then((result) => {
-        console.log('Actual slippage:', result * 100);
+        console.log('Actual stake slippage:', result * 100);
         setEarningSlippage(result);
       })
       .catch((error) => {
@@ -1245,7 +1245,7 @@ const Component = () => {
                 : !isSlippageAcceptable && (
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake/unstake amount and try again`}
+                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
                     title='Slippage too high'
                     type='error'
                   />

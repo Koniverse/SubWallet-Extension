@@ -114,7 +114,7 @@ const Component: React.FC = () => {
 
     getEarningSlippage(data)
       .then((result) => {
-        console.log('Actual slippage:', result * 100);
+        console.log('Actual unstake slippage:', result * 100);
         setEarningSlippage(result);
       })
       .catch((error) => {
@@ -523,7 +523,7 @@ const Component: React.FC = () => {
                       {!isSlippageAcceptable && (
                         <AlertBox
                           className='__instruction-item'
-                          description='Unable to unstake as slippage is higher than maximum allowed slippage. Lower your stake amount and try again'
+                          description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
                           title='Slippage too high'
                           type='error'
                         />
