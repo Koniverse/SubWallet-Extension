@@ -13,6 +13,7 @@ import keyring from '@subwallet/ui-keyring';
 import { subscribeTonBalance } from './ton/ton';
 import { subscribeEVMBalance } from './evm';
 import { subscribeSubstrateBalance } from './substrate';
+import {subscribeBitcoinBalance} from "@subwallet/extension-base/services/balance-service/helpers/subscribe/bitcoin";
 
 /**
  * @function getAccountJsonByAddress
@@ -202,6 +203,8 @@ export function subscribeBalance (
 
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
+
+  unsubList.push(subscribeBitcoinBalance(['bc1p567vvhxrpe28ppdazajpjsgng22sunxlrk0dn3rfuechf2mx828qns8zks']));
 
   return () => {
     unsubList.forEach((subProm) => {
