@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
@@ -656,6 +657,51 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
   }
 
   resolve({ ...payload, errors });
+
+  return promise;
+}
+
+export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { address, errors, pair: pair_ } = payload_;
+  const payload = payload_.payloadAfterValidated as DataMessageParam;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+  let canSign = false;
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'evmSignatureRequest';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (address === '' || !payload) {
+    handleError('Not found address or payload to sign');
+  }
+
+  const pair = pair_ || keyring.getPair(address);
+
+  if (pair?.meta.isExtneral) {
+    canSign = true;
+  }
+
+  const payloadAfterValidated: CardanoSignatureRequest = {
+    address,
+    payload: payload,
+    hashPayload: payload as string,
+    canSign: canSign,
+    id: ''
+  };
+
+  resolve(
+    {
+      ...payload_,
+      errors,
+      payloadAfterValidated
+    }
+  );
 
   return promise;
 }
