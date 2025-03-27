@@ -482,12 +482,19 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address)
-          .catch((e) => {
-            console.error(e);
+        return new Promise<string[] | null>((resolve) => {
+          setTimeout(() => {
+            subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address)
+              .then((result) => {
+                resolve(result);
+              })
+              .catch((e) => {
+                console.error(e);
 
-            return null;
-          });
+                return null;
+              });
+          }, 30000);
+        });
       } else {
         return null;
       }
