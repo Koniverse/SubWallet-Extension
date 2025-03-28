@@ -523,7 +523,7 @@ const Component: React.FC = () => {
                       {!isSlippageAcceptable && (
                         <AlertBox
                           className='__instruction-item'
-                          description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
+                          description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
                           title='Slippage too high!'
                           type='error'
                         />

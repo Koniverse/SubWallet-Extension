@@ -693,7 +693,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(new BigN(price[netuid as number]));
 
     if (new BigN(amount).lt(minUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient unstake. You need to unstake at least ${formatNumber(minUnstake, _getAssetDecimals(this.nativeToken))} ${poolInfo.metadata.subnetData?.subnetSymbol || ''} to earn rewards`))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t`Amount too low. You need to unstake at least ${formatNumber(minUnstake, _getAssetDecimals(this.nativeToken))} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`)];
     }
 
     return baseErrors;
