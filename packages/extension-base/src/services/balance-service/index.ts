@@ -16,6 +16,7 @@ import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base'
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -200,6 +201,9 @@ export class BalanceService implements StoppableServiceInterface {
   ): Promise<[() => void, AmountData]> {
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
     const chainState = this.state.chainService.getChainStateByKey(chain);
+    const priorityList = this.state.chainService.value.priorityTokens;
+
+    console.log('[[Balance-service: priorityList]]', priorityList);
 
     if (!chainInfo || !chainState || !chainState.active) {
       return Promise.reject(new BalanceError(BalanceErrorType.NETWORK_ERROR, t('{{chain}} is inactive. Please enable network', { replace: { chain: chainInfo.name } })));
@@ -476,9 +480,26 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    const evmPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
     const balanceDataList = await Promise.all(promiseList);
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -520,6 +541,26 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        balanceData.forEach((slug) => {
+          const chainSlug = slug.split('-')[0];
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            needEnableChains.push(chainSlug);
+            needActiveTokens.push(existedKey);
+            currentAssetSettings[existedKey] = { visible: true };
+          }
+        });
+      }
+    }
+
+    console.log('needActiveTokens', needActiveTokens);
+    console.log('balanceDataList', balanceDataList);
+    console.log('evmBalanceDataList', evmBalanceDataList);
+    console.log('needEnableChains', needEnableChains);
+
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
@@ -548,6 +589,7 @@ export class BalanceService implements StoppableServiceInterface {
     const scanBalance = () => {
       const addresses = keyring.getPairs().map((account) => account.address);
       const cache = this.balanceDetectSubject.value;
+
       const now = Date.now();
       const needDetectAddresses: string[] = [];
 
@@ -556,6 +598,8 @@ export class BalanceService implements StoppableServiceInterface {
           needDetectAddresses.push(address);
         }
       }
+
+      console.log('[scanBalance] needDetectAddresses', needDetectAddresses);
 
       if (needDetectAddresses.length) {
         this.autoEnableChains(needDetectAddresses).finally(noop);

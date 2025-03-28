@@ -88,6 +88,7 @@ export class AccountState {
 
         // Add account
         addedAddresses.forEach((address) => {
+          console.log('address', address);
           this.koniState.eventService.emit('account.add', address);
         });
       } else {
@@ -707,6 +708,10 @@ export class AccountState {
 
   public enableChain (slug: string) {
     this.koniState.enableChain(slug, true).catch(console.error);
+  }
+
+  public enableChainWithPriorityAssets (slug: string) {
+    this.koniState.enableChainWithPriorityAssets(slug, true).catch(console.error);
   }
 
   /* Others */

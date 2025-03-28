@@ -20,6 +20,7 @@ import AutoEnableChainsTokens from './AutoEnableChainsTokens';
 import DeleteChain from './DeleteChain';
 import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
+import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
 import MigrateAutoLock from './MigrateAutoLock';
@@ -54,7 +55,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // '1.1.13-02-2': EnableEarningChains,
   '1.1.13-03': DeleteEarningData,
   '1.1.17-01': MigratePioneerProvider,
-  '1.1.17-03': EnableVaraChain,
+  // [`${EVERYTIME}.1`]: EnableVaraChain,
   '1.1.24-01': MigrateProvidersV1M1P24,
   '1.1.26-01': MigratePolygonUSDCProvider,
   '1.1.28-01': MigrateEarningVersion,
@@ -68,6 +69,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.2.32-01': MigratePairData,
   '1.3.6-01': MigrateTransactionHistoryBridge,
   '1.3.10-01': ClearMetadataDatabase,
+  [EVERYTIME]: DisableZeroBalanceTokens,
   [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
