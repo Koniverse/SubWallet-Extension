@@ -60,8 +60,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
-    console.log('quotes from API', quotes);
-
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
@@ -229,10 +227,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       selectedQuote: swapQuoteResponse.optimalQuote,
       path
     });
-
-    // todo: can also return a chain route
-    console.log('path--------------------------', path);
-    console.log('optimalProcess----------------', optimalProcess);
 
     return {
       process: optimalProcess,
@@ -551,6 +545,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     if (params.process.steps.length === 1) { // todo: do better to handle error generating steps
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Please check your network and try again'));
     }
+
+    console.log('handling swap process: ', params.process);
 
     if (handler) {
       return handler.handleSwapProcess(params);
