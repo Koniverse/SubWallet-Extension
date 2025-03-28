@@ -4,6 +4,7 @@
 import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { reloadCron, saveShowBalance } from '@subwallet/extension-koni-ui/messaging';
+import { checkLightClient } from '@subwallet/extension-koni-ui/messaging/expert';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, formatNumber, Icon, Number, SwNumberProps, Tag, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -48,12 +49,7 @@ function Component (
   }, [isShowBalance]);
 
   const reloadBalance = useCallback(() => {
-    setReloading(true);
-    reloadCron({ data: 'balance' })
-      .catch(console.error)
-      .finally(() => {
-        setReloading(false);
-      });
+    checkLightClient();
   }, []);
 
   return (

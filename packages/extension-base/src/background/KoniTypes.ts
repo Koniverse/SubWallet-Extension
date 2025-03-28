@@ -2429,6 +2429,11 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+  /* Migrate Unified Account */
+
+  /* Avail light client */
+  'pri(avail.lightClient)': [null, null]
+  /* Avail light client */
 }
 
 export interface ApplicationMetadataType {

@@ -106,6 +106,7 @@
     "@polkadot/util": "^13.4.3",
     "@polkadot/util-crypto": "^13.4.3",
     "@polkadot/x-global": "^13.4.3",
+    "@subwallet/avail-light-lib": "file:../../Avail/avail-light/extension/pkg/",
     "@subwallet/chain-list": "0.2.101",
     "@subwallet/keyring": "^0.1.9",
     "@subwallet/react-ui": "5.1.2-b79",
