@@ -90,7 +90,8 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     this.providerSlug = SwapProviderId.SIMPLE_SWAP;
   }
 
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+  // just duplicate the validateSwapProcess
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const amount = params.selectedQuote.fromAmount;
     const bnAmount = BigInt(amount);
 

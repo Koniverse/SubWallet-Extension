@@ -217,7 +217,8 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+  // just duplicate the validateSwapProcess
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const amount = params.selectedQuote.fromAmount;
     const bnAmount = BigInt(amount);
 

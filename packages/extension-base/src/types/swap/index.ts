@@ -4,7 +4,6 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { BaseStepDetail, BaseStepType, CommonOptimalSwapPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
@@ -214,6 +213,26 @@ export interface OptimalSwapPathParams {
   selectedQuote?: SwapQuote;
 }
 
+export enum DynamicSwapType {
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE'
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  pair: ActionPair;
+}
+
+export const enum XcmStepPosition {
+  FIRST = 0,
+  AFTER_SWAP = 1,
+  AFTER_XCM_SWAP = 2
+}
+
+export interface PairSlug {
+  fromTokenSlug: string,
+}
+
 export interface OptimalSwapPathParamsV2 {
   request: SwapRequest;
   selectedQuote?: SwapQuote;
@@ -257,7 +276,7 @@ export interface BaseSwapStepMetadata {
 }
 
 export interface BriefXCMStep extends BaseSwapStepMetadata {
-  expectedReceive?: string;
+  expectedReceive: string;
 }
 
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 
 import { CommonStepDetail, CommonStepFeeInfo } from '../service-base';
@@ -71,6 +72,29 @@ export interface BriefProcessStep {
   processId: string;
   stepId: number;
 }
+
+export interface BriefXcmStep {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationTokenInfo: _ChainAsset;
+}
+
+export interface BriefXcmStepV2 {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationValue: string;
+  destinationTokenInfo: _ChainAsset;
+}
+
+// temp for avoid conflict // todo: recheck to refactor BriefXcmStepV2 and BriefSwapStepV2 later;
+export interface BriefSwapStepV2 {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationValue: string;
+  destinationTokenInfo: _ChainAsset;
+}
+
+export type BriefStepV2 = BriefXcmStepV2 | BriefSwapStepV2;
 
 export interface BriefSwapStep {
   pair: SwapPair;
