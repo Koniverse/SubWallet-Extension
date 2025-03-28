@@ -13,7 +13,7 @@ import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getAssetSymbol, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, BriefSwapStepV2, BriefXCMStep, BriefXcmStepV2, CommonStepType, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, TransferTxErrorType, XcmStepPosition } from '@subwallet/extension-base/types';
@@ -142,7 +142,10 @@ export class SwapBaseHandler {
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
 
       const id = getId();
-      const feeInfo = await this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
+      const [feeInfo, toTokenBalance] = await Promise.all([
+        this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate'),
+        this.balanceService.getTotalBalance(params.request.address, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
+      ]);
 
       const mockSendingValue = xcmStepIndex === XcmStepPosition.FIRST ? fromAmount : selectedQuote?.toAmount || '0';
       const recipientAddress = xcmStepIndex === XcmStepPosition.FIRST ? _reformatAddressWithChain(address, toChainInfo) : recipient || _reformatAddressWithChain(address, toChainInfo); // has recipient in case swap to another address
@@ -162,7 +165,7 @@ export class SwapBaseHandler {
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
       const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-      const estimatedXcmFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString();
+      const estimatedXcmFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.high).toString();
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -182,10 +185,18 @@ export class SwapBaseHandler {
       }
 
       // todo: increase transfer amount when XCM local token
-      if (xcmStepIndex === XcmStepPosition.FIRST && isXcmNativeToken) {
-        // xcm fee is paid in native token but swap token is not always native token
-        // add amount of fee into sending value to ensure has enough token to swap
-        bnTransferAmount = bnTransferAmount.plus(BigN(estimatedXcmFee));
+      if (xcmStepIndex === XcmStepPosition.FIRST) {
+        if (isXcmNativeToken) {
+          // xcm fee is paid in native token but swap token is not always native token
+          // add amount of fee into sending value to ensure has enough token to swap
+          bnTransferAmount = bnTransferAmount.plus(BigN(estimatedXcmFee));
+        } else {
+          bnTransferAmount = bnTransferAmount.plus(BigN(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium));
+        }
+
+        if (BigN(toTokenBalance.value).lte(0)) {
+          bnTransferAmount = bnTransferAmount.plus(_getTokenMinAmount(toTokenInfo));
+        }
       }
 
       const step: BaseStepDetail = {
