@@ -639,7 +639,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
 
     if (new BigN(amount).lt(bnMinUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t`Amount too low. You need to unstake at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`))];
     }
 
     return baseErrors;
