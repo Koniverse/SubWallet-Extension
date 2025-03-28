@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
-import { OptimalSwapPathParams, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
+import { DynamicSwapAction, OptimalSwapPathParams, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
 import { OptimalYieldPath, OptimalYieldPathParams, YieldStepType } from '@subwallet/extension-base/types/yield';
 
 /* ServiceWithProcess */

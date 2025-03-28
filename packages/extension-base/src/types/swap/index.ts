@@ -276,7 +276,7 @@ export interface BaseSwapStepMetadata {
 }
 
 export interface BriefXCMStep extends BaseSwapStepMetadata {
-  expectedReceive?: string;
+  expectedReceive: string;
 }
 
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {

@@ -12,8 +12,8 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _getTokenMinAmount, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
-import { FEE_RATE_MULTIPLIER, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams, XcmStepPosition } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 
@@ -320,7 +320,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       }
 
       if (step.action === DynamicSwapType.BRIDGE) {
-        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler); // todo
+        return this.swapBaseHandler.getBridgeStep.bind(this.swapBaseHandler);
       }
 
       throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);
@@ -441,109 +441,6 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       default:
         return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
-  }
-
-  public async validateSwapStep (params: ValidateSwapProcessParams, isXcmOk: boolean, stepIndex: number): Promise<TransactionError[]> {
-    // check swap quote timestamp
-    // check balance to pay transaction fee
-    // check balance against spending amount
-    if (!params.selectedQuote) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
-    }
-
-    const selectedQuote = params.selectedQuote;
-    const currentTimestamp = +Date.now();
-
-    if (selectedQuote.aliveUntil <= currentTimestamp) {
-      return Promise.resolve([new TransactionError(SwapErrorType.QUOTE_TIMEOUT)]);
-    }
-
-    const stepFee = params.process.totalFee[stepIndex].feeComponent;
-    const networkFee = stepFee.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
-
-    if (!networkFee) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
-    }
-
-    const fromAsset = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
-    const feeTokenInfo = this.chainService.getAssetBySlug(networkFee.tokenSlug);
-    const feeTokenChain = this.chainService.getChainInfoByKey(feeTokenInfo.originChain);
-
-    const { fromAmount, minSwap } = params.selectedQuote;
-
-    const [feeTokenBalance, fromAssetBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, feeTokenInfo.originChain, feeTokenInfo.slug),
-      this.balanceService.getTransferableBalance(params.address, fromAsset.originChain, fromAsset.slug)
-    ]);
-
-    const balanceError = _validateBalanceToSwapOnAssetHub(fromAsset, feeTokenInfo, feeTokenChain, networkFee.amount, fromAssetBalance.value, feeTokenBalance.value, fromAmount, isXcmOk, minSwap);
-
-    if (balanceError) {
-      return Promise.resolve([balanceError]);
-    }
-
-    if (!params.recipient) {
-      return Promise.resolve([]);
-    }
-
-    const toAsset = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
-    const toAssetChain = this.chainService.getChainInfoByKey(toAsset.originChain);
-
-    const recipientError = _validateSwapRecipient(toAssetChain, params.recipient);
-
-    if (recipientError) {
-      return Promise.resolve([recipientError]);
-    }
-
-    return Promise.resolve([]);
-  }
-
-  async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigN(amount);
-
-    if (bnAmount.lte(0)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
-    }
-
-    // todo
-    const swapStep = params.process.steps.find((item) => item.type === SwapStepType.SWAP);
-
-    if (!swapStep) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Swap step not found')];
-    }
-
-    let isXcmOk = false;
-    const currentStep = params.currentStep;
-
-    for (const [index, step] of params.process.steps.entries()) {
-      if (currentStep > index) {
-        continue;
-      }
-
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.XCM:
-            return this.swapBaseHandler.validateBridgeStep(params, index);
-          case SwapStepType.SWAP:
-            return this.validateSwapStep(params, isXcmOk, index);
-          default:
-            return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
-    }
-
-    return [];
   }
 
   async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
