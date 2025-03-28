@@ -1585,6 +1585,7 @@ export default class KoniState {
 
   public onAccountAdd () {
     this.eventService.on('account.add', (address) => {
+      console.log('[onAccountAdd]');
       this.balanceService.autoEnableChains([address]).catch(this.logger.error);
     });
   }

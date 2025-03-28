@@ -35,6 +35,7 @@ export default class MigrationService {
         }).first();
 
         if (!check || key.startsWith(EVERYTIME)) {
+          console.log('[key]', key);
           const job = new JobClass(this.state);
 
           await job.run();

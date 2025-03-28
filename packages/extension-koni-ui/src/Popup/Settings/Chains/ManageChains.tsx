@@ -41,6 +41,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const chainInfoList = useChainInfoWithStateAndStatus();
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
+  console.log('chainInfoList', chainInfoList);
+  const filterChainListStatus = chainInfoList.filter((chainInfo) => chainInfo.chainStatus === 'ACTIVE');
+  const filterChainListActive = chainInfoList.filter((chainInfo) => chainInfo.active);
+
+  console.log('filterChainListStatus', filterChainListStatus);
+  console.log('filterChainListActive', filterChainListActive);
+
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
     { label: t('EVM networks'), value: FilterValue.EVM },
     { label: t('Substrate networks'), value: FilterValue.SUBSTRATE },
@@ -147,7 +154,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage networks')}
+        title={t<string>('Manage networks 1')}
       >
         <SwList.Section
           actionBtnIcon={(

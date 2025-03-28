@@ -12,6 +12,7 @@ export type ChainInfoWithStateAndStatus = ChainInfoWithState & _ChainApiStatus;
 export function useChainInfoWithStateAndStatus ({ filterStatus = true } = {} as {filterStatus?: boolean}): ChainInfoWithStateAndStatus[] {
   const chainInfoList = useChainInfoWithState({ filterStatus });
   const chainStatusMap = useSelector((state: RootState) => state.chainStore.chainStatusMap);
+  console.log('chainStatusMap', chainStatusMap);
 
   const chainInfoListWithStatus: ChainInfoWithStateAndStatus[] = useMemo(() => {
     return chainInfoList.map((item) => {

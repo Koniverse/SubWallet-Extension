@@ -65,6 +65,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     };
   }, [assetSettingMap, selectedFilters]);
 
+  const filteredAssetItems = useMemo(() => {
+    return assetItems.filter(filterFunction);
+  }, [assetItems, filterFunction]);
+
+  console.log('filteredAssetItems', filteredAssetItems);
+
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
     { label: t('Enabled tokens'), value: FilterValue.ENABLED },
     { label: t('Disabled tokens'), value: FilterValue.DISABLED },

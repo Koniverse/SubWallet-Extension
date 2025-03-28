@@ -88,6 +88,7 @@ export class AccountState {
 
         // Add account
         addedAddresses.forEach((address) => {
+          console.log('address', address);
           this.koniState.eventService.emit('account.add', address);
         });
       } else {

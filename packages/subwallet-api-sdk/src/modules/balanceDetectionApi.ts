@@ -13,6 +13,8 @@ export class BalanceDetectionApi {
   async getEvmTokenBalanceSlug (address: string): Promise<string[]> {
     const url = `${this.baseUrl}/balance-detection/get-token-slug?address=${address}`;
 
+    console.log('url, address', url, address);
+
     try {
       const rawResponse = await fetch(url, {
         method: 'GET',

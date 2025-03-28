@@ -201,6 +201,9 @@ export class BalanceService implements StoppableServiceInterface {
   ): Promise<[() => void, AmountData]> {
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
     const chainState = this.state.chainService.getChainStateByKey(chain);
+    const priorityList = this.state.chainService.value.priorityTokens;
+
+    console.log('[[Balance-service: priorityList]]', priorityList);
 
     if (!chainInfo || !chainState || !chainState.active) {
       return Promise.reject(new BalanceError(BalanceErrorType.NETWORK_ERROR, t('{{chain}} is inactive. Please enable network', { replace: { chain: chainInfo.name } })));
@@ -553,6 +556,11 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    console.log('needActiveTokens', needActiveTokens);
+    console.log('balanceDataList', balanceDataList);
+    console.log('evmBalanceDataList', evmBalanceDataList);
+    console.log('needEnableChains', needEnableChains);
+
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
@@ -590,6 +598,8 @@ export class BalanceService implements StoppableServiceInterface {
           needDetectAddresses.push(address);
         }
       }
+
+      console.log('[scanBalance] needDetectAddresses', needDetectAddresses);
 
       if (needDetectAddresses.length) {
         this.autoEnableChains(needDetectAddresses).finally(noop);
