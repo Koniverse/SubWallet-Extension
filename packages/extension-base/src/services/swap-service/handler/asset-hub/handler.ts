@@ -393,6 +393,10 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     // todo: move to gen process
     const minReceive = new BigN(1 - params.slippage).times(toAmount).integerValue(BigN.ROUND_DOWN);
 
+    if (!params.address || !paths || !fromAmount || !minReceive) {
+      throw new SwapError(SwapErrorType.UNKNOWN);
+    }
+
     const extrinsic = await this.router?.buildSwapExtrinsic(paths, params.address, fromAmount, minReceive.toString());
 
     return {

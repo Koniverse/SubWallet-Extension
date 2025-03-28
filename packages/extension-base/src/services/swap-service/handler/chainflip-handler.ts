@@ -167,6 +167,10 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const data = await response.json() as DepositAddressResponse;
 
+    if (!data.id || !data.address || data.address === '' || !data.issuedBlock || !data.network || !data.channelId) {
+      throw new Error('Error get Chainflip data');
+    }
+
     const depositChannelId = `${data.issuedBlock}-${data.network}-${data.channelId}`;
     const depositAddress = data.address;
 

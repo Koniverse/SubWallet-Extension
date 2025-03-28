@@ -4121,6 +4121,8 @@ export default class KoniExtension {
       throw e;
     }
 
+    console.log('swap data', submitData);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { chainType, extrinsic, extrinsicType, isPermit, transferNativeAmount, txChain, txData } = submitData;
 
