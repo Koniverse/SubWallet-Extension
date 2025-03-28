@@ -20,7 +20,7 @@ import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/compone
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -231,6 +231,22 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const recipientValue = useWatchTransaction('recipient', form, defaultData);
 
+  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP);
+
+  const [swapFromFieldRenderKey, setSwapFromFieldRenderKey] = useState<string>('SwapFromField');
+
+  const currentFromTokenAvailableBalance = useMemo(() => {
+    if (!fromTokenSlugValue || availableBalanceHookResult.isLoading || !availableBalanceHookResult.nativeTokenSlug) {
+      return undefined;
+    }
+
+    if (availableBalanceHookResult.nativeTokenSlug !== fromTokenSlugValue) {
+      return availableBalanceHookResult.tokenBalance;
+    }
+
+    return availableBalanceHookResult.nativeTokenBalance;
+  }, [availableBalanceHookResult.isLoading, availableBalanceHookResult.nativeTokenBalance, availableBalanceHookResult.nativeTokenSlug, availableBalanceHookResult.tokenBalance, fromTokenSlugValue]);
+
   const { checkChainConnected, turnOnChain } = useChainConnection();
   const onPreCheck = usePreCheckAction(fromValue);
   const oneSign = useOneSignProcess(fromValue);
@@ -383,23 +399,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setIsRecipientFieldManuallyVisible(true);
   }, []);
 
-  // todo: this logic is only true with substrate, evm address. Make sure it work with ton, bitcoin, and more
-  const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
-    const { chain, from, toTokenSlug } = form.getFieldsValue();
-    const destChain = assetRegistryMap[toTokenSlug].originChain;
-    const destChainInfo = chainInfoMap[destChain];
-    const account = findAccountByAddress(accounts, _recipientAddress);
-
-    return validateRecipientAddress({ srcChain: chain,
-      destChainInfo,
-      fromAddress: from,
-      toAddress: _recipientAddress,
-      account,
-      actionType: ActionType.SWAP,
-      autoFormatValue,
-      allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
-
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
   const isRecipientFieldAllowed = useMemo(() => {
@@ -416,6 +415,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     return !isChainInfoAccordantAccountChainType(chainInfoMap[destChainValue], fromAccountJson.chainType);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
+
+  const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
+    if (!isRecipientFieldAllowed) {
+      return Promise.resolve();
+    }
+
+    const { chain, from, toTokenSlug } = form.getFieldsValue();
+    const destChain = assetRegistryMap[toTokenSlug].originChain;
+    const destChainInfo = chainInfoMap[destChain];
+    const account = findAccountByAddress(accounts, _recipientAddress);
+
+    return validateRecipientAddress({ srcChain: chain,
+      destChainInfo,
+      fromAddress: from,
+      toAddress: _recipientAddress,
+      account,
+      actionType: ActionType.SWAP,
+      autoFormatValue,
+      allowLedgerGenerics: ledgerGenericAllowNetworks });
+  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks]);
 
   const onSelectFromToken = useCallback((tokenSlug: string) => {
     form.setFieldValue('fromTokenSlug', tokenSlug);
@@ -754,6 +773,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const onSelectSlippage = useCallback((slippage: SlippageType) => {
     setCurrentSlippage(slippage);
   }, []);
+
+  const onClickMaxAmountButton = useCallback(() => {
+    if (!currentFromTokenAvailableBalance) {
+      return;
+    }
+
+    onChangeAmount(currentFromTokenAvailableBalance.value);
+    setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
+  }, [currentFromTokenAvailableBalance, onChangeAmount]);
+
+  const onClickHaftAmountButton = useCallback(() => {
+    if (!currentFromTokenAvailableBalance) {
+      return;
+    }
+
+    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toString();
+
+    onChangeAmount(result);
+    setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
+  }, [currentFromTokenAvailableBalance, onChangeAmount]);
 
   useEffect(() => {
     const updateFromValue = () => {
@@ -1109,10 +1148,36 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               <HiddenInput fields={hideFields} />
 
               <div className={'__swap-field-area'}>
+                {
+                  !!currentFromTokenAvailableBalance && (
+                    <div className={'__quick-amount-buttons-area'}>
+                      <Button
+                        className={'__max-amount-button __quick-amount-button'}
+                        onClick={onClickMaxAmountButton}
+                        size='xs'
+                        type={'ghost'}
+                      >
+                        {t('Max')}
+                      </Button>
+
+                      <Button
+                        className={'__half-amount-button __quick-amount-button'}
+                        disabled={!isSwitchable}
+                        onClick={onClickHaftAmountButton}
+                        size='xs'
+                        type={'ghost'}
+                      >
+                        50%
+                      </Button>
+                    </div>
+                  )
+                }
+
                 <SwapFromField
                   amountValue={fromAmountValue}
                   className={'__swap-from-field'}
                   fromAsset={fromAssetInfo}
+                  key={swapFromFieldRenderKey}
                   label={t('From')}
                   onChangeAmount={onChangeAmount}
                   onSelectToken={onSelectFromToken}
@@ -1216,6 +1281,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 <FreeBalance
                   address={fromValue}
                   chain={chainValue}
+                  extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
                   label={`${t('Swap balance')}:`}
@@ -1347,6 +1413,23 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
 
     '.__transaction-form-area .ant-form-item': {
       marginBottom: 12
+    },
+
+    '.__quick-amount-buttons-area': {
+      position: 'relative',
+      zIndex: 10,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      height: 0,
+      paddingRight: token.paddingXS
+    },
+
+    '.__quick-amount-button': {
+      height: '36px',
+      lineHeight: '36px',
+      paddingLeft: token.paddingXS,
+      paddingRight: token.paddingXS,
+      fontWeight: token.bodyFontWeight
     },
 
     '.__swap-from-field': {
