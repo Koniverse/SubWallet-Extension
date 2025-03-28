@@ -40,9 +40,27 @@ export function getClearOrigin () {
 }
 
 export function getBuyExecution (tokenInfo: _ChainAsset, originChainInfo: _ChainInfo, value: string, version: number) {
+  // _getAssetIdentifier wrong for USDT: Hydration -> PAH. todo: review logic
+  // const mockId = {
+  //   Concrete: {
+  //     interior: {
+  //       X2: [
+  //         {
+  //           PalletInstance: 50
+  //         },
+  //         {
+  //           GeneralIndex: 1984
+  //         }
+  //       ]
+  //     },
+  //     parents: 0
+  //   }
+  // };
+
   return {
     BuyExecution: {
       fees: {
+        // id: mockId,
         id: _getAssetIdentifier(tokenInfo, version),
         fun: {
           Fungible: value
@@ -62,7 +80,7 @@ export function getDepositAsset (destChainInfo: _ChainInfo, recipient: _Address,
         }
       },
       beneficiary: {
-        parent: 0,
+        parents: 0,
         interior: {
           X1: _getRecipientLocation(destChainInfo, recipient, version)
         }
@@ -77,17 +95,30 @@ export function getSetTopic () {
   };
 }
 
-// todo
-export function getWithdrawAsset (value: string) {
+export function getWithdrawAsset (tokenInfo: _ChainAsset, value: string, version: number) {
+  // wrong for USDT: Hydration -> PAH
+  // wrong for DOT: Hydration -> Polkadot
+  // _getAssetIdentifier wrong for USDT: Hydration -> PAH. todo: review logic
+  // const mockId = {
+  //   Concrete: {
+  //     interior: {
+  //       X2: [
+  //         {
+  //           PalletInstance: 50
+  //         },
+  //         {
+  //           GeneralIndex: 1984
+  //         }
+  //       ]
+  //     },
+  //     parents: 0
+  //   }
+  // };
+
   return {
     WithdrawAsset: [
       {
-        id: {
-          Concrete: {
-            parents: 1,
-            interior: 'Here'
-          }
-        },
+        id: _getAssetIdentifier(tokenInfo, version), // wrong for USDT: Hydration -> PAH
         fun: {
           Fungible: value
         }
@@ -108,7 +139,7 @@ export function getSetAppendix () {
             }
           },
           beneficiary: {
-            parent: 1,
+            parents: 1,
             interior: {
               X1: {
                 Parachain: 1000
