@@ -4,6 +4,7 @@
 import { CardanoSignatureRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
+import { CardanoMessageDetail } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { CardanoSignatureSupportType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -61,9 +62,7 @@ function Component ({ className, request, type }: Props) {
       {(!errors || errors.length === 0) && <BaseDetailModal
         title={t('Message details')}
       >
-        <div>
-          {JSON.stringify(payload)}
-        </div>
+        <CardanoMessageDetail bytes={payload.hashPayload} />
       </BaseDetailModal>}
     </>
   );

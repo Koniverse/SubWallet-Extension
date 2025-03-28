@@ -400,7 +400,7 @@ export default class AuthRequestHandler {
 
       if (!confirmAnotherType && !request.reConfirm && allowedListByRequestType.length !== 0) {
         // Prevent appear confirmation popup
-        return false;
+        return true;
       }
     } else {
       // Auto auth for web app

@@ -663,6 +663,8 @@ export default class KoniExtension {
         accounts.forEach(({ address }) => isSubstrateAddress(address) && list.push(address));
       } else if (accountAuthType === 'ton') {
         accounts.forEach(({ address }) => isTonAddress(address) && list.push(address));
+      } else if (accountAuthType === 'cardano') {
+        accounts.forEach(({ address }) => isCardanoAddress(address) && list.push(address));
       }
 
       return list;

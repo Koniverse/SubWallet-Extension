@@ -80,6 +80,6 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
   // }
 
   isEnable (): Promise<boolean> {
-    return Promise.resolve(false);
+    return Promise.resolve(true);
   }
 }

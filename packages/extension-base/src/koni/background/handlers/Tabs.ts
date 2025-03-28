@@ -1293,8 +1293,7 @@ export default class KoniTabs {
       case 'evm(provider.send)':
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
 
-        // Cardano
-
+      // Cardano
       case 'cardano(sign.data)':
         return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
       default:

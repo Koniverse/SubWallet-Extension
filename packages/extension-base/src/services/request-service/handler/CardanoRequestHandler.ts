@@ -170,7 +170,7 @@ export default class CardanoRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    const signature = pair.cardano.sign(payload as string);
+    const signature = pair.cardano.signMessage(payload as string, true);
 
     const publicKey = decodeAddress(address);
 
@@ -192,7 +192,7 @@ export default class CardanoRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    return pair.cardano.sign(cardanoPayload);
+    return pair.cardano.signTransaction(cardanoPayload);
   }
 
   public resetWallet () {
