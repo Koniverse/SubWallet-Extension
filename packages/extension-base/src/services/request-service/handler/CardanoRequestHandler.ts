@@ -1,11 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano } from '@subwallet/extension-base/background/KoniTypes';
+import { Address, Bip32PublicKey } from '@emurgo/cardano-serialization-lib-nodejs';
+import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano, ResponseCardanoSignData } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import RequestService from '@subwallet/extension-base/services/request-service';
+import { createCOSEKey } from '@subwallet/extension-base/services/request-service/helper';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import { keyring } from '@subwallet/ui-keyring';
+import { Buffer } from 'buffer';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
@@ -144,7 +147,7 @@ export default class CardanoRequestHandler {
   private async decorateResult<T extends ConfirmationTypeCardano> (t: T, request: ConfirmationDefinitionsCardano[T][0], result: ConfirmationDefinitionsCardano[T][1]) {
     if (result.payload === '') {
       if (t === 'cardanoSignatureRequest') {
-        // result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
+        result.payload = this.signMessage(request as ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]);
       } else if (t === 'cardanoSendTransactionRequest') {
         result.payload = this.signTransactionCardano(request as ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]);
       }
@@ -159,6 +162,28 @@ export default class CardanoRequestHandler {
     }
   }
 
+  private signMessage (confirmation: ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]): ResponseCardanoSignData {
+    const { address, payload } = confirmation.payload;
+    const pair = keyring.getPair(address);
+
+    if (pair.isLocked) {
+      keyring.unlockPair(pair.address);
+    }
+
+    const signature = pair.cardano.signMessage(payload as string, true);
+
+    const publicKey = Bip32PublicKey.from_bytes(pair.publicKey);
+
+    const paymentPubKey = publicKey.derive(0).derive(0);
+
+    const coseKey = createCOSEKey((Address.from_bech32(address)).to_bytes(), paymentPubKey.to_raw_key().as_bytes());
+
+    return {
+      signature,
+      key: Buffer.from(coseKey.to_bytes()).toString('hex')
+    };
+  }
+
   private signTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]): string { // alibaba
     const transaction = confirmation.payload;
     const { cardanoPayload, from } = transaction;
@@ -169,7 +194,7 @@ export default class CardanoRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    return pair.cardano.sign(cardanoPayload);
+    return pair.cardano.signTransaction(cardanoPayload);
   }
 
   public resetWallet () {

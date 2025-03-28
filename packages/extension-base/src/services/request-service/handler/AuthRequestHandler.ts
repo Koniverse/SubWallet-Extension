@@ -6,7 +6,7 @@ import { AuthRequestV2, ResultResolver } from '@subwallet/extension-base/backgro
 import { AccountAuthType, AuthorizeRequest, RequestAuthorizeTab, Resolver } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES } from '@subwallet/extension-base/constants';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
@@ -14,7 +14,7 @@ import { AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/se
 import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -48,6 +48,11 @@ export default class AuthRequestHandler {
 
       if (existKeyBothConnectAuthType && (!value.accountAuthTypes || value.accountAuthTypes.length < 2)) {
         value.accountAuthTypes = ['evm', 'substrate'];
+        needUpdateAuthList = true;
+      }
+
+      if ((value as AuthUrlInfoNeedMigration).currentEvmNetworkKey) {
+        value.currentNetworkKey = (value as AuthUrlInfoNeedMigration).currentEvmNetworkKey;
         needUpdateAuthList = true;
       }
 
@@ -164,6 +169,18 @@ export default class AuthRequestHandler {
       }
     }
 
+    if (options.accessType === 'cardano') {
+      const cardanoChains = Object.values(chainInfoMaps).filter(_isChainCardanoCompatible);
+
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : cardanoChains.find((chain) => chainStateMap[chain.slug]?.active)) || cardanoChains[0];
+
+      if (options.autoActive) {
+        if (!needEnableChains.includes(chainInfo?.slug)) {
+          needEnableChains.push(chainInfo?.slug);
+        }
+      }
+    }
+
     needEnableChains = needEnableChains.filter((slug) => !chainStateMap[slug]?.active);
     needEnableChains.length > 0 && this.#chainService.enableChains(needEnableChains);
 
@@ -172,6 +189,8 @@ export default class AuthRequestHandler {
 
   private authCompleteV2 = (id: string, url: string, resolve: (result: boolean) => void, reject: (error: Error) => void): Resolver<ResultResolver> => {
     const isAllowedMap = this.getAddressList();
+
+    console.log(isAllowedMap);
 
     const complete = (result: boolean | Error, cb: () => void, accounts?: string[]) => {
       const isAllowed = result === true;
@@ -211,6 +230,10 @@ export default class AuthRequestHandler {
               return true;
             }
 
+            if (isCardanoAddress(a) && !accountAuthTypes.includes('cardano')) {
+              return true;
+            }
+
             return false;
           });
 
@@ -223,6 +246,12 @@ export default class AuthRequestHandler {
 
       if (accountAuthTypes.includes('evm')) {
         const chainInfo = this.getDAppChainInfo({ accessType: 'evm', autoActive: true, url });
+
+        defaultEvmNetworkKey = chainInfo?.slug;
+      }
+
+      if (accountAuthTypes.includes('cardano')) {
+        const chainInfo = this.getDAppChainInfo({ accessType: 'cardano', autoActive: true, url });
 
         defaultEvmNetworkKey = chainInfo?.slug;
       }
@@ -253,7 +282,7 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentEvmNetworkKey: existed ? existed.currentEvmNetworkKey : defaultEvmNetworkKey
+          currentNetworkKey: existed ? existed.currentNetworkKey : defaultEvmNetworkKey
         };
 
         this.setAuthorize(authorizeList, () => {
@@ -362,6 +391,8 @@ export default class AuthRequestHandler {
           list.push(...allowedListByRequestType.filter((a) => isSubstrateAddress(a)));
         } else if (accountAuthType === 'ton') {
           list.push(...allowedListByRequestType.filter((a) => isTonAddress(a)));
+        } else if (accountAuthType === 'cardano') {
+          list.push(...allowedListByRequestType.filter((a) => isCardanoAddress(a)));
         }
 
         return list;
@@ -369,7 +400,7 @@ export default class AuthRequestHandler {
 
       if (!confirmAnotherType && !request.reConfirm && allowedListByRequestType.length !== 0) {
         // Prevent appear confirmation popup
-        return false;
+        return true;
       }
     } else {
       // Auto auth for web app

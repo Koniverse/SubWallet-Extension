@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Injected } from '@subwallet/extension-inject/types';
-import type { SendRequest } from './types';
+import type { SendRequest } from '../types';
 
 import Accounts from './Accounts';
 import Metadata from './Metadata';

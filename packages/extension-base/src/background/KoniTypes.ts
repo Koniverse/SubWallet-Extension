@@ -1103,7 +1103,7 @@ export interface TonSignRequest {
 }
 
 export interface CardanoSignRequest {
-  account: AccountJson;
+  address: string;
   hashPayload: string;
   canSign: boolean;
 }
@@ -1129,7 +1129,7 @@ export interface TonSignatureRequest extends TonSignRequest {
 
 export interface CardanoSignatureRequest extends CardanoSignRequest {
   id: string;
-  type: string;
+  errors?: ErrorValidation[];
   payload: unknown
 }
 
@@ -1138,6 +1138,30 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   parseData: EvmTransactionData;
   isToContract: boolean;
   errors?: ErrorValidation[]
+}
+
+// Cardano Request Dapp Input
+export enum CardanoProviderErrorType {
+  INVALID_REQUEST = 'INVALID_REQUEST',
+  REFUSED_REQUEST = 'REFUSED_REQUEST',
+  ACCOUNT_CHANGED = 'ACCOUNT_CHANGED',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  PROOF_GENERATION_FAILED = 'PROOF_GENERATION_FAILED',
+  ADDRESS_SIGN_NOT_PK = 'ADDRESS_SIGN_NOT_PK',
+  SIGN_DATA_DECLINED = 'SIGN_DATA_DECLINED',
+  SUBMIT_TRANSACTION_REFUSED = 'SUBMIT_TRANSACTION_REFUSED',
+  SUBMIT_TRANSACTION_FAILURE = 'SUBMIT_TRANSACTION_FAILURE',
+  SIGN_TRANSACTION_DECLINED = 'SIGN_TRANSACTION_DECLINED',
+}
+
+export interface RequestCardanoSignData {
+  address: string;
+  payload: string;
+}
+
+export interface ResponseCardanoSignData {
+  signature: string,
+  key: string,
 }
 
 // TODO: add account info + dataToSign
@@ -1214,7 +1238,7 @@ export interface ConfirmationDefinitionsTon {
 }
 
 export interface ConfirmationDefinitionsCardano {
-  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<string>],
+  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<ResponseCardanoSignData>],
   cardanoSendTransactionRequest: [ConfirmationsQueueItem<CardanoSendTransactionRequest>, ConfirmationResult<string>],
   cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
 }
@@ -2294,6 +2318,11 @@ export interface KoniRequestSignatures {
   'evm(events.subscribe)': [RequestEvmEvents, boolean, EvmEvent];
   'evm(request)': [RequestArguments, unknown];
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
+
+  // Cardano
+  'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
+  // 'cardano(sign.tx)': [RequestSignTx, string];
+  // 'cardano(submit.tx)': [RequestSignTxRaw, string];
 
   // Evm Transaction
   'pri(evm.transaction.parse.input)': [RequestParseEvmContractInput, ResponseParseEvmContractInput];
