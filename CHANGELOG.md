@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.26
+Build date: Mar 27, 2025.
+
+Bug fixed:
+- Fixed bug show balance for Polimec (#4058)
+- Fixed bug View explorer for Bittensor (#4058)
+
+
 ## 1.3.25
 Build date: Mar 24, 2025.
 
