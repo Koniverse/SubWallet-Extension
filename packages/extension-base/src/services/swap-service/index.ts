@@ -15,7 +15,7 @@ import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-se
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -82,10 +82,11 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   // deprecated
-  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
-    const result: CommonOptimalPath = {
+  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalSwapPath {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
+      steps: [DEFAULT_FIRST_STEP],
+      path: []
     };
 
     result.totalFee.push({
@@ -102,10 +103,11 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
-  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalPath {
-    const result: CommonOptimalPath = {
+  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalSwapPath {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
+      steps: [DEFAULT_FIRST_STEP],
+      path: []
     };
 
     const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
@@ -136,7 +138,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   }
 
   // deprecated
-  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcess(params);
     } else {
@@ -151,7 +153,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }
   }
 
-  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcessV2(params);
     } else {
@@ -163,6 +165,29 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       } else {
         return this.getDefaultProcessV2(params);
       }
+    }
+  }
+
+  public async generateOptimalProcessWithoutPath (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
+    if (!params.selectedQuote || params.path.length > 0) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    const [path, directSwapRequest] = this.getAvailablePath(params.request);
+
+    if (!directSwapRequest) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    params.path = path;
+
+    const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+    const handler = this.handlers[providerId];
+
+    if (handler) {
+      return handler.generateOptimalProcessV2(params);
+    } else {
+      return this.getDefaultProcessV2(params);
     }
   }
 
@@ -498,8 +523,12 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const providerId = params.selectedQuote.provider.id;
     const handler = this.handlers[providerId];
 
+    if (params.currentStep > 1) { // only validate from the first step
+      return [];
+    }
+
     if (handler) {
-      return handler.validateSwapProcess(params);
+      return handler.validateSwapProcessV2(params);
     } else {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }

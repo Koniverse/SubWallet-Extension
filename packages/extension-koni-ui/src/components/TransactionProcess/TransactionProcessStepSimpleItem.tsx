@@ -6,7 +6,7 @@ import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing, isStepT
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
-import { CheckCircle, ProhibitInset, SpinnerGap } from 'phosphor-react';
+import { CheckCircle, ClockCounterClockwise, ProhibitInset, SpinnerGap } from 'phosphor-react';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -22,9 +22,14 @@ const Component: FC<Props> = (props: Props) => {
           phosphorIcon: CheckCircle,
           weight: 'fill'
         };
-      } else if (isStepFailed(status) || isStepTimeout(status)) {
+      } else if (isStepFailed(status)) {
         return {
           phosphorIcon: ProhibitInset,
+          weight: 'fill'
+        };
+      } else if (isStepTimeout(status)) {
+        return {
+          phosphorIcon: ClockCounterClockwise,
           weight: 'fill'
         };
       } else if (isStepProcessing(status)) {
@@ -140,8 +145,12 @@ export const TransactionProcessStepSimpleItem = styled(Component)<Props>(({ them
       color: token.colorSuccess
     },
 
-    '.__item-left-part.-failed, .__item-left-part.-timeout': {
+    '.__item-left-part.-failed': {
       color: token.colorError
+    },
+
+    '.__item-left-part.-timeout': {
+      color: token.gold
     },
 
     '.__item-right-part': {

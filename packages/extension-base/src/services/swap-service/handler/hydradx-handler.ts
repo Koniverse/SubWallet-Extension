@@ -10,12 +10,12 @@ import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _getTokenMinAmount, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, OptimalSwapPathParams, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
@@ -247,6 +247,94 @@ export class HydradxHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
+  async getXcmStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    // todo: improve this function for Round 2
+
+    const xcmPairInfo = params.path.find((step, i) => i === 0 && step.action === DynamicSwapType.BRIDGE)?.pair;
+
+    if (!xcmPairInfo) {
+      return undefined;
+    }
+
+    const fromTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.from);
+    const toTokenInfo = this.chainService.getAssetBySlug(xcmPairInfo.to);
+    const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+    const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
+
+    if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
+      throw Error('Token and chain not found');
+    }
+
+    try {
+      const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
+
+      const id = getId();
+      const [feeInfo, toTokenBalance] = await Promise.all([
+        this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate'),
+        this.balanceService.getTotalBalance(params.request.address, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
+      ]);
+
+      const xcmTransfer = await createXcmExtrinsic({
+        originTokenInfo: fromTokenInfo,
+        destinationTokenInfo: toTokenInfo,
+        // Mock sending value to get payment info
+        sendingValue: params.request.fromAmount,
+        recipient: params.request.address,
+        substrateApi: substrateApi,
+        sender: params.request.address,
+        originChain: fromChainInfo,
+        destinationChain: toChainInfo,
+        feeInfo
+      });
+
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
+      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
+      const fee: CommonStepFeeInfo = {
+        feeComponent: [{
+          feeType: SwapFeeType.NETWORK_FEE,
+          amount: Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.high).toString(),
+          tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
+        }],
+        defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
+        feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
+      };
+
+      let bnTransferAmount = new BigNumber(params.request.fromAmount);
+
+      // todo: increase transfer amount when XCM local token
+      if (_isNativeToken(fromTokenInfo)) {
+        // xcm fee is paid in native token but swap token is not always native token
+        // add amount of fee into sending value to ensure has enough token to swap
+        const bnXcmFee = new BigNumber(fee.feeComponent[0].amount);
+
+        bnTransferAmount = bnTransferAmount.plus(bnXcmFee);
+      } else {
+        bnTransferAmount = bnTransferAmount.plus(BigNumber(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium));
+      }
+
+      if (BigNumber(toTokenBalance.value).lte(0)) {
+        bnTransferAmount = bnTransferAmount.plus(_getTokenMinAmount(toTokenInfo));
+      }
+
+      const step: BaseStepDetail = {
+        metadata: {
+          sendingValue: bnTransferAmount.toString(),
+          originTokenInfo: fromTokenInfo,
+          destinationTokenInfo: toTokenInfo
+        },
+        name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
+        type: CommonStepType.XCM
+      };
+
+      return [step, fee];
+    } catch (e) {
+      console.error('Error creating xcm step', e);
+
+      return undefined;
+    }
+  }
+
   async getSwapStepV2 (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const { path, request: { fromAmount, slippage }, selectedQuote } = params;
     const swapPairInfo = path.find((step) => step.action === DynamicSwapType.SWAP)?.pair;
@@ -276,7 +364,7 @@ export class HydradxHandler implements SwapBaseInterface {
     return Promise.resolve([submitStep, selectedQuote.feeInfo]);
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getXcmStep.bind(this),
       // this.getFeeOptionStep.bind(this),
@@ -284,7 +372,7 @@ export class HydradxHandler implements SwapBaseInterface {
     ]);
   }
 
-  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     const stepFuncList: GenSwapStepFuncV2[] = params.path.map((step, stepIndex) => {
       if (step.action === DynamicSwapType.SWAP) {
         return this.getSwapStepV2.bind(this);
@@ -499,6 +587,41 @@ export class HydradxHandler implements SwapBaseInterface {
 
     if (xcmSwapXcm) {
       return this.swapBaseHandler.validateXcmSwapXcmV2(params, 2, 1, 3);
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
+
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigNumber(selectedQuote.fromAmount).lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    const actionList = JSON.stringify(process.path.map((step) => step.action));
+    const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+    if (swap) {
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, 1); // todo: create interface for input request
+    }
+
+    if (swapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwap) {
+      return this.swapBaseHandler.validateXcmSwapProcess(params, 2, 1);
+    }
+
+    if (xcmSwapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];

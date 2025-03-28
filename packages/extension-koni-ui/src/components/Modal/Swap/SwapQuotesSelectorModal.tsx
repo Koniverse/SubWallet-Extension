@@ -51,7 +51,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <Button
               block={true}
               className={'__right-button'}
-              disabled={!currentQuote}
+              disabled={!currentQuote || items.length < 2}
               icon={(
                 <Icon
                   phosphorIcon={CheckCircle}
