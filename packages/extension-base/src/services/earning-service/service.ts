@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL, CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL } from '@subwallet/extension-base/constants';
@@ -11,6 +12,7 @@ import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
 import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { createClaimNotification } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
@@ -169,7 +171,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
     });
 
     this.status = ServiceStatus.INITIALIZED;
-
     await this.start();
 
     this.handleActions();
@@ -678,7 +679,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     });
   }
 
-  public async getPoolReward (addresses: string[], callback: (result: EarningRewardItem) => void): Promise<VoidFunction> {
+  public async getPoolReward (addresses: string[], callback: (result: EarningRewardItem, tokenInfo: _ChainAsset) => void): Promise<VoidFunction> {
     let cancel = false;
 
     await this.eventService.waitChainReady;
@@ -735,13 +736,21 @@ export default class EarningService implements StoppableServiceInterface, Persis
       return;
     }
 
-    this.getPoolReward(addresses, (result: EarningRewardItem) => {
+    this.getPoolReward(addresses, (result: EarningRewardItem, tokenInfo: _ChainAsset) => {
       this.updateEarningReward(result);
+
+      const notification = createClaimNotification(result, tokenInfo);
+
+      this.state.inappNotificationService.validateAndWriteNotificationsToDB([notification], result.address).catch(console.error);
     }).catch(console.error);
 
     this.earningsRewardInterval = setInterval(() => {
-      this.getPoolReward(addresses, (result: EarningRewardItem) => {
+      this.getPoolReward(addresses, (result: EarningRewardItem, tokenInfo: _ChainAsset) => {
         this.updateEarningReward(result);
+
+        const notification = createClaimNotification(result, tokenInfo);
+
+        this.state.inappNotificationService.validateAndWriteNotificationsToDB([notification], result.address).catch(console.error);
       }).catch(console.error);
     }, CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL);
   }

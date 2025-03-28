@@ -23,6 +23,7 @@ import { isSubstrateAddress } from '@subwallet/keyring';
 export class InappNotificationService implements CronServiceInterface {
   status: ServiceStatus;
   private refeshAvailBridgeClaimTimeOut: NodeJS.Timeout | undefined;
+  private isLockWrite: boolean;
 
   constructor (
     private readonly dbService: DatabaseService,
@@ -31,6 +32,7 @@ export class InappNotificationService implements CronServiceInterface {
     private readonly chainService: ChainService
   ) {
     this.status = ServiceStatus.NOT_INITIALIZED;
+    this.isLockWrite = false;
   }
 
   async init (): Promise<void> {
@@ -181,26 +183,31 @@ export class InappNotificationService implements CronServiceInterface {
   }
 
   async validateAndWriteNotificationsToDB (notifications: _BaseNotificationInfo[], address: string) {
-    const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
-    const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
-    const passNotifications: _NotificationInfo[] = [];
-    const [comparedNotifications, remindTimeConfig] = await Promise.all([
-      this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
-      await fetchLastestRemindNotificationTime()
-    ]);
+    if (!this.getLockWriteStatus()) {
+      this.setLockWriteStatus(true);
+      const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
+      const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
+      const passNotifications: _NotificationInfo[] = [];
+      const [comparedNotifications, remindTimeConfig] = await Promise.all([
+        this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
+        await fetchLastestRemindNotificationTime()
+      ]);
 
-    for (const candidateNotification of notifications) {
-      candidateNotification.title = candidateNotification.title.replace('{{accountName}}', accountName);
+      for (const candidateNotification of notifications) {
+        candidateNotification.title = candidateNotification.title.replace('{{accountName}}', accountName);
 
-      if (this.passValidateNotification(candidateNotification, comparedNotifications, remindTimeConfig)) {
-        passNotifications.push({
-          ...candidateNotification,
-          proxyId
-        });
+        if (this.passValidateNotification(candidateNotification, comparedNotifications, remindTimeConfig)) {
+          passNotifications.push({
+            ...candidateNotification,
+            proxyId
+          });
+        }
       }
-    }
 
-    await this.dbService.upsertNotifications(passNotifications);
+      await this.dbService.upsertNotifications(passNotifications);
+
+      this.setLockWriteStatus(false);
+    }
   }
 
   cronCreateBridgeClaimNotification () {
@@ -521,5 +528,13 @@ export class InappNotificationService implements CronServiceInterface {
 
   migrateNotificationProxyId (proxyIds: string[], newProxyId: string, newName: string) {
     this.dbService.updateNotificationProxyId(proxyIds, newProxyId, newName);
+  }
+
+  getLockWriteStatus () {
+    return this.isLockWrite;
+  }
+
+  setLockWriteStatus (status: boolean) {
+    this.isLockWrite = status;
   }
 }
