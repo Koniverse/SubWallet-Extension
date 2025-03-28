@@ -66,6 +66,7 @@ const Component: FC<Props> = (props: Props) => {
       className={className}
     >
       <SwapTransactionBlock
+        className={'__swap-transaction-block'}
         fromAmount={data.quote.fromAmount}
         fromAssetSlug={originSwapPair?.from}
         logoSize={36}
@@ -110,7 +111,7 @@ export const Swap = styled(Component)<Props>(({ theme: { token } }: Props) => {
     borderRadius: token.borderRadiusLG,
     paddingBottom: token.padding,
 
-    '.swap-confirmation-container': {
+    '.__swap-transaction-block': {
       '.__summary-quote': {
         marginBottom: token.marginXS
       },
