@@ -232,7 +232,7 @@ export function calculateTernoaValidatorReturn (rewardPerValidator: number, vali
   return stakeRatio * 365 * 100;
 }
 
-export async function calculateAnalogChainStakedReturn () {
+export async function calculateAnalogChainStakedReturn (): Promise<number | undefined> {
   const url = 'https://explorer-api.analog.one/api/nominations?projection=apy,rewardsClaimed,eraEndsTime';
 
   try {
@@ -249,9 +249,13 @@ export async function calculateAnalogChainStakedReturn () {
       throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
-    const apyInfo = await response.json();
+    const apyInfo = await response.json() as {
+      data: {
+        apy: number;
+      }
+    };
 
-    return apyInfo?.data?.apy || undefined;
+    return apyInfo?.data?.apy as number | undefined;
   } catch (e) {
     console.error('Fetch error:', e);
 
