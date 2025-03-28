@@ -7,15 +7,17 @@ import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/backgro
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { t } from 'i18next';
 
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import { TestnetBittensorDelegateInfo } from './dtao';
+import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -589,6 +591,22 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
 
+  public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldJoin(data, path);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    const { amount } = data;
+
+    if (new BN(amount).lt(new BN(DEFAULT_DTAO_MINBOND))) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+    }
+
+    return baseErrors;
+  }
+
   /* Join pool action */
 
   /* Leave pool action */
@@ -605,6 +623,26 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, 0, binaryAmount);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
+  }
+
+  public override async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldLeave(amount, address, fastLeave, selectedTarget, slug);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    if (!poolInfo) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
+    }
+
+    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+
+    if (new BigN(amount).lt(bnMinUnstake)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t`Insufficient unstake. You need to unstake at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`)];
+    }
+
+    return baseErrors;
   }
 
   /* Leave pool action */
