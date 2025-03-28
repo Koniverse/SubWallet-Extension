@@ -12,7 +12,7 @@ import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTEN
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
+import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
@@ -76,6 +76,7 @@ const Component: React.FC = () => {
   const currentValidator = useWatchTransaction('validator', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const fastLeaveValue = useWatchTransaction('fastLeave', form, defaultData);
+  const amountValue = useWatchTransaction('value', form, defaultData);
 
   const { list: allPositions } = useYieldPositionDetail(slug);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
@@ -91,6 +92,45 @@ const Component: React.FC = () => {
         return poolInfo.metadata.inputAsset;
     }
   }, [poolInfo]);
+
+  // For subnet staking
+
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [maxSlippage] = useState<number>(0.005);
+
+  useEffect(() => {
+    if (!isSubnetStaking) {
+      return;
+    }
+
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+    const data = {
+      slug: poolInfo.slug,
+      value: amountValue,
+      netuid: netuid,
+      type: ExtrinsicType.STAKING_UNBOND
+    };
+
+    getEarningSlippage(data)
+      .then((result) => {
+        console.log('Actual unstake slippage:', result * 100);
+        setEarningSlippage(result);
+      })
+      .catch((error) => {
+        console.error('Error fetching earning slippage:', error);
+      });
+  }, [amountValue, isSubnetStaking, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
+
+  const isSlippageAcceptable = useMemo(() => {
+    if (earningSlippage === null || !amountValue) {
+      return true;
+    }
+
+    return earningSlippage <= maxSlippage;
+  }, [amountValue, earningSlippage, maxSlippage]);
+
+  // For subnet staking
 
   const bondedAsset = useGetChainAssetInfo(bondedSlug || poolInfo.metadata.inputAsset);
   const decimals = bondedAsset?.decimals || 0;
@@ -281,10 +321,13 @@ const Component: React.FC = () => {
         bondedBalance={bondedValue}
         className={'bonded-balance'}
         decimals={decimals}
+        isSlippageAcceptable={isSlippageAcceptable}
+        isSubnetStaking={isSubnetStaking}
+        maxSlippage={maxSlippage}
         symbol={symbol}
       />
     );
-  }, [bondedValue, decimals, symbol]);
+  }, [bondedValue, decimals, symbol, isSlippageAcceptable, maxSlippage, isSubnetStaking]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -477,6 +520,14 @@ const Component: React.FC = () => {
                           />
                         );
                       })}
+                      {!isSlippageAcceptable && (
+                        <AlertBox
+                          className='__instruction-item'
+                          description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
+                          title='Slippage too high!'
+                          type='error'
+                        />
+                      )}
                     </>
                   )
                   : (
@@ -502,7 +553,7 @@ const Component: React.FC = () => {
       <TransactionFooter>
         {/* todo: recheck action type, it may not work as expected any more */}
         <Button
-          disabled={isDisable || !isBalanceReady}
+          disabled={isDisable || !isBalanceReady || !isSlippageAcceptable}
           icon={(
             <Icon
               phosphorIcon={MinusCircle}
