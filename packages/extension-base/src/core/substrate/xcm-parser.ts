@@ -158,7 +158,7 @@ export function _isPosBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _Ch
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-function _getMultiLocationParent (originChainInfo: _ChainInfo, isWithinSameConsensus: boolean): number {
+export function _getMultiLocationParent (originChainInfo: _ChainInfo, isWithinSameConsensus: boolean): number {
   let parent = 0; // how many hops up the hierarchy
 
   if (_isSubstrateParaChain(originChainInfo)) {
@@ -172,7 +172,7 @@ function _getMultiLocationParent (originChainInfo: _ChainInfo, isWithinSameConse
   return parent;
 }
 
-function _getMultiLocationInterior (destChainInfo: _ChainInfo, isWithinSameConsensus: boolean, version: number, recipient?: _Address): unknown {
+export function _getMultiLocationInterior (destChainInfo: _ChainInfo, isWithinSameConsensus: boolean, version: number, recipient?: _Address): unknown {
   const junctions: unknown[] = [];
 
   if (isWithinSameConsensus) {
@@ -246,7 +246,7 @@ function _getGlobalConsensusJunction (destChainInfo: _ChainInfo, version: number
   }
 }
 
-function _getRecipientLocation (destChainInfo: _ChainInfo, recipient: _Address, version: number) {
+export function _getRecipientLocation (destChainInfo: _ChainInfo, recipient: _Address, version: number) {
   const network = _getNetworkByVersion(version);
 
   if (destChainInfo.slug === COMMON_CHAIN_SLUGS.ASTAR_EVM) {
@@ -262,7 +262,7 @@ function _getRecipientLocation (destChainInfo: _ChainInfo, recipient: _Address, 
   return { AccountId32: { network, id: decodeAddress(recipient) } };
 }
 
-function _getAssetIdentifier (tokenInfo: _ChainAsset, version: number) {
+export function _getAssetIdentifier (tokenInfo: _ChainAsset, version: number) {
   const _assetIdentifier = _getXcmAssetMultilocation(tokenInfo);
 
   if (!_assetIdentifier) {
