@@ -1471,5 +1471,9 @@
   "Max fee per gas must be higher than {{min}} GWEI": "",
   "This network is currently not supported": "",
   "Subnet staking": "",
-  "Subnet": ""
+  "Subnet": "",
+  "Destination chain is not active": "",
+  "You can't receive less than {{number}} {{symbol}}": "",
+  "Timeout": "",
+  "Sender available balance": ""
 }
