@@ -26,15 +26,36 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
         currentAccountProxy.accounts.map(({ address }) => reformatAddress(address, 0))
       );
 
-      return yieldPositions.filter((info) => {
+      const rs: YieldPositionInfo[] = [];
+
+      for (const info of yieldPositions) {
         const isChainValid = chainsByAccountType.includes(info.chain);
+
+        if (!isChainValid) {
+          continue;
+        }
+
         const havePool = !!poolInfoMap[info.slug];
+
+        if (!havePool) {
+          continue;
+        }
+
         const haveStake = new BigN(info.totalStake).gt(0);
+
+        if (!haveStake) {
+          continue;
+        }
+
         const formatedAddress = reformatAddress(info.address, 0);
         const isSameAddress = accountAddresses.has(formatedAddress);
 
-        return isChainValid && havePool && haveStake && isSameAddress;
-      });
+        if (isSameAddress) {
+          rs.push(info);
+        }
+      }
+
+      return rs;
     }
 
     const raw: Record<string, YieldPositionInfo[]> = {};
