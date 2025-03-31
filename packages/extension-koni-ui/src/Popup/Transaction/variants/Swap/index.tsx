@@ -10,8 +10,7 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getLastAmountFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -22,7 +21,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SW
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { getLatestSwapQuote, getOptimalProcessOnSelectQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -184,7 +183,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
-  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
+  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
 
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
@@ -444,7 +443,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     form.setFieldValue('toTokenSlug', tokenSlug);
   }, [form]);
 
-  const handleGenerateOptimalProcess = useCallback(
+  const generateOptimalProcessOnSelectQuote = useCallback(
     async (quote: SwapQuote) => {
       try {
         const currentRequest: SwapRequest = {
@@ -458,10 +457,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
         const optimalRequest = {
           request: currentRequest,
-          selectedQuote: quote
+          selectedQuote: quote,
+          path: []
         };
 
-        return await generateOptimalProcess(optimalRequest);
+        return await getOptimalProcessOnSelectQuote(optimalRequest);
       } catch (error) {
         console.error('generateOptimalProcess failed:', error);
 
@@ -473,7 +473,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      const processResult = await handleGenerateOptimalProcess(quote);
+      const processResult = await generateOptimalProcessOnSelectQuote(quote);
 
       if (!processResult) {
         return;
@@ -503,7 +503,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         };
       });
     },
-    [handleGenerateOptimalProcess]
+    [generateOptimalProcessOnSelectQuote]
   );
 
   const onChangeAmount = useCallback((value: string) => {
@@ -620,7 +620,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               address: from,
               process: currentOptimalSwapPath,
               selectedQuote: currentQuote,
-              currentStep: 1,
+              currentStep: 0,
               recipient // Need to assign format address with toChainInfo in case there's no recipient
             });
 

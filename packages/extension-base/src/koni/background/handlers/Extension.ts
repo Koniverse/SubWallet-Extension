@@ -324,7 +324,6 @@ export default class KoniExtension {
       responseData.accounts = transformedAccounts?.length ? [combineAllAccountProxy(transformedAccounts), ...transformedAccounts] : [];
       responseData.currentAccountProxy = currentAccount?.proxyId;
 
-      console.debug('subscriptionAccountGroups', responseData);
       cb(responseData);
     });
 
