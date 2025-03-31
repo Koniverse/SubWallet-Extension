@@ -11,10 +11,9 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { ChainflipSwapTxData, OptimalSwapPathParams, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -36,6 +35,11 @@ interface DepositAddressResponse {
   explorerUrl: string;
   channelOpeningFee: number;
   channelOpeningFeeNative: string;
+}
+
+interface ChainFlipMetadata {
+  srcChain: string;
+  destChain: string;
 }
 
 export class ChainflipSwapHandler implements SwapBaseInterface {
@@ -134,9 +138,22 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
+    const processMetadata = params.process.steps[params.currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
+    const quoteMetadata = params.quote.metadata as ChainFlipMetadata;
+
+    if (!processMetadata || !quoteMetadata) {
+      throw new Error('Metadata for Chainflip not found');
+    }
+
+    if (processMetadata.destChain !== quoteMetadata.destChain || processMetadata.srcChain !== quoteMetadata.srcChain) {
+      throw new Error('Metadata for Chainflip not found');
+    }
+
     const depositParams = {
+      sourceChain: processMetadata.srcChain,
       destinationAddress: receiver,
       destinationAsset: toAssetId,
+      destinationChain: processMetadata.destChain,
       minimumPrice: minReceive, // minimum accepted price for swaps through the channel
       refundAddress: address, // address to which assets are refunded
       retryDurationInBlocks: '100', // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
@@ -149,6 +166,10 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     });
 
     const data = await response.json() as DepositAddressResponse;
+
+    if (!data.id || !data.address || data.address === '' || !data.issuedBlock || !data.network || !data.channelId) {
+      throw new Error('Error get Chainflip data');
+    }
 
     const depositChannelId = `${data.issuedBlock}-${data.network}-${data.channelId}`;
     const depositAddress = data.address;
@@ -239,21 +260,82 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (params.selectedQuote) {
-      const submitStep = {
-        name: 'Swap',
-        type: SwapStepType.SWAP
-      };
+    const metadata = params.selectedQuote?.metadata as ChainFlipMetadata;
 
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    if (!params.selectedQuote) {
+      return Promise.resolve(undefined);
     }
 
-    return Promise.resolve(undefined);
+    if (!metadata || !metadata.srcChain || !metadata.destChain) {
+      return Promise.resolve(undefined);
+    }
+
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      metadata: {
+        sendingValue: params.request.fromAmount.toString(),
+        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
+
+        srcChain: metadata.srcChain,
+        destChain: metadata.destChain
+      }
+    };
+
+    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getSubmitStep.bind(this)
     ]);
+  }
+
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
+    return this.swapBaseHandler.generateOptimalProcessV2(params, [
+      this.getSubmitStep.bind(this)
+    ]);
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
+
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigNumber(selectedQuote.fromAmount).lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    const actionList = JSON.stringify(process.path.map((step) => step.action));
+    const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP); // todo
+
+    if (swapIndex <= -1) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (swap) {
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex); // todo: create interface for input request
+    }
+
+    if (swapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwap) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
   }
 }

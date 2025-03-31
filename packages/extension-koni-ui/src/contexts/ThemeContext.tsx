@@ -200,6 +200,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.ant-badge.g-filter-badge': {
+      '.ant-badge-dot.ant-badge-dot': {
+        width: 8,
+        height: 8,
+        transform: 'none',
+        top: 'auto',
+        bottom: 4,
+        right: 3
+      }
+    },
+
     '.form-row': {
       display: 'flex',
       gap: token.sizeSM,
