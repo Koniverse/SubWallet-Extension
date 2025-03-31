@@ -5,7 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
-import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -116,7 +116,7 @@ export class UniswapHandler implements SwapBaseInterface {
     return this.swapBaseHandler.providerInfo;
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getApprovalStep.bind(this),
       this.getPermitStep.bind(this),
@@ -124,8 +124,8 @@ export class UniswapHandler implements SwapBaseInterface {
     ]);
   }
 
-  generateOptimalProcessV2 (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
-    return this.swapBaseHandler.generateOptimalProcess(params, [
+  generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
+    return this.swapBaseHandler.generateOptimalProcessV2(params, [
       this.getApprovalStep.bind(this),
       this.getPermitStep.bind(this),
       this.getSubmitStep.bind(this)
@@ -200,84 +200,20 @@ export class UniswapHandler implements SwapBaseInterface {
 
   async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
-      const submitStep = {
+      const submitStep: BaseStepDetail = {
         name: 'Swap',
-        type: SwapStepType.SWAP
+        type: SwapStepType.SWAP,
+        metadata: {
+          sendingValue: params.request.fromAmount.toString(),
+          originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
+          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
+        }
       };
 
       return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
     }
 
     return Promise.resolve(undefined);
-  }
-
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigInt(amount);
-
-    if (bnAmount <= BigInt(0)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')]);
-    }
-
-    let isXcmOk = false;
-
-    for (const [index, step] of params.process.steps.entries()) {
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.TOKEN_APPROVAL:
-            return Promise.resolve([]);
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
-    }
-
-    return [];
-  }
-
-  // just duplicate the validateSwapProcess
-  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigInt(amount);
-
-    if (bnAmount <= BigInt(0)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')]);
-    }
-
-    let isXcmOk = false;
-
-    for (const [index, step] of params.process.steps.entries()) {
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.TOKEN_APPROVAL:
-            return Promise.resolve([]);
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
-    }
-
-    return [];
   }
 
   public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
@@ -455,5 +391,46 @@ export class UniswapHandler implements SwapBaseInterface {
       chainType: ChainType.EVM,
       isPermit: true
     };
+  }
+
+  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    // todo: recheck address and recipient format in params
+    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
+
+    // todo: validate path with optimalProcess
+    // todo: review error message in case many step swap
+    if (BigNumber(selectedQuote.fromAmount).lte(0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+    }
+
+    const actionList = JSON.stringify(process.path.map((step) => step.action));
+    const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP); // todo
+
+    if (swapIndex <= -1) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (swap) {
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex); // todo: create interface for input request
+    }
+
+    if (swapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwap) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (xcmSwapXcm) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
   }
 }

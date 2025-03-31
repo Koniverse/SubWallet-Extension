@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 1.3.26
+Build date: Mar 27, 2025.
+
+Bug fixed:
+- Fixed bug show balance for Polimec (#4058)
+- Fixed bug View explorer for Bittensor (#4058)
+
+
+## 1.3.25
+Build date: Mar 24, 2025.
+
+Features & Update:
+- Support dTAO staking (#4036)
+- Integrate Meld All in One Wizard (#4085)
+
+Bug fixed:
+- Fixed bug integrating Wagmi into SubWallet (#4086)
+
+
 ## 1.3.24
 Build date: Mar 18, 2025.
 

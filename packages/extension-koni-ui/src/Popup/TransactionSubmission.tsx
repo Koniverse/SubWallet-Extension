@@ -11,7 +11,7 @@ import { isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subw
 import { PageIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
-import { CheckCircle, ProhibitInset, SpinnerGap } from 'phosphor-react';
+import { CheckCircle, ClockCounterClockwise, ProhibitInset, SpinnerGap } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -116,8 +116,12 @@ const Component: React.FC<Props> = (props: Props) => {
       return CheckCircle;
     }
 
-    if (isStepFailed(processData?.status) || isStepTimeout(processData?.status)) {
+    if (isStepFailed(processData?.status)) {
       return ProhibitInset;
+    }
+
+    if (isStepTimeout(processData?.status)) {
+      return ClockCounterClockwise;
     }
 
     return SpinnerGap;
