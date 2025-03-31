@@ -84,6 +84,7 @@ import { assert, hexStripPrefix, hexToU8a, isAscii, isHex, noop, u8aToHex } from
 import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
 import { getSuitableRegistry, RegistrySource, setupApiRegistry, setupDappRegistry, setupDatabaseRegistry } from '../utils';
+import { dryRunXcm } from "@subwallet/extension-base/services/balance-service/transfer/xcm/utils";
 
 export function isJsonPayload (value: SignerPayloadJSON | SignerPayloadRaw): value is SignerPayloadJSON {
   return (value as SignerPayloadJSON).genesisHash !== undefined;
@@ -1607,6 +1608,14 @@ export default class KoniExtension {
       };
 
       extrinsic = await funcCreateExtrinsic(params);
+
+      const dryRunResult = await dryRunXcm(params);
+
+      console.log('dryRunResult', dryRunResult);
+
+      if (!dryRunResult?.success) {
+        throw new Error('Not safe extrinsic!');
+      }
 
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {
         const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;

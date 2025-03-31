@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -16,7 +17,8 @@ export const XCM_VERSION = {
 const paraSpellEndpoint = 'https://api.lightspell.xyz';
 
 export const paraSpellApi = {
-  buildXcm: `${paraSpellEndpoint}/x-transfer`
+  buildXcm: `${paraSpellEndpoint}/x-transfer`,
+  dryRunXcm: `${paraSpellEndpoint}/dry-run`
 };
 
 export const paraSpellKey = process.env.PARASPELL_API_KEY || '';
@@ -105,6 +107,37 @@ export function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Subm
     return decoded;
   } catch (e) {
     console.error('Unable to decode tx hex', e);
+
+    return undefined;
+  }
+}
+
+export async function dryRunXcm ({ destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue }: CreateXcmExtrinsicProps) {
+  try {
+    const bodyData = {
+      senderAddress: sender,
+      address: recipient,
+      from: lightSpellChainMapping[originChain.slug],
+      to: lightSpellChainMapping[destinationChain.slug],
+      currency: {
+        symbol: originTokenInfo.symbol,
+        amount: sendingValue
+      }
+    };
+
+    const response = await fetch(paraSpellApi.dryRunXcm, {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-API-KEY': paraSpellKey
+      }
+    });
+
+    return await response.json() as { success: boolean, fee: string };
+  } catch (e) {
+    console.error('Unable to dry run', e);
 
     return undefined;
   }
