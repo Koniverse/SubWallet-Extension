@@ -237,6 +237,10 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   private async init (): Promise<void> {
     try {
+      if (this.isInit || !this.substrateApi) {
+        return;
+      }
+
       const substrateApi = await this.substrateApi.isReady;
       const dynamicInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as DynamicInfo[] | undefined;
       const subnetsInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getSubnetsInfoV2()).toJSON() as SubnetsInfo[] | undefined;
@@ -283,9 +287,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     let cancel = false;
 
@@ -402,9 +404,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   override async subscribePoolPosition (useAddresses: string[], rsCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
@@ -606,9 +606,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     if (this.chain === 'bittensor') {
       return this.getMainnetPoolTargets();
@@ -692,8 +690,12 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(new BigN(price[netuid as number]));
 
-    if (new BigN(amount).lt(minUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formatNumber(minUnstake, _getAssetDecimals(this.nativeToken))} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`))];
+    console.log('minUnstake', minUnstake.dividedBy(10 ** _getAssetDecimals(this.nativeToken)).toString());
+
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigNumber.ROUND_CEIL).dividedBy(1000);
+
+    if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formattedMinUnstake.toString()} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`))];
     }
 
     return baseErrors;
