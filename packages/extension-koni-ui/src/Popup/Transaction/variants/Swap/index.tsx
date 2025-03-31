@@ -1284,7 +1284,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('Swap balance')}:`}
+                  label={`${t('Available balance')}`}
+                  labelTooltip={'Available balance for swap'}
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>
