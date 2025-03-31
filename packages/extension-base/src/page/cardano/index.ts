@@ -79,7 +79,9 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
   //   return this;
   // }
 
-  isEnable (): Promise<boolean> {
-    return Promise.resolve(true);
+  async isEnable (): Promise<boolean> {
+    const accountList = await this.sendMessage('pub(accounts.list)', { accountAuthType: 'cardano' });
+
+    return accountList.length > 0;
   }
 }

@@ -1158,9 +1158,16 @@ export interface RequestCardanoSignData {
   payload: string;
 }
 
+export type Cbor = string;
+
+export interface RequestCardanoSignTx {
+  tx: Cbor;
+  partialSign: boolean
+}
+
 export interface ResponseCardanoSignData {
-  signature: string,
-  key: string,
+  signature: Cbor,
+  key: Cbor,
 }
 
 // TODO: add account info + dataToSign
@@ -2313,7 +2320,7 @@ export interface KoniRequestSignatures {
 
   // Cardano
   'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
-  // 'cardano(sign.tx)': [RequestSignTx, string];
+  'cardano(sign.tx)': [RequestCardanoSignTx, Cbor];
   // 'cardano(submit.tx)': [RequestSignTxRaw, string];
 
   // Evm Transaction
