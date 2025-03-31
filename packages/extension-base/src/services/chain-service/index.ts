@@ -12,7 +12,7 @@ import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-
 import { TonChainHandler } from '@subwallet/extension-base/services/chain-service/handler/TonChainHandler';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
@@ -719,6 +719,7 @@ export class ChainService {
     await this.initApis();
     await this.initAssetSettings();
     await this.autoEnableTokens();
+    await this.enablePopularTokens();
   }
 
   initAssetRefMap () {
@@ -791,6 +792,29 @@ export class ChainService {
         }
       } else {
         if (originChain === 'avail_mainnet') {
+          await this.updateAssetSetting(assetSlug, { visible: true });
+        }
+      }
+    }
+  }
+
+  async enablePopularTokens () {
+    const assetSettings = this.assetSettingSubject.value;
+    const chainStateMap = this.getChainStateMap();
+    const priorityTokensMap = this.priorityTokensSubject.value || {};
+
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
+      : [];
+
+    for (const assetSlug of priorityTokensList) {
+      const assetState = assetSettings[assetSlug];
+      const assetInfo = this.getAssetBySlug(assetSlug);
+
+      const chainState = chainStateMap[assetInfo.originChain];
+
+      if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
+        if (!chainState || !chainState.manualTurnOff) {
           await this.updateAssetSetting(assetSlug, { visible: true });
         }
       }
@@ -2077,7 +2101,9 @@ export class ChainService {
     const assetsByChain = this.getFungibleTokensByChain(chainSlug);
     const priorityTokensMap = this.priorityTokensSubject.value || {};
 
-    const priorityTokensList = Object.keys(priorityTokensMap.token);
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
+      : [];
 
     for (const asset of Object.values(assetsByChain)) {
       if (visible) {

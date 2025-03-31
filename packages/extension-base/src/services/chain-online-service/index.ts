@@ -153,6 +153,12 @@ export class ChainOnlineService {
             })
             .catch(console.error);
 
+          this.chainService.enablePopularTokens()
+            .then(() => {
+              this.eventService.emit('asset.updateState', '');
+            })
+            .catch(console.error);
+
           this.chainService.setChainStateMap(currentChainStateMap);
           this.chainService.subscribeChainStateMap().next(currentChainStateMap);
 
