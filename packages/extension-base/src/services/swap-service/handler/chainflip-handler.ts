@@ -11,9 +11,8 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -87,41 +86,6 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     } else {
       return INTERMEDIARY_MAINNET_ASSET_SLUG;
     }
-  }
-
-  // just duplicate the validateSwapProcess
-  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = new BigNumber(amount);
-
-    if (bnAmount.lte(0)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
-    }
-
-    let isXcmOk = false;
-
-    for (const [index, step] of params.process.steps.entries()) {
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.TOKEN_APPROVAL:
-            return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
-    }
-
-    return [];
   }
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {

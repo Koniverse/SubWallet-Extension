@@ -5,15 +5,13 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
-import { _validateBalanceToSwapOnAssetHub, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _getTokenMinAmount, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams, XcmStepPosition } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParams, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams, XcmStepPosition } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 
@@ -443,42 +441,6 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     }
   }
 
-  async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    // todo: recheck address and recipient format in params
-    const { process, selectedQuote } = params; // todo: review flow, currentStep param.
-
-    // todo: validate path with optimalProcess
-    // todo: review error message in case many step swap
-    if (BigN(selectedQuote.fromAmount).lte(0)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
-    }
-
-    const actionList = process.steps.map((step) => step.type);
-    const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
-    const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
-    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
-    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
-    const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
-
-    if (swap) {
-      return this.swapBaseHandler.validateSwapV2(params, 1); // todo: create interface for input request
-    }
-
-    if (swapXcm) {
-      return this.swapBaseHandler.validateSwapXcmV2(params, 1, 2);
-    }
-
-    if (xcmSwap) {
-      return this.swapBaseHandler.validateXcmSwapV2(params, 2, 1);
-    }
-
-    if (xcmSwapXcm) {
-      return this.swapBaseHandler.validateXcmSwapXcmV2(params, 2, 1, 3);
-    }
-
-    return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-  }
-
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     // todo: recheck address and recipient format in params
     const { process, selectedQuote } = params; // todo: review flow, currentStep param.
@@ -489,12 +451,11 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
-    const actionList = process.steps.map((step) => step.type);
-    const [firstStep, secondStep, thirdStep, fourthStep, fifthStep] = actionList;
-    const swap = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && !thirdStep;
-    const swapXcm = firstStep === CommonStepType.DEFAULT && secondStep === SwapStepType.SWAP && thirdStep === CommonStepType.XCM && !fourthStep;
-    const xcmSwap = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && !fourthStep;
-    const xcmSwapXcm = firstStep === CommonStepType.DEFAULT && secondStep === CommonStepType.XCM && thirdStep === SwapStepType.SWAP && fourthStep === CommonStepType.XCM && !fifthStep;
+    const actionList = JSON.stringify(process.path.map((step) => step.action));
+    const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
 
     if (swap) {
       return this.swapBaseHandler.validateSwapOnlyProcess(params, 1); // todo: create interface for input request

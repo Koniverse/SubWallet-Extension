@@ -520,7 +520,7 @@ export class HydradxHandler implements SwapBaseInterface {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
-    const actionList = JSON.stringify(process.path[0].map((step) => step.action));
+    const actionList = JSON.stringify(process.path.map((step) => step.action));
     const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
     const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
     const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);

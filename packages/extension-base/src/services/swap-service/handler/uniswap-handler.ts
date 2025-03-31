@@ -4,9 +4,8 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
-import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -215,41 +214,6 @@ export class UniswapHandler implements SwapBaseInterface {
     }
 
     return Promise.resolve(undefined);
-  }
-
-  // just duplicate the validateSwapProcess
-  public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigInt(amount);
-
-    if (bnAmount <= BigInt(0)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')]);
-    }
-
-    let isXcmOk = false;
-
-    for (const [index, step] of params.process.steps.entries()) {
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.TOKEN_APPROVAL:
-            return Promise.resolve([]);
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
-      };
-
-      const errors = await getErrors();
-
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
-    }
-
-    return [];
   }
 
   public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
