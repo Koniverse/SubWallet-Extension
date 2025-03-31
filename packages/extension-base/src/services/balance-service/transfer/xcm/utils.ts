@@ -3,6 +3,11 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 
+import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
+import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
+
 export const XCM_VERSION = {
   V3: 'V3',
   V4: 'V4'
@@ -41,6 +46,69 @@ export const lightSpellChainMapping: Record<string, string> = {
   polkadot: 'Polkadot',
   kusama: 'Kusama'
 };
+
+export function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
+  try {
+    assert(isHex(hex), 'Expected a hex-encoded call');
+
+    let extrinsicCall: Call;
+    let extrinsicPayload: ExtrinsicPayload | null = null;
+    let decoded: SubmittableExtrinsic<'promise'> | null = null;
+
+    try {
+      // attempt to decode with api.tx
+      const tx = api.tx(hex);
+
+      // ensure that the full data matches here
+      assert(tx.toHex() === hex, 'Cannot decode data as extrinsic, length mismatch');
+
+      decoded = tx;
+      extrinsicCall = api.createType('Call', decoded.method);
+    } catch {
+      try {
+        // attempt to decode as Call
+        extrinsicCall = api.createType('Call', hex);
+
+        const callHex = extrinsicCall.toHex();
+
+        if (callHex === hex) {
+          // ok
+        } else if (hex.startsWith(callHex)) {
+          // this could be an un-prefixed payload...
+          const prefixed = u8aConcat(compactToU8a(extrinsicCall.encodedLength), hex);
+
+          extrinsicPayload = api.createType('ExtrinsicPayload', prefixed);
+
+          assert(u8aEq(extrinsicPayload.toU8a(), prefixed), 'Unable to decode data as un-prefixed ExtrinsicPayload');
+
+          extrinsicCall = api.createType('Call', extrinsicPayload.method.toHex());
+        } else {
+          console.error('Unable to decode data as Call, length mismatch in supplied data');
+        }
+      } catch {
+        // final attempt, we try this as-is as a (prefixed) payload
+        extrinsicPayload = api.createType('ExtrinsicPayload', hex);
+
+        assert(extrinsicPayload.toHex() === hex, 'Unable to decode input data as Call, Extrinsic or ExtrinsicPayload');
+
+        extrinsicCall = api.createType('Call', extrinsicPayload.method.toHex());
+      }
+    }
+
+    const { method, section } = api.registry.findMetaCall(extrinsicCall.callIndex);
+    const extrinsicFn = api.tx[section][method];
+
+    if (!decoded) {
+      decoded = extrinsicFn(...extrinsicCall.args);
+    }
+
+    return decoded;
+  } catch (e) {
+    console.error('Unable to decode tx hex', e);
+
+    return undefined;
+  }
+}
 
 // todo: remove
 export const STABLE_XCM_VERSION = 3;
