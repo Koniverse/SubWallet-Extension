@@ -1330,13 +1330,15 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     '.__alert-box': {
       marginTop: token.marginSM
     },
+
     '.__subnet-wrapper': {
       display: 'flex',
       alignItems: 'center',
       gap: token.sizeXS,
       minWidth: 0
     },
-    // TODO: recheck with orther UI
+
+    // TODO: recheck with other UI
     '.__max-slippage': {
       display: 'flex',
       alignItems: 'center',
