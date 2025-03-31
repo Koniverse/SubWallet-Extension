@@ -34,7 +34,7 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -1585,7 +1585,7 @@ export default class KoniExtension {
         funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
         type = 'substrate';
       } else {
-        funcCreateExtrinsic = createXcmExtrinsic;
+        funcCreateExtrinsic = createXcmExtrinsicV2;
         type = 'substrate';
       }
 

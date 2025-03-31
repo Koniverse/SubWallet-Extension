@@ -3,8 +3,49 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 
+export const XCM_VERSION = {
+  V3: 'V3',
+  V4: 'V4'
+};
+
+const paraSpellEndpoint = 'https://api.lightspell.xyz';
+
+export const paraSpellApi = {
+  buildXcm: `${paraSpellEndpoint}/x-transfer`
+};
+
+export const paraSpellKey = process.env.PARASPELL_API_KEY || '';
+export const lightSpellChainMapping: Record<string, string> = {
+  statemint: 'AssetHubPolkadot',
+  acala: 'Acala',
+  astar: 'Astar',
+  bifrost_dot: 'BifrostPolkadot',
+  bitgreen: 'Bitgreen',
+  bridgeHubPolkadot: 'BridgeHubPolkadot',
+  bridgeHubKusama: 'BridgeHubKusama',
+  centrifuge: 'Centrifuge',
+  hydradx_main: 'Hydration',
+  interlay: 'Interlay',
+  moonbeam: 'Moonbeam',
+  amplitude: 'Amplitude',
+  statemine: 'AssetHubKusama',
+  bifrost: 'BifrostKusama',
+  karura: 'Karura',
+  moonriver: 'Moonriver',
+  shiden: 'Shiden',
+  manta_network: 'Manta',
+  pendulum: 'Pendulum',
+  phala: 'Phala',
+  mythos: 'Mythos',
+  ethereum: 'Ethereum',
+  polkadot: 'Polkadot',
+  kusama: 'Kusama'
+};
+
+// todo: remove
 export const STABLE_XCM_VERSION = 3;
 
+// todo: remove
 export function isUseTeleportProtocol (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, tokenSlug?: string) {
   const relayChainToSystemChain =
     (['polkadot'].includes(originChainInfo.slug) && ['statemint'].includes(destChainInfo.slug)) ||

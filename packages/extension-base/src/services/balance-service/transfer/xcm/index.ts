@@ -7,6 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
+import { lightSpellChainMapping, paraSpellApi, paraSpellKey, XCM_VERSION } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -15,7 +16,10 @@ import { _isNativeToken } from '@subwallet/extension-base/services/chain-service
 import { FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { TransactionConfig } from 'web3-core';
 
+import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
+import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
 
@@ -151,3 +155,108 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
 
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
+
+export const createXcmExtrinsicV2 = async ({ destinationChain,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sendingValue,
+  substrateApi }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+  if (!substrateApi) {
+    throw Error('Substrate API is not available');
+  }
+
+  const bodyData = {
+    from: lightSpellChainMapping[originChain.slug], // add each time support new xcm chain
+    to: lightSpellChainMapping[destinationChain.slug],
+    address: recipient,
+    currency: {
+      symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
+      amount: sendingValue
+    },
+    xcmVersion: XCM_VERSION.V3
+  };
+
+  const response = await fetch(paraSpellApi.buildXcm, {
+    method: 'POST',
+    body: JSON.stringify(bodyData),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-API-KEY': paraSpellKey
+    }
+  });
+
+  const extrinsicHex = await response.text();
+  const chainApi = await substrateApi.isReady;
+  const extrinsic = txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
+
+  if (!extrinsic) {
+    throw new Error('No extrinsic'); // todo: content?
+  }
+
+  return extrinsic;
+};
+
+export function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
+  try {
+    assert(isHex(hex), 'Expected a hex-encoded call');
+
+    let extrinsicCall: Call;
+    let extrinsicPayload: ExtrinsicPayload | null = null;
+    let decoded: SubmittableExtrinsic<'promise'> | null = null;
+
+    try {
+      // attempt to decode with api.tx
+      const tx = api.tx(hex);
+
+      // ensure that the full data matches here
+      assert(tx.toHex() === hex, 'Cannot decode data as extrinsic, length mismatch');
+
+      decoded = tx;
+      extrinsicCall = api.createType('Call', decoded.method);
+    } catch {
+      try {
+        // attempt to decode as Call
+        extrinsicCall = api.createType('Call', hex);
+
+        const callHex = extrinsicCall.toHex();
+
+        if (callHex === hex) {
+          // ok
+        } else if (hex.startsWith(callHex)) {
+          // this could be an un-prefixed payload...
+          const prefixed = u8aConcat(compactToU8a(extrinsicCall.encodedLength), hex);
+
+          extrinsicPayload = api.createType('ExtrinsicPayload', prefixed);
+
+          assert(u8aEq(extrinsicPayload.toU8a(), prefixed), 'Unable to decode data as un-prefixed ExtrinsicPayload');
+
+          extrinsicCall = api.createType('Call', extrinsicPayload.method.toHex());
+        } else {
+          console.error('Unable to decode data as Call, length mismatch in supplied data');
+        }
+      } catch {
+        // final attempt, we try this as-is as a (prefixed) payload
+        extrinsicPayload = api.createType('ExtrinsicPayload', hex);
+
+        assert(extrinsicPayload.toHex() === hex, 'Unable to decode input data as Call, Extrinsic or ExtrinsicPayload');
+
+        extrinsicCall = api.createType('Call', extrinsicPayload.method.toHex());
+      }
+    }
+
+    const { method, section } = api.registry.findMetaCall(extrinsicCall.callIndex);
+    const extrinsicFn = api.tx[section][method];
+
+    if (!decoded) {
+      decoded = extrinsicFn(...extrinsicCall.args);
+    }
+
+    return decoded;
+  } catch (e) {
+    console.error('Unable to decode tx hex', e);
+
+    return undefined;
+  }
+}

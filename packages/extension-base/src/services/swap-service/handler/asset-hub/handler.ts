@@ -7,7 +7,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { _validateBalanceToSwapOnAssetHub, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -125,7 +125,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       const id = getId();
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, alternativeChainInfo.slug, 'substrate');
 
-      const xcmTransfer = await createXcmExtrinsic({
+      const xcmTransfer = await createXcmExtrinsicV2({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
         // Mock sending value to get payment info
@@ -213,7 +213,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       const id = getId();
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
 
-      const xcmTransfer = await createXcmExtrinsic({
+      const xcmTransfer = await createXcmExtrinsicV2({
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
         // Mock sending value to get payment info
@@ -351,7 +351,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       bnTotalAmount = bnTotalAmount.plus(bnXcmFee);
     }
 
-    const xcmTransfer = await createXcmExtrinsic({
+    const xcmTransfer = await createXcmExtrinsicV2({
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: briefXcmStep.sendingValue,

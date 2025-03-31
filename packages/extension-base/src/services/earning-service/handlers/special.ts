@@ -6,7 +6,7 @@ import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/
 import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, RuntimeDispatchInfo, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -274,7 +274,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const id = getId();
           const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
 
-          const xcmTransfer = await createXcmExtrinsic({
+          const xcmTransfer = await createXcmExtrinsicV2({
             sender: address,
             originTokenInfo: altInputTokenInfo,
             destinationTokenInfo: inputTokenInfo,
@@ -552,7 +552,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const id = getId();
     const feeInfo = await this.state.feeService.subscribeChainFee(id, originChainInfo.slug, 'substrate');
 
-    const extrinsic = await createXcmExtrinsic({
+    const extrinsic = await createXcmExtrinsicV2({
       destinationTokenInfo,
       originTokenInfo,
       recipient: address,

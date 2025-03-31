@@ -10,7 +10,7 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -361,7 +361,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else if (isAvailBridgeFromAvail) {
       funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
     } else {
-      funcCreateExtrinsic = createXcmExtrinsic;
+      funcCreateExtrinsic = createXcmExtrinsicV2;
     }
 
     const extrinsic = await funcCreateExtrinsic(params);

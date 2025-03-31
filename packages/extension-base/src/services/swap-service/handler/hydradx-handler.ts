@@ -8,7 +8,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType, RequestChangeFeeToken } from '@subwallet/extension-base/background/KoniTypes';
 import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -128,7 +128,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const id = getId();
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, alternativeAsset.originChain, 'substrate');
 
-      const xcmTransfer = await createXcmExtrinsic({
+      const xcmTransfer = await createXcmExtrinsicV2({
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
         // Mock sending value to get payment info
