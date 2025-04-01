@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubWalletResponse } from '../sdk';
+import { SWApiResponse } from '../types';
 
 interface XcmRequest {
   address: string;
@@ -46,13 +46,13 @@ export class XcmApi {
         body: JSON.stringify({ XcmRequest: xcmRequest })
       });
 
-      const response = await rawResponse.json() as SubWalletResponse<XcmApiResponse>;
+      const response = await rawResponse.json() as SWApiResponse<XcmApiResponse>;
 
-      if (response.statusCode !== 200) {
-        throw new Error(response.message);
+      if (response.error) {
+        throw new Error(response.error.message);
       }
 
-      return response.result;
+      return response.data;
     } catch (error) {
       throw new Error(`${(error as Error).message}`);
     }
