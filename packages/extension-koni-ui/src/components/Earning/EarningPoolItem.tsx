@@ -86,7 +86,6 @@ const Component: React.FC<Props> = (props: Props) => {
               className='__item-logo'
               isShowSubLogo={false}
               network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
-              shape='squircle'
               size={40}
             />
           )}

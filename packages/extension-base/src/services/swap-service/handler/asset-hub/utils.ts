@@ -172,6 +172,10 @@ export const buildSwapExtrinsic = (api: ApiPromise, paths: _ChainAsset[], recipi
   const pathsInfo = paths.map((asset) => {
     const multilocation = _getXcmAssetMultilocation(asset);
 
+    if (!multilocation) {
+      throw new Error('Error getting multilocation');
+    }
+
     return api.createType('MultiLocation', multilocation).toU8a();
   });
 
