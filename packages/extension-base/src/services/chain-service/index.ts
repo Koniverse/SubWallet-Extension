@@ -827,36 +827,30 @@ export class ChainService {
   }
 
   handleLatestPriorityTokens (latestPriorityTokens: TokenPriorityDetails) {
+    const currentTokens = this.priorityTokensSubject.value || {};
+
     this.priorityTokensSubject.next(latestPriorityTokens);
     this.logger.log('Finished updating latest popular tokens');
+
+    const currentTokenKeys = Object.keys(currentTokens.token || {}); // Extract keys from current tokens
+    const newTokenKeys = Object.keys(latestPriorityTokens.token || {}); // Extract keys from new tokens
+
+    if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) { // Check if token keys have changed
+      this.enablePopularTokens()
+        .then(() => this.logger.log('Popular tokens enabled due to priority tokens change')) // Log success after enabling tokens
+        .catch((e) => console.error('Error enabling popular tokens:', e)); // Log error if enabling fails
+    }
   }
 
   handleLatestData () {
-    this.fetchLatestChainData()
-      .then((latestChainInfo) => {
-        this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
-        this.handleLatestChainData(latestChainInfo);
-        this.lockChainInfoMap = false;
-
-        return this.fetchLatestPriorityTokens();
-      })
-      .then((latestPriorityTokens) => {
-        const currentTokens = this.priorityTokensSubject.value || {};
-
-        this.handleLatestPriorityTokens(latestPriorityTokens);
-
-        const currentTokenKeys = Object.keys(currentTokens.token || {});
-        const newTokenKeys = Object.keys(latestPriorityTokens.token || {});
-
-        if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) {
-          this.enablePopularTokens()
-            .then(() => this.logger.log('Popular tokens enabled due to priority tokens change'))
-            .catch((e) => console.error('Error enabling popular tokens:', e));
-        }
-      }).catch((e) => {
-        this.lockChainInfoMap = false;
-        console.error('Error update latest chain data', e);
-      });
+    this.fetchLatestChainData().then((latestChainInfo) => {
+      this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
+      this.handleLatestChainData(latestChainInfo);
+      this.lockChainInfoMap = false;
+    }).catch((e) => {
+      this.lockChainInfoMap = false;
+      console.error('Error update latest chain data', e);
+    });
 
     // this.fetchLatestPriceIdsData().then((latestPriceIds) => {
     //   this.handleLatestPriceId(latestPriceIds);
@@ -865,6 +859,12 @@ export class ChainService {
     this.fetchLatestLedgerGenericAllowChains()
       .then((latestledgerGenericAllowChains) => {
         this.handleLatestLedgerGenericAllowChains(latestledgerGenericAllowChains);
+      })
+      .catch(console.error);
+
+    this.fetchLatestPriorityTokens()
+      .then((latestPriorityTokens) => {
+        this.handleLatestPriorityTokens(latestPriorityTokens);
       })
       .catch(console.error);
   }
@@ -1010,7 +1010,6 @@ export class ChainService {
     const chainStateMap = this.getChainStateMap();
 
     if (chainStateMap[chainSlug].active || this.lockChainInfoMap) {
-
       return false;
     }
 
