@@ -4,15 +4,15 @@
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { _validateBalanceToSwapOnAssetHub, _validateSwapRecipient } from '@subwallet/extension-base/core/logic-validation/swap';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { dryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
-import { AssetHubSwapStepMetadata, BasicTxErrorType, BriefXCMStep, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, XcmStepPosition } from '@subwallet/extension-base/types';
+import { getAmountAfterSlippage, getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
+import { AssetHubSwapStepMetadata, BasicTxErrorType, BriefXCMStep, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, XcmStepPosition } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { OptimalSwapPathParams, SwapBaseTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -124,8 +124,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       const xcmOriginSubstrateApi = await this.chainService.getSubstrateApi(alternativeAsset.originChain).isReady;
       const id = getId();
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, alternativeChainInfo.slug, 'substrate');
-
-      const xcmTransfer = await createXcmExtrinsicV2({
+      const xcmRequest = {
         originTokenInfo: alternativeAsset,
         destinationTokenInfo: fromAsset,
         // Mock sending value to get payment info
@@ -136,15 +135,14 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         substrateApi: xcmOriginSubstrateApi,
         destinationChain: originalChainInfo,
         originChain: alternativeChainInfo
-      });
+      };
 
-      const _xcmFeeInfo = await xcmTransfer.paymentInfo(params.request.address);
-      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+      const DryRunInfo = await dryRunXcm(xcmRequest);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
           feeType: SwapFeeType.NETWORK_FEE,
-          amount: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString(),
+          amount: DryRunInfo.fee,
           tokenSlug: _getChainNativeTokenSlug(alternativeChainInfo)
         }],
         defaultFeeToken: _getChainNativeTokenSlug(alternativeChainInfo),
@@ -212,8 +210,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     try {
       const id = getId();
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate');
-
-      const xcmTransfer = await createXcmExtrinsicV2({
+      const xcmRequest = {
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
         // Mock sending value to get payment info
@@ -224,11 +221,10 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         originChain: fromChainInfo,
         destinationChain: toChainInfo,
         feeInfo
-      });
+      };
 
-      const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
-      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-      const estimatedXcmFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString();
+      const dryRunInfo = await dryRunXcm(xcmRequest);
+      const estimatedXcmFee = dryRunInfo.fee;
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -351,7 +347,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       bnTotalAmount = bnTotalAmount.plus(bnXcmFee);
     }
 
-    const xcmTransfer = await createXcmExtrinsicV2({
+    const xcmRequest = {
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: briefXcmStep.sendingValue,
@@ -361,7 +357,12 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       destinationChain,
       originChain,
       feeInfo
-    });
+    };
+
+    const [extrinsic] = await Promise.all([
+      createXcmExtrinsicV2(xcmRequest),
+      dryRunXcm(xcmRequest)
+    ]);
 
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originAsset.originChain,
@@ -375,7 +376,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     return {
       txChain: originAsset.originChain,
-      extrinsic: xcmTransfer,
+      extrinsic,
       transferNativeAmount: _isNativeToken(originAsset) ? briefXcmStep.sendingValue : '0',
       extrinsicType: ExtrinsicType.TRANSFER_XCM,
       chainType: ChainType.SUBSTRATE,

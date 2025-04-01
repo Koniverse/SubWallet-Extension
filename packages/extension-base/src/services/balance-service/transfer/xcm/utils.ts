@@ -2,27 +2,34 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { BasicTxErrorType } from '@subwallet/extension-base/types';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
-export const XCM_VERSION = {
+interface DryRunInfo {
+  success: boolean,
+  fee: string // has fee in case dry run success
+}
+
+const XCM_VERSION = {
   V3: 'V3',
   V4: 'V4'
 };
 
 const paraSpellEndpoint = 'https://api.lightspell.xyz';
 
-export const paraSpellApi = {
+const paraSpellApi = {
   buildXcm: `${paraSpellEndpoint}/x-transfer`,
   dryRunXcm: `${paraSpellEndpoint}/dry-run`
 };
 
-export const paraSpellKey = process.env.PARASPELL_API_KEY || '';
-export const lightSpellChainMapping: Record<string, string> = {
+const paraSpellKey = process.env.PARASPELL_API_KEY || '';
+const lightSpellChainMapping: Record<string, string> = {
   statemint: 'AssetHubPolkadot',
   acala: 'Acala',
   astar: 'Astar',
@@ -49,7 +56,7 @@ export const lightSpellChainMapping: Record<string, string> = {
   kusama: 'Kusama'
 };
 
-export function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
+function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
   try {
     assert(isHex(hex), 'Expected a hex-encoded call');
 
@@ -112,7 +119,52 @@ export function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Subm
   }
 }
 
-export async function dryRunXcm ({ destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue }: CreateXcmExtrinsicProps) {
+export async function buildXcm (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi } = request;
+
+  if (!substrateApi) {
+    throw Error('Substrate API is not available');
+  }
+
+  try {
+    const bodyData = {
+      address: recipient,
+      from: lightSpellChainMapping[originChain.slug], // todo: add mapping each time support new xcm chain
+      to: lightSpellChainMapping[destinationChain.slug],
+      currency: {
+        symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
+        amount: sendingValue
+      },
+      xcmVersion: XCM_VERSION.V3
+    };
+
+    const response = await fetch(paraSpellApi.buildXcm, {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-API-KEY': paraSpellKey
+      }
+    });
+
+    const extrinsicHex = await response.text();
+    const chainApi = await substrateApi.isReady;
+
+    return txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
+  } catch (e) {
+    console.error('Unable to build xcm', e);
+
+    return undefined;
+  }
+}
+
+// dry run can fail due to sender address & amount token
+export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+
+  let dryRunInfo: DryRunInfo | undefined;
+
   try {
     const bodyData = {
       senderAddress: sender,
@@ -135,12 +187,16 @@ export async function dryRunXcm ({ destinationChain, originChain, originTokenInf
       }
     });
 
-    return await response.json() as { success: boolean, fee: string };
+    dryRunInfo = await response.json() as DryRunInfo;
   } catch (e) {
     console.error('Unable to dry run', e);
-
-    return undefined;
   }
+
+  if (!dryRunInfo || !dryRunInfo.success) {
+    throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed'); // todo: content?
+  }
+
+  return dryRunInfo;
 }
 
 // todo: remove

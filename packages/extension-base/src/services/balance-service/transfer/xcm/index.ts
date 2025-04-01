@@ -7,7 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { lightSpellChainMapping, paraSpellApi, paraSpellKey, txHexToSubmittableExtrinsic, XCM_VERSION } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -153,40 +153,8 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
 
-export const createXcmExtrinsicV2 = async ({ destinationChain,
-  originChain,
-  originTokenInfo,
-  recipient,
-  sendingValue,
-  substrateApi }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
-  if (!substrateApi) {
-    throw Error('Substrate API is not available');
-  }
-
-  const bodyData = {
-    from: lightSpellChainMapping[originChain.slug], // todo: add mapping each time support new xcm chain
-    to: lightSpellChainMapping[destinationChain.slug],
-    address: recipient,
-    currency: {
-      symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
-      amount: sendingValue
-    },
-    xcmVersion: XCM_VERSION.V3
-  };
-
-  const response = await fetch(paraSpellApi.buildXcm, {
-    method: 'POST',
-    body: JSON.stringify(bodyData),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-API-KEY': paraSpellKey
-    }
-  });
-
-  const extrinsicHex = await response.text();
-  const chainApi = await substrateApi.isReady;
-  const extrinsic = txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
+export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+  const extrinsic = await buildXcm(request);
 
   if (!extrinsic) {
     throw new Error('No extrinsic'); // todo: content?

@@ -25,6 +25,7 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   createdAt: number;
   updatedAt: number;
   estimateFee?: FeeData,
+  xcmFeeDryRun?: string;
   transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;

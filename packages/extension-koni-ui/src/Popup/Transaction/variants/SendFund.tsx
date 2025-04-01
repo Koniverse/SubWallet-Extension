@@ -818,6 +818,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         address: fromValue,
         chain: assetRegistry[assetValue].originChain,
         token: assetValue,
+        value: transferAmountValue,
         destChain: destChainValue,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
@@ -839,7 +840,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
