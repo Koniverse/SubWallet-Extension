@@ -16,6 +16,7 @@ interface DryRunInfo {
   fee: string // has fee in case dry run success
 }
 
+// @ts-ignore
 const XCM_VERSION = {
   V3: 'V3',
   V4: 'V4'
@@ -134,8 +135,8 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
       currency: {
         symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
         amount: sendingValue
-      },
-      xcmVersion: XCM_VERSION.V3
+      }
+      // xcmVersion: XCM_VERSION.V3
     };
 
     const response = await fetch(paraSpellApi.buildXcm, {
@@ -175,6 +176,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
         symbol: originTokenInfo.symbol,
         amount: sendingValue
       }
+      // xcmVersion: XCM_VERSION.V3
     };
 
     const response = await fetch(paraSpellApi.dryRunXcm, {
