@@ -1006,20 +1006,15 @@ export class ChainService {
   }
 
   public async enableChain (chainSlug: string) {
-    console.log('ENABLECHAIN', chainSlug);
     const chainInfo = this.getChainInfoByKey(chainSlug);
     const chainStateMap = this.getChainStateMap();
 
     if (chainStateMap[chainSlug].active || this.lockChainInfoMap) {
-      console.log('log7.1__', chainSlug);
-      console.log('log7.1__chainStateMap[chainSlug].activ', chainStateMap[chainSlug].active);
-      console.log('log7.1__this.lockChainInfoMap', this.lockChainInfoMap);
 
       return false;
     }
 
     this.lockChainInfoMap = true;
-    console.log('log7');
     this.dbService.updateChainStore({
       ...chainInfo,
       active: true,
@@ -1059,7 +1054,6 @@ export class ChainService {
         if (!currentState) {
           // Enable chain success then update chain state
           await this.initApiForChain(chainInfo);
-          console.log('log6');
           this.dbService.updateChainStore({
             ...chainInfo,
             active: true,
@@ -1104,7 +1098,6 @@ export class ChainService {
     // Set disconnect state for inactive chain
     this.updateChainConnectionStatus(chainSlug, _ChainConnectionStatus.DISCONNECTED);
     this.destroyApiForChain(chainInfo);
-    console.log('log5');
     this.dbService.updateChainStore({
       ...chainInfo,
       active: false,
@@ -1287,10 +1280,6 @@ export class ChainService {
           const hasProvider = Object.values(providers).length > 0;
           const canActive = hasProvider && chainInfo.chainStatus === _ChainStatus.ACTIVE;
 
-          console.log('1.canActive, storedChainInfo.active', canActive, storedChainInfo.active);
-          console.log('1.storedSlug', storedSlug);
-          console.log('1.storedChainInfo', storedChainInfo);
-          console.log('1.providers', providers);
           const selectedProvider = updateCurrentProvider(providers, storedChainInfo, storedSlug, canActive && storedChainInfo.active);
 
           this.dataMap.chainStateMap[storedSlug] = {
@@ -2079,8 +2068,6 @@ export class ChainService {
 
     let needUpdateSubject: boolean | undefined;
 
-    console.log('[] assetSetting', assetSetting);
-
     // Update settings
     currentAssetSettings[assetSlug] = assetSetting;
 
@@ -2088,11 +2075,8 @@ export class ChainService {
       const assetInfo = this.getAssetBySlug(assetSlug);
       const chainState = this.getChainStateByKey(assetInfo.originChain);
 
-      console.log('[] chainState 0', chainState.slug);
-
       // if chain not enabled, then automatically enable
       if (chainState && !chainState.active) {
-        console.log('[] chainState 1', chainState.slug);
         await this.enableChain(chainState.slug);
         needUpdateSubject = true;
 
