@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { ExtrinsicType, NotificationType, TokenPriorityDetails } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
@@ -30,7 +30,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, BackgroundIcon, Button, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -112,58 +112,6 @@ function getTokenSelectorItem (
   });
 
   return result;
-}
-
-function sortTokens (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails) {
-  const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
-
-  targetTokens.sort((a, b) => {
-    const getTokenGroupLevel = (token: SortableTokenItem): number => {
-      if (token.total) {
-        const value = token.total.value.toNumber();
-
-        if (value > 0) {
-          return 1;
-        } // Group 1: Has total.value > 0
-
-        return 2; // Group 2: Has total.value == 0
-      }
-
-      return 3; // Group 3: No total
-    };
-
-    const aLevel = getTokenGroupLevel(a);
-    const bLevel = getTokenGroupLevel(b);
-
-    // Different group levels → sort by group level
-    if (aLevel !== bLevel) {
-      return aLevel - bLevel;
-    }
-
-    // Same group
-    if (aLevel === 1) {
-      return sortTokenByValue(a, b); // Group 1: sort by value
-    }
-
-    // Group 2 or 3: sort by priority
-    const aSlug = a.slug;
-    const bSlug = b.slug;
-
-    const aIsPrioritized = priorityTokenKeys.includes(aSlug);
-    const bIsPrioritized = priorityTokenKeys.includes(bSlug);
-
-    const aPriority = aIsPrioritized ? priorityTokenGroups.token[aSlug] : 0;
-    const bPriority = bIsPrioritized ? priorityTokenGroups.token[bSlug] : 0;
-
-    return sortTokenByPriority(
-      a.symbol,
-      b.symbol,
-      aIsPrioritized,
-      bIsPrioritized,
-      aPriority,
-      bPriority
-    );
-  });
 }
 
 const numberMetadata = { maxNumberFormat: 8 };
@@ -367,7 +315,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     if (targetTokenSlugs.length) {
       const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
 
-      sortTokens(result, priorityTokens);
+      sortTokensByBalanceInSelector(result, priorityTokens);
 
       return result;
     }
@@ -380,7 +328,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     const result = getTokenSelectorItem(targetTokenSlugs, assetRegistryMap, getAccountTokenBalance(targetTokenSlugs, targetAccountProxyIdForGetBalance), chainStateMap);
 
-    sortTokens(result, priorityTokens);
+    sortTokensByBalanceInSelector(result, priorityTokens);
 
     return result;
   }, [assetRegistryMap, chainStateMap, fromAndToTokenMap, fromTokenSlugValue, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);

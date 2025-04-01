@@ -15,17 +15,20 @@ interface Props extends ThemeProps {
   tokenSlug: string;
   tokenSymbol: string;
   chainSlug: string;
+  isSelected: boolean;
   chainName: string;
   balanceInfo?: TokenSelectorItemType['balanceInfo'];
   showBalance?: boolean;
 }
 
-const Component = ({ balanceInfo, chainName, chainSlug, className, onClick, showBalance, tokenSlug, tokenSymbol }: Props) => {
+const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, onClick, showBalance, tokenSlug, tokenSymbol }: Props) => {
   const isShowBalance = useSelector((state: RootState) => state.settings.isShowBalance);
 
   return (
     <div
-      className={CN(className)}
+      className={CN(className, {
+        '-selected': isSelected
+      })}
       onClick={onClick}
     >
       <div className='__item-left-part'>
@@ -144,7 +147,7 @@ const TokenSelectorItem = styled(Component)<Props>(({ theme: { token } }: Props)
       color: token.colorTextLight4
     },
 
-    '&:hover': {
+    '&:hover, &.-selected': {
       background: token.colorBgInput
     }
   });

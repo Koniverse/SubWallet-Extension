@@ -55,6 +55,7 @@ export const sortTokenByPriority = (a: string, b: string, aIsPrioritizedToken: b
   }
 };
 
+// Todo: Merge sortTokensByStandard and sortTokensByBalanceInSelector to one function
 export function sortTokensByStandard (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails, isTokenGroup = false) {
   const priorityTokenGroupKeys = Object.keys(priorityTokenGroups.tokenGroup);
   const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
@@ -91,5 +92,57 @@ export function sortTokensByStandard (targetTokens: SortableTokenItem[], priorit
 
       return sortTokenByPriority(a.symbol, b.symbol, aIsPrioritizedToken, bIsPrioritizedToken, aPriority, bPriority);
     }
+  });
+}
+
+export function sortTokensByBalanceInSelector (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails) {
+  const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
+
+  targetTokens.sort((a, b) => {
+    const getTokenGroupLevel = (token: SortableTokenItem): number => {
+      if (token.total) {
+        const value = token.total.value.toNumber();
+
+        if (value > 0) {
+          return 1;
+        } // Group 1: Has total.value > 0
+
+        return 2; // Group 2: Has total.value == 0
+      }
+
+      return 3; // Group 3: No total
+    };
+
+    const aLevel = getTokenGroupLevel(a);
+    const bLevel = getTokenGroupLevel(b);
+
+    // Different group levels → sort by group level
+    if (aLevel !== bLevel) {
+      return aLevel - bLevel;
+    }
+
+    // Same group
+    if (aLevel === 1) {
+      return sortTokenByValue(a, b); // Group 1: sort by value
+    }
+
+    // Group 2 or 3: sort by priority
+    const aSlug = a.slug;
+    const bSlug = b.slug;
+
+    const aIsPrioritized = priorityTokenKeys.includes(aSlug);
+    const bIsPrioritized = priorityTokenKeys.includes(bSlug);
+
+    const aPriority = aIsPrioritized ? priorityTokenGroups.token[aSlug] : 0;
+    const bPriority = bIsPrioritized ? priorityTokenGroups.token[bSlug] : 0;
+
+    return sortTokenByPriority(
+      a.symbol,
+      b.symbol,
+      aIsPrioritized,
+      bIsPrioritized,
+      aPriority,
+      bPriority
+    );
   });
 }
