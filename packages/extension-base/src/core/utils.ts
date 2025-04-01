@@ -1,15 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
+import { ExtrinsicType, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { SUFFICIENT_CHAIN } from '@subwallet/extension-base/services/chain-service/constants';
+import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { isAddressAndChainCompatible, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
-import { isAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isCardanoTestnetAddress, isTonAddress } from '@subwallet/keyring';
 
+import { AnyJson } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export function getStrictMode (type: string, extrinsicType?: ExtrinsicType) {
@@ -64,7 +68,8 @@ export function _isValidAddressForEcosystem (validateRecipientParams: ValidateRe
   if (!isAddressAndChainCompatible(toAddress, destChainInfo)) {
     if (_isChainEvmCompatible(destChainInfo) ||
       _isChainSubstrateCompatible(destChainInfo) ||
-      _isChainTonCompatible(destChainInfo)) {
+      _isChainTonCompatible(destChainInfo) ||
+      _isChainCardanoCompatible(destChainInfo)) {
       return 'Recipient address must be the same type as sender address';
     }
 
@@ -92,6 +97,16 @@ export function _isValidTonAddressFormat (validateRecipientParams: ValidateRecip
   const tonInfoData = isTonAddress(toAddress) && tonAddressInfo(toAddress);
 
   if (tonInfoData && tonInfoData.isTestOnly !== destChainInfo.isTestnet) {
+    return `Recipient address must be a valid ${destChainInfo.name} address`;
+  }
+
+  return '';
+}
+
+export function _isValidCardanoAddressFormat (validateRecipientParams: ValidateRecipientParams): string {
+  const { destChainInfo, toAddress } = validateRecipientParams;
+
+  if (isCardanoTestnetAddress(toAddress) !== destChainInfo.isTestnet) {
     return `Recipient address must be a valid ${destChainInfo.name} address`;
   }
 
@@ -132,3 +147,26 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 
   return '';
 }
+
+export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<boolean> => {
+  if (SUFFICIENT_CHAIN.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
+    const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
+
+    const queryParams: _SubstrateAdapterQueryArgs = {
+      section: 'query',
+      module: 'foreignAssets',
+      method: 'asset',
+      args: [assetId]
+    };
+
+    if (!_isBridgedToken(tokenInfo)) {
+      queryParams.module = 'assets';
+    }
+
+    const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+
+    return metadata.isSufficient;
+  } else {
+    return false;
+  }
+};

@@ -11,8 +11,7 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { _getChainNativeTokenSlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
@@ -220,10 +219,11 @@ export class BalanceService implements StoppableServiceInterface {
       const evmApiMap = this.state.chainService.getEvmApiMap();
       const substrateApiMap = this.state.chainService.getSubstrateApiMap();
       const tonApiMap = this.state.chainService.getTonApiMap();
+      const cardanoApiMap = this.state.chainService.getCardanoApiMap();
 
       let unsub = noop;
 
-      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, (result) => {
+      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
         const rs = result[0];
 
         let value: string;
@@ -321,6 +321,23 @@ export class BalanceService implements StoppableServiceInterface {
     return await this.state.dbService.stores.balance.getBalanceMapByAddresses(address);
   }
 
+  public async getTokensHasBalance (address: string, chain: string, tokenSlug?: string): Promise<Record<string, BalanceItem>> {
+    const balanceItems = await this.state.dbService.stores.balance.getBalanceHasAmount(address, chain);
+    const tokenHasBalanceInfoMap: Record<string, BalanceItem> = {};
+
+    balanceItems.forEach((balanceItem) => {
+      tokenHasBalanceInfoMap[balanceItem.tokenSlug] = balanceItem;
+    });
+
+    if (tokenSlug) {
+      return {
+        [tokenSlug]: tokenHasBalanceInfoMap[tokenSlug]
+      };
+    }
+
+    return tokenHasBalanceInfoMap;
+  }
+
   public async handleResetBalance (forceRefresh?: boolean) {
     if (forceRefresh) {
       this.balanceMap.setData({});
@@ -398,6 +415,7 @@ export class BalanceService implements StoppableServiceInterface {
     const evmApiMap = this.state.chainService.getEvmApiMap();
     const substrateApiMap = this.state.chainService.getSubstrateApiMap();
     const tonApiMap = this.state.chainService.getTonApiMap();
+    const cardanoApiMap = this.state.chainService.getCardanoApiMap();
 
     const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
     const assetState = this.state.chainService.subscribeAssetSettings().value;
@@ -407,7 +425,7 @@ export class BalanceService implements StoppableServiceInterface {
       })
       .map((asset) => asset.slug);
 
-    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, (result) => {
+    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
       !cancel && this.setBalanceItem(result);
     }, ExtrinsicType.TRANSFER_BALANCE);
 
@@ -558,7 +576,7 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   // process
-  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
     const originChainInfo = this.state.chainService.getChainInfoByKey(params.originChain);
 
     if (!params.destChain) { // normal transfers

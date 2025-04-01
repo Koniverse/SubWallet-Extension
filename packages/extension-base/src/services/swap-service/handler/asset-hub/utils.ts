@@ -51,7 +51,7 @@ export const getReserveForPath = async (api: ApiPromise, paths: _ChainAsset[]): 
 };
 
 export const estimateTokensForPool = (amount: string, reserves: [string, string]): string => {
-  if (amount === '0') {
+  if (!amount || amount === '0') {
     return '0';
   }
 
@@ -97,7 +97,7 @@ export const estimateActualRate = (amount: string, reserves: Array<[string, stri
   return result.toString();
 };
 
-export const estimateRateAfter = (amount: string, reserves: Array<[string, string]>): string => {
+export const estimateRateAfterForPath = (amount: string, reserves: Array<[string, string]>): string => {
   const m = new BigN(amount);
 
   const reserve = reserves[0];
@@ -171,6 +171,10 @@ export const checkMinAmountForPath = (reserves: Array<[string, string]>, amounts
 export const buildSwapExtrinsic = (api: ApiPromise, paths: _ChainAsset[], recipient: string, amountIn: string, amountOutMin: string, keepAlive = true): SubmittableExtrinsic<'promise'> => {
   const pathsInfo = paths.map((asset) => {
     const multilocation = _getXcmAssetMultilocation(asset);
+
+    if (!multilocation) {
+      throw new Error('Error getting multilocation');
+    }
 
     return api.createType('MultiLocation', multilocation).toU8a();
   });

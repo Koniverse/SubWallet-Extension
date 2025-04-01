@@ -4,7 +4,7 @@
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -97,7 +97,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const poolInfo = poolInfoMap[slug];
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
 
-  const nominations = useMemo(() => compound?.nominations || [], [compound]);
+  // const cachedNominations = useMemo(() => compound?.nominations || [], [compound]);
+
+  const [nominations] = useState<NominationInfo[]>(compound?.nominations || []); // Remove set Nomination
   const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(chain), [chain]);
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
@@ -276,8 +278,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
+    const keyBase = key.split('___')[0];
+
     const selected = changeValidators.includes(key);
-    const nominated = nominatorValueList.includes(key);
+    const nominated = nominatorValueList.includes(key) || nominatorValueList.some((nom) => nom.split('___')[0] === keyBase);
 
     return (
       <StakingValidatorItem
@@ -312,6 +316,31 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const onActiveValidatorSelector = useCallback(() => {
     activeModal(id);
   }, [activeModal, id]);
+
+  // FIX BUG WHEN USE BITTENSOR API KEY
+
+  // useEffect(() => {
+  //   setNominations((old) => {
+  //     const sortNomination = (a: NominationInfo, b: NominationInfo) => {
+  //       if (a.validatorAddress > b.validatorAddress) {
+  //         return 1;
+  //       } else if (a.validatorAddress < b.validatorAddress) {
+  //         return -1;
+  //       }
+
+  //       return 0;
+  //     };
+
+  //     const oldSorted = old.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
+  //     const newSorted = cachedNominations.sort(sortNomination).map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join('---');
+
+  //     if (oldSorted !== newSorted) {
+  //       return cachedNominations;
+  //     }
+
+  //     return old;
+  //   });
+  // }, [cachedNominations]);
 
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
@@ -405,7 +434,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         onCancel={onCancelSelectValidator}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),

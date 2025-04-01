@@ -16,6 +16,7 @@ jobs:
         step: ['web-runner:build-zip']
     name: ${{ matrix.step }}
     runs-on: ubuntu-22.04
+    environment: 'mobile'
     steps:
     - uses: actions/checkout@v3
       with:
@@ -32,7 +33,7 @@ jobs:
         TRANSAK_API_KEY: ${{ secrets.TRANSAK_API_KEY }}
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
         CHAINFLIP_BROKER_API: ${{ secrets.CHAINFLIP_BROKER_API }}
-        BITTENSOR_API_KEY_1: ${{ secrets.BITTENSOR_API_KEY_1 }} 
+        BITTENSOR_API_KEY_1: ${{ secrets.BITTENSOR_API_KEY_1 }}
         BITTENSOR_API_KEY_2: ${{ secrets.BITTENSOR_API_KEY_2 }}
         BITTENSOR_API_KEY_3: ${{ secrets.BITTENSOR_API_KEY_3 }}
         BITTENSOR_API_KEY_4: ${{ secrets.BITTENSOR_API_KEY_4 }}
@@ -43,6 +44,11 @@ jobs:
         BITTENSOR_API_KEY_9: ${{ secrets.BITTENSOR_API_KEY_9 }}
         BITTENSOR_API_KEY_10: ${{ secrets.BITTENSOR_API_KEY_10 }}
         SIMPLE_SWAP_API_KEY: ${{ secrets.SIMPLE_SWAP_API_KEY }}
+        UNISWAP_API_KEY:  ${{ secrets.UNISWAP_API_KEY }}
+        SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
+        BLOCKFROST_API_KEY_MAIN: ${{ secrets.BLOCKFROST_API_KEY_MAIN }}
+        BLOCKFROST_API_KEY_PREP: ${{ secrets.BLOCKFROST_API_KEY_PREP }}
+        MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
         BRANCH_NAME: master
       run: |
         yarn install --immutable | grep -v 'YN0013'

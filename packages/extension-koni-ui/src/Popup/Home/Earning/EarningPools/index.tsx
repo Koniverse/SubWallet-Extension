@@ -62,7 +62,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
+    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
   ], [t]);
 
   const positionSlugs = useMemo(() => {
@@ -154,6 +155,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         } else if (filter === YieldPoolType.LIQUID_STAKING && item.type === YieldPoolType.LIQUID_STAKING) {
           return true;
         } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
+          return true;
+        } else if (filter === YieldPoolType.SUBNET_STAKING && item.type === YieldPoolType.SUBNET_STAKING) {
           return true;
         }
         // Uncomment the following code block if needed

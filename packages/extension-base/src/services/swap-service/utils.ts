@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { Asset, Assets, Chain, Chains } from '@chainflip/sdk/swap';
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
+import { DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { BriefXCMStep, CommonStepDetail, CommonStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -13,30 +14,6 @@ export const CHAIN_FLIP_TESTNET_EXPLORER = 'https://blocks-perseverance.chainfli
 export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
 
 export const SIMPLE_SWAP_EXPLORER = 'https://simpleswap.io';
-
-export const CHAIN_FLIP_SUPPORTED_MAINNET_MAPPING: Record<string, Chain> = {
-  [COMMON_CHAIN_SLUGS.POLKADOT]: Chains.Polkadot,
-  [COMMON_CHAIN_SLUGS.ETHEREUM]: Chains.Ethereum,
-  [COMMON_CHAIN_SLUGS.ARBITRUM]: Chains.Arbitrum
-};
-
-export const CHAIN_FLIP_SUPPORTED_TESTNET_MAPPING: Record<string, Chain> = {
-  [COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA]: Chains.Ethereum,
-  [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT]: Chains.Polkadot
-};
-
-export const CHAIN_FLIP_SUPPORTED_MAINNET_ASSET_MAPPING: Record<string, Asset> = {
-  [COMMON_ASSETS.DOT]: Assets.DOT,
-  [COMMON_ASSETS.ETH]: Assets.ETH,
-  [COMMON_ASSETS.USDC_ETHEREUM]: Assets.USDC,
-  [COMMON_ASSETS.USDT_ETHEREUM]: Assets.USDT
-};
-
-export const CHAIN_FLIP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, Asset> = {
-  [COMMON_ASSETS.PDOT]: Assets.DOT,
-  [COMMON_ASSETS.ETH_SEPOLIA]: Assets.ETH,
-  [COMMON_ASSETS.USDC_SEPOLIA]: Assets.USDC
-};
 
 export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string> = {
   'bittensor-NATIVE-TAO': 'tao',
@@ -54,13 +31,23 @@ export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in millisecon
 
 export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
-  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
-  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
   [SwapProviderId.POLKADOT_ASSET_HUB]: [COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB],
   [SwapProviderId.KUSAMA_ASSET_HUB]: [COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB],
+  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT],
+  [SwapProviderId.UNISWAP]: [COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
+
+  // testnet
+  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
+  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
   [SwapProviderId.ROCOCO_ASSET_HUB]: [COMMON_CHAIN_SLUGS.ROCOCO_ASSET_HUB],
-  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT]
+  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub']
+};
+
+export const FEE_RATE_MULTIPLIER: Record<string, number> = {
+  default: 1,
+  medium: 1.2,
+  high: 2
 };
 
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
@@ -115,4 +102,89 @@ export function getChainflipBroker (isTestnet: boolean) { // noted: currently no
       url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
     };
   }
+}
+
+export function getChainflipSwap (isTestnet: boolean) {
+  if (isTestnet) {
+    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+  } else {
+    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+  }
+}
+
+export function getBridgeStep (from: string, to: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.BRIDGE,
+    pair: {
+      slug: `${from}___${to}`,
+      from,
+      to
+    }
+  };
+}
+
+export function getSwapStep (from: string, to: string): DynamicSwapAction {
+  return {
+    action: DynamicSwapType.SWAP,
+    pair: {
+      slug: `${from}___${to}`,
+      from,
+      to
+    }
+  };
+}
+
+export function findXcmDestination (assetRefMap: Record<string, _AssetRef>, chainAsset: _ChainAsset, destChain: string) {
+  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
+    assetRef.srcAsset === chainAsset.slug &&
+    assetRef.destChain === destChain &&
+    assetRef.path === _AssetRefPath.XCM
+  );
+
+  if (foundAssetRef) {
+    return foundAssetRef.destAsset;
+  }
+
+  return undefined;
+}
+
+export function isChainsHasSameProvider (fromChain: string, toChain: string) {
+  // todo: a provider may support multiple chains but not cross-chain swaps
+  for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
+    if (group.includes(fromChain) && group.includes(toChain)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+
+  if (!mainSteps.length) {
+    return undefined;
+  }
+
+  if (mainSteps.length === 1) {
+    const metadata = mainSteps[0].metadata as unknown as BriefXCMStep; // todo: temp for round 1, the exact interface is handle in round 2
+
+    return {
+      from: metadata.originTokenInfo.slug,
+      to: metadata.destinationTokenInfo.slug,
+      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+    };
+  }
+
+  const firstStep = mainSteps[0];
+  const lastStep = mainSteps[mainSteps.length - 1];
+
+  const firstMetadata = firstStep.metadata as unknown as BriefXCMStep;
+  const lastMetadata = lastStep.metadata as unknown as BriefXCMStep;
+
+  return {
+    from: firstMetadata.originTokenInfo.slug,
+    to: lastMetadata.destinationTokenInfo.slug,
+    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+  };
 }

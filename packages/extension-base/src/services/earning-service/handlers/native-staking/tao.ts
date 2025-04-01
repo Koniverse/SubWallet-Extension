@@ -6,19 +6,29 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { t } from 'i18next';
 
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
+import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
+
+export interface TaoStakeInfo {
+  hotkey: string;
+  stake: string;
+  netuid: number;
+}
 
 interface TaoStakingStakeOption {
-  owner: string,
-  amount: string,
-  identity: string
+  owner: string;
+  amount: string;
+  identity?: string
 }
 
 interface Hotkey {
@@ -70,57 +80,134 @@ function random (...keys: string[]) {
 }
 
 export const bittensorApiKey = (): string => {
-  return random(BITTENSOR_API_KEY_1, BITTENSOR_API_KEY_2, BITTENSOR_API_KEY_3, BITTENSOR_API_KEY_4, BITTENSOR_API_KEY_5, BITTENSOR_API_KEY_6);
+  return random(BITTENSOR_API_KEY_1, BITTENSOR_API_KEY_2, BITTENSOR_API_KEY_3, BITTENSOR_API_KEY_4, BITTENSOR_API_KEY_5, BITTENSOR_API_KEY_6, BITTENSOR_API_KEY_7, BITTENSOR_API_KEY_8, BITTENSOR_API_KEY_9, BITTENSOR_API_KEY_10);
 };
 
 /* Fetch data */
+export class BittensorCache {
+  private static instance: BittensorCache | null = null;
+  private cache: ValidatorResponse | null = null;
+  private cacheTimeout: NodeJS.Timeout | null = null;
+  private promise: Promise<ValidatorResponse> | null = null;
 
-export async function fetchDelegates (): Promise<ValidatorResponse> {
-  const apiKey = bittensorApiKey();
+  // eslint-disable-next-line no-useless-constructor, @typescript-eslint/no-empty-function
+  private constructor () {}
 
-  return new Promise(function (resolve) {
-    fetch('https://api.taostats.io/api/validator/latest/v1', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${apiKey}`
-      }
-    }).then((resp) => {
-      resolve(resp.json());
-    }).catch(console.error);
-  });
-}
+  public static getInstance (): BittensorCache {
+    if (!BittensorCache.instance) {
+      BittensorCache.instance = new BittensorCache();
+    }
 
-export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
-  const apiKey = bittensorApiKey();
-
-  return new Promise(function (resolve) {
-    fetch(`https://api.taostats.io/api/stake_balance/latest/v1?coldkey=${address}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${apiKey}`
-      }
-    }).then((resp) => {
-      resolve(resp.json());
-    }).catch(console.error);
-  });
-}
-
-/* Fetch data */
-
-const testnetDelegate = {
-  '5G6wdAdS7hpBuH1tjuZDhpzrGw9Wf71WEVakDCxHDm1cxEQ2': {
-    name: '0x436c6f776e4e616d65f09fa4a1',
-    url: 'https://example.com  ',
-    image: 'https://example.com/image.png',
-    discord: '0xe28094446973636f7264',
-    description: 'This is an example identity.',
-    additional: ''
+    return BittensorCache.instance;
   }
-};
+
+  public async get (): Promise<ValidatorResponse> {
+    if (this.cache) {
+      return this.cache;
+    }
+
+    if (this.promise) {
+      return this.promise;
+    }
+
+    this.promise = this.fetchData();
+
+    return this.promise;
+  }
+
+  private async fetchData (): Promise<ValidatorResponse> {
+    const apiKey = bittensorApiKey();
+
+    try {
+      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1?limit=200', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${apiKey}`
+        }
+      });
+
+      if (!resp.ok) {
+        console.error('Fetch bittensor delegates fail:', resp.status);
+
+        return this.cache || { data: [] };
+      }
+
+      const rawData = await resp.json() as ValidatorResponse;
+      const data = {
+        data: rawData.data.filter((validator) => parseFloat(validator.apr) > 0.0001)
+      };
+
+      this.cache = data;
+      this.promise = null;
+
+      if (this.cacheTimeout) {
+        clearTimeout(this.cacheTimeout);
+      }
+
+      this.cacheTimeout = setTimeout(() => {
+        this.fetchData().then((newData) => {
+          if (newData.data.length > 0) {
+            this.cache = newData;
+          }
+        }).catch(console.error);
+      }, 60 * 2000);
+
+      return data;
+    } catch (error) {
+      console.error(error);
+      this.promise = null;
+
+      return this.cache || { data: [] };
+    }
+  }
+}
+
+// export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
+//   const apiKey = bittensorApiKey();
+
+//   return new Promise(function (resolve) {
+//     fetch(`https://api.taostats.io/api/stake_balance/latest/v1?coldkey=${address}`, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `${apiKey}`
+//       }
+//     }).then((resp) => {
+//       resolve(resp.json());
+//     }).catch(console.error);
+//   });
+// }
+
+/* Fetch data */
+
+// const testnetDelegate = {
+//   '5G6wdAdS7hpBuH1tjuZDhpzrGw9Wf71WEVakDCxHDm1cxEQ2': {
+//     name: '0x436c6f776e4e616d65f09fa4a1',
+//     url: 'https://example.com  ',
+//     image: 'https://example.com/image.png',
+//     discord: '0xe28094446973636f7264',
+//     description: 'This is an example identity.',
+//     additional: ''
+//   }
+// };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
+  protected override readonly availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: false,
+    withdraw: false,
+    claimReward: false
+  };
+
+  private bittensorCache: BittensorCache;
+  constructor (state: KoniState, chain: string) {
+    super(state, chain);
+    this.bittensorCache = BittensorCache.getInstance();
+  }
+
   /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
@@ -152,8 +239,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           return;
         }
 
-        const minDelegatorStake = await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
+        const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
+        const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
 
+        const bnTaoIn = new BN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
 
         const data: NativeYieldPoolInfo = {
@@ -161,7 +251,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           type: this.type,
           metadata: {
             ...this.metadataInfo,
-            description: this.getDescription('0')
+            description: this.getDescription()
           },
           statistic: {
             assetEarning: [
@@ -169,16 +259,17 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                 slug: this.nativeToken.slug
               }
             ],
-            maxCandidatePerFarmer: 16,
+            maxCandidatePerFarmer: Number(maxValidatorPerNominator),
             maxWithdrawalRequestPerFarmer: 1,
             earningThreshold: {
               join: BNminDelegatorStake.toString(),
               defaultUnstake: '0',
               fastUnstake: '0'
             },
-            eraTime: 1.2,
+            eraTime: 24,
             era: 0,
-            unstakingPeriod: 1.2
+            unstakingPeriod: 1.2,
+            tvl: bnTaoIn.toString()
           }
         };
 
@@ -250,68 +341,53 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const substrateApi = await this.substrateApi.isReady;
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
+    const _delegateInfo = await this.bittensorCache.get();
 
-    const getDevnetPoolPosition = async () => {
-      const testnetAddress = Object.keys(testnetDelegate)[0];
-      const delegatorState: TaoStakingStakeOption[] = [];
-      let bnTotalBalance = BN_ZERO;
-
-      const stakePromises = useAddresses.map(async (address) => {
-        const stakeAmount = (await substrateApi.api.query.subtensorModule.stake(testnetAddress, address)).toString();
-        const bnStakeAmount = new BN(stakeAmount);
-
-        bnTotalBalance = bnTotalBalance.add(bnStakeAmount);
-
-        delegatorState.push({
-          owner: testnetAddress,
-          amount: bnStakeAmount.toString(),
-          identity: testnetAddress
-        });
-
-        rsCallback({
-          ...defaultInfo,
-          type: this.type,
-          address: address,
-          balanceToken: this.nativeToken.slug,
-          totalStake: bnTotalBalance.toString(),
-          activeStake: bnStakeAmount.toString(),
-          unstakeBalance: '0',
-          status: EarningStatus.EARNING_REWARD,
-          isBondedBefore: true,
-          nominations: delegatorState.map((delegate) => ({
-            chain: this.chain,
-            validatorAddress: delegate.owner,
-            activeStake: delegate.amount,
-            status: EarningStatus.EARNING_REWARD
-          })),
-          unstakings: []
-        });
-      });
-
-      await Promise.all(stakePromises);
-    };
-
-    const getMainnetPoolPosition = async () => {
+    const getPoolPosition = async () => {
       const rawDelegateStateInfos = await Promise.all(
-        useAddresses.map((address) => fetchTaoDelegateState(address))
+        useAddresses.map(async (address) => (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON())
       );
 
-      if (rawDelegateStateInfos.length > 0) {
+      if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
           const owner = reformatAddress(useAddresses[i], 42);
           const delegatorState: TaoStakingStakeOption[] = [];
           let bnTotalBalance = BN_ZERO;
-          const delegateStateInfo = rawDelegateStateInfo.data;
+
+          const delegateStateInfo = rawDelegateStateInfo as unknown as TaoStakeInfo[];
+
+          const totalDelegate: Record<string, string> = {};
 
           for (const delegate of delegateStateInfo) {
-            const name = delegate.hotkey_name || delegate.hotkey.ss58;
+            const hotkey = delegate.hotkey;
+            const netuid = delegate.netuid;
+            const stake = new BigN(delegate.stake);
 
-            bnTotalBalance = bnTotalBalance.add(new BN(delegate.stake));
+            if (netuid === 0) {
+              const taoStake = stake.toFixed(0);
+
+              if (totalDelegate[hotkey]) {
+                totalDelegate[hotkey] = new BigN(totalDelegate[hotkey]).plus(taoStake).toFixed();
+              } else {
+                totalDelegate[hotkey] = taoStake;
+              }
+            }
+          }
+
+          for (const hotkey in totalDelegate) {
+            bnTotalBalance = bnTotalBalance.add(new BN(totalDelegate[hotkey]));
+            let identity = '';
+
+            if (_delegateInfo) {
+              const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
+
+              identity = delegateInfo ? delegateInfo.name : '';
+            }
 
             delegatorState.push({
-              owner: delegate.hotkey.ss58,
-              amount: delegate.stake,
-              identity: name
+              owner: hotkey,
+              amount: totalDelegate[hotkey],
+              identity: identity
             });
           }
 
@@ -345,16 +421,66 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       }
     };
 
+    // const getMainnetPoolPosition = async () => {
+    //   const rawDelegateStateInfos = await Promise.all(
+    //     useAddresses.map((address) => fetchTaoDelegateState(address))
+    //   );
+
+    //   if (rawDelegateStateInfos.length > 0) {
+    //     rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
+    //       const owner = reformatAddress(useAddresses[i], 42);
+    //       const delegatorState: TaoStakingStakeOption[] = [];
+    //       let bnTotalBalance = BN_ZERO;
+    //       const delegateStateInfo = rawDelegateStateInfo.data;
+
+    //       for (const delegate of delegateStateInfo) {
+    //         const name = delegate.hotkey_name || delegate.hotkey.ss58;
+
+    //         bnTotalBalance = bnTotalBalance.add(new BN(delegate.stake));
+
+    //         delegatorState.push({
+    //           owner: delegate.hotkey.ss58,
+    //           amount: delegate.stake,
+    //           identity: name
+    //         });
+    //       }
+
+    //       if (delegateStateInfo && delegateStateInfo.length > 0) {
+    //         this.parseNominatorMetadata(chainInfo, owner, delegatorState)
+    //           .then((nominatorMetadata) => {
+    //             rsCallback({
+    //               ...defaultInfo,
+    //               ...nominatorMetadata,
+    //               address: owner,
+    //               type: this.type
+    //             });
+    //           })
+    //           .catch(console.error);
+    //       } else {
+    //         rsCallback({
+    //           ...defaultInfo,
+    //           type: this.type,
+    //           address: owner,
+    //           balanceToken: this.nativeToken.slug,
+    //           totalStake: '0',
+    //           activeStake: '0',
+    //           unstakeBalance: '0',
+    //           status: EarningStatus.NOT_STAKING,
+    //           isBondedBefore: false,
+    //           nominations: [],
+    //           unstakings: []
+    //         });
+    //       }
+    //     });
+    //   }
+    // };
+
     const getStakingPositionInterval = async () => {
       if (cancel) {
         return;
       }
 
-      if (this.chain === 'bittensor_devnet') {
-        await getDevnetPoolPosition();
-      } else {
-        await getMainnetPoolPosition();
-      }
+      await getPoolPosition();
     };
 
     getStakingPositionInterval().catch(console.error);
@@ -375,30 +501,28 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = testnetDelegate;
-    const validatorAddresses = Object.keys(_topValidator);
+    const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
+    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
+    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
+    const bnMinBond = new BN(nominatorMinRequiredStake);
 
-    return validatorAddresses.map((address) => {
-      return {
-        address: address,
-        totalStake: '0',
-        ownStake: '0',
-        otherStake: '0',
-        minBond: '0',
-        nominatorCount: 0,
-        commission: '0',
-        expectedReturn: 0,
-        blocked: false,
-        isVerified: false,
-        chain: this.chain,
-        isCrowded: false,
-        identity: address
-      } as unknown as ValidatorInfo;
-    });
+    return testnetDelegate.map((delegate) => ({
+      address: delegate.delegateSs58,
+      totalStake: '0',
+      ownStake: '0',
+      otherStake: '0',
+      minBond: bnMinBond.toString(),
+      nominatorCount: delegate.nominators.length,
+      commission: delegate.take / 1000,
+      blocked: false,
+      isVerified: false,
+      chain: this.chain,
+      isCrowded: false
+    }) as unknown as ValidatorInfo);
   }
 
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
-    const _topValidator = await fetchDelegates();
+    const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
@@ -444,10 +568,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
-    if (this.chain === 'bittensor_devnet') {
-      return this.getDevnetPoolTargets();
-    } else {
+    if (this.chain === 'bittensor') {
       return this.getMainnetPoolTargets();
+    } else {
+      return this.getDevnetPoolTargets();
     }
   }
 
@@ -462,9 +586,25 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
-    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, binaryAmount);
+    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, 0, binaryAmount);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
+  }
+
+  public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldJoin(data, path);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    const { amount } = data;
+
+    if (new BN(amount).lt(new BN(DEFAULT_DTAO_MINBOND))) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+    }
+
+    return baseErrors;
   }
 
   /* Join pool action */
@@ -480,9 +620,29 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, binaryAmount);
+    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, 0, binaryAmount);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
+  }
+
+  public override async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldLeave(amount, address, fastLeave, selectedTarget, slug);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    if (!poolInfo) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
+    }
+
+    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+
+    if (new BigN(amount).lt(bnMinUnstake)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`))];
+    }
+
+    return baseErrors;
   }
 
   /* Leave pool action */
