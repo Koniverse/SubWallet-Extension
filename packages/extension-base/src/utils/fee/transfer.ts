@@ -57,8 +57,9 @@ export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo
     const isSnowBridgeEvmTransfer = _isPureEvmChain(srcChain) && _isSnowBridgeXcm(srcChain, destChain) && !isAvailBridgeFromEvm;
     const isPolygonBridgeTransfer = _isPolygonChainBridge(srcChain.slug, destChain.slug);
     const isPosBridgeTransfer = _isPosChainBridge(srcChain.slug, destChain.slug);
+    const isAcrossBridgeTransfer = _isAcrossChainBridge(srcChain.slug, destChain.slug);
 
-    return (isAvailBridgeFromEvm || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer) ? 'evm' : 'substrate';
+    return (isAvailBridgeFromEvm || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer) ? 'evm' : 'substrate';
   } else {
     if (_isChainEvmCompatible(srcChain) && _isTokenTransferredByEvm(srcToken)) {
       return 'evm';
@@ -336,11 +337,12 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       throw Error('Destination token is not available');
     }
 
+    const evmSendingValue = isAcrossBridgeTransfer ? '100000000000000' : '0'; // Across have min stake
     const params: CreateXcmExtrinsicProps = {
       destinationTokenInfo: destToken,
       originTokenInfo: srcToken,
       // If value is 0, substrate will throw error when estimating fee
-      sendingValue: feeChainType === 'substrate' ? '1000000000000000000' : '0',
+      sendingValue: feeChainType === 'substrate' ? '1000000000000000000' : evmSendingValue,
       sender: address,
       recipient,
       destinationChain: destChain,

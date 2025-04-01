@@ -514,7 +514,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       const chainId = _getEvmChainId(chainInfo);
 
       if (chainId) {
-        const SpokePoolAddress = SpokePoolMapping[chainId].SpokePool.address;
+        const tokenApprovalStep = processState.steps.find((step) => step.type === CommonStepType.TOKEN_APPROVAL); // Maybe can add index
+        const metadata = tokenApprovalStep?.metadata;
+        const SpokePoolAddress = metadata?.SpokePoolAddress as string;
 
         return approveSpending({
           amount: values.value,
@@ -533,7 +535,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       chain: values.chain,
       owner: values.from
     });
-  }, [assetRegistry, chainInfoMap]);
+  }, [assetRegistry, chainInfoMap, processState.steps]);
 
   // Submit transaction
   const doSubmit = useCallback((values: TransferParams, options: TransferOptions) => {

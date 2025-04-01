@@ -199,8 +199,6 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
 
     return transactionConfig;
   } catch (error) {
-    console.error('Error:', error);
-
     return Promise.reject(error);
   }
 };
