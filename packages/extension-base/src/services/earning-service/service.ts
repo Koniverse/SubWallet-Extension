@@ -13,7 +13,7 @@ import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/e
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
@@ -941,7 +941,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -998,6 +998,19 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     if (handler) {
       return handler.handleYieldClaimReward(params.address, params.bondReward);
+    } else {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
+    }
+  }
+
+  public async yieldGetEarningSlippage (params: RequestEarningSlippage): Promise<number> {
+    await this.eventService.waitChainReady;
+
+    const { slug } = params;
+    const handler = this.getPoolHandler(slug);
+
+    if (handler) {
+      return handler.getEarningSlippage(params);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
