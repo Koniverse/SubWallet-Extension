@@ -11,8 +11,7 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { _getChainNativeTokenSlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
@@ -611,7 +610,7 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   // process
-  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
     const originChainInfo = this.state.chainService.getChainInfoByKey(params.originChain);
 
     if (!params.destChain) { // normal transfers

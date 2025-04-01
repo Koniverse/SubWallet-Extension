@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 
 import { CommonStepDetail, CommonStepFeeInfo } from '../service-base';
@@ -71,12 +70,6 @@ export interface ProcessTransactionData {
 export interface BriefProcessStep {
   processId: string;
   stepId: number;
-}
-
-export interface BriefXCMStep {
-  sendingValue: string;
-  originTokenInfo: _ChainAsset;
-  destinationTokenInfo: _ChainAsset;
 }
 
 export interface BriefSwapStep {
