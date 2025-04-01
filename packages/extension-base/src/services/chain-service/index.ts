@@ -719,7 +719,6 @@ export class ChainService {
     await this.initApis();
     await this.initAssetSettings();
     await this.autoEnableTokens();
-    await this.enablePopularTokens();
   }
 
   initAssetRefMap () {
@@ -833,14 +832,31 @@ export class ChainService {
   }
 
   handleLatestData () {
-    this.fetchLatestChainData().then((latestChainInfo) => {
-      this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
-      this.handleLatestChainData(latestChainInfo);
-      this.lockChainInfoMap = false;
-    }).catch((e) => {
-      this.lockChainInfoMap = false;
-      console.error('Error update latest chain data', e);
-    });
+    this.fetchLatestChainData()
+      .then((latestChainInfo) => {
+        this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
+        this.handleLatestChainData(latestChainInfo);
+        this.lockChainInfoMap = false;
+
+        return this.fetchLatestPriorityTokens();
+      })
+      .then((latestPriorityTokens) => {
+        const currentTokens = this.priorityTokensSubject.value || {};
+
+        this.handleLatestPriorityTokens(latestPriorityTokens);
+
+        const currentTokenKeys = Object.keys(currentTokens.token || {});
+        const newTokenKeys = Object.keys(latestPriorityTokens.token || {});
+
+        if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) {
+          this.enablePopularTokens()
+            .then(() => this.logger.log('Popular tokens enabled due to priority tokens change'))
+            .catch((e) => console.error('Error enabling popular tokens:', e));
+        }
+      }).catch((e) => {
+        this.lockChainInfoMap = false;
+        console.error('Error update latest chain data', e);
+      });
 
     // this.fetchLatestPriceIdsData().then((latestPriceIds) => {
     //   this.handleLatestPriceId(latestPriceIds);
@@ -849,12 +865,6 @@ export class ChainService {
     this.fetchLatestLedgerGenericAllowChains()
       .then((latestledgerGenericAllowChains) => {
         this.handleLatestLedgerGenericAllowChains(latestledgerGenericAllowChains);
-      })
-      .catch(console.error);
-
-    this.fetchLatestPriorityTokens()
-      .then((latestPriorityTokens) => {
-        this.handleLatestPriorityTokens(latestPriorityTokens);
       })
       .catch(console.error);
   }
@@ -996,15 +1006,20 @@ export class ChainService {
   }
 
   public async enableChain (chainSlug: string) {
+    console.log('ENABLECHAIN', chainSlug);
     const chainInfo = this.getChainInfoByKey(chainSlug);
     const chainStateMap = this.getChainStateMap();
 
     if (chainStateMap[chainSlug].active || this.lockChainInfoMap) {
+      console.log('log7.1__', chainSlug);
+      console.log('log7.1__chainStateMap[chainSlug].activ', chainStateMap[chainSlug].active);
+      console.log('log7.1__this.lockChainInfoMap', this.lockChainInfoMap);
+
       return false;
     }
 
     this.lockChainInfoMap = true;
-
+    console.log('log7');
     this.dbService.updateChainStore({
       ...chainInfo,
       active: true,
@@ -1044,7 +1059,7 @@ export class ChainService {
         if (!currentState) {
           // Enable chain success then update chain state
           await this.initApiForChain(chainInfo);
-
+          console.log('log6');
           this.dbService.updateChainStore({
             ...chainInfo,
             active: true,
@@ -1089,7 +1104,7 @@ export class ChainService {
     // Set disconnect state for inactive chain
     this.updateChainConnectionStatus(chainSlug, _ChainConnectionStatus.DISCONNECTED);
     this.destroyApiForChain(chainInfo);
-
+    console.log('log5');
     this.dbService.updateChainStore({
       ...chainInfo,
       active: false,
@@ -1271,6 +1286,11 @@ export class ChainService {
 
           const hasProvider = Object.values(providers).length > 0;
           const canActive = hasProvider && chainInfo.chainStatus === _ChainStatus.ACTIVE;
+
+          console.log('1.canActive, storedChainInfo.active', canActive, storedChainInfo.active);
+          console.log('1.storedSlug', storedSlug);
+          console.log('1.storedChainInfo', storedChainInfo);
+          console.log('1.providers', providers);
           const selectedProvider = updateCurrentProvider(providers, storedChainInfo, storedSlug, canActive && storedChainInfo.active);
 
           this.dataMap.chainStateMap[storedSlug] = {
@@ -2059,6 +2079,8 @@ export class ChainService {
 
     let needUpdateSubject: boolean | undefined;
 
+    console.log('[] assetSetting', assetSetting);
+
     // Update settings
     currentAssetSettings[assetSlug] = assetSetting;
 
@@ -2066,8 +2088,11 @@ export class ChainService {
       const assetInfo = this.getAssetBySlug(assetSlug);
       const chainState = this.getChainStateByKey(assetInfo.originChain);
 
+      console.log('[] chainState 0', chainState.slug);
+
       // if chain not enabled, then automatically enable
       if (chainState && !chainState.active) {
+        console.log('[] chainState 1', chainState.slug);
         await this.enableChain(chainState.slug);
         needUpdateSubject = true;
 
