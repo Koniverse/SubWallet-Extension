@@ -7,7 +7,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN, { BigNumber } from 'bignumber.js';
@@ -109,28 +109,31 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     return this.swapBaseHandler.slug;
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
-    return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getSubmitStep.bind(this)
-    ]);
-  }
-
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     return this.swapBaseHandler.generateOptimalProcessV2(params, [
       this.getSubmitStep.bind(this)
     ]);
   }
 
-  async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const stepData = params.path[stepIndex];
+
+    if (stepData.action !== DynamicSwapType.SWAP) {
+      return Promise.resolve(undefined);
+    }
+
     if (params.selectedQuote) {
       const submitStep: BaseStepDetail = {
         name: 'Swap',
         type: SwapStepType.SWAP,
+        // @ts-ignore
         metadata: {
           sendingValue: params.request.fromAmount.toString(),
           originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
-        }
+          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
+          sender: params.request.address,
+          receiver: params.request.recipient || params.request.address
+        } as unknown as BaseSwapStepMetadata
       };
 
       return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);

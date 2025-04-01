@@ -134,8 +134,7 @@ export interface HydradxSwapTxData extends SwapBaseTxData {
 }
 
 // parameters & responses
-export type GenSwapStepFunc = (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
-export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
+export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2, stepIndex: number) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
 export interface ChainflipPreValidationMetadata {
   minSwap: AmountData;
@@ -223,19 +222,14 @@ export interface DynamicSwapAction {
   pair: ActionPair;
 }
 
-export const enum XcmStepPosition {
+export const enum BridgeStepPosition {
   FIRST = 0,
-  AFTER_SWAP = 1,
-  AFTER_XCM_SWAP = 2
-}
-
-export interface PairSlug {
-  fromTokenSlug: string,
+  AFTER_SWAP = 1
 }
 
 export interface OptimalSwapPathParamsV2 {
   request: SwapRequest;
-  selectedQuote?: SwapQuote;
+  selectedQuote: SwapQuote;
   path: DynamicSwapAction[];
 }
 
@@ -273,6 +267,8 @@ export interface BaseSwapStepMetadata {
   sendingValue: string;
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
+  sender: string,
+  receiver: string
 }
 
 export interface BriefXCMStep extends BaseSwapStepMetadata {

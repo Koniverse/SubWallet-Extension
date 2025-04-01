@@ -12,7 +12,7 @@ import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatibl
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParams, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -224,8 +224,14 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     }
   }
 
-  async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const metadata = params.selectedQuote?.metadata as ChainFlipMetadata;
+
+    const stepData = params.path[stepIndex];
+
+    if (stepData.action !== DynamicSwapType.SWAP) {
+      return Promise.resolve(undefined);
+    }
 
     if (!params.selectedQuote) {
       return Promise.resolve(undefined);
@@ -238,6 +244,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
+      // @ts-ignore
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
         originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
@@ -245,16 +252,10 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
         srcChain: metadata.srcChain,
         destChain: metadata.destChain
-      }
+      } as unknown as ChainFlipSwapStepMetadata
     };
 
     return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
-  }
-
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
-    return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getSubmitStep.bind(this)
-    ]);
   }
 
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {

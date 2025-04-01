@@ -5,7 +5,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ServiceStatus, ServiceWithProcessInterface, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
+import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetOriginChain, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
@@ -13,10 +13,10 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
+import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
@@ -24,13 +24,7 @@ import { BehaviorSubject } from 'rxjs';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
 
-export const _isChainSupportedByProvider = (providerSlug: SwapProviderId, chain: string) => {
-  const supportedChains = _PROVIDER_TO_SUPPORTED_PAIR_MAP[providerSlug];
-
-  return supportedChains ? supportedChains.includes(chain) : false;
-};
-
-export class SwapService implements ServiceWithProcessInterface, StoppableServiceInterface {
+export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
   private eventService: EventService;
   private readonly chainService: ChainService;
@@ -79,28 +73,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return availableQuotes;
   }
 
-  // deprecated
-  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalSwapPath {
-    const result: CommonOptimalSwapPath = {
-      totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP],
-      path: []
-    };
-
-    result.totalFee.push({
-      feeComponent: [],
-      feeOptions: [params.request.pair.from],
-      defaultFeeToken: params.request.pair.from
-    });
-    result.steps.push({
-      id: result.steps.length,
-      name: 'Swap',
-      type: SwapStepType.SWAP
-    });
-
-    return result;
-  }
-
   private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalSwapPath {
     const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
@@ -133,22 +105,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     });
 
     return result;
-  }
-
-  // deprecated
-  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
-    if (!params.selectedQuote) {
-      return this.getDefaultProcess(params);
-    } else {
-      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
-      const handler = this.handlers[providerId];
-
-      if (handler) {
-        return handler.generateOptimalProcess(params);
-      } else {
-        return this.getDefaultProcess(params);
-      }
-    }
   }
 
   public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
@@ -227,6 +183,10 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       selectedQuote: swapQuoteResponse.optimalQuote,
       path
     });
+
+    console.log('-------');
+    console.log('data', path, optimalProcess);
+    console.log('-------');
 
     return {
       process: optimalProcess,
