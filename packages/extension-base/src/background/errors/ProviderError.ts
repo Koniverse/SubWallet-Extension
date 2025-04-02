@@ -27,10 +27,10 @@ const defaultErrorMap: Record<ProviderErrorType, { message: string, code?: numbe
 export class ProviderError extends SWError {
   override errorType: ProviderErrorType;
 
-  constructor (errorType: ProviderErrorType, errMessage?: string, data?: unknown) {
+  constructor (errorType: ProviderErrorType, errMessage?: string, data?: unknown, errorCode?: number) {
     const { code, message } = defaultErrorMap[errorType];
 
-    super(errorType, errMessage || message, code, data);
+    super(errorType, errMessage || message, errorCode || code, data);
 
     this.errorType = errorType;
   }

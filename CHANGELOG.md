@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## 1.3.26
+Build date: Mar 27, 2025.
+
+Bug fixed:
+- Fixed bug show balance for Polimec (#4058)
+- Fixed bug View explorer for Bittensor (#4058)
+
+
+## 1.3.25
+Build date: Mar 24, 2025.
+
+Features & Update:
+- Support dTAO staking (#4036)
+- Integrate Meld All in One Wizard (#4085)
+
+Bug fixed:
+- Fixed bug integrating Wagmi into SubWallet (#4086)
+
+
+## 1.3.24
+Build date: Mar 18, 2025.
+
+Features & Update:
+- Auto update metadata for substrate chain (#4037)
+- Allow customizing fee for substrate/evm transactions (#3658)
+- Support custom fee token when sending token on Hydration (#4045)
+
+Bug fixed:
+- Fixed bug Can't reset data when search on select token popup (#3786)
+
+
 ## 1.3.23
 Build date: Mar 05, 2025.
 

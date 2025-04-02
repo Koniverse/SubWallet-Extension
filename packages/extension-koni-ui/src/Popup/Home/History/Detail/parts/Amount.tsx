@@ -100,6 +100,16 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }
 
+  let symbol = amount?.symbol;
+
+  if (data.type === ExtrinsicType.STAKING_UNBOND) {
+    const additionalInfo = data.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo?.symbol) {
+      symbol = additionalInfo.symbol;
+    }
+  }
+
   return (
     <>
       {
@@ -108,7 +118,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <MetaInfo.Number
               decimals={amount?.decimals || undefined}
               label={amountLabel}
-              suffix={amount?.symbol || undefined}
+              suffix={symbol || undefined}
               value={amountValue || '0'}
             />
           )
