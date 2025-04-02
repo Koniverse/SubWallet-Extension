@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { CommonOptimalPath, ProcessType, StepStatus, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
+import { CommonOptimalSwapPath, ProcessType, StepStatus, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   currentQuote: SwapQuote | undefined;
-  currentOptimalSwapPath: CommonOptimalPath | undefined;
+  currentOptimalSwapPath: CommonOptimalSwapPath | undefined;
   isFormInvalid: boolean;
   estimatedFeeValue: BigN;
   handleRequestLoading: boolean;
