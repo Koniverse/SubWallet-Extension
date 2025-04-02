@@ -3,6 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { fetchPsChainMap } from '@subwallet/extension-base/constants/ps-chains-mapping';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
 
@@ -30,32 +31,6 @@ const paraSpellApi = {
 };
 
 const paraSpellKey = process.env.PARASPELL_API_KEY || '';
-const lightSpellChainMapping: Record<string, string> = {
-  statemint: 'AssetHubPolkadot',
-  acala: 'Acala',
-  astar: 'Astar',
-  bifrost_dot: 'BifrostPolkadot',
-  bitgreen: 'Bitgreen',
-  bridgeHubPolkadot: 'BridgeHubPolkadot',
-  bridgeHubKusama: 'BridgeHubKusama',
-  centrifuge: 'Centrifuge',
-  hydradx_main: 'Hydration',
-  interlay: 'Interlay',
-  moonbeam: 'Moonbeam',
-  amplitude: 'Amplitude',
-  statemine: 'AssetHubKusama',
-  bifrost: 'BifrostKusama',
-  karura: 'Karura',
-  moonriver: 'Moonriver',
-  shiden: 'Shiden',
-  manta_network: 'Manta',
-  pendulum: 'Pendulum',
-  phala: 'Phala',
-  mythos: 'Mythos',
-  ethereum: 'Ethereum',
-  polkadot: 'Polkadot',
-  kusama: 'Kusama'
-};
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
   try {
@@ -127,11 +102,13 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw Error('Substrate API is not available');
   }
 
+  const psChainMap = await fetchPsChainMap();
+
   try {
     const bodyData = {
       address: recipient,
-      from: lightSpellChainMapping[originChain.slug], // todo: add mapping each time support new xcm chain
-      to: lightSpellChainMapping[destinationChain.slug],
+      from: psChainMap[originChain.slug], // todo: add mapping each time support new xcm chain
+      to: psChainMap[destinationChain.slug],
       currency: {
         symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
         amount: sendingValue
@@ -163,6 +140,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 // dry run can fail due to sender address & amount token
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const psChainMap = await fetchPsChainMap();
 
   let dryRunInfo: DryRunInfo | undefined;
 
@@ -170,8 +148,8 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     const bodyData = {
       senderAddress: sender,
       address: recipient,
-      from: lightSpellChainMapping[originChain.slug],
-      to: lightSpellChainMapping[destinationChain.slug],
+      from: psChainMap[originChain.slug],
+      to: psChainMap[destinationChain.slug],
       currency: {
         symbol: originTokenInfo.symbol,
         amount: sendingValue
