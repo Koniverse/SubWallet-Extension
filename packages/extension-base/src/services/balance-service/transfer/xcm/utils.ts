@@ -102,15 +102,21 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw Error('Substrate API is not available');
   }
 
+  const psSymbol = originTokenInfo.metadata?.psSymbol;
+
+  if (!psSymbol) {
+    throw Error('Token is not support XCM at this time'); // todo: content
+  }
+
   const psChainMap = await fetchPsChainMap();
 
   try {
     const bodyData = {
       address: recipient,
-      from: psChainMap[originChain.slug], // todo: add mapping each time support new xcm chain
+      from: psChainMap[originChain.slug],
       to: psChainMap[destinationChain.slug],
       currency: {
-        symbol: originTokenInfo.symbol, // todo: MUST check symbol is created exactly
+        symbol: psSymbol,
         amount: sendingValue
       }
       // xcmVersion: XCM_VERSION.V3
@@ -141,6 +147,11 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const psChainMap = await fetchPsChainMap();
+  const psSymbol = originTokenInfo.metadata?.psSymbol;
+
+  if (!psSymbol) {
+    throw Error('Token is not support XCM at this time'); // todo: content
+  }
 
   let dryRunInfo: DryRunInfo | undefined;
 
@@ -151,7 +162,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
       from: psChainMap[originChain.slug],
       to: psChainMap[destinationChain.slug],
       currency: {
-        symbol: originTokenInfo.symbol,
+        symbol: psSymbol,
         amount: sendingValue
       }
       // xcmVersion: XCM_VERSION.V3

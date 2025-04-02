@@ -6797,15 +6797,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.103-beta.1":
-  version: 0.2.103-beta.1
-  resolution: "@subwallet/chain-list@npm:0.2.103-beta.1"
+"@subwallet/chain-list@npm:0.2.103-beta.2":
+  version: 0.2.103-beta.2
+  resolution: "@subwallet/chain-list@npm:0.2.103-beta.2"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: 6a087c4424b755c3263f0e1cccf6b7fadd48bcea94d1ff7d913a8e165b5ce30e16c448c0f931119a8a46d50f6cadeaf8eb11d8a19572a230d38a445ddd5c992e
+  checksum: a6d1ff35e341c8faf7e2a7192d01cbe48cd260813e2403f4c48fbf137027cc7b74870c0605f4c0795331bf3260e47857287606908abfb2f6ae2bc69808f5ba08
   languageName: node
   linkType: hard
 
@@ -6848,7 +6848,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.103-beta.1
+    "@subwallet/chain-list": 0.2.103-beta.2
     "@subwallet/extension-base": ^1.3.24-0
     "@subwallet/extension-chains": ^1.3.24-0
     "@subwallet/extension-dapp": ^1.3.24-0
@@ -6988,7 +6988,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.103-beta.1
+    "@subwallet/chain-list": 0.2.103-beta.2
     "@subwallet/extension-base": ^1.3.24-0
     "@subwallet/extension-chains": ^1.3.24-0
     "@subwallet/extension-dapp": ^1.3.24-0
@@ -7129,7 +7129,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.103-beta.1
+    "@subwallet/chain-list": 0.2.103-beta.2
     "@subwallet/extension-base": ^1.3.24-0
     "@subwallet/extension-chains": ^1.3.24-0
     "@subwallet/extension-dapp": ^1.3.24-0
@@ -7310,7 +7310,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.103-beta.1
+    "@subwallet/chain-list": 0.2.103-beta.2
   languageName: unknown
   linkType: soft
 
