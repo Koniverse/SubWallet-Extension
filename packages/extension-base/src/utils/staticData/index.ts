@@ -27,7 +27,7 @@ export const blockedActions: Record<string, EnvConfig> = require('./blockedActio
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const oldChainPrefix: Record<string, EnvConfig> = require('./oldChainPrefix.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
-export const psChainMap: Record<string, EnvConfig> = require('./psChainMap.json');
+export const paraSpellChainMap: Record<string, EnvConfig> = require('./paraSpellChainMap.json');
 
 export enum StaticKey {
   BUY_SERVICE_INFOS = 'buy-service-infos',
@@ -41,7 +41,7 @@ export enum StaticKey {
   REMIND_NOTIFICATION_TIME = 'remind-notification-time',
   BLOCKED_ACTIONS = 'blocked-actions',
   OLD_CHAIN_PREFIX = 'old-chain-prefix',
-  PS_CHAIN_MAP= 'ps-chain-map',
+  PARASPELL_CHAIN_MAP= 'paraspell-chain-map',
 }
 
 export const staticData = {
@@ -56,5 +56,5 @@ export const staticData = {
   [StaticKey.REMIND_NOTIFICATION_TIME]: remindNotificationTime,
   [StaticKey.BLOCKED_ACTIONS]: blockedActions,
   [StaticKey.OLD_CHAIN_PREFIX]: oldChainPrefix,
-  [StaticKey.PS_CHAIN_MAP]: psChainMap
+  [StaticKey.PARASPELL_CHAIN_MAP]: paraSpellChainMap
 };

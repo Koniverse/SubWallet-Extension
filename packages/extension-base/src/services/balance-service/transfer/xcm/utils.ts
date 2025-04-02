@@ -3,7 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { fetchPsChainMap } from '@subwallet/extension-base/constants/ps-chains-mapping';
+import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
 
@@ -15,6 +15,11 @@ import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 interface DryRunInfo {
   success: boolean,
   fee: string // has fee in case dry run success
+}
+
+interface ParaSpellCurrency {
+  symbol: string,
+  amount: string
 }
 
 // @ts-ignore
@@ -102,24 +107,20 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw Error('Substrate API is not available');
   }
 
-  const psSymbol = originTokenInfo.metadata?.psSymbol;
+  const paraSpellSymbol = originTokenInfo.metadata?.psSymbol;
 
-  if (!psSymbol) {
+  if (!paraSpellSymbol) {
     throw Error('Token is not support XCM at this time'); // todo: content
   }
 
-  const psChainMap = await fetchPsChainMap();
+  const paraSpellChainMap = await fetchParaSpellChainMap();
 
   try {
     const bodyData = {
       address: recipient,
-      from: psChainMap[originChain.slug],
-      to: psChainMap[destinationChain.slug],
-      currency: {
-        symbol: psSymbol,
-        amount: sendingValue
-      }
-      // xcmVersion: XCM_VERSION.V3
+      from: paraSpellChainMap[originChain.slug],
+      to: paraSpellChainMap[destinationChain.slug],
+      currency: createParaSpellCurrency(paraSpellSymbol, sendingValue)
     };
 
     const response = await fetch(paraSpellApi.buildXcm, {
@@ -146,10 +147,10 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 // dry run can fail due to sender address & amount token
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
-  const psChainMap = await fetchPsChainMap();
-  const psSymbol = originTokenInfo.metadata?.psSymbol;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellSymbol = originTokenInfo.metadata?.psSymbol;
 
-  if (!psSymbol) {
+  if (!paraSpellSymbol) {
     throw Error('Token is not support XCM at this time'); // todo: content
   }
 
@@ -159,13 +160,9 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     const bodyData = {
       senderAddress: sender,
       address: recipient,
-      from: psChainMap[originChain.slug],
-      to: psChainMap[destinationChain.slug],
-      currency: {
-        symbol: psSymbol,
-        amount: sendingValue
-      }
-      // xcmVersion: XCM_VERSION.V3
+      from: paraSpellChainMap[originChain.slug],
+      to: paraSpellChainMap[destinationChain.slug],
+      currency: createParaSpellCurrency(paraSpellSymbol, sendingValue)
     };
 
     const response = await fetch(paraSpellApi.dryRunXcm, {
@@ -188,6 +185,14 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   }
 
   return dryRunInfo;
+}
+
+function createParaSpellCurrency (symbol: string, amount: string): ParaSpellCurrency {
+  // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
+  return {
+    symbol,
+    amount
+  }
 }
 
 // todo: remove
