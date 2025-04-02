@@ -7,6 +7,7 @@ import { BalanceValueInfo } from '@subwallet/extension-koni-ui/types';
 export interface SortableTokenItem {
   slug: string,
   symbol: string,
+  isTestnet: boolean,
   total?: BalanceValueInfo,
 }
 
@@ -101,13 +102,13 @@ export function sortTokensByBalanceInSelector (targetTokens: SortableTokenItem[]
   targetTokens.sort((a, b) => {
     const getTokenGroupLevel = (token: SortableTokenItem): number => {
       if (token.total) {
-        const value = token.total.value.toNumber();
+        const value = token.total.convertedValue.toNumber();
 
-        if (value > 0) {
+        if (value > 0 || !token.isTestnet) {
           return 1;
-        } // Group 1: Has total.value > 0
+        } // Group 1: Has total.convertedValue > 0
 
-        return 2; // Group 2: Has total.value == 0
+        return 2; // Group 2: Has total.convertedValue == 0
       }
 
       return 3; // Group 3: No total

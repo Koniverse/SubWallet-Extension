@@ -96,7 +96,8 @@ function getTokenSelectorItem (
         free: tokenBalanceInfo.free,
         locked: tokenBalanceInfo.locked,
         total: tokenBalanceInfo.total,
-        currency: tokenBalanceInfo.currency
+        currency: tokenBalanceInfo.currency,
+        isTestnet: tokenBalanceInfo.isTestnet
       };
     })();
 
@@ -106,6 +107,7 @@ function getTokenSelectorItem (
       symbol: asset.symbol,
       name: asset.name,
       balanceInfo,
+      isTestnet: !!balanceInfo?.isTestnet,
       showBalance: true,
       total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
     });

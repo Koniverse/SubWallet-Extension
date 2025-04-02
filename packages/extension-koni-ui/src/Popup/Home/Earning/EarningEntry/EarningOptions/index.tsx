@@ -43,10 +43,6 @@ const testnetOrdinal = (group: YieldGroupInfo): number => {
   return group.isTestnet ? 0 : 1;
 };
 
-const convertedBalanceValueOrdinal = (group: YieldGroupInfo): number => {
-  return group.balance.convertedValue.toNumber();
-};
-
 const balanceOrdinal = (group: YieldGroupInfo): number => {
   return group.balance.value.toNumber();
 };
@@ -91,7 +87,6 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   const items = useMemo(() => {
     return [...data].sort((a, b) => {
       return (
-        convertedBalanceValueOrdinal(b) - convertedBalanceValueOrdinal(a) ||
         groupOrdinal(b) - groupOrdinal(a) ||
         testnetOrdinal(b) - testnetOrdinal(a) ||
         balanceOrdinal(b) - balanceOrdinal(a) ||

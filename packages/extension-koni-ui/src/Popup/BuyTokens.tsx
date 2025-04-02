@@ -173,7 +173,8 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           free: tokenBalanceInfo.free,
           locked: tokenBalanceInfo.locked,
           total: tokenBalanceInfo.total,
-          currency: tokenBalanceInfo.currency
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
         }
         : undefined;
 
@@ -183,6 +184,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
         symbol: info.symbol,
         originChain: info.network,
         balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
         total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };

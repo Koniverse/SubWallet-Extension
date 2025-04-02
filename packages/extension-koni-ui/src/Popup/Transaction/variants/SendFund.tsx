@@ -65,7 +65,7 @@ function getTokenItems (
   chainInfoMap: Record<string, _ChainInfo>,
   assetRegistry: Record<string, _ChainAsset>,
   tokenGroupSlug?: string // is ether a token slug or a multiChainAsset slug
-): SortableTokenSelectorItemType[] {
+): TokenSelectorItemType[] {
   let allowedChains: string[];
 
   if (!isAccountAll(accountProxy.id)) {
@@ -74,7 +74,7 @@ function getTokenItems (
     allowedChains = getChainsByAccountAll(accountProxy, accountProxies, chainInfoMap);
   }
 
-  const items: SortableTokenSelectorItemType[] = [];
+  const items: TokenSelectorItemType[] = [];
 
   Object.values(assetRegistry).forEach((chainAsset) => {
     const originChain = _getAssetOriginChain(chainAsset);
@@ -338,13 +338,15 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           free: tokenBalanceInfo.free,
           locked: tokenBalanceInfo.locked,
           total: tokenBalanceInfo.total,
-          currency: tokenBalanceInfo.currency
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
         }
         : undefined;
 
       return {
         ...item,
         balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
         total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     });
