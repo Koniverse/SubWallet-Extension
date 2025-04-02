@@ -483,11 +483,11 @@ export class BalanceService implements StoppableServiceInterface {
 
       if (typeValid) {
         return new Promise<string[] | null>((resolve) => {
-          const timeOutPromise = new Promise<string[]>((resolve) => {
-            setTimeout(() => resolve([]), 30000);
+          const timeOutPromise = new Promise<string[]>((_resolve) => {
+            setTimeout(() => _resolve([]), 30000);
           });
 
-          const apiPromise = subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address).then((result) => result) ?? Promise.resolve([]);
+          const apiPromise = subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
 
           Promise.race([timeOutPromise, apiPromise])
             .then((result) => resolve(result))
@@ -497,7 +497,7 @@ export class BalanceService implements StoppableServiceInterface {
             });
         });
       } else {
-        return null;
+        return Promise.resolve(null);
       }
     });
 
