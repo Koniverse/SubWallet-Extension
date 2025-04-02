@@ -366,10 +366,6 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
         paddingBottom: token.padding
       },
 
-      '.token-selector-item.-selected': {
-        backgroundColor: token.colorBgInput
-      },
-
       '.token-selector-item + .token-selector-item': {
         marginTop: token.marginXS
       }

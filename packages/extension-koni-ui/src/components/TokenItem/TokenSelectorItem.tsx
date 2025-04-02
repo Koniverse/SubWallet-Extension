@@ -15,7 +15,7 @@ interface Props extends ThemeProps {
   tokenSlug: string;
   tokenSymbol: string;
   chainSlug: string;
-  isSelected: boolean;
+  isSelected?: boolean;
   chainName: string;
   balanceInfo?: TokenSelectorItemType['balanceInfo'];
   showBalance?: boolean;

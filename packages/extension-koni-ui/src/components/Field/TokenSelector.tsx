@@ -102,9 +102,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         balanceInfo={item.balanceInfo}
         chainName={_getChainName(chainInfoMap[item.originChain])}
         chainSlug={item.originChain}
-        className={CN('token-selector-item', {
-          '-selected': value === item.slug
-        })}
+        className={CN('token-selector-item')}
         isSelected={selected}
         key={item.slug}
         showBalance={true}
@@ -112,7 +110,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         tokenSymbol={item.symbol}
       />
     );
-  }, [chainInfoMap, value]);
+  }, [chainInfoMap]);
 
   useEffect(() => {
     if (!value) {
@@ -168,92 +166,6 @@ export const TokenSelector = styled(forwardRef(Component))<Props>(({ theme: { to
       overflow: 'hidden',
       textWrap: 'nowrap',
       whiteSpace: 'nowrap'
-    },
-
-    // TODO: delete this when fix component in ui-base
-    '.token-item .ant-network-item-sub-name': {
-      display: 'none'
-    },
-
-    '.token-logo': {
-      bottom: 0,
-      right: 0,
-      margin: '-1px 0',
-
-      '.-sub-logo': {
-        '.ant-image': {
-          display: 'flex'
-        }
-      }
-    },
-
-    '.ant-network-item-content': {
-      padding: token.paddingSM
-    },
-
-    '.token-item .__check-icon': {
-      display: 'flex',
-      width: 40,
-      justifyContent: 'center'
-    },
-
-    '.__token-info-row': {
-      display: 'flex',
-      justifyContent: 'space-between',
-      flexDirection: 'row',
-      gap: token.paddingSM
-    },
-
-    '.__value': {
-      fontSize: token.fontSizeLG,
-      whiteSpace: 'nowrap',
-      lineHeight: token.lineHeightLG
-    },
-
-    '.__converted-value': {
-      lineHeight: token.lineHeight,
-      fontSize: token.fontSizeSM,
-      whiteSpace: 'nowrap'
-    },
-
-    '.-is-not-selected': {
-      marginRight: token.margin * 2
-    },
-
-    '.ant-number .ant-typography': {
-      fontSize: 'inherit !important',
-      color: 'inherit !important',
-      lineHeight: 'inherit'
-    },
-
-    '.__token-info': {
-      display: 'flex',
-      flexDirection: 'row',
-      overflow: 'hidden',
-      fontSize: token.fontSizeHeading5,
-      whiteSpace: 'nowrap',
-      lineHeight: token.lineHeightHeading5,
-      fontWeight: token.fontWeightStrong,
-      color: token.colorWhite
-    },
-
-    '.__token-name-wrapper': {
-      color: token.colorTextTertiary,
-      display: 'flex',
-      flexDirection: 'row',
-      overflow: 'hidden',
-
-      '.__token-name': {
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        whiteSpace: 'nowrap'
-      }
-    },
-
-    '.__token-original-chain': {
-      fontSize: token.fontSizeSM,
-      lineHeight: token.lineHeightSM,
-      color: token.colorTextDescription
     }
 
   });
