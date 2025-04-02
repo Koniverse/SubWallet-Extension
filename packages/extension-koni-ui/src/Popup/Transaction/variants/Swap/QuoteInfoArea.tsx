@@ -4,17 +4,18 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { CommonOptimalPath, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
+import { CommonOptimalPath, ProcessType, StepStatus, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Icon, Number as UiNumber, Tooltip } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, Logo, Number as UiNumber, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -39,38 +40,47 @@ type DecimalParts = {
   fractionPart?: string;
 };
 
+function roundFraction (raw: string, digits: number): string {
+  const numStr = `0.${raw}`;
+  const rounded = new BigN(numStr).decimalPlaces(digits, BigN.ROUND_HALF_UP);
+
+  return rounded.toFixed(digits).split('.')[1];
+}
+
 function analyzeDecimal (value: number): DecimalParts {
   const str = new BigN(value).toFixed();
-  const [intPart, fracPartRaw = ''] = str.split('.');
+  const [intPart, fracRaw = ''] = str.split('.');
+  const intVal = +intPart;
 
-  if (!fracPartRaw) {
+  if (!fracRaw || /^0*$/.test(fracRaw)) {
     return { integerPart: intPart };
   }
 
-  const zeroMatch = fracPartRaw.match(/^(0{3,})/);
-  const subCount = zeroMatch?.[1].length;
-  const rest = subCount ? fracPartRaw.slice(subCount) : fracPartRaw;
+  if (intVal > 0) {
+    if (/^0{3,}$/.test(fracRaw)) {
+      return { integerPart: intPart, fractionPart: '000' };
+    }
 
-  const maxLen = subCount ? 2 : 4;
-  const roundPart = rest.slice(0, maxLen + 1);
-
-  let roundedStr = roundPart;
-
-  if (roundPart.length > maxLen) {
-    const num = Number(`0.${roundPart}`);
-    const rounded = Math.round(num * Math.pow(10, maxLen));
-
-    roundedStr = String(rounded).padStart(maxLen, '0');
+    return {
+      integerPart: intPart,
+      fractionPart: roundFraction(fracRaw, 4)
+    };
   }
+
+  const zeroMatch = fracRaw.match(/^(0{3,})/);
+  const subCount = zeroMatch?.[1].length;
+  const rest = subCount ? fracRaw.slice(subCount) : fracRaw;
+  const maxLen = subCount ? 2 : 4;
+  const rounded = roundFraction(rest, maxLen);
 
   return {
     integerPart: intPart,
     subZeroCount: subCount,
-    fractionPart: roundedStr.length > 0 ? roundedStr : subCount ? '' : undefined
+    fractionPart: rounded || (subCount ? '' : undefined)
   };
 }
 
-function renderRateNumber (value: number): React.ReactNode {
+function renderRateValue (value: number): React.ReactNode {
   const parsed = analyzeDecimal(value);
 
   if (parsed.fractionPart === undefined) {
@@ -94,6 +104,40 @@ function renderRateNumber (value: number): React.ReactNode {
   );
 }
 
+const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
+  '.__brief': {
+    fontSize: token.fontSize,
+    lineHeight: token.lineHeight,
+    color: token.colorTextLight3
+  },
+
+  '.__token-item': {
+    display: 'inline-block',
+    alignItems: 'center'
+  },
+
+  '.__token-item-logo': {
+    display: 'inline-block',
+    marginRight: 3
+  },
+
+  '.__token-item-value': {
+    color: token.colorTextLight1
+  },
+
+  '.__fee-info': {
+    display: 'flex',
+    gap: token.sizeXXS,
+    color: token.colorTextLight4,
+    fontSize: token.fontSizeSM,
+    lineHeight: token.lineHeightSM
+  },
+
+  '.__fee-value': {
+
+  }
+}));
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
     fromAssetInfo, handleRequestLoading, isFormInvalid,
@@ -101,6 +145,88 @@ const Component: React.FC<Props> = (props: Props) => {
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
+
+  const { transactionStepsModal } = useContext(WalletModalContext);
+
+  const openProcessModal = useCallback(() => {
+    const items: TransactionProcessStepItemType[] = [];
+
+    // TODO: Replace this mock with real logic
+    currentOptimalSwapPath?.steps.forEach((stepItem, index) => {
+      // const status = (() => {
+      //   if (index === 0) {
+      //     return StepStatus.QUEUED;
+      //   }
+      //
+      //   if (index === 1) {
+      //     return StepStatus.PROCESSING;
+      //   }
+      //
+      //   return StepStatus.FAILED;
+      // })();
+
+      items.push({
+        status: StepStatus.QUEUED,
+        text: (
+          <StepContent>
+            <div className='__brief'>
+              Swap
+
+              &nbsp;
+              <span className='__token-item'>
+                <Logo
+                  className={'__token-item-logo'}
+                  size={16}
+                  token={'polkadot-NATIVE-DOT'.toLowerCase()}
+                />
+
+                <span className='__token-item-value'>
+                  100 DOT
+                </span>
+              </span>
+              &nbsp;
+
+              to
+
+              &nbsp;
+              <span className='__token-item'>
+                <Logo
+                  className={'__token-item-logo'}
+                  size={16}
+                  token={'ethereum-NATIVE-ETH'.toLowerCase()}
+                />
+
+                <span className='__token-item-value'>
+                  0.1 ETH
+                </span>
+              </span>
+              &nbsp;
+
+              via Chainflip
+            </div>
+
+            <div className='__fee-info'>
+              <span className='__fee-label'>Fee:</span>
+              <span className='__fee-value'>$0.2</span>
+            </div>
+          </StepContent>
+        ),
+        index,
+        logoKey: undefined,
+        isLastItem: index === (currentOptimalSwapPath?.steps.length - 1)
+      });
+    });
+
+    transactionStepsModal.open({
+      items,
+      type: ProcessType.SWAP,
+      variant: 'standard'
+    });
+  }, [currentOptimalSwapPath, transactionStepsModal]);
+
+  const rateValueNode = useMemo(() => {
+    return currentQuote?.rate ? renderRateValue(currentQuote.rate) : 0;
+  }, [currentQuote?.rate]);
 
   const renderRateInfo = () => {
     if (!currentQuote) {
@@ -114,7 +240,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </span>
         <span>&nbsp;~&nbsp;</span>
         <span>
-          {renderRateNumber(currentQuote.rate)}
+          {rateValueNode}
           {` ${_getAssetSymbol(toAssetInfo)}`}
         </span>
       </div>
@@ -248,11 +374,13 @@ const Component: React.FC<Props> = (props: Props) => {
     );
   };
 
+  const showQuoteEmptyBlock = (!currentQuote || handleRequestLoading || isFormInvalid);
+
   return (
     <>
       <div className={className}>
         {
-          !!currentQuote && !isFormInvalid && (
+          !showQuoteEmptyBlock && (
             <MetaInfo
               className={'__quote-info-block'}
               hasBackgroundWrapper={true}
@@ -283,7 +411,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__swap-process-info'}
                 label={t('Process')}
               >
-                <div className={'__swap-process-modal-trigger'}>
+                <div
+                  className={'__swap-process-modal-trigger'}
+                  onClick={openProcessModal}
+                >
 
                   {
                     currentOptimalSwapPath && (
@@ -323,7 +454,7 @@ const Component: React.FC<Props> = (props: Props) => {
         }
 
         {
-          (!currentQuote || handleRequestLoading || isFormInvalid) && renderQuoteEmptyBlock()
+          showQuoteEmptyBlock && renderQuoteEmptyBlock()
         }
       </div>
     </>

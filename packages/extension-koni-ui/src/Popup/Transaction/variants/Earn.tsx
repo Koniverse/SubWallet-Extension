@@ -19,15 +19,15 @@ import { EARNING_INSTRUCTION_MODAL, STAKE_ALERT_DATA } from '@subwallet/extensio
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useIsPopup, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number } from '@subwallet/react-ui';
+import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { CheckCircle, PlusCircle } from 'phosphor-react';
+import { CheckCircle, Info, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -136,7 +136,7 @@ const Component = () => {
   }, [slug, getCurrentConfirmation]);
 
   const mustChooseTarget = useMemo(
-    () => [YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType),
+    () => [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType),
     [poolType]
   );
 
@@ -188,20 +188,6 @@ const Component = () => {
 
     return result;
   }, [chainAsset, poolInfo]);
-
-  const isDisabledButton = useMemo(
-    () =>
-      // checkMintLoading ||
-      stepLoading ||
-      !!connectionError ||
-      !amountValue ||
-      !isBalanceReady ||
-      isFormInvalid ||
-      submitLoading ||
-      targetLoading ||
-      (mustChooseTarget && !poolTargetValue),
-    [stepLoading, connectionError, amountValue, isBalanceReady, isFormInvalid, submitLoading, targetLoading, mustChooseTarget, poolTargetValue]
-  );
 
   const inputAsset = useMemo(
     () => chainAsset[poolInfo?.metadata?.inputAsset],
@@ -636,11 +622,65 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+
+  // For subnet staking
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [maxSlippage] = useState<number>(0.005);
+
+  useEffect(() => {
+    if (!isSubnetStaking || (mustChooseTarget && !poolTargetValue)) {
+      return;
+    }
+
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+    const data = {
+      slug: poolInfo.slug,
+      value: amountValue,
+      netuid: netuid,
+      type: ExtrinsicType.STAKING_BOND
+    };
+
+    getEarningSlippage(data)
+      .then((result) => {
+        console.log('Actual stake slippage:', result * 100);
+        setEarningSlippage(result);
+      })
+      .catch((error) => {
+        console.error('Error fetching earning slippage:', error);
+      });
+  }, [amountValue, isFormInvalid, isSubnetStaking, mustChooseTarget, poolInfo.metadata.subnetData?.netuid, poolInfo.slug, poolTargetValue]);
+
+  const isSlippageAcceptable = useMemo(() => {
+    if (earningSlippage === null || !amountValue) {
+      return true;
+    }
+
+    return earningSlippage <= maxSlippage;
+  }, [earningSlippage, maxSlippage, amountValue]);
+
+  // For subnet staking
+
   const networkKey = useMemo(() => {
     const netuid = poolInfo.metadata.subnetData?.netuid || 0;
 
     return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
   }, [poolInfo.metadata.subnetData?.netuid]);
+
+  const isDisabledButton = useMemo(
+    () =>
+      // checkMintLoading ||
+      stepLoading ||
+      !!connectionError ||
+      !amountValue ||
+      !isBalanceReady ||
+      isFormInvalid ||
+      submitLoading ||
+      targetLoading ||
+      !isSlippageAcceptable ||
+      (mustChooseTarget && !poolTargetValue),
+
+    [stepLoading, connectionError, amountValue, isBalanceReady, isFormInvalid, submitLoading, targetLoading, isSlippageAcceptable, mustChooseTarget, poolTargetValue]
+  );
 
   const renderMetaInfo = useCallback(() => {
     const value = amountValue ? parseFloat(amountValue) / 10 ** assetDecimals : 0;
@@ -697,6 +737,7 @@ const Component = () => {
           })}
         {(
           <MetaInfo.Number
+            className='__label-bottom'
             decimals={assetDecimals}
             label={t('Minimum active stake')}
             suffix={assetSymbol}
@@ -711,8 +752,34 @@ const Component = () => {
               label={t('Network')}
             />
           )
-          : (
+          : (<>
+            <MetaInfo.Default label={
+              <Tooltip
+                placement={'topLeft'}
+                title={'If slippage exceeds this limit, transaction will not be executed'}
+              >
+                <div className={'__max-slippage'}>
+                  <div className='__label-bottom'>{t('Max slippage')}</div>
+                  <Icon
+                    className='__label-bottom'
+                    customSize={'16px'}
+                    phosphorIcon={Info}
+                    size='sm'
+                  />
+                </div>
+              </Tooltip>}
+            >
+              <div className='__subnet-wrapper'>
+                <span
+                  className='chain-name'
+                  style={{ color: isSlippageAcceptable ? '#A6A6A6' : '#BF1616' }}
+                >
+                  {maxSlippage * 100}%
+                </span>
+              </div>
+            </MetaInfo.Default>
             <MetaInfo.Default
+              className='__label-bottom'
               label={t('Subnet')}
             >
               <div className='__subnet-wrapper'>
@@ -723,12 +790,17 @@ const Component = () => {
                   shape='circle'
                   size={24}
                 />
-                <span className='chain-name'>{poolInfo.metadata.shortName}</span>
+                <span
+                  className='chain-name'
+                  style={{ color: '#A6A6A6' }}
+                >{poolInfo.metadata.shortName}</span>
               </div>
             </MetaInfo.Default>
+          </>
           )}
         {showFee && (
           <MetaInfo.Number
+            className='__label-bottom'
             decimals={0}
             label={t('Estimated fee')}
             prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
@@ -738,7 +810,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
+  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, isSlippageAcceptable, maxSlippage, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -1092,7 +1164,7 @@ const Component = () => {
                   <FreeBalanceToEarn
                     address={fromValue}
                     hidden={submitStepType !== YieldStepType.XCM}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('Available balance')}`}
                     onBalanceReady={setIsBalanceReady}
                     tokens={balanceTokens}
                   />
@@ -1163,11 +1235,20 @@ const Component = () => {
               {renderMetaInfo()}
 
               <AlertBox
-                className={'__alert-box'}
+                className='__alert-box'
                 description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
                 title={STAKE_ALERT_DATA.title}
-                type={'warning'}
+                type='warning'
               />
+
+              {!isSlippageAcceptable && (
+                <AlertBox
+                  className='__alert-box'
+                  description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
+                  title='Slippage too high!'
+                  type='error'
+                />
+              )}
             </TransactionContent>
             <TransactionFooter>
               <Button
@@ -1249,11 +1330,25 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     '.__alert-box': {
       marginTop: token.marginSM
     },
+
     '.__subnet-wrapper': {
       display: 'flex',
       alignItems: 'center',
       gap: token.sizeXS,
       minWidth: 0
+    },
+
+    // TODO: recheck with other UI
+    '.__max-slippage': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem'
+    },
+    '.__label-bottom, .__label-bottom *': {
+      color: `${token['gray-5']} !important`
+    },
+    '.__label-bottom, .__value': {
+      color: `${token['gray-5']} !important`
     }
   };
 });

@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [assetRegistryMap, toAssetSlug]);
 
   return (
-    <div className={CN(className, 'swap-confirmation-container')}>
+    <div className={CN(className)}>
       <div className={'__summary-quote'}>
         <div className={'__summary-from'}>
           <Logo
@@ -92,6 +92,7 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
     '.__quote-estimate-swap-confirm-value': {
       display: 'flex'
     },
+
     '.__summary-quote': {
       display: 'flex',
       justifyContent: 'space-between',
@@ -104,33 +105,42 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
       borderRadius: 8,
       marginBottom: 16
     },
+
     '.__summary-quote .-sub-logo': {
       bottom: 0,
       right: 0
     },
+
     '.__summary-quote .ant-image': {
       fontSize: 0
     },
+
     '.__summary-to, .__summary-from': {
       display: 'flex',
       alignItems: 'center',
       flexDirection: 'column',
       flex: 1
     },
+
     '.__quote-footer-label': {
       color: token.colorTextTertiary,
       fontSize: 12,
       fontWeight: token.bodyFontWeight,
       lineHeight: token.lineHeightSM
     },
+
     '.__amount-destination': {
       color: token.colorTextLight2,
       fontSize: token.fontSizeLG,
       fontWeight: token.fontWeightStrong,
-      lineHeight: token.lineHeightLG
-    },
-    '&.swap-confirmation-container .__swap-route-container': {
-      marginBottom: 20
+      lineHeight: token.lineHeightLG,
+
+      '.ant-number, .ant-typography': {
+        color: 'inherit !important',
+        fontSize: 'inherit !important',
+        fontWeight: 'inherit !important',
+        lineHeight: 'inherit'
+      }
     }
   };
 });

@@ -188,38 +188,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
   ];
 
-  const filterFunction = useMemo<(items: ExtraYieldPositionInfo) => boolean>(() => {
-    return (item) => {
-      if (!selectedFilters.length) {
-        return true;
-      }
+  const filterFunction = useMemo<(item: ExtraYieldPositionInfo) => boolean>(() => {
+    const filterMap: Record<string, boolean> = Object.fromEntries(selectedFilters.map((filter) => [filter, true]));
 
-      for (const filter of selectedFilters) {
-        if (filter === '') {
-          return true;
-        }
-
-        if (filter === YieldPoolType.NOMINATION_POOL && item.type === YieldPoolType.NOMINATION_POOL) {
-          return true;
-        } else if (filter === YieldPoolType.NATIVE_STAKING && item.type === YieldPoolType.NATIVE_STAKING) {
-          return true;
-        } else if (filter === YieldPoolType.LIQUID_STAKING && item.type === YieldPoolType.LIQUID_STAKING) {
-          return true;
-        } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
-          return true;
-        } else if (filter === YieldPoolType.SUBNET_STAKING && item.type === YieldPoolType.SUBNET_STAKING) {
-          return true;
-        }
-        // Uncomment the following code block if needed
-        // else if (filter === YieldPoolType.PARACHAIN_STAKING && item.type === YieldPoolType.PARACHAIN_STAKING) {
-        //   return true;
-        // } else if (filter === YieldPoolType.SINGLE_FARMING && item.type === YieldPoolType.SINGLE_FARMING) {
-        //   return true;
-        // }
-      }
-
-      return false;
-    };
+    return (item) => !selectedFilters.length || filterMap[item.type] || false;
   }, [selectedFilters]);
 
   const onClickItem = useCallback((item: ExtraYieldPositionInfo) => {

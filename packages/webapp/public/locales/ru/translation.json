@@ -1409,9 +1409,6 @@
   "EVM accounts": "",
   "Substrate accounts": "",
   "Unable to process this swap at the moment. Try again later": "",
-  "Open dApp to unstake": "",
-  "Open Taostats Dashboard and connect your SubWallet account to unstake your funds. This feature will come back to SubWallet soon!": "",
-  "Open dApp": "",
   "The custom value must be greater than 0": "",
   "The maximum fee must be greater than 0": "",
   "Apply fee": "",
@@ -1471,5 +1468,8 @@
   "Migrate to unified account": "",
   "Split unified account": "",
   "The priority fee must be equal or greater than 0": "",
-  "Max fee per gas must be higher than {{min}} GWEI": ""
+  "Max fee per gas must be higher than {{min}} GWEI": "",
+  "This network is currently not supported": "",
+  "Subnet staking": "",
+  "Subnet": ""
 }

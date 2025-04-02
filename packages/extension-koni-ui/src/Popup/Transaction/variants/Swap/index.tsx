@@ -10,19 +10,18 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getLastAmountFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AddressInputNew, AlertBox, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { generateOptimalProcess, getLatestSwapQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { getLatestSwapQuote, getOptimalProcessOnSelectQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -32,7 +31,7 @@ import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAc
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsDownUp, CheckCircle } from 'phosphor-react';
+import { ArrowsDownUp, Book, CheckCircle } from 'phosphor-react';
 import { Rule } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -158,7 +157,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
-  const { closeAlert, defaultData, openAlert, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<SwapParams>();
+  const { closeAlert, defaultData, openAlert, persistData } = useTransactionContext<SwapParams>();
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
 
@@ -184,7 +183,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
-  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
+  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
 
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
@@ -193,6 +192,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [handleRequestLoading, setHandleRequestLoading] = useState(true);
   const [requestUserInteractToContinue, setRequestUserInteractToContinue] = useState<boolean>(false);
+  const [isRecipientFieldManuallyVisible, setIsRecipientFieldManuallyVisible] = useState<boolean>(false);
 
   const continueRefreshQuoteRef = useRef<boolean>(false);
 
@@ -219,8 +219,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     startOnMount: true
   });
 
-  // mobile:
-  const [showQuoteDetailOnMobile, setShowQuoteDetailOnMobile] = useState<boolean>(false);
+  const addressInputRef = useRef<AddressInputRef>(null);
+  const isAddressInputReady = !!addressInputRef.current?.ready;
 
   // @ts-ignore
   const fromValue = useWatchTransaction('from', form, defaultData);
@@ -229,6 +229,22 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const toTokenSlugValue = useWatchTransaction('toTokenSlug', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const recipientValue = useWatchTransaction('recipient', form, defaultData);
+
+  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP);
+
+  const [swapFromFieldRenderKey, setSwapFromFieldRenderKey] = useState<string>('SwapFromField');
+
+  const currentFromTokenAvailableBalance = useMemo(() => {
+    if (!fromTokenSlugValue || availableBalanceHookResult.isLoading || !availableBalanceHookResult.nativeTokenSlug) {
+      return undefined;
+    }
+
+    if (availableBalanceHookResult.nativeTokenSlug !== fromTokenSlugValue) {
+      return availableBalanceHookResult.tokenBalance;
+    }
+
+    return availableBalanceHookResult.nativeTokenBalance;
+  }, [availableBalanceHookResult.isLoading, availableBalanceHookResult.nativeTokenBalance, availableBalanceHookResult.nativeTokenSlug, availableBalanceHookResult.tokenBalance, fromTokenSlugValue]);
 
   const { checkChainConnected, turnOnChain } = useChainConnection();
   const onPreCheck = usePreCheckAction(fromValue);
@@ -378,26 +394,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
   }, [form, fromTokenSlugValue, toTokenSlugValue]);
 
-  // todo: this logic is only true with substrate, evm address. Make sure it work with ton, bitcoin, and more
-  const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
-    const { chain, from, toTokenSlug } = form.getFieldsValue();
-    const destChain = assetRegistryMap[toTokenSlug].originChain;
-    const destChainInfo = chainInfoMap[destChain];
-    const account = findAccountByAddress(accounts, _recipientAddress);
-
-    return validateRecipientAddress({ srcChain: chain,
-      destChainInfo,
-      fromAddress: from,
-      toAddress: _recipientAddress,
-      account,
-      actionType: ActionType.SWAP,
-      autoFormatValue,
-      allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
+  const toggleAddressInputManually = useCallback(() => {
+    setIsRecipientFieldManuallyVisible(true);
+  }, []);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
-  const showRecipientField = useMemo(() => {
+  const isRecipientFieldAllowed = useMemo(() => {
     if (!fromValue || !destChainValue || !chainInfoMap[destChainValue]) {
       return false;
     }
@@ -412,6 +415,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return !isChainInfoAccordantAccountChainType(chainInfoMap[destChainValue], fromAccountJson.chainType);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
 
+  const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
+    if (!isRecipientFieldAllowed) {
+      return Promise.resolve();
+    }
+
+    const { chain, from, toTokenSlug } = form.getFieldsValue();
+    const destChain = assetRegistryMap[toTokenSlug].originChain;
+    const destChainInfo = chainInfoMap[destChain];
+    const account = findAccountByAddress(accounts, _recipientAddress);
+
+    return validateRecipientAddress({ srcChain: chain,
+      destChainInfo,
+      fromAddress: from,
+      toAddress: _recipientAddress,
+      account,
+      actionType: ActionType.SWAP,
+      autoFormatValue,
+      allowLedgerGenerics: ledgerGenericAllowNetworks });
+  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks]);
+
   const onSelectFromToken = useCallback((tokenSlug: string) => {
     form.setFieldValue('fromTokenSlug', tokenSlug);
   }, [form]);
@@ -420,7 +443,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     form.setFieldValue('toTokenSlug', tokenSlug);
   }, [form]);
 
-  const handleGenerateOptimalProcess = useCallback(
+  const generateOptimalProcessOnSelectQuote = useCallback(
     async (quote: SwapQuote) => {
       try {
         const currentRequest: SwapRequest = {
@@ -434,10 +457,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
         const optimalRequest = {
           request: currentRequest,
-          selectedQuote: quote
+          selectedQuote: quote,
+          path: []
         };
 
-        return await generateOptimalProcess(optimalRequest);
+        return await getOptimalProcessOnSelectQuote(optimalRequest);
       } catch (error) {
         console.error('generateOptimalProcess failed:', error);
 
@@ -449,7 +473,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      const processResult = await handleGenerateOptimalProcess(quote);
+      const processResult = await generateOptimalProcessOnSelectQuote(quote);
 
       if (!processResult) {
         return;
@@ -479,7 +503,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         };
       });
     },
-    [handleGenerateOptimalProcess]
+    [generateOptimalProcessOnSelectQuote]
   );
 
   const onChangeAmount = useCallback((value: string) => {
@@ -596,7 +620,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               address: from,
               process: currentOptimalSwapPath,
               selectedQuote: currentQuote,
-              currentStep: 1,
+              currentStep: 0,
               recipient // Need to assign format address with toChainInfo in case there's no recipient
             });
 
@@ -750,6 +774,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setCurrentSlippage(slippage);
   }, []);
 
+  const onClickMaxAmountButton = useCallback(() => {
+    if (!currentFromTokenAvailableBalance) {
+      return;
+    }
+
+    onChangeAmount(currentFromTokenAvailableBalance.value);
+    setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
+  }, [currentFromTokenAvailableBalance, onChangeAmount]);
+
+  const onClickHaftAmountButton = useCallback(() => {
+    if (!currentFromTokenAvailableBalance) {
+      return;
+    }
+
+    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toString();
+
+    onChangeAmount(result);
+    setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
+  }, [currentFromTokenAvailableBalance, onChangeAmount]);
+
   useEffect(() => {
     const updateFromValue = () => {
       if (!accountAddressItems.length) {
@@ -770,28 +814,86 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     updateFromValue();
   }, [accountAddressItems, form, fromValue]);
 
-  useEffect(() => {
-    setBackProps((prev) => ({
-      ...prev,
-      onClick: showQuoteDetailOnMobile
-        ? () => {
-          setShowQuoteDetailOnMobile(false);
-        }
-        : null
-    }));
-  }, [setBackProps, showQuoteDetailOnMobile]);
-
-  useEffect(() => {
-    if (recipientValue && toAssetInfo) {
-      form.validateFields(['recipient']).catch((e) => {
-        console.log('Error when validating', e);
-      });
+  const recipientAutoFilledInfo: string | undefined = useMemo(() => {
+    if (!isRecipientFieldAllowed || targetAccountProxy.accountType !== AccountProxyType.UNIFIED) {
+      return undefined;
     }
-  }, [form, recipientValue, toAssetInfo]);
+
+    const destChainInfo = chainInfoMap[destChainValue];
+
+    if (!destChainInfo) {
+      return undefined;
+    }
+
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => isChainInfoAccordantAccountChainType(destChainInfo, a.chainType));
+
+    if (!accountJsonForRecipientAutoFilled) {
+      return undefined;
+    }
+
+    const formatedAddress = getReformatAddress(accountJsonForRecipientAutoFilled, destChainInfo);
+
+    if (!formatedAddress) {
+      return undefined;
+    }
+
+    return JSON.stringify({
+      address: formatedAddress,
+      name: accountJsonForRecipientAutoFilled.name
+    });
+  }, [chainInfoMap, destChainValue, getReformatAddress, isRecipientFieldAllowed, targetAccountProxy.accountType, targetAccountProxy.accounts]);
 
   useEffect(() => {
-    setCustomScreenTitle(showQuoteDetailOnMobile ? t('Swap quote detail') : t('Swap'));
-  }, [setCustomScreenTitle, showQuoteDetailOnMobile, t]);
+    if (fromTokenSlugValue && toTokenSlugValue && isAddressInputReady) {
+      const addressInputCurrent = addressInputRef.current;
+
+      // The following code automatically fills the recipient field in specific cases
+      if (recipientAutoFilledInfo) {
+        try {
+          setIsRecipientFieldManuallyVisible(false);
+          const { address, name } = JSON.parse(recipientAutoFilledInfo) as {
+            address: string,
+            name: string
+          };
+
+          addressInputCurrent?.setInputValue?.(address);
+          addressInputCurrent?.setSelectedOption?.({
+            address,
+            formatedAddress: address,
+            analyzedGroup: AnalyzedGroup.RECENT,
+            displayName: name
+          });
+          form.setFieldValue('recipient', address);
+        } catch (e) {
+          console.log('Parse recipientAutoFilledInfo error', e);
+        }
+      } else {
+        addressInputCurrent?.setInputValue?.('');
+        addressInputCurrent?.setSelectedOption?.(undefined);
+        form.setFieldValue('recipient', undefined);
+        form.setFields([
+          {
+            name: 'recipient',
+            errors: []
+          }
+        ]);
+      }
+    }
+  }, [recipientAutoFilledInfo, form, fromTokenSlugValue, toTokenSlugValue, isAddressInputReady]);
+
+  useEffect(() => {
+    const timeout: NodeJS.Timeout = setTimeout(() => {
+      if (recipientValue && toAssetInfo && isRecipientFieldAllowed) {
+        form.validateFields(['recipient']).catch((e) => {
+          console.log('Error when validating', e);
+        });
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [form, isRecipientFieldAllowed, recipientValue, toAssetInfo]);
 
   useEffect(() => {
     const chain = _getAssetOriginChain(fromAssetInfo);
@@ -810,7 +912,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     // todo: simple validate before do this
     if (fromValue && fromTokenSlugValue && toTokenSlugValue && fromAmountValue) {
       timeout = setTimeout(() => {
-        form.validateFields(['from', 'recipient']).then(() => {
+        const fieldsToBeValidated: string[] = ['from'];
+
+        if (isRecipientFieldAllowed) {
+          fieldsToBeValidated.push('recipient');
+        }
+
+        form.validateFields(fieldsToBeValidated).then(() => {
           if (!sync) {
             return;
           }
@@ -880,7 +988,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage, form, fromAmountValue, fromTokenSlugValue, fromValue, recipientValue, showRecipientField, toTokenSlugValue]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, recipientValue, toTokenSlugValue]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -971,16 +1079,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   useEffect(() => {
     if (fromTokenItems.length) {
-      if (!fromTokenSlugValue) {
+      if (!fromTokenSlugValue || !fromTokenItems.some((i) => i.slug === fromTokenSlugValue)) {
         form.setFieldValue('fromTokenSlug', fromTokenItems[0].slug);
-      } else {
-        if (!fromTokenItems.some((i) => i.slug === fromTokenSlugValue)) {
-          form.setFieldValue('fromTokenSlug', fromTokenItems[0].slug);
-        }
       }
     } else {
       form.setFieldValue('fromTokenSlug', '');
-      form.setFieldValue('toTokenSlug', '');
     }
   }, [form, fromTokenItems, fromTokenSlugValue]);
 
@@ -989,6 +1092,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       if (!toTokenSlugValue || !toTokenItems.some((t) => t.slug === toTokenSlugValue)) {
         form.setFieldValue('toTokenSlug', toTokenItems[0].slug);
       }
+    } else {
+      form.setFieldValue('toTokenSlug', '');
     }
   }, [form, toTokenItems, toTokenSlugValue]);
 
@@ -1034,7 +1139,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             className={'__transaction-swap-wrapper'}
           >
             <Form
-              className={'form-container'}
+              className={'form-container form-space-xs'}
               form={form}
               initialValues={formDefault}
               onFieldsChange={onFieldsChange}
@@ -1043,10 +1148,36 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               <HiddenInput fields={hideFields} />
 
               <div className={'__swap-field-area'}>
+                {
+                  !!currentFromTokenAvailableBalance && (
+                    <div className={'__quick-amount-buttons-area'}>
+                      <Button
+                        className={'__max-amount-button __quick-amount-button'}
+                        onClick={onClickMaxAmountButton}
+                        size='xs'
+                        type={'ghost'}
+                      >
+                        {t('Max')}
+                      </Button>
+
+                      <Button
+                        className={'__half-amount-button __quick-amount-button'}
+                        disabled={!isSwitchable}
+                        onClick={onClickHaftAmountButton}
+                        size='xs'
+                        type={'ghost'}
+                      >
+                        50%
+                      </Button>
+                    </div>
+                  )
+                }
+
                 <SwapFromField
                   amountValue={fromAmountValue}
                   className={'__swap-from-field'}
                   fromAsset={fromAssetInfo}
+                  key={swapFromFieldRenderKey}
                   label={t('From')}
                   onChangeAmount={onChangeAmount}
                   onSelectToken={onSelectFromToken}
@@ -1072,6 +1203,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   >
                   </Button>
                 </div>
+
+                {
+                  !!recipientAutoFilledInfo && !isRecipientFieldManuallyVisible && (
+                    <div className='__address-input-toggle-container'>
+                      <Button
+                        className={'__address-input-toggle'}
+                        icon={(
+                          <Icon
+                            customSize={'16px'}
+                            phosphorIcon={Book}
+                          />
+                        )}
+                        onClick={toggleAddressInputManually}
+                        size='xs'
+                        type={'ghost'}
+                      >
+                      </Button>
+                    </div>
+                  )
+                }
 
                 <SwapToField
                   className={'__swap-to-field'}
@@ -1104,34 +1255,37 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 />
               )}
 
-              {showRecipientField && (
-                <Form.Item
-                  name={'recipient'}
-                  rules={[
-                    {
-                      validator: recipientAddressValidator
-                    }
-                  ]}
-                  statusHelpAsTooltip={true}
-                >
-                  <AddressInputNew
-                    chainSlug={destChainValue}
-                    dropdownHeight={isNotShowAccountSelector ? 227 : 167}
-                    label={`${t('To')}:`}
-                    labelStyle={'horizontal'}
-                    placeholder={t('Input your recipient account')}
-                    showAddressBook={true}
-                    showScanner={true}
-                  />
-                </Form.Item>
-              )}
+              <Form.Item
+                hidden={!isRecipientFieldAllowed || (!!recipientAutoFilledInfo && !isRecipientFieldManuallyVisible)}
+                name={'recipient'}
+                rules={[
+                  {
+                    validator: recipientAddressValidator
+                  }
+                ]}
+                statusHelpAsTooltip={true}
+              >
+                <AddressInputNew
+                  chainSlug={destChainValue}
+                  dropdownHeight={isNotShowAccountSelector ? 227 : 167}
+                  label={`${t('To')}:`}
+                  labelStyle={'horizontal'}
+                  placeholder={t('Input your recipient account')}
+                  ref={addressInputRef}
+                  showAddressBook={true}
+                  showScanner={true}
+                />
+              </Form.Item>
+
               <div className={'__balance-display-area'}>
                 <FreeBalance
                   address={fromValue}
                   chain={chainValue}
+                  extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('Swap balance')}:`}
+                  label={`${t('Available balance')}`}
+                  labelTooltip={'Available balance for swap'}
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>
@@ -1196,6 +1350,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             modalId={SWAP_ALL_QUOTES_MODAL}
             onCancel={closeSwapQuotesModal}
             optimalQuoteItem={optimalQuoteRef.current}
+            quoteAliveUntil={quoteAliveUntil}
             selectedItem={currentQuote}
           />
         )
@@ -1261,11 +1416,28 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
       marginBottom: 12
     },
 
+    '.__quick-amount-buttons-area': {
+      position: 'relative',
+      zIndex: 10,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      height: 0,
+      paddingRight: token.paddingXS
+    },
+
+    '.__quick-amount-button': {
+      height: '36px',
+      lineHeight: '36px',
+      paddingLeft: token.paddingXS,
+      paddingRight: token.paddingXS,
+      fontWeight: token.bodyFontWeight
+    },
+
     '.__swap-from-field': {
       marginBottom: token.marginXXS
     },
 
-    '.__swap-to-field': {
+    '.__swap-field-area': {
       marginBottom: token.marginXS
     },
 
@@ -1286,6 +1458,21 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
         display: 'flex',
         justifyContent: 'center'
       }
+    },
+
+    '.__address-input-toggle-container': {
+      position: 'relative'
+    },
+
+    '.__address-input-toggle': {
+      position: 'absolute',
+      top: -2,
+      right: 4
+    },
+
+    '.__address-input-toggle.-active': {
+      color: token.colorTextLight1,
+      cursor: 'not-allowed'
     }
   };
 });

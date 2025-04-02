@@ -5,7 +5,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ServiceStatus, ServiceWithProcessInterface, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
+import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetOriginChain, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
@@ -13,10 +13,10 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { _PROVIDER_TO_SUPPORTED_PAIR_MAP, findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { CommonOptimalPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { _SUPPORTED_SWAP_PROVIDERS, OptimalSwapPathParams, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
+import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
@@ -24,13 +24,7 @@ import { BehaviorSubject } from 'rxjs';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
 
-export const _isChainSupportedByProvider = (providerSlug: SwapProviderId, chain: string) => {
-  const supportedChains = _PROVIDER_TO_SUPPORTED_PAIR_MAP[providerSlug];
-
-  return supportedChains ? supportedChains.includes(chain) : false;
-};
-
-export class SwapService implements ServiceWithProcessInterface, StoppableServiceInterface {
+export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
   private eventService: EventService;
   private readonly chainService: ChainService;
@@ -60,8 +54,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
-    console.log('quotes from API', quotes);
-
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
@@ -81,31 +73,11 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return availableQuotes;
   }
 
-  // deprecated
-  private getDefaultProcess (params: OptimalSwapPathParams): CommonOptimalPath {
-    const result: CommonOptimalPath = {
+  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalSwapPath {
+    const result: CommonOptimalSwapPath = {
       totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
-    };
-
-    result.totalFee.push({
-      feeComponent: [],
-      feeOptions: [params.request.pair.from],
-      defaultFeeToken: params.request.pair.from
-    });
-    result.steps.push({
-      id: result.steps.length,
-      name: 'Swap',
-      type: SwapStepType.SWAP
-    });
-
-    return result;
-  }
-
-  private getDefaultProcessV2 (params: OptimalSwapPathParamsV2): CommonOptimalPath {
-    const result: CommonOptimalPath = {
-      totalFee: [MOCK_STEP_FEE],
-      steps: [DEFAULT_FIRST_STEP]
+      steps: [DEFAULT_FIRST_STEP],
+      path: []
     };
 
     const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
@@ -135,23 +107,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     return result;
   }
 
-  // deprecated
-  public async generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
-    if (!params.selectedQuote) {
-      return this.getDefaultProcess(params);
-    } else {
-      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
-      const handler = this.handlers[providerId];
-
-      if (handler) {
-        return handler.generateOptimalProcess(params);
-      } else {
-        return this.getDefaultProcess(params);
-      }
-    }
-  }
-
-  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalPath> {
+  public async generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
     if (!params.selectedQuote) {
       return this.getDefaultProcessV2(params);
     } else {
@@ -163,6 +119,29 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       } else {
         return this.getDefaultProcessV2(params);
       }
+    }
+  }
+
+  public async generateOptimalProcessWithoutPath (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
+    if (!params.selectedQuote || params.path.length > 0) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    const [path, directSwapRequest] = this.getAvailablePath(params.request);
+
+    if (!directSwapRequest) {
+      return this.getDefaultProcessV2(params);
+    }
+
+    params.path = path;
+
+    const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+    const handler = this.handlers[providerId];
+
+    if (handler) {
+      return handler.generateOptimalProcessV2(params);
+    } else {
+      return this.getDefaultProcessV2(params);
     }
   }
 
@@ -205,9 +184,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
       path
     });
 
-    // todo: can also return a chain route
-    console.log('path--------------------------', path);
-    console.log('optimalProcess----------------', optimalProcess);
+    console.log('-------');
+    console.log('data', path, optimalProcess);
+    console.log('-------');
 
     return {
       process: optimalProcess,
@@ -498,8 +477,12 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     const providerId = params.selectedQuote.provider.id;
     const handler = this.handlers[providerId];
 
+    if (params.currentStep > 1) { // only validate from the first step
+      return [];
+    }
+
     if (handler) {
-      return handler.validateSwapProcess(params);
+      return handler.validateSwapProcessV2(params);
     } else {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
@@ -508,6 +491,10 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const providerId = params.selectedQuote.provider.id;
     const handler = this.handlers[providerId];
+
+    if (params.currentStep > 0) {
+      return [];
+    }
 
     if (handler) {
       return handler.validateSwapProcessV2(params);
@@ -522,6 +509,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     if (params.process.steps.length === 1) { // todo: do better to handle error generating steps
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Please check your network and try again'));
     }
+
+    console.log('handling swap process: ', params.process);
 
     if (handler) {
       return handler.handleSwapProcess(params);
