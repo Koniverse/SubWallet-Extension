@@ -642,8 +642,8 @@ const Component = () => {
   const isDisabledSubnetContent = useMemo(
     () =>
       !isSubnetStaking ||
-        !amountValue ||
-        (mustChooseTarget && !poolTargetValue),
+      !amountValue ||
+      (mustChooseTarget && !poolTargetValue),
 
     [isSubnetStaking, amountValue, mustChooseTarget, poolTargetValue]
   );
@@ -677,12 +677,6 @@ const Component = () => {
           console.log('Actual stake slippage:', result.slippage * 100);
           setEarningSlippage(result.slippage);
           setEarningRate(result.rate);
-          const isAcceptable = result.slippage <= maxSlippage.slippage.toNumber();
-
-          if (!isAcceptable && !hasScrolled && alertBoxRef.current) {
-            alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setHasScrolled(true);
-          }
         })
         .catch((error) => {
           console.error('Error fetching earning slippage:', error);
@@ -691,7 +685,13 @@ const Component = () => {
           setSubmitLoading(false);
         });
     }, 200);
-  }, [amountValue, hasScrolled, isDisabledSubnetContent, maxSlippage.slippage, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
+
+    return () => {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+    };
+  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -700,6 +700,13 @@ const Component = () => {
 
     return earningSlippage <= maxSlippage.slippage.toNumber();
   }, [earningSlippage, maxSlippage, amountValue]);
+
+  useEffect(() => {
+    if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
+      alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHasScrolled(true);
+    }
+  }, [isSlippageAcceptable, hasScrolled]);
 
   const onSelectSlippage = useCallback((slippage: SlippageType) => {
     setMaxSlippage(slippage);

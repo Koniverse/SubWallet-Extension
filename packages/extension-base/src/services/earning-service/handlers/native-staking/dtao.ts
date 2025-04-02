@@ -209,8 +209,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const taoIn = new BigNumber(subnetInfo?.taoIn || 0);
     const k = alphaIn.multipliedBy(taoIn);
     const value = new BigNumber(params.value);
-    const price = await getAlphaToTaoMapping(this.substrateApi);
-    const rate = new BigNumber(price[params.netuid]);
+    const rate = taoIn.dividedBy(alphaIn);
 
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
@@ -677,7 +676,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Leave pool action */
 
   async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
-    console.log('slippage', slippage);
     const apiPromise = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
     const price = await getAlphaToTaoMapping(this.substrateApi);

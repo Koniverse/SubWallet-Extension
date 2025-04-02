@@ -105,8 +105,6 @@ const Component: React.FC = () => {
   const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
   const [earningRate, setEarningRate] = useState<number>(0);
-  const alertBoxRef = useRef<HTMLDivElement>(null);
-  const [hasScrolled, setHasScrolled] = useState<boolean>(false);
   const debounce = useRef<NodeJS.Timeout | null>(null);
 
   const isDisabledSubnetContent = useMemo(
@@ -142,12 +140,6 @@ const Component: React.FC = () => {
           console.log('Actual stake slippage:', result.slippage * 100);
           setEarningSlippage(result.slippage);
           setEarningRate(result.rate);
-          const isAcceptable = result.slippage <= maxSlippage.slippage.toNumber();
-
-          if (!isAcceptable && !hasScrolled && alertBoxRef.current) {
-            alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setHasScrolled(true);
-          }
         })
         .catch((error) => {
           console.error('Error fetching earning slippage:', error);
@@ -156,7 +148,13 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 200);
-  }, [amountValue, hasScrolled, isDisabledSubnetContent, maxSlippage.slippage, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
+
+    return () => {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+    };
+  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -165,6 +163,16 @@ const Component: React.FC = () => {
 
     return earningSlippage <= maxSlippage.slippage.toNumber();
   }, [amountValue, earningSlippage, maxSlippage]);
+
+  const alertBoxRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
+      alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHasScrolled(true);
+    }
+  }, [isSlippageAcceptable, hasScrolled]);
 
   const renderRate = useCallback(() => {
     return (
