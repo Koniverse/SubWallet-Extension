@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 1.3.28
+Build date: Apr 02, 2025.
+
+Features & Update:
+- Show value of derivative token relative to the origin tokens (#4081)
+- Add dTAO token (#4151)
+- Display dTAO balance like another token (#4150)
+
+Bug fixed:
+- Fixed bug related to subnet staking feature (#4140)
+- Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
+
+Bug fixed:
+- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
+
 ## 1.3.27
 Build date: Mar 29, 2025.
 
