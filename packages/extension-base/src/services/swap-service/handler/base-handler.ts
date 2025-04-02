@@ -13,8 +13,8 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { FEE_RATE_MULTIPLIER, getAmountAfterSlippage } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseSwapStepMetadata, BasicTxErrorType, BriefXCMStep, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
+import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -84,8 +84,6 @@ export class SwapBaseHandler {
         }
       }
 
-      // todo: edit swap quote if needed
-
       return result;
     } catch (e) {
       return result;
@@ -94,9 +92,9 @@ export class SwapBaseHandler {
 
   async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // only xcm on substrate for now
-    const { path, request: { address, fromAmount, recipient, slippage }, selectedQuote } = params;
+    const { path, request: { address, fromAmount, recipient }, selectedQuote } = params;
 
-    if (stepIndex < 0 || stepIndex >= params.path.length - 1) {
+    if (stepIndex < 0 || stepIndex > params.path.length - 1) {
       return undefined;
     }
 
@@ -166,9 +164,11 @@ export class SwapBaseHandler {
       const isBridgeNativeToken = _isNativeToken(fromTokenInfo);
 
       let bnSendingValue;
+      let expectedReceive;
 
       // todo: increase transfer amount when XCM local token
       if (stepIndex === 0) {
+        expectedReceive = fromAmount;
         bnSendingValue = BigN(fromAmount);
 
         if (isBridgeNativeToken) {
@@ -181,19 +181,20 @@ export class SwapBaseHandler {
           bnSendingValue = bnSendingValue.plus(_getTokenMinAmount(toTokenInfo));
         }
       } else { // bridge after swap
-        bnSendingValue = BigN(getAmountAfterSlippage(selectedQuote.toAmount, slippage));
+        expectedReceive = selectedQuote.toAmount;
+        bnSendingValue = BigN(selectedQuote.toAmount);
       }
 
       const step: BaseStepDetail = {
         // @ts-ignore
         metadata: {
           sendingValue: bnSendingValue.toString(),
-          expectedReceive: fromAmount, // todo: calculate this
+          expectedReceive,
           originTokenInfo: fromTokenInfo,
           destinationTokenInfo: toTokenInfo,
           receiver: recipientAddress,
           sender: address
-        } as BriefXCMStep,
+        } as BaseSwapStepMetadata,
         name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
         type: CommonStepType.XCM
       };
@@ -207,7 +208,7 @@ export class SwapBaseHandler {
   }
 
   public async handleBridgeStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const briefXcmStep = params.process.steps[params.currentStep].metadata as unknown as BriefXCMStep;
+    const briefXcmStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
 
     if (!briefXcmStep || !briefXcmStep.originTokenInfo || !briefXcmStep.destinationTokenInfo || !briefXcmStep.sendingValue) {
       throw new Error('XCM metadata error');
@@ -338,7 +339,7 @@ export class SwapBaseHandler {
     const swapMetadata = swapStepInfo.metadata as unknown as BaseSwapStepMetadata; // todo
     const swapFee = params.process.totalFee[swapIndex];
 
-    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue) {
+    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue || !swapMetadata.expectedReceive) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
@@ -381,11 +382,11 @@ export class SwapBaseHandler {
   public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
     // Bridge
     const currentStep = params.process.steps[xcmIndex];
-    const xcmMetadata = currentStep.metadata as unknown as BriefXCMStep;
+    const xcmMetadata = currentStep.metadata as unknown as BaseSwapStepMetadata;
     const currentFee = params.process.totalFee[xcmIndex];
     const bridgeFeeAmount = currentFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE)?.amount;
 
-    if (!xcmMetadata || !xcmMetadata.destinationTokenInfo || !xcmMetadata.originTokenInfo || !xcmMetadata.sendingValue) {
+    if (!xcmMetadata || !xcmMetadata.destinationTokenInfo || !xcmMetadata.originTokenInfo || !xcmMetadata.sendingValue || !xcmMetadata.expectedReceive) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
@@ -433,7 +434,7 @@ export class SwapBaseHandler {
     const swapMetadata = swapStepInfo.metadata as unknown as BaseSwapStepMetadata; // todo
     const swapFee = params.process.totalFee[swapIndex];
 
-    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue) {
+    if (!swapMetadata || !swapMetadata.destinationTokenInfo || !swapMetadata.originTokenInfo || !swapMetadata.sendingValue || !swapMetadata.expectedReceive) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 

@@ -469,25 +469,6 @@ export class SwapService implements StoppableServiceInterface {
     });
   }
 
-  // private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
-  //   return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
-  // }
-
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const providerId = params.selectedQuote.provider.id;
-    const handler = this.handlers[providerId];
-
-    if (params.currentStep > 1) { // only validate from the first step
-      return [];
-    }
-
-    if (handler) {
-      return handler.validateSwapProcessV2(params);
-    } else {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
-  }
-
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const providerId = params.selectedQuote.provider.id;
     const handler = this.handlers[providerId];

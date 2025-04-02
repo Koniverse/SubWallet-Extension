@@ -182,6 +182,7 @@ export interface SwapRequestResult {
 
 export interface SwapQuoteResponse {
   optimalQuote?: SwapQuote; // if no optimalQuote then there's an error
+  modifiedOptimalQuote?: SwapQuote;
   quotes: SwapQuote[];
   aliveUntil: number; // timestamp
   error?: SwapError; // only if there's no available quote
@@ -207,11 +208,6 @@ export interface SwapSubmitStepData {
   isPermit?: boolean;
 }
 
-export interface OptimalSwapPathParams {
-  request: SwapRequest;
-  selectedQuote?: SwapQuote;
-}
-
 export enum DynamicSwapType {
   SWAP = 'SWAP',
   BRIDGE = 'BRIDGE'
@@ -229,7 +225,7 @@ export const enum BridgeStepPosition {
 
 export interface OptimalSwapPathParamsV2 {
   request: SwapRequest;
-  selectedQuote: SwapQuote;
+  selectedQuote?: SwapQuote;
   path: DynamicSwapAction[];
 }
 
@@ -265,14 +261,11 @@ export const SIMPLE_SWAP_SLIPPAGE = 0.05;
 
 export interface BaseSwapStepMetadata {
   sendingValue: string;
+  expectedReceive: string;
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
-  sender: string,
+  sender: string;
   receiver: string
-}
-
-export interface BriefXCMStep extends BaseSwapStepMetadata {
-  expectedReceive: string;
 }
 
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
