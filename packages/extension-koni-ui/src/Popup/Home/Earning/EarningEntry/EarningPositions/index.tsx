@@ -32,7 +32,7 @@ type Props = ThemeProps & {
 const FILTER_MODAL_ID = 'earning-positions-filter-modal';
 const alertModalId = 'earning-positions-alert-modal';
 
-const testnetEarningPosition = (item: ExtraYieldPositionInfo, chainInfoMap: Record<string, _ChainInfo>): number => {
+const getOrdinalChainTypeValue = (item: ExtraYieldPositionInfo, chainInfoMap: Record<string, _ChainInfo>): number => {
   const chainInfo = chainInfoMap[item.chain];
 
   return chainInfo?.isTestnet ? 0 : 1;
@@ -81,7 +81,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
             .toNumber();
         };
 
-        return testnetEarningPosition(secondItem, chainInfoMap) - testnetEarningPosition(firstItem, chainInfoMap) ||
+        return getOrdinalChainTypeValue(secondItem, chainInfoMap) - getOrdinalChainTypeValue(firstItem, chainInfoMap) ||
           getValue(secondItem) - getValue(firstItem);
       });
   }, [assetInfoMap, chainInfoMap, currencyData, earningPositions, priceMap]);

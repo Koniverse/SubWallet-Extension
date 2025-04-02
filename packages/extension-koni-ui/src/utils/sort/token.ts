@@ -7,7 +7,7 @@ import { BalanceValueInfo } from '@subwallet/extension-koni-ui/types';
 export interface SortableTokenItem {
   slug: string,
   symbol: string,
-  isTestnet: boolean,
+  isTestnet?: boolean,
   total?: BalanceValueInfo,
 }
 
@@ -102,16 +102,27 @@ export function sortTokensByBalanceInSelector (targetTokens: SortableTokenItem[]
   targetTokens.sort((a, b) => {
     const getTokenGroupLevel = (token: SortableTokenItem): number => {
       if (token.total) {
-        const value = token.total.convertedValue.toNumber();
+        const convertedValue = token.total.convertedValue.toNumber();
+        const value = token.total.value.toNumber();
 
-        if (value > 0 || !token.isTestnet) {
-          return 1;
-        } // Group 1: Has total.convertedValue > 0
-
-        return 2; // Group 2: Has total.convertedValue == 0
+        if (!token.isTestnet) {
+          if (convertedValue > 0) {
+            return 1; // Mainnet, has convert balance
+          } else if (value > 0) {
+            return 2; // Mainnet, has balance, no convert balance
+          } else {
+            return 3; // Mainnet, has zero balance
+          }
+        } else {
+          if (value > 0) {
+            return 4; // Testnet, has balance
+          } else {
+            return 5; // Testnet, 0
+          }
+        }
       }
 
-      return 3; // Group 3: No total
+      return 6; // No chain enabled
     };
 
     const aLevel = getTokenGroupLevel(a);
@@ -123,11 +134,11 @@ export function sortTokensByBalanceInSelector (targetTokens: SortableTokenItem[]
     }
 
     // Same group
-    if (aLevel === 1) {
-      return sortTokenByValue(a, b); // Group 1: sort by value
+    if (aLevel === 1 || aLevel === 2 || aLevel === 4) {
+      return sortTokenByValue(a, b); // Groups 1, 2, 4: sort by value
     }
 
-    // Group 2 or 3: sort by priority
+    // Groups 3, 5, 6: sort by priority
     const aSlug = a.slug;
     const bSlug = b.slug;
 
