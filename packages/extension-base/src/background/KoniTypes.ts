@@ -2006,6 +2006,9 @@ export interface RequestPingSession {
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
+export type BitcoinBalanceMetadata = {
+  inscriptionCount: number
+}
 
 // Use stringify to communicate, pure boolean value will error with case 'false' value
 export interface KoniRequestSignatures {

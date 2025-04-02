@@ -409,3 +409,4 @@ export * from './promise';
 export * from './registry';
 export * from './swap';
 export * from './translate';
+export * from './bitcoin';
