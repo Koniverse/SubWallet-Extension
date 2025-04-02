@@ -4,8 +4,8 @@
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { subscribeCardanoBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano';
-import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain, _isPureBitcoinChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson, BalanceItem } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, getAddressesByChainTypeMap, pairToAccount } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
@@ -204,7 +204,7 @@ export function subscribeBalance (
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
 
-  unsubList.push(subscribeBitcoinBalance(['bc1p567vvhxrpe28ppdazajpjsgng22sunxlrk0dn3rfuechf2mx828qns8zks']));
+  unsubList.push(subscribeBitcoinBalance(['bc1pw4gt62ne4csu74528qjkmv554vwf62dy6erm227qzjjlc2tlfd7qcta9w2']));
 
   return () => {
     unsubList.forEach((subProm) => {

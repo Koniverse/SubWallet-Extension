@@ -417,7 +417,6 @@ export class BalanceService implements StoppableServiceInterface {
     const substrateApiMap = this.state.chainService.getSubstrateApiMap();
     const tonApiMap = this.state.chainService.getTonApiMap();
     const cardanoApiMap = this.state.chainService.getCardanoApiMap();
-
     const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
     const assetState = this.state.chainService.subscribeAssetSettings().value;
     const assets: string[] = Object.values(assetMap)
