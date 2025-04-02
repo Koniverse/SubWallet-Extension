@@ -89,7 +89,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', 'ethereum', 'ton', 'cardano'];
+    const types: KeypairType[] = type ? [type] : ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
 
     if (!hasMasterPassword) {
       if (!password) {
