@@ -10,10 +10,10 @@ import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, Accou
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
-import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { getKeypairTypeByAddress, isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
@@ -162,6 +162,53 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
 
   return _rs.length ? _rs : DEFAULT_ACCOUNT_TYPES;
 };
+
+export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo {
+  const result: BitcoinAccountInfo = {
+    name: 'Unknown',
+    order: 99
+  };
+
+  switch (type) {
+    case 'bitcoin-44':
+      result.logoKey = 'bitcoin';
+      result.name = 'Bitcoin (BIP44)';
+      result.order = 1;
+      break;
+
+    case 'bitcoin-84':
+      result.logoKey = 'bitcoin';
+      result.name = 'Bitcoin';
+      result.order = 2;
+      break;
+
+    case 'bitcoin-86':
+      result.logoKey = 'ordinal_rune';
+      result.name = 'Ordinal, Runes';
+      result.order = 3;
+      break;
+
+    case 'bittest-44':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Bitcoin testnet';
+      result.order = 4;
+      break;
+
+    case 'bittest-84':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Bitcoin testnet';
+      result.order = 5;
+      break;
+
+    case 'bittest-86':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Bitcoin testnet (BIP86)';
+      result.order = 6;
+      break;
+  }
+
+  return result;
+}
 
 // todo:
 //  - support bitcoin

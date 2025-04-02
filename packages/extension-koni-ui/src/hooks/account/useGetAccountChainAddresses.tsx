@@ -1,14 +1,45 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { KeypairType } from '@subwallet/keyring/types';
+
+import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress } from '@subwallet/extension-koni-ui/types';
-import { getChainsByAccountType } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinAccountDetails, getChainsByAccountType } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 // todo:
 //  - order the result
+
+// Helper function to create an AccountChainAddress object
+const createChainAddress = (
+  accountType: KeypairType,
+  chainInfo: _ChainInfo,
+  address: string,
+  isBitcoin: boolean
+): AccountChainAddress => {
+  if (isBitcoin) {
+    const bitcoinInfo = getBitcoinAccountDetails(accountType);
+
+    return {
+      name: bitcoinInfo.name,
+      logoKey: bitcoinInfo.logoKey,
+      slug: chainInfo.slug,
+      address,
+      accountType
+    };
+  }
+
+  return {
+    name: chainInfo.name,
+    slug: chainInfo.slug,
+    address,
+    accountType
+  };
+};
+
 const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAddress[] => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const getReformatAddress = useReformatAddress();
@@ -23,12 +54,15 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
         const reformatedAddress = getReformatAddress(a, chainInfo);
 
         if (reformatedAddress) {
-          result.push({
-            name: chainInfo.name,
-            slug: chainInfo.slug,
-            address: reformatedAddress,
-            accountType: a.type
-          });
+          const isBitcoin = chain.includes('bitcoin');
+          const chainAddress = createChainAddress(
+            a.type,
+            chainInfo,
+            reformatedAddress,
+            isBitcoin
+          );
+
+          result.push(chainAddress);
         }
       }
     });

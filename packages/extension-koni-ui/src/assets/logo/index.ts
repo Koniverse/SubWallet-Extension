@@ -23,6 +23,7 @@ export const DefaultLogosMap: Record<string, string> = {
   hydradx: '/images/projects/hydradx.png',
   simple_swap: '/images/projects/simple-swap.png',
   uniswap: '/images/projects/uniswap.png',
+  ordinal_rune: './images/projects/ordinal_rune.png',
   polkadot_assethub: '/images/projects/polkadot-asset-hub.png',
   kusama_assethub: '/images/projects/kusama-asset-hub.png',
   rococo_assethub: '/images/projects/rococo-asset-hub.png',
