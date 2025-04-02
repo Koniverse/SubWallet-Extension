@@ -3,15 +3,14 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { CommonOptimalPath, ProcessType, StepStatus, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
-import { MetaInfo, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
-import { QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
+import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
+import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Icon, Logo, Number as UiNumber, Tooltip } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, Logo, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
@@ -33,76 +32,6 @@ type Props = ThemeProps & {
   slippage: number;
   openSlippageModal: VoidFunction;
 };
-
-type DecimalParts = {
-  integerPart: string;
-  subZeroCount?: number;
-  fractionPart?: string;
-};
-
-function roundFraction (raw: string, digits: number): string {
-  const numStr = `0.${raw}`;
-  const rounded = new BigN(numStr).decimalPlaces(digits, BigN.ROUND_HALF_UP);
-
-  return rounded.toFixed(digits).split('.')[1];
-}
-
-function analyzeDecimal (value: number): DecimalParts {
-  const str = new BigN(value).toFixed();
-  const [intPart, fracRaw = ''] = str.split('.');
-  const intVal = +intPart;
-
-  if (!fracRaw || /^0*$/.test(fracRaw)) {
-    return { integerPart: intPart };
-  }
-
-  if (intVal > 0) {
-    if (/^0{3,}$/.test(fracRaw)) {
-      return { integerPart: intPart, fractionPart: '000' };
-    }
-
-    return {
-      integerPart: intPart,
-      fractionPart: roundFraction(fracRaw, 4)
-    };
-  }
-
-  const zeroMatch = fracRaw.match(/^(0{3,})/);
-  const subCount = zeroMatch?.[1].length;
-  const rest = subCount ? fracRaw.slice(subCount) : fracRaw;
-  const maxLen = subCount ? 2 : 4;
-  const rounded = roundFraction(rest, maxLen);
-
-  return {
-    integerPart: intPart,
-    subZeroCount: subCount,
-    fractionPart: rounded || (subCount ? '' : undefined)
-  };
-}
-
-function renderRateValue (value: number): React.ReactNode {
-  const parsed = analyzeDecimal(value);
-
-  if (parsed.fractionPart === undefined) {
-    return <>{parsed.integerPart}</>;
-  }
-
-  const { fractionPart, integerPart, subZeroCount } = parsed;
-
-  if (subZeroCount !== undefined) {
-    return (
-      <>
-        {integerPart}.0<sub>{subZeroCount}</sub>{fractionPart}
-      </>
-    );
-  }
-
-  return (
-    <>
-      {integerPart}.{fractionPart}
-    </>
-  );
-}
 
 const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
   '.__brief': {
@@ -224,26 +153,18 @@ const Component: React.FC<Props> = (props: Props) => {
     });
   }, [currentOptimalSwapPath, transactionStepsModal]);
 
-  const rateValueNode = useMemo(() => {
-    return currentQuote?.rate ? renderRateValue(currentQuote.rate) : 0;
-  }, [currentQuote?.rate]);
-
   const renderRateInfo = () => {
     if (!currentQuote) {
       return null;
     }
 
     return (
-      <div className={'__quote-estimate-swap-value'}>
-        <span>
-          1 {_getAssetSymbol(fromAssetInfo)}
-        </span>
-        <span>&nbsp;~&nbsp;</span>
-        <span>
-          {rateValueNode}
-          {` ${_getAssetSymbol(toAssetInfo)}`}
-        </span>
-      </div>
+      <QuoteRateDisplay
+        className={'__quote-estimate-swap-value'}
+        fromAssetInfo={fromAssetInfo}
+        rateValue={currentQuote.rate}
+        toAssetInfo={toAssetInfo}
+      />
     );
   };
 
@@ -435,7 +356,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__swap-estimated-fee-info'}
                 label={t('Estimated fee')}
               >
-                <UiNumber
+                <NumberDisplay
                   decimal={0}
                   prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                   suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}

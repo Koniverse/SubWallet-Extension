@@ -7,7 +7,7 @@ import { ExtrinsicType, NotificationType, TokenPriorityDetails } from '@subwalle
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getLastAmountFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
@@ -27,7 +27,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenAvailable, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokenByPriority, sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -163,7 +163,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
-  const assetSettingMap = useSelector((state) => state.assetRegistry.assetSettingMap);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
   const hasInternalConfirmations = useSelector((state: RootState) => state.requestState.hasInternalConfirmations);
@@ -304,13 +303,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const result: _ChainAsset[] = [];
 
     Object.values(assetRegistryMap).forEach((chainAsset) => {
-      if (isTokenAvailable(chainAsset, assetSettingMap, {}, false)) {
+      if (_isAssetFungibleToken(chainAsset)) {
         result.push(chainAsset);
       }
     });
 
     return result;
-  }, [assetRegistryMap, assetSettingMap]);
+  }, [assetRegistryMap]);
 
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
@@ -1162,7 +1161,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
                       <Button
                         className={'__half-amount-button __quick-amount-button'}
-                        disabled={!isSwitchable}
                         onClick={onClickHaftAmountButton}
                         size='xs'
                         type={'ghost'}
