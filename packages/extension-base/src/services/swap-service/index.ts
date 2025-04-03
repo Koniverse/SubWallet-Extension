@@ -335,7 +335,7 @@ export class SwapService implements StoppableServiceInterface {
       });
 
       if (request.preferredProvider) {
-        availableQuotes.find((quote) => quote.provider.id === request.preferredProvider);
+        selectedQuote = availableQuotes.find((quote) => quote.provider.id === request.preferredProvider) || availableQuotes[0];
       } else {
         selectedQuote = availableQuotes[0];
       }
