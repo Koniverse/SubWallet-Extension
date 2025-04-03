@@ -63,6 +63,8 @@ jobs:
         SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
         BLOCKFROST_API_KEY_MAIN: ${{ secrets.BLOCKFROST_API_KEY_MAIN }}
         BLOCKFROST_API_KEY_PREP: ${{ secrets.BLOCKFROST_API_KEY_PREP }}
+        MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
+        MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         GH_RELEASE_FILES: master-build.zip,master-src.zip
         COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         REF_NAME: ${{ github.ref_name }}
