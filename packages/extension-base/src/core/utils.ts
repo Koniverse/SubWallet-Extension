@@ -149,8 +149,6 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 }
 
 export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<boolean> => {
-  console.log('???', tokenInfo, SUFFICIENT_CHAIN);
-
   if (SUFFICIENT_CHAIN.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
     const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
 
@@ -167,7 +165,7 @@ export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _
 
     const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
 
-    return metadata.isSufficient;
+    return metadata?.isSufficient || false;
   } else {
     return false;
   }
