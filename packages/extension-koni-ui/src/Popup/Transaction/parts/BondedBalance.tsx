@@ -65,12 +65,16 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
           >
             <div className='slippage-info'>
               <span className='slippage-label'>{t('Slippage')}: </span>
-              <span
+              <Number
                 className='slippage-value'
-                style={{ color: isSlippageAcceptable ? token['gray-5'] : token.colorError }}
-              >
-                {maxSlippage ? (maxSlippage.slippage.toNumber() * 100) : 0}%
-              </span>
+                decimal={0}
+                decimalColor={isSlippageAcceptable ? token['gray-5'] : token.colorError}
+                intColor={isSlippageAcceptable ? token['gray-5'] : token.colorError}
+                size={14}
+                suffix={'%'}
+                unitColor={isSlippageAcceptable ? token['gray-5'] : token.colorError}
+                value={maxSlippage ? (maxSlippage.slippage.toNumber() * 100) : 0}
+              />
               <div
                 className='__slippage-editor-button'
                 onClick={onOpenSlippageModal}
@@ -124,7 +128,7 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
     '.slippage-info': {
       display: 'flex',
       alignItems: 'center',
-      maxWidth: '8.4375rem',
+      maxWidth: '9.375rem',
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     } as const,
