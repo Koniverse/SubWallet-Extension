@@ -62,11 +62,11 @@ export async function getSnowbridgeTransferProcessFromEvm (address: string, evmA
   return Promise.resolve(result);
 }
 
-export async function getAcrossbridgeTransferProcessFromEvm (originChainInfo: _ChainInfo): Promise<CommonOptimalPath> {
+export async function getAcrossbridgeTransferProcessFromEvm (originChainInfo: _ChainInfo): Promise<CommonOptimalTransferPath> {
   const chainId = _getEvmChainId(originChainInfo) as number;
   const SpokePoolAddress = SpokePoolMapping[chainId].SpokePool.address;
 
-  const result: CommonOptimalPath = {
+  const result: CommonOptimalTransferPath = {
     totalFee: [MOCK_STEP_FEE],
     steps: [DEFAULT_FIRST_STEP]
   };
