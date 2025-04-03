@@ -194,7 +194,7 @@ function createParaSpellCurrency (assetType: string, assetValue: string, amount:
   return {
     [assetType]: assetValue,
     amount
-  }
+  };
 }
 
 // todo: remove

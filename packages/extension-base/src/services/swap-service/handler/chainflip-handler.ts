@@ -247,6 +247,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       // @ts-ignore
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
+        expectedReceive: params.selectedQuote.toAmount,
         originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
         destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
 

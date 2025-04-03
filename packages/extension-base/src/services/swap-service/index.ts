@@ -14,7 +14,7 @@ import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-servi
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -169,7 +169,7 @@ export class SwapService implements StoppableServiceInterface {
     };
   }
 
-  public async handleSwapRequestV2 (request: SwapRequest): Promise<SwapRequestResult> {
+  public async handleSwapRequestV2 (request: SwapRequestV2): Promise<SwapRequestResult> {
     /*
     * 1. Find available path
     * 2. Ask swap quotes from providers
@@ -467,25 +467,6 @@ export class SwapService implements StoppableServiceInterface {
         }
       } as SwapPair;
     });
-  }
-
-  // private getSwapPairMetadata (slug: string): Record<string, any> | undefined {
-  //   return this.getSwapPairs().find((pair) => pair.slug === slug)?.metadata;
-  // }
-
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const providerId = params.selectedQuote.provider.id;
-    const handler = this.handlers[providerId];
-
-    if (params.currentStep > 1) { // only validate from the first step
-      return [];
-    }
-
-    if (handler) {
-      return handler.validateSwapProcessV2(params);
-    } else {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
   }
 
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {

@@ -71,7 +71,7 @@ const Component: FC<Props> = (props: Props) => {
       ...iconInfo,
       size: 'xs'
     };
-  }, [index, status]);
+  }, [index, logoKey, status]);
 
   return (
     <div

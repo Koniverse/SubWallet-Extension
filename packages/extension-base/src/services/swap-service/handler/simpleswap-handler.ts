@@ -122,24 +122,25 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    if (params.selectedQuote) {
-      const submitStep: BaseStepDetail = {
-        name: 'Swap',
-        type: SwapStepType.SWAP,
-        // @ts-ignore
-        metadata: {
-          sendingValue: params.request.fromAmount.toString(),
-          originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
-          sender: params.request.address,
-          receiver: params.request.recipient || params.request.address
-        } as unknown as BaseSwapStepMetadata
-      };
-
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    if (!params.selectedQuote) {
+      return Promise.resolve(undefined);
     }
 
-    return Promise.resolve(undefined);
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      // @ts-ignore
+      metadata: {
+        sendingValue: params.request.fromAmount.toString(),
+        expectedReceive: params.selectedQuote.toAmount,
+        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
+        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
+        sender: params.request.address,
+        receiver: params.request.recipient || params.request.address
+      } as unknown as BaseSwapStepMetadata
+    };
+
+    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
   }
 
   public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {

@@ -86,7 +86,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { fromAmount, slippage }, selectedQuote } = params;
+    const { path, request: { fromAmount }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {
@@ -105,8 +105,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       // @ts-ignore
       metadata: {
         sendingValue: fromAmount,
+        expectedReceive: selectedQuote.toAmount,
         originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-        destinationValue: getAmountAfterSlippage(selectedQuote?.toAmount || '0', slippage),
         destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to),
         sender: params.request.address,
         receiver: params.request.recipient || params.request.address
@@ -205,7 +205,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     }
 
     if (swapXcm) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateSwapXcmProcess(params, 1, 2);
     }
 
     if (xcmSwap) {
@@ -213,7 +213,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     }
 
     if (xcmSwapXcm) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateXcmSwapXcmProcess(params, 2, 1, 3);
     }
 
     return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
