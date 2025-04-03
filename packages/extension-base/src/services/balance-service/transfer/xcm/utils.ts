@@ -18,7 +18,7 @@ interface DryRunInfo {
 }
 
 interface ParaSpellCurrency {
-  symbol: string,
+  [p: string]: string,
   amount: string
 }
 
@@ -107,9 +107,10 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw Error('Substrate API is not available');
   }
 
-  const paraSpellSymbol = originTokenInfo.metadata?.psSymbol;
+  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
+  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
 
-  if (!paraSpellSymbol) {
+  if (!psAssetType || !psAssetValue) {
     throw Error('Token is not support XCM at this time'); // todo: content
   }
 
@@ -120,7 +121,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
       address: recipient,
       from: paraSpellChainMap[originChain.slug],
       to: paraSpellChainMap[destinationChain.slug],
-      currency: createParaSpellCurrency(paraSpellSymbol, sendingValue)
+      currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
     };
 
     const response = await fetch(paraSpellApi.buildXcm, {
@@ -148,9 +149,10 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
-  const paraSpellSymbol = originTokenInfo.metadata?.psSymbol;
+  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
+  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
 
-  if (!paraSpellSymbol) {
+  if (!psAssetType || !psAssetValue) {
     throw Error('Token is not support XCM at this time'); // todo: content
   }
 
@@ -162,7 +164,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
       address: recipient,
       from: paraSpellChainMap[originChain.slug],
       to: paraSpellChainMap[destinationChain.slug],
-      currency: createParaSpellCurrency(paraSpellSymbol, sendingValue)
+      currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
     };
 
     const response = await fetch(paraSpellApi.dryRunXcm, {
@@ -187,10 +189,10 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   return dryRunInfo;
 }
 
-function createParaSpellCurrency (symbol: string, amount: string): ParaSpellCurrency {
+function createParaSpellCurrency (assetType: string, assetValue: string, amount: string): ParaSpellCurrency {
   // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
   return {
-    symbol,
+    [assetType]: assetValue,
     amount
   }
 }
