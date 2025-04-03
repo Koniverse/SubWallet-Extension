@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   currentQuote: SwapQuote | undefined;
-  optimalQuote: SwapQuote | undefined;
+  quoteOptions: SwapQuote[];
   currentOptimalSwapPath: CommonOptimalSwapPath | undefined;
   isFormInvalid: boolean;
   estimatedFeeValue: BigN;
@@ -70,8 +70,8 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
-    fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal,
-    openSwapQuotesModal, optimalQuote, quoteAliveUntil, slippage, swapError,
+    fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal, openSwapQuotesModal,
+    quoteAliveUntil, quoteOptions, slippage, swapError,
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
@@ -170,6 +170,8 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const _renderRateInfo = () => {
+    const recommendedQuote = quoteOptions[0];
+
     return (
       <div
         className={'__quote-selector-trigger'}
@@ -178,7 +180,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {renderRateInfo()}
 
         {
-          !!optimalQuote?.provider.id && (optimalQuote?.provider.id === currentQuote?.provider.id) && (
+          !!recommendedQuote?.provider.id && (recommendedQuote?.provider.id === currentQuote?.provider.id) && (
             <div className='__best-tag'>
               {t('Best')}
             </div>

@@ -185,7 +185,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
-  const optimalQuoteRef = useRef<SwapQuote | undefined>(undefined);
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [handleRequestLoading, setHandleRequestLoading] = useState(true);
@@ -460,7 +459,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
     setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
     setSwapError(rs.quote.error);
-    optimalQuoteRef.current = rs.quote.optimalQuote;
   }, []);
 
   const onConfirmSelectedQuote = useCallback(
@@ -1283,8 +1281,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   isFormInvalid={isFormInvalid}
                   openSlippageModal={openSlippageModal}
                   openSwapQuotesModal={openSwapQuotesModal}
-                  optimalQuote={optimalQuoteRef.current}
                   quoteAliveUntil={quoteAliveUntil}
+                  quoteOptions={quoteOptions}
                   slippage={slippage}
                   swapError={swapError}
                   toAssetInfo={toAssetInfo}
@@ -1327,10 +1325,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         isSwapQuotesSelectorModalVisible && (
           <SwapQuotesSelectorModal
             applyQuote={onConfirmSelectedQuote}
+            disableConfirmButton={handleRequestLoading}
             items={quoteOptions}
             modalId={SWAP_ALL_QUOTES_MODAL}
             onCancel={closeSwapQuotesModal}
-            optimalQuoteItem={optimalQuoteRef.current}
             quoteAliveUntil={quoteAliveUntil}
             selectedItem={currentQuote}
           />
