@@ -265,6 +265,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onOpenSlippageModal}
         >
           <Tooltip
+            className={'__slippage-content'}
             open={slippageTitle ? undefined : false}
             placement={'topRight'}
             title={slippageTitle}
@@ -272,9 +273,7 @@ const Component: React.FC<Props> = (props: Props) => {
             {
               !!slippageTitle && (
                 <Icon
-                  customSize='16px'
                   phosphorIcon={Info}
-                  size='sm'
                   weight='fill'
                 />
               )
@@ -448,7 +447,7 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       }
     },
 
-    '.__slippage-action': {
+    '.__slippage-action, .__slippage-content': {
       display: 'flex',
       alignItems: 'center',
       gap: token.sizeXXS

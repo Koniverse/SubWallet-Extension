@@ -8,7 +8,6 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
-import { getLastAmountFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
@@ -1227,7 +1226,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   decimals={_getAssetDecimals(toAssetInfo)}
                   loading={handleRequestLoading && showQuoteArea}
                   onSelectToken={onSelectToToken}
-                  swapValue={currentOptimalSwapPath ? getLastAmountFromSteps(currentOptimalSwapPath.steps) || 0 : 0}
+                  swapValue={currentQuote?.toAmount || 0}
                   toAsset={toAssetInfo}
                   tokenSelectorItems={toTokenItems}
                   tokenSelectorValue={toTokenSlugValue}
@@ -1279,6 +1278,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 <FreeBalance
                   address={fromValue}
                   chain={chainValue}
+                  className={'__balance-display'}
                   extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
@@ -1426,9 +1426,14 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
     '.__quick-amount-button': {
       height: '36px',
       lineHeight: '36px',
+      fontSize: token.fontSizeSM,
       paddingLeft: token.paddingXS,
       paddingRight: token.paddingXS,
       fontWeight: token.bodyFontWeight
+    },
+
+    '.__quick-amount-button.__quick-amount-button .ant-btn-content-wrapper': {
+      fontSize: token.fontSizeSM
     },
 
     '.__swap-from-field': {
@@ -1437,6 +1442,11 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
 
     '.__swap-field-area': {
       marginBottom: token.marginXS
+    },
+
+    '.__balance-display': {
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM
     },
 
     '.__quote-info-area': {
