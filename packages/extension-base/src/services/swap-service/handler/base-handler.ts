@@ -167,16 +167,17 @@ export class SwapBaseHandler {
       let bnSendingValue;
       let expectedReceive;
 
+      const actionList = JSON.stringify(path.map((step) => step.action));
+      const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
       // todo: increase transfer amount when XCM local token
       if (stepIndex === 0) {
         expectedReceive = fromAmount;
         bnSendingValue = BigN(fromAmount);
 
-        const actionList = JSON.stringify(path.map((step) => step.action));
-        const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-
         if (xcmSwapXcm) {
           bnSendingValue = bnSendingValue.multipliedBy(1.02);
+          expectedReceive = bnSendingValue.toString();
         }
 
         if (isBridgeNativeToken) {
@@ -190,7 +191,12 @@ export class SwapBaseHandler {
         }
       } else { // bridge after swap
         expectedReceive = selectedQuote.toAmount;
-        bnSendingValue = BigN(selectedQuote.toAmount);
+
+        if (xcmSwapXcm) {
+          bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(1.02); // need to round
+        } else {
+          bnSendingValue = BigN(selectedQuote.toAmount);
+        }
       }
 
       const step: BaseStepDetail = {
@@ -699,10 +705,6 @@ export class SwapBaseHandler {
 
     if (params.selectedQuote.aliveUntil <= +Date.now()) {
       return [new TransactionError(SwapErrorType.QUOTE_TIMEOUT)];
-    }
-
-    if (params.selectedQuote.toAmount !== swapMetadata.expectedReceive) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);

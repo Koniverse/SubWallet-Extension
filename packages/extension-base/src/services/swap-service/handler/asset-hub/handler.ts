@@ -105,13 +105,24 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+    let bnSendingValue = BigN(fromAmount);
+    let bnExpectedReceive = BigN(selectedQuote.toAmount);
+
+    if (xcmSwapXcm) {
+      bnSendingValue = bnSendingValue.multipliedBy(1.02);
+      bnExpectedReceive = bnExpectedReceive.multipliedBy(1.02);
+    }
+
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
       // @ts-ignore
       metadata: {
-        sendingValue: fromAmount,
-        expectedReceive: selectedQuote.toAmount,
+        sendingValue: bnSendingValue.toString(),
+        expectedReceive: bnExpectedReceive.toString(),
         originTokenInfo,
         destinationTokenInfo,
         sender: _reformatAddressWithChain(params.request.address, originChain),
@@ -156,15 +167,13 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     };
 
     const paths = params.quote.route.path.map((slug) => this.chainService.getAssetBySlug(slug));
-    const { fromAmount, toAmount } = params.quote;
-    // todo: move to gen process
-    const minReceive = BigN(getAmountAfterSlippage(toAmount, params.slippage));
+    const minReceive = BigN(getAmountAfterSlippage(metadata.expectedReceive, params.slippage));
 
-    if (!params.address || !paths || !fromAmount || !minReceive) {
+    if (!params.address || !paths || !minReceive) {
       throw new SwapError(SwapErrorType.UNKNOWN);
     }
 
-    const extrinsic = await this.router?.buildSwapExtrinsic(paths, params.address, fromAmount, minReceive.toString());
+    const extrinsic = await this.router?.buildSwapExtrinsic(paths, params.address, metadata.sendingValue, minReceive.toString());
 
     return {
       txChain: fromAsset.originChain,
