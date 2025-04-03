@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
-import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo, _BitcoinInfo } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetRefPath, _AssetType, _BitcoinInfo, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
 import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
+import { BitcoinChainHandler } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/BitcoinChainHandler';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
 import { MantaPrivateHandler } from '@subwallet/extension-base/services/chain-service/handler/manta/MantaPrivateHandler';
@@ -21,7 +22,6 @@ import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
 import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT } from '@subwallet/extension-base/utils';
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
-import { BitcoinChainHandler } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/BitcoinChainHandler';
 
 import { logger as createLogger } from '@polkadot/util/logger';
 import { HexString, Logger } from '@polkadot/util/types';
@@ -126,7 +126,7 @@ export class ChainService {
     this.tonChainHandler = new TonChainHandler(this);
     this.cardanoChainHandler = new CardanoChainHandler(this);
     this.bitcoinChainHandler = new BitcoinChainHandler(this);
-    
+
     this.logger = createLogger('chain-service');
   }
 
@@ -218,6 +218,7 @@ export class ChainService {
   public getBitcoinApiMap () {
     return this.bitcoinChainHandler.getApiMap();
   }
+
   public getTonApi (slug: string) {
     return this.tonChainHandler.getTonApiByChain(slug);
   }
@@ -1545,7 +1546,7 @@ export class ChainService {
     let evmInfo: _EvmInfo | null = null;
     const tonInfo: _TonInfo | null = null;
     const cardanoInfo: _CardanoInfo | null = null;
-    let bitcoinInfo: _BitcoinInfo | null = null;
+    const bitcoinInfo: _BitcoinInfo | null = null;
 
     if (params.chainSpec.genesisHash !== '') {
       substrateInfo = {
