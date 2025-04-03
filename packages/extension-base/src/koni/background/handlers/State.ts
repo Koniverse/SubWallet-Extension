@@ -578,7 +578,7 @@ export default class KoniState {
 
     if (authUrls[shortenUrl]) {
       if (chainInfo && !_isChainEnabled(chainState)) {
-        await this.enableChain(networkKey);
+        await this.enableChainWithPriorityAssets(networkKey);
       }
 
       authUrls[shortenUrl].currentEvmNetworkKey = networkKey;
@@ -894,6 +894,14 @@ export default class KoniState {
   public async enableChain (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
       await this.chainService.updateAssetSettingByChain(chainSlug, true);
+    }
+
+    return this.chainService.enableChain(chainSlug);
+  }
+
+  public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
+    if (enableTokens) {
+      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);

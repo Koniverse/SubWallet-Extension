@@ -19,6 +19,7 @@ import MigratePolygonUSDCProvider from './tokens/MigratePolygonUSDCProvider';
 import DeleteChain from './DeleteChain';
 import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
+import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
 import MigrateImportedToken from './MigrateImportedToken';
@@ -64,6 +65,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.2.32-01': MigratePairData,
   '1.3.6-01': MigrateTransactionHistoryBridge,
   '1.3.10-01': ClearMetadataDatabase,
+  '1.3.26-01': DisableZeroBalanceTokens,
   [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
