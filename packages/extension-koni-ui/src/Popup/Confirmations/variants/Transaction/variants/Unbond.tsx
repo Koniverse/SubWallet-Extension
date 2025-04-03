@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
+import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -21,6 +22,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
+
+  const isBittensorChain = useMemo(() => {
+    return data.poolInfo?.chain === 'bittensor' || data.poolInfo?.chain === 'bittensor_testnet';
+  }, [data.poolInfo?.chain]);
 
   return (
     <div className={CN(className)}>
@@ -46,12 +51,24 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+      {isBittensorChain && (
+        <AlertBox
+          className={CN(className, 'alert-box')}
+          description={t('An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete')}
+          title={t('TAO unstaking fee')}
+          type='info'
+        />
+      )}
     </div>
   );
 };
 
 const UnbondTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '&.alert-box': {
+      marginTop: token.marginSM
+    }
+  };
 });
 
 export default UnbondTransactionConfirmation;

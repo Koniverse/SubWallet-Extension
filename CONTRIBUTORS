@@ -1,19 +1,19 @@
-    2975	AnhMTV                        	Release version 1.3.25
-    2554	Nam Phạm                      	[Issue 4036] review: showing earning option for dTAO staking
-    2527	S2kael                        	[Issue-4037] Update UX
+    2985	AnhMTV                        	
+    2589	Nam Phạm                      	[Issue 4090] chore: update yarn lock
+    2543	S2kael                        	[Issue-4140] Improve filtering performance
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     706	bluezdot                      	[Issue-4045] fix: minor UX
+     716	bluezdot                      	[Issue-4090] feat: add arbitrum to uniswap provider
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     251	Frenkie Nguyen                	[Issue-3864] refactor: handle gohome in QR modal
+     256	Frenkie Nguyen                	[Issue-4081] Update the URL to detect the environment
+     199	tunghp2002                    	[Issue-4140] use online cache
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
-     179	tunghp2002                    	[Issue-4036] Chore: fix lint
+     178	lw                            	[Issue-4090] refactor: Disable quote selection when only one option is available
      170	lw-cdm                        	
-     166	lw                            	[Issue-4085] feat: Update Meld on-ramp feature
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     128	PDTnhah                       	[Issue-4029] Test: Test API key
+     133	PDTnhah                       	[Extension] Update explorer for polimec
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	
@@ -23,9 +23,9 @@
       53	Dominhquangdev                	update Bridge code
       28	S2kael                        	[Issue-3658] Hide estimate fee field on Send Fund screen with cardano chain
       10	Trang Trịnh                   	api get karura and acala nfts
+      10	tunghp2002                    	
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
-       9	tunghp2002                    	
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number

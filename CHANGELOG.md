@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 1.3.27
+Build date: Mar 29, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain round 1 (#4090)
+- Update chainlist stable version 0.2.102 (#4058)
+- Update API key for blockfrost on Cardano (#4164)
+
+Bug fixed:
+- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
+
+
+## 1.3.26
+Build date: Mar 27, 2025.
+
+Bug fixed:
+- Fixed bug show balance for Polimec (#4058)
+- Fixed bug View explorer for Bittensor (#4058)
+
+
 ## 1.3.25
 Build date: Mar 24, 2025.
 

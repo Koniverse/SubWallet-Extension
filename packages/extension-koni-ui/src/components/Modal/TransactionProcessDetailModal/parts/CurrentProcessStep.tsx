@@ -3,11 +3,11 @@
 
 import { BaseStepType, CommonStepType, ProcessStep, ProcessTransactionData, StepStatus, SwapStepType, YieldStepType } from '@subwallet/extension-base/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isStepCompleted, isStepFailed, isStepProcessing } from '@subwallet/extension-koni-ui/utils';
+import { isStepCompleted, isStepFailed, isStepProcessing, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
-import { CheckCircle, ProhibitInset, Spinner } from 'phosphor-react';
+import { CheckCircle, ClockCounterClockwise, ProhibitInset, Spinner } from 'phosphor-react';
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,6 +30,11 @@ const Component: FC<Props> = (props: Props) => {
       } else if (isStepFailed(processData.status)) {
         return {
           phosphorIcon: ProhibitInset,
+          weight: 'fill'
+        };
+      } else if (isStepTimeout(processData.status)) {
+        return {
+          phosphorIcon: ClockCounterClockwise,
           weight: 'fill'
         };
       }
@@ -68,6 +73,10 @@ const Component: FC<Props> = (props: Props) => {
 
     if (isStepFailed(processData.status)) {
       return t('Failed');
+    }
+
+    if (isStepTimeout(processData.status)) {
+      return t('Timeout');
     }
 
     if (!currentStep) {
@@ -125,7 +134,8 @@ const Component: FC<Props> = (props: Props) => {
       className={CN(className, {
         '-processing': isStepProcessing(processData.status),
         '-complete': isStepCompleted(processData.status),
-        '-failed': isStepFailed(processData.status)
+        '-failed': isStepFailed(processData.status),
+        '-timeout': isStepTimeout(processData.status)
       })}
     >
       <Icon
@@ -187,6 +197,10 @@ export const CurrentProcessStep = styled(Component)<Props>(({ theme: { token } }
 
     '&.-failed': {
       color: token.colorError
+    },
+
+    '&.-timeout': {
+      color: token.gold
     }
   });
 });
