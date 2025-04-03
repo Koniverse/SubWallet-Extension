@@ -116,12 +116,6 @@ export class SimpleSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const stepData = params.path[stepIndex];
-
-    if (stepData.action !== DynamicSwapType.SWAP) {
-      return Promise.resolve(undefined);
-    }
-
     if (!params.selectedQuote) {
       return Promise.resolve(undefined);
     }
