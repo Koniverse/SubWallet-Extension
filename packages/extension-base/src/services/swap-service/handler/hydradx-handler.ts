@@ -14,6 +14,7 @@ import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/se
 import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -168,6 +169,11 @@ export class HydradxHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    const originTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
@@ -175,10 +181,10 @@ export class HydradxHandler implements SwapBaseInterface {
       metadata: {
         sendingValue: fromAmount,
         expectedReceive: selectedQuote.toAmount,
-        originTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(swapPairInfo.to),
-        sender: params.request.address,
-        receiver: params.request.recipient || params.request.address,
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(params.request.address, originChain),
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
         txHex
       } as unknown as HydrationSwapStepMetadata
     };

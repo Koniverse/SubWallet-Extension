@@ -6,6 +6,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -201,6 +202,11 @@ export class UniswapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    const originTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
@@ -208,8 +214,10 @@ export class UniswapHandler implements SwapBaseInterface {
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
         expectedReceive: params.selectedQuote.toAmount,
-        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(params.request.address, originChain),
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain)
       } as unknown as BaseSwapStepMetadata
     };
 

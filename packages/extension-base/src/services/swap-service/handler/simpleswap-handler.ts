@@ -126,6 +126,11 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    const originTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
@@ -133,10 +138,10 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
         expectedReceive: params.selectedQuote.toAmount,
-        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
-        sender: params.request.address,
-        receiver: params.request.recipient || params.request.address
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(params.request.address, originChain),
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain)
       } as unknown as BaseSwapStepMetadata
     };
 
