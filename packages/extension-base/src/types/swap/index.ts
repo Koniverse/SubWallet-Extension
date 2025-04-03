@@ -175,6 +175,16 @@ export interface SwapRequest {
   currentQuote?: SwapProvider
 }
 
+export interface SwapRequestV2 {
+  address: string;
+  pair: SwapPair;
+  fromAmount: string;
+  slippage: number; // Example: 0.01 for 1%
+  recipient?: string;
+  feeToken?: string;
+  preferredProvider?: SwapProviderId; // allow user to designate a provider
+}
+
 export interface SwapRequestResult {
   process: CommonOptimalSwapPath;
   quote: SwapQuoteResponse;
@@ -182,7 +192,6 @@ export interface SwapRequestResult {
 
 export interface SwapQuoteResponse {
   optimalQuote?: SwapQuote; // if no optimalQuote then there's an error
-  modifiedOptimalQuote?: SwapQuote;
   quotes: SwapQuote[];
   aliveUntil: number; // timestamp
   error?: SwapError; // only if there's no available quote
