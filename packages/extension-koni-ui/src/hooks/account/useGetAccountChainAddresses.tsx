@@ -4,6 +4,7 @@
 import type { KeypairType } from '@subwallet/keyring/types';
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG } from '@subwallet/extension-base/services/chain-service/constants';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress } from '@subwallet/extension-koni-ui/types';
@@ -54,7 +55,7 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
         const reformatedAddress = getReformatAddress(a, chainInfo);
 
         if (reformatedAddress) {
-          const isBitcoin = chain.includes('bitcoin');
+          const isBitcoin = [_BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG].includes(chain);
           const chainAddress = createChainAddress(
             a.type,
             chainInfo,

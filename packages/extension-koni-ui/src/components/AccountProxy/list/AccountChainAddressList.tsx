@@ -116,7 +116,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
           className={'address-item'}
           isShowInfoButton={isPolkadotUnifiedChain}
           item={item}
-          key={item.slug}
+          key={`${item.slug}_${item.address}`}
           onClick={onShowQr(item)}
           onClickCopyButton={onCopyAddress(item)}
           onClickInfoButton={onClickInfoButton(item)}

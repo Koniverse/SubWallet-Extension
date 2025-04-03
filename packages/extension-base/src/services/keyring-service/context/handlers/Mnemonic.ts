@@ -27,7 +27,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
   /* Create seed */
   public async mnemonicCreateV2 ({ length = SEED_DEFAULT_LENGTH, mnemonic: _seed, type = 'general' }: RequestMnemonicCreateV2): Promise<ResponseMnemonicCreateV2> {
-    const types: KeypairType[] = type === 'general' ? ['sr25519', 'ethereum', 'ton', 'cardano'] : ['ton-native'];
+    const types: KeypairType[] = type === 'general' ? ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'] : ['ton-native'];
     const seed = _seed ||
     type === 'general'
       ? mnemonicGenerate(length)
@@ -57,7 +57,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
         assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
 
         mnemonicTypes = 'general';
-        pairTypes = ['sr25519', 'ethereum', 'ton'];
+        pairTypes = ['sr25519', 'ethereum', 'ton', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
         mnemonicTypes = 'ton';

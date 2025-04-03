@@ -172,7 +172,7 @@ export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo
   switch (type) {
     case 'bitcoin-44':
       result.logoKey = 'bitcoin';
-      result.name = 'Bitcoin (BIP44)';
+      result.name = 'Bitcoin (Legacy)';
       result.order = 1;
       break;
 
