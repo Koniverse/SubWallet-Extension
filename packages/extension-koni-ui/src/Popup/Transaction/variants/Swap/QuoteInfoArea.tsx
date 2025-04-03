@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   currentQuote: SwapQuote | undefined;
+  optimalQuote: SwapQuote | undefined;
   currentOptimalSwapPath: CommonOptimalSwapPath | undefined;
   isFormInvalid: boolean;
   estimatedFeeValue: BigN;
@@ -69,8 +70,8 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
-    fromAssetInfo, handleRequestLoading, isFormInvalid,
-    openSlippageModal, openSwapQuotesModal, quoteAliveUntil, slippage, swapError,
+    fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal,
+    openSwapQuotesModal, optimalQuote, quoteAliveUntil, slippage, swapError,
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
@@ -176,9 +177,13 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         {renderRateInfo()}
 
-        <div className='__best-tag'>
-          {t('Best')}
-        </div>
+        {
+          !!optimalQuote?.provider.id && (optimalQuote?.provider.id === currentQuote?.provider.id) && (
+            <div className='__best-tag'>
+              {t('Best')}
+            </div>
+          )
+        }
 
         <Icon
           className={'__caret-icon'}
@@ -278,7 +283,6 @@ const Component: React.FC<Props> = (props: Props) => {
               !!slippageTitle && (
                 <Icon
                   phosphorIcon={Info}
-                  weight='fill'
                 />
               )
             }

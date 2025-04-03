@@ -78,7 +78,6 @@ const Component = ({ address,
                 <Icon
                   className={'__info-icon'}
                   phosphorIcon={Info}
-                  weight='fill'
                 />
               )
             }

@@ -3,13 +3,13 @@
 
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { SwapQuote } from '@subwallet/extension-base/types/swap';
-import { swapCustomFormatter } from '@subwallet/extension-base/utils';
-import { TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
+import { swapNumberMetadata } from '@subwallet/extension-base/utils';
+import { NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
-import { Icon, Logo, Number } from '@subwallet/react-ui';
+import { Icon, Logo } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -22,7 +22,6 @@ type Props = ThemeProps & {
   selected?: boolean,
   onSelect?: (quote: SwapQuote) => void,
 }
-const numberMetadata = { maxNumberFormat: 8 };
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, isRecommend, onSelect, quote, selected } = props;
@@ -96,16 +95,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
           <div className={'__line-2 __line'}>
             <div className='__line-label'>
-              <span className={'__est-receive-label'}>{t('Min receivable')}</span>
+              <span className={'__est-receive-label'}>{t('Est. receive')}</span>
             </div>
 
             <div className='__line-value'>
-              <Number
+              <NumberDisplay
                 className={'__est-receive-value'}
-                customFormatter={swapCustomFormatter}
                 decimal={_getAssetDecimals(toAssetInfo)}
-                formatType={'custom'}
-                metadata={numberMetadata}
+                metadata={swapNumberMetadata}
                 suffix={_getAssetSymbol(toAssetInfo)}
                 value={quote.toAmount || '0'}
               />
@@ -115,8 +112,9 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className={'__line-3 __line'}>
             <div className='__line-label'>{t('Fee')}</div>
             <div className='__line-value'>
-              <Number
+              <NumberDisplay
                 decimal={0}
+                metadata={swapNumberMetadata}
                 prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                 suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
                 value={estimatedFeeValue}
