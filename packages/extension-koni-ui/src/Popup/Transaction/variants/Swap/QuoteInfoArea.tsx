@@ -191,7 +191,11 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const renderQuoteEmptyBlock = () => {
-    const isError = !!swapError || isFormInvalid;
+    if (swapError) {
+      return null;
+    }
+
+    const isError = isFormInvalid;
     let message = '';
     const _loading = handleRequestLoading && !isFormInvalid;
 
@@ -200,7 +204,7 @@ const Component: React.FC<Props> = (props: Props) => {
     } else if (handleRequestLoading) {
       message = t('Loading...');
     } else {
-      message = swapError ? swapError?.message : t('No swap quote found. Adjust your amount or try again later.');
+      message = t('No swap quote found. Adjust your amount or try again later.');
     }
 
     return (
