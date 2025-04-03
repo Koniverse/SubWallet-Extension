@@ -487,7 +487,7 @@ export class BalanceService implements StoppableServiceInterface {
             setTimeout(() => _resolve([]), 30000);
           });
 
-          const apiPromise = subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
 
           Promise.race([timeOutPromise, apiPromise])
             .then((result) => resolve(result))

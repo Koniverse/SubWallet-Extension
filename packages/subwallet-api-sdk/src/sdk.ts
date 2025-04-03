@@ -26,12 +26,12 @@ export class SubWalletApiSdk {
   private baseUrl = '';
   private static _instance: SubWalletApiSdk | undefined = undefined;
   public swapApi: SwapApi | undefined;
-  public balanceDetectioApi: BalanceDetectionApi | undefined;
+  public balanceDetectionApi: BalanceDetectionApi | undefined;
 
   public init (url: string) {
     this.baseUrl = url;
     this.swapApi = new SwapApi(url);
-    this.balanceDetectioApi = new BalanceDetectionApi(url);
+    this.balanceDetectionApi = new BalanceDetectionApi(url);
   }
 
   async fetchUnsignedPayload (params: BuildCardanoTxParams): Promise<string> {
