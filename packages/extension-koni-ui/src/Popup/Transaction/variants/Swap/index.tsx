@@ -627,7 +627,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
                 if (latestSwapRequestResult.quote.optimalQuote) {
                   latestOptimalQuote = latestSwapRequestResult.quote.optimalQuote;
-                  updateSwapStates(latestSwapRequestResult);
+                  updateSwapStates(latestSwapRequestResult, currentQuoteRequest.preferredProvider);
                 }
               }
             }
