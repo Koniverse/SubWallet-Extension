@@ -64,6 +64,7 @@ const _additionalEnv = {
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
+  MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false),
   PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
 };
