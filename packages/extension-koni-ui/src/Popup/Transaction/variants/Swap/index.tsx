@@ -461,6 +461,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setSwapError(rs.quote.error);
   }, []);
 
+  const notifyNoQuote = useCallback(() => {
+    notify({
+      message: t('No swap quote found'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
       setHandleRequestLoading(true);
@@ -930,10 +938,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               updateSwapStates(result);
               setHandleRequestLoading(false);
             }
-          }).catch((e) => {
+          }).catch((e: Error) => {
             console.log('handleSwapRequest error', e);
 
             if (sync) {
+              if (e.message.toLowerCase().startsWith('swap pair is not found')) {
+                notifyNoQuote();
+              }
+
               setHandleRequestLoading(false);
             }
           });
@@ -953,7 +965,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -970,8 +982,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           if (sync) {
             updateSwapStates(rs, currentQuoteRequest.preferredProvider);
           }
-        }).catch((e) => {
+        }).catch((e: Error) => {
           console.log('Error when doing refreshSwapRequestResult', e);
+
+          if (e.message.toLowerCase().startsWith('swap pair is not found')) {
+            notifyNoQuote();
+          }
         }).finally(() => {
           if (sync) {
             setHandleRequestLoading(false);
@@ -1014,7 +1030,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {

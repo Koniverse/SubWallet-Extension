@@ -198,7 +198,7 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const renderQuoteEmptyBlock = () => {
-    if (swapError) {
+    if (swapError || !currentQuote) {
       return null;
     }
 
@@ -210,8 +210,6 @@ const Component: React.FC<Props> = (props: Props) => {
       message = t('Invalid input. Re-enter information in the red field and try again');
     } else if (handleRequestLoading) {
       message = t('Loading...');
-    } else {
-      message = t('No swap quote found. Adjust your amount or try again later.');
     }
 
     return (
