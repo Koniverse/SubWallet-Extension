@@ -171,6 +171,13 @@ export class SwapBaseHandler {
         expectedReceive = fromAmount;
         bnSendingValue = BigN(fromAmount);
 
+        const actionList = JSON.stringify(path.map((step) => step.action));
+        const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+        if (xcmSwapXcm) {
+          bnSendingValue = bnSendingValue.multipliedBy(1.02);
+        }
+
         if (isBridgeNativeToken) {
           bnSendingValue = bnSendingValue.plus(BigN(estimatedBridgeFee));
         } else {
