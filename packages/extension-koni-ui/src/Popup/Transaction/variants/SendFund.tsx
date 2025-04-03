@@ -15,7 +15,7 @@ import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
@@ -126,9 +126,6 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
 
 const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug'];
 const alertModalId = 'confirmation-alert-modal';
-const substrateAccountSlug = 'polkadot-NATIVE-DOT';
-const evmAccountSlug = 'ethereum-NATIVE-ETH';
-const tonAccountSlug = 'ton-NATIVE-TON';
 const defaultAddressInputRenderKey = 'address-input-render-key';
 
 const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
@@ -156,6 +153,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const assetValue = useWatchTransaction('asset', form, defaultData);
+
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
   const getReformatAddress = useReformatAddress();
@@ -771,40 +769,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       onSubmit(values);
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
-
-  // todo: recheck with ledger account
-  useEffect(() => {
-    const updateInfoWithTokenSlug = (tokenSlug: string) => {
-      const existedToken = tokenItems.find(({ slug }) => slug === tokenSlug);
-      const isAllowedToken = !!existedToken && chainStateMap[existedToken.originChain].active;
-
-      if (isAllowedToken) {
-        const tokenInfo = assetRegistry[tokenSlug];
-
-        form.setFieldsValue({
-          asset: tokenSlug,
-          chain: tokenInfo.originChain,
-          destChain: tokenInfo.originChain
-        });
-      }
-    };
-
-    if (tokenItems.length && !assetValue) {
-      if (targetAccountProxy && !isAccountAll(targetAccountProxy.id)) {
-        if (targetAccountProxy.accountType === AccountProxyType.UNIFIED) {
-          updateInfoWithTokenSlug(substrateAccountSlug);
-        } else {
-          if (targetAccountProxy.chainTypes.includes(AccountChainType.SUBSTRATE)) {
-            updateInfoWithTokenSlug(substrateAccountSlug);
-          } else if (targetAccountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
-            updateInfoWithTokenSlug(evmAccountSlug);
-          } else if (targetAccountProxy.chainTypes.includes(AccountChainType.TON)) {
-            updateInfoWithTokenSlug(tonAccountSlug);
-          }
-        }
-      }
-    }
-  }, [assetRegistry, assetValue, chainInfoMap, chainStateMap, form, targetAccountProxy, tokenItems]);
 
   useEffect(() => {
     const updateFromValue = () => {
