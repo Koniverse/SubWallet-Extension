@@ -74,7 +74,7 @@ const _additionalEnv = {
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
-  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
 };
 
 const createConfig = (entry, alias = {}, useSplitChunk = false) => {
