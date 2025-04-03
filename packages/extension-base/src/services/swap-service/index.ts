@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
+import { _AssetRefPath } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
@@ -190,6 +191,12 @@ export class SwapService implements StoppableServiceInterface {
 
     if (!fromChain || !toChain) {
       throw Error('Token metadata error');
+    }
+
+    const directXcmRef = Object.values(assetRefMap).find((assetRef) => assetRef.path === _AssetRefPath.XCM && assetRef.srcAsset === fromToken.slug && assetRef.destAsset === toToken.slug);
+
+    if (directXcmRef) {
+      return [[], undefined];
     }
 
     // SWAP: 2 tokens in the same chain and chain has dex
