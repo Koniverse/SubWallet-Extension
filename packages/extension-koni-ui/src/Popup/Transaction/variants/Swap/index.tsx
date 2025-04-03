@@ -349,7 +349,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
   }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, targetAccountProxy, tokenSelectorItems]);
 
-  const toTokenItems = tokenSelectorItems;
+  const toTokenItems = useMemo(() => {
+    return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
+  }, [fromTokenSlugValue, tokenSelectorItems]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -1086,14 +1088,30 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [form, fromTokenItems, fromTokenSlugValue]);
 
   useEffect(() => {
-    if (toTokenItems.length) {
-      if (!toTokenSlugValue || !toTokenItems.some((t) => t.slug === toTokenSlugValue)) {
-        form.setFieldValue('toTokenSlug', toTokenItems[0].slug);
+    const updateToTokenSlug = () => {
+      if (!fromTokenSlugValue) {
+        return;
       }
-    } else {
-      form.setFieldValue('toTokenSlug', '');
-    }
-  }, [form, toTokenItems, toTokenSlugValue]);
+
+      if (toTokenItems.length) {
+        if (!toTokenSlugValue || !toTokenItems.some((t) => t.slug === toTokenSlugValue)) {
+          const nextValue = toTokenItems[0].slug;
+
+          if (nextValue !== fromTokenSlugValue) {
+            form.setFieldValue('toTokenSlug', nextValue);
+          }
+        }
+      } else {
+        form.setFieldValue('toTokenSlug', '');
+      }
+    };
+
+    const timeout = setTimeout(updateToTokenSlug, 100);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [form, fromTokenSlugValue, toTokenItems, toTokenSlugValue]);
 
   const altChain = useMemo(() => {
     // todo: fill logic to get altChain here
