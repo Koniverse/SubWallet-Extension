@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetRefPath, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
-import { BriefStepV2, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -208,7 +208,7 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   return mainSteps.reduce((chainRoute, currentStep, currentIndex) => {
-    const metadata = currentStep.metadata as unknown as BriefStepV2;
+    const metadata = currentStep.metadata as unknown as BaseSwapStepMetadata;
 
     if (!metadata) {
       console.error('Step has no metadata');
@@ -228,8 +228,6 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
 }
 
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
-  // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
-  // todo: opt2: make data about sending and receiving token is required.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   if (!mainSteps.length) {
@@ -237,7 +235,7 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   }
 
   if (mainSteps.length === 1) {
-    const metadata = mainSteps[0].metadata as unknown as BriefStepV2;
+    const metadata = mainSteps[0].metadata as unknown as BaseSwapStepMetadata;
 
     if (!metadata) {
       return undefined;
@@ -253,12 +251,31 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   const firstStep = mainSteps[0];
   const lastStep = mainSteps[mainSteps.length - 1];
 
-  const firstMetadata = firstStep.metadata as unknown as BriefStepV2;
-  const lastMetadata = lastStep.metadata as unknown as BriefStepV2;
+  const firstMetadata = firstStep.metadata as unknown as BaseSwapStepMetadata;
+  const lastMetadata = lastStep.metadata as unknown as BaseSwapStepMetadata;
 
   return {
     from: firstMetadata.originTokenInfo.slug,
     to: lastMetadata.destinationTokenInfo.slug,
     slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
   };
+}
+
+export function getSwapChainsFromPath (path: DynamicSwapAction[], chainAssetMap: Record<string, _ChainAsset>): string[] {
+  const swapChains: string[] = [];
+
+  path.forEach((pathElement) => {
+    const fromAsset = chainAssetMap[pathElement.pair.from];
+    const toAsset = chainAssetMap[pathElement.pair.to];
+
+    if (swapChains.at(-1) !== fromAsset.slug) {
+      swapChains.push(fromAsset.slug);
+    }
+
+    if (swapChains.at(-1) !== toAsset.slug) {
+      swapChains.push(toAsset.slug);
+    }
+  });
+
+  return swapChains;
 }
