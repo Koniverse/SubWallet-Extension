@@ -217,7 +217,7 @@ const Component = (props: Props) => {
                     token={selectedItem.slug.toLowerCase()}
                   />
                   <div className={'__item-token-info'}>
-                    <span>{selectedItem.symbol}</span>
+                    <span className={'__item-token-symbol'}>{selectedItem.symbol}</span>
                     <span className={'__item-token-name'}>{chainInfoMap[selectedItem.originChain]?.name}</span>
                   </div>
                 </div>
@@ -286,8 +286,6 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
     '&.-modal-trigger': {
       display: 'flex',
       alignItems: 'center',
-      paddingLeft: token.padding,
-      paddingRight: token.padding,
       cursor: 'pointer',
 
       '.__modal-trigger-content': {
@@ -310,6 +308,15 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
         flexDirection: 'column',
         color: token.colorWhite,
         overflow: 'hidden'
+      },
+
+      '.__item-token-symbol': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
       },
 
       '.__item-token-name': {

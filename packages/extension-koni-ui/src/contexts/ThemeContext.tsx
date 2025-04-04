@@ -29,6 +29,11 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
   applyPreloadStyle(extendToken.bodyBackgroundColor);
 
   return ({
+    '@keyframes swRotate': {
+      '100%': {
+        transform: 'rotate(360deg)'
+      }
+    },
     body: {
       fontFamily: token.fontFamily,
       color: token.colorText,

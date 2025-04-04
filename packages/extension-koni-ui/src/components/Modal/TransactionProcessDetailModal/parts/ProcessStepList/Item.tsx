@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessStep } from '@subwallet/extension-base/types';
-import { ProcessStepItem } from '@subwallet/extension-koni-ui/components';
+import { TransactionProcessStepSimpleItem } from '@subwallet/extension-koni-ui/components';
 import { useGetTransactionProcessStepText } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { FC, useMemo } from 'react';
@@ -24,12 +24,12 @@ const Component: FC<Props> = (props: Props) => {
   }, [combineInfo, getStepText, processStep]);
 
   return (
-    <ProcessStepItem
+    <TransactionProcessStepSimpleItem
       className={className}
       index={index}
       isLastItem={isLastItem}
       status={processStep.status}
-      text={text}
+      content={text}
     />
   );
 };

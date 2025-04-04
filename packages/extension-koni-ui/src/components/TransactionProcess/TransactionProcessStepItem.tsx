@@ -1,30 +1,38 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { StepStatus } from '@subwallet/extension-base/types';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
-import { Icon } from '@subwallet/react-ui';
+import { Icon, Logo } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
 import { CheckCircle, ClockCounterClockwise, ProhibitInset, SpinnerGap } from 'phosphor-react';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 
-export type ProcessStepItemType = {
-  status: StepStatus;
-  text: string;
-  index: number,
-  isLastItem?: boolean;
-}
-
-type Props = ThemeProps & ProcessStepItemType;
+type Props = ThemeProps & TransactionProcessStepItemType;
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, index, isLastItem, status, text } = props;
+  const { className, content, index, isLastItem, logoKey, status } = props;
 
   const iconProp = useMemo<SwIconProps>(() => {
     const iconInfo: SwIconProps = (() => {
+      if (logoKey) {
+        if (isStepCompleted(status) || isStepFailed(status) || isStepTimeout(status)) {
+          return {
+            type: 'customIcon',
+            customIcon: (
+              <Logo
+                className={'__step-chain-logo'}
+                network={logoKey.toLowerCase()}
+                shape={'circle'}
+                size={16}
+              />
+            )
+          };
+        }
+      }
+
       if (isStepCompleted(status)) {
         return {
           phosphorIcon: CheckCircle,
@@ -63,49 +71,59 @@ const Component: FC<Props> = (props: Props) => {
       ...iconInfo,
       size: 'xs'
     };
-  }, [index, status]);
+  }, [index, logoKey, status]);
 
   return (
     <div
       className={CN(className, {
-        '-last-item': isLastItem
-      })}
-    >
-      <div className={CN('__item-left-part', {
+        '-last-item': isLastItem,
         '-pending': isStepPending(status),
         '-processing': isStepProcessing(status),
         '-complete': isStepCompleted(status),
         '-failed': isStepFailed(status),
         '-timeout': isStepTimeout(status)
       })}
-      >
+    >
+      <div className={'__item-left-part'}>
         <Icon
           {...iconProp}
-          className={CN('__icon')}
+          className={CN('__icon', {
+            '-spinner': isStepProcessing(status)
+          })}
         />
-
-        {
-          !isLastItem && (
-            <div className='__line'></div>
-          )
-        }
       </div>
       <div className='__item-right-part'>
-        <div className='__text'>{text}</div>
+        <div className='__content'>{content}</div>
       </div>
     </div>
   );
 };
 
-export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const TransactionProcessStepItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
-    gap: token.sizeXS,
+    gap: token.size,
 
     '.__item-left-part': {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
+    },
+
+    '.__item-left-part:before, .__item-left-part:after': {
+      content: '""',
+      display: 'block',
+      width: 1,
+      flex: 1
+    },
+
+    '.__item-left-part:before': {
+      marginBottom: 6
+    },
+
+    '.__item-left-part:after': {
+      marginTop: 6,
+      backgroundColor: 'currentcolor'
     },
 
     '.__icon': {
@@ -117,12 +135,16 @@ export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: P
       justifyContent: 'center'
     },
 
-    '.__line': {
-      width: 1,
-      flex: 1,
-      backgroundColor: 'currentcolor',
-      marginTop: 2,
-      marginBottom: 2
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
+      }
+    },
+
+    '.__step-chain-logo': {
+      '.ant-image, img': {
+        display: 'block'
+      }
     },
 
     '.__step-ordinal-wrapper': {
@@ -141,43 +163,69 @@ export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: P
       lineHeight: token.lineHeightSM
     },
 
-    '.__item-left-part.-pending': {
-      color: token.colorTextLight7
-    },
-
-    '.__item-left-part.-processing': {
-      color: '#D9A33E'
-    },
-
-    '.__item-left-part.-complete': {
-      color: token.colorSuccess
-    },
-
-    '.__item-left-part.-failed': {
-      color: token.colorError
-    },
-
-    '.__item-left-part.-timeout': {
-      color: token.gold
+    '.__content': {
+      background: token.colorBgSecondary,
+      padding: '10px 16px',
+      borderRadius: token.borderRadiusLG,
+      color: token.colorTextLight3,
+      fontSize: token.fontSize,
+      lineHeight: '24px'
     },
 
     '.__item-right-part': {
-      paddingBottom: 4
+      flex: 1,
+      paddingTop: 6,
+      paddingBottom: 6
     },
 
-    '.__text': {
-      marginTop: -8,
-      minHeight: 40,
-      display: 'flex',
-      alignItems: 'center',
-      color: token.colorTextLight3,
-      fontSize: token.sizeSM,
-      lineHeight: token.lineHeightSM
+    // pending
+    '&.-pending .__item-left-part': {
+      color: token.colorTextLight7
+    },
+
+    '&.-pending + & .__item-left-part:before': {
+      backgroundColor: token.colorTextLight7
+    },
+
+    // processing
+    '&.-processing .__item-left-part': {
+      color: '#D9A33E'
+    },
+
+    '&.-processing + & .__item-left-part:before': {
+      backgroundColor: '#D9A33E'
+    },
+
+    // complete
+    '&.-complete .__item-left-part': {
+      color: token.colorSuccess
+    },
+
+    '&.-complete + & .__item-left-part:before': {
+      backgroundColor: token.colorSuccess
+    },
+
+    // failed
+    '&.-failed .__item-left-part': {
+      color: token.colorError
+    },
+
+    '&.-failed + & .__item-left-part:before': {
+      backgroundColor: token.colorError
+    },
+
+    // timeout
+    '&.-timeout .__item-left-part': {
+      color: token.gold
+    },
+
+    '&.-timeout + & .__item-left-part:before': {
+      backgroundColor: token.gold
     },
 
     '&.-last-item': {
-      '.__item-right-part': {
-        paddingBottom: 0
+      '.__item-left-part:after': {
+        opacity: 0
       }
     }
   });
