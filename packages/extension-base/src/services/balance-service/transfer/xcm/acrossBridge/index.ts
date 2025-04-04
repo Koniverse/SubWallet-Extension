@@ -3,6 +3,7 @@
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 
+// Across Bridge
 const acrossPairsMap = new Map([
   [COMMON_CHAIN_SLUGS.ETHEREUM, new Set(['optimism', 'base_mainnet', 'arbitrum_one'])],
   ['optimism', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
