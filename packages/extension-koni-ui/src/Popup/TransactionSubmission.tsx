@@ -240,12 +240,6 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
     },
 
     '&.-swap-processing': {
-      '@keyframes swRotate': {
-        '100%': {
-          transform: 'rotate(360deg)'
-        }
-      },
-
       '.spinner': {
         animation: 'swRotate 1.2s linear infinite'
       },

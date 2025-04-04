@@ -73,7 +73,9 @@ const Component: FC<Props> = (props: Props) => {
       >
         <Icon
           {...iconProp}
-          className={CN('__icon')}
+          className={CN('__icon', {
+            '-spinner': isStepProcessing(status)
+          })}
         />
 
         {
@@ -107,6 +109,12 @@ export const TransactionProcessStepSimpleItem = styled(Component)<Props>(({ them
       borderRadius: '100%',
       alignItems: 'center',
       justifyContent: 'center'
+    },
+
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
+      }
     },
 
     '.__line': {

@@ -87,7 +87,9 @@ const Component: FC<Props> = (props: Props) => {
       <div className={'__item-left-part'}>
         <Icon
           {...iconProp}
-          className={CN('__icon')}
+          className={CN('__icon', {
+            '-spinner': isStepProcessing(status)
+          })}
         />
       </div>
       <div className='__item-right-part'>
@@ -133,6 +135,12 @@ export const TransactionProcessStepItem = styled(Component)<Props>(({ theme: { t
       justifyContent: 'center'
     },
 
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
+      }
+    },
+
     '.__step-chain-logo': {
       '.ant-image, img': {
         display: 'block'
@@ -158,7 +166,10 @@ export const TransactionProcessStepItem = styled(Component)<Props>(({ theme: { t
     '.__content': {
       background: token.colorBgSecondary,
       padding: '10px 16px',
-      borderRadius: token.borderRadiusLG
+      borderRadius: token.borderRadiusLG,
+      color: token.colorTextLight3,
+      fontSize: token.fontSize,
+      lineHeight: '24px'
     },
 
     '.__item-right-part': {

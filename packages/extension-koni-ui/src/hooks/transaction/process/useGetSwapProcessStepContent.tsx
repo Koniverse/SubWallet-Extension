@@ -26,9 +26,7 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
   },
 
   '.__brief': {
-    fontSize: token.fontSize,
-    lineHeight: token.lineHeight,
-    color: token.colorTextLight3
+
   },
 
   '.__token-item': {
@@ -43,7 +41,7 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
     img: {
       position: 'relative',
       verticalAlign: 'top',
-      top: 3
+      top: 4
     }
   },
 
@@ -137,7 +135,7 @@ const useGetSwapProcessStepContent = () => {
     return result;
   }, [assetRegistry, priceMap]);
 
-  return useCallback((processStep: CommonStepDetail, feeInfo: CommonStepFeeInfo | undefined, quote: SwapQuote) => {
+  return useCallback((processStep: CommonStepDetail, feeInfo: CommonStepFeeInfo | undefined, quote: SwapQuote, showFee = true) => {
     if (([
       CommonStepType.XCM
     ] as BaseStepType[]).includes(processStep.type)) {
@@ -180,18 +178,20 @@ const useGetSwapProcessStepContent = () => {
               {`from ${analysisResult.chainName} to ${analysisResult.destChainName}`}
             </div>
 
-            <div className='__fee-info'>
-              <span className='__fee-label'>Fee:</span>
+            {showFee && (
+              <div className='__fee-info'>
+                <span className='__fee-label'>Fee:</span>
 
-              <NumberDisplay
-                className={'__fee-value'}
-                decimal={0}
-                metadata={swapNumberMetadata}
-                prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
-                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                value={getFeeValue(feeInfo)}
-              />
-            </div>
+                <NumberDisplay
+                  className={'__fee-value'}
+                  decimal={0}
+                  metadata={swapNumberMetadata}
+                  prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                  value={getFeeValue(feeInfo)}
+                />
+              </div>
+            )}
           </StepContent>
         );
       }
@@ -256,18 +256,22 @@ const useGetSwapProcessStepContent = () => {
               {`on ${analysisResult.toChainName} via ${analysisResult.providerName}`}
             </div>
 
-            <div className='__fee-info'>
-              <span className='__fee-label'>Fee:</span>
+            {
+              showFee && (
+                <div className='__fee-info'>
+                  <span className='__fee-label'>Fee:</span>
 
-              <NumberDisplay
-                className={'__fee-value'}
-                decimal={0}
-                metadata={swapNumberMetadata}
-                prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
-                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                value={getFeeValue(feeInfo)}
-              />
-            </div>
+                  <NumberDisplay
+                    className={'__fee-value'}
+                    decimal={0}
+                    metadata={swapNumberMetadata}
+                    prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                    suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                    value={getFeeValue(feeInfo)}
+                  />
+                </div>
+              )
+            }
           </StepContent>
         );
       }

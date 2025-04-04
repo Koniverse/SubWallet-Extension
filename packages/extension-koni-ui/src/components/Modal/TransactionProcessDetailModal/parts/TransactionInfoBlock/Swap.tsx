@@ -92,13 +92,9 @@ const Component: FC<Props> = (props: Props) => {
 
 export const Swap = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    backgroundColor: token.colorBgSecondary,
-    borderRadius: token.borderRadiusLG,
-    paddingBottom: token.padding,
-
     '.__swap-transaction-block': {
       '.__summary-quote': {
-        marginBottom: token.marginXS
+        marginBottom: token.margin
       },
 
       '.token-logo': {
