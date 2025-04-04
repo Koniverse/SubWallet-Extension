@@ -252,7 +252,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
                   {
                     currentOptimalSwapPath && (
-                      <TransactionProcessPreview steps={currentOptimalSwapPath.steps} />
+                      <TransactionProcessPreview path={currentOptimalSwapPath.path} />
                     )
                   }
 

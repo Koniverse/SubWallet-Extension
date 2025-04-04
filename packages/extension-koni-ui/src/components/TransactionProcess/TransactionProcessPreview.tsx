@@ -1,9 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getChainRouteFromSteps } from '@subwallet/extension-base/services/swap-service/utils';
-import { CommonStepDetail } from '@subwallet/extension-base/types';
+import { getSwapChainsFromPath } from '@subwallet/extension-base/services/swap-service/utils';
+import { DynamicSwapAction } from '@subwallet/extension-base/types';
 import { NetworkGroup } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -13,16 +15,17 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  steps: CommonStepDetail[];
+  path: DynamicSwapAction[];
 };
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, steps } = props;
+  const { className, path } = props;
+  const assetRegistry = useSelector((root: RootState) => root.assetRegistry.assetRegistry);
   const { t } = useTranslation();
 
   const items: string[] = useMemo(() => {
-    return getChainRouteFromSteps(steps);
-  }, [steps]);
+    return getSwapChainsFromPath(path, assetRegistry);
+  }, [assetRegistry, path]);
 
   const isMode1 = items.length < 6;
 

@@ -268,12 +268,12 @@ export function getSwapChainsFromPath (path: DynamicSwapAction[], chainAssetMap:
     const fromAsset = chainAssetMap[pathElement.pair.from];
     const toAsset = chainAssetMap[pathElement.pair.to];
 
-    if (swapChains.at(-1) !== fromAsset.slug) {
-      swapChains.push(fromAsset.slug);
+    if (swapChains.at(-1) !== fromAsset.originChain) {
+      swapChains.push(fromAsset.originChain);
     }
 
-    if (swapChains.at(-1) !== toAsset.slug) {
-      swapChains.push(toAsset.slug);
+    if (swapChains.at(-1) !== toAsset.originChain) {
+      swapChains.push(toAsset.originChain);
     }
   });
 
