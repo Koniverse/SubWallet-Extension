@@ -24,7 +24,7 @@ const Component: FC<Props> = (props: Props) => {
     return getChainRouteFromSteps(steps);
   }, [steps]);
 
-  const isMode1 = items.length < 4;
+  const isMode1 = items.length < 6;
 
   return (
     <div

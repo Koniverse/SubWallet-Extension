@@ -118,11 +118,12 @@ export class SwapBaseHandler {
     }
 
     let recipientAddress;
+    const senderAddress = _reformatAddressWithChain(address, fromChainInfo);
 
     if (stepIndex === 0) {
       recipientAddress = _reformatAddressWithChain(address, toChainInfo);
     } else { // bridge after swap
-      recipientAddress = recipient || _reformatAddressWithChain(address, toChainInfo); // todo: might be wrong
+      recipientAddress = _reformatAddressWithChain(recipient || address, toChainInfo);
     }
 
     try {
@@ -131,7 +132,7 @@ export class SwapBaseHandler {
       const id = getId();
       const [feeInfo, toTokenBalance] = await Promise.all([
         this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'substrate'),
-        this.balanceService.getTotalBalance(params.request.address, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
+        this.balanceService.getTotalBalance(senderAddress, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
       ]);
 
       const mockSendingValue = stepIndex === 0 ? fromAmount : selectedQuote?.toAmount || '0';
@@ -145,7 +146,7 @@ export class SwapBaseHandler {
         feeInfo,
         // Mock sending value to get payment info
         sendingValue: mockSendingValue,
-        sender: address,
+        sender: senderAddress,
         recipient: recipientAddress
       };
 
@@ -167,10 +168,18 @@ export class SwapBaseHandler {
       let bnSendingValue;
       let expectedReceive;
 
+      const actionList = JSON.stringify(path.map((step) => step.action));
+      const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
       // todo: increase transfer amount when XCM local token
       if (stepIndex === 0) {
         expectedReceive = fromAmount;
         bnSendingValue = BigN(fromAmount);
+
+        if (xcmSwapXcm) {
+          bnSendingValue = bnSendingValue.multipliedBy(1.02);
+          expectedReceive = bnSendingValue.toString();
+        }
 
         if (isBridgeNativeToken) {
           bnSendingValue = bnSendingValue.plus(BigN(estimatedBridgeFee));
@@ -183,7 +192,12 @@ export class SwapBaseHandler {
         }
       } else { // bridge after swap
         expectedReceive = selectedQuote.toAmount;
-        bnSendingValue = BigN(selectedQuote.toAmount);
+
+        if (xcmSwapXcm) {
+          bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(1.02); // need to round
+        } else {
+          bnSendingValue = BigN(selectedQuote.toAmount);
+        }
       }
 
       const step: BaseStepDetail = {
@@ -194,7 +208,7 @@ export class SwapBaseHandler {
           originTokenInfo: fromTokenInfo,
           destinationTokenInfo: toTokenInfo,
           receiver: recipientAddress,
-          sender: address
+          sender: senderAddress
         } as BaseSwapStepMetadata,
         name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
         type: CommonStepType.XCM
@@ -357,6 +371,10 @@ export class SwapBaseHandler {
       return [new TransactionError(SwapErrorType.QUOTE_TIMEOUT)];
     }
 
+    if (params.selectedQuote.toAmount !== swapMetadata.expectedReceive) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
     const swapNetworkFee = swapFee.feeComponent.find((fee) => fee.feeType === SwapFeeType.NETWORK_FEE);
 
     if (!swapNetworkFee) {
@@ -365,7 +383,7 @@ export class SwapBaseHandler {
 
     const swapToken = swapMetadata.originTokenInfo;
     const swapReceivingToken = swapMetadata.destinationTokenInfo;
-    const bnSwapReceivingAmount = BigN(params.selectedQuote.toAmount);
+    const bnSwapReceivingAmount = BigN(swapMetadata.expectedReceive);
 
     const bnSwapValue = BigN(swapMetadata.sendingValue);
     const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
@@ -374,14 +392,14 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    return this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    return this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver);
   }
 
   public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {
@@ -416,8 +434,8 @@ export class SwapBaseHandler {
 
     const bnBridgeDeliveryFee = BigN(0); // todo
 
-    const bridgeSender = _reformatAddressWithChain(params.address, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
-    const bridgeReceiver = _reformatAddressWithChain(params.recipient ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
+    const bridgeSender = _reformatAddressWithChain(xcmMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
+    const bridgeReceiver = _reformatAddressWithChain(xcmMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
     const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
@@ -487,14 +505,14 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value).plus(bnBridgeAmount);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
@@ -518,6 +536,10 @@ export class SwapBaseHandler {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
+    if (params.selectedQuote.toAmount !== swapMetadata.expectedReceive) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
     if (params.selectedQuote.aliveUntil <= +Date.now()) {
       return [new TransactionError(SwapErrorType.QUOTE_TIMEOUT)];
     }
@@ -530,10 +552,9 @@ export class SwapBaseHandler {
 
     const swapToken = swapMetadata.originTokenInfo;
     const swapReceivingToken = swapMetadata.destinationTokenInfo;
-    const bnSwapReceivingAmount = BigN(params.selectedQuote.toAmount);
+    const bnSwapReceivingAmount = BigN(swapMetadata.expectedReceive);
 
     const bnSwapValue = BigN(swapMetadata.sendingValue);
-    const expectedSwapReceive = swapMetadata.expectedReceive;
     const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
 
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
@@ -546,14 +567,14 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
@@ -579,7 +600,7 @@ export class SwapBaseHandler {
     const fromChain = this.chainService.getChainInfoByKey(bridgeFromToken.originChain);
     const toChain = this.chainService.getChainInfoByKey(bridgeToToken.originChain);
 
-    if (swapToken.slug !== bridgeFromToken.slug) {
+    if (swapReceivingToken.slug !== bridgeFromToken.slug) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
@@ -592,14 +613,14 @@ export class SwapBaseHandler {
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
 
-    if (bnBridgeAmount.gt(expectedSwapReceive)) {
+    if (bnBridgeAmount.gt(bnSwapReceivingAmount)) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     const bnBridgeDeliveryFee = BigN(0); // todo
 
-    const bridgeSender = _reformatAddressWithChain(params.address, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
-    const bridgeReceiver = _reformatAddressWithChain(params.recipient ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
+    const bridgeSender = _reformatAddressWithChain(xcmMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
+    const bridgeReceiver = _reformatAddressWithChain(xcmMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
     const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
@@ -607,7 +628,7 @@ export class SwapBaseHandler {
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
-    const bnBridgeFromTokenBalance = new BigN(bridgeFromTokenBalance.value).plus(expectedSwapReceive);
+    const bnBridgeFromTokenBalance = new BigN(bridgeFromTokenBalance.value).plus(bnSwapReceivingAmount);
     const bnBridgeFeeTokenBalance = new BigN(bridgeFeeTokenBalance.value);
 
     const bridgeStepValidation = await this.validateBridgeStep(bridgeReceiver, bridgeFromToken, bridgeToToken, bridgeSelectedFeeToken, bridgeToChainNativeToken, bnBridgeAmount, bnBridgeFromTokenBalance, bnBridgeFeeAmount, bnBridgeFeeTokenBalance, bnBridgeDeliveryFee);
@@ -651,8 +672,8 @@ export class SwapBaseHandler {
 
     const bnBridgeDeliveryFee = BigN(0); // todo
 
-    const bridgeSender = _reformatAddressWithChain(params.address, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
-    const bridgeReceiver = _reformatAddressWithChain(params.recipient ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
+    const bridgeSender = _reformatAddressWithChain(bridgeMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
+    const bridgeReceiver = _reformatAddressWithChain(bridgeMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
     const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
@@ -699,14 +720,13 @@ export class SwapBaseHandler {
 
     const swapToken = swapMetadata.originTokenInfo;
     const swapReceivingToken = swapMetadata.destinationTokenInfo;
-    const bnSwapReceivingAmount = BigN(params.selectedQuote.toAmount);
+    const bnSwapReceivingAmount = BigN(swapMetadata.expectedReceive);
 
     if (swapToken.slug !== bridgeToToken.slug) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     const bnSwapValue = BigN(swapMetadata.sendingValue);
-    const expectedSwapReceive = swapMetadata.expectedReceive;
     const bnSwapFeeAmount = BigN(swapNetworkFee.amount);
 
     if (bnSwapValue.gt(bnBridgeAmount)) {
@@ -723,14 +743,14 @@ export class SwapBaseHandler {
     const swapToChain = this.chainService.getChainInfoByKey(swapMetadata.destinationTokenInfo.originChain);
 
     const [swapFeeTokenBalance, swapFromTokenBalance] = await Promise.all([
-      this.balanceService.getTransferableBalance(params.address, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
-      this.balanceService.getTransferableBalance(params.address, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapFeeToken.originChain, swapFeeToken.slug, ExtrinsicType.SWAP),
+      this.balanceService.getTransferableBalance(swapMetadata.sender, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
     const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value).plus(bnBridgeAmount);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, params.recipient);
+    const swapStepValidation = this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver);
 
     if (swapStepValidation.length > 0) {
       return swapStepValidation;
@@ -769,14 +789,14 @@ export class SwapBaseHandler {
     const transitToChainNativeToken = this.chainService.getNativeTokenInfo(transitToToken.originChain);
     const transitSelectedFeeToken = this.chainService.getAssetBySlug(transitTotalFee.selectedFeeToken || transitTotalFee.defaultFeeToken);
 
-    if (bnTransitAmount.gt(expectedSwapReceive)) {
+    if (bnTransitAmount.gt(bnSwapReceivingAmount)) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     const bnTransitDeliveryFee = BigN(0); // todo
 
-    const transitSender = _reformatAddressWithChain(params.address, this.chainService.getChainInfoByKey(transitFromToken.originChain));
-    const transitReceiver = _reformatAddressWithChain(params.recipient ?? transitSender, this.chainService.getChainInfoByKey(transitToToken.originChain));
+    const transitSender = _reformatAddressWithChain(transitMetadata.sender, this.chainService.getChainInfoByKey(transitFromToken.originChain));
+    const transitReceiver = _reformatAddressWithChain(transitMetadata.receiver ?? transitSender, this.chainService.getChainInfoByKey(transitToToken.originChain));
 
     const [transitFromTokenBalance, transitFeeTokenBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(transitSender, transitFromToken.originChain, transitFromToken.slug, ExtrinsicType.TRANSFER_XCM),
@@ -784,7 +804,7 @@ export class SwapBaseHandler {
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
-    const bnTransitFromTokenBalance = new BigN(transitFromTokenBalance.value).plus(expectedSwapReceive);
+    const bnTransitFromTokenBalance = new BigN(transitFromTokenBalance.value).plus(bnSwapReceivingAmount);
     const bnTransitFeeTokenBalance = new BigN(transitFeeTokenBalance.value);
 
     const transitStepValidation = await this.validateBridgeStep(transitReceiver, transitFromToken, transitToToken, transitSelectedFeeToken, transitToChainNativeToken, bnTransitAmount, bnTransitFromTokenBalance, bnTransitFeeAmount, bnTransitFeeTokenBalance, bnTransitDeliveryFee);

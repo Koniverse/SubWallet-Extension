@@ -23,7 +23,7 @@ export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string>
 };
 
 export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in milliseconds
-  default: 30000,
+  default: 90000,
   [SwapProviderId.CHAIN_FLIP_TESTNET]: 30000,
   [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000
 };

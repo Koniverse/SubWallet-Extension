@@ -6,6 +6,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -124,7 +125,7 @@ export class UniswapHandler implements SwapBaseInterface {
     ]);
   }
 
-  async getApprovalStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
       const walletAddress = params.request.address;
       const fromAmount = params.selectedQuote.fromAmount;
@@ -164,7 +165,7 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  async getPermitStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
@@ -191,15 +192,14 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const stepData = params.path[stepIndex];
-
-    if (stepData.action !== DynamicSwapType.SWAP) {
-      return Promise.resolve(undefined);
-    }
-
     if (!params.selectedQuote) {
       return Promise.resolve(undefined);
     }
+
+    const originTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
     const submitStep: BaseStepDetail = {
       name: 'Swap',
@@ -208,8 +208,10 @@ export class UniswapHandler implements SwapBaseInterface {
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
         expectedReceive: params.selectedQuote.toAmount,
-        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(params.request.address, originChain),
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain)
       } as unknown as BaseSwapStepMetadata
     };
 

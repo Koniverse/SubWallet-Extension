@@ -8,7 +8,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -17,13 +17,13 @@ type Props = ThemeProps & {
   items: SwapQuote[],
   applyQuote: (quote: SwapQuote) => Promise<void>,
   selectedItem?: SwapQuote,
-  optimalQuoteItem?: SwapQuote,
   onCancel: VoidFunction;
   quoteAliveUntil: number | undefined;
+  disableConfirmButton?: boolean;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { applyQuote, className, items, modalId, onCancel, optimalQuoteItem, quoteAliveUntil, selectedItem } = props;
+  const { applyQuote, className, disableConfirmButton, items, modalId, onCancel, quoteAliveUntil, selectedItem } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [currentQuote, setCurrentQuote] = useState<SwapQuote | undefined>(selectedItem);
 
@@ -34,16 +34,27 @@ const Component: React.FC<Props> = (props: Props) => {
   }, []);
 
   const handleApplySlippage = useCallback(() => {
-    if (currentQuote) {
+    const quoteResult = items.find((i) => i.provider.id === currentQuote?.provider.id);
+
+    // refresh selected quote before passing it to outside
+    if (quoteResult) {
       setLoading(true);
-      applyQuote(currentQuote).catch((error) => {
+      applyQuote(quoteResult).catch((error) => {
         console.error('Error when confirm swap quote:', error);
       }).finally(() => {
         onCancel();
         setLoading(false);
       });
     }
-  }, [currentQuote, applyQuote, onCancel]);
+  }, [items, currentQuote?.provider.id, applyQuote, onCancel]);
+
+  useEffect(() => {
+    if (items.length) {
+      if (currentQuote && selectedItem && !items.some((i) => i.provider.id === currentQuote.provider.id)) {
+        setCurrentQuote(selectedItem);
+      }
+    }
+  }, [currentQuote, items, selectedItem]);
 
   return (
     <>
@@ -56,7 +67,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <Button
               block={true}
               className={'__right-button'}
-              disabled={!currentQuote || items.length < 2}
+              disabled={disableConfirmButton || !currentQuote || items.length < 2}
               icon={(
                 <Icon
                   phosphorIcon={CheckCircle}
@@ -86,10 +97,10 @@ const Component: React.FC<Props> = (props: Props) => {
           </>
         )}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <SwapQuotesItem
             className={'__swap-quote-Item'}
-            isRecommend={optimalQuoteItem?.provider.id === item.provider.id}
+            isRecommend={index === 0}
             key={item.provider.id}
             onSelect={onSelectItem}
             quote={item}

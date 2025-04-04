@@ -4120,7 +4120,8 @@ export default class KoniExtension {
   }
 
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
-    return this.#koniState.swapService.handleSwapRequest(request);
+    // @ts-ignore
+    return Promise.resolve(null);
   }
 
   private async handleSwapRequestV2 (request: SwapRequestV2): Promise<SwapRequestResult> {
@@ -4565,20 +4566,19 @@ export default class KoniExtension {
             const specialCaseForUniswap = data.quote.provider.id === SwapProviderId.UNISWAP && !!data.process.steps.find((step) => step.type === SwapStepType.PERMIT);
 
             if (stepNums > 2 && isLastStep && !specialCaseForUniswap) {
-              const quote = data.quote;
-              const latestSwapQuote = await this.getLatestSwapQuote({
-                address: data.address,
-                currentQuote: quote.provider,
-                feeToken: quote.feeInfo.selectedFeeToken,
-                recipient: data.recipient,
-                pair: quote.pair,
-                fromAmount: quote.fromAmount,
-                slippage: data.slippage
-              });
+              // const latestSwapQuote = await this.getLatestSwapQuote({
+              //   address: data.address,
+              //   currentQuote: quote.provider,
+              //   feeToken: quote.feeInfo.selectedFeeToken,
+              //   recipient: data.recipient,
+              //   pair: quote.pair,
+              //   fromAmount: quote.fromAmount,
+              //   slippage: data.slippage
+              // });
 
               return this.handleSwapStep({
                 ...data,
-                quote: latestSwapQuote.optimalQuote || data.quote,
+                quote: data.quote,
                 currentStep: step,
                 isPassConfirmation,
                 errorOnTimeOut: true,

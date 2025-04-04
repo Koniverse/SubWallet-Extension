@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   currentQuote: SwapQuote | undefined;
+  quoteOptions: SwapQuote[];
   currentOptimalSwapPath: CommonOptimalSwapPath | undefined;
   isFormInvalid: boolean;
   estimatedFeeValue: BigN;
@@ -69,8 +70,8 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
-    fromAssetInfo, handleRequestLoading, isFormInvalid,
-    openSlippageModal, openSwapQuotesModal, quoteAliveUntil, slippage, swapError,
+    fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal, openSwapQuotesModal,
+    quoteAliveUntil, quoteOptions, slippage, swapError,
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
@@ -169,6 +170,8 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const _renderRateInfo = () => {
+    const recommendedQuote = quoteOptions[0];
+
     return (
       <div
         className={'__quote-selector-trigger'}
@@ -176,9 +179,13 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         {renderRateInfo()}
 
-        <div className='__best-tag'>
-          {t('Best')}
-        </div>
+        {
+          !!recommendedQuote?.provider.id && (recommendedQuote?.provider.id === currentQuote?.provider.id) && (
+            <div className='__best-tag'>
+              {t('Best')}
+            </div>
+          )
+        }
 
         <Icon
           className={'__caret-icon'}
@@ -191,7 +198,11 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const renderQuoteEmptyBlock = () => {
-    const isError = !!swapError || isFormInvalid;
+    if (swapError || !currentQuote) {
+      return null;
+    }
+
+    const isError = isFormInvalid;
     let message = '';
     const _loading = handleRequestLoading && !isFormInvalid;
 
@@ -199,8 +210,6 @@ const Component: React.FC<Props> = (props: Props) => {
       message = t('Invalid input. Re-enter information in the red field and try again');
     } else if (handleRequestLoading) {
       message = t('Loading...');
-    } else {
-      message = swapError ? swapError?.message : t('No swap quote found. Adjust your amount or try again later.');
     }
 
     return (
@@ -274,7 +283,6 @@ const Component: React.FC<Props> = (props: Props) => {
               !!slippageTitle && (
                 <Icon
                   phosphorIcon={Info}
-                  weight='fill'
                 />
               )
             }

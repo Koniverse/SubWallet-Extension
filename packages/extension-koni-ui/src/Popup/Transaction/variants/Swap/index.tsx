@@ -9,7 +9,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapStepType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2, SwapStepType } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -20,7 +20,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SW
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { getLatestSwapQuote, getOptimalProcessOnSelectQuote, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -175,7 +175,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const [quoteAliveUntil, setQuoteAliveUntil] = useState<number | undefined>(undefined);
-  const [currentQuoteRequest, setCurrentQuoteRequest] = useState<SwapRequest | undefined>(undefined);
+  const [currentQuoteRequest, setCurrentQuoteRequest] = useState<SwapRequestV2 | undefined>(undefined);
   const [feeOptions, setFeeOptions] = useState<string[] | undefined>([]);
   const [currentFeeOption, setCurrentFeeOption] = useState<string | undefined>(undefined);
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
@@ -185,7 +185,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
-  const optimalQuoteRef = useRef<SwapQuote | undefined>(undefined);
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [handleRequestLoading, setHandleRequestLoading] = useState(true);
@@ -349,7 +348,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
   }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, targetAccountProxy, tokenSelectorItems]);
 
-  const toTokenItems = tokenSelectorItems;
+  const toTokenItems = useMemo(() => {
+    return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
+  }, [fromTokenSlugValue, tokenSelectorItems]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -441,55 +442,28 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     form.setFieldValue('toTokenSlug', tokenSlug);
   }, [form]);
 
-  const generateOptimalProcessOnSelectQuote = useCallback(
-    async (quote: SwapQuote) => {
-      try {
-        const currentRequest: SwapRequest = {
-          address: fromValue,
-          pair: quote.pair,
-          fromAmount: quote.fromAmount,
-          slippage: currentSlippage.slippage.toNumber(),
-          recipient: recipientValue || undefined,
-          currentQuote: quote.provider
-        };
+  const updateSwapStates = useCallback((rs: SwapRequestResult) => {
+    setOptimalSwapPath(rs.process);
+    setQuoteOptions(rs.quote.quotes);
+    setCurrentQuote(rs.quote.optimalQuote);
+    setQuoteAliveUntil(rs.quote.aliveUntil);
+    setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
+    setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
+    setSwapError(rs.quote.error);
+  }, []);
 
-        const optimalRequest = {
-          request: currentRequest,
-          selectedQuote: quote,
-          path: []
-        };
-
-        return await getOptimalProcessOnSelectQuote(optimalRequest);
-      } catch (error) {
-        console.error('generateOptimalProcess failed:', error);
-
-        return null;
-      }
-    },
-    [fromValue, currentSlippage.slippage, recipientValue]
-  );
+  const notifyNoQuote = useCallback(() => {
+    notify({
+      message: t('No swap quote found'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      const processResult = await generateOptimalProcessOnSelectQuote(quote);
-
-      if (!processResult) {
-        return;
-      }
-
-      setOptimalSwapPath(processResult);
-      dispatchProcessState({
-        payload: {
-          steps: processResult.steps,
-          feeStructure: processResult.totalFee
-        },
-        type: CommonActionType.STEP_CREATE
-      });
-
-      setCurrentQuote(quote);
-      setFeeOptions(quote.feeInfo.feeOptions);
-      setCurrentFeeOption(quote.feeInfo.feeOptions?.[0]);
-
+      setHandleRequestLoading(true);
+      continueRefreshQuoteRef.current = true;
       setCurrentQuoteRequest((oldRequest) => {
         if (!oldRequest) {
           return undefined;
@@ -497,11 +471,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
         return {
           ...oldRequest,
-          currentQuote: quote.provider
+          preferredProvider: quote.provider.id
         };
       });
+
+      return Promise.resolve();
     },
-    [generateOptimalProcessOnSelectQuote]
+    []
   );
 
   const onChangeAmount = useCallback((value: string) => {
@@ -646,14 +622,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
             if (currentOptimalSwapPath.steps.length > 2 && isLastStep && !specialCaseForUniswap) {
               if (currentQuoteRequest) {
-                const latestSwapQuote = await getLatestSwapQuote(currentQuoteRequest);
+                const latestSwapRequestResult = await handleSwapRequestV2(currentQuoteRequest);
 
-                if (latestSwapQuote.optimalQuote) {
-                  latestOptimalQuote = latestSwapQuote.optimalQuote;
-                  setQuoteOptions(latestSwapQuote.quotes);
-                  setCurrentQuote(latestSwapQuote.optimalQuote);
-                  setQuoteAliveUntil(latestSwapQuote.aliveUntil);
-                  setSwapError(latestSwapQuote.error);
+                if (latestSwapRequestResult.quote.optimalQuote) {
+                  latestOptimalQuote = latestSwapRequestResult.quote.optimalQuote;
+                  updateSwapStates(latestSwapRequestResult);
                 }
               }
             }
@@ -738,7 +711,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, updateSwapStates]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -944,7 +917,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           handleSwapRequestV2(currentRequest).then((result) => {
             if (sync) {
               setCurrentQuoteRequest(currentRequest);
-              setOptimalSwapPath(result.process);
 
               dispatchProcessState({
                 payload: {
@@ -954,19 +926,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 type: CommonActionType.STEP_CREATE
               });
 
-              setQuoteOptions(result.quote.quotes);
-              setCurrentQuote(result.quote.optimalQuote);
-              setQuoteAliveUntil(result.quote.aliveUntil);
-              setFeeOptions(result.quote.optimalQuote?.feeInfo?.feeOptions || []);
-              setCurrentFeeOption(result.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
-              setSwapError(result.quote.error);
-              optimalQuoteRef.current = result.quote.optimalQuote;
+              updateSwapStates(result);
               setHandleRequestLoading(false);
             }
-          }).catch((e) => {
+          }).catch((e: Error) => {
             console.log('handleSwapRequest error', e);
 
             if (sync) {
+              if (e.message.toLowerCase().startsWith('swap pair is not found')) {
+                notifyNoQuote();
+              }
+
               setHandleRequestLoading(false);
             }
           });
@@ -986,28 +956,29 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, recipientValue, toTokenSlugValue]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
     let timer: NodeJS.Timer | undefined;
     let sync = true;
 
-    const updateQuote = () => {
+    const refreshSwapRequestResult = () => {
       if (currentQuoteRequest) {
         if (sync) {
           setHandleRequestLoading(true);
         }
 
-        getLatestSwapQuote(currentQuoteRequest).then((rs) => {
+        handleSwapRequestV2(currentQuoteRequest).then((rs) => {
           if (sync) {
-            setQuoteOptions(rs.quotes);
-            setCurrentQuote(rs.optimalQuote);
-            setQuoteAliveUntil(rs.aliveUntil);
-            setSwapError(rs.error);
+            updateSwapStates(rs);
           }
-        }).catch((e) => {
-          console.log('Error when getLatestSwapQuote', e);
+        }).catch((e: Error) => {
+          console.log('Error when doing refreshSwapRequestResult', e);
+
+          if (e.message.toLowerCase().startsWith('swap pair is not found')) {
+            notifyNoQuote();
+          }
         }).finally(() => {
           if (sync) {
             setHandleRequestLoading(false);
@@ -1031,13 +1002,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         clearInterval(timer);
 
         if (!requestUserInteractToContinue && !hasInternalConfirmations) {
-          updateQuote();
+          refreshSwapRequestResult();
         }
       } else {
         if (continueRefreshQuoteRef.current) {
           continueRefreshQuoteRef.current = false;
 
-          updateQuote();
+          refreshSwapRequestResult();
         }
       }
     };
@@ -1050,7 +1021,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, quoteAliveUntil, requestUserInteractToContinue]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
@@ -1086,14 +1057,30 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [form, fromTokenItems, fromTokenSlugValue]);
 
   useEffect(() => {
-    if (toTokenItems.length) {
-      if (!toTokenSlugValue || !toTokenItems.some((t) => t.slug === toTokenSlugValue)) {
-        form.setFieldValue('toTokenSlug', toTokenItems[0].slug);
+    const updateToTokenSlug = () => {
+      if (!fromTokenSlugValue) {
+        return;
       }
-    } else {
-      form.setFieldValue('toTokenSlug', '');
-    }
-  }, [form, toTokenItems, toTokenSlugValue]);
+
+      if (toTokenItems.length) {
+        if (!toTokenSlugValue || !toTokenItems.some((t) => t.slug === toTokenSlugValue)) {
+          const nextValue = toTokenItems[0].slug;
+
+          if (nextValue !== fromTokenSlugValue) {
+            form.setFieldValue('toTokenSlug', nextValue);
+          }
+        }
+      } else {
+        form.setFieldValue('toTokenSlug', '');
+      }
+    };
+
+    const timeout = setTimeout(updateToTokenSlug, 100);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [form, fromTokenSlugValue, toTokenItems, toTokenSlugValue]);
 
   const altChain = useMemo(() => {
     // todo: fill logic to get altChain here
@@ -1302,6 +1289,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   openSlippageModal={openSlippageModal}
                   openSwapQuotesModal={openSwapQuotesModal}
                   quoteAliveUntil={quoteAliveUntil}
+                  quoteOptions={quoteOptions}
                   slippage={slippage}
                   swapError={swapError}
                   toAssetInfo={toAssetInfo}
@@ -1344,10 +1332,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         isSwapQuotesSelectorModalVisible && (
           <SwapQuotesSelectorModal
             applyQuote={onConfirmSelectedQuote}
+            disableConfirmButton={handleRequestLoading}
             items={quoteOptions}
             modalId={SWAP_ALL_QUOTES_MODAL}
             onCancel={closeSwapQuotesModal}
-            optimalQuoteItem={optimalQuoteRef.current}
             quoteAliveUntil={quoteAliveUntil}
             selectedItem={currentQuote}
           />

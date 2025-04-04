@@ -116,15 +116,14 @@ export class SimpleSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const stepData = params.path[stepIndex];
-
-    if (stepData.action !== DynamicSwapType.SWAP) {
-      return Promise.resolve(undefined);
-    }
-
     if (!params.selectedQuote) {
       return Promise.resolve(undefined);
     }
+
+    const originTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
     const submitStep: BaseStepDetail = {
       name: 'Swap',
@@ -133,10 +132,10 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       metadata: {
         sendingValue: params.request.fromAmount.toString(),
         expectedReceive: params.selectedQuote.toAmount,
-        originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-        destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to),
-        sender: params.request.address,
-        receiver: params.request.recipient || params.request.address
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(params.request.address, originChain),
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain)
       } as unknown as BaseSwapStepMetadata
     };
 
