@@ -442,19 +442,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     form.setFieldValue('toTokenSlug', tokenSlug);
   }, [form]);
 
-  const updateSwapStates = useCallback((rs: SwapRequestResult, preferredProvider?: SwapProviderId) => {
+  const updateSwapStates = useCallback((rs: SwapRequestResult) => {
     setOptimalSwapPath(rs.process);
     setQuoteOptions(rs.quote.quotes);
-
-    const targetQuote = (() => {
-      if (!preferredProvider) {
-        return rs.quote.optimalQuote;
-      }
-
-      return rs.quote.quotes.find((q) => q.provider.id === preferredProvider) || rs.quote.optimalQuote;
-    })();
-
-    setCurrentQuote(targetQuote);
+    setCurrentQuote(rs.quote.optimalQuote);
     setQuoteAliveUntil(rs.quote.aliveUntil);
     setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
     setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
@@ -635,7 +626,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
                 if (latestSwapRequestResult.quote.optimalQuote) {
                   latestOptimalQuote = latestSwapRequestResult.quote.optimalQuote;
-                  updateSwapStates(latestSwapRequestResult, currentQuoteRequest.preferredProvider);
+                  updateSwapStates(latestSwapRequestResult);
                 }
               }
             }
@@ -980,7 +971,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
         handleSwapRequestV2(currentQuoteRequest).then((rs) => {
           if (sync) {
-            updateSwapStates(rs, currentQuoteRequest.preferredProvider);
+            updateSwapStates(rs);
           }
         }).catch((e: Error) => {
           console.log('Error when doing refreshSwapRequestResult', e);
