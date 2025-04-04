@@ -24,7 +24,7 @@ type Props = ThemeProps & TransactionStepsModalProps & {
 const modalId = TRANSACTION_STEPS_MODAL;
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, items, onCancel, type, variant } = props;
+  const { className, items, onCancel, type, variant = 'standard' } = props;
   const { t } = useTranslation();
 
   const modalTitle = useMemo(() => {

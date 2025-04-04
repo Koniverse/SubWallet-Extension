@@ -1,33 +1,24 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getSwapChainsFromPath } from '@subwallet/extension-base/services/swap-service/utils';
-import { DynamicSwapAction } from '@subwallet/extension-base/types';
 import { NetworkGroup } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowRight } from 'phosphor-react';
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  path: DynamicSwapAction[];
+  chains: string[];
 };
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, path } = props;
-  const assetRegistry = useSelector((root: RootState) => root.assetRegistry.assetRegistry);
+  const { chains, className } = props;
   const { t } = useTranslation();
 
-  const items: string[] = useMemo(() => {
-    return getSwapChainsFromPath(path, assetRegistry);
-  }, [assetRegistry, path]);
-
-  const isMode1 = items.length < 6;
+  const isMode1 = chains.length < 6;
 
   return (
     <div
@@ -38,7 +29,7 @@ const Component: FC<Props> = (props: Props) => {
     >
       {
         isMode1
-          ? items.map((item, index) => (
+          ? chains.map((item, index) => (
             <React.Fragment key={index}>
               <Logo
                 className={'__chain-logo'}
@@ -48,7 +39,7 @@ const Component: FC<Props> = (props: Props) => {
               />
 
               {
-                (index !== items.length - 1) && (
+                (index !== chains.length - 1) && (
                   <Icon
                     className={'__separator-icon'}
                     customSize={'12px'}
@@ -62,11 +53,11 @@ const Component: FC<Props> = (props: Props) => {
           : (
             <>
               <NetworkGroup
-                chains={items}
+                chains={chains}
                 className={'__chain-logo-group'}
               />
               <div className='__steps-label'>
-                {`${items.length} ${t('steps')}`}
+                {`${chains.length} ${t('steps')}`}
               </div>
             </>
           )

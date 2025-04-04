@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRef, _AssetRefPath, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
+import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
@@ -261,19 +261,19 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   };
 }
 
-export function getSwapChainsFromPath (path: DynamicSwapAction[], chainAssetMap: Record<string, _ChainAsset>): string[] {
+export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
   const swapChains: string[] = [];
 
   path.forEach((pathElement) => {
-    const fromAsset = chainAssetMap[pathElement.pair.from];
-    const toAsset = chainAssetMap[pathElement.pair.to];
+    const fromAssetOriginChain = _getOriginChainOfAsset(pathElement.pair.from);
+    const toAssetOriginChain = _getOriginChainOfAsset(pathElement.pair.to);
 
-    if (swapChains.at(-1) !== fromAsset.originChain) {
-      swapChains.push(fromAsset.originChain);
+    if (swapChains.at(-1) !== fromAssetOriginChain) {
+      swapChains.push(fromAssetOriginChain);
     }
 
-    if (swapChains.at(-1) !== toAsset.originChain) {
-      swapChains.push(toAsset.originChain);
+    if (swapChains.at(-1) !== toAssetOriginChain) {
+      swapChains.push(toAssetOriginChain);
     }
   });
 

@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
+import { getSwapChainsFromPath } from '@subwallet/extension-base/services/swap-service/utils';
 import { CommonOptimalSwapPath, ProcessType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
@@ -208,6 +209,14 @@ const Component: React.FC<Props> = (props: Props) => {
     );
   };
 
+  const processChains = useMemo(() => {
+    if (!currentOptimalSwapPath) {
+      return [];
+    }
+
+    return getSwapChainsFromPath(currentOptimalSwapPath.path);
+  }, [currentOptimalSwapPath]);
+
   const showQuoteEmptyBlock = (!currentQuote || handleRequestLoading || isFormInvalid);
 
   return (
@@ -250,11 +259,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   onClick={openProcessModal}
                 >
 
-                  {
-                    currentOptimalSwapPath && (
-                      <TransactionProcessPreview path={currentOptimalSwapPath.path} />
-                    )
-                  }
+                  <TransactionProcessPreview chains={processChains} />
 
                   <Icon
                     className={'__caret-icon'}

@@ -38,12 +38,22 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
 
   '.__token-item-logo': {
     display: 'inline-block',
-    marginRight: 3
+    marginRight: 3,
+
+    img: {
+      position: 'relative',
+      verticalAlign: 'top',
+      top: 3
+    }
   },
 
   '.__token-item-value': {
     color: token.colorTextLight1,
     display: 'inline-block'
+  },
+
+  '.__token-item-symbol': {
+    color: token.colorTextLight1
   },
 
   '.__fee-info': {
@@ -62,12 +72,12 @@ const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps)
 type TokenDisplayProps = {
   slug: string;
   symbol: string;
-  decimals: number;
-  value: string;
+  decimals?: number;
+  value?: string;
 }
 
 const TokenDisplay = (props: TokenDisplayProps) => {
-  const { decimals,
+  const { decimals = 0,
     slug,
     symbol,
     value } = props;
@@ -80,12 +90,22 @@ const TokenDisplay = (props: TokenDisplayProps) => {
         token={slug.toLowerCase()}
       />
 
-      <NumberDisplay
-        className='__token-item-value'
-        decimal={decimals}
-        suffix={symbol}
-        value={value}
-      />
+      {
+        typeof value !== 'undefined'
+          ? (
+            <NumberDisplay
+              className='__token-item-value'
+              decimal={decimals}
+              suffix={symbol}
+              value={value}
+            />
+          )
+          : (
+            <span className={'__token-item-symbol'}>
+              {symbol}
+            </span>
+          )
+      }
     </span>
   );
 };
@@ -265,6 +285,7 @@ const useGetSwapProcessStepContent = () => {
           const asset = assetRegistry[tokenApprove];
 
           return {
+            tokenSlug: tokenApprove,
             tokenSymbol: _getAssetSymbol(asset),
             chainName: _getChainName(chainInfoMap[asset.originChain])
           };
@@ -278,11 +299,22 @@ const useGetSwapProcessStepContent = () => {
       const analysisResult = analysisMetadata();
 
       if (analysisResult) {
-        return t('Approve {{tokenSymbol}} on {{chainName}} for swap', {
-          replace: {
-            ...analysisResult
-          }
-        });
+        return (
+          <StepContent>
+            <div className='__brief'>
+              Approve
+
+              &nbsp;
+              <TokenDisplay
+                slug={analysisResult.tokenSlug}
+                symbol={analysisResult.tokenSymbol}
+              />
+              &nbsp;
+
+              {`on ${analysisResult.chainName} for swap`}
+            </div>
+          </StepContent>
+        );
       }
     }
 
