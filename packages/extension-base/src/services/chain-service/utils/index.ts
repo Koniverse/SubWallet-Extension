@@ -77,6 +77,10 @@ export function _isPureCardanoChain (chainInfo: _ChainInfo) {
   return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo);
 }
 
+export function _isPureBitcoinChain (chainInfo: _ChainInfo) {
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.bitcoinInfo);
+}
+
 export function _getOriginChainOfAsset (assetSlug: string) {
   if (assetSlug.startsWith(_CUSTOM_PREFIX)) {
     const arr = assetSlug.split('-').slice(1);

@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
-import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetRefPath, _AssetType, _BitcoinInfo, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
 import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
+import { BitcoinChainHandler } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/BitcoinChainHandler';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
 import { MantaPrivateHandler } from '@subwallet/extension-base/services/chain-service/handler/manta/MantaPrivateHandler';
@@ -29,9 +30,10 @@ import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
 const filterChainInfoMap = (data: Record<string, _ChainInfo>, ignoredChains: string[]): Record<string, _ChainInfo> => {
   return Object.fromEntries(
     Object.entries(data)
-      .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
+      .filter(([slug, info]) => !ignoredChains.includes(slug))
   );
 };
+// .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
 
 const ignoredList = [
   'bevm',
@@ -74,6 +76,7 @@ export class ChainService {
 
   private substrateChainHandler: SubstrateChainHandler;
   private evmChainHandler: EvmChainHandler;
+  private bitcoinChainHandler: BitcoinChainHandler;
   private tonChainHandler: TonChainHandler;
   private cardanoChainHandler: CardanoChainHandler;
   private mantaChainHandler: MantaPrivateHandler | undefined;
@@ -122,6 +125,7 @@ export class ChainService {
     this.evmChainHandler = new EvmChainHandler(this);
     this.tonChainHandler = new TonChainHandler(this);
     this.cardanoChainHandler = new CardanoChainHandler(this);
+    this.bitcoinChainHandler = new BitcoinChainHandler(this);
 
     this.logger = createLogger('chain-service');
   }
@@ -205,6 +209,14 @@ export class ChainService {
 
   public getSubstrateApiMap () {
     return this.substrateChainHandler.getSubstrateApiMap();
+  }
+
+  public getBitcoinApi (slug: string) {
+    return this.bitcoinChainHandler.getApiByChain(slug);
+  }
+
+  public getBitcoinApiMap () {
+    return this.bitcoinChainHandler.getApiMap();
   }
 
   public getTonApi (slug: string) {
@@ -951,6 +963,12 @@ export class ChainService {
 
       this.cardanoChainHandler.setCardanoApi(chainInfo.slug, chainApi);
     }
+
+    if (chainInfo.bitcoinInfo !== null && chainInfo.bitcoinInfo !== undefined) {
+      const chainApi = await this.bitcoinChainHandler.initApi(chainInfo.slug, endpoint, { providerName, onUpdateStatus });
+
+      this.bitcoinChainHandler.setApi(chainInfo.slug, chainApi);
+    }
   }
 
   private destroyApiForChain (chainInfo: _ChainInfo) {
@@ -968,6 +986,10 @@ export class ChainService {
 
     if (chainInfo.cardanoInfo !== null) {
       this.cardanoChainHandler.destroyCardanoApi(chainInfo.slug);
+    }
+
+    if (chainInfo.bitcoinInfo !== null && chainInfo.bitcoinInfo !== undefined) {
+      this.bitcoinChainHandler.destroyApi(chainInfo.slug);
     }
   }
 
@@ -1524,6 +1546,7 @@ export class ChainService {
     let evmInfo: _EvmInfo | null = null;
     const tonInfo: _TonInfo | null = null;
     const cardanoInfo: _CardanoInfo | null = null;
+    const bitcoinInfo: _BitcoinInfo | null = null;
 
     if (params.chainSpec.genesisHash !== '') {
       substrateInfo = {
@@ -1561,7 +1584,7 @@ export class ChainService {
       providers: params.chainEditInfo.providers,
       substrateInfo,
       evmInfo,
-      bitcoinInfo: null,
+      bitcoinInfo,
       tonInfo,
       cardanoInfo,
       isTestnet: false,
