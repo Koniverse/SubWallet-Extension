@@ -152,7 +152,9 @@ const Component: FC<Props> = (props: Props) => {
     >
       <Icon
         {...iconProp}
-        className={CN('__icon')}
+        className={CN('__icon', {
+          '-spinner': isStepProcessing(processData.status)
+        })}
       />
 
       <div className='__title'>
@@ -191,6 +193,12 @@ export const CurrentProcessStep = styled(Component)<Props>(({ theme: { token } }
       svg: {
         position: 'relative',
         zIndex: 2
+      }
+    },
+
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
       }
     },
 
