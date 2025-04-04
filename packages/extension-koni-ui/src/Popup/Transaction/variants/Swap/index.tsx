@@ -80,7 +80,8 @@ function getTokenSelectorItem (
         free: tokenBalanceInfo.free,
         locked: tokenBalanceInfo.locked,
         total: tokenBalanceInfo.total,
-        currency: tokenBalanceInfo.currency
+        currency: tokenBalanceInfo.currency,
+        isTestnet: tokenBalanceInfo.isTestnet
       };
     })();
 
