@@ -137,6 +137,7 @@ export class CardanoApi implements _CardanoApi {
 
   async getBalanceMap (address: string): Promise<CardanoBalanceItem[]> {
     try {
+      console.log('Getting balance map', this.projectId);
       const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}`;
       const response = await fetch(
         url, {
@@ -147,6 +148,7 @@ export class CardanoApi implements _CardanoApi {
         }
       );
 
+      console.log('response', response);
       const addressBalance = await response.json() as CardanoAddressBalance;
 
       return addressBalance.amount;

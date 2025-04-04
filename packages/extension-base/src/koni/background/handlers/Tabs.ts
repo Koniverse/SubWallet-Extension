@@ -4,10 +4,11 @@
 import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
 import { _AssetType } from '@subwallet/chain-list/types';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestEvmProviderSend, RequestSettingsType, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoSignData, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -20,9 +21,9 @@ import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-s
 import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
-import { canDerive, getEVMChainInfo, stripUrl } from '@subwallet/extension-base/utils';
+import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
 import Web3 from 'web3';
@@ -61,13 +62,32 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
       const validTypes = {
         evm: EthereumKeypairTypes,
         substrate: SubstrateKeypairTypes,
-        ton: TonKeypairTypes
+        ton: TonKeypairTypes,
+        cardano: CardanoKeypairTypes
       };
 
       return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
     } else {
       return true;
     }
+  };
+
+  const authReformatAddress = ({ json: { address, meta: { genesisHash, name } }, type }: SingleAddress) => {
+    const accountRs = {
+      address,
+      genesisHash,
+      name,
+      type
+    };
+
+    if (type === 'cardano') {
+      const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isTestnet);
+
+      accountRs.address = convertCardanoAddressToHex(addressChainFormat);
+    }
+
+    return accountRs;
   };
 
   return Object
@@ -77,12 +97,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))
-    .map(({ json: { address, meta: { genesisHash, name } }, type }): InjectedAccount => ({
-      address,
-      genesisHash,
-      name,
-      type
-    }));
+    .map(authReformatAddress);
 }
 
 interface ChainPatrolResponse {
@@ -314,6 +329,14 @@ export default class KoniTabs {
       if (authInfo.accountAuthTypes.includes('evm')) {
         accountAuthTypes.push('evm');
       }
+
+      if (authInfo.accountAuthTypes.includes('ton')) {
+        accountAuthTypes.push('ton');
+      }
+
+      if (authInfo.accountAuthTypes.includes('cardano')) {
+        accountAuthTypes.push('cardano');
+      }
     }
 
     return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
@@ -376,11 +399,18 @@ export default class KoniTabs {
 
   private authorizeV2 (url: string, request: RequestAuthorizeTab): Promise<boolean> {
     const isConnectOnlyEvmAccountType = request.accountAuthTypes?.length === 1 && request.accountAuthTypes?.includes('evm');
+    const isConnectOnlyCardanoAccountType = request.accountAuthTypes?.length === 1 && request.accountAuthTypes?.includes('cardano');
 
     if (isConnectOnlyEvmAccountType) {
       return new Promise((resolve, reject) => {
         this.#koniState.authorizeUrlV2(url, request).then(resolve).catch((e: Error) => {
           reject(new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST));
+        });
+      });
+    } else if (isConnectOnlyCardanoAccountType) {
+      return new Promise((resolve, reject) => {
+        this.#koniState.authorizeUrlV2(url, request).then(resolve).catch((e: Error) => {
+          reject(new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST));
         });
       });
     } else {
@@ -430,8 +460,8 @@ export default class KoniTabs {
     if (url) {
       const authInfo = await this.getAuthInfo(url);
 
-      if (authInfo?.currentEvmNetworkKey) {
-        currentChain = authInfo?.currentEvmNetworkKey;
+      if (authInfo?.currentNetworkKey) {
+        currentChain = authInfo?.currentNetworkKey;
       }
 
       if (authInfo?.isAllowed) {
@@ -1178,6 +1208,17 @@ export default class KoniTabs {
     return await this.#koniState.addTokenConfirm(id, url, tokenInfo);
   }
 
+  // Cardano
+  private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
+    const signResult = await this.#koniState.cardanoSignData(id, url, params);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
+
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], url: string, port: chrome.runtime.Port): Promise<ResponseTypes[keyof ResponseTypes]> {
     if (type === 'pub(phishing.redirectIfDenied)') {
       return this.redirectIfPhishing(url);
@@ -1251,6 +1292,10 @@ export default class KoniTabs {
         return await this.handleEvmRequest(id, url, request as RequestArguments);
       case 'evm(provider.send)':
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
+
+      // Cardano
+      case 'cardano(sign.data)':
+        return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }

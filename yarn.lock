@@ -2173,6 +2173,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emurgo/cardano-message-signing-browser@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@emurgo/cardano-message-signing-browser@npm:1.1.0"
+  checksum: 5c1ecb18a378ffc539fe04d9211dc10b1d577cf0691ad1c7365d683966f21602b8fa83f3e0b2ad6bfd3109ad7e9ed110c517216391409ab2f3518a39d3fd8ae2
+  languageName: node
+  linkType: hard
+
 "@emurgo/cardano-serialization-lib-browser@npm:^13.2.0":
   version: 13.2.0
   resolution: "@emurgo/cardano-serialization-lib-browser@npm:13.2.0"
@@ -6816,6 +6823,7 @@ __metadata:
     "@acala-network/api": ^5.0.2
     "@apollo/client": ^3.7.14
     "@azns/resolver-core": ^1.4.0
+    "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@equilab/api": ~1.14.25
     "@ethereumjs/common": ^4.1.0
