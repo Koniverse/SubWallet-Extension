@@ -4,6 +4,7 @@
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
 import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
@@ -18,7 +19,7 @@ import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migrati
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
-import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT } from '@subwallet/extension-base/utils';
+import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT, reformatAddress } from '@subwallet/extension-base/utils';
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
 
@@ -217,6 +218,21 @@ export class ChainService {
 
   public getCardanoApi (slug: string) {
     return this.cardanoChainHandler.getCardanoApiByChain(slug);
+  }
+
+  public async getUtxosByAddresses (addresses: string[], slug: string, isTestnet: boolean): Promise<Record<string, CardanoUtxosItem[]>> {
+    const cardanoApi = this.getCardanoApi(slug);
+
+    const addressUtxoMap: Record<string, CardanoUtxosItem[]> = {};
+
+    await Promise.all(addresses.map(async (address) => {
+      const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
+      const utxos = await cardanoApi.getUtxos(formattedAddress);
+
+      addressUtxoMap[formattedAddress] = utxos;
+    }));
+
+    return { ...addressUtxoMap };
   }
 
   public getCardanoApiMap () {

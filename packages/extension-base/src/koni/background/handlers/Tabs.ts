@@ -8,7 +8,7 @@ import { CardanoProviderError } from '@subwallet/extension-base/background/error
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoSignData, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -1215,6 +1215,16 @@ export default class KoniTabs {
     if (signResult) {
       return signResult;
     } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Failed to sign data');
+    }
+  }
+
+  private async cardanoSignTransaction (id: string, url: string, params: RequestCardanoSignTransaction): Promise<ResponseCardanoSignTransaction> {
+    const signResult = await this.#koniState.cardanoSignTx(id, url, params);
+
+    if (signResult) {
+      return signResult;
+    } else {
       throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
     }
   }
@@ -1296,6 +1306,8 @@ export default class KoniTabs {
       // Cardano
       case 'cardano(sign.data)':
         return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
+      case 'cardano(sign.tx)':
+        return await this.cardanoSignTransaction(id, url, request as RequestCardanoSignTransaction);
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }

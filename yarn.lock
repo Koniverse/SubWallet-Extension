@@ -7208,10 +7208,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/keyring@npm:0.1.9"
+"@subwallet/keyring@file:C:\\Users\\ADMIN\\WebstormProjects\\SubWallet-Base\\packages\\keyring\\build::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.8
+  resolution: "@subwallet/keyring@file:/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/keyring/build#/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/keyring/build::hash=5b82eb&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
+    "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
     "@metamask/eth-sig-util": ^7.0.3
@@ -7231,7 +7232,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: a04f8370c5af418e0d9220ad405dd2f376d5879b72a8cebfa214109cd52af173713df5d1e25ec92edae6d1df6871e59b90d1694eef57d2c5b0e039502631c2ee
+  checksum: c9511518153245246d1b93463a365db999929a687f9b65dc6d487c21c08e9d7b204f7927fe4c2dc3cdf0717a42d78e80279c4d0a3f61612f157b1ab9dcb0ff47
   languageName: node
   linkType: hard
 
@@ -7322,9 +7323,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/ui-keyring@npm:0.1.9"
+"@subwallet/ui-keyring@file:C:\\Users\\ADMIN\\WebstormProjects\\SubWallet-Base\\packages\\ui-keyring\\build::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.8
+  resolution: "@subwallet/ui-keyring@file:/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/ui-keyring/build#/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/ui-keyring/build::hash=2461da&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
@@ -7334,7 +7335,7 @@ __metadata:
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 332502def6742a386e8c2001ea82ded2dfbcba274df669cb3b8166945ea975ca22b6e2a758733cc9cbbb38dca18a956ef92e6e7c45b85cb55f053d6a45bc07f9
+  checksum: ee667a5b5f314d12f2690728879adb24ad35789f7b2d9c56d9851d2c4daea18c1c1326ea9741417b8ce1562dbd3ffc7d3734afb69456c2ffec63ab5e519f8e5c
   languageName: node
   linkType: hard
 

@@ -1,12 +1,14 @@
 // Copyright 2019-2022 @polkadot/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Value as CardanoValue } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _FundStatus, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { Resolver } from '@subwallet/extension-base/background/handlers/State';
 import { AccountAuthType, AuthorizeRequest, ConfirmationRequestBase, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeCancel, RequestAuthorizeReject, RequestAuthorizeSubscribe, RequestAuthorizeTab, RequestCurrentAccountAddress, ResponseAuthorizeList } from '@subwallet/extension-base/background/types';
 import { AppConfig, BrowserConfig, OSConfig } from '@subwallet/extension-base/constants';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
+import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
@@ -1153,16 +1155,11 @@ export enum CardanoProviderErrorType {
   SIGN_TRANSACTION_DECLINED = 'SIGN_TRANSACTION_DECLINED',
 }
 
+export type Cbor = string;
+
 export interface RequestCardanoSignData {
   address: string;
   payload: string;
-}
-
-export type Cbor = string;
-
-export interface RequestCardanoSignTx {
-  tx: Cbor;
-  partialSign: boolean
 }
 
 export interface ResponseCardanoSignData {
@@ -1170,9 +1167,29 @@ export interface ResponseCardanoSignData {
   key: Cbor,
 }
 
+export interface RequestCardanoSignTransaction {
+  tx: Cbor;
+  partialSign: boolean
+}
+
+export interface CardanoTransactionDappConfig {
+  inputs: Record<string, CardanoValue>,
+  outputs: Record<string, CardanoValue>,
+  to: string,
+  networkKey: string,
+  value: CardanoBalanceItem[],
+  estimateCardanoFee: string,
+  cardanoPayload: string,
+  errors?: ErrorValidation[],
+  id: string,
+}
+
+export type ResponseCardanoSignTransaction = Cbor;
+
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
 export type CardanoSendTransactionRequest = CardanoTransactionConfig;
+export type CardanoSignTransactionRequest = CardanoTransactionDappConfig;
 
 export type EvmWatchTransactionRequest = EvmSendTransactionRequest;
 export type TonWatchTransactionRequest = TonSendTransactionRequest;
@@ -1246,6 +1263,7 @@ export interface ConfirmationDefinitionsTon {
 export interface ConfirmationDefinitionsCardano {
   cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<ResponseCardanoSignData>],
   cardanoSendTransactionRequest: [ConfirmationsQueueItem<CardanoSendTransactionRequest>, ConfirmationResult<string>],
+  cardanoSignTransactionRequest: [ConfirmationsQueueItem<CardanoSignTransactionRequest>, ConfirmationResult<string>],
   cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
 }
 
@@ -2320,7 +2338,7 @@ export interface KoniRequestSignatures {
 
   // Cardano
   'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
-  'cardano(sign.tx)': [RequestCardanoSignTx, Cbor];
+  'cardano(sign.tx)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
   // 'cardano(submit.tx)': [RequestSignTxRaw, string];
 
   // Evm Transaction

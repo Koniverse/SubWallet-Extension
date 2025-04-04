@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CardanoAddressBalance, CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
@@ -12,7 +12,7 @@ import { hexAddPrefix, isHex } from '@polkadot/util';
 
 export const API_KEY = {
   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
-  testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
+  testnet: process.env.BLOCKFROST_API_KEY_PREP || 'preprodn4IaPVVX7FYJdOvW1qE6EshWbatZ4oPw'
 };
 
 export class CardanoApi implements _CardanoApi {
@@ -137,7 +137,6 @@ export class CardanoApi implements _CardanoApi {
 
   async getBalanceMap (address: string): Promise<CardanoBalanceItem[]> {
     try {
-      console.log('Getting balance map', this.projectId);
       const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}`;
       const response = await fetch(
         url, {
@@ -148,10 +147,31 @@ export class CardanoApi implements _CardanoApi {
         }
       );
 
-      console.log('response', response);
       const addressBalance = await response.json() as CardanoAddressBalance;
 
       return addressBalance.amount;
+    } catch (e) {
+      console.error('Error on getting account balance', e);
+
+      return [];
+    }
+  }
+
+  async getUtxos (address: string): Promise<CardanoUtxosItem[]> {
+    try {
+      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}/utxos`;
+      const response = await fetch(
+        url, {
+          method: 'GET',
+          headers: {
+            Project_id: this.projectId
+          }
+        }
+      );
+
+      const utxos = await response.json() as CardanoUtxosItem[];
+
+      return utxos;
     } catch (e) {
       console.error('Error on getting account balance', e);
 
