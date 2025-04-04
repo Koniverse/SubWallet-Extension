@@ -157,13 +157,46 @@ export class HydradxHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    if (!this.tradeRouter) {
+      return Promise.resolve(undefined);
+    }
+
     const swapPairInfo = stepData.pair;
 
     if (!swapPairInfo || !selectedQuote) {
       return Promise.resolve(undefined);
     }
 
-    const txHex: `0x${string}` = params.selectedQuote?.metadata as `0x${string}`;
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+
+    let txHex = params.selectedQuote?.metadata as string;
+    let bnSendingValue = BigN(fromAmount);
+    let bnExpectedReceive = BigN(selectedQuote.toAmount);
+
+    if (xcmSwapXcm) {
+      // override info if xcm-swap-xcm
+      bnSendingValue = bnSendingValue.multipliedBy(1.02);
+      bnExpectedReceive = bnExpectedReceive.multipliedBy(1.02);
+
+      const originTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.from);
+      const destinationTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.to);
+      const fromAssetId = _getTokenOnChainAssetId(originTokenInfo);
+      const toAssetId = _getTokenOnChainAssetId(destinationTokenInfo);
+
+      const quoteResponse = await this.tradeRouter.getBestSell(
+        fromAssetId,
+        toAssetId,
+        bnSendingValue.toFixed(0, 1)
+      );
+
+      const minReceive = bnExpectedReceive
+        .times(1 - params.request.slippage)
+        .integerValue();
+
+      // @ts-ignore
+      txHex = quoteResponse.toTx(minReceive).hex;
+    }
 
     if (!txHex || !isHex(txHex)) {
       return Promise.resolve(undefined);
@@ -179,8 +212,8 @@ export class HydradxHandler implements SwapBaseInterface {
       type: SwapStepType.SWAP,
       // @ts-ignore
       metadata: {
-        sendingValue: fromAmount,
-        expectedReceive: selectedQuote.toAmount,
+        sendingValue: bnSendingValue.toFixed(0, 1),
+        expectedReceive: bnExpectedReceive.toFixed(0, 1),
         originTokenInfo,
         destinationTokenInfo,
         sender: _reformatAddressWithChain(params.request.address, originChain),
