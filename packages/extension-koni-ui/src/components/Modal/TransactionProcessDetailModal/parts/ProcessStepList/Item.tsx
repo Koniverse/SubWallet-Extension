@@ -29,7 +29,7 @@ const Component: FC<Props> = (props: Props) => {
       index={index}
       isLastItem={isLastItem}
       status={processStep.status}
-      text={text}
+      content={text}
     />
   );
 };

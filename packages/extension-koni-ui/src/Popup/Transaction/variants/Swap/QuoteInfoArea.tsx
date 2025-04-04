@@ -3,14 +3,14 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { CommonOptimalSwapPath, ProcessType, StepStatus, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
+import { CommonOptimalSwapPath, ProcessType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetSwapProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
-import { ActivityIndicator, Icon, Logo, Tooltip } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
@@ -34,40 +34,6 @@ type Props = ThemeProps & {
   openSlippageModal: VoidFunction;
 };
 
-const StepContent = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
-  '.__brief': {
-    fontSize: token.fontSize,
-    lineHeight: token.lineHeight,
-    color: token.colorTextLight3
-  },
-
-  '.__token-item': {
-    display: 'inline-block',
-    alignItems: 'center'
-  },
-
-  '.__token-item-logo': {
-    display: 'inline-block',
-    marginRight: 3
-  },
-
-  '.__token-item-value': {
-    color: token.colorTextLight1
-  },
-
-  '.__fee-info': {
-    display: 'flex',
-    gap: token.sizeXXS,
-    color: token.colorTextLight4,
-    fontSize: token.fontSizeSM,
-    lineHeight: token.lineHeightSM
-  },
-
-  '.__fee-value': {
-
-  }
-}));
-
 const Component: React.FC<Props> = (props: Props) => {
   const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
     fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal, openSwapQuotesModal,
@@ -78,81 +44,21 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { transactionStepsModal } = useContext(WalletModalContext);
 
+  const getSwapProcessSteps = useGetSwapProcessSteps();
+
   const openProcessModal = useCallback(() => {
-    const items: TransactionProcessStepItemType[] = [];
+    if (!currentOptimalSwapPath || !currentQuote) {
+      return;
+    }
 
-    // TODO: Replace this mock with real logic
-    currentOptimalSwapPath?.steps.forEach((stepItem, index) => {
-      // const status = (() => {
-      //   if (index === 0) {
-      //     return StepStatus.QUEUED;
-      //   }
-      //
-      //   if (index === 1) {
-      //     return StepStatus.PROCESSING;
-      //   }
-      //
-      //   return StepStatus.FAILED;
-      // })();
-
-      items.push({
-        status: StepStatus.QUEUED,
-        text: (
-          <StepContent>
-            <div className='__brief'>
-              Swap
-
-              &nbsp;
-              <span className='__token-item'>
-                <Logo
-                  className={'__token-item-logo'}
-                  size={16}
-                  token={'polkadot-NATIVE-DOT'.toLowerCase()}
-                />
-
-                <span className='__token-item-value'>
-                  100 DOT
-                </span>
-              </span>
-              &nbsp;
-
-              to
-
-              &nbsp;
-              <span className='__token-item'>
-                <Logo
-                  className={'__token-item-logo'}
-                  size={16}
-                  token={'ethereum-NATIVE-ETH'.toLowerCase()}
-                />
-
-                <span className='__token-item-value'>
-                  0.1 ETH
-                </span>
-              </span>
-              &nbsp;
-
-              via Chainflip
-            </div>
-
-            <div className='__fee-info'>
-              <span className='__fee-label'>Fee:</span>
-              <span className='__fee-value'>$0.2</span>
-            </div>
-          </StepContent>
-        ),
-        index,
-        logoKey: undefined,
-        isLastItem: index === (currentOptimalSwapPath?.steps.length - 1)
-      });
-    });
+    const items: TransactionProcessStepItemType[] = getSwapProcessSteps(currentOptimalSwapPath, currentQuote);
 
     transactionStepsModal.open({
       items,
       type: ProcessType.SWAP,
       variant: 'standard'
     });
-  }, [currentOptimalSwapPath, transactionStepsModal]);
+  }, [currentOptimalSwapPath, currentQuote, getSwapProcessSteps, transactionStepsModal]);
 
   const renderRateInfo = () => {
     if (!currentQuote) {
