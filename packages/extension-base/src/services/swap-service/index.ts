@@ -149,6 +149,7 @@ export class SwapService implements StoppableServiceInterface {
     };
   }
 
+  // todo: rewrite this function
   public getAvailablePath (request: SwapRequestV2): [DynamicSwapAction[], SwapRequestV2 | undefined] {
     const { address, pair } = request;
     // todo: control provider tighter

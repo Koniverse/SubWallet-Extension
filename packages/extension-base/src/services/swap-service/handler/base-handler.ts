@@ -150,7 +150,7 @@ export class SwapBaseHandler {
 
       const _xcmFeeInfo = await xcmTransfer.paymentInfo(senderAddress);
       const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-      const estimatedBridgeFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.high).toString();
+      const estimatedBridgeFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString();
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
