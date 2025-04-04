@@ -274,7 +274,8 @@ export interface BaseSwapStepMetadata {
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
   sender: string;
-  receiver: string
+  receiver: string;
+  version: number;
 }
 
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {

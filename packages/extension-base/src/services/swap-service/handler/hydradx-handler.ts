@@ -185,7 +185,8 @@ export class HydradxHandler implements SwapBaseInterface {
         destinationTokenInfo,
         sender: _reformatAddressWithChain(params.request.address, originChain),
         receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
-        txHex
+        txHex,
+        version: 2
       } as unknown as HydrationSwapStepMetadata
     };
 
