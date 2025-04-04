@@ -19,6 +19,7 @@ import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { isHex } from '@polkadot/util';
+import {DEFAULT_EXCESS_AMOUNT_WEIGHT} from "@subwallet/extension-base/services/swap-service/utils";
 
 const HYDRADX_SUBWALLET_REFERRAL_CODE = 'WALLET';
 const HYDRADX_SUBWALLET_REFERRAL_ACCOUNT = '7PCsCpkgsHdNaZhv79wCCQ5z97uxVbSeSCtDMUa1eZHKXy4a';
@@ -169,15 +170,17 @@ export class HydradxHandler implements SwapBaseInterface {
 
     const actionList = JSON.stringify(path.map((step) => step.action));
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const needEditAmount = swapXcm || xcmSwapXcm;
 
     let txHex = params.selectedQuote?.metadata as string;
     let bnSendingValue = BigN(fromAmount);
     let bnExpectedReceive = BigN(selectedQuote.toAmount);
 
-    if (xcmSwapXcm) {
+    if (needEditAmount) {
       // override info if xcm-swap-xcm
-      bnSendingValue = bnSendingValue.multipliedBy(1.02);
-      bnExpectedReceive = bnExpectedReceive.multipliedBy(1.02);
+      bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+      bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
 
       const originTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.from);
       const destinationTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.to);

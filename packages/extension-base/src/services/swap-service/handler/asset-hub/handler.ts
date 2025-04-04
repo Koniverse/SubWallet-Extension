@@ -8,7 +8,10 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { getAmountAfterSlippage } from '@subwallet/extension-base/services/swap-service/utils';
+import {
+  DEFAULT_EXCESS_AMOUNT_WEIGHT,
+  getAmountAfterSlippage
+} from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, SwapBaseTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -107,13 +110,15 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     const actionList = JSON.stringify(path.map((step) => step.action));
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const needEditAmount = swapXcm || xcmSwapXcm;
 
     let bnSendingValue = BigN(fromAmount);
     let bnExpectedReceive = BigN(selectedQuote.toAmount);
 
-    if (xcmSwapXcm) {
-      bnSendingValue = bnSendingValue.multipliedBy(1.02);
-      bnExpectedReceive = bnExpectedReceive.multipliedBy(1.02);
+    if (needEditAmount) {
+      bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+      bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
     }
 
     const submitStep: BaseStepDetail = {
