@@ -13,7 +13,7 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import {DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER} from '@subwallet/extension-base/services/swap-service/utils';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';

@@ -8,10 +8,7 @@ import { BalanceService } from '@subwallet/extension-base/services/balance-servi
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import {
-  DEFAULT_EXCESS_AMOUNT_WEIGHT,
-  getAmountAfterSlippage
-} from '@subwallet/extension-base/services/swap-service/utils';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT, getAmountAfterSlippage } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, SwapBaseTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';

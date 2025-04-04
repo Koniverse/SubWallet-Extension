@@ -11,6 +11,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -19,7 +20,6 @@ import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { isHex } from '@polkadot/util';
-import {DEFAULT_EXCESS_AMOUNT_WEIGHT} from "@subwallet/extension-base/services/swap-service/utils";
 
 const HYDRADX_SUBWALLET_REFERRAL_CODE = 'WALLET';
 const HYDRADX_SUBWALLET_REFERRAL_ACCOUNT = '7PCsCpkgsHdNaZhv79wCCQ5z97uxVbSeSCtDMUa1eZHKXy4a';
