@@ -5,6 +5,7 @@ import { fetchUnsignedPayload } from '@subwallet/subwallet-api-sdk/cardano';
 import { BuildCardanoTxParams } from '@subwallet/subwallet-api-sdk/cardano/utils';
 
 import { SwapApi } from './modules/swapApi';
+import { XcmApi } from './modules/xcmApi';
 
 export interface CardanoTransactionConfigProps {
   cardanoId: string;
@@ -25,10 +26,12 @@ export class SubWalletApiSdk {
   private baseUrl = '';
   private static _instance: SubWalletApiSdk | undefined = undefined;
   public swapApi: SwapApi | undefined;
+  public xcmApi: XcmApi | undefined;
 
   public init (url: string) {
     this.baseUrl = url;
     this.swapApi = new SwapApi(url);
+    this.xcmApi = new XcmApi(url);
   }
 
   async fetchUnsignedPayload (params: BuildCardanoTxParams): Promise<string> {
