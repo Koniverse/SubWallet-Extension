@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProcessTransactionData, ResponseSubscribeProcessById } from '@subwallet/extension-base/types';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
+import { ProcessTransactionData, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { CloseIcon, Layout, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
@@ -17,13 +18,21 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import reformatAddress from '../utils/account/reformatAddress';
-
 type Props = ThemeProps;
 
-const SwapProcessingContentComponent = () => {
+type SwapProcessingContentComponentProps = {
+  processData: ProcessTransactionData;
+}
+
+const SwapProcessingContentComponent = (props: SwapProcessingContentComponentProps) => {
   const { t } = useTranslation();
+  const { processData } = props;
   const [messageIndex, setMessageIndex] = useState(0);
+  const data = processData.combineInfo as SwapBaseTxData;
+
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(data.process.steps);
+  }, [data.process.steps]);
 
   const messages = useMemo<string[]>(() => {
     return [
@@ -62,11 +71,11 @@ const SwapProcessingContentComponent = () => {
 
       <SwapTransactionBlock
         className={'swap-transaction-block'}
-        fromAmount={'100000'}
-        fromAssetSlug={'polkadot-NATIVE-DOT'}
+        fromAmount={data.quote.fromAmount}
+        fromAssetSlug={originSwapPair?.from}
         logoSize={36}
-        toAmount={'1000000000000'}
-        toAssetSlug={'ethereum-NATIVE-ETH'}
+        toAmount={data.quote.toAmount}
+        toAssetSlug={originSwapPair?.to}
       />
     </div>
   );
@@ -94,17 +103,6 @@ const Component: React.FC<Props> = (props: Props) => {
       });
     },
     [navigate, transactionProcessId]
-  );
-
-  const viewInHistory = useCallback(
-    () => {
-      if (processData?.address && processData?.lastTransactionChain && processData?.lastTransactionId) {
-        navigate(`/home/history/${reformatAddress(processData?.address)}/${processData?.lastTransactionChain}/${processData?.lastTransactionId}`, { state: { from: 'ignoreRemind' } });
-      } else {
-        navigate('/home/history');
-      }
-    },
-    [processData?.address, processData?.lastTransactionChain, processData?.lastTransactionId, navigate]
   );
 
   const isFinal = useMemo(() => {
@@ -183,8 +181,8 @@ const Component: React.FC<Props> = (props: Props) => {
         rightFooterButton={processData
           ? ({
             block: true,
-            onClick: isFinal ? viewInHistory : viewProgress,
-            children: isFinal ? t('View transaction') : t('View progress')
+            onClick: viewProgress,
+            children: t('View progress')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
@@ -195,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
         )}
 
         {!!processData && isSwapProcessing && !isFinal && (
-          <SwapProcessingContentComponent />
+          <SwapProcessingContentComponent processData={processData} />
         )}
 
         {
@@ -214,7 +212,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 {t('Transaction submitted!')}
               </div>
               <div className='description'>
-                {isFinal ? t('View transaction progress in the History tab or go back to home') : t('View transaction progress in the Notifications screen or go back to home')}
+                {t('View transaction progress in the Notifications screen or go back to home')}
               </div>
             </div>
           )
@@ -288,21 +286,12 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
         marginBottom: 40
       },
 
-      '.title': {
-        marginBottom: token.margin,
-        fontWeight: token.fontWeightStrong,
-        fontSize: token.fontSizeHeading3,
-        lineHeight: token.lineHeightHeading3,
-        color: token.colorTextBase
-      },
-
       '.description': {
-        padding: '0 36px',
-        marginBottom: token.margin * 2,
-        fontSize: token.fontSizeHeading5,
-        lineHeight: token.lineHeightHeading5,
-        color: token.colorTextLight5,
-        textAlign: 'center'
+        padding: '0 24px',
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight4,
+        marginBottom: token.margin
       }
     },
 
