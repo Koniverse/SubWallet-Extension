@@ -14,7 +14,6 @@ export const postRequest = (url: string, body: any, headers?: Record<string, str
 };
 
 export const getRequest = (url: string, params?: Record<string, string>, headers?: Record<string, string>) => {
-  console.log('getRequest url: ', url);
   const queryString = params
     ? Object.keys(params)
       .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)

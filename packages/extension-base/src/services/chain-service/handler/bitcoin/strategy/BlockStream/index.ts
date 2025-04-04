@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { _BEAR_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
-import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Brc20BalanceItem, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData, RuneTxs, RuneTxsResponse, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
+import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
+import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, RecommendedFeeEstimates, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
 import { BitcoinApiStrategy, BitcoinTransactionEventMap } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
-// import { HiroService } from '@subwallet/extension-base/services/hiro-service';
-// import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
@@ -25,9 +23,8 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
     super(context);
 
-    this.baseUrl = 'https://btc-api.koni.studio/';
+    this.baseUrl = 'https://btc-api.koni.studio';
     this.isTestnet = url.includes('testnet');
-    console.log('BlockStreamRequestStrategy.getBlockTime');
 
     this.getBlockTime()
       .then((rs) => {
@@ -40,7 +37,7 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
   private headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${_BEAR_TOKEN}`
+    Authorization: `Bearer ${_BTC_SERVICE_TOKEN}`
   };
 
   isRateLimited (): boolean {
@@ -244,150 +241,6 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
       return rs.result;
     }, 0);
   }
-
-  // async getRunes (address: string) {
-  //   const runesFullList: RunesInfoByAddress[] = [];
-  //   const pageSize = 60;
-  //   let offset = 0;
-
-  //   const runeService = RunesService.getInstance(this.isTestnet);
-
-  //   try {
-  //     while (true) {
-  //       const response = await runeService.getAddressRunesInfo(address, {
-  //         limit: String(pageSize),
-  //         offset: String(offset)
-  //       }) as unknown as RunesInfoByAddressFetchedData;
-
-  //       const runes = response.runes;
-
-  //       if (runes.length !== 0) {
-  //         runesFullList.push(...runes);
-  //         offset += pageSize;
-  //       } else {
-  //         break;
-  //       }
-  //     }
-
-  //     return runesFullList;
-  //   } catch (error) {
-  //     console.error(`Failed to get ${address} balances`, error);
-  //     throw error;
-  //   }
-  // }
-
-  // * Deprecated
-  // async getRuneTxsUtxos (address: string) {
-  //   const txsFullList: RuneTxs[] = [];
-  //   const pageSize = 10;
-  //   let offset = 0;
-
-  //   const runeService = RunesService.getInstance(this.isTestnet);
-
-  //   try {
-  //     while (true) {
-  //       const response = await runeService.getAddressRuneTxs(address, {
-  //         limit: String(pageSize),
-  //         offset: String(offset)
-  //       }) as unknown as RuneTxsResponse;
-
-  //       let runesTxs: RuneTxs[] = [];
-
-  //       if (response.statusCode === 200) {
-  //         runesTxs = response.data.transactions;
-  //       } else {
-  //         console.log(`Error on request rune transactions for address ${address}`);
-  //         break;
-  //       }
-
-  //       if (runesTxs.length !== 0) {
-  //         txsFullList.push(...runesTxs);
-  //         offset += pageSize;
-  //       } else {
-  //         break;
-  //       }
-  //     }
-
-  //     return txsFullList;
-  //   } catch (error) {
-  //     console.error(`Failed to get ${address} transactions`, error);
-  //     throw error;
-  //   }
-  // }
-
-  // async getRuneUtxos (address: string) {
-  //   const runeService = RunesService.getInstance(this.isTestnet);
-
-  //   try {
-  //     const responseRuneUtxos = await runeService.getAddressRuneUtxos(address);
-
-  //     return responseRuneUtxos.utxo;
-  //   } catch (error) {
-  //     console.error(`Failed to get ${address} rune utxos`, error);
-  //     throw error;
-  //   }
-  // }
-
-  // async getAddressBRC20FreeLockedBalance (address: string, ticker: string): Promise<Brc20BalanceItem> {
-  //   const hiroService = HiroService.getInstance(this.isTestnet);
-
-  //   try {
-  //     const response = await hiroService.getAddressBRC20BalanceInfo(address, {
-  //       ticker: String(ticker)
-  //     });
-
-  //     const balanceInfo = response?.results[0];
-
-  //     if (balanceInfo) {
-  //       const rawFree = balanceInfo.transferrable_balance;
-  //       const rawLocked = balanceInfo.available_balance;
-
-  //       return {
-  //         free: rawFree.replace('.', ''),
-  //         locked: rawLocked.replace('.', '')
-  //       } as Brc20BalanceItem;
-  //     }
-  //   } catch (error) {
-  //     console.error(`Failed to get ${address} BRC20 balance for ticker ${ticker}`, error);
-  //   }
-
-  //   return {
-  //     free: '0',
-  //     locked: '0'
-  //   } as Brc20BalanceItem;
-  // }
-
-  // async getAddressInscriptions (address: string) {
-  //   const inscriptionsFullList: Inscription[] = [];
-  //   const pageSize = 60;
-  //   let offset = 0;
-
-  //   const hiroService = HiroService.getInstance(this.isTestnet);
-
-  //   try {
-  //     while (true) {
-  //       const response = await hiroService.getAddressInscriptionsInfo({
-  //         limit: String(pageSize),
-  //         offset: String(offset),
-  //         address: String(address)
-  //       }) as unknown as InscriptionFetchedData;
-
-  //       const inscriptions = response.results;
-
-  //       if (inscriptions.length !== 0) {
-  //         inscriptionsFullList.push(...inscriptions);
-  //         offset += pageSize;
-  //       } else {
-  //         break;
-  //       }
-  //     }
-
-  //     return inscriptionsFullList;
-  //   } catch (error) {
-  //     console.error(`Failed to get ${address} inscriptions`, error);
-  //     throw error;
-  //   }
-  // }
 
   getTxHex (txHash: string): Promise<string> {
     return this.addRequest<string>(async (): Promise<string> => {
