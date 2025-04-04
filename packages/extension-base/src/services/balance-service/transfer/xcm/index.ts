@@ -7,6 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
+import { buildXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -150,4 +151,14 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
       : _createPosBridgeL1toL2Extrinsic;
 
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+  const extrinsic = await buildXcm(request);
+
+  if (!extrinsic) {
+    throw new Error('No extrinsic'); // todo: content?
+  }
+
+  return extrinsic;
 };

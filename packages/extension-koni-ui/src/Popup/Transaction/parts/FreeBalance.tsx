@@ -76,8 +76,8 @@ const Component = ({ address,
             {
               !!labelTooltip && (
                 <Icon
+                  className={'__info-icon'}
                   phosphorIcon={Info}
-                  weight='fill'
                 />
               )
             }
@@ -135,8 +135,18 @@ const FreeBalance = styled(Component)<Props>(({ theme: { token } }: Props) => {
       cursor: 'pointer'
     },
 
+    '.__info-icon': {
+      marginLeft: token.marginXXS
+    },
+
     '.error-message': {
       color: token.colorError
+    },
+
+    '.ant-number, .ant-number .ant-typography': {
+      fontSize: 'inherit !important',
+      color: 'inherit !important',
+      lineHeight: 'inherit'
     },
 
     '&.ant-typography': {

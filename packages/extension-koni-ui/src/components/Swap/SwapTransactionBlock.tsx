@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { swapCustomFormatter } from '@subwallet/extension-base/utils';
+import { swapNumberMetadata } from '@subwallet/extension-base/utils';
+import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Icon, Logo, Number } from '@subwallet/react-ui';
+import { Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowRight } from 'phosphor-react';
 import React, { useMemo } from 'react';
@@ -18,7 +19,6 @@ interface Props extends ThemeProps{
   toAmount: string | undefined;
   logoSize?: number
 }
-const numberMetadata = { maxNumberFormat: 8 };
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, fromAmount,
@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [assetRegistryMap, toAssetSlug]);
 
   return (
-    <div className={CN(className, 'swap-confirmation-container')}>
+    <div className={CN(className)}>
       <div className={'__summary-quote'}>
         <div className={'__summary-from'}>
           <Logo
@@ -48,12 +48,10 @@ const Component: React.FC<Props> = (props: Props) => {
             subNetwork={_getAssetOriginChain(fromAssetInfo)}
             token={fromAssetSlug?.toLowerCase()}
           />
-          <Number
+          <NumberDisplay
             className={'__amount-destination'}
-            customFormatter={swapCustomFormatter}
             decimal={_getAssetDecimals(fromAssetInfo)}
-            formatType={'custom'}
-            metadata={numberMetadata}
+            metadata={swapNumberMetadata}
             value={fromAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(fromAssetInfo)}</span>
@@ -72,12 +70,10 @@ const Component: React.FC<Props> = (props: Props) => {
             subNetwork={_getAssetOriginChain(toAssetInfo)}
             token={toAssetSlug?.toLowerCase()}
           />
-          <Number
+          <NumberDisplay
             className={'__amount-destination'}
-            customFormatter={swapCustomFormatter}
             decimal={_getAssetDecimals(toAssetInfo)}
-            formatType={'custom'}
-            metadata={numberMetadata}
+            metadata={swapNumberMetadata}
             value={toAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(toAssetInfo)}</span>
@@ -92,6 +88,7 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
     '.__quote-estimate-swap-confirm-value': {
       display: 'flex'
     },
+
     '.__summary-quote': {
       display: 'flex',
       justifyContent: 'space-between',
@@ -104,33 +101,42 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
       borderRadius: 8,
       marginBottom: 16
     },
+
     '.__summary-quote .-sub-logo': {
       bottom: 0,
       right: 0
     },
+
     '.__summary-quote .ant-image': {
       fontSize: 0
     },
+
     '.__summary-to, .__summary-from': {
       display: 'flex',
       alignItems: 'center',
       flexDirection: 'column',
       flex: 1
     },
+
     '.__quote-footer-label': {
       color: token.colorTextTertiary,
       fontSize: 12,
       fontWeight: token.bodyFontWeight,
       lineHeight: token.lineHeightSM
     },
+
     '.__amount-destination': {
       color: token.colorTextLight2,
       fontSize: token.fontSizeLG,
       fontWeight: token.fontWeightStrong,
-      lineHeight: token.lineHeightLG
-    },
-    '&.swap-confirmation-container .__swap-route-container': {
-      marginBottom: 20
+      lineHeight: token.lineHeightLG,
+
+      '.ant-number, .ant-typography': {
+        color: 'inherit !important',
+        fontSize: 'inherit !important',
+        fontWeight: 'inherit !important',
+        lineHeight: 'inherit'
+      }
     }
   };
 });

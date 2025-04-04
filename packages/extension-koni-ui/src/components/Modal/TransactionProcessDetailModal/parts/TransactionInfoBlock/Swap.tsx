@@ -1,14 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { SwapBaseTxData } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
+import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getCurrentCurrencyTotalFee } from '@subwallet/extension-koni-ui/utils';
-import { Number } from '@subwallet/react-ui';
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -39,24 +37,6 @@ const Component: FC<Props> = (props: Props) => {
     return getCurrentCurrencyTotalFee(data.quote.feeInfo.feeComponent, assetRegistryMap, priceMap);
   }, [assetRegistryMap, data.quote.feeInfo.feeComponent, priceMap]);
 
-  const renderRateConfirmInfo = () => {
-    return (
-      <div className={'__quote-rate-wrapper'}>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(fromAssetInfo)}
-          value={1}
-        />
-        <span>&nbsp;~&nbsp;</span>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(toAssetInfo)}
-          value={data.quote.rate}
-        />
-      </div>
-    );
-  };
-
   const originSwapPair = useMemo(() => {
     return getTokenPairFromStep(data.process.steps);
   }, [data.process.steps]);
@@ -66,6 +46,7 @@ const Component: FC<Props> = (props: Props) => {
       className={className}
     >
       <SwapTransactionBlock
+        className={'__swap-transaction-block'}
         fromAmount={data.quote.fromAmount}
         fromAssetSlug={originSwapPair?.from}
         logoSize={36}
@@ -89,7 +70,12 @@ const Component: FC<Props> = (props: Props) => {
           label={t('Quote rate')}
           valueColorSchema={'gray'}
         >
-          {renderRateConfirmInfo()}
+          <QuoteRateDisplay
+            className={'__quote-estimate-swap-value'}
+            fromAssetInfo={fromAssetInfo}
+            rateValue={data.quote.rate}
+            toAssetInfo={toAssetInfo}
+          />
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
@@ -110,7 +96,7 @@ export const Swap = styled(Component)<Props>(({ theme: { token } }: Props) => {
     borderRadius: token.borderRadiusLG,
     paddingBottom: token.padding,
 
-    '.swap-confirmation-container': {
+    '.__swap-transaction-block': {
       '.__summary-quote': {
         marginBottom: token.marginXS
       },
