@@ -90,6 +90,8 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [data.quote.aliveUntil]);
 
+  console.log('process--3', process);
+
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock

@@ -18,7 +18,7 @@ export type ReceiveModalProps = {
 
 export type TransactionProcessStepItemType = {
   status: StepStatus;
-  text: React.ReactNode;
+  content: React.ReactNode;
   index: number,
   logoKey?: string;
   isLastItem?: boolean;

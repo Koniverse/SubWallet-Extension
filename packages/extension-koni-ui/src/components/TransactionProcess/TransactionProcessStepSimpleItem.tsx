@@ -13,7 +13,7 @@ import styled from 'styled-components';
 type Props = ThemeProps & TransactionProcessStepItemType;
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, index, isLastItem, status, text } = props;
+  const { className, content, index, isLastItem, status } = props;
 
   const iconProp = useMemo<SwIconProps>(() => {
     const iconInfo: SwIconProps = (() => {
@@ -83,7 +83,7 @@ const Component: FC<Props> = (props: Props) => {
         }
       </div>
       <div className='__item-right-part'>
-        <div className='__text'>{text}</div>
+        <div className='__content'>{content}</div>
       </div>
     </div>
   );
@@ -157,7 +157,7 @@ export const TransactionProcessStepSimpleItem = styled(Component)<Props>(({ them
       paddingBottom: 4
     },
 
-    '.__text': {
+    '.__content': {
       marginTop: -8,
       minHeight: 40,
       display: 'flex',
