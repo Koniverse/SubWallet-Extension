@@ -4172,25 +4172,6 @@ export default class KoniExtension {
             .map((step, index): ProcessStep => {
               const fee = inputData.process.totalFee[index];
 
-              if (step.type === SwapStepType.SWAP) {
-                const metadata: BriefSwapStep = {
-                  pair: quote.pair,
-                  aliveUntil: quote.aliveUntil,
-                  fromAmount: quote.fromAmount,
-                  rate: quote.rate,
-                  provider: quote.provider,
-                  route: quote.route,
-                  toAmount: quote.toAmount
-                };
-
-                return {
-                  ...step,
-                  status: StepStatus.QUEUED,
-                  fee,
-                  metadata: metadata as unknown as Record<string, unknown>
-                };
-              }
-
               return {
                 ...step,
                 fee,
@@ -4200,39 +4181,6 @@ export default class KoniExtension {
             .filter((step) => step.type !== CommonStepType.DEFAULT),
           status: StepStatus.QUEUED
         });
-      }
-
-      const isLastStep = inputData.currentStep === process.steps.length - 1;
-
-      if (isLastStep) {
-        const metadata: BriefSwapStep = {
-          pair: quote.pair,
-          aliveUntil: quote.aliveUntil,
-          fromAmount: quote.fromAmount,
-          rate: quote.rate,
-          provider: quote.provider,
-          route: quote.route,
-          toAmount: quote.toAmount
-        };
-
-        const step: ProcessStep = {
-          ..._step,
-          // In case one sign, status already set to prepare before
-          status: process.steps.length > 2 ? StepStatus.PREPARE : StepStatus.QUEUED,
-          fee: process.totalFee[inputData.currentStep],
-          metadata: metadata as unknown as Record<string, unknown>
-        };
-
-        const combineInfo: SwapBaseTxData = {
-          provider: quote.provider,
-          slippage: inputData.slippage,
-          address,
-          recipient,
-          quote,
-          process
-        };
-
-        await this.#koniState.transactionService.updateProcessInfo(processId, combineInfo, step);
       }
     }
 
