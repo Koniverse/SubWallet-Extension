@@ -121,8 +121,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       type: SwapStepType.SWAP,
       // @ts-ignore
       metadata: {
-        sendingValue: bnSendingValue.toString(),
-        expectedReceive: bnExpectedReceive.toString(),
+        sendingValue: bnSendingValue.toFixed(0, 1),
+        expectedReceive: bnExpectedReceive.toFixed(0, 1),
         originTokenInfo,
         destinationTokenInfo,
         sender: _reformatAddressWithChain(params.request.address, originChain),

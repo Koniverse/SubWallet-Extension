@@ -177,7 +177,7 @@ export class SwapBaseHandler {
 
         if (xcmSwapXcm) {
           bnSendingValue = bnSendingValue.multipliedBy(1.02);
-          expectedReceive = bnSendingValue.toString();
+          expectedReceive = bnSendingValue.toFixed(0, 1);
         }
 
         if (isBridgeNativeToken) {
@@ -202,7 +202,7 @@ export class SwapBaseHandler {
       const step: BaseStepDetail = {
         // @ts-ignore
         metadata: {
-          sendingValue: bnSendingValue.toString(),
+          sendingValue: bnSendingValue.toFixed(0, 1),
           expectedReceive,
           originTokenInfo: fromTokenInfo,
           destinationTokenInfo: toTokenInfo,
