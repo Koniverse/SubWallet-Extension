@@ -17,7 +17,8 @@ export default class FeeService {
     evm: {},
     substrate: {},
     ton: {},
-    cardano: {}
+    cardano: {},
+    bitcoin: {}
   };
 
   constructor (state: KoniState) {

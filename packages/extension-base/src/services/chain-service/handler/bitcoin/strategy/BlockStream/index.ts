@@ -37,7 +37,7 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
   private headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${_BEAR_TOKEN}`
+    Authorization: `Bearer ${_BEAR_TOKEN}`
   };
 
   isRateLimited (): boolean {
