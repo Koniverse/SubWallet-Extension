@@ -5,7 +5,7 @@ import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
-import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType, SwapStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -235,10 +235,20 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
     return undefined;
   }
 
+  const isStepValidIfSwap = (step: CommonStepDetail) => {
+    const metadata = step.metadata as unknown as (BaseSwapStepMetadata | undefined);
+
+    return step.type !== SwapStepType.SWAP || (!!metadata?.version && (metadata?.version >= 2));
+  };
+
   if (mainSteps.length === 1) {
+    if (!isStepValidIfSwap(mainSteps[0])) {
+      return undefined;
+    }
+
     const metadata = mainSteps[0].metadata as unknown as BaseSwapStepMetadata;
 
-    if (!metadata || !(metadata.version > 1)) {
+    if (!metadata) {
       return undefined;
     }
 
@@ -252,10 +262,14 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   const firstStep = mainSteps[0];
   const lastStep = mainSteps[mainSteps.length - 1];
 
+  if (!isStepValidIfSwap(firstStep) || !isStepValidIfSwap(lastStep)) {
+    return undefined;
+  }
+
   const firstMetadata = firstStep.metadata as unknown as BaseSwapStepMetadata;
   const lastMetadata = lastStep.metadata as unknown as BaseSwapStepMetadata;
 
-  if (!(firstMetadata?.version > 1) || !(lastMetadata?.version > 1)) {
+  if (!firstMetadata || !lastMetadata) {
     return undefined;
   }
 
