@@ -109,7 +109,7 @@ function Component (props: Props): React.ReactElement<Props> {
   return (
     <SwModal
       className={CN(className, {
-        '-stretch-height': !!searchBox
+        '-has-search-box': !!searchBox
       })}
       closeIcon={closeIcon}
       footer={filterModalFooter}
@@ -141,12 +141,6 @@ function Component (props: Props): React.ReactElement<Props> {
 
 export const FilterModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    '&.-stretch-height': {
-      '.ant-sw-modal-content': {
-        height: '100vh'
-      }
-    },
-
     '.ant-sw-modal-body': {
       overflow: 'auto',
       display: 'flex',
@@ -165,7 +159,6 @@ export const FilterModal = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.__list-container': {
       flex: 1,
-      paddingTop: token.padding,
       overflow: 'auto'
     },
 
@@ -180,6 +173,16 @@ export const FilterModal = styled(Component)<Props>(({ theme: { token } }: Props
     '.ant-checkbox-wrapper': {
       display: 'flex',
       alignItems: 'center'
+    },
+
+    '&.-has-search-box': {
+      '.ant-sw-modal-content': {
+        height: '100vh'
+      },
+
+      '.__list-container': {
+        paddingTop: token.padding
+      }
     }
   });
 });
