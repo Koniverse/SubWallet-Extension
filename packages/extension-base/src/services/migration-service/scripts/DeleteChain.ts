@@ -10,6 +10,6 @@ export default class DeleteChain extends BaseMigrationJob {
       this.state.forceRemoveChain(chain);
     });
 
-    console.log('done job');
+    console.log('done job ');
   }
 }

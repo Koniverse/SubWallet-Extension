@@ -121,7 +121,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <Component
           closeAlert={closeAlert}
           openAlert={openAlert}
-          transaction={transaction}
+          process={process}
         />
       );
     }

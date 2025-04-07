@@ -9,7 +9,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getMultiChainAsset, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, ProcessType } from '@subwallet/extension-base/types';
+import {AccountProxy, AccountProxyType, ProcessType, SwapStepType} from '@subwallet/extension-base/types';
 import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
@@ -22,7 +22,13 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SW
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useDefaultNavigate, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { getLatestSwapQuote, handleSwapRequest, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import {
+  generateOptimalProcess,
+  getLatestSwapQuote,
+  handleSwapRequest,
+  handleSwapStep,
+  validateSwapProcess
+} from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, FreeBalanceToEarn, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -102,6 +108,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [quoteOptions, setQuoteOptions] = useState<SwapQuote[]>([]);
   const [currentQuote, setCurrentQuote] = useState<SwapQuote | undefined>(undefined);
+  const [confirmQuoteLoading, setConfirmQuoteLoading] = useState(false);
+  const [tempQuote, setTempQuote] = useState<SwapQuote | undefined>(undefined);
   const [quoteAliveUntil, setQuoteAliveUntil] = useState<number | undefined>(undefined);
   const [currentQuoteRequest, setCurrentQuoteRequest] = useState<SwapRequest | undefined>(undefined);
   const [feeOptions, setFeeOptions] = useState<string[] | undefined>([]);
@@ -394,21 +402,75 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     activeModal(SWAP_CHOOSE_FEE_TOKEN_MODAL);
   }, [activeModal]);
 
-  const onSelectQuote = useCallback((quote: SwapQuote) => {
-    setCurrentQuote(quote);
-    setFeeOptions(quote.feeInfo.feeOptions);
-    setCurrentFeeOption(quote.feeInfo.feeOptions?.[0]);
+  const handleGenerateOptimalProcess = useCallback(
+    async (quote: SwapQuote) => {
+      try {
+        const currentRequest: SwapRequest = {
+          address: fromValue,
+          pair: quote.pair,
+          fromAmount: quote.fromAmount,
+          slippage: currentSlippage.slippage.toNumber(),
+          recipient: recipientValue || undefined,
+          currentQuote: quote.provider
+        };
 
-    setCurrentQuoteRequest((oldRequest) => {
-      if (!oldRequest) {
-        return undefined;
+        const optimalRequest = {
+          request: currentRequest,
+          selectedQuote: quote
+        };
+
+        return await generateOptimalProcess(optimalRequest);
+      } catch (error) {
+        console.error('generateOptimalProcess failed:', error);
+
+        return null;
+      }
+    },
+    [fromValue, currentSlippage.slippage, recipientValue]
+  );
+
+  const onConfirmationItem = useCallback(
+    async (quote: SwapQuote) => {
+      setConfirmQuoteLoading(true);
+      const processResult = await handleGenerateOptimalProcess(quote);
+      console.log('processResult', processResult);
+
+      if (!processResult) {
+        return;
       }
 
-      return {
-        ...oldRequest,
-        currentQuote: quote.provider
-      };
-    });
+      setOptimalSwapPath(processResult);
+      dispatchProcessState({
+        payload: {
+          steps: processResult.steps,
+          feeStructure: processResult.totalFee
+        },
+        type: CommonActionType.STEP_CREATE
+      });
+
+      setCurrentQuote(quote);
+      setFeeOptions(quote.feeInfo.feeOptions);
+      setCurrentFeeOption(quote.feeInfo.feeOptions?.[0]);
+
+      setCurrentQuoteRequest((oldRequest) => {
+        if (!oldRequest) {
+          return undefined;
+        }
+
+        return {
+          ...oldRequest,
+          currentQuote: quote.provider
+        };
+      });
+
+      setConfirmQuoteLoading(false);
+      inactiveModal(SWAP_ALL_QUOTES_MODAL);
+    },
+    [handleGenerateOptimalProcess, inactiveModal]
+  );
+
+  const onSelectQuote = useCallback((quote: SwapQuote) => {
+    setTempQuote(quote);
   }, []);
 
   const onSelectFeeOption = useCallback((slug: string) => {
@@ -666,8 +728,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             }
           } else {
             let latestOptimalQuote = currentQuote;
-
-            if (currentOptimalSwapPath.steps.length > 2 && isLastStep) {
+            const specialCaseForUniswap =
+              latestOptimalQuote.provider.id === SwapProviderId.UNISWAP &&
+              !!currentOptimalSwapPath.steps.find(step => step.type === SwapStepType.PERMIT);
+            if (currentOptimalSwapPath.steps.length > 2 && isLastStep && !specialCaseForUniswap) {
               if (currentQuoteRequest) {
                 const latestSwapQuote = await getLatestSwapQuote(currentQuoteRequest);
 
@@ -687,6 +751,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 id: processId,
                 type: ProcessType.SWAP,
                 request: {
+                  cacheProcessId: processId,
                   process: currentOptimalSwapPath,
                   currentStep: step,
                   quote: latestOptimalQuote,
@@ -703,6 +768,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               return true;
             } else {
               const submitPromise: Promise<SWTransactionResponse> = handleSwapStep({
+                cacheProcessId: processId,
                 process: currentOptimalSwapPath,
                 currentStep: step,
                 quote: latestOptimalQuote,
@@ -1018,6 +1084,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
               setQuoteOptions(result.quote.quotes);
               setCurrentQuote(result.quote.optimalQuote);
+              setTempQuote(result.quote.optimalQuote);
               setQuoteAliveUntil(result.quote.aliveUntil);
               setFeeOptions(result.quote.optimalQuote?.feeInfo?.feeOptions || []);
               setCurrentFeeOption(result.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
@@ -1629,10 +1696,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       />
       <SwapQuotesSelectorModal
         items={quoteOptions}
+        loading={confirmQuoteLoading}
         modalId={SWAP_ALL_QUOTES_MODAL}
         onSelectItem={onSelectQuote}
+        onConfirmationItem={onConfirmationItem}
         optimalQuoteItem={optimalQuoteRef.current}
-        selectedItem={currentQuote}
+        selectedItem={tempQuote}
       />
       <SwapTermsOfServiceModal onOk={onAfterConfirmTermModal} />
       <SwapIdleWarningModal

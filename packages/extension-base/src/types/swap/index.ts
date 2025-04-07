@@ -4,7 +4,12 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
+import {
+  BaseStepDetail,
+  BaseStepType,
+  CommonOptimalPath,
+  CommonStepFeeInfo
+} from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
 import { BaseProcessRequestSign, TransactionData } from '../transaction';
@@ -58,7 +63,8 @@ export enum SwapErrorType {
 }
 
 export enum SwapStepType {
-  SWAP = 'SWAP'
+  SWAP = 'SWAP',
+  PERMIT = 'PERMIT'
 }
 
 export enum SwapProviderId {
@@ -70,7 +76,8 @@ export enum SwapProviderId {
   KUSAMA_ASSET_HUB = 'KUSAMA_ASSET_HUB',
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
-  SIMPLE_SWAP = 'SIMPLE_SWAP'
+  SIMPLE_SWAP = 'SIMPLE_SWAP',
+  UNISWAP = 'UNISWAP'
 }
 
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
@@ -80,9 +87,10 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
-  SwapProviderId.ROCOCO_ASSET_HUB,
-  // SwapProviderId.WESTEND_ASSET_HUB,
-  SwapProviderId.SIMPLE_SWAP
+  // SwapProviderId.ROCOCO_ASSET_HUB,
+  SwapProviderId.WESTEND_ASSET_HUB,
+  SwapProviderId.SIMPLE_SWAP,
+  SwapProviderId.UNISWAP
 ];
 
 export interface SwapProvider {
@@ -185,6 +193,7 @@ export interface SwapSubmitParams extends BaseProcessRequestSign {
   address: string;
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
+  cacheProcessId: string;
 }
 
 export interface SwapSubmitStepData {
@@ -193,7 +202,8 @@ export interface SwapSubmitStepData {
   extrinsic: TransactionData;
   transferNativeAmount: string;
   extrinsicType: ExtrinsicType;
-  chainType: ChainType
+  chainType: ChainType;
+  isPermit?: boolean;
 }
 
 export interface OptimalSwapPathParams {
@@ -220,6 +230,11 @@ export interface ValidateSwapProcessParams {
 export interface SlippageType {
   slippage: BigN,
   isCustomType: boolean
+}
+
+export interface PermitSwapData {
+  processId: string;
+  step: BaseStepType;
 }
 
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%

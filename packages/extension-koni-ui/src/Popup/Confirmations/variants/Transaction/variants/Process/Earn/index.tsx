@@ -1,21 +1,21 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EarningProcessType, ProcessTransactionData, SummaryEarningProcessData } from '@subwallet/extension-base/types';
-import YieldProcessConfirmation from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/Process/Earn/JoinYieldPool';
+import { EarningProcessType, SummaryEarningProcessData } from '@subwallet/extension-base/types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { BaseProcessConfirmationProps } from '../Base';
 import NativeStakingProcessConfirmation from './Bond';
 import NominationPoolProcessConfirmation from './JoinPool';
+import YieldProcessConfirmation from './JoinYieldPool';
 
 type Props = BaseProcessConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { transaction } = props;
+  const { process } = props;
 
-  const type = useMemo(() => ((transaction.process as ProcessTransactionData).combineInfo as SummaryEarningProcessData).type, [transaction.process]);
+  const type = useMemo(() => (process.combineInfo as SummaryEarningProcessData).type, [process]);
 
   if (type === EarningProcessType.NATIVE_STAKING) {
     return <NativeStakingProcessConfirmation {...props} />;

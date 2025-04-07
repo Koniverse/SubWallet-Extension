@@ -3,7 +3,7 @@
 
 import { RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { ProcessTransactionData, SummaryEarningProcessData } from '@subwallet/extension-base/types';
+import { SummaryEarningProcessData } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug, useGetTransactionProcessSteps } from '@subwallet/extension-koni-ui/hooks';
@@ -18,19 +18,20 @@ import { BaseProcessConfirmationProps } from '../Base';
 type Props = BaseProcessConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, transaction } = props;
+  const { className, process } = props;
 
-  const process = useMemo(() => transaction.process as ProcessTransactionData, [transaction.process]);
-  const data = useMemo(() => (process.combineInfo as SummaryEarningProcessData).data as unknown as RequestBondingSubmit, [process.combineInfo]);
+  const combinedInfo = useMemo(() => process.combineInfo as SummaryEarningProcessData, [process.combineInfo]);
+  const chain = useMemo(() => combinedInfo.brief.chain, [combinedInfo.brief.chain]);
+  const data = useMemo(() => combinedInfo.data as unknown as RequestBondingSubmit, [combinedInfo]);
 
   const handleValidatorLabel = useMemo(() => {
-    return getValidatorLabel(transaction.chain);
-  }, [transaction.chain]);
-  const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
+    return getValidatorLabel(chain);
+  }, [chain]);
+  const networkPrefix = useGetChainPrefixBySlug(chain);
 
   const { t } = useTranslation();
 
-  const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
 
   const getTransactionProcessSteps = useGetTransactionProcessSteps();
 
@@ -41,8 +42,8 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <CommonTransactionInfo
-        address={transaction.address}
-        network={transaction.chain}
+        address={data.address}
+        network={chain}
       />
       <MetaInfo
         className={'meta-info'}
@@ -62,11 +63,16 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.amount}
         />
 
+        {
+          /**
+           * TODO: Convert value from steps' fee
+           * */
+        }
         <MetaInfo.Number
           decimals={decimals}
           label={t('Estimated fee')}
           suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
+          value={0}
         />
 
         <MetaInfo.TransactionProcess

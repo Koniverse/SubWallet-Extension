@@ -13,7 +13,7 @@ import { BaseNftApi } from '@subwallet/extension-base/koni/api/nft/nft';
 import OrdinalNftApi from '@subwallet/extension-base/koni/api/nft/ordinal_nft';
 import { RmrkNftApi } from '@subwallet/extension-base/koni/api/nft/rmrk_nft';
 import { UniqueNftApi } from '@subwallet/extension-base/koni/api/nft/unique_network_nft';
-// import UniqueNftApi from '@subwallet/extension-base/koni/api/nft/unique_nft';
+
 import { VaraNftApi } from '@subwallet/extension-base/koni/api/nft/vara_nft';
 import { WasmNftApi } from '@subwallet/extension-base/koni/api/nft/wasm_nft';
 import { _NFT_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';

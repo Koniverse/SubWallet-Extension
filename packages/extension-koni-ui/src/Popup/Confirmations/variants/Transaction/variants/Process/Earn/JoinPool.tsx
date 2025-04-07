@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProcessTransactionData, SubmitJoinNominationPool, SummaryEarningProcessData } from '@subwallet/extension-base/types';
+import { SubmitJoinNominationPool, SummaryEarningProcessData } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetTransactionProcessSteps } from '@subwallet/extension-koni-ui/hooks';
@@ -16,12 +16,13 @@ import { BaseProcessConfirmationProps } from '../Base';
 type Props = BaseProcessConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, transaction } = props;
-  const process = useMemo(() => transaction.process as ProcessTransactionData, [transaction.process]);
-  const data = useMemo(() => (process.combineInfo as SummaryEarningProcessData).data as unknown as SubmitJoinNominationPool, [process.combineInfo]);
+  const { className, process } = props;
+  const combinedInfo = useMemo(() => process.combineInfo as SummaryEarningProcessData, [process.combineInfo]);
+  const chain = useMemo(() => combinedInfo.brief.chain, [combinedInfo.brief.chain]);
+  const data = useMemo(() => combinedInfo.data as unknown as SubmitJoinNominationPool, [combinedInfo]);
 
   const { t } = useTranslation();
-  const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
 
   const getTransactionProcessSteps = useGetTransactionProcessSteps();
 
@@ -32,8 +33,8 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <CommonTransactionInfo
-        address={transaction.address}
-        network={transaction.chain}
+        address={data.address}
+        network={chain}
       />
       <MetaInfo
         className={'meta-info'}
@@ -58,11 +59,16 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.amount}
         />
 
+        {
+          /**
+           * TODO: Convert value from steps' fee
+           * */
+        }
         <MetaInfo.Number
           decimals={decimals}
           label={t('Estimated fee')}
           suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
+          value={0}
         />
 
         <MetaInfo.TransactionProcess

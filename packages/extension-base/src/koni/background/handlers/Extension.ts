@@ -46,18 +46,122 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
-import { SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import {
+  SWPermitTransaction,
+  SWTransaction,
+  SWTransactionInput,
+  SWTransactionResponse,
+  SWTransactionResult,
+  TransactionEmitter,
+  TransactionEventResponse,
+  ValidateTransactionResponseInput
+} from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountsStore } from '@subwallet/extension-base/stores';
-import { AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, BriefSwapStep, BuyServiceInfo, BuyTokenInfo, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeInfo, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapStepType, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import {
+  AccountJson,
+  AccountProxyMap,
+  AccountSignMode,
+  AccountsWithCurrentAddress,
+  BalanceJson,
+  BasicTxErrorType,
+  BasicTxWarningCode,
+  BriefProcessStep,
+  BriefSwapStep,
+  BuyServiceInfo,
+  BuyTokenInfo,
+  CommonStepFeeInfo,
+  CommonStepType,
+  EarningProcessType,
+  EarningRewardJson,
+  EvmFeeInfo,
+  FeeChainType,
+  FeeInfo, HandleYieldStepData,
+  NominationPoolInfo,
+  OptimalYieldPathParams,
+  ProcessStep,
+  ProcessTransactionData,
+  ProcessType,
+  RequestAccountBatchExportV2,
+  RequestAccountCreateSuriV2,
+  RequestAccountNameValidate,
+  RequestBatchJsonGetAccountInfo,
+  RequestBatchRestoreV2,
+  RequestBounceableValidate,
+  RequestChangeAllowOneSign,
+  RequestChangeTonWalletContractVersion,
+  RequestCheckPublicAndSecretKey,
+  RequestCrossChainTransfer,
+  RequestDeriveCreateMultiple,
+  RequestDeriveCreateV3,
+  RequestDeriveValidateV2,
+  RequestEarlyValidateYield,
+  RequestExportAccountProxyMnemonic,
+  RequestGetAllTonWalletContractVersion,
+  RequestGetAmountForPair,
+  RequestGetDeriveAccounts,
+  RequestGetDeriveSuggestion,
+  RequestGetTokensCanPayFee,
+  RequestGetYieldPoolTargets,
+  RequestInputAccountSubscribe,
+  RequestJsonGetAccountInfo,
+  RequestJsonRestoreV2,
+  RequestMetadataHash,
+  RequestMnemonicCreateV2,
+  RequestMnemonicValidateV2,
+  RequestPrivateKeyValidateV2,
+  RequestShortenMetadata,
+  RequestStakeCancelWithdrawal,
+  RequestStakeClaimReward,
+  RequestSubmitProcessTransaction,
+  RequestSubscribeProcessById,
+  RequestUnlockDotCheckCanMint,
+  RequestUnlockDotSubscribeMintedData,
+  RequestYieldLeave,
+  RequestYieldStepSubmit,
+  RequestYieldWithdrawal,
+  ResponseAccountBatchExportV2,
+  ResponseAccountCreateSuriV2,
+  ResponseAccountNameValidate,
+  ResponseBatchJsonGetAccountInfo,
+  ResponseCheckPublicAndSecretKey,
+  ResponseDeriveValidateV2,
+  ResponseExportAccountProxyMnemonic,
+  ResponseGetAllTonWalletContractVersion,
+  ResponseGetDeriveAccounts,
+  ResponseGetDeriveSuggestion,
+  ResponseGetYieldPoolTargets,
+  ResponseInputAccountSubscribe,
+  ResponseJsonGetAccountInfo,
+  ResponseMetadataHash,
+  ResponseMnemonicCreateV2,
+  ResponseMnemonicValidateV2,
+  ResponsePrivateKeyValidateV2,
+  ResponseShortenMetadata,
+  ResponseSubscribeProcessAlive,
+  ResponseSubscribeProcessById,
+  StakingTxErrorType,
+  StepStatus,
+  StorageDataInterface,
+  SummaryEarningProcessData,
+  SwapBaseTxData,
+  SwapFeeType, SwapProviderId,
+  SwapStepType,
+  SwapSubmitStepData,
+  TokenSpendingApprovalParams,
+  ValidateYieldProcessParams,
+  YieldPoolType,
+  YieldStepType,
+  YieldTokenBaseInfo
+} from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
-import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { OptimalSwapPathParams, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, createTransactionFromRLP, detectTransferTxType, getAccountSignMode, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -3490,8 +3594,20 @@ export default class KoniExtension {
         .generateBeforeHandleResponseErrors(yieldValidation);
     }
 
+    let submitData: HandleYieldStepData;
+
+    try {
+      submitData = await this.#koniState.earningService.handleYieldJoin(inputData);
+    } catch (e) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      throw e;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = await this.#koniState.earningService.handleYieldJoin(inputData);
+    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = submitData;
     const isPoolSupportAlternativeFee = this.#koniState.earningService.isPoolSupportAlternativeFee(inputData.data.slug);
     const poolHandler = this.#koniState.earningService.getPoolHandler(data.slug);
 
@@ -3993,6 +4109,10 @@ export default class KoniExtension {
     return this.#koniState.swapService.getSwapPairs();
   }
 
+  private async generateOptimalProcess (request: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+    return this.#koniState.swapService.generateOptimalProcess(request);
+  }
+
   private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
     return this.#koniState.swapService.handleSwapRequest(request);
   }
@@ -4040,8 +4160,20 @@ export default class KoniExtension {
         .generateBeforeHandleResponseErrors(swapValidations);
     }
 
+    let submitData: SwapSubmitStepData;
+
+    try {
+      submitData = await this.#koniState.swapService.handleSwapProcess(inputData);
+    } catch (e) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      throw e;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = await this.#koniState.swapService.handleSwapProcess(inputData);
+    const { chainType, extrinsic, extrinsicType, isPermit, transferNativeAmount, txChain, txData } = submitData;
     // const chosenFeeToken = process.steps.findIndex((step) => step.type === SwapStepType.SET_FEE_TOKEN) > -1;
     // const allowSkipValidation = [ExtrinsicType.SET_FEE_TOKEN, ExtrinsicType.SWAP].includes(extrinsicType);
 
@@ -4136,6 +4268,24 @@ export default class KoniExtension {
 
         await this.#koniState.transactionService.updateProcessInfo(processId, combineInfo, step);
       }
+    }
+
+    if (isPermit) {
+      return await this.#koniState.transactionService.handlePermitTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic as unknown as SWPermitTransaction['transaction'],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        eventsHandler,
+        step
+      });
     }
 
     return await this.#koniState.transactionService.handleTransaction({
@@ -4397,7 +4547,9 @@ export default class KoniExtension {
               ? (rs: TransactionEventResponse) => callback(rs as SWTransactionResponse)
               : undefined;
 
-            if (stepNums > 2 && isLastStep) {
+            const specialCaseForUniswap = data.quote.provider.id === SwapProviderId.UNISWAP && !!data.process.steps.find((step) => step.type === SwapStepType.PERMIT);
+
+            if (stepNums > 2 && isLastStep && !specialCaseForUniswap) {
               const quote = data.quote;
               const latestSwapQuote = await this.getLatestSwapQuote({
                 address: data.address,
@@ -5125,6 +5277,8 @@ export default class KoniExtension {
         /* Swap service */
       case 'pri(swapService.subscribePairs)':
         return this.subscribeSwapPairs(id, port);
+      case 'pri(swapService.generateOptimalProcess)':
+        return this.generateOptimalProcess(request as OptimalSwapPathParams);
       case 'pri(swapService.handleSwapRequest)':
         return this.handleSwapRequest(request as SwapRequest);
       case 'pri(swapService.getLatestQuote)':

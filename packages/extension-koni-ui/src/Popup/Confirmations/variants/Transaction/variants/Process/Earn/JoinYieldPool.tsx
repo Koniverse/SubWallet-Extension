@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { ProcessTransactionData, SubmitYieldStepData, SummaryEarningProcessData } from '@subwallet/extension-base/types';
+import { SubmitYieldStepData, SummaryEarningProcessData } from '@subwallet/extension-base/types';
 import { CommonTransactionInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import CN from 'classnames';
@@ -15,11 +15,12 @@ import { BaseProcessConfirmationProps } from '../Base';
 type Props = BaseProcessConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, transaction } = props;
+  const { className, process } = props;
   const { t } = useTranslation();
 
-  const process = useMemo(() => transaction.process as ProcessTransactionData, [transaction.process]);
-  const txParams = useMemo(() => (process.combineInfo as SummaryEarningProcessData).data as unknown as SubmitYieldStepData, [process.combineInfo]);
+  const combinedInfo = useMemo(() => process.combineInfo as SummaryEarningProcessData, [process.combineInfo]);
+  const chain = useMemo(() => combinedInfo.brief.chain, [combinedInfo.brief.chain]);
+  const txParams = useMemo(() => combinedInfo.data as unknown as SubmitYieldStepData, [combinedInfo]);
 
   const { assetRegistry: tokenInfoMap } = useSelector((state) => state.assetRegistry);
 
@@ -67,8 +68,8 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <CommonTransactionInfo
-        address={transaction.address}
-        network={transaction.chain}
+        address={process.address}
+        network={chain}
       />
       <MetaInfo
         className={'meta-info'}
@@ -90,11 +91,16 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )}
 
+        {
+          /**
+           * TODO: Convert value from steps' fee
+           * */
+        }
         <MetaInfo.Number
           decimals={feeTokenDecimals}
           label={t('Estimated fee')}
           suffix={feeTokenSymbol}
-          value={transaction.estimateFee?.value || 0}
+          value={0}
         />
 
         <MetaInfo.TransactionProcess

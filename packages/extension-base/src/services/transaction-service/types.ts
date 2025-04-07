@@ -9,6 +9,7 @@ import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
+import {SignTypedDataMessageV3V4} from "@subwallet/extension-base/core/logic-validation";
 
 export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee {
   id: string;
@@ -33,6 +34,10 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   step?: BriefProcessStep;
 }
 
+export interface SWPermitTransaction extends Omit<SWTransaction, 'transaction'> {
+  transaction: SignTypedDataMessageV3V4;
+}
+
 export interface SWTransactionResult extends Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {
   process?: ProcessTransactionData;
 }
@@ -50,6 +55,10 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   isTransferLocalTokenAndPayThatTokenAsFee?: boolean;
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
+}
+
+export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
+  transaction?: SWPermitTransaction['transaction'] | null;
 }
 
 export type SWTransactionResponse = SwInputBase & Pick<SWTransaction, 'warnings' | 'errors'> & Partial<Pick<SWTransaction, 'id' | 'extrinsicHash' | 'status' | 'estimateFee'>> & TransactionFee & {
