@@ -15,12 +15,13 @@ import { useMemo } from 'react';
 //  - order the result
 
 // Helper function to create an AccountChainAddress object
-const createChainAddress = (
+const createChainAddressItem = (
   accountType: KeypairType,
   chainInfo: _ChainInfo,
-  address: string,
-  isBitcoin: boolean
+  address: string
 ): AccountChainAddress => {
+  const isBitcoin = [_BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG].includes(chainInfo.slug);
+
   if (isBitcoin) {
     const bitcoinInfo = getBitcoinAccountDetails(accountType);
 
@@ -55,15 +56,13 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
         const reformatedAddress = getReformatAddress(a, chainInfo);
 
         if (reformatedAddress) {
-          const isBitcoin = [_BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG].includes(chain);
-          const chainAddress = createChainAddress(
+          const chainAddressItem = createChainAddressItem(
             a.type,
             chainInfo,
-            reformatedAddress,
-            isBitcoin
+            reformatedAddress
           );
 
-          result.push(chainAddress);
+          result.push(chainAddressItem);
         }
       }
     });
