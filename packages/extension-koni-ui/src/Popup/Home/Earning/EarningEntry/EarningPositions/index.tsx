@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
@@ -30,6 +31,12 @@ type Props = ThemeProps & {
 
 const FILTER_MODAL_ID = 'earning-positions-filter-modal';
 const alertModalId = 'earning-positions-alert-modal';
+
+const getOrdinalChainTypeValue = (item: ExtraYieldPositionInfo, chainInfoMap: Record<string, _ChainInfo>): number => {
+  const chainInfo = chainInfoMap[item.chain];
+
+  return chainInfo?.isTestnet ? 0 : 1;
+};
 
 function Component ({ className, earningPositions, setEntryView, setLoading }: Props) {
   const { t } = useTranslation();
@@ -74,9 +81,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
             .toNumber();
         };
 
-        return getValue(secondItem) - getValue(firstItem);
+        return getOrdinalChainTypeValue(secondItem, chainInfoMap) - getOrdinalChainTypeValue(firstItem, chainInfoMap) ||
+          getValue(secondItem) - getValue(firstItem);
       });
-  }, [assetInfoMap, currencyData, earningPositions, priceMap]);
+  }, [assetInfoMap, chainInfoMap, currencyData, earningPositions, priceMap]);
 
   const chainStakingBoth = useMemo(() => {
     if (!currentAccountProxy) {

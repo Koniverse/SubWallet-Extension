@@ -12,6 +12,7 @@ export type TokenSelectorItemType = {
   balanceInfo?: {
     isReady: boolean;
     isNotSupport: boolean;
+    isTestnet: boolean;
     free: BalanceValueInfo;
     locked: BalanceValueInfo;
     total: BalanceValueInfo;

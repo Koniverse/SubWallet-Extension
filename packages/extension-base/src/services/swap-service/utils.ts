@@ -3,9 +3,9 @@
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
-import { BriefStepV2, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
 
@@ -208,7 +208,7 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   return mainSteps.reduce((chainRoute, currentStep, currentIndex) => {
-    const metadata = currentStep.metadata as unknown as BriefStepV2;
+    const metadata = currentStep.metadata as unknown as BaseSwapStepMetadata;
 
     if (!metadata) {
       console.error('Step has no metadata');
@@ -227,9 +227,8 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
   }, [] as string[]);
 }
 
+// note: this function may return undefined if metadata version is < 2 or does not exist
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
-  // todo: handle metadata for other providers than hydra & pah. Also add validate metadata.
-  // todo: opt2: make data about sending and receiving token is required.
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
   if (!mainSteps.length) {
@@ -237,28 +236,53 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   }
 
   if (mainSteps.length === 1) {
-    const metadata = mainSteps[0].metadata as unknown as BriefStepV2;
+    const metadata = mainSteps[0].metadata as unknown as BaseSwapStepMetadata;
 
-    if (!metadata) {
+    if (!metadata || !(metadata.version > 1)) {
       return undefined;
     }
 
     return {
       from: metadata.originTokenInfo.slug,
       to: metadata.destinationTokenInfo.slug,
-      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+      slug: _parseAssetRefKey(metadata.originTokenInfo.slug, metadata.destinationTokenInfo.slug)
     };
   }
 
   const firstStep = mainSteps[0];
   const lastStep = mainSteps[mainSteps.length - 1];
 
-  const firstMetadata = firstStep.metadata as unknown as BriefStepV2;
-  const lastMetadata = lastStep.metadata as unknown as BriefStepV2;
+  const firstMetadata = firstStep.metadata as unknown as BaseSwapStepMetadata;
+  const lastMetadata = lastStep.metadata as unknown as BaseSwapStepMetadata;
+
+  if (!(firstMetadata?.version > 1) || !(lastMetadata?.version > 1)) {
+    return undefined;
+  }
 
   return {
     from: firstMetadata.originTokenInfo.slug,
     to: lastMetadata.destinationTokenInfo.slug,
-    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+    slug: _parseAssetRefKey(firstMetadata.originTokenInfo.slug, lastMetadata.destinationTokenInfo.slug)
   };
 }
+
+export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
+  const swapChains: string[] = [];
+
+  path.forEach((pathElement) => {
+    const fromAssetOriginChain = _getOriginChainOfAsset(pathElement.pair.from);
+    const toAssetOriginChain = _getOriginChainOfAsset(pathElement.pair.to);
+
+    if (swapChains.at(-1) !== fromAssetOriginChain) {
+      swapChains.push(fromAssetOriginChain);
+    }
+
+    if (swapChains.at(-1) !== toAssetOriginChain) {
+      swapChains.push(toAssetOriginChain);
+    }
+  });
+
+  return swapChains;
+}
+
+export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.02; // add 2%

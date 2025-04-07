@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
-import { ProcessTransactionData } from '@subwallet/extension-base/types';
+import { getSwapChainsFromPath, getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
+import { ProcessTransactionData, ProcessType } from '@subwallet/extension-base/types';
 import { SwapBaseTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetSwapProcessSteps, useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -64,10 +64,19 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [data.quote.estimatedArrivalTime]);
 
   const getTransactionProcessSteps = useGetTransactionProcessSteps();
+  const getSwapProcessSteps = useGetSwapProcessSteps();
 
   const stepItems = useMemo(() => {
-    return getTransactionProcessSteps(process.steps, process.combineInfo, false);
-  }, [getTransactionProcessSteps, process.combineInfo, process.steps]);
+    if (process.type === ProcessType.SWAP) {
+      return getSwapProcessSteps(data.process, data.quote);
+    }
+
+    return getTransactionProcessSteps(process.steps, data, false);
+  }, [process.type, process.steps, getTransactionProcessSteps, data, getSwapProcessSteps]);
+
+  const processChains = useMemo(() => {
+    return getSwapChainsFromPath(data.process.path);
+  }, [data.process.path]);
 
   const originSwapPair = useMemo(() => {
     return getTokenPairFromStep(data.process.steps);
@@ -135,6 +144,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.TransactionProcess
           items={stepItems}
+          processChains={processChains}
           type={process.type}
         />
 
@@ -152,16 +162,17 @@ const Component: React.FC<Props> = (props: Props) => {
         {/*     type='warning' */}
         {/*   /> */}
         {/* )} */}
-        {showQuoteExpired &&
-          (
-            <AlertBox
-              className={'__swap-quote-expired'}
-              description={t('Swap quote expired. Cancel to get a new quote.')}
-              title={t('Pay attention!')}
-              type='warning'
-            />)
-        }
       </MetaInfo>
+
+      {showQuoteExpired &&
+        (
+          <AlertBox
+            className={'__swap-quote-expired'}
+            description={t('Swap quote expired. Cancel to get a new quote.')}
+            title={t('Pay attention!')}
+            type='warning'
+          />)
+      }
     </div>
   );
 };

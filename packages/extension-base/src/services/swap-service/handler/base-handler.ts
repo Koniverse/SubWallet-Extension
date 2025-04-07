@@ -15,7 +15,7 @@ import { dryRunXcm } from '@subwallet/extension-base/services/balance-service/tr
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
-import { FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -170,15 +170,17 @@ export class SwapBaseHandler {
 
       const actionList = JSON.stringify(path.map((step) => step.action));
       const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+      const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+      const needEditAmount = swapXcm || xcmSwapXcm;
 
       // todo: increase transfer amount when XCM local token
       if (stepIndex === 0) {
         expectedReceive = fromAmount;
         bnSendingValue = BigN(fromAmount);
 
-        if (xcmSwapXcm) {
-          bnSendingValue = bnSendingValue.multipliedBy(1.02);
-          expectedReceive = bnSendingValue.toString();
+        if (needEditAmount) {
+          bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+          expectedReceive = bnSendingValue.toFixed(0, 1);
         }
 
         if (isBridgeNativeToken) {
@@ -193,8 +195,8 @@ export class SwapBaseHandler {
       } else { // bridge after swap
         expectedReceive = selectedQuote.toAmount;
 
-        if (xcmSwapXcm) {
-          bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(1.02); // need to round
+        if (needEditAmount) {
+          bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
         } else {
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
@@ -203,7 +205,7 @@ export class SwapBaseHandler {
       const step: BaseStepDetail = {
         // @ts-ignore
         metadata: {
-          sendingValue: bnSendingValue.toString(),
+          sendingValue: bnSendingValue.toFixed(0, 1),
           expectedReceive,
           originTokenInfo: fromTokenInfo,
           destinationTokenInfo: toTokenInfo,
@@ -533,10 +535,6 @@ export class SwapBaseHandler {
 
     // Validate quote
     if (!params.selectedQuote) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
-
-    if (params.selectedQuote.toAmount !== swapMetadata.expectedReceive) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 

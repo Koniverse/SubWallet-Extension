@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessType } from '@subwallet/extension-base/types';
+import { TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
 import { Icon } from '@subwallet/react-ui';
@@ -15,11 +16,12 @@ import { InfoItemBase } from './types';
 
 export interface TransactionProcessItemType extends Omit<InfoItemBase, 'value'> {
   items: TransactionProcessStepItemType[];
+  processChains?: string[];
   type: ProcessType;
 }
 
 const Component: React.FC<TransactionProcessItemType> = (props: TransactionProcessItemType) => {
-  const { className, items, label, type } = props;
+  const { className, items, label, processChains, type } = props;
   const { transactionStepsModal } = useContext(WalletModalContext);
 
   const { t } = useTranslation();
@@ -51,16 +53,27 @@ const Component: React.FC<TransactionProcessItemType> = (props: TransactionProce
       </div>
       <div className={'__col __value-col -to-right'}>
         <div
-          className={'__steps-modal-trigger'}
+          className={CN('__steps-modal-trigger', {
+            '-mode-1': processChains,
+            '-mode-2': !processChains
+          })}
           onClick={onOpenModal}
         >
-          <span className='__steps-modal-trigger-text'>
-            {stepText}
-          </span>
+          {
+            processChains
+              ? (
+                <TransactionProcessPreview chains={processChains} />
+              )
+              : (
+                <span className='__steps-modal-trigger-text'>
+                  {stepText}
+                </span>
+              )
+          }
 
           <Icon
             className='__steps-modal-trigger-arrow-icon'
-            customSize={'20px'}
+            customSize={'16px'}
             phosphorIcon={CaretRight}
           />
         </div>
@@ -72,13 +85,16 @@ const Component: React.FC<TransactionProcessItemType> = (props: TransactionProce
 const TransactionProcessItem = styled(Component)<TransactionProcessItemType>(({ theme: { token } }: TransactionProcessItemType) => {
   return {
     '.__steps-modal-trigger': {
-      backgroundColor: token.colorTextLight8,
-      borderRadius: 20,
-      padding: '8px 8px 8px 16px',
       display: 'flex',
       gap: token.sizeXXS,
       alignItems: 'center',
       cursor: 'pointer'
+    },
+
+    '.__steps-modal-trigger.-mode-2': {
+      backgroundColor: token.colorTextLight8,
+      borderRadius: 20,
+      padding: '8px 8px 8px 16px'
     },
 
     '.__steps-modal-trigger-text': {

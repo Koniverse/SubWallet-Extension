@@ -125,7 +125,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className={'__line-4 __line hidden'}>
             <div className='__line-label'>{t('Process')}</div>
             <div className='__line-value'>
-              <TransactionProcessPreview steps={[]} />
+              <TransactionProcessPreview chains={[]} />
             </div>
           </div>
         </div>

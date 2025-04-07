@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { PoolService, TradeRouter } from '@galacticcouncil/sdk';
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
@@ -11,10 +10,13 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, RuntimeDispatchInfo, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import { SwapQuote } from '@subwallet/subwallet-api-sdk/modules/swapApi';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -28,7 +30,6 @@ const HYDRADX_TESTNET_SUBWALLET_REFERRAL_ACCOUNT = '7LCt6dFqtxzdKVB2648jWW9d85do
 
 export class HydradxHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
-  private tradeRouter: TradeRouter | undefined;
   private readonly isTestnet: boolean = true;
   public isReady = false;
   providerSlug: SwapProviderId;
@@ -52,13 +53,6 @@ export class HydradxHandler implements SwapBaseInterface {
     if (!chainState.active) {
       await this.chainService.enableChain(this.chain());
     }
-
-    const substrateApi = this.chainService.getSubstrateApi(this.chain());
-
-    await substrateApi.api.isReady;
-    const poolService = new PoolService(substrateApi.api);
-
-    this.tradeRouter = new TradeRouter(poolService);
 
     this.isReady = true;
   }
@@ -163,29 +157,67 @@ export class HydradxHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    const txHex: `0x${string}` = params.selectedQuote?.metadata as `0x${string}`;
-
-    if (!txHex || !isHex(txHex)) {
-      return Promise.resolve(undefined);
-    }
-
     const originTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.from);
     const destinationTokenInfo = this.chainService.getAssetBySlug(swapPairInfo.to);
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
+    const sender = _reformatAddressWithChain(params.request.address, originChain);
+    const receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
+
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const needEditAmount = swapXcm || xcmSwapXcm;
+
+    let txHex = params.selectedQuote?.metadata as string;
+    let bnSendingValue = BigN(fromAmount);
+    let bnExpectedReceive = BigN(selectedQuote.toAmount);
+
+    if (needEditAmount) {
+      // override info if xcm-swap-xcm
+      bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+      bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+
+      const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData({
+        address: sender,
+        pair: {
+          from: swapPairInfo.from,
+          to: swapPairInfo.to,
+          slug: swapPairInfo.slug
+        },
+        fromAmount: bnSendingValue.toFixed(0, 1),
+        slippage: params.request.slippage
+      });
+
+      const quoteAskResponse = quotes?.find((quote) => quote.provider === this.providerSlug);
+
+      if (!quoteAskResponse || !quoteAskResponse.quote) {
+        return Promise.resolve(undefined);
+      }
+
+      const overrideQuote = quoteAskResponse.quote as SwapQuote;
+
+      txHex = overrideQuote.metadata as string;
+    }
+
+    if (!txHex || !isHex(txHex)) {
+      return Promise.resolve(undefined);
+    }
 
     const submitStep: BaseStepDetail = {
       name: 'Swap',
       type: SwapStepType.SWAP,
       // @ts-ignore
       metadata: {
-        sendingValue: fromAmount,
-        expectedReceive: selectedQuote.toAmount,
+        sendingValue: bnSendingValue.toFixed(0, 1),
+        expectedReceive: bnExpectedReceive.toFixed(0, 1),
         originTokenInfo,
         destinationTokenInfo,
-        sender: _reformatAddressWithChain(params.request.address, originChain),
-        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
-        txHex
+        sender,
+        receiver,
+        txHex,
+        version: 2
       } as unknown as HydrationSwapStepMetadata
     };
 
@@ -252,7 +284,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
     const fromAsset = metadata.originTokenInfo;
 
-    if (!this.isReady || !this.tradeRouter) {
+    if (!this.isReady) {
       return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
     }
 

@@ -124,29 +124,6 @@ export class SwapService implements StoppableServiceInterface {
     }
   }
 
-  public async generateOptimalProcessWithoutPath (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
-    if (!params.selectedQuote || params.path.length > 0) {
-      return this.getDefaultProcessV2(params);
-    }
-
-    const [path, directSwapRequest] = this.getAvailablePath(params.request);
-
-    if (!directSwapRequest) {
-      return this.getDefaultProcessV2(params);
-    }
-
-    params.path = path;
-
-    const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
-    const handler = this.handlers[providerId];
-
-    if (handler) {
-      return handler.generateOptimalProcessV2(params);
-    } else {
-      return this.getDefaultProcessV2(params);
-    }
-  }
-
   public async handleSwapRequestV2 (request: SwapRequestV2): Promise<SwapRequestResult> {
     /*
     * 1. Find available path
@@ -163,7 +140,6 @@ export class SwapService implements StoppableServiceInterface {
     });
 
     console.log('-------');
-    console.log('path', path);
     console.log('optimalProcess', optimalProcess);
     console.log('-------');
 
@@ -173,6 +149,7 @@ export class SwapService implements StoppableServiceInterface {
     };
   }
 
+  // todo: rewrite this function
   public getAvailablePath (request: SwapRequestV2): [DynamicSwapAction[], SwapRequestV2 | undefined] {
     const { address, pair } = request;
     // todo: control provider tighter
@@ -207,22 +184,6 @@ export class SwapService implements StoppableServiceInterface {
     }
 
     // ------------------------
-    // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
-    const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
-
-    if (swapTransit && supportSwapChains.includes(fromChain)) {
-      const swapStep = getSwapStep(fromToken.slug, swapTransit);
-
-      process.push(swapStep);
-      process.push(getBridgeStep(swapTransit, toToken.slug));
-
-      return [process, {
-        ...request,
-        pair: swapStep.pair
-      }];
-    }
-
-    // ------------------------
     // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
     const bridgeTransit = findBridgeTransitDestination(assetRefMap, fromToken, toToken);
 
@@ -235,6 +196,22 @@ export class SwapService implements StoppableServiceInterface {
       return [process, {
         ...request,
         address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
+        pair: swapStep.pair
+      }];
+    }
+
+    // ------------------------
+    // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
+    const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
+
+    if (swapTransit && supportSwapChains.includes(fromChain)) {
+      const swapStep = getSwapStep(fromToken.slug, swapTransit);
+
+      process.push(swapStep);
+      process.push(getBridgeStep(swapTransit, toToken.slug));
+
+      return [process, {
+        ...request,
         pair: swapStep.pair
       }];
     }

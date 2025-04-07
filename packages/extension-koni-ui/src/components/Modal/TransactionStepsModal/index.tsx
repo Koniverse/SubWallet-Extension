@@ -24,7 +24,7 @@ type Props = ThemeProps & TransactionStepsModalProps & {
 const modalId = TRANSACTION_STEPS_MODAL;
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, items, onCancel, type, variant } = props;
+  const { className, items, onCancel, type, variant = 'standard' } = props;
   const { t } = useTranslation();
 
   const modalTitle = useMemo(() => {
@@ -81,10 +81,6 @@ const Component: FC<Props> = (props: Props) => {
 
 const TransactionStepsModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    '.ant-sw-modal-content.ant-sw-modal-content': {
-      paddingBottom: 0
-    },
-
     '.ant-sw-modal-body.ant-sw-modal-body': {
       paddingBottom: 0
     },

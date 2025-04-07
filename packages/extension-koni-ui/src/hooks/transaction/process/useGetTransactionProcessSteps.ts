@@ -12,7 +12,7 @@ const useGetTransactionProcessSteps = () => {
   return useCallback((processStep: ProcessStep[], combineInfo: unknown, fillStepStatus = true): TransactionProcessStepItemType[] => {
     return processStep.map((ps, index) => ({
       status: fillStepStatus ? ps.status : StepStatus.QUEUED,
-      text: getStepText(ps, combineInfo),
+      content: getStepText(ps, combineInfo),
       index,
       isLastItem: index === processStep.length - 1
     }));

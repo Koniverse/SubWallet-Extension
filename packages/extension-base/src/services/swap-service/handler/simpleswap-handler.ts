@@ -135,7 +135,8 @@ export class SimpleSwapHandler implements SwapBaseInterface {
         originTokenInfo,
         destinationTokenInfo,
         sender: _reformatAddressWithChain(params.request.address, originChain),
-        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain)
+        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
+        version: 2
       } as unknown as BaseSwapStepMetadata
     };
 

@@ -253,7 +253,9 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
         receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
 
         srcChain: metadata.srcChain,
-        destChain: metadata.destChain
+        destChain: metadata.destChain,
+
+        version: 2
       } as unknown as ChainFlipSwapStepMetadata
     };
 
