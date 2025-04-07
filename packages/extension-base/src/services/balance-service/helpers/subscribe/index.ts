@@ -130,6 +130,7 @@ export function subscribeBalance (
   evmApiMap: Record<string, _EvmApi>,
   tonApiMap: Record<string, _TonApi>,
   cardanoApiMap: Record<string, _CardanoApi>,
+  bitcoinApiMap: Record<string, _BitcoinApi>,
   callback: (rs: BalanceItem[]) => void,
   extrinsicType?: ExtrinsicType
 ) {
@@ -177,7 +178,7 @@ export function subscribeBalance (
     }
 
     const cardanoApi = cardanoApiMap[chainSlug];
-
+    
     if (_isPureCardanoChain(chainInfo)) {
       return subscribeCardanoBalance({
         addresses: useAddresses,
@@ -186,6 +187,15 @@ export function subscribeBalance (
         chainInfo,
         cardanoApi
       });
+    }
+
+    const bitcoinApi = bitcoinApiMap[chainSlug];
+
+    if (_isPureBitcoinChain(chainInfo)) {
+      return subscribeBitcoinBalance(
+        ['bc1q224l0fvnfuf8mdh95hvu6e2gzx6ergugvghht2'],
+        bitcoinApi,
+      );
     }
 
     // If the chain is not ready, return pending state
@@ -203,8 +213,6 @@ export function subscribeBalance (
 
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
-
-  unsubList.push(subscribeBitcoinBalance(['bc1pw4gt62ne4csu74528qjkmv554vwf62dy6erm227qzjjlc2tlfd7qcta9w2']));
 
   return () => {
     unsubList.forEach((subProm) => {
