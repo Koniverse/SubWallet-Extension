@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 // import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
 // import { filteredOutTxsUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -11,7 +13,7 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
   try {
     // const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
     const [utxos] = await Promise.all([
-      await bitcoinApi.api.getUtxos(address)
+      await bitcoinApi.api.getUtxos(address),
     ]);
 
     // let filteredUtxos: UtxoResponseItem[];
@@ -37,7 +39,7 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
   }
 };
 
-async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) {
+async function getBitcoinBalance(bitcoinApi: _BitcoinApi, addresses: string[]) {
   return await Promise.all(addresses.map(async (address) => {
     try {
       const [filteredUtxos, addressSummaryInfo] = await Promise.all([
@@ -73,20 +75,17 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
 }
 
 export const subscribeBitcoinBalance = async (addresses: string[], bitcoinApi: _BitcoinApi) => {
+
   const getBalance = async () => {
     try {
       const balances = await getBitcoinBalance(bitcoinApi, addresses);
-
       return balances[0].balance;
     } catch (e) {
-      console.error('Error on get Bitcoin balance with token', e);
-
+      console.error(`Error on get Bitcoin balance with token`, e);
       return '0';
-    }
-  };
-
+    };
+  }
   const balanceBTC = await getBalance();
-
   console.log('btc balance: ', balanceBTC);
 
   return () => {

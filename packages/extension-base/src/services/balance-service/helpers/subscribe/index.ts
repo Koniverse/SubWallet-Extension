@@ -5,8 +5,8 @@ import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { subscribeBitcoinBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/bitcoin';
 import { subscribeCardanoBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano';
-import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson, BalanceItem } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, getAddressesByChainTypeMap, pairToAccount } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
@@ -178,7 +178,7 @@ export function subscribeBalance (
     }
 
     const cardanoApi = cardanoApiMap[chainSlug];
-    
+
     if (_isPureCardanoChain(chainInfo)) {
       return subscribeCardanoBalance({
         addresses: useAddresses,
@@ -193,8 +193,8 @@ export function subscribeBalance (
 
     if (_isPureBitcoinChain(chainInfo)) {
       return subscribeBitcoinBalance(
-        ['bc1q224l0fvnfuf8mdh95hvu6e2gzx6ergugvghht2'],
-        bitcoinApi,
+        ['bc1p2v22jvkpr4r5shne4t7dczepsnf4tzeq7q743htlkjql9pj4q4hsmw3xte'],
+        bitcoinApi
       );
     }
 
