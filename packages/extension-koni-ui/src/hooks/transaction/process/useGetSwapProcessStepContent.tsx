@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseStepType, BaseSwapStepMetadata, CommonStepDetail, CommonStepFeeInfo, CommonStepType, SwapQuote, SwapStepType } from '@subwallet/extension-base/types';
+import { BaseStepType, BaseSwapStepMetadata, BriefSwapStep, CommonStepDetail, CommonStepFeeInfo, CommonStepType, SwapQuote, SwapStepType } from '@subwallet/extension-base/types';
 import { swapNumberMetadata } from '@subwallet/extension-base/utils';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
@@ -203,7 +203,11 @@ const useGetSwapProcessStepContent = () => {
           const { destinationTokenInfo,
             expectedReceive,
             originTokenInfo,
-            sendingValue } = processStep.metadata as unknown as BaseSwapStepMetadata;
+            sendingValue, version } = processStep.metadata as unknown as BaseSwapStepMetadata;
+
+          if (!version || !(version >= 2)) {
+            return null;
+          }
 
           return {
             fromTokenSlug: originTokenInfo.slug,
@@ -225,7 +229,33 @@ const useGetSwapProcessStepContent = () => {
         }
       };
 
-      const analysisResult = analysisMetadata();
+      const analysisMetadataForOldData = () => {
+        try {
+          const { fromAmount, pair, toAmount } = processStep.metadata as unknown as BriefSwapStep;
+          const fromAsset = assetRegistry[pair.from];
+          const toAsset = assetRegistry[pair.to];
+
+          return {
+            fromTokenSlug: pair.from,
+            fromTokenValue: fromAmount,
+            fromTokenSymbol: _getAssetSymbol(fromAsset),
+            fromTokenDecimals: _getAssetDecimals(fromAsset),
+            fromChainName: _getChainName(chainInfoMap[fromAsset.originChain]),
+            toTokenSlug: pair.to,
+            toTokenValue: toAmount,
+            toTokenSymbol: _getAssetSymbol(toAsset),
+            toTokenDecimals: _getAssetDecimals(toAsset),
+            toChainName: _getChainName(chainInfoMap[toAsset.originChain]),
+            providerName: quote.provider.name
+          };
+        } catch (e) {
+          console.log('analysisMetadata error', processStep, e);
+
+          return null;
+        }
+      };
+
+      const analysisResult = analysisMetadata() || analysisMetadataForOldData();
 
       if (analysisResult) {
         return (

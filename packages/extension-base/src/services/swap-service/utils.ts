@@ -3,7 +3,7 @@
 
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
@@ -227,6 +227,7 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
   }, [] as string[]);
 }
 
+// note: this function may return undefined if metadata version is < 2 or does not exist
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
   const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
 
@@ -237,14 +238,14 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   if (mainSteps.length === 1) {
     const metadata = mainSteps[0].metadata as unknown as BaseSwapStepMetadata;
 
-    if (!metadata) {
+    if (!metadata || !(metadata.version > 1)) {
       return undefined;
     }
 
     return {
       from: metadata.originTokenInfo.slug,
       to: metadata.destinationTokenInfo.slug,
-      slug: `${metadata.originTokenInfo.slug}___${metadata.destinationTokenInfo.slug}`
+      slug: _parseAssetRefKey(metadata.originTokenInfo.slug, metadata.destinationTokenInfo.slug)
     };
   }
 
@@ -254,10 +255,14 @@ export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | und
   const firstMetadata = firstStep.metadata as unknown as BaseSwapStepMetadata;
   const lastMetadata = lastStep.metadata as unknown as BaseSwapStepMetadata;
 
+  if (!(firstMetadata?.version > 1) || !(lastMetadata?.version > 1)) {
+    return undefined;
+  }
+
   return {
     from: firstMetadata.originTokenInfo.slug,
     to: lastMetadata.destinationTokenInfo.slug,
-    slug: `${firstMetadata.originTokenInfo.slug}___${lastMetadata.destinationTokenInfo.slug}`
+    slug: _parseAssetRefKey(firstMetadata.originTokenInfo.slug, lastMetadata.destinationTokenInfo.slug)
   };
 }
 
