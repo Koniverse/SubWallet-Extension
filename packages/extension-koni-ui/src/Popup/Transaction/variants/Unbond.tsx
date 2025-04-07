@@ -132,7 +132,7 @@ const Component: React.FC = () => {
         slug: poolInfo.slug,
         value: amountValue,
         netuid: netuid,
-        type: ExtrinsicType.STAKING_BOND
+        type: ExtrinsicType.STAKING_UNBOND
       };
 
       getEarningSlippage(data)
@@ -196,7 +196,7 @@ const Component: React.FC = () => {
           <span
             className='chain-name'
             style={{ color: '#A6A6A6' }}
-          >{`1 ${poolInfo.metadata?.subnetData?.subnetSymbol || ''} = ${earningRate.toFixed(2)} ${bondedAsset?.symbol || ''}`}</span>
+          >{`1 ${bondedAsset?.symbol || ''} = ${(1 / earningRate).toFixed(2)} ${poolInfo.metadata?.subnetData?.subnetSymbol || ''}`}</span>
         </MetaInfo.Default>
       </MetaInfo>
     );
@@ -597,9 +597,11 @@ const Component: React.FC = () => {
                         );
                       })}
                       {!isSlippageAcceptable && (
-                        <div ref={alertBoxRef}>
+                        <div
+                          className='__instruction-item'
+                          ref={alertBoxRef}
+                        >
                           <AlertBox
-                            className='__instruction-item'
                             description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
                             title='Slippage too high!'
                             type='error'
