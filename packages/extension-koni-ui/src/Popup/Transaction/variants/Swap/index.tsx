@@ -705,7 +705,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    onChangeAmount(currentFromTokenAvailableBalance.value);
+    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(95).dividedToIntegerBy(100).toString();
+
+    onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
   }, [currentFromTokenAvailableBalance, onChangeAmount]);
 
