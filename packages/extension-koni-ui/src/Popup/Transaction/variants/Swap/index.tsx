@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -250,13 +250,19 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const result: _ChainAsset[] = [];
 
     Object.values(assetRegistryMap).forEach((chainAsset) => {
-      if (_isAssetFungibleToken(chainAsset)) {
+      if (!_isAssetFungibleToken(chainAsset)) {
+        return;
+      }
+
+      const chainSlug = chainAsset.originChain;
+
+      if (chainInfoMap[chainSlug]?.chainStatus === _ChainStatus.ACTIVE) {
         result.push(chainAsset);
       }
     });
 
     return result;
-  }, [assetRegistryMap]);
+  }, [assetRegistryMap, chainInfoMap]);
 
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
