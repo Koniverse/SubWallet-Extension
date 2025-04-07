@@ -163,18 +163,18 @@ export class HydradxHandler implements SwapBaseInterface {
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
     const sender = _reformatAddressWithChain(params.request.address, originChain);
-    const receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
+    let receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
 
     const actionList = JSON.stringify(path.map((step) => step.action));
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
     const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-    const needEditAmount = swapXcm || xcmSwapXcm;
+    const needModifyData = swapXcm || xcmSwapXcm;
 
     let txHex = params.selectedQuote?.metadata as string;
     let bnSendingValue = BigN(fromAmount);
     let bnExpectedReceive = BigN(selectedQuote.toAmount);
 
-    if (needEditAmount) {
+    if (needModifyData) {
       // override info if xcm-swap-xcm
       bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
       bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
@@ -199,6 +199,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const overrideQuote = quoteAskResponse.quote as SwapQuote;
 
       txHex = overrideQuote.metadata as string;
+      receiver = _reformatAddressWithChain(params.request.address, destinationChain);
     }
 
     if (!txHex || !isHex(txHex)) {

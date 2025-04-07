@@ -128,7 +128,7 @@ export class SwapService implements StoppableServiceInterface {
     /*
     * 1. Find available path
     * 2. Ask swap quotes from providers
-    * 3. Select the best quote @Todo: handle this better
+    * 3. Select the best quote
     * 4. Generate optimal process for that quote
     * */
 
