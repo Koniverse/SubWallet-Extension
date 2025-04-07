@@ -1629,16 +1629,6 @@ export default class KoniExtension {
       }
 
       additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
-        try {
-          const dryRunInfo = await dryRunXcm(params);
-
-          if (!dryRunInfo.success) {
-            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Failed to dry run xcm')); // todo: content
-          }
-        } catch (e) {
-          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Failed to dry run xcm')); // todo: content
-        }
-
         let isSendingTokenSufficient = false;
         let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
@@ -1679,6 +1669,16 @@ export default class KoniExtension {
 
         warning.length && inputTransaction.warnings.push(...warning);
         error.length && inputTransaction.errors.push(...error);
+
+        try {
+          const dryRunInfo = await dryRunXcm(params);
+
+          if (!dryRunInfo.success) {
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Failed to dry run xcm')); // todo: content
+          }
+        } catch (e) {
+          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Failed to dry run xcm')); // todo: content
+        }
       };
 
       eventsHandler = (eventEmitter: TransactionEmitter) => {
