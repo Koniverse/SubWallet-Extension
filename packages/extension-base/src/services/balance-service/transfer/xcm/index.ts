@@ -163,7 +163,7 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
       return createXcmExtrinsic(request);
     }
 
-    throw new Error('No extrinsic'); // todo: content
+    throw new Error('Token not supported. Select another token or destination chain and try again');
   }
 };
 
@@ -181,7 +181,7 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
       });
     }
 
-    throw new Error('Dry run failed'); // todo: content
-    // throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed');
+    throw new Error('Unable to perform transaction. Select another token or destination chain and try again');
+    // throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
   }
 };

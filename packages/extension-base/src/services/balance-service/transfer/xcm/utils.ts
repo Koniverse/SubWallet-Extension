@@ -183,7 +183,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   }
 
   if (!dryRunInfo || !dryRunInfo.success) {
-    throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed'); // todo: content?
+    throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
   }
 
   return dryRunInfo;

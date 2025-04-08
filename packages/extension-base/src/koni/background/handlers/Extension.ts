@@ -1676,10 +1676,10 @@ export default class KoniExtension {
           const dryRunInfo = await dryRunXcmExtrinsicV2(params);
 
           if (!dryRunInfo.success) {
-            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed')); // todo: content
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
           }
         } catch (e) {
-          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed')); // todo: content
+          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
         }
       };
 
