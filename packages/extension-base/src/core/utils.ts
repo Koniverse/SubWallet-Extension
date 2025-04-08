@@ -149,6 +149,7 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 }
 
 export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<boolean> => {
+  // todo: remove const and detect by pallets instead
   if (SUFFICIENT_CHAIN.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
     const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
 
