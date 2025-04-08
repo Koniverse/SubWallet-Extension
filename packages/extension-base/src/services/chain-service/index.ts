@@ -3,7 +3,7 @@
 
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
-import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AssetSetting, MetadataItem, SufficientChainsDetails, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
@@ -96,7 +96,7 @@ export class ChainService {
   private chainLogoMapSubject = new BehaviorSubject<Record<string, string>>(ChainLogoMap);
   private ledgerGenericAllowChainsSubject = new BehaviorSubject<string[]>([]);
   private priorityTokensSubject = new BehaviorSubject({} as TokenPriorityDetails);
-  private sufficientChainsSubject = new BehaviorSubject<string[]>([]);
+  private sufficientChainsSubject = new BehaviorSubject({} as SufficientChainsDetails);
 
   // Todo: Update to new store indexed DB
   private store: AssetSettingStore = new AssetSettingStore();
@@ -817,7 +817,7 @@ export class ChainService {
     this.logger.log('Finished updating latest popular tokens');
   }
 
-  handleLatestSufficientChains (latestSufficientChains: string[]) {
+  handleLatestSufficientChains (latestSufficientChains: SufficientChainsDetails) {
     this.sufficientChainsSubject.next(latestSufficientChains);
     this.logger.log('Finished updating latest supported sufficient chains');
   }
@@ -1176,7 +1176,7 @@ export class ChainService {
   }
 
   private async fetchLatestSufficientChains () {
-    return await fetchStaticData<string[]>('chains/supported-sufficient-chains') || [];
+    return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
   }
 
   private async initChains () {

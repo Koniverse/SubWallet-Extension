@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
-import { ExtrinsicType, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, SufficientChainsDetails, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -147,29 +147,46 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
   return '';
 }
 
-export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi, sufficientChain: string[]): Promise<boolean> => {
-  if (sufficientChain.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
+export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi, sufficientChain: SufficientChainsDetails): Promise<boolean> => {
+  if (tokenInfo.assetType !== _AssetType.NATIVE) {
     const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
+    const chainSlug = tokenInfo.originChain;
 
     const queryParams: _SubstrateAdapterQueryArgs = {
       section: 'query',
-      module: 'foreignAssets',
-      method: 'asset',
       args: [assetId]
     };
 
-    if (!_isBridgedToken(tokenInfo)) {
-      queryParams.module = 'assets';
+    if (sufficientChain.assetHubPallet.includes(chainSlug)) {
+      if (!_isBridgedToken(tokenInfo)) {
+        queryParams.module = 'assets';
+      } else {
+        queryParams.module = 'foreignAssets';
+      }
+
+      queryParams.method = 'asset';
     }
 
-    if (tokenInfo.originChain === 'hydradx_main') {
+    if (sufficientChain.assetRegistryPallet.includes(chainSlug)) {
       queryParams.module = 'assetRegistry';
       queryParams.method = 'assets';
     }
 
-    const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+    if (sufficientChain.assetsPallet.includes(chainSlug)) {
+      queryParams.module = 'assets';
+      queryParams.method = 'asset';
+    }
 
-    return metadata.isSufficient;
+    if (sufficientChain.foreignAssetsPallet.includes(chainSlug)) {
+      queryParams.module = 'foreignAsset';
+      queryParams.method = 'asset';
+    }
+
+    if (queryParams.method && queryParams.module) {
+      const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+
+      return metadata.isSufficient;
+    }
   }
 
   if (tokenInfo.metadata?.isSufficient) {
