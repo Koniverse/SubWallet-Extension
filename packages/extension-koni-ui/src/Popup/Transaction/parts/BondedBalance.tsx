@@ -61,7 +61,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
         {isSubnetStaking && (
           <Tooltip
             placement={'topRight'}
-            title={'If slippage exceeds this limit, transaction will not be executed'}
+            title={'Transaction will not be executed if the price changes more than this slippage'}
           >
             <div className='slippage-info'>
               <span className='slippage-label'>{t('Slippage')}: </span>

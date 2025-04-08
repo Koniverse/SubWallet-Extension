@@ -771,7 +771,7 @@ const Component = () => {
           label={
             <Tooltip
               placement={'topLeft'}
-              title={'If slippage exceeds this limit, transaction will not be executed'}
+              title={'Transaction will not be executed if the price changes more than this slippage'}
             >
               <div className={'__max-slippage'}>
                 <div className='__label-bottom'>{t('Slippage')}</div>
@@ -790,7 +790,7 @@ const Component = () => {
               className='chain-name'
               style={{ color: isSlippageAcceptable ? '#A6A6A6' : '#BF1616' }}
             >
-              {maxSlippage.slippage.toNumber() * 100}%
+              {+(maxSlippage.slippage.toNumber() * 100).toFixed(10)}%
             </span>
             <div
               className='__slippage-editor-button'
@@ -1345,7 +1345,7 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
+                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
                     title='Slippage too high!'
                     type='error'
                   />

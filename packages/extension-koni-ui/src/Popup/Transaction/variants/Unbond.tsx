@@ -185,7 +185,7 @@ const Component: React.FC = () => {
         <MetaInfo.Number
           className='__label-bottom'
           decimals={decimals}
-          label={t('Expected alpha amount')}
+          label={t('Expected TAO to receive')}
           suffix={bondedAsset?.symbol || ''}
           value={BigNumber(amountValue).multipliedBy(earningRate)}
         />
@@ -602,7 +602,7 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your unstake amount and try again`}
+                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
                             title='Slippage too high!'
                             type='error'
                           />
