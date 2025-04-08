@@ -6,7 +6,6 @@ import { ExtrinsicType, SufficientMetadata } from '@subwallet/extension-base/bac
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { SUFFICIENT_CHAIN } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
@@ -148,9 +147,8 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
   return '';
 }
 
-export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<boolean> => {
-  // todo: remove const and detect by pallets instead
-  if (SUFFICIENT_CHAIN.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
+export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi, sufficientChain: string[]): Promise<boolean> => {
+  if (sufficientChain.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
     const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
 
     const queryParams: _SubstrateAdapterQueryArgs = {
@@ -164,15 +162,19 @@ export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _
       queryParams.module = 'assets';
     }
 
+    if (tokenInfo.originChain === 'hydradx_main') {
+      queryParams.module = 'assetRegistry';
+      queryParams.method = 'assets';
+    }
+
     const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
 
     return metadata.isSufficient;
   }
 
-  // todo
-  // if (tokenInfo.metadata?.isSufficient) {
-  //   return tokenInfo.metadata?.isSufficient;
-  // }
+  if (tokenInfo.metadata?.isSufficient) {
+    return tokenInfo.metadata?.isSufficient;
+  }
 
   return false;
 };

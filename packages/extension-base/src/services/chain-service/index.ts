@@ -96,6 +96,7 @@ export class ChainService {
   private chainLogoMapSubject = new BehaviorSubject<Record<string, string>>(ChainLogoMap);
   private ledgerGenericAllowChainsSubject = new BehaviorSubject<string[]>([]);
   private priorityTokensSubject = new BehaviorSubject({} as TokenPriorityDetails);
+  private sufficientChainsSubject = new BehaviorSubject<string[]>([]);
 
   // Todo: Update to new store indexed DB
   private store: AssetSettingStore = new AssetSettingStore();
@@ -129,6 +130,7 @@ export class ChainService {
   public get value () {
     const ledgerGenericAllowChains = this.ledgerGenericAllowChainsSubject;
     const priorityTokens = this.priorityTokensSubject;
+    const sufficientChains = this.sufficientChainsSubject;
 
     return {
       get ledgerGenericAllowChains () {
@@ -136,6 +138,9 @@ export class ChainService {
       },
       get priorityTokens () {
         return priorityTokens.value;
+      },
+      get sufficientChains () {
+        return sufficientChains.value;
       }
     };
   }
@@ -143,6 +148,7 @@ export class ChainService {
   public get observable () {
     const ledgerGenericAllowChains = this.ledgerGenericAllowChainsSubject;
     const priorityTokens = this.priorityTokensSubject;
+    const sufficientChains = this.sufficientChainsSubject;
 
     return {
       get ledgerGenericAllowChains () {
@@ -150,6 +156,9 @@ export class ChainService {
       },
       get priorityTokens () {
         return priorityTokens.asObservable();
+      },
+      get sufficientChains () {
+        return sufficientChains.asObservable();
       }
     };
   }
@@ -808,6 +817,11 @@ export class ChainService {
     this.logger.log('Finished updating latest popular tokens');
   }
 
+  handleLatestSufficientChains (latestSufficientChains: string[]) {
+    this.sufficientChainsSubject.next(latestSufficientChains);
+    this.logger.log('Finished updating latest supported sufficient chains');
+  }
+
   handleLatestData () {
     this.fetchLatestChainData().then((latestChainInfo) => {
       this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
@@ -831,6 +845,12 @@ export class ChainService {
     this.fetchLatestPriorityTokens()
       .then((latestPriorityTokens) => {
         this.handleLatestPriorityTokens(latestPriorityTokens);
+      })
+      .catch(console.error);
+
+    this.fetchLatestSufficientChains()
+      .then((latestSufficientChains) => {
+        this.handleLatestSufficientChains(latestSufficientChains);
       })
       .catch(console.error);
   }
@@ -1153,6 +1173,10 @@ export class ChainService {
       tokenGroup: {},
       token: {}
     };
+  }
+
+  private async fetchLatestSufficientChains () {
+    return await fetchStaticData<string[]>('chains/supported-sufficient-chains') || [];
   }
 
   private async initChains () {

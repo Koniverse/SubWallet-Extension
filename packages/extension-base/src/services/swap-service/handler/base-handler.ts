@@ -257,13 +257,14 @@ export class SwapBaseHandler {
     // Check keepAlive on dest chain for receiver
     if (!_isNativeToken(toAsset)) {
       const toChainApi = this.chainService.getSubstrateApi(toAsset.originChain);
+      const sufficientChain = this.chainService.value.sufficientChains;
 
       // TODO: Need to update, currently only support substrate xcm
       if (!toChainApi) {
         return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Destination chain is not active'))];
       }
 
-      const isSendingTokenSufficient = await _isSufficientToken(toAsset, toChainApi);
+      const isSendingTokenSufficient = await _isSufficientToken(toAsset, toChainApi, sufficientChain);
 
       if (!isSendingTokenSufficient) {
         const toChainNativeAssetBalance = await this.balanceService.getTotalBalance(receiver, toAsset.originChain, toChainNativeAsset.slug, ExtrinsicType.TRANSFER_BALANCE);
@@ -386,13 +387,14 @@ export class SwapBaseHandler {
 
     // By here, we know that the user is receiving a valid amount of toToken
     const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
+    const sufficientChain = this.chainService.value.sufficientChains;
 
     if (!toChainApi) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     // Only need to check if account is alive with the receiving toToken
-    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi);
+    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi, sufficientChain);
 
     if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
       const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);

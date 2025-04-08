@@ -1500,7 +1500,9 @@ export default class KoniExtension {
       const amount = BigInt(transferAmount.value);
 
       const substrateApi = this.#koniState.getSubstrateApi(chain);
-      const isSendingTokenSufficient = await _isSufficientToken(transferTokenInfo, substrateApi);
+      const sufficientChain = this.#koniState.chainService.value.sufficientChains;
+
+      const isSendingTokenSufficient = await _isSufficientToken(transferTokenInfo, substrateApi, sufficientChain);
 
       const [warnings, errors] = additionalValidateTransferForRecipient(transferTokenInfo, nativeTokenInfo, extrinsicType, receiverSendingTokenKeepAliveBalance, amount, senderSendingTokenTransferable, receiverSystemAccountInfo, isSendingTokenSufficient);
 
@@ -1643,11 +1645,10 @@ export default class KoniExtension {
           receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
         }
 
-        if (_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
-          const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+        const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+        const sufficientChain = this.#koniState.chainService.value.sufficientChains;
 
-          isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi);
-        }
+        isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
         const [warning, error] = additionalValidateTransferForRecipient(
           destinationTokenInfo,
