@@ -4,25 +4,8 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
-import {
-  BaseStepDetail,
-  BasicTxErrorType,
-  CommonOptimalPath,
-  CommonStepFeeInfo,
-  CommonStepType,
-  FeeOptionKey,
-  HandleYieldStepData,
-  OptimalSwapPathParams,
-  SwapBaseTxData,
-  SwapFeeType,
-  SwapProviderId,
-  SwapStepType,
-  SwapSubmitParams,
-  SwapSubmitStepData,
-  TokenSpendingApprovalParams,
-  ValidateSwapProcessParams,
-  PermitSwapData, ApproveStepMetadata,
-} from '@subwallet/extension-base/types';
+import TransactionService from '@subwallet/extension-base/services/transaction-service';
+import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
@@ -32,7 +15,6 @@ import { _getContractAddressOfToken, _isNativeToken } from '../../chain-service/
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
-import TransactionService from "@subwallet/extension-base/services/transaction-service";
 
 const API_URL = 'https://trade-api.gateway.uniswap.org/v1';
 const headers = {
@@ -62,7 +44,6 @@ interface UniswapQuote {
     token: string;
   };
 }
-
 interface SwapResponse {
   swap: TransactionConfig
 }
@@ -78,7 +59,7 @@ interface CheckApprovalResponse {
   cancel: any;
 }
 
-async function fetchCheckApproval(walletAddress: string, fromAmount: string, quote: UniswapQuote): Promise<CheckApprovalResponse> {
+async function fetchCheckApproval (walletAddress: string, fromAmount: string, quote: UniswapQuote): Promise<CheckApprovalResponse> {
   const chainId = quote.chainId;
   const response = await fetch(`${API_URL}/check_approval`, {
     method: 'POST',
@@ -106,8 +87,7 @@ export class UniswapHandler implements SwapBaseInterface {
   public transactionService: TransactionService;
 
   providerSlug: SwapProviderId;
-
-  constructor(chainService: ChainService, balanceService: BalanceService, transactionService: TransactionService, feeService: FeeService) {
+  constructor (chainService: ChainService, balanceService: BalanceService, transactionService: TransactionService, feeService: FeeService) {
     this.swapBaseHandler = new SwapBaseHandler({
       chainService,
       balanceService,
@@ -120,23 +100,23 @@ export class UniswapHandler implements SwapBaseInterface {
     this.providerSlug = SwapProviderId.UNISWAP;
   }
 
-  get chainService() {
+  get chainService () {
     return this.swapBaseHandler.chainService;
   }
 
-  get balanceService() {
+  get balanceService () {
     return this.swapBaseHandler.balanceService;
   }
 
-  get feeService() {
+  get feeService () {
     return this.swapBaseHandler.feeService;
   }
 
-  get providerInfo() {
+  get providerInfo () {
     return this.swapBaseHandler.providerInfo;
   }
 
-  generateOptimalProcess(params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
+  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalPath> {
     return this.swapBaseHandler.generateOptimalProcess(params, [
       this.getApprovalStep.bind(this),
       this.getPermitStep.bind(this),
@@ -144,12 +124,12 @@ export class UniswapHandler implements SwapBaseInterface {
     ]);
   }
 
-  async getApprovalStep(params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getApprovalStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
       const walletAddress = params.request.address;
       const fromAmount = params.selectedQuote.fromAmount;
       const inputTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
-      const {quote} = params.selectedQuote.metadata as UniswapMetadata;
+      const { quote } = params.selectedQuote.metadata as UniswapMetadata;
 
       const checkApprovalResponse = await fetchCheckApproval(walletAddress, fromAmount, quote);
       const approval = checkApprovalResponse.approval;
@@ -170,6 +150,7 @@ export class UniswapHandler implements SwapBaseInterface {
           contractAddress: _getContractAddressOfToken(inputTokenInfo),
           spenderAddress: spender
         };
+
         const submitStep = {
           name: 'Approve token',
           type: CommonStepType.TOKEN_APPROVAL,
@@ -183,13 +164,13 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  async getPermitStep(params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getPermitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
         type: SwapStepType.PERMIT
       };
-
+      // TODO: GET NATIVE TOKEN
       const defaultFeeToken = params.selectedQuote.feeInfo.defaultFeeToken;
       const feeInfo: CommonStepFeeInfo = {
         feeComponent: [
@@ -209,7 +190,7 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  async getSubmitStep(params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote) {
       const submitStep = {
         name: 'Swap',
@@ -222,7 +203,7 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  public async validateSwapProcess(params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
     const amount = params.selectedQuote.fromAmount;
     const bnAmount = BigInt(amount);
 
@@ -256,8 +237,8 @@ export class UniswapHandler implements SwapBaseInterface {
     return [];
   }
 
-  public async handleSwapProcess(params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const {currentStep, process} = params;
+  public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
+    const { currentStep, process } = params;
     const type = process.steps[currentStep].type;
 
     switch (type) {
@@ -274,11 +255,11 @@ export class UniswapHandler implements SwapBaseInterface {
     }
   }
 
-  private async tokenApproveSpending(params: SwapSubmitParams): Promise<HandleYieldStepData> {
+  private async tokenApproveSpending (params: SwapSubmitParams): Promise<HandleYieldStepData> {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
     const walletAddress = params.address;
     const fromAmount = params.quote.fromAmount;
-    const {quote} = params.quote.metadata as UniswapMetadata;
+    const { quote } = params.quote.metadata as UniswapMetadata;
 
     const checkApprovalResponse = await fetchCheckApproval(walletAddress, fromAmount, quote);
     let transactionConfig: TransactionConfig = {} as TransactionConfig;
@@ -323,11 +304,12 @@ export class UniswapHandler implements SwapBaseInterface {
     });
   }
 
-  public async handleSubmitStep(params: SwapSubmitParams): Promise<SwapSubmitStepData> {
+  public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
 
-    const {permitData, quote, routing} = params.quote.metadata as UniswapMetadata;
+    const { permitData, quote, routing } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
+
     let signature: string | undefined;
 
     if (permitData) {
@@ -391,9 +373,9 @@ export class UniswapHandler implements SwapBaseInterface {
     } as SwapSubmitStepData;
   }
 
-  public handlePermitStep(params: SwapSubmitParams) {
+  public handlePermitStep (params: SwapSubmitParams) {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
-    const {permitData} = params.quote.metadata as UniswapMetadata;
+    const { permitData } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
 
     let validatePayload;
@@ -402,9 +384,9 @@ export class UniswapHandler implements SwapBaseInterface {
       const payload = {
         types: {
           EIP712Domain: [
-            {name: 'name', type: 'string'},
-            {name: 'chainId', type: 'uint256'},
-            {name: 'verifyingContract', type: 'address'}
+            { name: 'name', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' }
           ],
           ...permitData.types
         },
@@ -413,14 +395,13 @@ export class UniswapHandler implements SwapBaseInterface {
         message: permitData.values
       };
 
-      validatePayload = validateTypedSignMessageDataV3V4({data: payload, from: params.address});
+      validatePayload = validateTypedSignMessageDataV3V4({ data: payload, from: params.address });
     }
 
     const txData: PermitSwapData = {
       processId,
       step: SwapStepType.PERMIT
     };
-
 
     return {
       txChain: fromAsset.originChain,

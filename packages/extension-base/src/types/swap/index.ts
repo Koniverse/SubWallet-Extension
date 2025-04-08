@@ -4,12 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import {
-  BaseStepDetail,
-  BaseStepType,
-  CommonOptimalPath,
-  CommonStepFeeInfo
-} from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, BaseStepType, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
 import { BaseProcessRequestSign, TransactionData } from '../transaction';
@@ -84,11 +79,11 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.CHAIN_FLIP_TESTNET,
   SwapProviderId.CHAIN_FLIP_MAINNET,
   SwapProviderId.HYDRADX_MAINNET,
-  SwapProviderId.HYDRADX_TESTNET,
+  // SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
   // SwapProviderId.ROCOCO_ASSET_HUB,
-  SwapProviderId.WESTEND_ASSET_HUB,
+  // SwapProviderId.WESTEND_ASSET_HUB,
   SwapProviderId.SIMPLE_SWAP,
   SwapProviderId.UNISWAP
 ];

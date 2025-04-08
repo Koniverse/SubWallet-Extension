@@ -55,6 +55,7 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         await handler.init();
       }
     }));
+
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
     if (Array.isArray(quotes)) {
@@ -117,7 +118,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     * 2. Select the best quote
     * 3. Generate optimal process for that quote
     * */
-
     const swapQuoteResponse = await this.getLatestQuotes(request);
 
     const optimalProcess = await this.generateOptimalProcess({
@@ -202,7 +202,6 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
         case SwapProviderId.UNISWAP:
           this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
           break;
-
         default:
           throw new Error('Unsupported provider');
       }

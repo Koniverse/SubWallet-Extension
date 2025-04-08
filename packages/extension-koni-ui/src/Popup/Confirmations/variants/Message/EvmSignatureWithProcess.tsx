@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { EvmSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, EarnProcessConfirmation, SwapProcessConfirmation } from '../Transaction/variants/Process';
+import { BaseProcessConfirmation, EarnProcessConfirmation, SwapProcessConfirmation } from '../Process';
 
 interface Props extends ThemeProps {
   request: ConfirmationsQueueItem<EvmSignatureRequest>
