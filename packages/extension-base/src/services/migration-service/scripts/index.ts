@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import BaseMigrationJob from '../Base';
-import AutoEnableSomeTokens from './databases/AutoEnableSomeTokens';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
 import MigrateAssetSetting from './databases/MigrateAssetSetting';
@@ -57,7 +56,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.28-01': MigrateEarningVersion,
   '1.1.33-01': MigrateLedgerAccountV2,
   '1.1.41-01': DeleteChainStaking,
-  '1.1.46-01': AutoEnableSomeTokens,
+  // '1.1.46-01': AutoEnableSomeTokens,
   '1.2.28-01': MigrateAssetSetting,
   '1.2.28-02': MigrateTransactionHistoryBySymbol,
   '1.2.69-01': MigrateRemoveGenesisHash,
