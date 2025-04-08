@@ -173,7 +173,7 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
-    if (isParaSpellNotSupportDryRunXcm(errorMessage)) {
+    if (isParaSpellNotSupportDryRunXcm(errorMessage) || isParaSpellNotSupportBuildXcm(errorMessage)) {
       // skip dry run in this case
       return Promise.resolve({
         success: true,
