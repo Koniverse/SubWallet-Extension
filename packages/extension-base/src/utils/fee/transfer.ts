@@ -10,11 +10,10 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { dryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
@@ -367,6 +366,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
     const extrinsic = await funcCreateExtrinsic(params);
 
+    // todo: refactor condition
     if (feeChainType === 'evm') {
       // Calculate fee for evm transaction
       const tx = extrinsic as TransactionConfig;
@@ -390,9 +390,23 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else if (feeChainType === 'substrate') {
       // Calculate fee for substrate transaction
       if (isSubstrateXcm) {
-        const dryRunInfo = await dryRunXcm(params);
+        try {
+          const estimatedFeeByDryRun = (await dryRunXcmExtrinsicV2(params)).fee;
 
-        estimatedFee = dryRunInfo.fee;
+          if (!estimatedFeeByDryRun) {
+            throw Error('Can not get fee through dry run');
+          }
+
+          estimatedFee = estimatedFeeByDryRun;
+        } catch (e) {
+          try {
+            const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
+
+            estimatedFee = paymentInfo?.partialFee?.toString() || '0';
+          } catch (e) {
+            estimatedFee = '0';
+          }
+        }
       } else {
         try {
           const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
@@ -468,8 +482,6 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   } else {
     if (!_isNativeToken(srcToken)) {
       maxTransferable = BigN(freeBalance.value);
-    } else if (isSubstrateXcm) {
-      maxTransferable = BigN(freeBalance.value).minus(BigN(estimatedFee));
     } else {
       maxTransferable = BigN(freeBalance.value).minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
     }

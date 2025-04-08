@@ -7,7 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, DryRunInfo, dryRunXcmV2, isParaSpellNotSupportBuildXcm, isParaSpellNotSupportDryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -154,11 +154,34 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
 };
 
 export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
-  const extrinsic = await buildXcm(request);
+  try {
+    return await buildXcm(request);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
-  if (!extrinsic) {
-    throw new Error('No extrinsic'); // todo: content?
+    if (isParaSpellNotSupportBuildXcm(errorMessage)) {
+      return createXcmExtrinsic(request);
+    }
+
+    throw new Error('No extrinsic'); // todo: content
   }
+};
 
-  return extrinsic;
+export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<DryRunInfo> => {
+  try {
+    return await dryRunXcmV2(request);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
+
+    if (isParaSpellNotSupportDryRunXcm(errorMessage)) {
+      // skip dry run in this case
+      return Promise.resolve({
+        success: true,
+        fee: undefined
+      });
+    }
+
+    throw new Error('Dry run failed'); // todo: content
+    // throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Dry run failed');
+  }
 };

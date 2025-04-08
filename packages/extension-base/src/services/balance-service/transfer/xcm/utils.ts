@@ -12,9 +12,9 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
-interface DryRunInfo {
+export interface DryRunInfo {
   success: boolean,
-  fee: string // has fee in case dry run success
+  fee?: string // has fee in case dry run success
 }
 
 interface ParaSpellCurrency {
@@ -22,11 +22,11 @@ interface ParaSpellCurrency {
   amount: string
 }
 
-// @ts-ignore
-const XCM_VERSION = {
-  V3: 'V3',
-  V4: 'V4'
-};
+interface ParaSpellError {
+  message: string,
+  error: string,
+  statusCode: number
+}
 
 const paraSpellEndpoint = 'https://api.lightspell.xyz';
 
@@ -37,7 +37,7 @@ const paraSpellApi = {
 
 const paraSpellKey = process.env.PARASPELL_API_KEY || '';
 
-function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> | undefined {
+function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
   try {
     assert(isHex(hex), 'Expected a hex-encoded call');
 
@@ -94,9 +94,9 @@ function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Submittable
 
     return decoded;
   } catch (e) {
-    console.error('Unable to decode tx hex', e);
+    console.error('Failed to decode extrinsic hex', e);
 
-    return undefined;
+    throw new Error('Failed to decode extrinsic hex');
   }
 }
 
@@ -104,45 +104,45 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
-    throw Error('Substrate API is not available');
+    return Promise.reject(new Error('Substrate API is not available'));
   }
 
   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
   const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
 
   if (!psAssetType || !psAssetValue) {
-    throw Error('Token is not support XCM at this time'); // todo: content
+    throw new Error('Token is not support XCM at this time');
   }
 
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
-  try {
-    const bodyData = {
-      address: recipient,
-      from: paraSpellChainMap[originChain.slug],
-      to: paraSpellChainMap[destinationChain.slug],
-      currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
-    };
+  const bodyData = {
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
+  };
 
-    const response = await fetch(paraSpellApi.buildXcm, {
-      method: 'POST',
-      body: JSON.stringify(bodyData),
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-API-KEY': paraSpellKey
-      }
-    });
+  const response = await fetch(paraSpellApi.buildXcm, {
+    method: 'POST',
+    body: JSON.stringify(bodyData),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-API-KEY': paraSpellKey
+    }
+  });
 
-    const extrinsicHex = await response.text();
-    const chainApi = await substrateApi.isReady;
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
 
-    return txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
-  } catch (e) {
-    console.error('Unable to build xcm', e);
-
-    return undefined;
+    throw new Error(error.message);
   }
+
+  const extrinsicHex = await response.text();
+  const chainApi = await substrateApi.isReady;
+
+  return txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
 }
 
 // dry run can fail due to sender address & amount token
@@ -153,7 +153,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
 
   if (!psAssetType || !psAssetValue) {
-    throw Error('Token is not support XCM at this time'); // todo: content
+    throw new Error('Token is not support XCM at this time'); // todo: content
   }
 
   let dryRunInfo: DryRunInfo | undefined;
@@ -189,12 +189,61 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   return dryRunInfo;
 }
 
+export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
+  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
+
+  if (!psAssetType || !psAssetValue) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
+  };
+
+  const response = await fetch(paraSpellApi.dryRunXcm, {
+    method: 'POST',
+    body: JSON.stringify(bodyData),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-API-KEY': paraSpellKey
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return await response.json() as DryRunInfo;
+}
+
 function createParaSpellCurrency (assetType: string, assetValue: string, amount: string): ParaSpellCurrency {
   // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
   return {
     [assetType]: assetValue,
     amount
   };
+}
+
+export function isParaSpellNotSupportBuildXcm (str: string): boolean {
+  const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i;
+
+  return regex.test(str);
+}
+
+export function isParaSpellNotSupportDryRunXcm (str: string): boolean {
+  const regex = /(?=.*DryRunApi)(?=.*not available).*/i;
+
+  return regex.test(str);
 }
 
 // todo: remove

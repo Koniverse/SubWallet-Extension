@@ -4,19 +4,19 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { validateSpendingAndFeePayment } from '@subwallet/extension-base/core/logic-validation';
 import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { dryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -150,8 +150,24 @@ export class SwapBaseHandler {
         recipient: recipientAddress
       };
 
-      const dryRunInfo = await dryRunXcm(xcmRequest);
-      const estimatedBridgeFee = dryRunInfo.fee;
+      // TODO: calculate fee for destination chain
+      let estimatedBridgeFee;
+
+      try {
+        const bridgeFeeByDryRun = (await dryRunXcmExtrinsicV2(xcmRequest)).fee;
+
+        if (!bridgeFeeByDryRun) {
+          throw new Error('Can not get fee through dry run');
+        }
+
+        estimatedBridgeFee = bridgeFeeByDryRun;
+      } catch (e) {
+        const xcmTransfer = await createXcmExtrinsicV2(xcmRequest);
+        const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
+        const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
+        estimatedBridgeFee = Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
+      }
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -252,7 +268,7 @@ export class SwapBaseHandler {
 
     const [extrinsic] = await Promise.all([
       createXcmExtrinsicV2(xcmRequest),
-      dryRunXcm(xcmRequest)
+      dryRunXcmExtrinsicV2(xcmRequest)
     ]);
 
     const xcmData: RequestCrossChainTransfer = {

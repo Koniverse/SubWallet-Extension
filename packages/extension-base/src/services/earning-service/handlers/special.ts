@@ -3,13 +3,12 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { dryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
+import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, RuntimeDispatchInfo, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { t } from 'i18next';
@@ -274,9 +273,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const xcmOriginSubstrateApi = await this.state.getSubstrateApi(altInputTokenInfo.originChain).isReady;
           const id = getId();
           const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
-
-          // TODO: calculate fee for destination chain
-          const dryRunInfo = await dryRunXcm({
+          const xcmRequest = {
             sender: address,
             originTokenInfo: altInputTokenInfo,
             destinationTokenInfo: inputTokenInfo,
@@ -286,11 +283,30 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
             originChain: altChainInfo,
             substrateApi: xcmOriginSubstrateApi,
             feeInfo
-          });
+          };
+
+          // TODO: calculate fee for destination chain
+          let xcmFee;
+
+          try {
+            const xcmFeeByDryRun = (await dryRunXcmExtrinsicV2(xcmRequest)).fee;
+
+            if (!xcmFeeByDryRun) {
+              throw new Error('Can not get fee through dry run');
+            }
+
+            xcmFee = xcmFeeByDryRun;
+          } catch (e) {
+            const xcmTransfer = await createXcmExtrinsicV2(xcmRequest);
+            const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
+            const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
+            xcmFee = Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
+          }
 
           const fee: YieldTokenBaseInfo = {
             slug: altInputTokenSlug,
-            amount: dryRunInfo.fee
+            amount: xcmFee
           };
 
           let bnTransferAmount = bnAmount.sub(bnInputTokenBalance);
@@ -563,7 +579,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
     const [extrinsic] = await Promise.all([
       createXcmExtrinsicV2(xcmRequest),
-      dryRunXcm(xcmRequest)
+      dryRunXcmExtrinsicV2(xcmRequest) // ensure dry run success
     ]);
 
     const xcmData: RequestCrossChainTransfer = {
