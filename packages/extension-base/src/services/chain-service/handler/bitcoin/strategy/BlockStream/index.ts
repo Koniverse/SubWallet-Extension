@@ -3,9 +3,10 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
-import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, RecommendedFeeEstimates, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
+import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
 import { BitcoinApiStrategy, BitcoinTransactionEventMap } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
+import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
@@ -240,6 +241,38 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
       return rs.result;
     }, 0);
+  }
+
+  async getAddressInscriptions (address: string) {
+    const inscriptionsFullList: Inscription[] = [];
+    const pageSize = 60;
+    let offset = 0;
+
+    const hiroService = HiroService.getInstance(this.isTestnet);
+
+    try {
+      while (true) {
+        const response = await hiroService.getAddressInscriptionsInfo({
+          limit: String(pageSize),
+          offset: String(offset),
+          address: String(address)
+        }) as unknown as InscriptionFetchedData;
+
+        const inscriptions = response.results;
+
+        if (inscriptions.length !== 0) {
+          inscriptionsFullList.push(...inscriptions);
+          offset += pageSize;
+        } else {
+          break;
+        }
+      }
+
+      return inscriptionsFullList;
+    } catch (error) {
+      console.error(`Failed to get ${address} inscriptions`, error);
+      throw error;
+    }
   }
 
   getTxHex (txHash: string): Promise<string> {

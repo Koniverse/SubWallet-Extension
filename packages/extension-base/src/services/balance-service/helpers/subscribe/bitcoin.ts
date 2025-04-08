@@ -5,18 +5,20 @@ import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types
 import { BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-// import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
-// import { filteredOutTxsUtxos } from '@subwallet/extension-base/utils';
+import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
+import { filteredOutTxsUtxos, getInscriptionUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
   try {
     // const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
-    const [utxos] = await Promise.all([
-      await bitcoinApi.api.getUtxos(address)
+    const [utxos, inscriptionUtxos] = await Promise.all([
+    // const [utxos] = await Promise.all([
+      await bitcoinApi.api.getUtxos(address),
+      await getInscriptionUtxos(bitcoinApi, address)
     ]);
 
-    // let filteredUtxos: UtxoResponseItem[];
+    let filteredUtxos: UtxoResponseItem[] = [];
 
     if (!utxos || !utxos.length) {
       return [];
@@ -29,9 +31,9 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
     // filteredUtxos = filteredOutTxsUtxos(utxos, runeTxsUtxos);
 
     // filter out inscription utxos
-    // filteredUtxos = filteredOutTxsUtxos(filteredUtxos, inscriptionUtxos);
+    filteredUtxos = filteredOutTxsUtxos(utxos, inscriptionUtxos);
 
-    return utxos;
+    return filteredUtxos;
   } catch (error) {
     console.log('Error while fetching Bitcoin balances', error);
 

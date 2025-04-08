@@ -187,3 +187,27 @@ export function filteredOutTxsUtxos (allTxsUtxos: UtxoResponseItem[], filteredOu
 
   return allTxsUtxos.filter((element) => !listFilterOut.includes(`${element.txid}:${element.vout}`));
 }
+
+export async function getInscriptionUtxos (bitcoinApi: _BitcoinApi, address: string) {
+  try {
+    const inscriptions = await bitcoinApi.api.getAddressInscriptions(address);
+
+    return inscriptions.map((inscription) => {
+      const [txid, vout] = inscription.output.split(':');
+
+      return {
+        txid,
+        vout: parseInt(vout),
+        status: {
+          confirmed: true, // not use in filter out inscription utxos
+          block_height: inscription.genesis_block_height,
+          block_hash: inscription.genesis_block_hash,
+          block_time: inscription.genesis_timestamp
+        },
+        value: parseInt(inscription.value)
+      } as UtxoResponseItem;
+    });
+  } catch (e) {
+    return [];
+  }
+}

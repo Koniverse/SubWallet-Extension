@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { BitcoinAddressSummaryInfo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
+import { BitcoinAddressSummaryInfo, Inscription } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
 import { ApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BitcoinFeeInfo, BitcoinTransactionStatus, BitcoinTx, UtxoResponseItem } from '@subwallet/extension-base/types';
 import EventEmitter from 'eventemitter3';
@@ -13,7 +13,7 @@ export interface BitcoinApiStrategy extends Omit<ApiRequestStrategy, 'addRequest
   // getRuneTxsUtxos (address: string): Promise<RuneTxs[]>; // noted: all rune utxos come in account
   // getRuneUtxos (address: string): Promise<RuneUtxo[]>;
   // getAddressBRC20FreeLockedBalance (address: string, ticker: string): Promise<Brc20BalanceItem>;
-  // getAddressInscriptions (address: string): Promise<Inscription[]>
+  getAddressInscriptions (address: string): Promise<Inscription[]>
   getAddressTransaction (address: string, limit?: number): Promise<BitcoinTx[]>;
   getTransactionStatus (txHash: string): Promise<BitcoinTransactionStatus>;
   getTransactionDetail (txHash: string): Promise<BitcoinTx>;
