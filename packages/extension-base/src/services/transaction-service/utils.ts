@@ -53,6 +53,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
+  if (explorerLink.includes('cere.statescan.io')) {
+    return '#/accounts';
+  }
+
   if (explorerLink.includes('explorer.zkverify.io')) {
     return 'account';
   }
@@ -81,7 +85,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['invarch', 'tangle', 'polimec'].includes(chainInfo.slug)) {
+  if (['invarch', 'tangle', 'polimec', 'cere'].includes(chainInfo.slug)) {
     return '#/extrinsics';
   }
 
