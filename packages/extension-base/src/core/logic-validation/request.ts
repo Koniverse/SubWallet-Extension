@@ -1,21 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import { BigNum, TransactionOutputs, Value as CardanoAmountValue } from '@emurgo/cardano-serialization-lib-nodejs';
 import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData, RequestCardanoSignTransaction } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { convertUtxoRawToUtxo, convertValueToAsset } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
+import { isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
@@ -707,128 +704,6 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
   );
 
   return promise;
-}
-
-export async function validationCardanoSignTransactionMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
-  const { errors } = payload_;
-  const { tx: txHex } = payload_.payloadAfterValidated as RequestCardanoSignTransaction;
-
-  if (!txHex) {
-    throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Not found transaction to sign');
-  }
-
-  const tx = CardanoWasm.Transaction.from_hex(txHex);
-  const inputs = tx.body().inputs();
-  const outputs = tx.body().outputs();
-
-  if (!inputs || !outputs) {
-    payload_.errorPosition = 'dApp';
-    const [message] = convertErrorMessage('Invalid transaction');
-
-    errors.push(new Error(message));
-  }
-
-  const estimateCardanoFee = tx.body().fee().to_str();
-
-  const authInfo = await koni.getAuthList();
-  const authInfoMap = authInfo[stripUrl(url)];
-
-  if (!authInfoMap) {
-    payload_.errorPosition = 'dApp';
-    const [message] = convertErrorMessage('Account not in allowed list');
-
-    errors.push(new Error(message));
-  }
-
-  const addresses = Object.entries(authInfoMap.isAllowedMap).reduce<string[]>((acc, [address, isAllowed]) => {
-    if (isAllowed && isCardanoAddress(address)) {
-      acc.push(address);
-    }
-
-    return acc;
-  }, []);
-
-  const currentNetworkKey = authInfoMap.currentNetworkKey || 'cardano_preproduction';
-
-  const allUtxosRaw = await koni.chainService.getUtxosByAddresses(addresses, currentNetworkKey, currentNetworkKey === 'cardano_preproduction');
-  const allUtxos = Object.entries(allUtxosRaw)
-    .map(([, utxo]) => convertUtxoRawToUtxo(utxo))
-    .flat();
-
-  const outputTransactionUnSpend = TransactionOutputs.new();
-
-  inputs.to_js_value().forEach((input) => {
-    const availableUtxo = allUtxos.find((utxo) => {
-      const txIn = utxo.input();
-
-      return txIn.transaction_id().to_hex() === input.transaction_id && txIn.index() === input.index;
-    });
-
-    if (availableUtxo) {
-      outputTransactionUnSpend.add(availableUtxo.output());
-    }
-  });
-
-  const addressInputMap = getBalanceAddressMap(outputTransactionUnSpend);
-  const addressOutputMap = getBalanceAddressMap(outputs);
-  const addressInputAmountMap: Record<string, CardanoAmountValue> = {};
-  const addressOutputAmountMap: Record<string, CardanoAmountValue> = {};
-
-  for (const address in addressInputMap) {
-    const output = addressOutputMap[address] ?? CardanoAmountValue.new(BigNum.from_str('0'));
-    const input = addressInputMap[address];
-
-    const amount = input.checked_sub(output);
-
-    if (amount.is_zero()) {
-      continue;
-    }
-
-    addressInputAmountMap[address] = amount;
-    addressOutputAmountMap[address] = amount;
-  }
-
-  const transactionValue = CardanoAmountValue.new(BigNum.from_str('0'));
-
-  for (const address in addressOutputMap) {
-    if (!addressInputAmountMap[address] && !addressOutputMap[address].is_zero()) {
-      addressOutputAmountMap[address] = addressOutputMap[address];
-      transactionValue.checked_add(addressOutputMap[address]);
-    }
-  }
-
-  const payloadAfterValidated: CardanoTransactionDappConfig = {
-    ...payload_.payloadAfterValidated as CardanoTransactionDappConfig,
-    inputs: addressInputAmountMap,
-    outputs: addressOutputAmountMap,
-    value: convertValueToAsset(transactionValue),
-    estimateCardanoFee,
-    cardanoPayload: txHex
-  };
-
-  return {
-    ...payload_,
-    networkKey: currentNetworkKey,
-    errors,
-    payloadAfterValidated
-  };
-}
-
-function getBalanceAddressMap (outputs: TransactionOutputs) {
-  const acc: Record<string, CardanoAmountValue> = {};
-
-  for (let i = 0; i < outputs.len() - 1; i++) {
-    const item = outputs.get(i);
-    const address = item.address().to_bech32();
-
-    if (!acc[address]) {
-      acc[address] = item.amount();
-    } else {
-      acc[address].checked_add(item.amount());
-    }
-  }
-
-  return acc;
 }
 
 export function convertErrorMessage (message_: string, name?: string): string[] {

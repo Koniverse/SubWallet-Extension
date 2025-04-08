@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Value as CardanoValue } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _FundStatus, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { Resolver } from '@subwallet/extension-base/background/handlers/State';
@@ -1156,6 +1155,15 @@ export enum CardanoProviderErrorType {
 }
 
 export type Cbor = string;
+export type CardanoPaginate = {
+  page: number,
+  limit: number,
+};
+
+export interface RequestCardanoGetUtxos {
+  amount?: Cbor;
+  paginate?: CardanoPaginate;
+}
 
 export interface RequestCardanoSignData {
   address: string;
@@ -1172,11 +1180,18 @@ export interface RequestCardanoSignTransaction {
   partialSign: boolean
 }
 
+export interface AddressCardanoTransactionBalance {
+  values: CardanoBalanceItem[],
+  isOwner?: boolean,
+  isRecipient?: boolean
+}
+
+export type CardanoKeyType = 'stake' | 'payment';
 export interface CardanoTransactionDappConfig {
-  inputs: Record<string, CardanoValue>,
-  outputs: Record<string, CardanoValue>,
-  to: string,
+  txInputs: Record<string, AddressCardanoTransactionBalance>,
+  txOutputs: Record<string, AddressCardanoTransactionBalance>,
   networkKey: string,
+  addressRequireKeyTypeMap: Record<string, CardanoKeyType[]>,
   value: CardanoBalanceItem[],
   estimateCardanoFee: string,
   cardanoPayload: string,
@@ -2337,9 +2352,10 @@ export interface KoniRequestSignatures {
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
 
   // Cardano
+  'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[]];
   'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
   'cardano(sign.tx)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
-  // 'cardano(submit.tx)': [RequestSignTxRaw, string];
+  'cardano(submit.tx)': [Cbor, string];
 
   // Evm Transaction
   'pri(evm.transaction.parse.input)': [RequestParseEvmContractInput, ResponseParseEvmContractInput];

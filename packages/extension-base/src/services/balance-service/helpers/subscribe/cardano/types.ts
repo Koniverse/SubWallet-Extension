@@ -24,6 +24,12 @@ export interface CardanoUtxosItem {
   reference_script_hash: string | null;
 }
 
+export interface TransactionUtxosItem {
+  hash: string;
+  inputs: CardanoUtxosItem[];
+  outputs: CardanoUtxosItem[];
+}
+
 export interface CardanoTxJson {
   body: {
     inputs: CardanoTxInput[],

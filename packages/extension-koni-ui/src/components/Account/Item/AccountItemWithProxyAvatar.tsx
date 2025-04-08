@@ -9,7 +9,7 @@ import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { Context, useContext } from 'react';
+import React, { Context, useContext, useMemo } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
 type Props = ThemeProps & {
@@ -40,6 +40,8 @@ function Component (props: Props): React.ReactElement<Props> {
     </div>
   ));
 
+  const address = useMemo(() => accountAddress || account?.address, [account?.address, accountAddress]);
+
   return (
     <div
       className={CN(className)}
@@ -62,7 +64,7 @@ function Component (props: Props): React.ReactElement<Props> {
         >
           {accountName || account?.name || ''}
         </div>
-        {showAccountNameFallback && account && <div className={'account-item-address-wrapper'}>{toShort(accountAddress || account.address, 4, 4)}</div>}
+        {showAccountNameFallback && !!address && <div className={'account-item-address-wrapper'}>{toShort(address, 4, 4)}</div>}
       </div>
       <div className='__item-right-part'>
         {rightPartNode || (renderRightPart ? renderRightPart(checkedIconNode) : checkedIconNode)}

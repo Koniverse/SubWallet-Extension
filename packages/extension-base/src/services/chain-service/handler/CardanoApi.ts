@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, TransactionUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
@@ -176,6 +176,28 @@ export class CardanoApi implements _CardanoApi {
       console.error('Error on getting account balance', e);
 
       return [];
+    }
+  }
+
+  async getSpecificUtxo (txHash: string): Promise<TransactionUtxosItem> {
+    try {
+      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/txs/${txHash}/utxos`;
+      const response = await fetch(
+        url, {
+          method: 'GET',
+          headers: {
+            Project_id: this.projectId
+          }
+        }
+      );
+
+      const utxo = await response.json() as TransactionUtxosItem;
+
+      return utxo;
+    } catch (e) {
+      console.error('Error on getting account balance', e);
+
+      return {} as TransactionUtxosItem;
     }
   }
 

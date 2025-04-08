@@ -8,7 +8,7 @@ import { CardanoProviderError } from '@subwallet/extension-base/background/error
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -23,6 +23,7 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
+import { isCardanoAddress } from '@subwallet/keyring';
 import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
@@ -1209,6 +1210,31 @@ export default class KoniTabs {
   }
 
   // Cardano
+  private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[]> {
+    const authInfo = await this.getAuthInfo(url);
+    const networkKey = authInfo?.currentNetworkKey;
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    if (!networkKey) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
+    }
+
+    const allowedAccounts = Object.entries(authInfo?.isAllowedMap).reduce<string[]>((acc, [address, isAllowed]) => {
+      if (isAllowed && isCardanoAddress(address)) {
+        acc.push(address);
+      }
+
+      return acc;
+    }, []);
+
+    const utxos = await this.#koniState.chainService.getUtxosByAddresses(allowedAccounts, networkKey);
+
+    return utxos.map((utxo) => utxo.to_hex());
+  }
+
   private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
     const signResult = await this.#koniState.cardanoSignData(id, url, params);
 
@@ -1226,6 +1252,16 @@ export default class KoniTabs {
       return signResult;
     } else {
       throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
+
+  private async cardanoSubmitTransaction (id: string, url: string, params: string): Promise<ResponseCardanoSignTransaction> {
+    const txHash = await this.#koniState.cardanoSubmitTx(id, url, params);
+
+    if (txHash) {
+      return txHash;
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Failed to submit transaction');
     }
   }
 
@@ -1304,10 +1340,14 @@ export default class KoniTabs {
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
 
       // Cardano
+      case 'cardano(account.get.utxos)':
+        return await this.cardanoGetUtxo(id, url, request as RequestCardanoGetUtxos);
       case 'cardano(sign.data)':
         return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
       case 'cardano(sign.tx)':
         return await this.cardanoSignTransaction(id, url, request as RequestCardanoSignTransaction);
+      case 'cardano(submit.tx)':
+        return await this.cardanoSubmitTransaction(id, url, request as string);
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }

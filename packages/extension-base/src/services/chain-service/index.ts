@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
 import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
@@ -16,6 +17,7 @@ import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _
 import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
+import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request-service/helper';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
@@ -220,10 +222,11 @@ export class ChainService {
     return this.cardanoChainHandler.getCardanoApiByChain(slug);
   }
 
-  public async getUtxosByAddresses (addresses: string[], slug: string, isTestnet: boolean): Promise<Record<string, CardanoUtxosItem[]>> {
-    const cardanoApi = this.getCardanoApi(slug);
+  public async getUtxosByAddresses (addresses: string[], slug: string): Promise<TransactionUnspentOutput[]> {
+    const cardanoApi = this.getCardanoApi('cardano_preproduction');
 
     const addressUtxoMap: Record<string, CardanoUtxosItem[]> = {};
+    const isTestnet = true;
 
     await Promise.all(addresses.map(async (address) => {
       const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
@@ -232,7 +235,25 @@ export class ChainService {
       addressUtxoMap[formattedAddress] = utxos;
     }));
 
-    return { ...addressUtxoMap };
+    return Object.entries(addressUtxoMap)
+      .map(([, utxo]) => convertUtxoRawToUtxo(utxo))
+      .flat();
+  }
+
+  public getSpecificUtxo (slug: string) {
+    const cardanoApi = this.getCardanoApi('cardano_preproduction');
+
+    return async (txHash: string, txId: number) => {
+      const utxoRaw = await cardanoApi.getSpecificUtxo(txHash);
+
+      if (!utxoRaw.outputs) {
+        return undefined;
+      }
+
+      const utxos = convertUtxoRawToUtxo(utxoRaw.outputs);
+
+      return utxos[txId];
+    };
   }
 
   public getCardanoApiMap () {
