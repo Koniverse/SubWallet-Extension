@@ -273,7 +273,7 @@ export class HydradxHandler implements SwapBaseInterface {
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const metadata = params.process.steps[params.currentStep].metadata as unknown as HydrationSwapStepMetadata;
-    const txHex = params.quote.metadata as string;
+    const txHex = metadata.txHex;
 
     if (!txHex || !isHex(txHex)) {
       return new SwapError(SwapErrorType.UNKNOWN) as unknown as SwapSubmitStepData;
