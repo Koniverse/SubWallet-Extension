@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { _BEAR_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
 import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, RecommendedFeeEstimates, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
 import { BitcoinApiStrategy, BitcoinTransactionEventMap } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
@@ -37,7 +37,7 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
   private headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${_BEAR_TOKEN}`
+    Authorization: `Bearer ${_BTC_SERVICE_TOKEN}`
   };
 
   isRateLimited (): boolean {

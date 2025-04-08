@@ -78,9 +78,8 @@ const Component = (props: Props) => {
         balanceInfo={item.balanceInfo}
         chainName={_getChainName(chainInfoMap[item.originChain])}
         chainSlug={item.originChain}
-        className={CN('token-selector-item', {
-          '-selected': value === item.slug
-        })}
+        className={CN('token-selector-item')}
+        isSelected={value === item.slug}
         key={item.slug}
         onClick={onClickItem(item)}
         showBalance={true}
@@ -365,10 +364,6 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
         flex: 1,
         overflow: 'auto',
         paddingBottom: token.padding
-      },
-
-      '.token-selector-item.-selected': {
-        backgroundColor: token.colorBgInput
       },
 
       '.token-selector-item + .token-selector-item': {
