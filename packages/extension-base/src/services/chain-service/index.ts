@@ -1978,24 +1978,7 @@ export class ChainService {
     this.checkLatestData();
   }
 
-  public async initAssetSettings () {
-    const assetSettings = await this.getAssetSettings();
-    const activeChainSlugs = this.getActiveChainSlugs();
-    const assetRegistry = this.getAssetRegistry();
-
-    Object.values(assetRegistry).forEach((assetInfo) => {
-      const isSettingExisted = assetInfo.slug in assetSettings;
-
-      // Set visible for every enabled chains
-      if (activeChainSlugs.includes(assetInfo.originChain) && !isSettingExisted) {
-        // Setting only exist when set either by chain settings or user
-        assetSettings[assetInfo.slug] = {
-          visible: true
-        };
-      }
-    });
-
-    this.setAssetSettings(assetSettings, false);
+  public initAssetSettings () {
     this.eventService.emit('asset.ready', true);
   }
 
