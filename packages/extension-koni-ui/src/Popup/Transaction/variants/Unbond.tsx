@@ -193,10 +193,20 @@ const Component: React.FC = () => {
           className='__label-bottom'
           label={t('Conversion rate')}
         >
-          <span
-            className='chain-name'
-            style={{ color: '#A6A6A6' }}
-          >{`1 ${bondedAsset?.symbol || ''} = ${(1 / earningRate).toFixed(2)} ${poolInfo.metadata?.subnetData?.subnetSymbol || ''}`}</span>
+          <div className='__subnet-rate'>
+            <span
+              className='chain-name'
+              style={{ color: '#A6A6A6' }}
+            >
+              {`1 ${bondedAsset?.symbol || ''} = `}
+            </span>
+            <MetaInfo.Number
+              className='__label-bottom'
+              decimals={decimals}
+              suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
+              value={BigN(1).multipliedBy(10 ** decimals).multipliedBy(1 / earningRate)}
+            />
+          </div>
         </MetaInfo.Default>
       </MetaInfo>
     );
@@ -697,6 +707,12 @@ const Unbond = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
 
     // TODO: recheck with other UI
+    '.__subnet-rate': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem'
+    },
+
     '.__rate-wrapper': {
       marginTop: token.paddingSM
     },

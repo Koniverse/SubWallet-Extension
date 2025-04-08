@@ -233,7 +233,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
 
       return {
-        slippage: slippage.toNumber(),
+        slippage: slippage.plus(0.0001).toNumber(),
         rate: rate.toNumber()
       };
     } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
@@ -244,7 +244,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
 
       return {
-        slippage: slippage.toNumber(),
+        slippage: slippage.plus(0.0001).toNumber(),
         rate: rate.toNumber()
       };
     }

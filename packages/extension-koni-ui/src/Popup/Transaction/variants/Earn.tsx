@@ -753,15 +753,19 @@ const Component = () => {
               className='__label-bottom'
               label={t('Conversion rate')}
             >
-              <div className='__subnet-wrapper'>
+              <div className='__subnet-rate'>
                 <span
                   className='chain-name'
                   style={{ color: '#A6A6A6' }}
                 >
-                  {`1 ${inputAsset.symbol} = ${(1 / earningRate).toFixed(2)} ${
-                    poolInfo.metadata?.subnetData?.subnetSymbol || ''
-                  }`}
+                  {`1 ${inputAsset.symbol} = `}
                 </span>
+                <Number
+                  className='__label-bottom'
+                  decimal={assetDecimals}
+                  suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
+                  value={BigN(1).multipliedBy(10 ** assetDecimals).multipliedBy(1 / earningRate)}
+                />
               </div>
             </MetaInfo.Default>
           </>
@@ -1445,6 +1449,12 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       alignItems: 'center',
       gap: token.sizeXS,
       minWidth: 0
+    },
+
+    '.__subnet-rate': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem'
     },
 
     '.__slippage-wrapper': {
