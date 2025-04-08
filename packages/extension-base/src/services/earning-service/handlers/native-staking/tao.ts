@@ -280,7 +280,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             era: 0,
             unstakingPeriod: 1.2,
             tvl: bnTaoIn.toString(),
-            totalApr: Number(highestApr.apr) * 100
+            totalApr: this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0
           }
         };
 
