@@ -7,12 +7,13 @@ import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@sub
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
-import { TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
+import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -41,6 +42,8 @@ interface LinkUrlProps {
   content: string;
 }
 
+type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
+
 const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
   if (props.url) {
     return (
@@ -67,11 +70,13 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
-  // const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
-  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
+
+  const { chainInfoMap, chainStateMap, priorityTokens } = useSelector((root: RootState) => root.chainStore);
   const { assetRegistry } = useSelector((state: RootState) => state.assetRegistry);
   const { walletReference } = useSelector((state: RootState) => state.settings);
   const { services, tokens } = useSelector((state: RootState) => state.buyService);
+
+  const getAccountTokenBalance = useGetAccountTokenBalance();
 
   const checkAsset = useAssetChecker();
   const allowedChains = useGetChainSlugsByAccount();
@@ -155,15 +160,32 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     promiseRef.current.reject(new Error('User reject'));
   }, []);
 
-  const tokenItems = useMemo<TokenItemType[]>(() => {
-    const result: TokenItemType[] = [];
+  const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+    const tokenBalanceMap = getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
 
-    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
-        originChain: info.network
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };
 
@@ -177,8 +199,10 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
       }
     });
 
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
     return result;
-  }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 

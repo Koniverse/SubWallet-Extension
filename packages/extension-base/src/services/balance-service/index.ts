@@ -481,14 +481,22 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectioApi?.getEvmTokenBalanceSlug(address)
-          .catch((e) => {
-            console.error(e);
-
-            return null;
+        return new Promise<string[] | null>((resolve) => {
+          const timeOutPromise = new Promise<string[]>((_resolve) => {
+            setTimeout(() => _resolve([]), 30000);
           });
+
+          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+
+          Promise.race([timeOutPromise, apiPromise])
+            .then((result) => resolve(result))
+            .catch((error) => {
+              console.error(error);
+              resolve(null);
+            });
+        });
       } else {
-        return null;
+        return Promise.resolve(null);
       }
     });
 
@@ -539,16 +547,22 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
-        balanceData.forEach((slug) => {
+        for (const slug of balanceData) {
           const chainSlug = slug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
             needEnableChains.push(chainSlug);
             needActiveTokens.push(existedKey);
             currentAssetSettings[existedKey] = { visible: true };
           }
-        });
+        }
       }
     }
 
