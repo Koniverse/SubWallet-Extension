@@ -12,7 +12,7 @@ import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isSubstrateAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
@@ -679,6 +679,10 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
 
   if (address === '' || !payload) {
     handleError('Not found address or payload to sign');
+  }
+
+  if (!isCardanoAddress(address)) {
+    handleError('Not found cardano address');
   }
 
   const pair = pair_ || keyring.getPair(address);

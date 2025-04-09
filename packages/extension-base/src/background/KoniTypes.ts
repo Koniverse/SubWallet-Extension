@@ -1191,7 +1191,8 @@ export interface CardanoTransactionDappConfig {
   txInputs: Record<string, AddressCardanoTransactionBalance>,
   txOutputs: Record<string, AddressCardanoTransactionBalance>,
   networkKey: string,
-  addressRequireKeyTypeMap: Record<string, CardanoKeyType[]>,
+  from: string,
+  addressRequireKeyTypes: CardanoKeyType[],
   value: CardanoBalanceItem[],
   estimateCardanoFee: string,
   cardanoPayload: string,
@@ -2352,10 +2353,13 @@ export interface KoniRequestSignatures {
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
 
   // Cardano
+  'cardano(account.get)': [null, string[]];
+  'cardano(account.get.change.address)': [null, string];
   'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[]];
-  'cardano(sign.data)': [RequestCardanoSignData, ResponseCardanoSignData];
-  'cardano(sign.tx)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
-  'cardano(submit.tx)': [Cbor, string];
+  'cardano(network.get.current)': [null, number];
+  'cardano(data.sign)': [RequestCardanoSignData, ResponseCardanoSignData];
+  'cardano(transaction.sign)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
+  'cardano(transaction.submit)': [Cbor, string];
 
   // Evm Transaction
   'pri(evm.transaction.parse.input)': [RequestParseEvmContractInput, ResponseParseEvmContractInput];

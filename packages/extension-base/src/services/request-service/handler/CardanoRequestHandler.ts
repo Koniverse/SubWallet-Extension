@@ -202,26 +202,24 @@ export default class CardanoRequestHandler {
 
   private signDappTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSignTransactionRequest'][0]): string { // alibaba
     const transaction = confirmation.payload;
-    const { addressRequireKeyTypeMap, cardanoPayload } = transaction;
+    const { addressRequireKeyTypes, cardanoPayload, from } = transaction;
     const vkeyWitnessesFinal = Vkeywitnesses.new();
     const txWitnessSet = FixedTransaction.from_hex(cardanoPayload).witness_set() ?? TransactionWitnessSet.new();
 
-    Object.entries(addressRequireKeyTypeMap).forEach(([key, types]) => {
-      const pair = keyring.getPair(key);
+    const pair = keyring.getPair(from);
 
-      if (pair.isLocked) {
-        keyring.unlockPair(pair.address);
-      }
+    if (pair.isLocked) {
+      keyring.unlockPair(pair.address);
+    }
 
-      const keyTypes = [...new Set(types)];
-      const vKeyWitnessesHex = pair.cardano.signTransaction(cardanoPayload, { needVkeywitness: true, keyTypes });
+    const keyTypes = [...new Set(addressRequireKeyTypes)];
+    const vKeyWitnessesHex = pair.cardano.signTransaction(cardanoPayload, { needVkeywitness: true, keyTypes });
 
-      const vKeyWitnesses = Vkeywitnesses.from_hex(vKeyWitnessesHex);
+    const vKeyWitnesses = Vkeywitnesses.from_hex(vKeyWitnessesHex);
 
-      for (let i = 0; i < vKeyWitnesses.len(); i++) {
-        vkeyWitnessesFinal.add(vKeyWitnesses.get(i));
-      }
-    });
+    for (let i = 0; i < vKeyWitnesses.len(); i++) {
+      vkeyWitnessesFinal.add(vKeyWitnesses.get(i));
+    }
 
     txWitnessSet.set_vkeys(vkeyWitnessesFinal);
 

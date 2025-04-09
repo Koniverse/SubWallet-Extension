@@ -23,7 +23,6 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { isCardanoAddress } from '@subwallet/keyring';
 import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
@@ -73,24 +72,6 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     }
   };
 
-  const authReformatAddress = ({ json: { address, meta: { genesisHash, name } }, type }: SingleAddress) => {
-    const accountRs = {
-      address,
-      genesisHash,
-      name,
-      type
-    };
-
-    if (type === 'cardano') {
-      const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
-      const addressChainFormat = reformatAddress(address, +isTestnet);
-
-      accountRs.address = convertCardanoAddressToHex(addressChainFormat);
-    }
-
-    return accountRs;
-  };
-
   return Object
     .values(accounts)
     .filter(({ json: { meta: { isHidden } } }) => !isHidden)
@@ -98,7 +79,12 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))
-    .map(authReformatAddress);
+    .map(({ json: { address, meta: { genesisHash, name } }, type }): InjectedAccount => ({
+      address,
+      genesisHash,
+      name,
+      type
+    }));
 }
 
 interface ChainPatrolResponse {
@@ -420,11 +406,11 @@ export default class KoniTabs {
   }
 
   // TODO: Update logic
-  private async getEvmCurrentAccount (url: string): Promise<string[]> {
+  private async getCurrentAccount (url: string, authType: AccountAuthType): Promise<string[]> {
     return await new Promise((resolve) => {
       this.getAuthInfo(url).then((authInfo) => {
         const allAccounts = this.#koniState.keyringService.context.pairs;
-        const accountList = transformAccountsV2(allAccounts, false, authInfo, ['evm']).map((a) => a.address);
+        const accountList = transformAccountsV2(allAccounts, false, authInfo, [authType]).map((a) => a.address);
         let accounts: string[] = [];
 
         const proxyId = this.#koniState.keyringService.context.currentAccount.proxyId;
@@ -521,7 +507,7 @@ export default class KoniTabs {
   }
 
   private async getEvmPermission (url: string, id: string) {
-    const accounts = await this.getEvmCurrentAccount(url);
+    const accounts = await this.getCurrentAccount(url, 'evm');
 
     return [{
       id: id,
@@ -852,10 +838,10 @@ export default class KoniTabs {
     };
 
     // Detect accounts changed
-    let currentAccountList = await this.getEvmCurrentAccount(url);
+    let currentAccountList = await this.getCurrentAccount(url, 'evm');
 
     const onCurrentAccountChanged = async () => {
-      const newAccountList = await this.getEvmCurrentAccount(url);
+      const newAccountList = await this.getCurrentAccount(url, 'evm');
 
       // Compare to void looping reload
       if (JSON.stringify(currentAccountList) !== JSON.stringify(newAccountList)) {
@@ -884,7 +870,7 @@ export default class KoniTabs {
       }
 
       // Detect account
-      const newAccountList = await this.getEvmCurrentAccount(url);
+      const newAccountList = await this.getCurrentAccount(url, 'evm');
 
       // Compare to void looping reload
       if (JSON.stringify(currentAccountList) !== JSON.stringify(newAccountList)) {
@@ -1029,7 +1015,7 @@ export default class KoniTabs {
   }
 
   public async canUseAccount (address: string, url: string) {
-    const allowedAccounts = await this.getEvmCurrentAccount(url);
+    const allowedAccounts = await this.getCurrentAccount(url, 'evm');
 
     return !!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()));
   }
@@ -1067,7 +1053,7 @@ export default class KoniTabs {
         case 'net_version':
           return parseInt(await this.getEvmCurrentChainId(url), 16);
         case 'eth_accounts':
-          return await this.getEvmCurrentAccount(url);
+          return await this.getCurrentAccount(url, 'evm');
         case 'eth_sendTransaction':
           return await this.evmSendTransaction(id, url, request);
         case 'eth_sign':
@@ -1210,6 +1196,68 @@ export default class KoniTabs {
   }
 
   // Cardano
+  private async cardanoGetAccountList (id: string, url: string): Promise<string[]> {
+    const authInfo = await this.getAuthInfo(url);
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+
+    return accountList.map((address) => {
+      const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isTestnet);
+
+      return convertCardanoAddressToHex(addressChainFormat);
+    });
+  }
+
+  private async cardanoGetChangeAddress (id: string, url: string): Promise<string> {
+    const authInfo = await this.getAuthInfo(url);
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+
+    const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+    const addressChainFormat = reformatAddress(accountList[0], +isTestnet);
+
+    return convertCardanoAddressToHex(addressChainFormat);
+  }
+
+  private async cardanoGetCurrentNetworkId (id: string, url: string): Promise<number> {
+    let currentChain: string | undefined;
+    let autoActiveChain = false;
+
+    if (url) {
+      const authInfo = await this.getAuthInfo(url);
+
+      if (authInfo?.currentNetworkKey) {
+        currentChain = authInfo?.currentNetworkKey;
+      }
+
+      if (authInfo?.isAllowed) {
+        autoActiveChain = true;
+      }
+    }
+
+    const currentNetwork = this.#koniState.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: currentChain,
+      url
+    });
+
+    if (!currentNetwork?.cardanoInfo) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Can\'t get current network');
+    }
+
+    return +(!currentNetwork?.isTestnet);
+  }
+
   private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[]> {
     const authInfo = await this.getAuthInfo(url);
     const networkKey = authInfo?.currentNetworkKey;
@@ -1222,13 +1270,7 @@ export default class KoniTabs {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
     }
 
-    const allowedAccounts = Object.entries(authInfo?.isAllowedMap).reduce<string[]>((acc, [address, isAllowed]) => {
-      if (isAllowed && isCardanoAddress(address)) {
-        acc.push(address);
-      }
-
-      return acc;
-    }, []);
+    const allowedAccounts = [(await this.getCurrentAccount(url, 'cardano'))[0]];
 
     const utxos = await this.#koniState.chainService.getUtxosByAddresses(allowedAccounts, networkKey);
 
@@ -1236,7 +1278,8 @@ export default class KoniTabs {
   }
 
   private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
-    const signResult = await this.#koniState.cardanoSignData(id, url, params);
+    const addressList = await this.getCurrentAccount(url, 'cardano');
+    const signResult = await this.#koniState.cardanoSignData(id, url, params, addressList[0]);
 
     if (signResult) {
       return signResult;
@@ -1246,7 +1289,8 @@ export default class KoniTabs {
   }
 
   private async cardanoSignTransaction (id: string, url: string, params: RequestCardanoSignTransaction): Promise<ResponseCardanoSignTransaction> {
-    const signResult = await this.#koniState.cardanoSignTx(id, url, params);
+    const addressList = await this.getCurrentAccount(url, 'cardano');
+    const signResult = await this.#koniState.cardanoSignTx(id, url, params, addressList[0]);
 
     if (signResult) {
       return signResult;
@@ -1340,13 +1384,19 @@ export default class KoniTabs {
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
 
       // Cardano
+      case 'cardano(account.get)':
+        return await this.cardanoGetAccountList(id, url);
+      case 'cardano(account.get.change.address)':
+        return await this.cardanoGetChangeAddress(id, url);
       case 'cardano(account.get.utxos)':
         return await this.cardanoGetUtxo(id, url, request as RequestCardanoGetUtxos);
-      case 'cardano(sign.data)':
+      case 'cardano(network.get.current)':
+        return await this.cardanoGetCurrentNetworkId(id, url);
+      case 'cardano(data.sign)':
         return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
-      case 'cardano(sign.tx)':
+      case 'cardano(transaction.sign)':
         return await this.cardanoSignTransaction(id, url, request as RequestCardanoSignTransaction);
-      case 'cardano(submit.tx)':
+      case 'cardano(transaction.submit)':
         return await this.cardanoSubmitTransaction(id, url, request as string);
       default:
         throw new Error(`Unable to handle message of type ${type}`);

@@ -47,11 +47,10 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { isManifestV3, reformatAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { isManifestV3, isSameAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { isCardanoAddress } from '@subwallet/keyring';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
 import BN from 'bn.js';
@@ -1266,7 +1265,7 @@ export default class KoniState {
     });
   }
 
-  public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
+  public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData, currentAddress: string): Promise<ResponseCardanoSignData> {
     const { address, payload } = params;
 
     const payloadValidation: PayloadValidated = {
@@ -1283,6 +1282,11 @@ export default class KoniState {
       ];
 
     const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    if (!isSameAddress(address, currentAddress)) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED);
+    }
+
     const errorsFormated = convertErrorFormat(result.errors);
     const payloadAfterValidated: CardanoSignatureRequest = {
       ...result.payloadAfterValidated as CardanoSignatureRequest,
@@ -1305,7 +1309,7 @@ export default class KoniState {
   }
 
   // Todo: Add validate for this method
-  public async cardanoSignTx (id: string, url: string, param: RequestCardanoSignTransaction): Promise<ResponseCardanoSignTransaction> {
+  public async cardanoSignTx (id: string, url: string, param: RequestCardanoSignTransaction, currentAddress: string): Promise<ResponseCardanoSignTransaction> {
     const { partialSign, tx: txHex } = param;
     const tx = CardanoWasm.Transaction.from_hex(txHex);
     const inputs = tx.body().inputs();
@@ -1313,28 +1317,30 @@ export default class KoniState {
 
     const estimateCardanoFee = tx.body().fee().to_str();
 
-    const authInfo = await this.getAuthList();
-    const authInfoMap = authInfo[stripUrl(url)];
-    let requireKeyHashes: string[] = [];
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
 
-    if (!authInfoMap) {
-      throw new Error(t('Not found auth info'));
+    if (!authInfo) {
+      throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED, t('Not found auth info'));
     }
 
-    const currentNetworkKey = 'cardano_preproduction';
-    const isTestnet = currentNetworkKey === 'cardano_preproduction';
+    let requireKeyHashes: string[] = [];
+    let networkKey = authInfo?.currentNetworkKey;
+    let autoActiveChain = false;
 
-    const addresses = Object.entries(authInfoMap.isAllowedMap).reduce<string[]>((acc, [address, isAllowed]) => {
-      if (isAllowed && isCardanoAddress(address)) {
-        const formatAddress = isTestnet ? reformatAddress(address, 0) : address;
+    if (authInfo?.isAllowed) {
+      autoActiveChain = true;
+    }
 
-        acc.push(formatAddress);
-      }
+    const currentEvmNetwork = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
 
-      return acc;
-    }, []);
-
-    const allUtxos = await this.chainService.getUtxosByAddresses(addresses, currentNetworkKey);
+    networkKey = currentEvmNetwork?.slug || 'cardano_mainnet';
+    const allUtxos = await this.chainService.getUtxosByAddresses([currentAddress], networkKey);
 
     const outputTransactionUnSpend = TransactionOutputs.new();
 
@@ -1375,7 +1381,7 @@ export default class KoniState {
       addressInputAmountMap[address] = { values: convertValueToAsset(input) };
       addressOutputAmountMap[address] = { values: convertValueToAsset(output) };
 
-      if (addresses.includes(address)) {
+      if (isSameAddress(currentAddress, address)) {
         transactionValue = transactionValue.checked_add(amount);
         addressInputAmountMap[address].isOwner = true;
         addressOutputAmountMap[address].isOwner = true;
@@ -1396,41 +1402,55 @@ export default class KoniState {
     requireKeyHashes.push(...extractKeyHashFromCertificate(transactionBody.certs()));
     requireKeyHashes.push(...extractKeyHashesFromWithdrawals(transactionBody.withdrawals()));
     requireKeyHashes.push(...extractKeyHashesFromRequiredSigners(transactionBody.required_signers()));
-    requireKeyHashes.push(...(await extractKeyHashesFromCollaterals(transactionBody.collateral(), getSpecificUtxo(currentNetworkKey))));
+    requireKeyHashes.push(...(await extractKeyHashesFromCollaterals(transactionBody.collateral(), getSpecificUtxo(networkKey))));
 
     requireKeyHashes.push(...extractKeyHashesFromScripts(tx.witness_set().native_scripts()));
 
     requireKeyHashes = [...new Set(requireKeyHashes)];
-    const addressRequireKeyTypeMap: Record<string, CardanoKeyType[]> = {};
-    const keyHashAddressMap = addresses.reduce<Record<string, { address: string, type: 'stake' | 'payment'}>>((map, address) => {
-      addressRequireKeyTypeMap[address] = [];
+    const addressRequireKeyTypes: CardanoKeyType[] = [];
+    const keyHashAddressMap: Record<string, CardanoKeyType> = {};
 
-      const pair = keyring.getPair(address);
+    const pair = keyring.getPair(currentAddress);
 
-      if (pair) {
-        const publicKey = Bip32PublicKey.from_bytes(pair.publicKey);
+    if (pair) {
+      const publicKey = Bip32PublicKey.from_bytes(pair.publicKey);
 
-        const paymentPubKey = publicKey.derive(0).derive(0).to_raw_key().hash().to_hex();
-        const stakePubKey = publicKey.derive(2).derive(0).to_raw_key().hash().to_hex();
+      const paymentPubKey = publicKey.derive(0).derive(0).to_raw_key().hash().to_hex();
+      const stakePubKey = publicKey.derive(2).derive(0).to_raw_key().hash().to_hex();
 
-        map[paymentPubKey] = { address, type: 'payment' };
-        map[stakePubKey] = { address, type: 'stake' };
-      }
-
-      return map;
-    }, {});
+      keyHashAddressMap[paymentPubKey] = 'payment';
+      keyHashAddressMap[stakePubKey] = 'stake';
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST);
+    }
 
     const needForeignKeyHash = requireKeyHashes.some((key) => {
       const ownKeyHash = keyHashAddressMap[key];
 
       if (ownKeyHash) {
-        addressRequireKeyTypeMap[ownKeyHash.address].push(ownKeyHash.type);
+        addressRequireKeyTypes.push(ownKeyHash);
 
         return false;
       }
 
       return true;
     });
+
+    const needOwnerKeyHash = requireKeyHashes.some((key) => {
+      const ownKeyHash = keyHashAddressMap[key];
+
+      if (ownKeyHash) {
+        addressRequireKeyTypes.push(ownKeyHash);
+
+        return true;
+      }
+
+      return false;
+    });
+
+    if (!needOwnerKeyHash) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST);
+    }
 
     if (needForeignKeyHash && !partialSign) {
       throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED, 'Not support foreign key hash yet');
@@ -1440,11 +1460,12 @@ export default class KoniState {
       id,
       txInputs: addressInputAmountMap,
       txOutputs: addressOutputAmountMap,
-      addressRequireKeyTypeMap,
+      addressRequireKeyTypes,
       value: convertValueToAsset(transactionValue),
       estimateCardanoFee,
+      from: currentAddress,
       cardanoPayload: txHex,
-      networkKey: currentNetworkKey
+      networkKey
     };
 
     return this.requestService.addConfirmationCardano(id, url, 'cardanoSignTransactionRequest', result, {})

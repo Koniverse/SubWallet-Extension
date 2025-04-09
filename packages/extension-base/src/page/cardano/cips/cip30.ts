@@ -15,8 +15,8 @@ export class CIP30Api {
     // Implementation here
   }
 
-  getNetworkId () {
-    return 0;
+  async getNetworkId () {
+    return await this.sendMessage('cardano(network.get.current)');
   }
 
   async getCollateral () {
@@ -28,30 +28,34 @@ export class CIP30Api {
   }
 
   async getUsedAddresses () {
-    const accounts = await this.sendMessage('pub(accounts.listV2)', { accountAuthType: 'cardano' });
-
-    return accounts.map((account) => account.address);
+    return await this.sendMessage('cardano(account.get)');
   }
 
   async getChangeAddress () {
-    const accounts = await this.sendMessage('pub(accounts.listV2)', { accountAuthType: 'cardano' });
-
-    return accounts.map((account) => account.address)[0];
+    return await this.sendMessage('cardano(account.get.change.address)');
   }
 
-  getUnusedAddresses (x?: any) {
-    console.log('getUnusedAddresses');
+  async getUnusedAddresses (): Promise<string[]> {
+    return new Promise((resolve) => resolve([]));
+  }
+
+  async getRewardAddresses (): Promise<string[]> {
+    return new Promise((resolve) => resolve([]));
   }
 
   async signTx (tx: Cbor, partialSign = false) {
-    return await this.sendMessage('cardano(sign.tx)', { tx, partialSign });
+    return await this.sendMessage('cardano(transaction.sign)', { tx, partialSign });
   }
 
   async signData (address: string, payload: string) {
-    return await this.sendMessage('cardano(sign.data)', { address, payload });
+    return await this.sendMessage('cardano(data.sign)', { address, payload });
   }
 
   async submitTx (tx: Cbor) {
-    return await this.sendMessage('cardano(submit.tx)', tx);
+    return await this.sendMessage('cardano(transaction.submit)', tx);
+  }
+
+  async getBalance () {
+    // Implementation here
   }
 }

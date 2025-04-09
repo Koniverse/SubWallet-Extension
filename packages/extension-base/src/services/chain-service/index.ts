@@ -223,7 +223,7 @@ export class ChainService {
   }
 
   public async getUtxosByAddresses (addresses: string[], slug: string): Promise<TransactionUnspentOutput[]> {
-    const cardanoApi = this.getCardanoApi('cardano_preproduction');
+    const cardanoApi = this.getCardanoApi(slug);
 
     const addressUtxoMap: Record<string, CardanoUtxosItem[]> = {};
     const isTestnet = true;
@@ -241,7 +241,7 @@ export class ChainService {
   }
 
   public getSpecificUtxo (slug: string) {
-    const cardanoApi = this.getCardanoApi('cardano_preproduction');
+    const cardanoApi = this.getCardanoApi(slug);
 
     return async (txHash: string, txId: number) => {
       const utxoRaw = await cardanoApi.getSpecificUtxo(txHash);
