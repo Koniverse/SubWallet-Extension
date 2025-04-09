@@ -5,7 +5,7 @@ import type { ThemeProps } from '../types';
 
 import { GLOBAL_ALERT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useIsPopup } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import applyPreloadStyle from '@subwallet/extension-koni-ui/preloadStyle';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { generateTheme, SW_THEME_CONFIGS, SwThemeConfig } from '@subwallet/extension-koni-ui/themes';
@@ -57,6 +57,18 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.-side-panel-mode': {
+      '.main-page-container': {
+        height: '100%',
+
+        '.main-layout-content': {
+          border: 0,
+          height: '100%',
+          width: '100%'
+        }
+      }
+    },
+
     '.ant-sw-modal .ant-sw-modal-header': {
       borderRadius: '24px 24px 0 0'
     },
@@ -86,6 +98,15 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       '.ant-sw-modal-content': {
         '.ant-sw-modal-header': {
           borderRadius: 0
+        }
+      }
+    },
+
+    '.-side-panel-mode .ant-sw-modal': {
+      '&, &.ant-sw-qr-scanner': {
+        '.ant-sw-modal-content': {
+          width: '100%',
+          left: 0
         }
       }
     },
@@ -382,7 +403,7 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   const themeName = useSelector((state: RootState) => state.settings.theme);
   const logoMaps = useSelector((state: RootState) => state.settings.logoMaps);
   const [themeReady, setThemeReady] = useState(false);
-  const isPopup = useIsPopup();
+  const { isExpanseMode } = useExtensionDisplayModes();
 
   const themeConfig = useMemo(() => {
     const config = SW_THEME_CONFIGS[themeName];
@@ -394,12 +415,12 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   }, [logoMaps, themeName]);
 
   useEffect(() => {
-    if (isPopup) {
-      document.body.classList.remove('-expanse-mode');
-    } else {
+    if (isExpanseMode) {
       document.body.classList.add('-expanse-mode');
+    } else {
+      document.body.classList.remove('-expanse-mode');
     }
-  }, [isPopup]);
+  }, [isExpanseMode]);
 
   useEffect(() => {
     dataContext.awaitStores(['settings']).then(() => {
