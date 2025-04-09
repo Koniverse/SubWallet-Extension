@@ -3,12 +3,13 @@
 
 import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -19,6 +20,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { hasSufficientCardanoValue } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
@@ -1213,6 +1215,14 @@ export default class KoniTabs {
     });
   }
 
+  private async cardanoGetAccountBalance (id: string, url: string): Promise<string> {
+    const address = await this.getCurrentAccount(url, 'cardano');
+
+    const balanceValue = await this.#koniState.cardanoGetBalance(id, url, address[0]);
+
+    return balanceValue.to_hex();
+  }
+
   private async cardanoGetChangeAddress (id: string, url: string): Promise<string> {
     const authInfo = await this.getAuthInfo(url);
 
@@ -1258,7 +1268,7 @@ export default class KoniTabs {
     return +(!currentNetwork?.isTestnet);
   }
 
-  private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[]> {
+  private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[] | null> {
     const authInfo = await this.getAuthInfo(url);
     const networkKey = authInfo?.currentNetworkKey;
 
@@ -1270,9 +1280,57 @@ export default class KoniTabs {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
     }
 
-    const allowedAccounts = [(await this.getCurrentAccount(url, 'cardano'))[0]];
+    const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
 
-    const utxos = await this.#koniState.chainService.getUtxosByAddresses(allowedAccounts, networkKey);
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey, params.paginate);
+
+    if (!params.amount) {
+      return utxos.map((utxo) => utxo.to_hex());
+    } else {
+      const expectedValue = CardanoWasm.Value.from_hex(params.amount);
+      const utxosFiltered: CardanoWasm.TransactionUnspentOutput[] = [];
+      let currentTotalUtxoValue = CardanoWasm.Value.zero();
+      let founded = false;
+
+      for (const utxo of utxos) {
+        currentTotalUtxoValue = currentTotalUtxoValue.checked_add(utxo.output().amount());
+
+        if (!currentTotalUtxoValue) {
+          continue;
+        }
+
+        founded = hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue);
+
+        utxosFiltered.push(utxo);
+
+        if (founded) {
+          break;
+        }
+      }
+
+      if (founded) {
+        return utxosFiltered.map((utxo) => utxo.to_hex());
+      } else {
+        return null;
+      }
+    }
+  }
+
+  private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[]> {
+    const authInfo = await this.getAuthInfo(url);
+    const networkKey = authInfo?.currentNetworkKey;
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    if (!networkKey) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
+    }
+
+    const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
+
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey);
 
     return utxos.map((utxo) => utxo.to_hex());
   }
@@ -1384,10 +1442,14 @@ export default class KoniTabs {
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
 
       // Cardano
-      case 'cardano(account.get)':
+      case 'cardano(account.get.address)':
         return await this.cardanoGetAccountList(id, url);
+      case 'cardano(account.get.balance)':
+        return await this.cardanoGetAccountBalance(id, url);
       case 'cardano(account.get.change.address)':
         return await this.cardanoGetChangeAddress(id, url);
+      case 'cardano(account.get.collateral)':
+        return await this.cardanoGetCollateral(id, url, request as RequestCardanoGetCollateral);
       case 'cardano(account.get.utxos)':
         return await this.cardanoGetUtxo(id, url, request as RequestCardanoGetUtxos);
       case 'cardano(network.get.current)':

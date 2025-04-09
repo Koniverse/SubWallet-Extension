@@ -28,7 +28,7 @@ export class CIP30Api {
   }
 
   async getUsedAddresses () {
-    return await this.sendMessage('cardano(account.get)');
+    return await this.sendMessage('cardano(account.get.address)');
   }
 
   async getChangeAddress () {
@@ -56,6 +56,6 @@ export class CIP30Api {
   }
 
   async getBalance () {
-    // Implementation here
+    return await this.sendMessage('cardano(account.get.balance)');
   }
 }

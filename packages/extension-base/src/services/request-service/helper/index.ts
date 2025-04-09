@@ -65,7 +65,7 @@ export const createCOSEKey = (addressBytes: Uint8Array, publicKey: Uint8Array) =
   return coseKey;
 };
 
-const convertAssetToValue = (amount: CardanoBalanceItem[]): CardanoWasm.Value => {
+export const convertAssetToValue = (amount: CardanoBalanceItem[]): CardanoWasm.Value => {
   const value = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
   const multiAsset = CardanoWasm.MultiAsset.new();
 
@@ -485,4 +485,61 @@ export async function extractKeyHashesFromCollaterals (
   }
 
   return keyHashes;
+}
+
+/// Check if valueA has sufficient value to cover valueB
+export function hasSufficientCardanoValue (
+  valueA: CardanoWasm.Value,
+  valueB: CardanoWasm.Value
+): boolean {
+  const coinA = CardanoWasm.BigInt.from_str(valueA.coin().to_str());
+  const coinB = CardanoWasm.BigInt.from_str(valueB.coin().to_str());
+
+  // Check if ADA amount in valueA is less than required in valueB
+  if (coinA < coinB) {
+    return false;
+  }
+
+  const multiAssetB = valueB.multiasset();
+
+  if (!multiAssetB) {
+    return true;
+  } // No assets required in valueB
+
+  const multiAssetA = valueA.multiasset();
+
+  if (!multiAssetA) {
+    return false;
+  } // valueA has no assets but valueB requires them
+
+  const policyIds = multiAssetB.keys();
+
+  for (let i = 0; i < policyIds.len(); i++) {
+    const policyId = policyIds.get(i);
+    const assetsB = multiAssetB.get(policyId);
+    const assetsA = multiAssetA.get(policyId);
+
+    if (!assetsB) {
+      continue;
+    }
+
+    if (!assetsA) {
+      return false;
+    } // Required policy ID is missing in valueA
+
+    const assetNames = assetsB.keys();
+
+    for (let j = 0; j < assetNames.len(); j++) {
+      const assetName = assetNames.get(j);
+      const quantityB = BigInt(assetsB.get(assetName)?.to_str() ?? '0');
+      const quantityA = BigInt(assetsA.get(assetName)?.to_str() ?? '0');
+
+      // Check if asset quantity in valueA is less than required
+      if (quantityA < quantityB) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }

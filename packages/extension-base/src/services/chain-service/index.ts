@@ -4,7 +4,7 @@
 import { TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
-import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AssetSetting, CardanoPaginate, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
@@ -222,22 +222,29 @@ export class ChainService {
     return this.cardanoChainHandler.getCardanoApiByChain(slug);
   }
 
-  public async getUtxosByAddresses (addresses: string[], slug: string): Promise<TransactionUnspentOutput[]> {
+  public async getUtxosByAddress (address: string, slug: string, paginate?: CardanoPaginate): Promise<TransactionUnspentOutput[]> {
     const cardanoApi = this.getCardanoApi(slug);
 
-    const addressUtxoMap: Record<string, CardanoUtxosItem[]> = {};
     const isTestnet = true;
 
-    await Promise.all(addresses.map(async (address) => {
-      const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
-      const utxos = await cardanoApi.getUtxos(formattedAddress);
+    const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
+    const limit = paginate?.limit || 100;
+    const utxos: CardanoUtxosItem[] = [];
+    let needStop = false;
+    let page = (paginate?.page || 0) + 1;
 
-      addressUtxoMap[formattedAddress] = utxos;
-    }));
+    while (!needStop) {
+      const utxoRaw = await cardanoApi.getUtxos(formattedAddress, page, limit);
 
-    return Object.entries(addressUtxoMap)
-      .map(([, utxo]) => convertUtxoRawToUtxo(utxo))
-      .flat();
+      if (utxoRaw.length === 0) {
+        needStop = true;
+      } else {
+        utxos.push(...utxoRaw);
+        page++;
+      }
+    }
+
+    return convertUtxoRawToUtxo(utxos);
   }
 
   public getSpecificUtxo (slug: string) {

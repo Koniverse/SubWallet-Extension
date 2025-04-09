@@ -157,9 +157,11 @@ export class CardanoApi implements _CardanoApi {
     }
   }
 
-  async getUtxos (address: string): Promise<CardanoUtxosItem[]> {
+  async getUtxos (address: string, page: number, limit: number): Promise<CardanoUtxosItem[]> {
     try {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}/utxos`;
+      let url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}/utxos`;
+
+      url += `?page=${page}&count=${limit}`;
       const response = await fetch(
         url, {
           method: 'GET',

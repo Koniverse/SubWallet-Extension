@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import { BigNum, Bip32PublicKey, TransactionOutputs, Value as CardanoAmountValue } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
@@ -36,7 +35,7 @@ import NotificationService from '@subwallet/extension-base/services/notification
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
-import { convertValueToAsset, extractKeyHashesFromCollaterals, extractKeyHashesFromRequiredSigners, extractKeyHashesFromScripts, extractKeyHashesFromWithdrawals, extractKeyHashFromCertificate, getBalanceAddressMap } from '@subwallet/extension-base/services/request-service/helper';
+import { convertAssetToValue, convertValueToAsset, extractKeyHashesFromCollaterals, extractKeyHashesFromRequiredSigners, extractKeyHashesFromScripts, extractKeyHashesFromWithdrawals, extractKeyHashFromCertificate, getBalanceAddressMap } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/services/request-service/types';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
@@ -1265,6 +1264,27 @@ export default class KoniState {
     });
   }
 
+  public async cardanoGetBalance (id: string, url: string, address: string): Promise<CardanoWasm.Value> {
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
+
+    let networkKey = authInfo?.currentNetworkKey;
+
+    const autoActiveChain = authInfo?.isAllowed || false;
+    const chainInfo = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
+
+    networkKey = chainInfo?.slug || 'cardano_mainnet';
+    const cardanoApi = this.chainService.getCardanoApi(networkKey);
+    const balances = await cardanoApi.getBalanceMap(address);
+
+    return convertAssetToValue(balances);
+  }
+
   public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData, currentAddress: string): Promise<ResponseCardanoSignData> {
     const { address, payload } = params;
 
@@ -1340,9 +1360,9 @@ export default class KoniState {
     });
 
     networkKey = currentEvmNetwork?.slug || 'cardano_mainnet';
-    const allUtxos = await this.chainService.getUtxosByAddresses([currentAddress], networkKey);
+    const allUtxos = await this.chainService.getUtxosByAddress(currentAddress, networkKey);
 
-    const outputTransactionUnSpend = TransactionOutputs.new();
+    const outputTransactionUnSpend = CardanoWasm.TransactionOutputs.new();
 
     inputs.to_js_value().forEach((input) => {
       const availableUtxo = allUtxos.find((utxo) => {
@@ -1366,10 +1386,10 @@ export default class KoniState {
     const addressOutputMap = getBalanceAddressMap(outputs);
     const addressInputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
     const addressOutputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
-    let transactionValue = CardanoAmountValue.new(BigNum.from_str('0'));
+    let transactionValue = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
 
     for (const address in addressInputMap) {
-      const output = addressOutputMap[address] ?? CardanoAmountValue.new(BigNum.from_str('0'));
+      const output = addressOutputMap[address] ?? CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
       const input = addressInputMap[address];
 
       const amount = input.checked_sub(output);
@@ -1394,7 +1414,7 @@ export default class KoniState {
       }
     }
 
-    transactionValue = transactionValue.checked_sub(CardanoAmountValue.new(tx.body().fee()));
+    transactionValue = transactionValue.checked_sub(CardanoWasm.Value.new(tx.body().fee()));
 
     const transactionBody = tx.body();
     const getSpecificUtxo = this.chainService.getSpecificUtxo.bind(this);
@@ -1413,7 +1433,7 @@ export default class KoniState {
     const pair = keyring.getPair(currentAddress);
 
     if (pair) {
-      const publicKey = Bip32PublicKey.from_bytes(pair.publicKey);
+      const publicKey = CardanoWasm.Bip32PublicKey.from_bytes(pair.publicKey);
 
       const paymentPubKey = publicKey.derive(0).derive(0).to_raw_key().hash().to_hex();
       const stakePubKey = publicKey.derive(2).derive(0).to_raw_key().hash().to_hex();

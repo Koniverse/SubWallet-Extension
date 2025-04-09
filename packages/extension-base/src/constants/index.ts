@@ -40,7 +40,7 @@ export const XCM_MIN_AMOUNT_RATIO = 1.2;
 export const XCM_FEE_RATIO = 2;
 
 export const GAS_PRICE_RATIO = 1 + (2 / 100);
-
+export const MAX_COLLATERAL_AMOUNT = '50000000';
 export const NETWORK_MULTI_GAS_FEE = ['*'];
 
 export const ORDINAL_COLLECTION = '__Ordinal__';
