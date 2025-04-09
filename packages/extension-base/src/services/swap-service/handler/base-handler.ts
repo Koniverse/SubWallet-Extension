@@ -127,6 +127,10 @@ export class SwapBaseHandler {
     }
 
     try {
+      if (!this.chainService.getChainStateByKey(toTokenInfo.originChain).active) {
+        await this.chainService.enableChain(toTokenInfo.originChain);
+      }
+
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
 
       const id = getId();
@@ -781,10 +785,6 @@ export class SwapBaseHandler {
     const bnTransitAmount = new BigN(transitMetadata.sendingValue);
     const transitToChainNativeToken = this.chainService.getNativeTokenInfo(transitToToken.originChain);
     const transitSelectedFeeToken = this.chainService.getAssetBySlug(transitTotalFee.selectedFeeToken || transitTotalFee.defaultFeeToken);
-
-    if (bnTransitAmount.gt(bnSwapReceivingAmount)) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
 
     const bnTransitDeliveryFee = BigN(0); // todo
 

@@ -299,4 +299,4 @@ export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
   return swapChains;
 }
 
-export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.02; // add 2%
+export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.04; // add 2%
