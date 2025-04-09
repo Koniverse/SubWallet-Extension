@@ -1631,6 +1631,10 @@ export default class KoniExtension {
           return undefined;
         }
 
+        const setting = { visible: true };
+
+        await this.#koniState.chainService.updateAssetSetting(destinationTokenInfo.slug, setting, true);
+
         const { value: _senderTransferable } = await this.getAddressTransferableBalance({ address: from, networkKey: originNetworkKey, token: originTokenInfo.slug });
         const senderTransferable = BigInt(_senderTransferable);
 

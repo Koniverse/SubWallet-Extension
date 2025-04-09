@@ -182,10 +182,14 @@ export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _
       queryParams.method = 'asset';
     }
 
-    if (queryParams.method && queryParams.module) {
-      const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+    try {
+      if (queryParams.method && queryParams.module) {
+        const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
 
-      return metadata.isSufficient;
+        return metadata.isSufficient;
+      }
+    } catch (e) {
+      return false;
     }
   }
 
