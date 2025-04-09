@@ -1471,5 +1471,14 @@
   "Max fee per gas must be higher than {{min}} GWEI": "",
   "This network is currently not supported": "",
   "Subnet staking": "",
-  "Subnet": ""
+  "Subnet": "",
+  "Destination chain is not active": "",
+  "You can't receive less than {{number}} {{symbol}}": "",
+  "Timeout": "",
+  "Sender available balance": "",
+  "A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete": "",
+  "TAO staking fee": "",
+  "An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete": "",
+  "TAO unstaking fee": "",
+  "Max slippage": ""
 }

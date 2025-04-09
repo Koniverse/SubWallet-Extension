@@ -119,7 +119,7 @@ export class BittensorCache {
     const apiKey = bittensorApiKey();
 
     try {
-      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1?limit=200', {
+      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1?limit=50', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -242,6 +242,16 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
         const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
         const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
+        const _topValidator = await this.bittensorCache.get();
+
+        const validators = _topValidator.data;
+        let highestApr = validators[0];
+
+        for (let i = 1; i < validators.length; i++) {
+          if (parseFloat(validators[i].apr) > parseFloat(highestApr.apr)) {
+            highestApr = validators[i];
+          }
+        }
 
         const bnTaoIn = new BN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
@@ -269,7 +279,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             eraTime: 24,
             era: 0,
             unstakingPeriod: 1.2,
-            tvl: bnTaoIn.toString()
+            tvl: bnTaoIn.toString(),
+            totalApr: this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0
           }
         };
 
