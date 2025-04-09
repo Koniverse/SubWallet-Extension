@@ -201,6 +201,10 @@ export class SwapBaseHandler {
         }
       }
 
+      if (toTokenInfo.originChain === 'mythos' && _isNativeToken(toTokenInfo)) {
+        bnSendingValue = bnSendingValue.plus(BigN(2.5).shiftedBy(_getAssetDecimals(toTokenInfo)));
+      }
+
       const step: BaseStepDetail = {
         // @ts-ignore
         metadata: {
@@ -605,10 +609,6 @@ export class SwapBaseHandler {
     const bnBridgeAmount = new BigN(xcmMetadata.sendingValue);
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
-
-    if (bnBridgeAmount.gt(bnSwapReceivingAmount)) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
 
     const bnBridgeDeliveryFee = BigN(0); // todo
 
