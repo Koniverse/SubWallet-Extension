@@ -104,7 +104,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
     const processMetadata = params.process.steps[params.currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
-    const quoteMetadata = params.quote.metadata as ChainFlipMetadata;
+    const quoteMetadata = processMetadata as ChainFlipMetadata;
 
     if (!processMetadata || !quoteMetadata) {
       throw new Error('Metadata for Chainflip not found');

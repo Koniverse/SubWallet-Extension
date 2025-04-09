@@ -3,7 +3,8 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { getSwapChainsFromPath } from '@subwallet/extension-base/services/swap-service/utils';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { getAmountAfterSlippage, getSwapChainsFromPath } from '@subwallet/extension-base/services/swap-service/utils';
 import { CommonOptimalSwapPath, ProcessType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
@@ -105,13 +106,14 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const renderQuoteEmptyBlock = () => {
-    if (swapError || !currentQuote) {
+    const _loading = handleRequestLoading && !isFormInvalid;
+
+    if (swapError || (!currentQuote && !_loading)) {
       return null;
     }
 
     const isError = isFormInvalid;
     let message = '';
-    const _loading = handleRequestLoading && !isFormInvalid;
 
     if (isFormInvalid) {
       message = t('Invalid input. Re-enter information in the red field and try again');
@@ -170,7 +172,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const renderSlippageInfoContent = () => {
     const slippageTitle = isSimpleSwapSlippage ? 'Slippage can be up to 5% due to market conditions' : '';
-    const slippageContent = isSimpleSwapSlippage ? `Up to ${((slippage * 100).toString()).toString()}%` : `${((slippage * 100).toString()).toString()}%`;
+    const slippageValueString = new BigN(slippage).multipliedBy(100).toFixed();
+    const slippageContent = isSimpleSwapSlippage ? `Up to ${slippageValueString}%` : `${slippageValueString}%`;
 
     return (
       <>
@@ -216,6 +219,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return getSwapChainsFromPath(currentOptimalSwapPath.path);
   }, [currentOptimalSwapPath]);
+
+  const minReceivableValue = useMemo(() => {
+    if (!currentQuote) {
+      return '0';
+    }
+
+    return getAmountAfterSlippage(currentQuote.toAmount, slippage);
+  }, [currentQuote, slippage]);
 
   const showQuoteEmptyBlock = (!currentQuote || handleRequestLoading || isFormInvalid);
 
@@ -279,6 +290,16 @@ const Component: React.FC<Props> = (props: Props) => {
                   prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                   suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
                   value={estimatedFeeValue}
+                />
+              </MetaInfo.Default>
+
+              <MetaInfo.Default
+                label={t('Min receivable')}
+              >
+                <NumberDisplay
+                  decimal={_getAssetDecimals(toAssetInfo)}
+                  suffix={_getAssetSymbol(toAssetInfo)}
+                  value={minReceivableValue}
                 />
               </MetaInfo.Default>
 

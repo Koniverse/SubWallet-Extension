@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -9,7 +9,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2, SwapStepType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -250,13 +250,19 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const result: _ChainAsset[] = [];
 
     Object.values(assetRegistryMap).forEach((chainAsset) => {
-      if (_isAssetFungibleToken(chainAsset)) {
+      if (!_isAssetFungibleToken(chainAsset)) {
+        return;
+      }
+
+      const chainSlug = chainAsset.originChain;
+
+      if (chainInfoMap[chainSlug]?.chainStatus === _ChainStatus.ACTIVE) {
         result.push(chainAsset);
       }
     });
 
     return result;
-  }, [assetRegistryMap]);
+  }, [assetRegistryMap, chainInfoMap]);
 
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
@@ -566,20 +572,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               return await submitData(step + 1);
             }
           } else {
-            let latestOptimalQuote = currentQuote;
-            const specialCaseForUniswap = latestOptimalQuote.provider.id === SwapProviderId.UNISWAP && !!currentOptimalSwapPath.steps.find((step) => step.type === SwapStepType.PERMIT);
-
-            if (currentOptimalSwapPath.steps.length > 2 && isLastStep && !specialCaseForUniswap) {
-              if (currentQuoteRequest) {
-                const latestSwapRequestResult = await handleSwapRequestV2(currentQuoteRequest);
-
-                if (latestSwapRequestResult.quote.optimalQuote) {
-                  latestOptimalQuote = latestSwapRequestResult.quote.optimalQuote;
-                  updateSwapStates(latestSwapRequestResult);
-                }
-              }
-            }
-
             if (oneSign && currentOptimalSwapPath.steps.length > 2) {
               const submitPromise: Promise<SWTransactionResponse> = submitProcess({
                 address: from,
@@ -589,7 +581,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   cacheProcessId: processId,
                   process: currentOptimalSwapPath,
                   currentStep: step,
-                  quote: latestOptimalQuote,
+                  quote: currentQuote,
                   address: from,
                   slippage: slippage,
                   recipient
@@ -606,7 +598,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 cacheProcessId: processId,
                 process: currentOptimalSwapPath,
                 currentStep: step,
-                quote: latestOptimalQuote,
+                quote: currentQuote,
                 address: from,
                 slippage: slippage,
                 recipient
@@ -660,7 +652,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, updateSwapStates]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -699,7 +691,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    onChangeAmount(currentFromTokenAvailableBalance.value);
+    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(95).dividedToIntegerBy(100).toString();
+
+    onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
   }, [currentFromTokenAvailableBalance, onChangeAmount]);
 

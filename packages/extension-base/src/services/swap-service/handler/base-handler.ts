@@ -202,7 +202,7 @@ export class SwapBaseHandler {
         if (isBridgeNativeToken) {
           bnSendingValue = bnSendingValue.plus(BigN(estimatedBridgeFee));
         } else {
-          bnSendingValue = bnSendingValue.plus(BigN(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium));
+          bnSendingValue = bnSendingValue.plus(BigN(_getTokenMinAmount(toTokenInfo)).multipliedBy(FEE_RATE_MULTIPLIER.medium)).plus(_getTokenMinAmount(toTokenInfo));
         }
 
         if (BigN(toTokenBalance.value).lte(0)) {
@@ -258,9 +258,9 @@ export class SwapBaseHandler {
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: briefXcmStep.sendingValue,
-      recipient: params.address,
+      recipient: briefXcmStep.receiver,
       substrateApi: chainApi,
-      sender: params.address,
+      sender: briefXcmStep.sender,
       destinationChain,
       originChain,
       feeInfo
@@ -274,8 +274,8 @@ export class SwapBaseHandler {
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originAsset.originChain,
       destinationNetworkKey: destinationAsset.originChain,
-      from: params.address,
-      to: params.address,
+      from: briefXcmStep.sender,
+      to: briefXcmStep.receiver,
       value: briefXcmStep.sendingValue,
       tokenSlug: originAsset.slug,
       showExtraWarning: true

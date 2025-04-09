@@ -190,6 +190,12 @@ const Component = (props: Props) => {
     return result;
   }, [items, selectedItem, currentSearchText, hasAnyFilterValue, filterFunction, searchFunction]);
 
+  const filterSearchBox = useMemo(() => {
+    return {
+      placeholder: t('Search network')
+    };
+  }, [t]);
+
   return (
     <>
       <div
@@ -276,6 +282,7 @@ const Component = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
+        searchBox={filterSearchBox}
       />
     </>
   );
