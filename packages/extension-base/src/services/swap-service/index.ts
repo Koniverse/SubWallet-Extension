@@ -45,15 +45,6 @@ export class SwapService implements StoppableServiceInterface {
 
   private async askProvidersForQuote (request: SwapRequestV2) {
     const availableQuotes: QuoteAskResponse[] = [];
-
-    await Promise.all(Object.values(this.handlers).map(async (handler) => {
-      // temporary solution to reduce number of requests to providers, will work as long as there's only 1 provider for 1 chain
-
-      if (handler.init && handler.isReady === false) {
-        await handler.init();
-      }
-    }));
-
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
     if (Array.isArray(quotes)) {
@@ -326,6 +317,14 @@ export class SwapService implements StoppableServiceInterface {
 
       aliveUntil = selectedQuote?.aliveUntil || (+Date.now() + SWAP_QUOTE_TIMEOUT_MAP.default);
     }
+
+    const neededProviders = availableQuotes.map((quote) => quote.provider.id);
+
+    await Promise.all(Object.values(this.handlers).map(async (handler) => {
+      if (neededProviders.includes(handler.providerSlug) && handler.init && handler.isReady === false) {
+        await handler.init();
+      }
+    }));
 
     return {
       optimalQuote: selectedQuote,

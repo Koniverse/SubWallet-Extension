@@ -77,10 +77,6 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
       await this.chainService.enableChain(this.chain);
     }
 
-    const substrateApi = this.chainService.getSubstrateApi(this.chain);
-
-    await substrateApi.api.isReady;
-
     this.router = new AssetHubRouter(this.chain, this.chainService);
 
     this.isReady = true;
