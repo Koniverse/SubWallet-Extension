@@ -11,7 +11,7 @@ import { AccountExternalError, AddressBookInfo, AmountData, AmountDataWithId, As
 import { AccountAuthType, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountExport, RequestAuthorizeCancel, RequestAuthorizeReject, RequestCurrentAccountAddress, RequestMetadataApprove, RequestMetadataReject, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, LATEST_SESSION } from '@subwallet/extension-base/constants';
-import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
+import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmMinAmountToMythos, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
@@ -1631,6 +1631,13 @@ export default class KoniExtension {
       }
 
       additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
+        // hotfix xcm mythos to mythos chain
+        const mythosError = validateXcmMinAmountToMythos(destinationNetworkKey, destinationTokenInfo.slug, value);
+
+        if (mythosError) {
+          inputTransaction.errors.push(mythosError);
+        }
+
         let isSendingTokenSufficient = false;
         let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 

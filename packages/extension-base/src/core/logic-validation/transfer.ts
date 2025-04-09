@@ -509,3 +509,16 @@ async function isAccountActive (tonApi: _TonApi, address: string) {
 
   return state === 'active';
 }
+
+export function validateXcmMinAmountToMythos (destChain: string, destToken: string, amount: string) {
+  const MYTHOS_DESTINATION_FEE = '2500000000000000000';
+  const errorMsg = 'Enter an amount higher than 2.5 MYTH to pay cross-chain fee and avoid your MYTH being lost after the transaction';
+
+  if (destChain === 'mythos' && destToken === 'mythos-NATIVE-MYTH') {
+    if (BigN(amount).lte(MYTHOS_DESTINATION_FEE)) {
+      return new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, t(errorMsg));
+    }
+  }
+
+  return undefined;
+}
