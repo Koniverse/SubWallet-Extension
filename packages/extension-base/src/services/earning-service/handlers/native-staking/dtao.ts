@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
-import BigN, { BigNumber } from 'bignumber.js';
+import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -33,7 +33,7 @@ export interface SubnetData {
 interface TaoStakingStakeOption {
   owner: string;
   amount: string;
-  rate?: BigNumber;
+  rate?: BigN;
   identity?: string
 }
 
@@ -202,10 +202,10 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
 
-    const alphaIn = new BigNumber(subnetInfo?.alphaIn || 0);
-    const taoIn = new BigNumber(subnetInfo?.taoIn || 0);
+    const alphaIn = new BigN(subnetInfo?.alphaIn || 0);
+    const taoIn = new BigN(subnetInfo?.taoIn || 0);
     const k = alphaIn.multipliedBy(taoIn);
-    const value = new BigNumber(params.value);
+    const value = new BigN(params.value);
 
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
@@ -633,7 +633,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const alphaToTaoPrice = new BigN(price[netuid as number]);
     const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
 
-    const BNlimitPrice = new BigN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
+    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
@@ -669,7 +669,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const alphaToTaoPrice = new BigN(price[netuid as number]);
     const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
-    const BNlimitPrice = new BigN(limitPrice.integerValue(BigNumber.ROUND_CEIL).toFixed());
+    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
     if (!selectedTarget) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
@@ -695,7 +695,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const price = await getAlphaToTaoMapping(this.substrateApi);
     const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(new BigN(price[netuid as number]));
 
-    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigNumber.ROUND_CEIL).dividedBy(1000);
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
     if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formattedMinUnstake.toString()} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`))];
