@@ -37,6 +37,11 @@ const paraSpellApi = {
 
 const paraSpellKey = process.env.PARASPELL_API_KEY || '';
 
+export const CHAINS_NOT_SUPPORT_PARASPELL = {
+  buildXcm: ['interlay'],
+  dryRunXcm: ['interlay', 'acala', 'manta_network']
+};
+
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
   try {
     assert(isHex(hex), 'Expected a hex-encoded call');
