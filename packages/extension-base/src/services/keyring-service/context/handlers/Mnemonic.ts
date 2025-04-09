@@ -57,7 +57,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
         assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
 
         mnemonicTypes = 'general';
-        pairTypes = ['sr25519', 'ethereum', 'ton', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
+        pairTypes = ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
         mnemonicTypes = 'ton';
