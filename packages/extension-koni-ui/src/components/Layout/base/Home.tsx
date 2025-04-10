@@ -9,7 +9,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ButtonProps, Dropdown, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowsOut, BellSimpleRinging, FadersHorizontal, MagnifyingGlass, SidebarSimple } from 'phosphor-react';
+import { ArrowsOut, BellSimpleRinging, FadersHorizontal, MagnifyingGlass, PuzzlePiece, SidebarSimple } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -102,7 +102,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       key: '3',
       label: t('Open in popup'),
       icon: (
-        <Icon phosphorIcon={ArrowsOut} />
+        <Icon phosphorIcon={PuzzlePiece} />
       ),
       onClick: () => {
         isSidePanelMode && closeSidePanel();

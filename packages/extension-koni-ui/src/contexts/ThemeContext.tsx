@@ -106,7 +106,15 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       '&, &.ant-sw-qr-scanner': {
         '.ant-sw-modal-content': {
           width: '100%',
-          left: 0
+          left: 0,
+          maxHeight: 'calc(100vh - 56px)'
+        }
+      },
+
+      '&.modal-full, &.ant-sw-qr-scanner': {
+        '.ant-sw-modal-content': {
+          height: '100vh',
+          maxHeight: '100vh'
         }
       }
     },
