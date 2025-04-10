@@ -15,7 +15,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -154,25 +154,13 @@ export class SwapBaseHandler {
       };
 
       // TODO: calculate fee for destination chain
-      let estimatedBridgeFee;
+      const bridgeFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
 
-      try {
-        const bridgeFeeByDryRun = (await dryRunXcmExtrinsicV2(xcmRequest)).fee;
-
-        if (!bridgeFeeByDryRun) {
-          return undefined;
-        }
-
-        estimatedBridgeFee = BigN(bridgeFeeByDryRun).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
-      } catch (e) {
-        console.log('xcm through paraspell failed', e);
-
-        const xcmTransfer = await createXcmExtrinsicV2(xcmRequest);
-        const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
-        const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-
-        estimatedBridgeFee = BigN(xcmFeeInfo.partialFee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
+      if (!bridgeFeeByDryRun.fee) {
+        return undefined;
       }
+
+      const estimatedBridgeFee = BigN(bridgeFeeByDryRun.fee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -275,10 +263,11 @@ export class SwapBaseHandler {
       feeInfo
     };
 
-    const [extrinsic] = await Promise.all([
-      createXcmExtrinsicV2(xcmRequest),
-      dryRunXcmExtrinsicV2(xcmRequest)
-    ]);
+    const extrinsic = await createXcmExtrinsicV2(xcmRequest);
+
+    if (!extrinsic) {
+      throw new Error('XCM extrinsic error');
+    }
 
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originAsset.originChain,

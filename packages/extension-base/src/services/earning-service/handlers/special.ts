@@ -8,9 +8,10 @@ import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, RuntimeDispatchInfo, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
+import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { BN, BN_TEN, BN_ZERO, noop } from '@polkadot/util';
@@ -288,20 +289,12 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           // TODO: calculate fee for destination chain
           let xcmFee;
 
-          try {
-            const xcmFeeByDryRun = (await dryRunXcmExtrinsicV2(xcmRequest)).fee;
+          const xcmFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
 
-            if (!xcmFeeByDryRun) {
-              throw new Error('Can not get fee through dry run');
-            }
-
-            xcmFee = xcmFeeByDryRun;
-          } catch (e) {
-            const xcmTransfer = await createXcmExtrinsicV2(xcmRequest);
-            const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
-            const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-
-            xcmFee = Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
+          if (xcmFeeByDryRun.fee) {
+            xcmFee = BigN(xcmFeeByDryRun.fee).multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
+          } else {
+            throw new Error('Error estimating XCM fee');
           }
 
           const fee: YieldTokenBaseInfo = {
@@ -577,10 +570,11 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       feeInfo
     };
 
-    const [extrinsic] = await Promise.all([
-      createXcmExtrinsicV2(xcmRequest),
-      dryRunXcmExtrinsicV2(xcmRequest) // ensure dry run success
-    ]);
+    const extrinsic = await createXcmExtrinsicV2(xcmRequest);
+
+    if (!extrinsic) {
+      throw new Error('Error handling XCM extrinsic');
+    }
 
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originChainInfo.slug,

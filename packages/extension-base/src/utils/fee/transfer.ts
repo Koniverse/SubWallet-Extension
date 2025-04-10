@@ -311,7 +311,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
 export const calculateXcmMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
   const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, value } = request;
   const feeChainType = fee.type;
-  let estimatedFee: string;
+  let estimatedFee = '0';
   let feeOptions: FeeDetail;
   let maxTransferable: BigN;
   let error: string | undefined;
@@ -390,22 +390,12 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else if (feeChainType === 'substrate') {
       // Calculate fee for substrate transaction
       if (isSubstrateXcm) {
-        try {
-          const estimatedFeeByDryRun = (await dryRunXcmExtrinsicV2(params)).fee;
+        const estimatedFeeByDryRun = await dryRunXcmExtrinsicV2(params);
 
-          if (!estimatedFeeByDryRun) {
-            throw Error('Can not get fee through dry run');
-          }
-
-          estimatedFee = estimatedFeeByDryRun;
-        } catch (e) {
-          try {
-            const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
-
-            estimatedFee = paymentInfo?.partialFee?.toString() || '0';
-          } catch (e) {
-            estimatedFee = '0';
-          }
+        if (!estimatedFeeByDryRun.fee) {
+          estimatedFee = '0';
+        } else {
+          estimatedFee = estimatedFeeByDryRun.fee;
         }
       } else {
         try {

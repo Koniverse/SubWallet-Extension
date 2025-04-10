@@ -34,7 +34,7 @@ export type CreateXcmExtrinsicProps = {
   feeInfo: FeeInfo;
 } & TransactionFee;
 
-export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig>;
+export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig | undefined>;
 
 // SnowBridge
 export const createSnowBridgeExtrinsic = async ({ destinationChain,
