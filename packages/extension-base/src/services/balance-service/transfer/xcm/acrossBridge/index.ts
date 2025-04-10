@@ -6,9 +6,9 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 // Across Bridge
 const acrossPairsMap = new Map([
   [COMMON_CHAIN_SLUGS.ETHEREUM, new Set(['optimism', 'base_mainnet', 'arbitrum_one'])],
-  ['optimism', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
-  ['base_mainnet', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
-  ['arbitrum_one', new Set([COMMON_CHAIN_SLUGS.ETHEREUM])],
+  ['optimism', new Set([COMMON_CHAIN_SLUGS.ETHEREUM, 'base_mainnet', 'arbitrum_one'])],
+  ['base_mainnet', new Set([COMMON_CHAIN_SLUGS.ETHEREUM, 'optimism', 'arbitrum_one'])],
+  ['arbitrum_one', new Set([COMMON_CHAIN_SLUGS.ETHEREUM, 'optimism', 'base_mainnet'])],
   [COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA, new Set(['base_sepolia', 'arbitrum_sepolia'])], // TESTNET START HERE
   ['base_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA])],
   ['arbitrum_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA])]
