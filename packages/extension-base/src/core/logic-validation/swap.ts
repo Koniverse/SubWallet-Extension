@@ -135,7 +135,7 @@ export function _getChainflipEarlyValidationError (error: SwapErrorType, metadat
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }
@@ -152,7 +152,7 @@ export function _getEarlyHydradxValidationError (error: SwapErrorType, metadata:
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }
@@ -167,7 +167,7 @@ export function _getEarlyAssetHubValidationError (error: SwapErrorType, metadata
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     case SwapErrorType.MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT:
       return new SwapError(error, 'You swap too much. It make pool not enough existential deposit'); // TODO: i18n this
     default:
@@ -196,7 +196,7 @@ export function _getSimpleSwapEarlyValidationError (error: SwapErrorType, metada
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }

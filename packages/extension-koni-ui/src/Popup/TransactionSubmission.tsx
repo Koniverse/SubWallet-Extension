@@ -182,7 +182,7 @@ const Component: React.FC<Props> = (props: Props) => {
           ? ({
             block: true,
             onClick: viewProgress,
-            children: t('View progress')
+            children: t('View process')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}

@@ -15,6 +15,7 @@ import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationM
 import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
@@ -397,20 +398,24 @@ export class InappNotificationService implements CronServiceInterface {
       extrinsicType = ExtrinsicType.SWAP;
       const combineInfo = process.combineInfo as SwapBaseTxData;
 
-      const fromAsset = this.chainService.getAssetBySlug(combineInfo.quote.pair.from);
-      const toAsset = this.chainService.getAssetBySlug(combineInfo.quote.pair.to);
-      const fromChain = this.chainService.getChainInfoByKey(fromAsset.originChain);
-      const toChain = this.chainService.getChainInfoByKey(toAsset.originChain);
+      const targetPair = (() => {
+        try {
+          return getTokenPairFromStep(combineInfo.process.steps) || combineInfo.quote.pair;
+        } catch (e) {
+          return combineInfo.quote.pair;
+        }
+      })();
+
+      const fromAsset = this.chainService.getAssetBySlug(targetPair.from);
+      const toAsset = this.chainService.getAssetBySlug(targetPair.to);
 
       title = '[{{accountName}}]  SWAPPED {{fromAsset}}'
         .replace('{{fromAsset}}', fromAsset.symbol);
-      description = '{{fromAmount}} {{fromAsset}} on {{fromChain}} swapped for {{toAmount}} {{toAsset}} on {{toChain}}. Click to view details'
+      description = '{{fromAmount}} {{fromAsset}} swapped for {{toAmount}} {{toAsset}}. Click to view details'
         .replace('{{fromAmount}}', formatNumber(combineInfo.quote.fromAmount, fromAsset.decimals || 0))
         .replace('{{fromAsset}}', fromAsset.symbol)
-        .replace('{{fromChain}}', fromChain.name)
         .replace('{{toAmount}}', formatNumber(combineInfo.quote.toAmount, toAsset.decimals || 0))
-        .replace('{{toAsset}}', toAsset.symbol)
-        .replace('{{toChain}}', toChain.name);
+        .replace('{{toAsset}}', toAsset.symbol);
     } else {
       actionType = NotificationActionType.EARNING;
       extrinsicType = ExtrinsicType.JOIN_YIELD_POOL; // Not used
