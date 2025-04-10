@@ -7,7 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, CHAINS_NOT_SUPPORT_PARASPELL, DryRunInfo, dryRunXcmV2, isParaSpellNotSupportBuildXcm, isParaSpellNotSupportDryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, DryRunInfo, dryRunXcmV2, isParaSpellNotSupportBuildXcm, isParaSpellNotSupportDryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -154,11 +154,6 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
 };
 
 export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
-  // hotfix CHAINS_NOT_SUPPORT_PARASPELL due to status code
-  if (CHAINS_NOT_SUPPORT_PARASPELL.buildXcm.includes(request.originChain.slug)) {
-    return createXcmExtrinsic(request);
-  }
-
   try {
     return await buildXcm(request);
   } catch (e) {
@@ -173,14 +168,6 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
 };
 
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<DryRunInfo> => {
-  // hotfix CHAINS_NOT_SUPPORT_PARASPELL due to status code
-  if (CHAINS_NOT_SUPPORT_PARASPELL.dryRunXcm.includes(request.originChain.slug)) {
-    return {
-      success: true,
-      fee: undefined
-    };
-  }
-
   try {
     return await dryRunXcmV2(request);
   } catch (e) {
