@@ -1616,11 +1616,7 @@ export default class KoniExtension {
       extrinsic = await funcCreateExtrinsic(params);
 
       if (isSubstrateXcm) {
-        try {
-          xcmFeeDryRun = (await dryRunXcmExtrinsicV2(params)).fee;
-        } catch (e) {
-          xcmFeeDryRun = undefined;
-        }
+        xcmFeeDryRun = (await dryRunXcmExtrinsicV2(params)).fee;
       }
 
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {
@@ -1684,13 +1680,9 @@ export default class KoniExtension {
         warning.length && inputTransaction.warnings.push(...warning);
         error.length && inputTransaction.errors.push(...error);
 
-        try {
-          const dryRunInfo = await dryRunXcmExtrinsicV2(params);
+        const dryRunInfo = await dryRunXcmExtrinsicV2(params);
 
-          if (!dryRunInfo.success) {
-            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
-          }
-        } catch (e) {
+        if (!dryRunInfo.success) {
           inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
         }
       };

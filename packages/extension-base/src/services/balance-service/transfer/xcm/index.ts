@@ -2,18 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, DryRunInfo, dryRunXcmV2, isParaSpellNotSupportBuildXcm, isParaSpellNotSupportDryRunXcm } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, DryRunInfo, dryRunXcmV2, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { FeeInfo, RuntimeDispatchInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -153,17 +154,17 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
 
-export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'> | undefined> => {
   try {
     return await buildXcm(request);
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
-    if (isParaSpellNotSupportBuildXcm(errorMessage)) {
+    if (isChainNotSupportPolkadotApi(errorMessage)) {
       return createXcmExtrinsic(request);
     }
 
-    throw new Error('Token not supported. Select another token or destination chain and try again');
+    return undefined;
   }
 };
 
@@ -173,15 +174,27 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
-    if (isParaSpellNotSupportDryRunXcm(errorMessage) || isParaSpellNotSupportBuildXcm(errorMessage)) {
+    if (isChainNotSupportDryRun(errorMessage) || isChainNotSupportPolkadotApi(errorMessage)) {
+      const xcmTransfer = await createXcmExtrinsicV2(request);
+
+      if (!xcmTransfer) {
+        return {
+          success: false
+        };
+      }
+
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(request.sender);
+      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
       // skip dry run in this case
       return {
         success: true,
-        fee: undefined
+        fee: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString()
       };
     }
 
-    throw new Error('Unable to perform transaction. Select another token or destination chain and try again');
-    // throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
+    return {
+      success: false
+    };
   }
 };

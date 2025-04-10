@@ -234,14 +234,14 @@ function createParaSpellCurrency (assetType: string, assetValue: string, amount:
   };
 }
 
-export function isParaSpellNotSupportBuildXcm (str: string): boolean {
-  const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i;
+export function isChainNotSupportPolkadotApi (str: string): boolean {
+  const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i; // Example: The node Interlay is not yet supported by the Polkadot API.
 
   return regex.test(str);
 }
 
-export function isParaSpellNotSupportDryRunXcm (str: string): boolean {
-  const regex = /(?=.*DryRunApi)(?=.*not available).*/i;
+export function isChainNotSupportDryRun (str: string): boolean {
+  const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
 
   return regex.test(str);
 }
