@@ -255,6 +255,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         const bnTaoIn = new BN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
+        const apr = this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0;
 
         const data: NativeYieldPoolInfo = {
           ...this.baseInfo,
@@ -280,7 +281,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             era: 0,
             unstakingPeriod: 1.2,
             tvl: bnTaoIn.toString(),
-            totalApr: this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0
+            totalApr: apr
           }
         };
 
