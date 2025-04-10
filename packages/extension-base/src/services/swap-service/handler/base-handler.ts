@@ -127,6 +127,10 @@ export class SwapBaseHandler {
     }
 
     try {
+      if (!this.chainService.getChainStateByKey(toTokenInfo.originChain).active) {
+        await this.chainService.enableChain(toTokenInfo.originChain);
+      }
+
       const substrateApi = await this.chainService.getSubstrateApi(fromTokenInfo.originChain).isReady;
 
       const id = getId();
@@ -216,6 +220,10 @@ export class SwapBaseHandler {
         } else {
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
+      }
+
+      if (toTokenInfo.originChain === 'mythos' && _isNativeToken(toTokenInfo)) {
+        bnSendingValue = bnSendingValue.plus(BigN(2.5).shiftedBy(_getAssetDecimals(toTokenInfo)));
       }
 
       const step: BaseStepDetail = {
@@ -627,10 +635,6 @@ export class SwapBaseHandler {
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
 
-    if (bnBridgeAmount.gt(bnSwapReceivingAmount)) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
-
     const bnBridgeDeliveryFee = BigN(0); // todo
 
     const bridgeSender = _reformatAddressWithChain(xcmMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
@@ -802,10 +806,6 @@ export class SwapBaseHandler {
     const bnTransitAmount = new BigN(transitMetadata.sendingValue);
     const transitToChainNativeToken = this.chainService.getNativeTokenInfo(transitToToken.originChain);
     const transitSelectedFeeToken = this.chainService.getAssetBySlug(transitTotalFee.selectedFeeToken || transitTotalFee.defaultFeeToken);
-
-    if (bnTransitAmount.gt(bnSwapReceivingAmount)) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
 
     const bnTransitDeliveryFee = BigN(0); // todo
 
