@@ -143,6 +143,50 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    // dropdown menu
+
+    '.sw-dropdown-trigger': {
+      position: 'absolute',
+      inset: 0,
+      zIndex: 10
+    },
+
+    '.sw-dropdown-menu.sw-dropdown-menu': {
+      '&.ant-dropdown-placement-bottomLeft, &.ant-dropdown-placement-bottomRight, &.ant-dropdown-placement-bottom': {
+        '.ant-dropdown-menu': {
+
+          marginTop: -4
+        }
+
+      },
+
+      '.ant-dropdown-menu': {
+        minWidth: 150,
+        backgroundColor: token.colorBgDefault,
+        padding: 0
+      },
+
+      '.ant-dropdown-menu-item.ant-dropdown-menu-item': {
+        paddingTop: token.paddingXS,
+        paddingBottom: token.paddingXS,
+        color: token.colorTextLight1
+      },
+
+      '.ant-dropdown-menu-item-icon.ant-dropdown-menu-item-icon': {
+        fontSize: 16,
+        minWidth: 24,
+        height: 24,
+        justifyContent: 'center',
+        marginRight: token.marginXXS
+      },
+
+      '.ant-dropdown-menu-title-content': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        fontWeight: token.headingFontWeight
+      }
+    },
+
     '.text-secondary': {
       color: token.colorTextSecondary
     },

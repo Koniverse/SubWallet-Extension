@@ -123,10 +123,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       >
         <div className={`home home-container ${className}`}>
           <Layout.Home
-            onClickSearchIcon={onOpenGlobalSearchToken}
-            showFilterIcon
+            onClickSearchToken={onOpenGlobalSearchToken}
+            showFaderIcon
             showNotificationIcon
-            showSearchIcon
+            showSearchToken
+            showSidebarIcon
           >
             <Outlet />
             <GeneralTermModal onOk={onAfterConfirmTermModal} />
