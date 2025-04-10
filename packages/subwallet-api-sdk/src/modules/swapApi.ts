@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubWalletResponse } from '../sdk';
+import {DynamicSwapAction, SwapRequestV2} from "@subwallet/extension-base/types";
 
 export interface SwapPair {
   slug: string;
@@ -147,6 +148,36 @@ export class SwapApi {
       });
 
       const response = await rawResponse.json() as SubWalletResponse<{ rate: number }>;
+
+      if (response.statusCode !== 200) {
+        console.error(response.message);
+
+        return undefined;
+      }
+
+      return response.result.rate;
+    } catch (error) {
+      console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+
+      return undefined;
+    }
+  }
+
+  async findAvailablePath (request: SwapRequestV2) {
+    // todo: handle later
+    const url = `${this.baseUrl}/swap/find-available-path`;
+
+    try {
+      const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ request })
+      });
+
+      const response = await rawResponse.json() as SubWalletResponse<[DynamicSwapAction[], SwapRequestV2 | undefined] >;
 
       if (response.statusCode !== 200) {
         console.error(response.message);

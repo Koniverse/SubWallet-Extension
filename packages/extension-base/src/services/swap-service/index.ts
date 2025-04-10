@@ -14,7 +14,7 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportedSwapChains, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -144,7 +144,7 @@ export class SwapService implements StoppableServiceInterface {
   public getAvailablePath (request: SwapRequestV2): [DynamicSwapAction[], SwapRequestV2 | undefined] {
     const { address, pair } = request;
     // todo: control provider tighter
-    const supportSwapChains = getSupportSwapChain();
+    const supportSwapChains = getSupportedSwapChains();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
     const fromChain = _getAssetOriginChain(fromToken);
@@ -259,6 +259,8 @@ export class SwapService implements StoppableServiceInterface {
 
   public async getLatestQuoteFromSwapRequest (request: SwapRequestV2): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
     const [path, directSwapRequest] = this.getAvailablePath(request);
+    // todo
+    const [path, directSwapRequest] = await subwalletApiSdk.swapApi?.findAvailablePath(request);
 
     if (!directSwapRequest) {
       throw Error('Swap pair is not found');
