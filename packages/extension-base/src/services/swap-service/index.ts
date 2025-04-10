@@ -21,6 +21,7 @@ import { createPromiseHandler, PromiseHandler, reformatAddress } from '@subwalle
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { BehaviorSubject } from 'rxjs';
 
+import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
 
@@ -59,6 +60,8 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
     }));
 
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
+
+    console.log('quotes', quotes);
 
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
@@ -373,6 +376,9 @@ export class SwapService implements ServiceWithProcessInterface, StoppableServic
           break;
         case SwapProviderId.UNISWAP:
           this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
+        case SwapProviderId.KYBER:
+          this.handlers[providerId] = new KyberHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
           break;
         default:
           throw new Error('Unsupported provider');
