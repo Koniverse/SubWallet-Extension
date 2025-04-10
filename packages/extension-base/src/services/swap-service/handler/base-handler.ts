@@ -4,7 +4,6 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { validateSpendingAndFeePayment } from '@subwallet/extension-base/core/logic-validation';
 import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
@@ -161,16 +160,18 @@ export class SwapBaseHandler {
         const bridgeFeeByDryRun = (await dryRunXcmExtrinsicV2(xcmRequest)).fee;
 
         if (!bridgeFeeByDryRun) {
-          throw new Error('Can not get fee through dry run');
+          return undefined;
         }
 
-        estimatedBridgeFee = bridgeFeeByDryRun;
+        estimatedBridgeFee = BigN(bridgeFeeByDryRun).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
       } catch (e) {
+        console.log('xcm through paraspell failed', e);
+
         const xcmTransfer = await createXcmExtrinsicV2(xcmRequest);
         const _xcmFeeInfo = await xcmTransfer.paymentInfo(address);
         const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
 
-        estimatedBridgeFee = Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
+        estimatedBridgeFee = BigN(xcmFeeInfo.partialFee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
       }
 
       const fee: CommonStepFeeInfo = {
@@ -332,20 +333,8 @@ export class SwapBaseHandler {
 
       return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: fromToken.symbol } }))];
     }
-    // // Check keepAlive on dest chain for receiver
-    // if (!_isNativeToken(toAsset)) {
-    //   const toChainApi = this.chainService.getSubstrateApi(toAsset.originChain);
-    //   const sufficientChain = this.chainService.value.sufficientChains;
-    //
-    //   // TODO: Need to update, currently only support substrate xcm
-    //   if (!toChainApi) {
-    //     return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Destination chain is not active'))];
-    //   }
-    //
-    //   const isSendingTokenSufficient = await _isSufficientToken(toAsset, toChainApi, sufficientChain);
 
-
-      // By here, we know that the user is receiving a valid amount of toToken
+    // By here, we know that the user is receiving a valid amount of toToken
     const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
     const sufficientChain = this.chainService.value.sufficientChains;
 
