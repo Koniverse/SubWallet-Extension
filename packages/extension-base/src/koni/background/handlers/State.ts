@@ -1341,7 +1341,7 @@ export default class KoniState {
     const authInfo = authInfoMap[stripUrl(url)];
 
     if (!authInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED, t('Not found auth info'));
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, t('Not found auth info'));
     }
 
     let requireKeyHashes: string[] = [];
@@ -1469,11 +1469,11 @@ export default class KoniState {
     });
 
     if (!needOwnerKeyHash) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST);
+      throw new CardanoProviderError(CardanoProviderErrorType.PROOF_GENERATION_FAILED, t('Not found owner key hash'));
     }
 
     if (needForeignKeyHash && !partialSign) {
-      throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED, 'Not support foreign key hash yet');
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Not support foreign key hash yet');
     }
 
     const result: CardanoTransactionDappConfig = {
@@ -1497,7 +1497,7 @@ export default class KoniState {
             throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
           }
         } else {
-          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_DATA_DECLINED);
+          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED);
         }
       });
   }

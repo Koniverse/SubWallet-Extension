@@ -2361,7 +2361,7 @@ export interface KoniRequestSignatures {
   'cardano(account.get.balance)': [null, Cbor];
   'cardano(account.get.change.address)': [null, string];
   'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[] | null];
-  'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[]];
+  'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[] | null];
   'cardano(network.get.current)': [null, number];
   'cardano(data.sign)': [RequestCardanoSignData, ResponseCardanoSignData];
   'cardano(transaction.sign)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];

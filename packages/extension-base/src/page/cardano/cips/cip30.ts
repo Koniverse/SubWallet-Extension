@@ -19,8 +19,8 @@ export class CIP30Api {
     return await this.sendMessage('cardano(network.get.current)');
   }
 
-  async getCollateral () {
-    return await this.sendMessage('cardano(account.get.utxos)', {});
+  async getCollateral (payload: { amount: Cbor }) {
+    return await this.sendMessage('cardano(account.get.utxos)', payload);
   }
 
   async getUtxos (amount?: Cbor, paginate?: CardanoPaginate) {

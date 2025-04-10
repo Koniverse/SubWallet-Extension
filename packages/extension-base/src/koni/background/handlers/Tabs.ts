@@ -13,7 +13,7 @@ import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErro
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
-import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, MAX_COLLATERAL_AMOUNT, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
 import { generateValidationProcess, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
@@ -1262,7 +1262,7 @@ export default class KoniTabs {
     });
 
     if (!currentNetwork?.cardanoInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Can\'t get current network');
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Can\'t get current network');
     }
 
     return +(!currentNetwork?.isTestnet);
@@ -1270,57 +1270,55 @@ export default class KoniTabs {
 
   private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[] | null> {
     const authInfo = await this.getAuthInfo(url);
-    const networkKey = authInfo?.currentNetworkKey;
 
-    if (!authInfo || !authInfo.isAllowedMap) {
+    if (!authInfo?.isAllowedMap) {
       throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
     }
+
+    const networkKey = authInfo.currentNetworkKey;
 
     if (!networkKey) {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
     }
 
     const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey, params?.paginate);
 
-    const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey, params.paginate);
-
-    if (!params.amount) {
+    if (!params?.amount) {
       return utxos.map((utxo) => utxo.to_hex());
-    } else {
-      const expectedValue = CardanoWasm.Value.from_hex(params.amount);
-      const utxosFiltered: CardanoWasm.TransactionUnspentOutput[] = [];
-      let currentTotalUtxoValue = CardanoWasm.Value.zero();
-      let founded = false;
+    }
 
-      for (const utxo of utxos) {
-        currentTotalUtxoValue = currentTotalUtxoValue.checked_add(utxo.output().amount());
+    let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
 
-        if (!currentTotalUtxoValue) {
-          continue;
-        }
+    try {
+      expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+    } catch (e) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
 
-        founded = hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue);
+    let currentTotalUtxoValue = CardanoWasm.Value.zero();
+    const utxosFiltered: CardanoWasm.TransactionUnspentOutput[] = [];
 
+    for (const utxo of utxos) {
+      currentTotalUtxoValue = currentTotalUtxoValue.checked_add(utxo.output().amount());
+
+      if (hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue)) {
         utxosFiltered.push(utxo);
 
-        if (founded) {
-          break;
-        }
+        return utxosFiltered.map((utxo) => utxo.to_hex());
       }
 
-      if (founded) {
-        return utxosFiltered.map((utxo) => utxo.to_hex());
-      } else {
-        return null;
-      }
+      utxosFiltered.push(utxo);
     }
+
+    return null;
   }
 
-  private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[]> {
+  private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[] | null> {
     const authInfo = await this.getAuthInfo(url);
     const networkKey = authInfo?.currentNetworkKey;
 
-    if (!authInfo || !authInfo.isAllowedMap) {
+    if (!authInfo?.isAllowedMap) {
       throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
     }
 
@@ -1328,11 +1326,39 @@ export default class KoniTabs {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
     }
 
-    const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
+    if (!params.amount) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is required');
+    }
 
+    const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
     const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey);
 
-    return utxos.map((utxo) => utxo.to_hex());
+    let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
+
+    try {
+      expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+    } catch (e) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
+
+    if (expectedValue.multiasset() || expectedValue.coin().compare(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT)) > 0) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
+
+    let currentTotalUtxoValue = CardanoWasm.Value.zero();
+    const utxosFinal = utxos.filter((utxo) => {
+      const amount = utxo.output().amount();
+
+      if (amount.multiasset() || amount.coin().compare(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT)) > 0) {
+        return false;
+      }
+
+      currentTotalUtxoValue = currentTotalUtxoValue.checked_add(amount);
+
+      return hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue);
+    });
+
+    return utxosFinal.length ? utxosFinal.map((utxo) => utxo.to_hex()) : null;
   }
 
   private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
