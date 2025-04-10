@@ -134,6 +134,10 @@ export class SwapService implements StoppableServiceInterface {
     console.log('optimalProcess', optimalProcess);
     console.log('-------');
 
+    if (optimalProcess.steps.length - 1 < optimalProcess.path.length) { // minus the fill info step
+      throw new Error('Swap pair is not found');
+    }
+
     return {
       process: optimalProcess,
       quote: swapQuoteResponse
@@ -218,6 +222,10 @@ export class SwapService implements StoppableServiceInterface {
       process = [];
       const bridgeDestinationInfo = this.chainService.getAssetBySlug(bridgeTransit);
       const swapTransit = findSwapTransitDestination(assetRefMap, bridgeDestinationInfo, toToken);
+
+      if (bridgeTransit === swapTransit) {
+        continue;
+      }
 
       if (swapTransit && supportSwapChains.includes(bridgeDestinationInfo.originChain)) {
         const swapStep = getSwapStep(bridgeTransit, swapTransit);
