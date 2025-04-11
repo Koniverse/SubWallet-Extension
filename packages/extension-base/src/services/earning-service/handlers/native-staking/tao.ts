@@ -281,7 +281,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             era: 0,
             unstakingPeriod: 1.2,
             tvl: bnTaoIn.toString(),
-            totalApr: apr
+            totalApy: apr
           }
         };
 
