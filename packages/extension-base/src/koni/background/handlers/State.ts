@@ -43,7 +43,7 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -1575,9 +1575,16 @@ export default class KoniState {
     return result;
   }
 
+  scanAddressOnAdd: string[] = [];
+
   public onAccountAdd () {
     this.eventService.on('account.add', (address) => {
-      this.balanceService.autoEnableChains([address]).catch(this.logger.error);
+      this.scanAddressOnAdd.push(address);
+
+      addLazy('autoScanBalanceOnAdd', () => {
+        this.balanceService.autoEnableChains(this.scanAddressOnAdd).catch(this.logger.error);
+        this.scanAddressOnAdd = [];
+      }, 500, 5000, false);
     });
   }
 

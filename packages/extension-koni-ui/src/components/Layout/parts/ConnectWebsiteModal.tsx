@@ -9,7 +9,7 @@ import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Con
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
@@ -283,6 +283,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
               return (
                 <AccountProxyItem
                   accountProxy={ap}
+                  chainTypes={convertAuthorizeTypeToChainTypes(authInfo?.accountAuthTypes, ap.chainTypes)}
                   className={CN({
                     '-is-current': isCurrent
                   }, '__account-proxy-connect-item')}

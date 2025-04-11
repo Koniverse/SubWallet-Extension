@@ -1080,7 +1080,7 @@ export class ChainService {
     return true;
   }
 
-  public disableChain (chainSlug: string): boolean {
+  public disableChain (chainSlug: string, preventManualTurnOff = false): boolean {
     const chainInfo = this.getChainInfoByKey(chainSlug);
     const chainStateMap = this.getChainStateMap();
 
@@ -1090,7 +1090,7 @@ export class ChainService {
 
     this.lockChainInfoMap = true;
     chainStateMap[chainSlug].active = false;
-    chainStateMap[chainSlug].manualTurnOff = true;
+    chainStateMap[chainSlug].manualTurnOff = !preventManualTurnOff;
     // Set disconnect state for inactive chain
     this.updateChainConnectionStatus(chainSlug, _ChainConnectionStatus.DISCONNECTED);
     this.destroyApiForChain(chainInfo);
@@ -1099,7 +1099,7 @@ export class ChainService {
       ...chainInfo,
       active: false,
       currentProvider: chainStateMap[chainSlug].currentProvider,
-      manualTurnOff: true
+      manualTurnOff: !preventManualTurnOff
     }).catch(console.error);
 
     this.updateChainStateMapSubscription();
@@ -2131,7 +2131,7 @@ export class ChainService {
 
       for (const chain of Object.keys(activeChains)) {
         if (!_DEFAULT_ACTIVE_CHAINS.includes(chain)) {
-          this.disableChain(chain);
+          this.disableChain(chain, true);
         }
       }
 

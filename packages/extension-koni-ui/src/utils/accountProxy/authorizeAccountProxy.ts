@@ -30,3 +30,23 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
 
   return rs;
 };
+
+export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthType[] = [], accountChainTypes: AccountChainType[]): AccountChainType[] => {
+  if (!accountAuthTypes) {
+    return [];
+  }
+
+  const chainTypes: AccountChainType[] = [];
+
+  accountAuthTypes.forEach((type) => {
+    if (type === 'substrate') {
+      chainTypes.push(AccountChainType.SUBSTRATE);
+    } else if (type === 'evm') {
+      chainTypes.push(AccountChainType.ETHEREUM);
+    } else if (type === 'ton') {
+      chainTypes.push(AccountChainType.TON);
+    }
+  });
+
+  return chainTypes.filter((type) => accountChainTypes.includes(type));
+};
