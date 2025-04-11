@@ -282,7 +282,7 @@ const Component: React.FC<Props> = (props: Props) => {
               </MetaInfo.Default>
 
               <MetaInfo.Default
-                className={'__swap-estimated-fee-info'}
+                className={'__meta-info-number-row'}
                 label={t('Estimated fee')}
               >
                 <NumberDisplay
@@ -294,6 +294,7 @@ const Component: React.FC<Props> = (props: Props) => {
               </MetaInfo.Default>
 
               <MetaInfo.Default
+                className={'__meta-info-number-row'}
                 label={t('Min receivable')}
               >
                 <NumberDisplay
@@ -376,7 +377,7 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       gap: token.sizeXXS
     },
 
-    '.__swap-estimated-fee-info': {
+    '.__meta-info-number-row': {
       '.ant-number': {
         '&, .ant-typography': {
           color: 'inherit !important',

@@ -229,7 +229,8 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
 
 // note: this function may return undefined if metadata version is < 2 or does not exist
 export function getTokenPairFromStep (steps: CommonStepDetail[]): SwapPair | undefined {
-  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT);
+  // todo: review this
+  const mainSteps = steps.filter((step) => step.type !== CommonStepType.DEFAULT && step.type !== CommonStepType.TOKEN_APPROVAL && step.type !== SwapStepType.PERMIT);
 
   if (!mainSteps.length) {
     return undefined;

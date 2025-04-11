@@ -10,7 +10,7 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
-import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
+import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -128,6 +128,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [feeOptions, setFeeOptions] = useState<string[] | undefined>([]);
   const [currentFeeOption, setCurrentFeeOption] = useState<string | undefined>(undefined);
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
+  const [preferredProvider, setPreferredProvider] = useState<SwapProviderId | undefined>(undefined);
+
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
@@ -409,7 +411,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const notifyNoQuote = useCallback(() => {
     notify({
-      message: t('No swap quote found'),
+      message: t('Swap pair not supported. Select another pair and try again'),
       type: 'error',
       duration: 5
     });
@@ -417,18 +419,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
-      setHandleRequestLoading(true);
-      continueRefreshQuoteRef.current = true;
-      setCurrentQuoteRequest((oldRequest) => {
-        if (!oldRequest) {
-          return undefined;
-        }
-
-        return {
-          ...oldRequest,
-          preferredProvider: quote.provider.id
-        };
-      });
+      setPreferredProvider(quote.provider.id);
 
       return Promise.resolve();
     },
@@ -508,6 +499,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
 
     if (!currentQuote || !currentOptimalSwapPath) {
+      notifyNoQuote();
+
       return;
     }
 
@@ -652,7 +645,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -845,7 +838,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           setIsFormInvalid(false);
           setShowQuoteArea(true);
 
-          const currentRequest: SwapRequest = {
+          const currentRequest: SwapRequestV2 = {
             address: fromValue,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
@@ -854,7 +847,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             },
             fromAmount: fromAmountValue,
             slippage: currentSlippage.slippage.toNumber(),
-            recipient: recipientValue || undefined
+            recipient: recipientValue || undefined,
+            preferredProvider: preferredProvider
           };
 
           handleSwapRequestV2(currentRequest).then((result) => {
@@ -899,7 +893,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const

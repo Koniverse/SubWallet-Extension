@@ -104,14 +104,17 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
     const actionList = JSON.stringify(path.map((step) => step.action));
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
     const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-    const needEditAmount = swapXcm || xcmSwapXcm;
+    const needModifyData = swapXcm || xcmSwapXcm;
 
     let bnSendingValue = BigN(fromAmount);
     let bnExpectedReceive = BigN(selectedQuote.toAmount);
+    const sender = _reformatAddressWithChain(params.request.address, originChain);
+    let receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
 
-    if (needEditAmount) {
+    if (needModifyData) {
       bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
       bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
+      receiver = _reformatAddressWithChain(params.request.address, destinationChain);
     }
 
     const submitStep: BaseStepDetail = {
@@ -123,8 +126,8 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
         expectedReceive: bnExpectedReceive.toFixed(0, 1),
         originTokenInfo,
         destinationTokenInfo,
-        sender: _reformatAddressWithChain(params.request.address, originChain),
-        receiver: _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain),
+        sender,
+        receiver,
         version: 2
       } as unknown as BaseSwapStepMetadata
     };
