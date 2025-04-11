@@ -125,32 +125,51 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
+export interface EarningSlippageResult {
+  slippage: number;
+  rate: number;
+}
+
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 export const DEFAULT_DTAO_MINBOND = '600000';
 
-export const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi) => {
+const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
-  if (!allSubnets) {
+  if (!allSubnets || allSubnets.length === 0) {
     return {};
   }
 
-  return allSubnets.reduce((acc, subnet) => {
+  const result = Object.create(null) as Record<number, string>;
+
+  for (const subnet of allSubnets) {
     const netuid = subnet?.netuid;
+
+    if (netuid === undefined) {
+      continue;
+    }
+
     const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
     const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
 
-    if (netuid === 0) {
-      acc[netuid] = '1';
-    } else if (alphaIn.gt(0)) {
-      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
-    } else {
-      acc[netuid] = '1';
-    }
+    result[netuid] = netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
+  }
 
-    return acc;
-  }, {} as Record<number, string>);
+  return result;
+};
+
+const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number): Promise<string> => {
+  const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(netuid)).toJSON() as RateSubnetData | undefined;
+
+  if (!subnetInfo) {
+    return '1';
+  }
+
+  const taoIn = subnetInfo.taoIn ? new BigN(subnetInfo.taoIn) : new BigN(0);
+  const alphaIn = subnetInfo.alphaIn ? new BigN(subnetInfo.alphaIn) : new BigN(0);
+
+  return netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
 };
 
 export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
@@ -198,14 +217,16 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return slug.startsWith(`${this.slug}__`);
   }
 
-  public override async getEarningSlippage (params: RequestEarningSlippage): Promise<number> {
+  public override async getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
 
     const alphaIn = new BigN(subnetInfo?.alphaIn || 0);
     const taoIn = new BigN(subnetInfo?.taoIn || 0);
     const k = alphaIn.multipliedBy(taoIn);
+
     const value = new BigN(params.value);
+    const rate = taoIn.dividedBy(alphaIn);
 
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
@@ -214,7 +235,10 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
       const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
 
-      return slippage.toNumber();
+      return {
+        slippage: slippage.plus(0.0001).toNumber(),
+        rate: rate.toNumber()
+      };
     } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
       const newAlphaIn = alphaIn.plus(value);
       const newTaoReserve = k.dividedBy(newAlphaIn);
@@ -222,10 +246,16 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
       const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
 
-      return slippage.toNumber();
+      return {
+        slippage: slippage.plus(0.0001).toNumber(),
+        rate: rate.toNumber()
+      };
     }
 
-    return 0;
+    return {
+      slippage: 0,
+      rate: 1
+    };
   }
 
   public override get maintainBalance (): string {
@@ -625,13 +655,14 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Join pool action */
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
-    const { amount, netuid, selectedValidators: targetValidators } = data;
+    const { amount, selectedValidators: targetValidators, subnetData } = data;
+    const { netuid, slippage } = subnetData;
+
     const chainApi = await this.substrateApi.isReady;
     const binaryAmount = new BigN(amount);
 
-    const price = await getAlphaToTaoMapping(this.substrateApi);
-    const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 + DEFAULT_BITTENSOR_SLIPPAGE);
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 + (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
@@ -663,17 +694,17 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   /* Leave pool action */
 
-  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]> {
+  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
-    const binaryAmount = new BigN(amount);
-    const price = await getAlphaToTaoMapping(this.substrateApi);
-    const alphaToTaoPrice = new BigN(price[netuid as number]);
-    const limitPrice = (alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken))).multipliedBy(1 - DEFAULT_BITTENSOR_SLIPPAGE);
-    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
     if (!selectedTarget) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
+
+    const binaryAmount = new BigN(amount);
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 - (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
+    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(selectedTarget, netuid, binaryAmount, BNlimitPrice, false);
 
@@ -692,8 +723,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     }
 
     const netuid = poolInfo.metadata.subnetData?.netuid;
-    const price = await getAlphaToTaoMapping(this.substrateApi);
-    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(new BigN(price[netuid as number]));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(alphaToTaoPrice);
 
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
