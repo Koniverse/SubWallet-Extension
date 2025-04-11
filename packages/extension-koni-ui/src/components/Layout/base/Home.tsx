@@ -102,7 +102,10 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       key: '3',
       label: t('Open in popup'),
       icon: (
-        <Icon phosphorIcon={PuzzlePiece} />
+        <Icon
+          phosphorIcon={PuzzlePiece}
+          weight={'fill'}
+        />
       ),
       onClick: () => {
         isSidePanelMode && closeSidePanel();
