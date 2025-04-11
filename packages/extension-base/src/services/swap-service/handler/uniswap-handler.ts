@@ -301,7 +301,7 @@ export class UniswapHandler implements SwapBaseInterface {
     let postTransactionResponse;
     let extrinsic;
 
-    if (routing === 'CLASSIC' || routing === 'WRAP' || routing === 'UNWRAP') {
+    if (routing === 'CLASSIC' || routing === 'WRAP' || routing === 'UNWRAP' || routing === 'BRIDGE') {
       const body: Record<string, any> = {
         signature: signature,
         quote: quote
@@ -323,6 +323,8 @@ export class UniswapHandler implements SwapBaseInterface {
 
       extrinsic = transactionResponse.swap;
     } else if (routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2') {
+      // todo: update condition and add handle exception
+      // UniswapX, UniswapX_V2, and UniswapX_V3 are alternately referred to as DutchQuote, DutchQuoteV2, and DutchQuoteV3
       postTransactionResponse = await fetch(`${API_URL}/order`, {
         method: 'POST',
         headers: {
