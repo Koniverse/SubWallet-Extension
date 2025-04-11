@@ -23,11 +23,11 @@ import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, S
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import BigN from 'bignumber.js';
+import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
-import {t} from "i18next";
 
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
