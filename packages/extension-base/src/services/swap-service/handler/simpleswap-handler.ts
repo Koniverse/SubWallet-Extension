@@ -176,6 +176,8 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     const { fromAmount } = quote;
     const { addressFrom, amountTo, id } = await createSwapRequest({ fromSymbol, toSymbol, fromAmount, fromAsset, receiver, sender, toAsset });
 
+    console.log('simpleswap data', id, addressFrom);
+
     if (!id || id.length === 0 || !addressFrom || addressFrom.length === 0) {
       throw new SwapError(SwapErrorType.UNKNOWN);
     }
