@@ -13,11 +13,11 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
-import { isEthereumAddress } from '@polkadot/util-crypto';
+import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
 import { isChainInfoAccordantAccountChainType } from '../chain';
 import { getLogoByNetworkKey } from '../common';
@@ -126,7 +126,7 @@ export const funcSortByName = (a: AbstractAddressJson, b: AbstractAddressJson) =
   return ((a?.name || '').toLowerCase() > (b?.name || '').toLowerCase()) ? 1 : -1;
 };
 
-export const findContactByAddress = (contacts: AbstractAddressJson[], address?: string, networkPrefix = 42): AbstractAddressJson | null => {
+export const findContactByAddress = (contacts: AbstractAddressJson[], address?: string): AbstractAddressJson | null => {
   try {
     const isAllAccount = address && isAccountAll(address);
 
@@ -134,10 +134,7 @@ export const findContactByAddress = (contacts: AbstractAddressJson[], address?: 
       return null;
     }
 
-    const type: KeypairType = getKeypairTypeByAddress(address);
-
-    const originAddress = isAccountAll(address) ? address : isEthereumAddress(address) ? address : encodeAddress(decodeAddress(address), networkPrefix, type);
-
+    const originAddress = isAccountAll(address) ? address : isEthereumAddress(address) ? address : encodeAddress(decodeAddress(address));
     const result = contacts.find((contact) => contact.address.toLowerCase() === originAddress.toLowerCase());
 
     return result || null;
