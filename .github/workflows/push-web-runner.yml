@@ -51,6 +51,7 @@ jobs:
         MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
         MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         BRANCH_NAME: master
+        BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
         yarn install --immutable | grep -v 'YN0013'
         yarn ${{ matrix.step }}

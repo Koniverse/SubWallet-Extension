@@ -73,7 +73,8 @@ const _additionalEnv = {
   UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
-  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP)
+  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
+  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
 };
 
 const createConfig = (entry, alias = {}, useSplitChunk = false) => {

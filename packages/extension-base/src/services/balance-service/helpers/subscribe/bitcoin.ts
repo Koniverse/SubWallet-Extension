@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 // import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
 // import { filteredOutTxsUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
