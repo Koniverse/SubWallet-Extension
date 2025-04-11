@@ -9,7 +9,7 @@ export default function useSidePanelUtils () {
     const result = Bowser.getParser(window.navigator.userAgent).getResult();
 
     return (
-      result.browser.name?.toLowerCase() === 'chrome' &&
+      ['chrome', 'microsoft edge'].includes(result.browser.name?.toLowerCase() || '') &&
       result.platform.type === 'desktop'
     );
   }, []);

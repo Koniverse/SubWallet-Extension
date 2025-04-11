@@ -4,17 +4,18 @@
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { PageWrapper, WalletConnect } from '@subwallet/extension-koni-ui/components';
 import { EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
-import { useExtensionDisplayModes, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes, useSelector, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useUILock from '@subwallet/extension-koni-ui/hooks/common/useUILock';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
+import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { computeStatus, openInNewTab } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, ButtonProps, Icon, Image, ModalContext, SettingItem, SwHeader, SwIconProps, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, Globe, GlobeHemisphereEast, Lock, Rocket, ShareNetwork, ShieldCheck, UserCircleGear, X } from 'phosphor-react';
+import { ArrowsOut, ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, FrameCorners, Globe, GlobeHemisphereEast, Lock, Rocket, ShareNetwork, ShieldCheck, UserCircleGear, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -73,6 +74,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const navigate = useNavigate();
   const { token } = useTheme() as Theme;
   const { isPopupMode } = useExtensionDisplayModes();
+  const { canUseSidePanel } = useSidePanelUtils();
   const notify = useNotification();
   const { goHome } = useDefaultNavigate();
   const { t } = useTranslation();
@@ -112,17 +114,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     {
       key: 'general',
       items: [
-        // {
-        //   key: 'expand-view',
-        //   leftIcon: FrameCorners,
-        //   leftIconBgColor: token.colorPrimary,
-        //   rightIcon: ArrowsOut,
-        //   title: t('Expand view'),
-        //   onClick: () => {
-        //     windowOpen({ allowedPath: '/' }).catch(console.error);
-        //   },
-        //   isHidden: !isPopup
-        // },
+        {
+          key: 'expand-view',
+          leftIcon: FrameCorners,
+          leftIconBgColor: token.colorPrimary,
+          rightIcon: ArrowsOut,
+          title: t('Expand view'),
+          onClick: () => {
+            windowOpen({ allowedPath: '/' }).catch(console.error);
+          },
+          isHidden: canUseSidePanel() ? true : !isPopupMode
+        },
         {
           key: 'general-settings',
           leftIcon: GlobeHemisphereEast,
@@ -286,7 +288,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       ]
     }
-  ]), [activeModal, isPopupMode, navigate, t, token]);
+  ]), [activeModal, canUseSidePanel, isPopupMode, navigate, t, token]);
 
   const aboutSubwalletType = useMemo<SettingItemType[]>(() => {
     return [

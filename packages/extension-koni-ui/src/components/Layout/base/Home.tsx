@@ -33,7 +33,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
-  const { closeSidePanel, openSidePanel } = useSidePanelUtils();
+  const { canUseSidePanel, closeSidePanel, openSidePanel } = useSidePanelUtils();
   const { isExpanseMode, isPopupMode, isSidePanelMode } = useExtensionDisplayModes();
 
   const unreadNotificationCount = useMemo(() => {
@@ -180,7 +180,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       }
     }
 
-    if (showSidebarIcon) {
+    if (showSidebarIcon && canUseSidePanel()) {
       if (isExpanseMode) {
         icons.push({
           icon: (
@@ -217,7 +217,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     }
 
     return icons;
-  }, [faderMenu, isExpanseMode, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
+  }, [canUseSidePanel, faderMenu, isExpanseMode, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
 
   const onClickListIcon = useCallback(() => {
     navigate('/settings/list');
