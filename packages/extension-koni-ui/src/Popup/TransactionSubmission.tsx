@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
-import { ProcessTransactionData, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
+import { ProcessTransactionData, ProcessType, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { CloseIcon, Layout, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
@@ -156,8 +156,7 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [transactionProcessId]);
 
-  // const isSwapProcessing = processData?.type === ProcessType.SWAP;
-  const isSwapProcessing = true;
+  const isSwapProcessing = processData?.type === ProcessType.SWAP;
 
   return (
     <PageWrapper className={CN(className, {
