@@ -5,11 +5,13 @@ on:
       - koni-dev
       - upgrade-ui
       - subwallet-dev
+      - koni/dev/issue-4200-v2
   push:
     branches:
       - koni-dev
       - upgrade-ui
       - subwallet-dev
+      - koni/dev/issue-4200-v2
 
 jobs:
   master:
