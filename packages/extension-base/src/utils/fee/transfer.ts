@@ -392,11 +392,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       if (isSubstrateXcm) {
         const estimatedFeeByDryRun = await dryRunXcmExtrinsicV2(params);
 
-        if (!estimatedFeeByDryRun.fee) {
-          estimatedFee = '0';
-        } else {
-          estimatedFee = estimatedFeeByDryRun.fee;
-        }
+        estimatedFee = estimatedFeeByDryRun.fee || '0';
       } else {
         try {
           const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);

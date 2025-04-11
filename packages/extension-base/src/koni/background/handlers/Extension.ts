@@ -1615,7 +1615,7 @@ export default class KoniExtension {
       };
 
       extrinsic = await funcCreateExtrinsic(params);
-      let dryRunInfo: DryRunInfo | undefined;
+      let dryRunInfo: DryRunInfo;
 
       if (isSubstrateXcm) {
         dryRunInfo = await dryRunXcmExtrinsicV2(params);
@@ -1684,7 +1684,7 @@ export default class KoniExtension {
         warning.length && inputTransaction.warnings.push(...warning);
         error.length && inputTransaction.errors.push(...error);
 
-        if (isSubstrateXcm && dryRunInfo && !dryRunInfo.success) {
+        if (isSubstrateXcm && !dryRunInfo.success) {
           inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
         }
       };
