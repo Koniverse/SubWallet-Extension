@@ -10,11 +10,12 @@ import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
+import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
-import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { DynamicSwapType, SwapErrorType, SwapFeeType, SwapProvider, SwapProviderId, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
@@ -23,8 +24,6 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
-
-import { createXcmExtrinsic } from '../../balance-service/transfer/xcm';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -139,7 +138,9 @@ export class SwapBaseHandler {
         this.balanceService.getTotalBalance(senderAddress, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
       ]);
 
-      const xcmTransfer = await createXcmExtrinsic({
+      const mockSendingValue = stepIndex === 0 ? fromAmount : selectedQuote?.toAmount || '0';
+
+      const xcmRequest = {
         originTokenInfo: fromTokenInfo,
         destinationTokenInfo: toTokenInfo,
         originChain: fromChainInfo,
@@ -147,14 +148,19 @@ export class SwapBaseHandler {
         substrateApi: substrateApi,
         feeInfo,
         // Mock sending value to get payment info
-        sendingValue: fromAmount,
+        sendingValue: mockSendingValue,
         sender: senderAddress,
         recipient: recipientAddress
-      });
+      };
 
-      const _xcmFeeInfo = await xcmTransfer.paymentInfo(senderAddress);
-      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-      const estimatedBridgeFee = Math.ceil(xcmFeeInfo.partialFee * FEE_RATE_MULTIPLIER.medium).toString();
+      // TODO: calculate fee for destination chain
+      const bridgeFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
+
+      if (!bridgeFeeByDryRun.fee) {
+        return undefined;
+      }
+
+      const estimatedBridgeFee = BigN(bridgeFeeByDryRun.fee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -245,8 +251,7 @@ export class SwapBaseHandler {
     const substrateApi = this.chainService.getSubstrateApi(originAsset.originChain);
     const chainApi = await substrateApi.isReady;
     const feeInfo = await this.feeService.subscribeChainFee(getId(), originAsset.originChain, 'substrate');
-
-    const xcmTransfer = await createXcmExtrinsic({
+    const xcmRequest = {
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: briefXcmStep.sendingValue,
@@ -256,7 +261,13 @@ export class SwapBaseHandler {
       destinationChain,
       originChain,
       feeInfo
-    });
+    };
+
+    const extrinsic = await createXcmExtrinsicV2(xcmRequest);
+
+    if (!extrinsic) {
+      throw new Error('XCM extrinsic error');
+    }
 
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originAsset.originChain,
@@ -270,7 +281,7 @@ export class SwapBaseHandler {
 
     return {
       txChain: originAsset.originChain,
-      extrinsic: xcmTransfer,
+      extrinsic,
       transferNativeAmount: _isNativeToken(originAsset) ? briefXcmStep.sendingValue : '0',
       extrinsicType: ExtrinsicType.TRANSFER_XCM,
       chainType: ChainType.SUBSTRATE,
@@ -314,13 +325,14 @@ export class SwapBaseHandler {
 
     // By here, we know that the user is receiving a valid amount of toToken
     const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
+    const sufficientChain = this.chainService.value.sufficientChains;
 
     if (!toChainApi) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     // Only need to check if account is alive with the receiving toToken
-    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi);
+    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi, sufficientChain);
 
     if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
       const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);

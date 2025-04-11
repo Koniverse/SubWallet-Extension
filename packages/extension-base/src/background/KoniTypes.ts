@@ -1778,6 +1778,15 @@ export interface TokenPriorityDetails {
   token: Record<string, number>
 }
 
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect

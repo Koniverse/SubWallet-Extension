@@ -11,7 +11,7 @@ import { AccountExternalError, AddressBookInfo, AmountData, AmountDataWithId, As
 import { AccountAuthType, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountExport, RequestAuthorizeCancel, RequestAuthorizeReject, RequestCurrentAccountAddress, RequestMetadataApprove, RequestMetadataReject, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, LATEST_SESSION } from '@subwallet/extension-base/constants';
-import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
+import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmMinAmountToMythos, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
@@ -34,10 +34,11 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { DryRunInfo } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
@@ -1498,7 +1499,9 @@ export default class KoniExtension {
       const amount = BigInt(transferAmount.value);
 
       const substrateApi = this.#koniState.getSubstrateApi(chain);
-      const isSendingTokenSufficient = await _isSufficientToken(transferTokenInfo, substrateApi);
+      const sufficientChain = this.#koniState.chainService.value.sufficientChains;
+
+      const isSendingTokenSufficient = await _isSufficientToken(transferTokenInfo, substrateApi, sufficientChain);
 
       const [warnings, errors] = additionalValidateTransferForRecipient(transferTokenInfo, nativeTokenInfo, extrinsicType, receiverSendingTokenKeepAliveBalance, amount, senderSendingTokenTransferable, receiverSystemAccountInfo, isSendingTokenSufficient);
 
@@ -1547,7 +1550,7 @@ export default class KoniExtension {
     const destinationNativeTokenSlug: string = destinationNativeTokenInfo.slug;
 
     const [errors, fromKeyPair] = validateXcmTransferRequest(destinationTokenInfo, from, value);
-    let extrinsic: SubmittableExtrinsic<'promise'> | TransactionConfig | null = null;
+    let extrinsic: SubmittableExtrinsic<'promise'> | TransactionConfig | undefined | null;
 
     if (errors.length > 0) {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors(errors);
@@ -1560,9 +1563,12 @@ export default class KoniExtension {
     const isPolygonBridgeTransfer = _isPolygonChainBridge(originNetworkKey, destinationNetworkKey);
     const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
+    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
+
+    let xcmFeeDryRun: string | undefined;
 
     let additionalValidator: undefined | ((inputTransaction: SWTransactionResponse) => Promise<void>);
     let eventsHandler: undefined | ((eventEmitter: TransactionEmitter) => void);
@@ -1587,7 +1593,7 @@ export default class KoniExtension {
         funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
         type = 'substrate';
       } else {
-        funcCreateExtrinsic = createXcmExtrinsic;
+        funcCreateExtrinsic = createXcmExtrinsicV2;
         type = 'substrate';
       }
 
@@ -1609,6 +1615,13 @@ export default class KoniExtension {
       };
 
       extrinsic = await funcCreateExtrinsic(params);
+      let dryRunInfo: DryRunInfo;
+
+      if (isSubstrateXcm) {
+        dryRunInfo = await dryRunXcmExtrinsicV2(params);
+
+        xcmFeeDryRun = dryRunInfo.fee;
+      }
 
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {
         const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
@@ -1620,12 +1633,23 @@ export default class KoniExtension {
       }
 
       additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
+        // hotfix xcm mythos to mythos chain
+        const mythosError = validateXcmMinAmountToMythos(destinationNetworkKey, destinationTokenInfo.slug, value);
+
+        if (mythosError) {
+          inputTransaction.errors.push(mythosError);
+        }
+
         let isSendingTokenSufficient = false;
         let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
         if (!_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
           return undefined;
         }
+
+        const setting = { visible: true };
+
+        await this.#koniState.chainService.updateAssetSetting(destinationTokenInfo.slug, setting, true);
 
         const { value: _senderTransferable } = await this.getAddressTransferableBalance({ address: from, networkKey: originNetworkKey, token: originTokenInfo.slug });
         const senderTransferable = BigInt(_senderTransferable);
@@ -1641,11 +1665,10 @@ export default class KoniExtension {
           receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
         }
 
-        if (_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
-          const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+        const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+        const sufficientChain = this.#koniState.chainService.value.sufficientChains;
 
-          isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi);
-        }
+        isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
         const [warning, error] = additionalValidateTransferForRecipient(
           destinationTokenInfo,
@@ -1660,6 +1683,10 @@ export default class KoniExtension {
 
         warning.length && inputTransaction.warnings.push(...warning);
         error.length && inputTransaction.errors.push(...error);
+
+        if (isSubstrateXcm && !dryRunInfo.success) {
+          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
+        }
       };
 
       eventsHandler = (eventEmitter: TransactionEmitter) => {
@@ -1704,6 +1731,7 @@ export default class KoniExtension {
       isTransferAll: transferAll,
       isTransferLocalTokenAndPayThatTokenAsFee,
       isPassConfirmation,
+      xcmFeeDryRun,
       errors,
       additionalValidator: additionalValidator,
       eventsHandler: eventsHandler
@@ -1949,7 +1977,7 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, token, tokenPayFeeSlug } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, token, tokenPayFeeSlug, value } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
@@ -1972,6 +2000,7 @@ export default class KoniExtension {
 
     const _request: CalculateMaxTransferable = {
       address: address,
+      value, // todo: lazy subscribe to improve performance
       cardanoApi: this.#koniState.chainService.getCardanoApi(chain),
       destChain,
       destToken,
