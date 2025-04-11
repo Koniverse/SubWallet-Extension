@@ -116,13 +116,17 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
 
   protected async getSubmitStep (params: OptimalYieldPathParams): Promise<YieldStepBaseInfo> {
     const { address, amount, netuid, slug, targets } = params;
+
     const selectedValidators = !targets ? [] : targets as ValidatorInfo[];
     const data: SubmitJoinNativeStaking = {
       amount,
       address,
       slug,
       selectedValidators,
-      netuid
+      subnetData: {
+        netuid: netuid || 0,
+        slippage: 0
+      }
     };
     const positionInfo = await this.getPoolPosition(address);
     const [, fee] = await this.createJoinExtrinsic(data, positionInfo);
