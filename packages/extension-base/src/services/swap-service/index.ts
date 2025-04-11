@@ -5,6 +5,8 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRefPath } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -14,7 +16,7 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, getTokenPairFromStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -25,6 +27,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
+import {t} from "i18next";
 
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
@@ -465,6 +468,28 @@ export class SwapService implements StoppableServiceInterface {
 
     if (params.currentStep > 0) {
       return [];
+    }
+
+    const blockedConfigObjects = await fetchBlockedConfigObjects();
+    const currentConfig = this.state.settingService.getEnvironmentSetting();
+
+    const passBlockedConfigId = getPassConfigId(currentConfig, blockedConfigObjects);
+    const blockedActionsFeaturesMaps = await fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
+
+    const originSwapPairInfo = getTokenPairFromStep(params.process.steps);
+
+    if (!originSwapPairInfo) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    const currentAction = `${ExtrinsicType.SWAP}___${originSwapPairInfo.slug}___${params.selectedQuote.provider.id}`;
+
+    for (const blockedActionsFeaturesMap of blockedActionsFeaturesMaps) {
+      const { blockedActionsMap } = blockedActionsFeaturesMap;
+
+      if (blockedActionsMap.swap.includes(currentAction)) {
+        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature under maintenance. Try again later'))];
+      }
     }
 
     if (handler) {
