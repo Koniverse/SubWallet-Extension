@@ -51,7 +51,7 @@ export const insufficientXCMMessages = ['You can only enter a maximum'];
 const Component = () => {
   const { t } = useTranslation();
   const notify = useNotification();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const navigate = useNavigate();
   const isPopup = useIsPopup();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
@@ -711,6 +711,10 @@ const Component = () => {
   const onSelectSlippage = useCallback((slippage: SlippageType) => {
     setMaxSlippage(slippage);
   }, []);
+
+  const closeSlippageModal = useCallback(() => {
+    inactiveModal(EARNING_SLIPPAGE_MODAL);
+  }, [inactiveModal]);
 
   const onOpenSlippageModal = useCallback(() => {
     activeModal(EARNING_SLIPPAGE_MODAL);
@@ -1386,6 +1390,7 @@ const Component = () => {
       <SlippageModal
         modalId={EARNING_SLIPPAGE_MODAL}
         onApplySlippage={onSelectSlippage}
+        onCancel={closeSlippageModal}
         slippageValue={maxSlippage}
       />
     </>

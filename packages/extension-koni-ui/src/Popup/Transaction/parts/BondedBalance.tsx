@@ -29,11 +29,15 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
   const { token } = useTheme() as Theme;
 
   // For subnet staking
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const onSelectSlippage = useCallback((slippage: SlippageType) => {
     setMaxSlippage(slippage);
   }, [setMaxSlippage]);
+
+  const closeSlippageModal = useCallback(() => {
+    inactiveModal(EARNING_SLIPPAGE_MODAL);
+  }, [inactiveModal]);
 
   const onOpenSlippageModal = useCallback(() => {
     activeModal(EARNING_SLIPPAGE_MODAL);
@@ -93,6 +97,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
       <SlippageModal
         modalId={EARNING_SLIPPAGE_MODAL}
         onApplySlippage={onSelectSlippage}
+        onCancel={closeSlippageModal}
         slippageValue={slippageValue}
       />
     </Typography.Paragraph>
