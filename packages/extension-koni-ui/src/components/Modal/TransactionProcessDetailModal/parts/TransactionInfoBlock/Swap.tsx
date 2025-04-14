@@ -1,14 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
-import { SwapBaseTxData } from '@subwallet/extension-base/types';
+import { SwapBaseTxData, SwapPair } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
+import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getCurrentCurrencyTotalFee } from '@subwallet/extension-koni-ui/utils';
-import { Number } from '@subwallet/react-ui';
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -39,33 +38,72 @@ const Component: FC<Props> = (props: Props) => {
     return getCurrentCurrencyTotalFee(data.quote.feeInfo.feeComponent, assetRegistryMap, priceMap);
   }, [assetRegistryMap, data.quote.feeInfo.feeComponent, priceMap]);
 
-  const renderRateConfirmInfo = () => {
-    return (
-      <div className={'__quote-rate-wrapper'}>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(fromAssetInfo)}
-          value={1}
-        />
-        <span>&nbsp;~&nbsp;</span>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(toAssetInfo)}
-          value={data.quote.rate}
-        />
-      </div>
-    );
-  };
-
   const originSwapPair = useMemo(() => {
-    return getTokenPairFromStep(data.process.steps);
-  }, [data.process.steps]);
+    try {
+      const result = getTokenPairFromStep(data.process.steps);
+
+      if (result) {
+        return result;
+      }
+    } catch (e) {
+      console.log('getTokenPairFromStep error', e);
+    }
+
+    // try to fetch originSwapPair, hotfix for old data.
+
+    try {
+      const steps = processData.steps;
+
+      const from = (() => {
+        if (steps[0]?.metadata?.originTokenInfo) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          // @ts-ignore
+          return steps[0]?.metadata?.originTokenInfo?.slug as string;
+        } else if (steps[0]?.metadata?.pair) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          // @ts-ignore
+          return steps[0]?.metadata?.pair?.from as string;
+        }
+
+        return undefined;
+      })();
+
+      const to = (() => {
+        const lastStep = steps[steps.length - 1];
+
+        if (lastStep?.metadata?.originTokenInfo) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          // @ts-ignore
+          return lastStep?.metadata?.originTokenInfo?.slug as string;
+        } else if (lastStep?.metadata?.pair) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          // @ts-ignore
+          return lastStep?.metadata?.pair?.to as string;
+        }
+
+        return undefined;
+      })();
+
+      if (from && to) {
+        return {
+          from,
+          to,
+          slug: _parseAssetRefKey(from, to)
+        } as SwapPair;
+      }
+    } catch (e) {
+      console.log('try handling old data error', e);
+    }
+
+    return undefined;
+  }, [data.process.steps, processData.steps]);
 
   return (
     <div
       className={className}
     >
       <SwapTransactionBlock
+        className={'__swap-transaction-block'}
         fromAmount={data.quote.fromAmount}
         fromAssetSlug={originSwapPair?.from}
         logoSize={36}
@@ -89,7 +127,12 @@ const Component: FC<Props> = (props: Props) => {
           label={t('Quote rate')}
           valueColorSchema={'gray'}
         >
-          {renderRateConfirmInfo()}
+          <QuoteRateDisplay
+            className={'__quote-estimate-swap-value'}
+            fromAssetInfo={fromAssetInfo}
+            rateValue={data.quote.rate}
+            toAssetInfo={toAssetInfo}
+          />
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
@@ -106,13 +149,9 @@ const Component: FC<Props> = (props: Props) => {
 
 export const Swap = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    backgroundColor: token.colorBgSecondary,
-    borderRadius: token.borderRadiusLG,
-    paddingBottom: token.padding,
-
-    '.swap-confirmation-container': {
+    '.__swap-transaction-block': {
       '.__summary-quote': {
-        marginBottom: token.marginXS
+        marginBottom: token.margin
       },
 
       '.token-logo': {
