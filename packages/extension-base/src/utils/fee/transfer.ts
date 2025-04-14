@@ -10,7 +10,8 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createXcmExtrinsic, CreateXcmExtrinsicProps, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -56,8 +57,9 @@ export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo
     const isSnowBridgeEvmTransfer = _isPureEvmChain(srcChain) && _isSnowBridgeXcm(srcChain, destChain) && !isAvailBridgeFromEvm;
     const isPolygonBridgeTransfer = _isPolygonChainBridge(srcChain.slug, destChain.slug);
     const isPosBridgeTransfer = _isPosChainBridge(srcChain.slug, destChain.slug);
+    const isAcrossBridgeTransfer = _isAcrossChainBridge(srcChain.slug, destChain.slug);
 
-    return (isAvailBridgeFromEvm || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer) ? 'evm' : 'substrate';
+    return (isAvailBridgeFromEvm || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer) ? 'evm' : 'substrate';
   } else {
     if (_isChainEvmCompatible(srcChain) && _isTokenTransferredByEvm(srcToken)) {
       return 'evm';
@@ -322,6 +324,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const isSnowBridgeEvmTransfer = _isPureEvmChain(srcChain) && _isSnowBridgeXcm(srcChain, destChain) && !isAvailBridgeFromEvm;
   const isPolygonBridgeTransfer = _isPolygonChainBridge(srcChain.slug, destChain.slug);
   const isPosBridgeTransfer = _isPosChainBridge(srcChain.slug, destChain.slug);
+  const isAcrossBridgeTransfer = _isAcrossChainBridge(srcChain.slug, destChain.slug);
 
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
   const substrateAddress = fakeAddress; // todo: move this
@@ -334,11 +337,12 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       throw Error('Destination token is not available');
     }
 
+    const evmSendingValue = isAcrossBridgeTransfer ? '100000000000000' : '0'; // Across have min stake
     const params: CreateXcmExtrinsicProps = {
       destinationTokenInfo: destToken,
       originTokenInfo: srcToken,
       // If value is 0, substrate will throw error when estimating fee
-      sendingValue: feeChainType === 'substrate' ? '1000000000000000000' : '0',
+      sendingValue: feeChainType === 'substrate' ? '1000000000000000000' : evmSendingValue,
       sender: address,
       recipient,
       destinationChain: destChain,
@@ -354,6 +358,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
     if (isPosBridgeTransfer || isPolygonBridgeTransfer) {
       funcCreateExtrinsic = createPolygonBridgeExtrinsic;
+    } else if (isAcrossBridgeTransfer) {
+      funcCreateExtrinsic = createAcrossBridgeExtrinsic;
     } else if (isSnowBridgeEvmTransfer) {
       funcCreateExtrinsic = createSnowBridgeExtrinsic;
     } else if (isAvailBridgeFromEvm) {

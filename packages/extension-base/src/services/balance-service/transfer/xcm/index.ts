@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
@@ -12,7 +12,9 @@ import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { combineEthFee } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -150,4 +152,53 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
       : _createPosBridgeL1toL2Extrinsic;
 
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createAcrossBridgeExtrinsic = async ({ destinationChain,
+  destinationTokenInfo,
+  evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
+
+  if (!isAcrossBridgeXcm) {
+    throw new Error('This is not a valid AcrossBridge transfer');
+  }
+
+  if (!evmApi) {
+    throw new Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw new Error('Sender is required');
+  }
+
+  try {
+    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+
+    const _feeCustom = feeCustom as EvmEIP1559FeeOption;
+    const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
+
+    const transactionConfig: TransactionConfig = {
+      from: data?.sender,
+      to: data?.to,
+      value: data?.value,
+      data: data?.transferEncodedCall,
+      ...feeCombine
+    };
+
+    const gasLimit = await evmApi.api.eth.estimateGas(transactionConfig).catch(() => 200000);
+
+    transactionConfig.gas = gasLimit.toString();
+
+    return transactionConfig;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
