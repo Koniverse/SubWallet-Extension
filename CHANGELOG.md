@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 1.3.29
+Build date: Apr 08, 2025.
+
+Features & Update:
+- Support auto detect balance for EVM (#2836)
+- Sort token by balance (#2339)
+- Update for Meld on-ramp (#4198)
+- Add validate sufficient token for XCM transfer (#3895)
+
+Bug fixed:
+- Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
+
+
 ## 1.3.28
 Build date: Apr 02, 2025.
 
@@ -11,9 +24,6 @@ Features & Update:
 Bug fixed:
 - Fixed bug related to subnet staking feature (#4140)
 - Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
-
-Bug fixed:
-- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
 
 ## 1.3.27
 Build date: Mar 29, 2025.
