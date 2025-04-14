@@ -5,7 +5,7 @@ import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types
 import { BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { UtxoResponseItem } from '@subwallet/extension-base/types';
+import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
 import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -41,7 +41,7 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
   }
 };
 
-async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) {
+async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
     try {
       const [filteredUtxos, addressSummaryInfo] = await Promise.all([
@@ -77,24 +77,20 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
   }));
 }
 
-export const subscribeBitcoinBalance = async (addresses: string[], bitcoinApi: _BitcoinApi) => {
+export const subscribeBitcoinBalance = async (addresses: string[], bitcoinApi: _BitcoinApi, callback: (rs: BalanceItem[]) => void) => {
   console.log('subscribeBitcoinBalanceBalance', addresses);
 
-  const getBalance = async () => {
+  const getBalance = async (): Promise<BalanceItem[]> => {
     try {
       const balances = await getBitcoinBalance(bitcoinApi, addresses);
 
-      return balances[0].balance;
+      callback(balances);
     } catch (e) {
-      console.error('Error on get Bitcoin balance with token', e);
-
-      return '0';
+      console.error('Error while fetching cardano balance', e);
     }
   };
 
-  const balanceBTC = await getBalance();
-
-  console.log('btc balance: ', balanceBTC);
+  await getBalance();
 
   return () => {
     console.log('unsub');
