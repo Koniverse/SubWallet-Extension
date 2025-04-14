@@ -5,20 +5,19 @@ import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types
 import { BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
-import { filteredOutTxsUtxos, getInscriptionUtxos } from '@subwallet/extension-base/utils';
+import { UtxoResponseItem } from '@subwallet/extension-base/types';
+import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
   try {
-    // const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
-    const [utxos, inscriptionUtxos] = await Promise.all([
-    // const [utxos] = await Promise.all([
+    const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
       await bitcoinApi.api.getUtxos(address),
+      await getRuneUtxos(bitcoinApi, address),
       await getInscriptionUtxos(bitcoinApi, address)
     ]);
 
-    let filteredUtxos: UtxoResponseItem[] = [];
+    let filteredUtxos: UtxoResponseItem[];
 
     if (!utxos || !utxos.length) {
       return [];
@@ -28,8 +27,9 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
     // filteredUtxos = filterOutPendingTxsUtxos(utxos);
 
     // filter out rune utxos
-    // filteredUtxos = filteredOutTxsUtxos(utxos, runeTxsUtxos);
+    filteredUtxos = filteredOutTxsUtxos(utxos, runeTxsUtxos);
 
+    // filter out dust utxos
     // filter out inscription utxos
     filteredUtxos = filteredOutTxsUtxos(utxos, inscriptionUtxos);
 
@@ -49,6 +49,7 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
         bitcoinApi.api.getAddressSummaryInfo(address)
       ]);
 
+      console.log('addressSummaryInfo', addressSummaryInfo);
       const bitcoinBalanceMetadata = {
         inscriptionCount: addressSummaryInfo.total_inscription
       } as BitcoinBalanceMetadata;
@@ -77,6 +78,8 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
 }
 
 export const subscribeBitcoinBalance = async (addresses: string[], bitcoinApi: _BitcoinApi) => {
+  console.log('subscribeBitcoinBalanceBalance', addresses);
+
   const getBalance = async () => {
     try {
       const balances = await getBitcoinBalance(bitcoinApi, addresses);

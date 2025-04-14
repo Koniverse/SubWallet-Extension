@@ -188,6 +188,33 @@ export function filteredOutTxsUtxos (allTxsUtxos: UtxoResponseItem[], filteredOu
   return allTxsUtxos.filter((element) => !listFilterOut.includes(`${element.txid}:${element.vout}`));
 }
 
+export async function getRuneUtxos (bitcoinApi: _BitcoinApi, address: string) {
+  const responseRuneUtxos = await bitcoinApi.api.getRuneUtxos(address);
+
+  const runeUtxos: UtxoResponseItem[] = [];
+
+  responseRuneUtxos.forEach((responseRuneUtxo) => {
+    const txid = responseRuneUtxo.txid;
+    const vout = responseRuneUtxo.vout;
+    const utxoValue = responseRuneUtxo.satoshi;
+
+    if (txid && vout && utxoValue) {
+      const item = {
+        txid,
+        vout,
+        status: {
+          confirmed: true // not use in filter out rune utxos
+        },
+        value: utxoValue
+      } as UtxoResponseItem;
+
+      runeUtxos.push(item);
+    }
+  });
+
+  return runeUtxos;
+}
+
 export async function getInscriptionUtxos (bitcoinApi: _BitcoinApi, address: string) {
   try {
     const inscriptions = await bitcoinApi.api.getAddressInscriptions(address);

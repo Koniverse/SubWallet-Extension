@@ -247,9 +247,8 @@ export interface BlockStreamTransactionDetail {
 }
 
 export interface RuneUtxoResponse {
-  start: number,
   total: number,
-  utxo: RuneUtxo[]
+  results: RuneUtxo[]
 }
 
 export interface RuneUtxo {

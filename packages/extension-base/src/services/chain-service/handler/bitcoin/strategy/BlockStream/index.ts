@@ -3,10 +3,11 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
-import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
+import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData, RuneTxs, RuneTxsResponse, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
 import { BitcoinApiStrategy, BitcoinTransactionEventMap } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
+import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
@@ -241,6 +242,50 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
       return rs.result;
     }, 0);
+  }
+
+  async getRunes (address: string) {
+    const runesFullList: RunesInfoByAddress[] = [];
+    const pageSize = 60;
+    let offset = 0;
+
+    const runeService = RunesService.getInstance(this.isTestnet);
+
+    try {
+      while (true) {
+        const response = await runeService.getAddressRunesInfo(address, {
+          limit: String(pageSize),
+          offset: String(offset)
+        }) as unknown as RunesInfoByAddressFetchedData;
+
+        const runes = response.runes;
+
+        if (runes.length !== 0) {
+          runesFullList.push(...runes);
+          offset += pageSize;
+        } else {
+          break;
+        }
+      }
+
+      return runesFullList;
+    } catch (error) {
+      console.error(`Failed to get ${address} balances`, error);
+      throw error;
+    }
+  }
+
+  async getRuneUtxos (address: string) {
+    const runeService = RunesService.getInstance(this.isTestnet);
+
+    try {
+      const responseRuneUtxos = await runeService.getAddressRuneUtxos(address);
+
+      return responseRuneUtxos.results;
+    } catch (error) {
+      console.error(`Failed to get ${address} rune utxos`, error);
+      throw error;
+    }
   }
 
   async getAddressInscriptions (address: string) {
