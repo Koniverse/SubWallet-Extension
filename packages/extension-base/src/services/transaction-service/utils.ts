@@ -53,7 +53,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
   return 'address';
 }
 
-function getBlockExplorerTxRoute (chainInfo: _ChainInfo, explorerLink: string) {
+function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
   if (_isPureEvmChain(chainInfo)) {
     return 'tx';
   }
@@ -66,7 +66,9 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo, explorerLink: string) {
     return 'transaction';
   }
 
-  if (explorerLink.includes('statescan.io')) {
+  const explorerLink = _getBlockExplorerFromChain(chainInfo);
+
+  if (explorerLink && explorerLink.includes('statescan.io')) {
     return '#/extrinsics';
   }
 
@@ -89,7 +91,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   }
 
   if (explorerLink && isHex(hexAddPrefix(value))) {
-    const route = getBlockExplorerTxRoute(chainInfo, explorerLink);
+    const route = getBlockExplorerTxRoute(chainInfo);
 
     if (chainInfo.slug === 'tangle') {
       return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}extrinsic/${value}${route}/${value}`);
