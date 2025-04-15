@@ -349,7 +349,7 @@ export class HydradxHandler implements SwapBaseInterface {
       case CommonStepType.DEFAULT:
         return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
       case CommonStepType.XCM:
-        return this.swapBaseHandler.handleBridgeStep(params, 'substrate');
+        return this.swapBaseHandler.handleBridgeStep(params, 'xcm');
       case CommonStepType.SET_FEE_TOKEN:
         return this.handleSetFeeStep(params);
       case SwapStepType.SWAP:

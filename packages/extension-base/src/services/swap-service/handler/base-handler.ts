@@ -232,12 +232,12 @@ export class SwapBaseHandler {
   }
 
   public async handleBridgeStep (params: SwapSubmitParams, type: string): Promise<SwapSubmitStepData> {
-    if (type === 'substrate') {
+    if (type === 'xcm') {
       return this.handleBridgeSubstrate(params);
     }
 
-    if (type === 'evm') {
-      return this.handleBridgeEvm(params);
+    if (type === 'across') {
+      return this.handleBridgeAcross(params);
     }
 
     throw Error('Not support this type');
@@ -290,7 +290,7 @@ export class SwapBaseHandler {
     } as SwapSubmitStepData;
   }
 
-  public async handleBridgeEvm (params: SwapSubmitParams) {
+  public async handleBridgeAcross (params: SwapSubmitParams) {
     const bridgeStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
 
     if (!bridgeStep || !bridgeStep.originTokenInfo || !bridgeStep.destinationTokenInfo || !bridgeStep.sendingValue) {

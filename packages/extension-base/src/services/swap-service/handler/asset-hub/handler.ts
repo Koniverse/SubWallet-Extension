@@ -193,7 +193,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     switch (type) {
       case CommonStepType.XCM:
-        return this.swapBaseHandler.handleBridgeStep(params, 'substrate');
+        return this.swapBaseHandler.handleBridgeStep(params, 'xcm');
       case SwapStepType.SWAP:
         return this.handleSubmitStep(params);
       default:

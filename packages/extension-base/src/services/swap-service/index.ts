@@ -128,22 +128,21 @@ export class SwapService implements StoppableServiceInterface {
 
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
 
-    console.log('-------');
+    console.group('Swap Info');
     console.log('path', path);
-    console.log('-------');
     console.log('swapQuoteResponse', swapQuoteResponse);
 
-    const forceUniswapQuote = swapQuoteResponse.quotes.find((quote) => quote.provider.id === SwapProviderId.UNISWAP) || swapQuoteResponse.optimalQuote
+    // todo: remove after handling chainflip
+    const preferredUniswapQuote = swapQuoteResponse.quotes.find((quote) => quote.provider.id === SwapProviderId.UNISWAP) || swapQuoteResponse.optimalQuote;
 
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
-      selectedQuote: forceUniswapQuote,
+      selectedQuote: preferredUniswapQuote,
       path
     });
 
-    console.log('-------');
     console.log('optimalProcess', optimalProcess);
-    console.log('-------');
+    console.groupEnd();
 
     if (optimalProcess.steps.length - 1 < optimalProcess.path.length) { // minus the fill info step
       throw new Error('Swap pair is not found');
@@ -153,7 +152,7 @@ export class SwapService implements StoppableServiceInterface {
       process: optimalProcess,
       quote: {
         ...swapQuoteResponse,
-        optimalQuote: forceUniswapQuote
+        optimalQuote: preferredUniswapQuote
       }
     };
   }
