@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseStepType, CommonStepType, ProcessStep, ProcessTransactionData, StepStatus, SwapStepType, YieldStepType } from '@subwallet/extension-base/types';
+import { BaseStepType, CommonStepType, ProcessStep, ProcessTransactionData, ProcessType, StepStatus, SwapStepType, YieldStepType } from '@subwallet/extension-base/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isStepCompleted, isStepFailed, isStepProcessing, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
@@ -68,15 +68,27 @@ const Component: FC<Props> = (props: Props) => {
 
   const title = useMemo(() => {
     if (isStepCompleted(processData.status)) {
-      return t('Success');
+      if (processData.type === ProcessType.SWAP) {
+        return t('Swap success');
+      } else if (processData.type === ProcessType.EARNING) {
+        return t('Stake success');
+      }
+
+      return t('Transaction success');
     }
 
     if (isStepFailed(processData.status)) {
-      return t('Failed');
+      if (processData.type === ProcessType.SWAP) {
+        return t('Swap failed');
+      } else if (processData.type === ProcessType.EARNING) {
+        return t('Stake failed');
+      }
+
+      return t('Transaction failed');
     }
 
     if (isStepTimeout(processData.status)) {
-      return t('Timeout');
+      return t('Transaction timeout');
     }
 
     if (!currentStep) {
@@ -127,7 +139,7 @@ const Component: FC<Props> = (props: Props) => {
     // }
 
     return '';
-  }, [currentStep, processData.status, t]);
+  }, [currentStep, processData.status, processData.type, t]);
 
   return (
     <div
@@ -140,7 +152,9 @@ const Component: FC<Props> = (props: Props) => {
     >
       <Icon
         {...iconProp}
-        className={CN('__icon')}
+        className={CN('__icon', {
+          '-spinner': isStepProcessing(processData.status)
+        })}
       />
 
       <div className='__title'>
@@ -179,6 +193,12 @@ export const CurrentProcessStep = styled(Component)<Props>(({ theme: { token } }
       svg: {
         position: 'relative',
         zIndex: 2
+      }
+    },
+
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
       }
     },
 

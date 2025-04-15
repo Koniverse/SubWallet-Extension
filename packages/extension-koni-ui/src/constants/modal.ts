@@ -87,3 +87,7 @@ export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
 export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
+
+/* Other */
+export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+/* Other */

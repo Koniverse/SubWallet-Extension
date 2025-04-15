@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // 'init' | 'started' | 'starting' | 'stopped' | 'stopping'
-import { OptimalProcessParams, OptimalProcessResult } from '@subwallet/extension-base/types/service-base';
 import { PromiseHandler } from '@subwallet/extension-base/utils/promise';
 
 export enum ServiceStatus {
@@ -42,8 +41,4 @@ export interface SubscribeServiceInterface {
 export interface CronServiceInterface {
   startCron: () => Promise<void>;
   stopCron: () => Promise<void>;
-}
-
-export interface ServiceWithProcessInterface {
-  generateOptimalProcess(params: OptimalProcessParams): Promise<OptimalProcessResult>;
 }
