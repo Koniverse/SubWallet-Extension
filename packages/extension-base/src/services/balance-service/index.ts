@@ -11,11 +11,11 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { _getChainNativeTokenSlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -476,9 +476,34 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    const evmPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return new Promise<string[] | null>((resolve) => {
+          const timeOutPromise = new Promise<string[]>((_resolve) => {
+            setTimeout(() => _resolve([]), 30000);
+          });
+
+          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+
+          Promise.race([timeOutPromise, apiPromise])
+            .then((result) => resolve(result))
+            .catch((error) => {
+              console.error(error);
+              resolve(null);
+            });
+        });
+      } else {
+        return Promise.resolve(null);
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
     const balanceDataList = await Promise.all(promiseList);
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -520,6 +545,27 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        for (const slug of balanceData) {
+          const chainSlug = slug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            needEnableChains.push(chainSlug);
+            needActiveTokens.push(existedKey);
+            currentAssetSettings[existedKey] = { visible: true };
+          }
+        }
+      }
+    }
+
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
@@ -548,6 +594,7 @@ export class BalanceService implements StoppableServiceInterface {
     const scanBalance = () => {
       const addresses = keyring.getPairs().map((account) => account.address);
       const cache = this.balanceDetectSubject.value;
+
       const now = Date.now();
       const needDetectAddresses: string[] = [];
 
@@ -577,7 +624,7 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   // process
-  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
     const originChainInfo = this.state.chainService.getChainInfoByKey(params.originChain);
 
     if (!params.destChain) { // normal transfers

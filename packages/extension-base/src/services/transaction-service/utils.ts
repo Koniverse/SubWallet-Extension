@@ -49,12 +49,20 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
+  if (explorerLink.includes('polimec.statescan.io')) {
+    return '#/accounts';
+  }
+
   if (explorerLink.includes('explorer.zkverify.io')) {
     return 'account';
   }
 
   if (explorerLink.includes('astral.autonomys')) {
     return 'accounts';
+  }
+
+  if (explorerLink.includes('taostats.io')) {
+    return 'account';
   }
 
   return 'address';
@@ -73,7 +81,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['invarch', 'tangle'].includes(chainInfo.slug)) {
+  if (['invarch', 'tangle', 'polimec'].includes(chainInfo.slug)) {
     return '#/extrinsics';
   }
 
@@ -90,10 +98,6 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   }
 
   if (explorerLink && isHex(hexAddPrefix(value))) {
-    if (chainInfo.slug === 'bittensor') {
-      return undefined;
-    }
-
     const route = getBlockExplorerTxRoute(chainInfo);
 
     if (chainInfo.slug === 'tangle') {

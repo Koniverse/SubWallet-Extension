@@ -51,6 +51,7 @@ interface Props extends BasicInputWrapper, ThemeProps {
 export interface AddressInputRef extends BaseSelectRef {
   setInputValue: React.Dispatch<React.SetStateAction<string | undefined>>;
   setSelectedOption: React.Dispatch<React.SetStateAction<AnalyzeAddress | undefined>>;
+  ready: boolean;
 }
 
 const defaultScannerModalId = 'input-account-address-scanner-modal';
@@ -378,7 +379,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       return {
         ...fieldRefCurrent,
         setInputValue,
-        setSelectedOption
+        setSelectedOption,
+        ready: true
       };
     }
 
@@ -393,7 +395,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       },
       scrollTo: () => {
         //
-      }
+      },
+      ready: false
     };
   }, [fieldRefCurrent]);
 

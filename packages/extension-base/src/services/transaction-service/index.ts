@@ -4,7 +4,7 @@
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, EvmSignatureRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, fetchBlockedConfigObjects, fetchLastestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
 import { checkBalanceWithTransactionFee, checkSigningAccountForTransaction, checkSupportForAction, checkSupportForFeature, checkSupportForTransaction, estimateFeeForTransaction } from '@subwallet/extension-base/core/logic-validation/transfer';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { cellToBase64Str, externalMessage, getTransferCellPromise } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -115,7 +115,7 @@ export default class TransactionService {
 
     const passBlockedConfigId = getPassConfigId(currentConfig, blockedConfigObjects);
 
-    const blockedActionsFeaturesMaps = await fetchLastestBlockedActionsAndFeatures(passBlockedConfigId);
+    const blockedActionsFeaturesMaps = await fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
 
     for (const blockedActionsFeaturesMap of blockedActionsFeaturesMaps) {
       const { blockedActionsMap, blockedFeaturesList } = blockedActionsFeaturesMap;
@@ -668,6 +668,12 @@ export default class TransactionService {
       case ExtrinsicType.STAKING_UNBOND:
         {
           const data = parseTransactionData<ExtrinsicType.STAKING_UNBOND>(transaction.data);
+
+          if (data.poolInfo?.metadata.subnetData) {
+            historyItem.additionalInfo = {
+              symbol: data.poolInfo.metadata.subnetData.subnetSymbol
+            };
+          }
 
           if (data.isLiquidStaking && data.derivativeTokenInfo && data.exchangeRate && data.inputTokenInfo) {
             historyItem.amount = {

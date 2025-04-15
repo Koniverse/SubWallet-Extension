@@ -48,6 +48,7 @@ import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
 import { isManifestV3, isSameAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
+import { addLazy, isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -582,7 +583,7 @@ export default class KoniState {
 
     if (authUrls[shortenUrl]) {
       if (chainInfo && !_isChainEnabled(chainState)) {
-        await this.enableChain(networkKey);
+        await this.enableChainWithPriorityAssets(networkKey);
       }
 
       authUrls[shortenUrl].currentNetworkKey = networkKey;
@@ -898,6 +899,14 @@ export default class KoniState {
   public async enableChain (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
       await this.chainService.updateAssetSettingByChain(chainSlug, true);
+    }
+
+    return this.chainService.enableChain(chainSlug);
+  }
+
+  public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
+    if (enableTokens) {
+      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);
@@ -1831,9 +1840,16 @@ export default class KoniState {
     return result;
   }
 
+  scanAddressOnAdd: string[] = [];
+
   public onAccountAdd () {
     this.eventService.on('account.add', (address) => {
-      this.balanceService.autoEnableChains([address]).catch(this.logger.error);
+      this.scanAddressOnAdd.push(address);
+
+      addLazy('autoScanBalanceOnAdd', () => {
+        this.balanceService.autoEnableChains(this.scanAddressOnAdd).catch(this.logger.error);
+        this.scanAddressOnAdd = [];
+      }, 500, 5000, false);
     });
   }
 

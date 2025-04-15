@@ -5,8 +5,9 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { useGetBalance } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ActivityIndicator, Number, Typography } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, Number, Tooltip, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
+import { Info } from 'phosphor-react';
 import React, { useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 
@@ -14,6 +15,7 @@ type Props = ThemeProps & {
   address?: string,
   tokenSlug?: string;
   label?: string;
+  labelTooltip?: string;
   chain?: string;
   onBalanceReady?: (rs: boolean) => void;
   hidden?: boolean;
@@ -28,6 +30,7 @@ const Component = ({ address,
   hidden,
   isSubscribe,
   label,
+  labelTooltip,
   onBalanceReady,
   tokenSlug }: Props) => {
   const { t } = useTranslation();
@@ -58,7 +61,31 @@ const Component = ({ address,
       hidden: hidden
     })}
     >
-      {!error && <span className='__label'>{label || t('Sender available balance:')}</span>}
+      {!error && (
+        <Tooltip
+          open={labelTooltip ? undefined : false}
+          placement={'topRight'}
+          title={labelTooltip || ''}
+        >
+          <span className={CN('__label', {
+            '-hoverable': !!label
+          })}
+          >
+            {label || t('Sender available balance')}
+
+            {
+              !!labelTooltip && (
+                <Icon
+                  className={'__info-icon'}
+                  phosphorIcon={Info}
+                />
+              )
+            }
+
+            :
+          </span>
+        </Tooltip>
+      )}
       {isLoading && <ActivityIndicator size={14} />}
       {error && <Typography.Text className={'error-message'}>{error}</Typography.Text>}
       {
@@ -104,8 +131,22 @@ const FreeBalance = styled(Component)<Props>(({ theme: { token } }: Props) => {
       marginRight: 3
     },
 
+    '.__label.-hoverable': {
+      cursor: 'pointer'
+    },
+
+    '.__info-icon': {
+      marginLeft: token.marginXXS
+    },
+
     '.error-message': {
       color: token.colorError
+    },
+
+    '.ant-number, .ant-number .ant-typography': {
+      fontSize: 'inherit !important',
+      color: 'inherit !important',
+      lineHeight: 'inherit'
     },
 
     '&.ant-typography': {

@@ -12,6 +12,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
+import { convertAuthorizeTypeToChainTypes } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
 import { GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -157,6 +158,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
     return (
       <AccountProxyItem
         accountProxy={item}
+        chainTypes={convertAuthorizeTypeToChainTypes(authInfo.accountAuthTypes, item.chainTypes)}
         className={'__account-proxy-connect-item'}
         key={item.id}
         rightPartNode={(
