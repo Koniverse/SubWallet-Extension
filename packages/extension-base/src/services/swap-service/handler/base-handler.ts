@@ -11,7 +11,7 @@ import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-p
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, RuntimeDispatchInfo, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
@@ -24,7 +24,7 @@ import { t } from 'i18next';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
-import { createXcmExtrinsic } from '../../balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createXcmExtrinsic } from '../../balance-service/transfer/xcm';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -231,7 +231,19 @@ export class SwapBaseHandler {
     }
   }
 
-  public async handleBridgeStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
+  public async handleBridgeStep (params: SwapSubmitParams, type: string): Promise<SwapSubmitStepData> {
+    if (type === 'substrate') {
+      return this.handleBridgeSubstrate(params);
+    }
+
+    if (type === 'evm') {
+      return this.handleBridgeEvm(params);
+    }
+
+    throw Error('Not support this type');
+  }
+
+  public async handleBridgeSubstrate (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const briefXcmStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
 
     if (!briefXcmStep || !briefXcmStep.originTokenInfo || !briefXcmStep.destinationTokenInfo || !briefXcmStep.sendingValue) {
@@ -278,6 +290,55 @@ export class SwapBaseHandler {
     } as SwapSubmitStepData;
   }
 
+  public async handleBridgeEvm (params: SwapSubmitParams) {
+    const bridgeStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
+
+    if (!bridgeStep || !bridgeStep.originTokenInfo || !bridgeStep.destinationTokenInfo || !bridgeStep.sendingValue) {
+      throw new Error('Bridge metadata error');
+    }
+
+    const originTokenInfo = bridgeStep.originTokenInfo;
+    const destinationTokenInfo = bridgeStep.destinationTokenInfo;
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+    const evmApi = await this.chainService.getEvmApi(originTokenInfo.originChain).isReady;
+    const feeInfo = await this.feeService.subscribeChainFee(getId(), originTokenInfo.originChain, 'evm');
+    const sendingValue = bridgeStep.sendingValue;
+    const sender = bridgeStep.sender;
+    const recipient = bridgeStep.receiver;
+
+    const tx = await createAcrossBridgeExtrinsic({
+      originTokenInfo,
+      destinationTokenInfo,
+      originChain,
+      destinationChain,
+      evmApi,
+      feeInfo,
+      sendingValue,
+      sender,
+      recipient
+    });
+
+    const txData: RequestCrossChainTransfer = {
+      originNetworkKey: originTokenInfo.originChain,
+      destinationNetworkKey: destinationTokenInfo.originChain,
+      from: sender,
+      to: recipient,
+      value: sendingValue,
+      tokenSlug: originTokenInfo.slug,
+      showExtraWarning: true
+    };
+
+    return {
+      txChain: originTokenInfo.originChain,
+      extrinsic: tx,
+      transferNativeAmount: _isNativeToken(originTokenInfo) ? bridgeStep.sendingValue : '0',
+      extrinsicType: ExtrinsicType.TRANSFER_XCM,
+      chainType: ChainType.EVM,
+      txData: txData
+    } as SwapSubmitStepData;
+  }
+
   public async validateSetFeeTokenStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
     if (!params.selectedQuote) {
       return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
@@ -299,6 +360,21 @@ export class SwapBaseHandler {
   }
 
   private async validateBridgeStep (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
+    const isSubstrateBridge = _isPureSubstrateChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(fromToken))) && _isPureSubstrateChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(toToken)));
+    const isEvmBridge = _isPureEvmChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(fromToken))) && _isPureEvmChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(toToken)));
+
+    if (isSubstrateBridge) {
+      return this.validateBridgeSubstrate(receiver, fromToken, toToken, selectedFeeToken, toChainNativeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance, bnBridgeDeliveryFee);
+    }
+
+    if (isEvmBridge) {
+      return this.validateBridgeEvm(receiver, fromToken, toToken, selectedFeeToken, toChainNativeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance, bnBridgeDeliveryFee);
+    }
+
+    throw Error('Bridge type is not support');
+  }
+
+  private async validateBridgeSubstrate (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
 
@@ -330,6 +406,11 @@ export class SwapBaseHandler {
       }
     }
 
+    return [];
+  }
+
+  private async validateBridgeEvm (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
+    // todo: add validate for bridge evm
     return [];
   }
 

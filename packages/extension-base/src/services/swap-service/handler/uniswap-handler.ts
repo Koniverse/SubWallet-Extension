@@ -130,6 +130,8 @@ export class UniswapHandler implements SwapBaseInterface {
           this.getPermitStep.bind(this),
           this.getSubmitStep.bind(this)
         ]);
+
+        return;
       }
 
       if (step.action === DynamicSwapType.BRIDGE) {
@@ -137,6 +139,8 @@ export class UniswapHandler implements SwapBaseInterface {
           this.getApprovalStep.bind(this),
           this.getBridgeStep.bind(this)
         ]);
+
+        return;
       }
 
       throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);
@@ -253,8 +257,7 @@ export class UniswapHandler implements SwapBaseInterface {
     const { path, request, selectedQuote } = params;
 
     // todo: stepIndex is not corresponding index in path, because uniswap include approval and permit step
-    const firstBridgeIndex = 1;
-
+    const isBridgeFirst = stepIndex === 1;
     const bridgePairInfo = path.find((action) => action.action === DynamicSwapType.BRIDGE);
 
     if (!bridgePairInfo || !bridgePairInfo.pair) {
@@ -276,15 +279,13 @@ export class UniswapHandler implements SwapBaseInterface {
 
     const senderAddress = request.address;
     const receiverAddress = request.recipient || request.address;
+    const sendingValue = isBridgeFirst ? request.fromAmount : selectedQuote.toAmount;
 
     try {
       const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
 
       const id = getId();
-      const [feeInfo, toTokenBalance] = await Promise.all([
-        this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'evm') as Promise<EvmFeeInfo>,
-        this.balanceService.getTotalBalance(senderAddress, toTokenInfo.originChain, toTokenInfo.slug, ExtrinsicType.TRANSFER_BALANCE)
-      ]);
+      const feeInfo = await this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
 
       const tx = await createAcrossBridgeExtrinsic({
         originTokenInfo: fromTokenInfo,
@@ -294,7 +295,7 @@ export class UniswapHandler implements SwapBaseInterface {
         evmApi,
         feeInfo,
         // Mock sending value to get payment info
-        sendingValue: request.fromAmount,
+        sendingValue,
         sender: senderAddress,
         recipient: receiverAddress
       });
@@ -338,7 +339,7 @@ export class UniswapHandler implements SwapBaseInterface {
       const swapBridge = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
       const needEditAmount = swapBridge || bridgeSwapBridge;
 
-      if (stepIndex === firstBridgeIndex) {
+      if (isBridgeFirst) {
         expectedReceive = request.fromAmount;
         bnSendingValue = BigNumber(request.fromAmount);
 
@@ -348,12 +349,16 @@ export class UniswapHandler implements SwapBaseInterface {
         }
 
         if (isBridgeNativeToken) {
-
-        } else {
-
+          bnSendingValue = bnSendingValue.plus(BigNumber(estimatedBridgeFee));
         }
-      } else {
+      } else { // bridge after swap
+        expectedReceive = selectedQuote.toAmount;
 
+        if (needEditAmount) {
+          bnSendingValue = BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
+        } else {
+          bnSendingValue = BigNumber(selectedQuote.toAmount);
+        }
       }
 
       const step: BaseStepDetail = {
@@ -382,11 +387,15 @@ export class UniswapHandler implements SwapBaseInterface {
     const { currentStep, process } = params;
     const type = process.steps[currentStep].type;
 
+    console.log('type', type);
+
     switch (type) {
       case CommonStepType.DEFAULT:
         return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
       case CommonStepType.TOKEN_APPROVAL:
         return this.tokenApproveSpending(params);
+      case CommonStepType.XCM:
+        return this.swapBaseHandler.handleBridgeStep(params, 'evm');
       case SwapStepType.SWAP:
         return this.handleSubmitStep(params);
       case SwapStepType.PERMIT:
@@ -584,11 +593,11 @@ export class UniswapHandler implements SwapBaseInterface {
     }
 
     if (swapXcm) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateXcmSwapProcess(params, 1, 2);
     }
 
     if (xcmSwap) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateXcmSwapProcess(params, 2, 1);
     }
 
     if (xcmSwapXcm) {
