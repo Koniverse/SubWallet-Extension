@@ -8,7 +8,7 @@ import { EvmProviderError } from '@subwallet/extension-base/background/errors/Ev
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationDefinitions, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
@@ -46,9 +46,8 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { isManifestV3, isSameAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
-import { addLazy, isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -586,7 +585,7 @@ export default class KoniState {
         await this.enableChainWithPriorityAssets(networkKey);
       }
 
-      authUrls[shortenUrl].currentNetworkKey = networkKey;
+      authUrls[shortenUrl].currentNetworkMap.evm = networkKey;
       this.setAuthorize(authUrls);
     } else {
       throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('Not found {{shortenUrl}} in auth list', { replace: { shortenUrl } }));
@@ -1124,6 +1123,7 @@ export default class KoniState {
 
     const payloadValidation: PayloadValidated = {
       address,
+      type: 'evm',
       payloadAfterValidated: payload,
       method,
       errors: [],
@@ -1190,6 +1190,7 @@ export default class KoniState {
   public async evmSendTransaction (id: string, url: string, transactionParams: EvmSendTransactionParams, networkKeyInit?: string, topic?: string): Promise<string | undefined> {
     const payloadValidation: PayloadValidated = {
       errors: [],
+      type: 'evm',
       networkKey: networkKeyInit || '',
       payloadAfterValidated: transactionParams,
       address: transactionParams.from
@@ -1207,7 +1208,7 @@ export default class KoniState {
 
     if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
       if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
-        return this.requestService.addConfirmation(id, url, confirmationType, { ...result, errors: errorsFormated }, {})
+        return this.requestService.addConfirmation(id, url, confirmationType as keyof ConfirmationDefinitions, { ...result, errors: errorsFormated }, {})
           .then(() => {
             throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
           });
@@ -1277,7 +1278,7 @@ export default class KoniState {
     const authInfoMap = await this.getAuthList();
     const authInfo = authInfoMap[stripUrl(url)];
 
-    let networkKey = authInfo?.currentNetworkKey;
+    let networkKey = authInfo?.currentNetworkMap.cardano;
 
     const autoActiveChain = authInfo?.isAllowed || false;
     const chainInfo = this.requestService.getDAppChainInfo({
@@ -1287,7 +1288,7 @@ export default class KoniState {
       url
     });
 
-    networkKey = chainInfo?.slug || 'cardano_mainnet';
+    networkKey = chainInfo?.slug || 'cardano';
     const cardanoApi = this.chainService.getCardanoApi(networkKey);
     const balances = await cardanoApi.getBalanceMap(address);
 
@@ -1295,10 +1296,11 @@ export default class KoniState {
   }
 
   public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData, currentAddress: string): Promise<ResponseCardanoSignData> {
-    const { address, payload } = params;
-
+    const { address: addressHex, payload } = params;
+    const address = convertCardanoHexToBech32(addressHex);
     const payloadValidation: PayloadValidated = {
-      address: convertCardanoHexToBech32(address),
+      address,
+      type: 'cardano',
       payloadAfterValidated: payload,
       errors: [],
       networkKey: ''
@@ -1354,7 +1356,7 @@ export default class KoniState {
     }
 
     let requireKeyHashes: string[] = [];
-    let networkKey = authInfo?.currentNetworkKey;
+    let networkKey = authInfo?.currentNetworkMap.cardano;
     let autoActiveChain = false;
 
     if (authInfo?.isAllowed) {
@@ -1368,7 +1370,7 @@ export default class KoniState {
       url
     });
 
-    networkKey = currentEvmNetwork?.slug || 'cardano_mainnet';
+    networkKey = currentEvmNetwork?.slug || 'cardano';
     const allUtxos = await this.chainService.getUtxosByAddress(currentAddress, networkKey);
 
     const outputTransactionUnSpend = CardanoWasm.TransactionOutputs.new();

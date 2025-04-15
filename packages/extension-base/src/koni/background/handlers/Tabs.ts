@@ -23,7 +23,7 @@ import { _generateCustomProviderKey } from '@subwallet/extension-base/services/c
 import { hasSufficientCardanoValue } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
-import { canDerive, convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
+import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
@@ -77,7 +77,6 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
   return Object
     .values(accounts)
     .filter(({ json: { meta: { isHidden } } }) => !isHidden)
-    .filter(({ type }) => anyType ? true : canDerive(type))
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))
@@ -150,6 +149,7 @@ export default class KoniTabs {
     const payloadValidate: PayloadValidated = {
       address,
       networkKey: '',
+      type: 'substrate',
       errors: [],
       payloadAfterValidated: request
     };
@@ -167,6 +167,7 @@ export default class KoniTabs {
     const address = request.address;
     const payloadValidate: PayloadValidated = {
       address,
+      type: 'substrate',
       networkKey: '',
       errors: [],
       payloadAfterValidated: request
@@ -449,8 +450,8 @@ export default class KoniTabs {
     if (url) {
       const authInfo = await this.getAuthInfo(url);
 
-      if (authInfo?.currentNetworkKey) {
-        currentChain = authInfo?.currentNetworkKey;
+      if (authInfo?.currentNetworkMap.evm) {
+        currentChain = authInfo?.currentNetworkMap.evm;
       }
 
       if (authInfo?.isAllowed) {
@@ -1208,7 +1209,7 @@ export default class KoniTabs {
     const accountList = await this.getCurrentAccount(url, 'cardano');
 
     return accountList.map((address) => {
-      const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
       const addressChainFormat = reformatAddress(address, +isTestnet);
 
       return convertCardanoAddressToHex(addressChainFormat);
@@ -1232,7 +1233,7 @@ export default class KoniTabs {
 
     const accountList = await this.getCurrentAccount(url, 'cardano');
 
-    const isTestnet = authInfo?.currentNetworkKey !== 'cardano_preproduction';
+    const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
     const addressChainFormat = reformatAddress(accountList[0], +isTestnet);
 
     return convertCardanoAddressToHex(addressChainFormat);
@@ -1245,8 +1246,8 @@ export default class KoniTabs {
     if (url) {
       const authInfo = await this.getAuthInfo(url);
 
-      if (authInfo?.currentNetworkKey) {
-        currentChain = authInfo?.currentNetworkKey;
+      if (authInfo?.currentNetworkMap.cardano) {
+        currentChain = authInfo.currentNetworkMap.cardano;
       }
 
       if (authInfo?.isAllowed) {
@@ -1275,7 +1276,7 @@ export default class KoniTabs {
       throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
     }
 
-    const networkKey = authInfo.currentNetworkKey;
+    const networkKey = authInfo?.currentNetworkMap.cardano;
 
     if (!networkKey) {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
@@ -1316,7 +1317,7 @@ export default class KoniTabs {
 
   private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[] | null> {
     const authInfo = await this.getAuthInfo(url);
-    const networkKey = authInfo?.currentNetworkKey;
+    const networkKey = authInfo?.currentNetworkMap.cardano;
 
     if (!authInfo?.isAllowedMap) {
       throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');

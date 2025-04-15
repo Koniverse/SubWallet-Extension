@@ -51,8 +51,10 @@ export default class AuthRequestHandler {
         needUpdateAuthList = true;
       }
 
-      if ((value as AuthUrlInfoNeedMigration).currentEvmNetworkKey) {
-        value.currentNetworkKey = (value as AuthUrlInfoNeedMigration).currentEvmNetworkKey;
+      const existKeyEvmNetworkConnect = (value as AuthUrlInfoNeedMigration).currentEvmNetworkKey;
+
+      if (existKeyEvmNetworkConnect) {
+        value.currentNetworkMap = { evm: existKeyEvmNetworkConnect };
         needUpdateAuthList = true;
       }
 
@@ -190,8 +192,6 @@ export default class AuthRequestHandler {
   private authCompleteV2 = (id: string, url: string, resolve: (result: boolean) => void, reject: (error: Error) => void): Resolver<ResultResolver> => {
     const isAllowedMap = this.getAddressList();
 
-    console.log(isAllowedMap);
-
     const complete = (result: boolean | Error, cb: () => void, accounts?: string[]) => {
       const isAllowed = result === true;
       let isCancelled = false;
@@ -242,18 +242,18 @@ export default class AuthRequestHandler {
         });
       }
 
-      let defaultEvmNetworkKey: string | undefined;
+      const defaultNetworkMap: Partial<Record<AccountAuthType, string>> = {};
 
       if (accountAuthTypes.includes('evm')) {
         const chainInfo = this.getDAppChainInfo({ accessType: 'evm', autoActive: true, url });
 
-        defaultEvmNetworkKey = chainInfo?.slug;
+        defaultNetworkMap.evm = chainInfo?.slug;
       }
 
       if (accountAuthTypes.includes('cardano')) {
         const chainInfo = this.getDAppChainInfo({ accessType: 'cardano', autoActive: true, url });
 
-        defaultEvmNetworkKey = chainInfo?.slug;
+        defaultNetworkMap.cardano = chainInfo?.slug;
       }
 
       this.getAuthorize((value) => {
@@ -282,7 +282,7 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentNetworkKey: existed ? existed.currentNetworkKey : defaultEvmNetworkKey
+          currentNetworkMap: existed ? existed.currentNetworkMap : defaultNetworkMap
         };
 
         this.setAuthorize(authorizeList, () => {
@@ -418,7 +418,8 @@ export default class AuthRequestHandler {
           isAllowedMap,
           origin,
           url,
-          accountAuthTypes: ALL_ACCOUNT_AUTH_TYPES
+          accountAuthTypes: ALL_ACCOUNT_AUTH_TYPES,
+          currentNetworkMap: {}
         };
 
         this.setAuthorize(authList);

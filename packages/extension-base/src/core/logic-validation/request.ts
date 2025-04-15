@@ -5,7 +5,8 @@ import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
@@ -32,10 +33,11 @@ export interface PayloadValidated {
   address: string,
   pair?: KeyringPair,
   authInfo?: AuthUrlInfo,
+  type: AccountAuthType,
   method?: string,
   payloadAfterValidated: any,
   errorPosition?: 'dApp' | 'ui',
-  confirmationType?: ConfirmationType,
+  confirmationType?: ConfirmationType | ConfirmationTypeCardano,
   errors: Error[]
 }
 
@@ -247,7 +249,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
 export async function validationConnectMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
   let currentChain: string | undefined;
   let autoActiveChain = false;
-  let { address, authInfo, errors, networkKey } = { ...payload };
+  let { address, authInfo, errors, networkKey, type } = { ...payload };
 
   const handleError = (message_: string) => {
     payload.errorPosition = 'ui';
@@ -259,8 +261,8 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     errors.push(error);
   };
 
-  if (authInfo?.currentNetworkKey) {
-    currentChain = authInfo?.currentNetworkKey;
+  if (authInfo?.currentNetworkMap[type]) {
+    currentChain = authInfo?.currentNetworkMap[type];
   }
 
   if (authInfo?.isAllowed) {
@@ -669,7 +671,7 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
 
   const handleError = (message_: string) => {
     payload_.errorPosition = 'ui';
-    payload_.confirmationType = 'evmSignatureRequest';
+    payload_.confirmationType = 'cardanoSignatureRequest';
     const [message, name] = convertErrorMessage(message_);
     const error = new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, message, undefined, name);
 

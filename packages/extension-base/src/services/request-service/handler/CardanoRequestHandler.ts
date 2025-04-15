@@ -1,14 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Address, Bip32PublicKey, FixedTransaction, TransactionWitnessSet, Vkeywitnesses } from '@emurgo/cardano-serialization-lib-nodejs';
+import { FixedTransaction, TransactionWitnessSet, Vkeywitnesses } from '@emurgo/cardano-serialization-lib-nodejs';
 import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano, ResponseCardanoSignData } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import RequestService from '@subwallet/extension-base/services/request-service';
-import { createCOSEKey } from '@subwallet/extension-base/services/request-service/helper';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import { keyring } from '@subwallet/ui-keyring';
-import { Buffer } from 'buffer';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
@@ -173,18 +171,7 @@ export default class CardanoRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    const signature = pair.cardano.signMessage(payload as string, true);
-
-    const publicKey = Bip32PublicKey.from_bytes(pair.publicKey);
-
-    const paymentPubKey = publicKey.derive(0).derive(0);
-
-    const coseKey = createCOSEKey((Address.from_bech32(address)).to_bytes(), paymentPubKey.to_raw_key().as_bytes());
-
-    return {
-      signature,
-      key: Buffer.from(coseKey.to_bytes()).toString('hex')
-    };
+    return pair.cardano.signMessage(payload as string, true);
   }
 
   private signTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]): string { // alibaba

@@ -41,6 +41,7 @@ function Component (props: Props): React.ReactElement<Props> {
   ));
 
   const address = useMemo(() => accountAddress || account?.address, [account?.address, accountAddress]);
+  const hasAccountName = useMemo(() => !!accountName || !!account?.name, [account?.name, accountName]);
 
   return (
     <div
@@ -64,7 +65,11 @@ function Component (props: Props): React.ReactElement<Props> {
         >
           {accountName || account?.name || ''}
         </div>
-        {showAccountNameFallback && !!address && <div className={'account-item-address-wrapper'}>{toShort(address, 4, 4)}</div>}
+        {showAccountNameFallback && !!address &&
+          <div className={CN('account-item-address-wrapper', {
+            '-is-wrap-parentheses': hasAccountName
+          })}
+          >{toShort(address, 4, 4)}</div>}
       </div>
       <div className='__item-right-part'>
         {rightPartNode || (renderRightPart ? renderRightPart(checkedIconNode) : checkedIconNode)}
@@ -94,12 +99,12 @@ const AccountItemWithProxyAvatar = styled(Component)<Props>(({ theme }) => {
       display: 'flex',
       flexDirection: 'row',
 
-      '.account-item-address-wrapper:before': {
+      '.account-item-address-wrapper.-is-wrap-parentheses:before': {
         content: "'('",
         marginLeft: token.marginXXS
       },
 
-      '.account-item-address-wrapper:after': {
+      '.account-item-address-wrapper.-is-wrap-parentheses:after': {
         content: "')'"
       },
 

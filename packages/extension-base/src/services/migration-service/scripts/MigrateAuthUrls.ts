@@ -13,7 +13,7 @@ export default class MigrateSettings extends BaseMigrationJob {
             const stellaSwap = value[key];
 
             if (stellaSwap) {
-              stellaSwap.currentNetworkKey = 'moonbeam';
+              stellaSwap.currentNetworkMap.evm = 'moonbeam';
               value[key] = stellaSwap;
 
               this.state.setAuthorize(value, () => {

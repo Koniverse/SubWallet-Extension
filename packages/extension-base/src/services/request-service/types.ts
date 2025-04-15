@@ -25,7 +25,7 @@ export interface AuthUrlInfo {
   url: string;
   accountAuthTypes: AccountAuthType[];
   isAllowedMap: Record<string, boolean>;
-  currentNetworkKey?: string;
+  currentNetworkMap: Partial<Record<AccountAuthType, string>>;
 }
 
 export interface AuthUrlInfoNeedMigration extends Omit<AuthUrlInfo, 'accountAuthTypes'> {
