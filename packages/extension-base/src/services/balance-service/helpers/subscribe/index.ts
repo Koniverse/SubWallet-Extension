@@ -3,9 +3,10 @@
 
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { subscribeBitcoinBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/bitcoin';
 import { subscribeCardanoBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano';
-import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson, BalanceItem } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, getAddressesByChainTypeMap, pairToAccount } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
@@ -129,6 +130,7 @@ export function subscribeBalance (
   evmApiMap: Record<string, _EvmApi>,
   tonApiMap: Record<string, _TonApi>,
   cardanoApiMap: Record<string, _CardanoApi>,
+  bitcoinApiMap: Record<string, _BitcoinApi>,
   callback: (rs: BalanceItem[]) => void,
   extrinsicType?: ExtrinsicType
 ) {
@@ -185,6 +187,15 @@ export function subscribeBalance (
         chainInfo,
         cardanoApi
       });
+    }
+
+    const bitcoinApi = bitcoinApiMap[chainSlug];
+
+    if (_isPureBitcoinChain(chainInfo)) {
+      return subscribeBitcoinBalance(
+        ['bc1p2v22jvkpr4r5shne4t7dczepsnf4tzeq7q743htlkjql9pj4q4hsmw3xte'],
+        bitcoinApi
+      );
     }
 
     // If the chain is not ready, return pending state

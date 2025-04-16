@@ -45,7 +45,7 @@ function Component (props: Props): React.ReactElement<Props> {
       >
         <div className='__item-left-part'>
           <Logo
-            network={item.slug}
+            network={item.logoKey || item.slug}
             shape={'circle'}
             size={28}
           />

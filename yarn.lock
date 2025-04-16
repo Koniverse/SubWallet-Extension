@@ -6803,7 +6803,7 @@ __metadata:
     bowser: ^2.11.0
     browser-passworder: ^2.0.3
     buffer: ^6.0.3
-    cross-fetch: ^3.1.5
+    cross-fetch: ^4.1.0
     dexie: ^3.2.2
     dexie-export-import: ^4.0.7
     eth-simple-keyring: ^4.2.0
@@ -7131,9 +7131,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/keyring@npm:0.1.9"
+"@subwallet/keyring@npm:^0.1.10":
+  version: 0.1.10
+  resolution: "@subwallet/keyring@npm:0.1.10"
   dependencies:
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
@@ -7154,7 +7154,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: a04f8370c5af418e0d9220ad405dd2f376d5879b72a8cebfa214109cd52af173713df5d1e25ec92edae6d1df6871e59b90d1694eef57d2c5b0e039502631c2ee
+  checksum: 30ac451ff1d16f0b8deaf85a430e869e11a779f8c606f140459e8d16304c7ee493ca3c95368828601cf93e564b800be3bd8a4816dbd43b5554c3cdbed736e641
   languageName: node
   linkType: hard
 
@@ -7245,19 +7245,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/ui-keyring@npm:0.1.9"
+"@subwallet/ui-keyring@npm:^0.1.10":
+  version: 0.1.10
+  resolution: "@subwallet/ui-keyring@npm:0.1.10"
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
-    "@subwallet/keyring": ^0.1.8
+    "@subwallet/keyring": ^0.1.10
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 332502def6742a386e8c2001ea82ded2dfbcba274df669cb3b8166945ea975ca22b6e2a758733cc9cbbb38dca18a956ef92e6e7c45b85cb55f053d6a45bc07f9
+  checksum: 48c4412d30f3b1fbbdffc546be5829067de83ad595a5d095eae59a2fb28f4ed5331dfed507a02e36e8a509b8b562cdaafe0d29be1e43a5d5bc3c3a2e295417ee
   languageName: node
   linkType: hard
 
@@ -12781,7 +12781,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-fetch@npm:^3.1.4, cross-fetch@npm:^3.1.5":
+"cross-fetch@npm:^3.1.4":
   version: 3.1.5
   resolution: "cross-fetch@npm:3.1.5"
   dependencies:
@@ -12796,6 +12796,15 @@ __metadata:
   dependencies:
     node-fetch: ^2.6.12
   checksum: ecca4f37ffa0e8283e7a8a590926b66713a7ef7892757aa36c2d20ffa27b0ac5c60dcf453119c809abe5923fc0bae3702a4d896bfb406ef1077b0d0018213e24
+  languageName: node
+  linkType: hard
+
+"cross-fetch@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "cross-fetch@npm:4.1.0"
+  dependencies:
+    node-fetch: ^2.7.0
+  checksum: c02fa85d59f83e50dbd769ee472c9cc984060c403ee5ec8654659f61a525c1a655eef1c7a35e365c1a107b4e72d76e786718b673d1cb3c97f61d4644cb0a9f9d
   languageName: node
   linkType: hard
 
@@ -22105,7 +22114,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.12":
+"node-fetch@npm:^2.6.12, node-fetch@npm:^2.7.0":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
