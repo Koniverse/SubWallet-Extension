@@ -16,6 +16,7 @@ interface XcmApiResponse {
   to: string;
   transferEncodedCall: string;
   value: string;
+  metadata?: any;
 }
 
 export class XcmApi {

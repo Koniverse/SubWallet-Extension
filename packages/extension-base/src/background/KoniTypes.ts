@@ -36,6 +36,7 @@ import { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
 import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
+import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2033,6 +2034,7 @@ export interface KoniRequestSignatures {
   'pri(chainService.upsertChain)': [_NetworkUpsertParams, boolean];
   'pri(chainService.enableChains)': [EnableMultiChainParams, boolean];
   'pri(chainService.enableChain)': [EnableChainParams, boolean];
+  'pri(chainService.enableChainWithPriorityAssets)': [EnableChainParams, boolean];
   'pri(chainService.reconnectChain)': [string, boolean];
   'pri(chainService.disableChains)': [string[], boolean];
   'pri(chainService.disableChain)': [string, boolean];
@@ -2243,7 +2245,7 @@ export interface KoniRequestSignatures {
   'pri(yield.withdraw.submit)': [RequestYieldWithdrawal, SWTransactionResponse];
   'pri(yield.cancelWithdrawal.submit)': [RequestStakeCancelWithdrawal, SWTransactionResponse];
   'pri(yield.claimReward.submit)': [RequestStakeClaimReward, SWTransactionResponse];
-  'pri(yield.getEarningSlippage)': [RequestEarningSlippage, number];
+  'pri(yield.getEarningSlippage)': [RequestEarningSlippage, EarningSlippageResult];
 
   /* Other */
 
