@@ -18,7 +18,7 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useIsPopup, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
@@ -53,7 +53,8 @@ const Component = () => {
   const notify = useNotification();
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const navigate = useNavigate();
-  const isPopup = useIsPopup();
+  const { closeSidePanel } = useSidePanelUtils();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone,
     openAlert, persistData,
@@ -117,17 +118,19 @@ const Component = () => {
   const chainState = useFetchChainState(poolInfo?.chain || '');
 
   const onHandleOneSignConfirmation = useCallback((transactionProcessId: string) => {
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({
         allowedPath: '/transaction-submission',
         params: {
           'transaction-process-id': transactionProcessId
         }
       }).then(window.close).catch(console.log);
+
+      isSidePanelMode && closeSidePanel();
     } else {
       navigate(`/transaction-submission?transaction-process-id=${transactionProcessId}`);
     }
-  }, [isPopup, navigate]);
+  }, [closeSidePanel, isExpanseMode, isSidePanelMode, navigate]);
 
   const currentConfirmation = useMemo(() => {
     if (slug) {
