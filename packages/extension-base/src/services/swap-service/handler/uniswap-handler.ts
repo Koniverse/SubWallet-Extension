@@ -4,13 +4,12 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
-import { getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
+import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { createAcrossBridgeExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { SpokePoolMapping } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
-import { DEFAULT_EXCESS_AMOUNT_WEIGHT } from '@subwallet/extension-base/services/swap-service/utils';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, GenSwapStepFuncV2, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
@@ -169,17 +168,19 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getApproveSwap (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (!params.selectedQuote) {
+    const selectedQuote = params.selectedQuote;
+
+    if (!selectedQuote) {
       return Promise.resolve(undefined);
     }
 
-    const { quote } = params.selectedQuote.metadata as UniswapMetadata;
+    const quoteMetadata = (selectedQuote.metadata as UniswapMetadata).quote;
 
-    const sender = quote.swapper;
-    const sendingValue = params.selectedQuote.fromAmount;
-    const fromTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const sender = quoteMetadata.swapper;
+    const sendingValue = quoteMetadata.input.amount;
+    const fromTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
 
-    const checkApprovalResponse = await fetchCheckApproval(sender, sendingValue, quote);
+    const checkApprovalResponse = await fetchCheckApproval(sender, sendingValue, quoteMetadata);
     const approval = checkApprovalResponse.approval;
 
     if (!approval) {
@@ -210,20 +211,21 @@ export class UniswapHandler implements SwapBaseInterface {
       } as ApproveStepMetadata
     };
 
-    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    return Promise.resolve([submitStep, selectedQuote.feeInfo]); // todo: wrong feeInfo, please check
   }
 
   async getApproveBridge (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (!params.selectedQuote) {
+    const quote = params.selectedQuote;
+
+    if (!quote) {
       return Promise.resolve(undefined);
     }
 
     // todo: check approval instead of always approve
 
-    const quote = params.selectedQuote;
     const sendingAmount = quote.toAmount;
     const senderAddress = params.request.address;
-    const fromTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
+    const fromTokenInfo = this.chainService.getAssetBySlug(quote.pair.to);
     const fromChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(fromTokenInfo));
     const fromChainId = _getEvmChainId(fromChainInfo);
     const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
@@ -241,6 +243,21 @@ export class UniswapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    const tx = await getERC20SpendingApprovalTx(spokePoolAddress, senderAddress, tokenContract, evmApi);
+    const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+    const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+    const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+    const feeInfo: CommonStepFeeInfo = {
+      feeComponent: [{
+        feeType: SwapFeeType.NETWORK_FEE,
+        amount: estimatedFee,
+        tokenSlug: nativeTokenSlug
+      }],
+      defaultFeeToken: nativeTokenSlug,
+      feeOptions: [nativeTokenSlug]
+    };
+
     const submitStep: BaseStepDetail = {
       name: 'Approve token for bridge',
       type: CommonStepType.TOKEN_APPROVAL,
@@ -254,7 +271,7 @@ export class UniswapHandler implements SwapBaseInterface {
       } as ApproveStepMetadata
     };
 
-    return Promise.resolve([submitStep, quote.feeInfo]); // todo: handle feeInfo
+    return Promise.resolve([submitStep, feeInfo]);
   }
 
   async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
@@ -286,8 +303,7 @@ export class UniswapHandler implements SwapBaseInterface {
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const { path, request, selectedQuote } = params;
 
-    // todo: stepIndex is not corresponding index in path, because uniswap include approval and permit step
-    // const stepData = path[stepIndex];
+    // stepIndex is not corresponding index in path, because uniswap include approval and permit step
     const stepData = path.find((action) => action.action === DynamicSwapType.SWAP);
 
     if (!stepData || !stepData.pair) {
@@ -324,8 +340,7 @@ export class UniswapHandler implements SwapBaseInterface {
   async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const { path, request, selectedQuote } = params;
 
-    // todo: stepIndex is not corresponding index in path, because uniswap include approval and permit step
-    const isBridgeFirst = stepIndex === 1;
+    // stepIndex is not corresponding index in path, because uniswap include approval and permit step
     const bridgePairInfo = path.find((action) => action.action === DynamicSwapType.BRIDGE);
 
     if (!bridgePairInfo || !bridgePairInfo.pair) {
@@ -345,15 +360,13 @@ export class UniswapHandler implements SwapBaseInterface {
       throw Error('Token or chain not found');
     }
 
-    const senderAddress = request.address;
-    const receiverAddress = request.recipient || request.address;
-    const sendingValue = isBridgeFirst ? request.fromAmount : selectedQuote.toAmount;
+    const senderAddress = _reformatAddressWithChain(request.address, fromChainInfo);
+    const receiverAddress = _reformatAddressWithChain(request.recipient || request.address, toChainInfo);
+    const sendingValue = selectedQuote.toAmount;
 
     try {
       const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
-
-      const id = getId();
-      const feeInfo = await this.feeService.subscribeChainFee(id, fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+      const feeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
 
       const tx = await createAcrossBridgeExtrinsic({
         originTokenInfo: fromTokenInfo,
@@ -368,24 +381,20 @@ export class UniswapHandler implements SwapBaseInterface {
         recipient: receiverAddress
       });
 
-      const gasLimit = tx.gas || await evmApi.api.eth.estimateGas(tx);
-      const feeCombine = combineEthFee(feeInfo);
+      // // todo: wait until this ready to get destination fee. the real receiveAmount is deduce by this fee
+      // const acrossQuote = await getAcrossQuote({
+      //   destinationChain: toChainInfo,
+      //   destinationTokenInfo: toTokenInfo,
+      //   originChain: fromChainInfo,
+      //   originTokenInfo: fromTokenInfo,
+      //   recipient: receiverAddress,
+      //   sender: senderAddress,
+      //   sendingValue,
+      //   feeInfo
+      // });
 
-      let estimatedBridgeFee: string;
-
-      if (tx.maxFeePerGas) {
-        estimatedBridgeFee = BigNumber(tx.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
-      } else if (tx.gasPrice) {
-        estimatedBridgeFee = BigNumber(tx.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
-      } else {
-        if (feeCombine.maxFeePerGas) {
-          estimatedBridgeFee = BigNumber(feeCombine.maxFeePerGas).multipliedBy(gasLimit).toFixed(0);
-        } else if (feeCombine.gasPrice) {
-          estimatedBridgeFee = BigNumber((feeCombine.gasPrice || 0)).multipliedBy(gasLimit).toFixed(0);
-        }
-
-        estimatedBridgeFee = '0'; // todo
-      }
+      const estimatedBridgeFee = await estimateTxFee(tx, evmApi, feeInfo);
+      const expectedReceive = BigNumber(sendingValue).minus(estimatedBridgeFee).toFixed(0, 1);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -397,42 +406,10 @@ export class UniswapHandler implements SwapBaseInterface {
         feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
       };
 
-      const isBridgeNativeToken = _isNativeToken(fromTokenInfo);
-
-      let bnSendingValue;
-      let expectedReceive;
-
-      const actionList = JSON.stringify(path.map((step) => step.action));
-      const bridgeSwapBridge = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-      const swapBridge = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-      const needEditAmount = swapBridge || bridgeSwapBridge;
-
-      if (isBridgeFirst) {
-        expectedReceive = request.fromAmount;
-        bnSendingValue = BigNumber(request.fromAmount);
-
-        if (needEditAmount) {
-          bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
-          expectedReceive = bnSendingValue.toFixed(0, 1);
-        }
-
-        if (isBridgeNativeToken) {
-          bnSendingValue = bnSendingValue.plus(BigNumber(estimatedBridgeFee));
-        }
-      } else { // bridge after swap
-        expectedReceive = selectedQuote.toAmount;
-
-        if (needEditAmount) {
-          bnSendingValue = BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
-        } else {
-          bnSendingValue = BigNumber(selectedQuote.toAmount);
-        }
-      }
-
       const step: BaseStepDetail = {
         // @ts-ignore
         metadata: {
-          sendingValue: bnSendingValue.toFixed(0, 1),
+          sendingValue: sendingValue,
           expectedReceive,
           originTokenInfo: fromTokenInfo,
           destinationTokenInfo: toTokenInfo,

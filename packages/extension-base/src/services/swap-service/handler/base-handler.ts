@@ -10,6 +10,7 @@ import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -360,21 +361,6 @@ export class SwapBaseHandler {
   }
 
   private async validateBridgeStep (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
-    const isSubstrateBridge = _isPureSubstrateChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(fromToken))) && _isPureSubstrateChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(toToken)));
-    const isEvmBridge = _isPureEvmChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(fromToken))) && _isPureEvmChain(this.chainService.getChainInfoByKey(_getAssetOriginChain(toToken)));
-
-    if (isSubstrateBridge) {
-      return this.validateBridgeSubstrate(receiver, fromToken, toToken, selectedFeeToken, toChainNativeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance, bnBridgeDeliveryFee);
-    }
-
-    if (isEvmBridge) {
-      return this.validateBridgeEvm(receiver, fromToken, toToken, selectedFeeToken, toChainNativeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance, bnBridgeDeliveryFee);
-    }
-
-    throw Error('Bridge type is not support');
-  }
-
-  private async validateBridgeSubstrate (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
 
@@ -387,30 +373,29 @@ export class SwapBaseHandler {
 
       return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: fromToken.symbol } }))];
     }
-
     // By here, we know that the user is receiving a valid amount of toToken
-    const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
 
-    if (!toChainApi) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
+    const isAcrossBridge = _isAcrossChainBridge(_getAssetOriginChain(fromToken), _getAssetOriginChain(toToken));
 
-    // Only need to check if account is alive with the receiving toToken
-    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi);
+    if (!isAcrossBridge) {
+      const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
 
-    if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
-      const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+      if (!toChainApi) {
+        return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      }
 
-      if (!_isAccountActive(toChainNativeTokenBalance.metadata as FrameSystemAccountInfo)) {
-        return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
+      // Only need to check if account is alive with the receiving toToken
+      const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi);
+
+      if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
+        const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+
+        if (!_isAccountActive(toChainNativeTokenBalance.metadata as FrameSystemAccountInfo)) {
+          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
+        }
       }
     }
 
-    return [];
-  }
-
-  private async validateBridgeEvm (receiver: string, fromToken: _ChainAsset, toToken: _ChainAsset, selectedFeeToken: _ChainAsset, toChainNativeToken: _ChainAsset, bnBridgeAmount: BigN, bnFromTokenBalance: BigN, bnBridgeFeeAmount: BigN, bnFeeTokenBalance: BigN, bnBridgeDeliveryFee: BigN): Promise<TransactionError[]> {
-    // todo: add validate for bridge evm
     return [];
   }
 
