@@ -33,7 +33,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
-  const { canUseSidePanel, closeSidePanel, openSidePanel } = useSidePanelUtils();
+  const { closeSidePanel, isSidePanelSupported, openSidePanel } = useSidePanelUtils();
   const { isExpanseMode, isPopupMode, isSidePanelMode } = useExtensionDisplayModes();
 
   const unreadNotificationCount = useMemo(() => {
@@ -58,7 +58,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
         key: '1',
         label: t('Network display'),
         icon: (
-          <Icon phosphorIcon={ArrowsOut} />
+          <Icon phosphorIcon={FadersHorizontal} />
         ),
         onClick: onOpenCustomizeModal
       },
@@ -92,6 +92,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       icon: (
         <Icon phosphorIcon={SidebarSimple} />
       ),
+      disabled: !isSidePanelSupported,
       onClick: () => {
         isPopupMode && window.close();
         openSidePanel();
@@ -121,7 +122,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     }
 
     return [];
-  }, [closeSidePanel, isPopupMode, isSidePanelMode, openSidePanel, t]);
+  }, [closeSidePanel, isPopupMode, isSidePanelMode, isSidePanelSupported, openSidePanel, t]);
 
   const headerIcons = useMemo<ButtonProps[]>(() => {
     const icons: ButtonProps[] = [];
@@ -180,7 +181,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       }
     }
 
-    if (showSidebarIcon && canUseSidePanel()) {
+    if (showSidebarIcon) {
       if (isExpanseMode) {
         icons.push({
           icon: (
@@ -189,6 +190,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
               size='md'
             />
           ),
+          disabled: !isSidePanelSupported,
           onClick: openSidePanel,
           tooltip: t('Open in sidebar'),
           tooltipPlacement: 'bottomRight'
@@ -217,7 +219,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     }
 
     return icons;
-  }, [canUseSidePanel, faderMenu, isExpanseMode, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
+  }, [faderMenu, isExpanseMode, isSidePanelSupported, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
 
   const onClickListIcon = useCallback(() => {
     navigate('/settings/list');

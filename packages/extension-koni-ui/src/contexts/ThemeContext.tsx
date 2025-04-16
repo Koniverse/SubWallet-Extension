@@ -179,6 +179,10 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         padding: 0
       },
 
+      '.ant-dropdown-menu-item-disabled': {
+        opacity: 0.4
+      },
+
       '.ant-dropdown-menu-item.ant-dropdown-menu-item': {
         paddingTop: token.paddingXS,
         paddingBottom: token.paddingXS,

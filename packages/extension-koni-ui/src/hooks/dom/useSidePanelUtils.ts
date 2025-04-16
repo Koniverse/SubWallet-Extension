@@ -5,11 +5,15 @@ import Bowser from 'bowser';
 import { useCallback, useMemo } from 'react';
 
 export default function useSidePanelUtils () {
-  const canUseSidePanel = useCallback((): boolean => {
+  const isSidePanelSupported = useMemo((): boolean => {
     const result = Bowser.getParser(window.navigator.userAgent).getResult();
 
+    // temporary solution for detecting brave
+    // @ts-ignore
+    const isBrave = !!window.navigator.brave;
+
     return (
-      ['chrome', 'microsoft edge'].includes(result.browser.name?.toLowerCase() || '') &&
+      !isBrave && ['chrome', 'microsoft edge'].includes(result.browser.name?.toLowerCase() || '') &&
       result.platform.type === 'desktop'
     );
   }, []);
@@ -33,8 +37,8 @@ export default function useSidePanelUtils () {
   }, []);
 
   return useMemo(() => ({
-    canUseSidePanel,
+    isSidePanelSupported,
     openSidePanel,
     closeSidePanel
-  }), [canUseSidePanel, closeSidePanel, openSidePanel]);
+  }), [isSidePanelSupported, closeSidePanel, openSidePanel]);
 }
