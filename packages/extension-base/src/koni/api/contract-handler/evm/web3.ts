@@ -9,7 +9,7 @@ import { EvmFeeInfo } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
-import { Contract } from 'web3-eth-contract';
+import { Contract, ContractSendMethod } from 'web3-eth-contract';
 
 export const getERC20Contract = (assetAddress: string, evmApi: _EvmApi, options = {}): Contract => {
   // @ts-ignore
@@ -26,7 +26,7 @@ export function getWeb3Contract (contractAddress: _Address, evmApi: _EvmApi, con
 export async function getERC20Allowance (spender: _Address, owner: _Address, contractAddress: _Address, evmApi: _EvmApi): Promise<string> {
   const tokenContract = getERC20Contract(contractAddress, evmApi);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-  const allowanceCall = tokenContract.methods.allowance(owner, spender);
+  const allowanceCall = tokenContract.methods.allowance(owner, spender) as ContractSendMethod;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   return (await allowanceCall.call()) as string;

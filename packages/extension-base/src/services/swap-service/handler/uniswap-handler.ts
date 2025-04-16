@@ -221,8 +221,6 @@ export class UniswapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    // todo: check approval instead of always approve
-
     const sendingAmount = quote.toAmount;
     const senderAddress = params.request.address;
     const fromTokenInfo = this.chainService.getAssetBySlug(quote.pair.to);
@@ -230,6 +228,10 @@ export class UniswapHandler implements SwapBaseInterface {
     const fromChainId = _getEvmChainId(fromChainInfo);
     const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
     const tokenContract = _getContractAddressOfToken(fromTokenInfo);
+
+    if (_isNativeToken(fromTokenInfo)) {
+      return Promise.resolve(undefined);
+    }
 
     if (!fromChainId) {
       throw Error('Error getting Evm chain Id');
