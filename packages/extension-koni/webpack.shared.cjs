@@ -171,10 +171,6 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
       new webpack.NormalModuleReplacementPlugin(
         /@emurgo\/cardano-serialization-lib-nodejs/,
         '@emurgo/cardano-serialization-lib-browser'
-      ),
-      new webpack.NormalModuleReplacementPlugin(
-        /@emurgo\/cardano-message-signing-nodejs/,
-        '@emurgo/cardano-message-signing-browser'
       )
     ],
     resolve: {
