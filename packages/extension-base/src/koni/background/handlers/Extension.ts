@@ -35,7 +35,7 @@ import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObjec
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { _isAcrossChainBridge, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -1626,6 +1626,16 @@ export default class KoniExtension {
         dryRunInfo = await dryRunXcmExtrinsicV2(params);
 
         xcmFeeDryRun = dryRunInfo.fee;
+      }
+
+      if (isAcrossBridgeTransfer) {
+        const metadata = await getAcrossQuote(params);
+
+        inputData.metadata = {
+          amountOut: metadata.outputAmount,
+          rate: metadata.rate,
+          destChainSlug: destinationTokenInfo.slug
+        };
       }
 
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {

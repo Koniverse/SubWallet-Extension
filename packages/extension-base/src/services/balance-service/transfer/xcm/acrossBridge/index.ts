@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
+import { _isAcrossBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+
+import { CreateXcmExtrinsicProps } from '..';
 
 // Across Bridge
 const acrossPairsMap = new Map([
@@ -102,5 +106,43 @@ export const SpokePoolMapping: Record<number, { SpokePool: { address: string; bl
   },
   919: {
     SpokePool: { address: '0xbd886FC0725Cc459b55BbFEb3E4278610331f83b', blockNumber: 13999465 }
+  }
+};
+
+interface AcrossQuote {
+  outputAmount: string;
+  rate: string;
+}
+
+// Calculate fee for across bridge transfer
+export const getAcrossQuote = async ({ destinationChain,
+  destinationTokenInfo,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<AcrossQuote> => {
+  const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
+
+  console.log('sendingValue', sendingValue);
+
+  if (!isAcrossBridgeXcm) {
+    throw new Error('This is not a valid AcrossBridge transfer');
+  }
+
+  if (!sender) {
+    throw new Error('Sender is required');
+  }
+
+  try {
+    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+
+    if (!data || !data.metadata) {
+      throw new Error('Failed to get AcrossBridge quote');
+    }
+
+    return data.metadata as AcrossQuote;
+  } catch (error) {
+    return Promise.reject(error);
   }
 };
