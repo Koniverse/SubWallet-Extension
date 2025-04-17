@@ -364,7 +364,7 @@ export class UniswapHandler implements SwapBaseInterface {
 
     const senderAddress = _reformatAddressWithChain(request.address, fromChainInfo);
     const receiverAddress = _reformatAddressWithChain(request.recipient || request.address, toChainInfo);
-    const sendingValue = BigNumber(selectedQuote.toAmount).div(1.04).toFixed(0, 1);
+    const sendingValue = BigNumber(selectedQuote.toAmount).div(1.02).toFixed(0, 1);
 
     try {
       const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
@@ -685,7 +685,11 @@ export class UniswapHandler implements SwapBaseInterface {
     const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP);
     const bridgeIndex = params.process.steps.findIndex((step) => step.type === CommonStepType.XCM);
 
-    if (swapIndex <= -1 || bridgeIndex <= -1) {
+    if (swapIndex <= -1) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if (swapXcm && bridgeIndex <= -1) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
