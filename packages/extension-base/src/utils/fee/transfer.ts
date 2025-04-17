@@ -16,7 +16,7 @@ import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-s
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
@@ -329,6 +329,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
   const substrateAddress = fakeAddress; // todo: move this
   const evmAddress = u8aToHex(addressToEvm(fakeAddress)); // todo: move this
+  const bnFreeBalance = new BigN(freeBalance.value);
 
   const recipient = _isChainEvmCompatible(destChain) ? evmAddress : substrateAddress;
 
@@ -455,14 +456,14 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
       const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
 
-      maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+      maxTransferable = bnFreeBalance.minus(estimatedFeeLocal);
     } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(srcChain.slug)) {
       const rate = await getHydrationRate(address, nativeToken, srcToken);
 
       if (rate) {
         const estimatedFeeLocal = new BigN(estimatedFee).multipliedBy(rate).integerValue(BigN.ROUND_UP).toString();
 
-        maxTransferable = BigN(freeBalance.value).minus(estimatedFeeLocal);
+        maxTransferable = bnFreeBalance.minus(estimatedFeeLocal);
       } else {
         throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
       }
@@ -470,17 +471,23 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
     }
   } else if (isTransferNativeTokenAndPayLocalTokenAsFee) {
-    maxTransferable = BigN(freeBalance.value);
+    maxTransferable = bnFreeBalance;
   } else {
     if (!_isNativeToken(srcToken)) {
-      maxTransferable = BigN(freeBalance.value);
+      maxTransferable = bnFreeBalance;
     } else {
-      maxTransferable = BigN(freeBalance.value).minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      maxTransferable = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
     }
   }
 
+  if (isAvailBridgeFromAvail) {
+    const addedAmount = BigN(1).shiftedBy(_getAssetDecimals(srcToken));
+
+    maxTransferable = maxTransferable.minus(addedAmount);
+  }
+
   return {
-    maxTransferable: maxTransferable.gt(BN_ZERO) ? (maxTransferable.toFixed(0) || '0') : '0',
+    maxTransferable: maxTransferable.gt(BN_ZERO) ? maxTransferable.toFixed(0) : '0',
     feeOptions: feeOptions,
     feeType: feeChainType,
     id: id,
