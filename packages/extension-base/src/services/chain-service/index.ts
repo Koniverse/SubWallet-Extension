@@ -12,7 +12,7 @@ import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-
 import { TonChainHandler } from '@subwallet/extension-base/services/chain-service/handler/TonChainHandler';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
@@ -726,7 +726,7 @@ export class ChainService {
     this.xcmRefMapSubject.next(this.xcmRefMap);
 
     await this.initApis();
-    await this.initAssetSettings();
+    this.initAssetSettings();
     await this.autoEnableTokens();
   }
 
@@ -806,6 +806,29 @@ export class ChainService {
     }
   }
 
+  async enablePopularTokens () {
+    const assetSettings = this.assetSettingSubject.value;
+    const chainStateMap = this.getChainStateMap();
+    const priorityTokensMap = this.priorityTokensSubject.value || {};
+
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
+      : [];
+
+    for (const assetSlug of priorityTokensList) {
+      const assetState = assetSettings[assetSlug];
+      const assetInfo = this.getAssetBySlug(assetSlug);
+
+      const chainState = chainStateMap[assetInfo.originChain];
+
+      if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
+        if (!chainState || !chainState.manualTurnOff) {
+          await this.updateAssetSetting(assetSlug, { visible: true }, true);
+        }
+      }
+    }
+  }
+
   handleLatestLedgerGenericAllowChains (latestledgerGenericAllowChains: string[]) {
     this.ledgerGenericAllowChainsSubject.next(latestledgerGenericAllowChains);
     this.eventService.emit('ledger.ready', true);
@@ -813,8 +836,19 @@ export class ChainService {
   }
 
   handleLatestPriorityTokens (latestPriorityTokens: TokenPriorityDetails) {
+    const currentTokens = this.priorityTokensSubject.value || {};
+
     this.priorityTokensSubject.next(latestPriorityTokens);
     this.logger.log('Finished updating latest popular tokens');
+
+    const currentTokenKeys = Object.keys(currentTokens.token || {}); // Extract keys from current tokens
+    const newTokenKeys = Object.keys(latestPriorityTokens.token || {}); // Extract keys from new tokens
+
+    if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) { // Check if token keys have changed
+      this.enablePopularTokens()
+        .then(() => this.logger.log('Popular tokens enabled due to priority tokens change')) // Log success after enabling tokens
+        .catch((e) => console.error('Error enabling popular tokens:', e)); // Log error if enabling fails
+    }
   }
 
   handleLatestSufficientChains (latestSufficientChains: SufficientChainsDetails) {
@@ -1000,7 +1034,6 @@ export class ChainService {
     }
 
     this.lockChainInfoMap = true;
-
     this.dbService.updateChainStore({
       ...chainInfo,
       active: true,
@@ -1040,7 +1073,6 @@ export class ChainService {
         if (!currentState) {
           // Enable chain success then update chain state
           await this.initApiForChain(chainInfo);
-
           this.dbService.updateChainStore({
             ...chainInfo,
             active: true,
@@ -1085,7 +1117,6 @@ export class ChainService {
     // Set disconnect state for inactive chain
     this.updateChainConnectionStatus(chainSlug, _ChainConnectionStatus.DISCONNECTED);
     this.destroyApiForChain(chainInfo);
-
     this.dbService.updateChainStore({
       ...chainInfo,
       active: false,
@@ -1271,6 +1302,7 @@ export class ChainService {
 
           const hasProvider = Object.values(providers).length > 0;
           const canActive = hasProvider && chainInfo.chainStatus === _ChainStatus.ACTIVE;
+
           const selectedProvider = updateCurrentProvider(providers, storedChainInfo, storedSlug, canActive && storedChainInfo.active);
 
           this.dataMap.chainStateMap[storedSlug] = {
@@ -1970,24 +2002,7 @@ export class ChainService {
     this.checkLatestData();
   }
 
-  public async initAssetSettings () {
-    const assetSettings = await this.getAssetSettings();
-    const activeChainSlugs = this.getActiveChainSlugs();
-    const assetRegistry = this.getAssetRegistry();
-
-    Object.values(assetRegistry).forEach((assetInfo) => {
-      const isSettingExisted = assetInfo.slug in assetSettings;
-
-      // Set visible for every enabled chains
-      if (activeChainSlugs.includes(assetInfo.originChain) && !isSettingExisted) {
-        // Setting only exist when set either by chain settings or user
-        assetSettings[assetInfo.slug] = {
-          visible: true
-        };
-      }
-    });
-
-    this.setAssetSettings(assetSettings, false);
+  public initAssetSettings () {
     this.eventService.emit('asset.ready', true);
   }
 
@@ -2094,6 +2109,30 @@ export class ChainService {
     });
 
     this.setAssetSettings(assetSettings);
+  }
+
+  public async updatePriorityAssetsByChain (chainSlug: string, visible: boolean) {
+    const currentAssetSettings = await this.getAssetSettings();
+    const assetsByChain = this.getFungibleTokensByChain(chainSlug);
+    const priorityTokensMap = this.priorityTokensSubject.value || {};
+
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
+      : [];
+
+    for (const asset of Object.values(assetsByChain)) {
+      if (visible) {
+        const isPriorityToken = priorityTokensList.includes(asset.slug);
+
+        if (isPriorityToken || _isNativeToken(asset)) {
+          currentAssetSettings[asset.slug] = { visible: true };
+        }
+      } else {
+        currentAssetSettings[asset.slug] = { visible: false };
+      }
+    }
+
+    this.setAssetSettings(currentAssetSettings);
   }
 
   public subscribeAssetSettings () {
