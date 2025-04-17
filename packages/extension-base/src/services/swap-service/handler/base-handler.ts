@@ -7,7 +7,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { validateSpendingAndFeePayment } from '@subwallet/extension-base/core/logic-validation';
 import { _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
-import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
@@ -123,6 +123,10 @@ export class SwapBaseHandler {
       recipientAddress = _reformatAddressWithChain(address, toChainInfo);
     } else { // bridge after swap
       recipientAddress = _reformatAddressWithChain(recipient || address, toChainInfo);
+    }
+
+    if (!_isXcmWithinSameConsensus(fromChainInfo, toChainInfo) || _isSnowBridgeXcm(fromChainInfo, toChainInfo) || _isAcrossBridgeXcm(fromChainInfo, toChainInfo)) {
+      return undefined;
     }
 
     try {
