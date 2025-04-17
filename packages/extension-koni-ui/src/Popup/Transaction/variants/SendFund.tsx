@@ -8,10 +8,11 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { _getXcmUnstableWarning, _isMythosFromHydrationToMythos, _isXcmTransferUnstable } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { getAvailBridgeGatewayContract, getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -548,8 +549,27 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
     const isAvailBridge = isAvailChainBridge(values.destChain);
-
+    const isAcrossBridge = _isAcrossChainBridge(values.chain, values.destChain);
     const tokenInfo = assetRegistry[values.asset];
+
+    if (isAcrossBridge) {
+      const chainInfo = chainInfoMap[values.chain];
+      const chainId = _getEvmChainId(chainInfo);
+
+      if (chainId) {
+        const tokenApprovalStep = processState.steps.find((step) => step.type === CommonStepType.TOKEN_APPROVAL); // Maybe can add index
+        const metadata = tokenApprovalStep?.metadata;
+        const SpokePoolAddress = metadata?.SpokePoolAddress as string;
+
+        return approveSpending({
+          amount: values.value,
+          contractAddress: _getContractAddressOfToken(tokenInfo),
+          spenderAddress: SpokePoolAddress,
+          chain: values.chain,
+          owner: values.from
+        });
+      }
+    }
 
     return approveSpending({
       amount: values.value,
@@ -558,7 +578,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       chain: values.chain,
       owner: values.from
     });
-  }, [assetRegistry]);
+  }, [assetRegistry, chainInfoMap, processState.steps]);
 
   // Submit transaction
   const doSubmit = useCallback((values: TransferParams, options: TransferOptions) => {
