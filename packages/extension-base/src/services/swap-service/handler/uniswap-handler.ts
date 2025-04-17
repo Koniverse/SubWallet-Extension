@@ -364,7 +364,7 @@ export class UniswapHandler implements SwapBaseInterface {
 
     const senderAddress = _reformatAddressWithChain(request.address, fromChainInfo);
     const receiverAddress = _reformatAddressWithChain(request.recipient || request.address, toChainInfo);
-    const sendingValue = selectedQuote.toAmount;
+    const sendingValue = BigNumber(selectedQuote.toAmount).div(1.04).toFixed(0, 1);
 
     try {
       const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
