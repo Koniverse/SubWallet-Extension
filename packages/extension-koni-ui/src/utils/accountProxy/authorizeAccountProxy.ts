@@ -47,6 +47,8 @@ export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthTy
       chainTypes.push(AccountChainType.ETHEREUM);
     } else if (type === 'ton') {
       chainTypes.push(AccountChainType.TON);
+    } else if (type === 'cardano') {
+      chainTypes.push(AccountChainType.CARDANO);
     }
   });
 

@@ -6,7 +6,6 @@ import { CardanoBalanceItem, CardanoUtxosItem } from '@subwallet/extension-base/
 import { MetadataStore } from '@subwallet/extension-base/stores';
 import { addMetadata } from '@subwallet/extension-chains';
 import { MetadataDef } from '@subwallet/extension-inject/types';
-import { hexToAscii } from 'web3-utils';
 
 import { knownGenesis } from '@polkadot/networks/defaults';
 import { HexString } from '@polkadot/util/types';
@@ -108,7 +107,7 @@ export const convertValueToAsset = (value: CardanoWasm.Value): CardanoBalanceIte
           unit: assetUnit,
           quantity: quantity?.to_js_value() ?? '0',
           policy: policy.to_hex(),
-          name: hexToAscii(assetName.to_hex()),
+          name: Buffer.from(assetName.to_hex(), 'hex').toString(),
           fingerprint: `${policy.to_hex()}${assetName.to_hex()}`
         });
       }
@@ -415,7 +414,7 @@ export function extractKeyHashesFromRequiredSigners (requiredSigners?: CardanoWa
  */
 export async function extractKeyHashesFromCollaterals (
   collaterals?: CardanoWasm.TransactionInputs,
-  getSpecificUtxo?: (txHash: string, txId: number) => Promise<CardanoWasm.TransactionUnspentOutput | undefined>
+  getSpecificUtxo?: (txHash: string, txId: number) => Promise<CardanoUtxosItem | undefined>
 ): Promise<string[]> {
   if (!collaterals || !getSpecificUtxo) {
     return [];
@@ -435,7 +434,7 @@ export async function extractKeyHashesFromCollaterals (
     }
 
     // Load address object from UTXO
-    const address = utxo.output().address();
+    const address = CardanoWasm.Address.from_bech32(utxo.address);
 
     // Try extracting payment key hash from different address types
     const types = [
@@ -474,8 +473,8 @@ export function hasSufficientCardanoValue (
   valueA: CardanoWasm.Value,
   valueB: CardanoWasm.Value
 ): boolean {
-  const coinA = CardanoWasm.BigInt.from_str(valueA.coin().to_str());
-  const coinB = CardanoWasm.BigInt.from_str(valueB.coin().to_str());
+  const coinA = BigInt(valueA.coin().to_str());
+  const coinB = BigInt(valueB.coin().to_str());
 
   // Check if ADA amount in valueA is less than required in valueB
   if (coinA < coinB) {

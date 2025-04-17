@@ -250,16 +250,14 @@ export class ChainService {
   public getSpecificUtxo (slug: string) {
     const cardanoApi = this.getCardanoApi(slug);
 
-    return async (txHash: string, txId: number) => {
+    return async (txHash: string, txId: number): Promise<CardanoUtxosItem | undefined> => {
       const utxoRaw = await cardanoApi.getSpecificUtxo(txHash);
 
       if (!utxoRaw.outputs) {
         return undefined;
       }
 
-      const utxos = convertUtxoRawToUtxo(utxoRaw.outputs);
-
-      return utxos[txId];
+      return utxoRaw.outputs[txId];
     };
   }
 

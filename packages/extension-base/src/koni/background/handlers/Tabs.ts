@@ -1327,17 +1327,17 @@ export default class KoniTabs {
       throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
     }
 
-    if (!params.amount) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is required');
-    }
-
     const allowedAccount = (await this.getCurrentAccount(url, 'cardano'))[0];
     const utxos = await this.#koniState.chainService.getUtxosByAddress(allowedAccount, networkKey);
 
     let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
 
     try {
-      expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+      if (params?.amount) {
+        expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+      } else {
+        expectedValue = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT));
+      }
     } catch (e) {
       throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
     }
