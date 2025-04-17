@@ -2004,6 +2004,10 @@ export interface RequestPingSession {
   sessionId: string;
 }
 
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
+}
+
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
