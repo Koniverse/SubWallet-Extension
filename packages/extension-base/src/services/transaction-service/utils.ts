@@ -33,23 +33,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'account';
   }
 
-  if (explorerLink.includes('explorer.polimec.org')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('invarch.statescan.io')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('tangle.statescan.io')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('laos.statescan.io')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('polimec.statescan.io')) {
+  if (explorerLink.includes('statescan.io')) {
     return '#/accounts';
   }
 
@@ -68,7 +52,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
   return 'address';
 }
 
-function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
+function getBlockExplorerTxRoute (chainInfo: _ChainInfo, explorerLink: string) {
   if (_isPureEvmChain(chainInfo)) {
     return 'tx';
   }
@@ -81,7 +65,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['invarch', 'tangle', 'polimec'].includes(chainInfo.slug)) {
+  if (explorerLink.includes('statescan.io')) {
     return '#/extrinsics';
   }
 
@@ -98,7 +82,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   }
 
   if (explorerLink && isHex(hexAddPrefix(value))) {
-    const route = getBlockExplorerTxRoute(chainInfo);
+    const route = getBlockExplorerTxRoute(chainInfo, explorerLink);
 
     if (chainInfo.slug === 'tangle') {
       return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}extrinsic/${value}${route}/${value}`);
