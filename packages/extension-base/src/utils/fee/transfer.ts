@@ -333,17 +333,16 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
   const recipient = _isChainEvmCompatible(destChain) ? evmAddress : substrateAddress;
 
-  try {
-    if (!destToken) {
-      throw Error('Destination token is not available');
-    }
+  if (!destToken) {
+    throw Error('Destination token is not available');
+  }
 
-    const evmSendingValue = isAcrossBridgeTransfer ? '100000000000000' : '0'; // Across have min stake
+  try {
     const params: CreateXcmExtrinsicProps = {
       destinationTokenInfo: destToken,
       originTokenInfo: srcToken,
       // If value is 0, substrate will throw error when estimating fee
-      sendingValue: !isAcrossBridgeTransfer ? value : evmSendingValue,
+      sendingValue: value,
       sender: address,
       recipient,
       destinationChain: destChain,
@@ -361,6 +360,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       funcCreateExtrinsic = createPolygonBridgeExtrinsic;
     } else if (isAcrossBridgeTransfer) {
       funcCreateExtrinsic = createAcrossBridgeExtrinsic;
+      params.sendingValue = BigN(1).shiftedBy(_getAssetDecimals(srcToken)).toFixed(0, 1);
     } else if (isSnowBridgeEvmTransfer) {
       funcCreateExtrinsic = createSnowBridgeExtrinsic;
     } else if (isAvailBridgeFromEvm) {
@@ -369,6 +369,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
     } else {
       funcCreateExtrinsic = createXcmExtrinsicV2;
+      params.sendingValue = BigN(1).shiftedBy(_getAssetDecimals(srcToken)).toFixed(0, 1);
     }
 
     const extrinsic = await funcCreateExtrinsic(params);

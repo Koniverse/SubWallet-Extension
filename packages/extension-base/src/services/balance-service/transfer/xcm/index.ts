@@ -160,6 +160,7 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   try {
     return await buildXcm(request);
   } catch (e) {
+    console.log('createXcmExtrinsicV2 error: ', e);
     const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
     if (isChainNotSupportPolkadotApi(errorMessage)) {
