@@ -49,7 +49,7 @@ export const FEE_RATE_MULTIPLIER: Record<string, number> = {
   high: 2
 };
 
-export function getSupportSwapChain (): string[] {
+export function getSupportedSwapChains (): string[] {
   return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
 }
 
