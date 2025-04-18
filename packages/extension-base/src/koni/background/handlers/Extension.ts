@@ -45,6 +45,7 @@ import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/
 import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { convertEVMTransactionConfigToEip7702UserOp } from '@subwallet/extension-base/services/keyring-service/context/handlers/Eip7702';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -1343,6 +1344,7 @@ export default class KoniExtension {
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
 
+    const fromChainInfo = this.#koniState.getChainInfo(chain);
     const nativeTokenInfo = this.#koniState.getNativeTokenInfo(chain);
     const nativeTokenSlug: string = nativeTokenInfo.slug;
     const isTransferNativeToken = nativeTokenSlug === tokenSlug;
@@ -1400,6 +1402,8 @@ export default class KoniExtension {
             value: txVal
           });
         }
+
+        transaction = await convertEVMTransactionConfigToEip7702UserOp(transaction, evmApi, fromChainInfo);
       } else if (_isMantaZkAsset(transferTokenInfo)) {
         transaction = undefined;
         transferAmount.value = '0';
