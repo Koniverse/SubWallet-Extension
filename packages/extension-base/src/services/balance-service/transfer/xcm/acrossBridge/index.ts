@@ -49,8 +49,6 @@ export const getAcrossQuote = async ({ destinationChain,
   sendingValue }: CreateXcmExtrinsicProps) => {
   const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
 
-  console.log('sendingValue', sendingValue);
-
   if (!isAcrossBridgeXcm) {
     throw new Error('This is not a valid AcrossBridge transfer');
   }
