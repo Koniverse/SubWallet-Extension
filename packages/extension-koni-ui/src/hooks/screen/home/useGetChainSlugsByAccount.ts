@@ -5,6 +5,8 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { validateBitcoinAddress } from '@subwallet/keyring/utils';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -74,6 +76,18 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
       return allAccount ? getChainsByAccountAll(allAccount, accountProxies, chainInfoMap) : [];
     }
 
-    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain);
-  }, [address, currentAccountProxy?.id, accountProxies, chainTypes, chainInfoMap, specialChain]);
+    const supportedChains = getChainsByAccountType(chainInfoMap, chainTypes, specialChain);
+
+    const bitcoinAddressDetails = (_address && validateBitcoinAddress(_address)) ? getBitcoinAddressInfo(_address) : null;
+
+    if (bitcoinAddressDetails) {
+      return supportedChains.filter((chainSlug) => {
+        const chainInfo = chainInfoMap[chainSlug];
+
+        return chainInfo?.bitcoinInfo?.bitcoinNetwork === bitcoinAddressDetails.network;
+      });
+    }
+
+    return supportedChains;
+  }, [address, currentAccountProxy, chainInfoMap, chainTypes, specialChain, accountProxies]);
 };
