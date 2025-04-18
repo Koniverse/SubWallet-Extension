@@ -1,14 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { PriceChartPoint } from '@subwallet/extension-base/background/KoniTypes';
 import { SwNumberProps } from '@subwallet/react-ui/es/number';
-
-export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | 'ALL';
-
-export interface PriceChartPoint {
-  time: number;
-  value: number;
-}
 
 export interface DisplayPriceChartPoint extends PriceChartPoint {
   time: number;

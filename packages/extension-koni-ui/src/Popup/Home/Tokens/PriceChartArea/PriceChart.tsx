@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate } from '@subwallet/extension-koni-ui/utils';
@@ -10,7 +11,7 @@ import { CategoricalChartState } from 'recharts/types/chart/types';
 import { Props as DotProps } from 'recharts/types/shape/Dot';
 import styled, { ThemeContext } from 'styled-components';
 
-import { DisplayPriceChartPoint, PriceChartPoint, PriceChartTimeframe } from './types';
+import { DisplayPriceChartPoint } from './types';
 
 type Props = ThemeProps & {
   pricePoints: PriceChartPoint[];

@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { PriceChartPoint } from '@subwallet/extension-base/background/KoniTypes';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { PriceInfoUI } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/PriceChartArea/PriceInfoUI';
-import { PriceInfoUIProps, PriceChartPoint } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/PriceChartArea/types';
+import { PriceInfoUIProps } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/PriceChartArea/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import BigN from 'bignumber.js';
 import React, { useMemo } from 'react';

@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { timeframes } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/PriceChartArea/shared';
+import { PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { PriceChartTimeframe } from './types';
+import { timeframes } from './shared';
 
 type Props = ThemeProps & {
   selectedTimeframe: PriceChartTimeframe,
