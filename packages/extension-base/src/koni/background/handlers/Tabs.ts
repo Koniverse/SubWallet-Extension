@@ -4,6 +4,7 @@
 import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
+import { TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
@@ -1302,14 +1303,11 @@ export default class KoniTabs {
 
     for (const utxo of utxos) {
       currentTotalUtxoValue = currentTotalUtxoValue.checked_add(utxo.output().amount());
+      utxosFiltered.push(utxo);
 
       if (hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue)) {
-        utxosFiltered.push(utxo);
-
         return utxosFiltered.map((utxo) => utxo.to_hex());
       }
-
-      utxosFiltered.push(utxo);
     }
 
     return null;
@@ -1347,17 +1345,22 @@ export default class KoniTabs {
     }
 
     let currentTotalUtxoValue = CardanoWasm.Value.zero();
-    const utxosFinal = utxos.filter((utxo) => {
+    const utxosFinal: CardanoWasm.TransactionUnspentOutput[] = [];
+
+    for (const utxo of utxos) {
       const amount = utxo.output().amount();
 
-      if (amount.multiasset() || amount.coin().compare(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT)) > 0) {
-        return false;
+      if (amount.multiasset()) {
+        continue;
       }
 
       currentTotalUtxoValue = currentTotalUtxoValue.checked_add(amount);
+      utxosFinal.push(utxo);
 
-      return hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue);
-    });
+      if (hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue)) {
+        break;
+      }
+    }
 
     return utxosFinal.length ? utxosFinal.map((utxo) => utxo.to_hex()) : null;
   }
