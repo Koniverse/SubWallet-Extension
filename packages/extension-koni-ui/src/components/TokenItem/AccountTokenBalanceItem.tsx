@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BalanceMetadata, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { _isChainBitcoinCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { BalanceItem } from '@subwallet/extension-base/types';
 import { Avatar } from '@subwallet/extension-koni-ui/components';
@@ -23,11 +24,17 @@ interface Props extends ThemeProps {
   item: BalanceItem;
 }
 
+interface BalanceDisplayItem {
+  label: string;
+  value: string;
+  key: string;
+}
+
 // todo: logic in this file may not be correct in some case, need to recheck
 const Component: React.FC<Props> = (props: Props) => {
   const { className, item } = props;
 
-  const { address, free, locked, tokenSlug } = item;
+  const { address, free, locked, metadata, tokenSlug } = item;
 
   const { t } = useTranslation();
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
@@ -72,6 +79,42 @@ const Component: React.FC<Props> = (props: Props) => {
   const symbol = tokenInfo?.symbol || '';
   const link = (chainInfo !== undefined) && getExplorerLink(chainInfo, reformatedAddress, 'account');
 
+  const isBitcoinMetadata = (meta: _BalanceMetadata | undefined): meta is BitcoinBalanceMetadata => {
+    return !!meta && typeof meta === 'object' && 'runeBalance' in meta && 'inscriptionBalance' in meta;
+  };
+
+  const renderBalanceItem = useCallback(
+    ({ key, label, value }: BalanceDisplayItem) => (
+      <MetaInfo.Number
+        className='balance-info'
+        decimals={decimals}
+        key={key}
+        label={label}
+        suffix={symbol}
+        value={value}
+        valueColorSchema='gray'
+      />
+    ),
+    [decimals, symbol]
+  );
+
+  const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
+
+  const balanceItems = useMemo<BalanceDisplayItem[]>(() => {
+    if (isBitcoinChain) {
+      return [
+        { key: 'btc_transferable', label: t('BTC Transferable'), value: free },
+        { key: 'btc_rune', label: t('BTC Rune (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.runeBalance) : '0' },
+        { key: 'btc_inscription', label: t('BTC Inscription (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.inscriptionBalance) : '0' }
+      ];
+    }
+
+    return [
+      { key: 'transferable', label: t('Transferable'), value: free },
+      { key: 'locked', label: t('Locked'), value: locked }
+    ];
+  }, [isBitcoinChain, free, locked, metadata, t]);
+
   return (
     <MetaInfo
       className={CN(className, 'account-token-detail', { '__show-button': !!link })}
@@ -108,22 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
         value={total}
         valueColorSchema='light'
       />
-      <MetaInfo.Number
-        className='balance-info'
-        decimals={decimals}
-        label={t('Transferable')}
-        suffix={symbol}
-        value={free}
-        valueColorSchema='gray'
-      />
-      <MetaInfo.Number
-        className='balance-info'
-        decimals={decimals}
-        label={t('Locked')}
-        suffix={symbol}
-        value={locked}
-        valueColorSchema='gray'
-      />
+      {balanceItems.map(renderBalanceItem)}
       {!!link && (
         <Button
           block

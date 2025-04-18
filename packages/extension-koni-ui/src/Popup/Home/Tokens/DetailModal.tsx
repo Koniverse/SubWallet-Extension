@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
+import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem } from '@subwallet/extension-base/types';
 import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
@@ -57,7 +59,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const { balanceMap } = useSelector((state) => state.balance);
-
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [form] = Form.useForm<FormState>();
 
   const view = Form.useWatch('view', form);
@@ -82,25 +84,33 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const items = useMemo((): ItemType[] => {
     const symbol = currentTokenInfo?.symbol || '';
     const balanceInfo = currentTokenInfo ? tokenBalanceMap[currentTokenInfo.slug] : undefined;
+    const chainInfo = balanceInfo?.chain && chainInfoMap[balanceInfo?.chain];
 
-    const result: ItemType[] = [];
+    const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
 
-    result.push({
-      key: 'transferable',
+    const createItem = (key: string, label: string, value: BigN): ItemType => ({
+      key,
       symbol,
-      label: t('Transferable'),
-      value: balanceInfo ? balanceInfo.free.value : new BigN(0)
+      label,
+      value
     });
 
-    result.push({
-      key: 'locked',
-      symbol,
-      label: t('Locked'),
-      value: balanceInfo ? balanceInfo.locked.value : new BigN(0)
-    });
+    if (isBitcoinChain) {
+      return [
+        createItem('transferable', t('BTC Transferable'), new BigN(0)),
+        createItem('rune', t('BTC Rune (Locked)'), new BigN(0)),
+        createItem('inscription', t('BTC Inscription (Locked)'), new BigN(0))
+      ];
+    }
 
-    return result;
-  }, [currentTokenInfo, t, tokenBalanceMap]);
+    const transferableValue = balanceInfo?.free.value ?? new BigN(0);
+    const lockedValue = balanceInfo?.locked.value ?? new BigN(0);
+
+    return [
+      createItem('transferable', t('Transferable'), transferableValue),
+      createItem('locked', t('Locked'), lockedValue)
+    ];
+  }, [chainInfoMap, currentTokenInfo, t, tokenBalanceMap]);
 
   const accountItems = useMemo((): BalanceItem[] => {
     if (!currentAccountProxy || !currentTokenInfo?.slug) {
