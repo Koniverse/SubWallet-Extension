@@ -21,7 +21,7 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
-import { Subscription } from 'rxjs';
+import { timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
@@ -364,10 +364,8 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const tokenMap = filterAssetsByChainAndType(assetMap, chainInfo.slug, tokenTypes);
 
   // Hotfix balance for gdot
-  let gdotBalances: BalanceItem[] = [];
-
   const getGdotBalance = async () => {
-    gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
+    const gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
 
     callback(gdotBalances);
   };
@@ -375,15 +373,9 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
     // Hotfix balance for gdot
     if (tokenInfo.slug === gdotSlug) {
-      getGdotBalance().catch(console.error);
-
-      const interval = setInterval(() => {
+      return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
         getGdotBalance().catch(console.error);
-      }, CRON_REFRESH_PRICE_INTERVAL);
-
-      return () => {
-        clearInterval(interval);
-      };
+      });
     }
 
     try {
@@ -423,11 +415,7 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
 
   return () => {
     unsubList.forEach((unsub) => {
-      if (unsub instanceof Subscription) {
-        unsub && unsub.unsubscribe();
-      } else {
-        unsub && unsub();
-      }
+      unsub && unsub.unsubscribe();
     });
   };
 };
