@@ -64,7 +64,7 @@ import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { getKeypairTypeByAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { KeyringAddress, KeyringJson$Meta } from '@subwallet/ui-keyring/types';
@@ -643,7 +643,8 @@ export default class KoniExtension {
     const validTypes = {
       evm: EthereumKeypairTypes,
       substrate: SubstrateKeypairTypes,
-      ton: TonKeypairTypes
+      ton: TonKeypairTypes,
+      cardano: CardanoKeypairTypes
     };
 
     return !!accountAuthTypes && accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
@@ -661,6 +662,8 @@ export default class KoniExtension {
         accounts.forEach(({ address }) => isSubstrateAddress(address) && list.push(address));
       } else if (accountAuthType === 'ton') {
         accounts.forEach(({ address }) => isTonAddress(address) && list.push(address));
+      } else if (accountAuthType === 'cardano') {
+        accounts.forEach(({ address }) => isCardanoAddress(address) && list.push(address));
       }
 
       return list;
