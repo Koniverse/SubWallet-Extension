@@ -1,8 +1,8 @@
-    3004	AnhMTV                        	
+    3006	AnhMTV                        	
     2667	Nam Phạm                      	disable block explorer for truth network
     2549	S2kael                        	[Isssue-4163] Update stable version for chain-list
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     765	bluezdot                      	[Issue-4133] fix: fix mock amount to get fee
+     769	bluezdot                      	[Issue-4283] opt: refactor subscription
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
