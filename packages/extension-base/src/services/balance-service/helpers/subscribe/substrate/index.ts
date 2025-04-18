@@ -3,7 +3,7 @@
 
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
+import { CRON_REFRESH_PRICE_INTERVAL, SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _getAssetsPalletLocked, _getAssetsPalletTransferable } from '@subwallet/extension-base/core/substrate/assets-pallet';
 import { _getForeignAssetPalletLockedBalance, _getForeignAssetPalletTransferable } from '@subwallet/extension-base/core/substrate/foreign-asset-pallet';
 import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/substrate/nominationpools-pallet';
@@ -21,6 +21,7 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { Subscription } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
@@ -365,11 +366,26 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   // Hotfix balance for gdot
   let gdotBalances: BalanceItem[] = [];
 
-  if (Object.keys(assetMap).includes(gdotSlug)) {
+  const getGdotBalance = async () => {
     gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
-  }
+
+    callback(gdotBalances);
+  };
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
+    // Hotfix balance for gdot
+    if (tokenInfo.slug === gdotSlug) {
+      getGdotBalance().catch(console.error);
+
+      const interval = setInterval(() => {
+        getGdotBalance().catch(console.error);
+      }, CRON_REFRESH_PRICE_INTERVAL);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+
     try {
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
@@ -396,8 +412,6 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
           };
         });
 
-        items.push(...gdotBalances);
-
         callback(items);
       });
     } catch (err) {
@@ -409,7 +423,11 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
 
   return () => {
     unsubList.forEach((unsub) => {
-      unsub && unsub.unsubscribe();
+      if (unsub instanceof Subscription) {
+        unsub && unsub.unsubscribe();
+      } else {
+        unsub && unsub();
+      }
     });
   };
 };
