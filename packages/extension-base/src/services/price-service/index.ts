@@ -1,16 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryCurrentTokenPrice, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { getExchangeRateMap, getPriceMap } from '@subwallet/extension-base/services/price-service/coingecko';
+import { getExchangeRateMap, getHistoryPrice, getPriceMap } from '@subwallet/extension-base/services/price-service/coingecko';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
-import { wait } from '@subwallet/extension-base/utils';
+import { getTimeRange, getTokenPriceHistoryId, resampleChartData, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
@@ -37,6 +37,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   private priceSubject: BehaviorSubject<PriceJson>;
   private rawPriceSubject: BehaviorSubject<Omit<PriceJson, 'exchangeRateMap'>>;
   private rawExchangeRateMap: BehaviorSubject<Record<CurrencyType, ExchangeRateJSON>>;
+  private historyTokenPriceSubject: BehaviorSubject<Record<string, PriceChartPoint[]>>;
   private refreshTimeout: NodeJS.Timeout | undefined;
   private priceIds = new Set<string>();
   private readonly currency = new CurrentCurrencyStore();
@@ -45,6 +46,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.priceSubject = new BehaviorSubject({ ...DEFAULT_PRICE_SUBJECT });
     this.rawPriceSubject = new BehaviorSubject({} as Omit<PriceJson, 'exchangeRateMap'>);
     this.rawExchangeRateMap = new BehaviorSubject({} as Record<CurrencyType, ExchangeRateJSON>);
+    this.historyTokenPriceSubject = new BehaviorSubject({});
     this.status = ServiceStatus.NOT_INITIALIZED;
     this.dbService = dbService;
     this.eventService = eventService;
@@ -201,6 +203,101 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       });
 
     this.refreshTimeout = setTimeout(this.refreshPriceData.bind(this), CRON_REFRESH_PRICE_INTERVAL);
+  }
+
+  public async getHistoryTokenPriceData (priceId: string, timeframe: PriceChartTimeframe): Promise<HistoryTokenPriceJSON> {
+    const id = getTokenPriceHistoryId(priceId, timeframe);
+    let historyTokenPriceData = this.historyTokenPriceSubject.value[id];
+    const now = Math.floor(Date.now() / 1000);
+    const { from, granularity, to } = getTimeRange(timeframe);
+
+    if (historyTokenPriceData && to - now <= granularity) {
+      return {
+        history: resampleChartData(historyTokenPriceData, timeframe)
+      };
+    } else {
+      const newHistoryTokenPriceData = await getHistoryPrice(priceId, DEFAULT_CURRENCY, from, to);
+
+      if (newHistoryTokenPriceData.length) {
+        historyTokenPriceData = [...newHistoryTokenPriceData];
+      }
+    }
+
+    const { promise, resolve } = createPromiseHandler<CurrencyType>();
+
+    this.getCurrentCurrency(resolve);
+
+    const currencyKey = await promise;
+    const exchangeRateMap = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY];
+
+    if (exchangeRateMap && currencyKey !== DEFAULT_CURRENCY) {
+      historyTokenPriceData = historyTokenPriceData.map((price) => {
+        return {
+          ...price,
+          value: price.value * exchangeRateMap.exchange
+        };
+      });
+    }
+
+    if (historyTokenPriceData?.length) {
+      this.historyTokenPriceSubject.next({
+        ...this.historyTokenPriceSubject.value,
+        [id]: [...historyTokenPriceData]
+      });
+    }
+
+    return {
+      history: resampleChartData(historyTokenPriceData, timeframe)
+    };
+  }
+
+  public async getHistoryCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
+    const { lastUpdate, price24hMap, priceMap } = await getPriceMap(new Set([priceId]), DEFAULT_CURRENCY);
+    const { promise, resolve } = createPromiseHandler<CurrencyType>();
+    let priceResult = {} as HistoryCurrentTokenPrice;
+
+    if (Object.keys(price24hMap).length && Object.keys(priceMap).length) {
+      const priceStored = await this.getPrice();
+
+      priceResult = {
+        value: priceStored.priceMap[priceId],
+        value24h: priceStored.price24hMap[priceId],
+        time: Date.now()
+      };
+    }
+
+    this.getCurrentCurrency(resolve);
+
+    const currencyKey = await promise;
+
+    const exchangeRateMap = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY];
+
+    if (exchangeRateMap && currencyKey !== DEFAULT_CURRENCY) {
+      priceResult.value24h = exchangeRateMap.exchange * price24hMap[priceId];
+      priceResult.value = exchangeRateMap.exchange * priceMap[priceId];
+    }
+
+    if (lastUpdate) {
+      priceResult.time = lastUpdate.getTime();
+    }
+
+    if (priceResult.value && priceResult.value24h) {
+      const priceStored = await this.getPrice();
+
+      this.priceSubject.next({
+        ...priceStored,
+        priceMap: {
+          ...priceStored.priceMap,
+          [priceId]: priceResult.value
+        },
+        price24hMap: {
+          ...priceStored.price24hMap,
+          [priceId]: priceResult.value24h
+        }
+      });
+    }
+
+    return priceResult;
   }
 
   async init (): Promise<void> {
