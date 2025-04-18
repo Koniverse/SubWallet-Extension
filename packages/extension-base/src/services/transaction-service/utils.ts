@@ -118,13 +118,15 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
     }
 
     if (chainInfo.slug === 'truth_network') {
-      getTransactionId(value)
-        .then((transactionId) => {
-          return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${transactionId}`);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      // getTransactionId(value)
+      //   .then((transactionId) => {
+      //     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${transactionId}`);
+      //   })
+      //   .catch((err) => {
+      //     console.error(err);
+      //   });
+
+      return undefined;
     }
 
     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`);
