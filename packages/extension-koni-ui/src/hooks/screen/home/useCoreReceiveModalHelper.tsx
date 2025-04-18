@@ -172,15 +172,14 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     // current account is not All, just do show QR logic
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
+    const addressGroupList = transformBitcoinAccounts(
+      currentAccountProxy?.accounts || [],
+      chainSlug,
+      item.slug,
+      chainInfo
+    );
 
-    if (isBitcoinChain) {
-      const addressGroupList = transformBitcoinAccounts(
-        currentAccountProxy?.accounts || [],
-        chainSlug,
-        item.slug,
-        chainInfo
-      );
-
+    if (isBitcoinChain && addressGroupList.length > 1) {
       openAddressGroupModal(addressGroupList, () => {
         inactiveModal(tokenSelectorModalId);
         setSelectedAccountAddressItem(undefined);
