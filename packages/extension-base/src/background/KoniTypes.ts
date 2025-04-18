@@ -190,7 +190,18 @@ export interface PriceJson {
   currencyData: CurrencyJson,
   exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
-  price24hMap: Record<string, number>
+  price24hMap: Record<string, number>,
+  lastUpdate?: Date
+}
+
+export interface HistoryTokenPriceJSON {
+  history: PriceChartPoint[];
+}
+
+export interface HistoryCurrentTokenPrice {
+  value: number;
+  value24h: number;
+  time: number;
 }
 
 export interface ExchangeRateJSON {
@@ -414,6 +425,13 @@ export type CurrencyType = 'USD'
 | 'RUB'
 | 'VND'
 
+export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | 'ALL';
+
+export interface PriceChartPoint {
+  time: number;
+  value: number;
+}
+
 export type LanguageOptionType = {
   text: string;
   value: LanguageType;
@@ -462,6 +480,8 @@ export type RequestChangeShowZeroBalance = { show: boolean };
 export type RequestChangeLanguage = { language: LanguageType };
 
 export type RequestChangePriceCurrency = { currency: CurrencyType }
+
+export type RequestGetHistoryTokenPriceData = { priceId: string, timeframe: PriceChartTimeframe };
 
 export type RequestChangeShowBalance = { enable: boolean };
 
@@ -2082,6 +2102,8 @@ export interface KoniRequestSignatures {
   // Price, balance, crowdloan functions
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
+  'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
+  'pri(price.getAndUpdateCurrentPrice)': [string, HistoryCurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
   'pri(crowdloan.getCrowdloan)': [RequestCrowdloan, CrowdloanJson];

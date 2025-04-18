@@ -17,6 +17,7 @@ import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 export { canDerive } from './canDerive';
 export * from './mv3';
 export * from './fetch';
+export * from './price';
 
 export const notDef = (x: any) => x === null || typeof x === 'undefined';
 export const isDef = (x: any) => !notDef(x);

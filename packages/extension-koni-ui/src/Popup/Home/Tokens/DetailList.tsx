@@ -56,6 +56,8 @@ const TokenDetailModalId = 'tokenDetailModalId';
 function Component (): React.ReactElement {
   const { slug: tokenGroupSlug } = useParams();
 
+  console.log('tokenGroupSlug', tokenGroupSlug);
+
   const notify = useNotification();
   const { t } = useTranslation();
   const navigate = useNavigate();

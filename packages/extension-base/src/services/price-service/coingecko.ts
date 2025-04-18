@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceChartPoint, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { isProductionMode } from '@subwallet/extension-base/constants';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 
@@ -12,7 +12,8 @@ interface GeckoItem {
   name: string,
   current_price: number,
   price_change_24h: number,
-  symbol: string
+  symbol: string,
+  last_updated: string
 }
 
 interface DerivativeTokenPrice {
@@ -33,6 +34,13 @@ interface ExchangeRateItem {
   base_code: string,
   conversion_rates: Record<string, number>
 }
+
+interface HistoryTokenPriceItem {
+  prices: number[][],
+  market_caps: number[][],
+  total_volumes: number[][]
+}
+
 const DEFAULT_CURRENCY = 'USD';
 const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
 
@@ -175,13 +183,58 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       });
     }
 
+    let lastUpdate: Date | undefined;
+
+    // Check if there is only one price ID, get the last updated date from this token
+    if (priceIds.size === 1 && responseDataPrice[0] && responseDataPrice[0].last_updated) {
+      lastUpdate = new Date(responseDataPrice[0].last_updated);
+    }
+
     return {
       currency,
       currencyData,
       priceMap,
-      price24hMap
+      price24hMap,
+      lastUpdate
     };
   } catch (e) {
     return {} as Omit<PriceJson, 'exchangeRateMap'>;
   }
+};
+
+export const getHistoryPrice = async (priceId: string, currency: CurrencyType = 'USD', from: string | number, to: string | number = '365'): Promise<PriceChartPoint[]> => {
+  let response: Response | undefined;
+
+  try {
+    response = await fetch(`https://api.coingecko.com/api/v3/coins/${priceId}/market_chart/range?vs_currency=${currency.toLowerCase()}&from=${from}&to=${to}`);
+
+    // if (useBackupApi || response?.status !== 200) {
+    //   useBackupApi = true;
+    //
+    //   try {
+    //     response = await fetch(`${apiCacheDomain}/api/price/history-price?ids=${priceId}&vs_currency=${currency.toLowerCase()}&days=90&interval=${type}`);
+    //   } catch (e) {}
+    //
+    //   if (response?.status !== 200) {
+    //     try {
+    //       response = await fetch('https://static-cache.subwallet.app/price/data.json');
+    //     } catch (e) {}
+    //   }
+    // }
+
+    const historyData = (await response?.json() || {}) as HistoryTokenPriceItem;
+
+    if (historyData.prices) {
+      const prices = historyData.prices.map((item) => {
+        return {
+          time: item[0],
+          value: item[1]
+        };
+      });
+
+      return prices;
+    }
+  } catch (e) {}
+
+  return [];
 };
