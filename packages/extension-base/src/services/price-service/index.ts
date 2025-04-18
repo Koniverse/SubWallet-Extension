@@ -254,7 +254,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   public async getHistoryCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
     const { lastUpdate, price24hMap, priceMap } = await getPriceMap(new Set([priceId]), DEFAULT_CURRENCY);
     const { promise, resolve } = createPromiseHandler<CurrencyType>();
-    let priceResult: HistoryCurrentTokenPrice = {};
+    let priceResult = {} as HistoryCurrentTokenPrice;
 
     if (Object.keys(price24hMap).length && Object.keys(priceMap).length) {
       const priceStored = await this.getPrice();

@@ -199,9 +199,9 @@ export interface HistoryTokenPriceJSON {
 }
 
 export interface HistoryCurrentTokenPrice {
-  value?: number;
-  value24h?: number;
-  time?: number;
+  value: number;
+  value24h: number;
+  time: number;
 }
 
 export interface ExchangeRateJSON {
