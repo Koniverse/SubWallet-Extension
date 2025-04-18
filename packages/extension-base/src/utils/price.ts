@@ -29,12 +29,12 @@ export const getTokenPriceHistoryId = (tokenId: string, timeframe: PriceChartTim
 };
 
 // Round the given date to the nearest time based on granularity (in minutes)
-const roundToNearestTime = (date: Date, granularity: number, isDateFrom = false): number => {
+const roundToNearestTime = (date: Date, granularity: number, isToDate = false): number => {
   const roundedDate = new Date(date.getTime());
   const granularityMinute = granularity / MINUTE;
   const roundedMinutes = Math.floor(date.getMinutes() / granularityMinute) * granularityMinute;
 
-  roundedDate.setMinutes(roundedMinutes - +isDateFrom, 30, 0); // Reset seconds and milliseconds
+  roundedDate.setMinutes(roundedMinutes + (+isToDate * granularityMinute), 0, 0); // Reset seconds and milliseconds
 
   return roundedDate.getTime();
 };
@@ -45,7 +45,7 @@ export const getTimeRange = (timeframe: PriceChartTimeframe): TimeRange => {
   const granularity = TYPE_INTERVAL[timeframe];
   let dateFrom: Date;
 
-  const to = roundToNearestTime(new Date(now), granularity); // Align 'to' with the granularity based on type
+  const to = roundToNearestTime(new Date(now), granularity, true); // Align 'to' with the granularity based on type
 
   switch (timeframe) {
     case '1D':
@@ -71,9 +71,7 @@ export const getTimeRange = (timeframe: PriceChartTimeframe): TimeRange => {
       throw new Error('Unknown time type');
   }
 
-  const from = roundToNearestTime(dateFrom, granularity, true); // Align 'from' with the granularity based on type
-
-  console.log(new Date(from).toISOString());
+  const from = roundToNearestTime(dateFrom, granularity); // Align 'from' with the granularity based on type
 
   return {
     from: Math.floor(from / 1000), // Convert to UNIX timestamp (seconds)

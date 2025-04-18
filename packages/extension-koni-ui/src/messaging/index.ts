@@ -48,8 +48,8 @@ export async function getHistoryTokenPrice (priceId: string, timeframe: PriceCha
   return sendMessage('pri(price.getHistory)', { priceId, timeframe });
 }
 
-export async function getHistoryCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
-  return sendMessage('pri(price.getHistoryCurrentPrice)', priceId);
+export async function getAndUpdateCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
+  return sendMessage('pri(price.getAndUpdateCurrentPrice)', priceId);
 }
 
 export * from './accounts';

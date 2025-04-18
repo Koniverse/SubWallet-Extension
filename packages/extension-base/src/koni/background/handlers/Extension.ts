@@ -4769,7 +4769,7 @@ export default class KoniExtension {
         return await this.subscribePrice(id, port);
       case 'pri(price.getHistory)':
         return await this.getHistoryTokenPrice(request as RequestGetHistoryTokenPriceData);
-      case 'pri(price.getHistoryCurrentPrice)':
+      case 'pri(price.getAndUpdateCurrentPrice)':
         return await this.getHistoryCurrentTokenPrice(request as string);
       case 'pri(settings.savePriceCurrency)':
         return await this.setPriceCurrency(request as RequestChangePriceCurrency);

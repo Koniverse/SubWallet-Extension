@@ -281,6 +281,22 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       priceResult.time = lastUpdate.getTime();
     }
 
+    if (priceResult.value && priceResult.value24h) {
+      const priceStored = await this.getPrice();
+
+      this.priceSubject.next({
+        ...priceStored,
+        priceMap: {
+          ...priceStored.priceMap,
+          [priceId]: priceResult.value
+        },
+        price24hMap: {
+          ...priceStored.price24hMap,
+          [priceId]: priceResult.value24h
+        }
+      });
+    }
+
     return priceResult;
   }
 

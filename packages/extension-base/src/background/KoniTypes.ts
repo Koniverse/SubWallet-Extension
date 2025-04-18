@@ -2090,7 +2090,7 @@ export interface KoniRequestSignatures {
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
   'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
-  'pri(price.getHistoryCurrentPrice)': [string, HistoryCurrentTokenPrice];
+  'pri(price.getAndUpdateCurrentPrice)': [string, HistoryCurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
   'pri(crowdloan.getCrowdloan)': [RequestCrowdloan, CrowdloanJson];
