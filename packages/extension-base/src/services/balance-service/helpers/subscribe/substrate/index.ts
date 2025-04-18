@@ -362,6 +362,13 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const tokenTypes = includeNativeToken ? [_AssetType.NATIVE, _AssetType.LOCAL] : [_AssetType.LOCAL];
   const tokenMap = filterAssetsByChainAndType(assetMap, chainInfo.slug, tokenTypes);
 
+  // Hotfix balance for gdot
+  let gdotBalances: BalanceItem[] = [];
+
+  if (Object.keys(assetMap).includes(gdotSlug)) {
+    gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
+  }
+
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
     try {
       const params: _SubstrateAdapterSubscriptionArgs[] = [
@@ -388,6 +395,8 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
             locked: totalLockedFromTransfer.toString()
           };
         });
+
+        items.push(...gdotBalances);
 
         callback(items);
       });
@@ -586,3 +595,25 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
     clearInterval(interval);
   };
 };
+
+// Hot fix for gdot balance
+
+const gdotSlug = 'hydradx_main-LOCAL-GDOT';
+
+async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
+  return await Promise.all(addresses.map(async (address) => {
+    const _balanceInfo = await substrateApi.api.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address);
+    const balanceInfo = _balanceInfo.toPrimitive() as OrmlTokensAccountData;
+
+    const transferableBalance = _getTokensPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
+    const totalLockedFromTransfer = _getTokensPalletLocked(balanceInfo);
+
+    return {
+      address,
+      tokenSlug: tokenInfo.slug,
+      state: APIItemState.READY,
+      free: transferableBalance.toString(),
+      locked: totalLockedFromTransfer.toString()
+    } as unknown as BalanceItem;
+  }));
+}
