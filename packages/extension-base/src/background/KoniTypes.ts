@@ -1799,6 +1799,15 @@ export interface TokenPriorityDetails {
   token: Record<string, number>
 }
 
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect
@@ -2022,6 +2031,10 @@ export interface ResponseMigrateSoloAccount {
 
 export interface RequestPingSession {
   sessionId: string;
+}
+
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
 }
 
 /* Core types */

@@ -3,7 +3,7 @@
 
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
-import { AssetSetting, MetadataItem, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AssetSetting, MetadataItem, SufficientChainsDetails, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
@@ -96,6 +96,7 @@ export class ChainService {
   private chainLogoMapSubject = new BehaviorSubject<Record<string, string>>(ChainLogoMap);
   private ledgerGenericAllowChainsSubject = new BehaviorSubject<string[]>([]);
   private priorityTokensSubject = new BehaviorSubject({} as TokenPriorityDetails);
+  private sufficientChainsSubject = new BehaviorSubject({} as SufficientChainsDetails);
 
   // Todo: Update to new store indexed DB
   private store: AssetSettingStore = new AssetSettingStore();
@@ -129,6 +130,7 @@ export class ChainService {
   public get value () {
     const ledgerGenericAllowChains = this.ledgerGenericAllowChainsSubject;
     const priorityTokens = this.priorityTokensSubject;
+    const sufficientChains = this.sufficientChainsSubject;
 
     return {
       get ledgerGenericAllowChains () {
@@ -136,6 +138,9 @@ export class ChainService {
       },
       get priorityTokens () {
         return priorityTokens.value;
+      },
+      get sufficientChains () {
+        return sufficientChains.value;
       }
     };
   }
@@ -143,6 +148,7 @@ export class ChainService {
   public get observable () {
     const ledgerGenericAllowChains = this.ledgerGenericAllowChainsSubject;
     const priorityTokens = this.priorityTokensSubject;
+    const sufficientChains = this.sufficientChainsSubject;
 
     return {
       get ledgerGenericAllowChains () {
@@ -150,6 +156,9 @@ export class ChainService {
       },
       get priorityTokens () {
         return priorityTokens.asObservable();
+      },
+      get sufficientChains () {
+        return sufficientChains.asObservable();
       }
     };
   }
@@ -842,6 +851,11 @@ export class ChainService {
     }
   }
 
+  handleLatestSufficientChains (latestSufficientChains: SufficientChainsDetails) {
+    this.sufficientChainsSubject.next(latestSufficientChains);
+    this.logger.log('Finished updating latest supported sufficient chains');
+  }
+
   handleLatestData () {
     this.fetchLatestChainData().then((latestChainInfo) => {
       this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
@@ -865,6 +879,12 @@ export class ChainService {
     this.fetchLatestPriorityTokens()
       .then((latestPriorityTokens) => {
         this.handleLatestPriorityTokens(latestPriorityTokens);
+      })
+      .catch(console.error);
+
+    this.fetchLatestSufficientChains()
+      .then((latestSufficientChains) => {
+        this.handleLatestSufficientChains(latestSufficientChains);
       })
       .catch(console.error);
   }
@@ -1184,6 +1204,10 @@ export class ChainService {
       tokenGroup: {},
       token: {}
     };
+  }
+
+  private async fetchLatestSufficientChains () {
+    return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
   }
 
   private async initChains () {
