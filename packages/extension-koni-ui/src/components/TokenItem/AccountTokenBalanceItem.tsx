@@ -98,10 +98,10 @@ const Component: React.FC<Props> = (props: Props) => {
     [decimals, symbol]
   );
 
-  const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
-
   const balanceItems = useMemo<BalanceDisplayItem[]>(() => {
-    if (isBitcoinChain) {
+    const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
+
+    if (isBitcoinChain && isBitcoinMetadata(metadata)) {
       return [
         { key: 'btc_transferable', label: t('BTC Transferable'), value: free },
         { key: 'btc_rune', label: t('BTC Rune (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.runeBalance) : '0' },
@@ -113,7 +113,7 @@ const Component: React.FC<Props> = (props: Props) => {
       { key: 'transferable', label: t('Transferable'), value: free },
       { key: 'locked', label: t('Locked'), value: locked }
     ];
-  }, [isBitcoinChain, free, locked, metadata, t]);
+  }, [chainInfo, free, locked, metadata, t]);
 
   return (
     <MetaInfo
