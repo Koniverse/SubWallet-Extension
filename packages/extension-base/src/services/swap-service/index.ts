@@ -291,6 +291,10 @@ export class SwapService implements StoppableServiceInterface {
       throw Error('Swap pair is not found');
     }
 
+    if (path.length > 1 && path.map((action) => action.action).includes(DynamicSwapType.BRIDGE)) {
+      directSwapRequest.isCrossChain = true;
+    }
+
     const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
 
     return {
