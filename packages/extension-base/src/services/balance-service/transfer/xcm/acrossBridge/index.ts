@@ -22,6 +22,10 @@ export function _isAcrossChainBridge (srcChain: string, destChain: string): bool
   return acrossPairsMap.get(srcChain)?.has(destChain) ?? false;
 }
 
+export function _isAcrossTestnetBridge (srcChain: string): boolean {
+  return srcChain === 'base_sepolia' || srcChain === 'arbitrum_sepolia' || srcChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA;
+}
+
 export const SpokePoolMapping: Record<number, { SpokePool: { address: string; blockNumber: number } }> = {
   1: {
     SpokePool: { address: '0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5', blockNumber: 17117454 }
