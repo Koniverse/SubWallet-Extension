@@ -193,8 +193,9 @@ export function subscribeBalance (
 
     if (_isPureBitcoinChain(chainInfo)) {
       return subscribeBitcoinBalance(
-        ['bc1p2v22jvkpr4r5shne4t7dczepsnf4tzeq7q743htlkjql9pj4q4hsmw3xte'],
-        bitcoinApi
+        ['bc1q9uewqm7495ddfcs900yg86ux5tdzzkcphkvd9l'],
+        bitcoinApi,
+        callback
       );
     }
 

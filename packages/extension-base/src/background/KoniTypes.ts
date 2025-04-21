@@ -2006,9 +2006,11 @@ export interface RequestPingSession {
 
 /* Core types */
 export type _Address = string;
-export type _BalanceMetadata = unknown;
+export type _BalanceMetadata = BitcoinBalanceMetadata | unknown;
 export type BitcoinBalanceMetadata = {
-  inscriptionCount: number
+  inscriptionCount: number,
+  runeBalance: string, // sum of BTC in UTXO which contains rune
+  inscriptionBalance: string // sum of BTC in UTXO which contains rune
 }
 
 // Use stringify to communicate, pure boolean value will error with case 'false' value
