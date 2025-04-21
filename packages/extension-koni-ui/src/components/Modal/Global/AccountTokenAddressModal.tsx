@@ -14,13 +14,13 @@ import { CaretLeft, FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 
-export interface AddressGroupModalProps {
+export interface AccountTokenAddressModalProps {
   items: AccountTokenAddress[];
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
 }
 
-type Props = ThemeProps & AddressGroupModalProps & {
+type Props = ThemeProps & AccountTokenAddressModalProps & {
   onCancel: VoidFunction;
 };
 

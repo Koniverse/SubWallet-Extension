@@ -4,7 +4,7 @@
 import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
-import { AddressGroupModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
+import { AccountTokenAddressModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
 import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_GROUP_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -70,8 +70,8 @@ export interface WalletModalContextType {
     open: (props: SelectAddressFormatModalProps) => void,
     close: VoidFunction
   },
-  addressGroupModal: {
-    open: (props: AddressGroupModalProps) => void,
+  accountTokenAddressModal: {
+    open: (props: AccountTokenAddressModalProps) => void,
     close: VoidFunction
   },
   alertModal: {
@@ -107,7 +107,7 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: () => {}
   },
-  addressGroupModal: {
+  accountTokenAddressModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -158,7 +158,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   /* Address QR Modal */
   const [addressQrModalProps, setAddressQrModalProps] = useState<AddressQrModalProps | undefined>();
   const [selectAddressFormatModalProps, setSelectAddressFormatModalProps] = useState<SelectAddressFormatModalProps | undefined>();
-  const [addressGroupModalProps, setAddressGroupModalProps] = useState<AddressGroupModalProps | undefined>();
+  const [accountTokenAddressModalProps, setAccountTokenAddressModalProps] = useState<AccountTokenAddressModalProps | undefined>();
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
   const [transactionProcessId, setTransactionProcessId] = useState('');
   const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
@@ -173,8 +173,8 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     activeModal(SELECT_ADDRESS_FORMAT_MODAL);
   }, [activeModal]);
 
-  const openAddressGroupModal = useCallback((props: AddressGroupModalProps) => {
-    setAddressGroupModalProps(props);
+  const openAccountTokenAddressModal = useCallback((props: AccountTokenAddressModalProps) => {
+    setAccountTokenAddressModalProps(props);
     activeModal(ADDRESS_GROUP_MODAL);
   }, [activeModal]);
 
@@ -192,9 +192,9 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setSelectAddressFormatModalProps(undefined);
   }, [inactiveModal]);
 
-  const closeAddressGroupModal = useCallback(() => {
+  const closeAccountTokenAddressModal = useCallback(() => {
     inactiveModal(ADDRESS_GROUP_MODAL);
-    setAddressGroupModalProps(undefined);
+    setAccountTokenAddressModalProps(undefined);
   }, [inactiveModal]);
 
   const onCancelAddressQrModal = useCallback(() => {
@@ -205,9 +205,9 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     selectAddressFormatModalProps?.onCancel?.() || closeSelectAddressFormatModal();
   }, [closeSelectAddressFormatModal, selectAddressFormatModalProps]);
 
-  const onCancelAddressGroupModal = useCallback(() => {
-    addressGroupModalProps?.onCancel?.() || closeAddressGroupModal();
-  }, [addressGroupModalProps, closeAddressGroupModal]);
+  const onCancelAccountTokenAddressModal = useCallback(() => {
+    accountTokenAddressModalProps?.onCancel?.() || closeAccountTokenAddressModal();
+  }, [accountTokenAddressModalProps, closeAccountTokenAddressModal]);
 
   /* Address QR Modal */
 
@@ -252,9 +252,9 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       open: openSelectAddressFormatModal,
       close: closeSelectAddressFormatModal
     },
-    addressGroupModal: {
-      open: openAddressGroupModal,
-      close: closeAddressGroupModal
+    accountTokenAddressModal: {
+      open: openAccountTokenAddressModal,
+      close: closeAccountTokenAddressModal
     },
     alertModal: {
       open: openAlert,
@@ -269,7 +269,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     transactionStepsModal: {
       open: openTransactionStepsModal
     }
-  }), [checkAddressQrModalActive, closeAddressGroupModal, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressGroupModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, closeAccountTokenAddressModal, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAccountTokenAddressModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -355,10 +355,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     }
 
     {
-      !!addressGroupModalProps && (
+      !!accountTokenAddressModalProps && (
         <AccountTokenAddressModal
-          {...addressGroupModalProps}
-          onCancel={onCancelAddressGroupModal}
+          {...accountTokenAddressModalProps}
+          onCancel={onCancelAccountTokenAddressModal}
         />
       )
     }
