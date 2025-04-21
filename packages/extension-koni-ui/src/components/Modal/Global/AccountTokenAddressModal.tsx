@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {AccountTokenAddressItem, CloseIcon, GeneralEmptyList} from '@subwallet/extension-koni-ui/components';
+import { AccountTokenAddressItem, CloseIcon, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_GROUP_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { AddressGroupItemInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -15,7 +15,7 @@ import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 
 export interface AddressGroupModalProps {
-  items: AddressGroupItemInfo[];
+  items: AccountTokenAddress[];
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
 }
@@ -31,7 +31,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   const notify = useNotification();
   const { addressQrModal } = useContext(WalletModalContext);
 
-  const onShowQr = useCallback((item: AddressGroupItemInfo) => {
+  const onShowQr = useCallback((item: AccountTokenAddress) => {
     return () => {
       const processFunction = () => {
         addressQrModal.open({
@@ -49,7 +49,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
     };
   }, [addressQrModal, onCancel]);
 
-  const onCopyAddress = useCallback((item: AddressGroupItemInfo) => {
+  const onCopyAddress = useCallback((item: AccountTokenAddress) => {
     return () => {
       const processFunction = () => {
         copyToClipboard(item.accountInfo.address || '');
@@ -63,7 +63,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   }, [notify, t]);
 
   const renderItem = useCallback(
-    (item: AddressGroupItemInfo) => {
+    (item: AccountTokenAddress) => {
       return (
         <AccountTokenAddressItem
           className={'item-wrapper'}

@@ -36,7 +36,7 @@ export type AccountChainAddress = {
   logoKey?: string
 }
 
-export type AddressGroupItemInfo = {
+export type AccountTokenAddress = {
   accountInfo: AccountJson;
   tokenSlug: string;
   chainSlug: string;

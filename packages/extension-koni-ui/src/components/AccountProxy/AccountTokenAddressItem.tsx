@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressGroupItemInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -10,7 +10,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  item: AddressGroupItemInfo;
+  item: AccountTokenAddress;
   onClick?: VoidFunction;
   onClickCopyButton?: VoidFunction;
   onClickQrButton?: VoidFunction;
