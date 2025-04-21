@@ -128,16 +128,12 @@ export class SwapService implements StoppableServiceInterface {
 
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
 
-    console.group('Swap Info');
+    console.group('Swap Logger');
     console.log('path', path);
-    console.log('swapQuoteResponse', swapQuoteResponse);
-
-    // todo: remove after handling chainflip
-    const preferredUniswapQuote = swapQuoteResponse.quotes.find((quote) => quote.provider.id === SwapProviderId.UNISWAP) || swapQuoteResponse.optimalQuote;
 
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
-      selectedQuote: preferredUniswapQuote,
+      selectedQuote: swapQuoteResponse.optimalQuote,
       path
     });
 
@@ -150,10 +146,7 @@ export class SwapService implements StoppableServiceInterface {
 
     return {
       process: optimalProcess,
-      quote: {
-        ...swapQuoteResponse,
-        optimalQuote: preferredUniswapQuote
-      }
+      quote: swapQuoteResponse
     };
   }
 
