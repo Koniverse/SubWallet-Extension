@@ -57,7 +57,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [selectedChain, setSelectedChain] = useState<string | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
-  const { addressGroupModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
+  const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
@@ -111,20 +111,20 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     processFunction();
   }, [selectAddressFormatModal]);
 
-  const openAddressGroupModal = useCallback((accounts: AccountTokenAddress[], closeCallback?: VoidCallback) => {
+  const openAccountTokenAddressModal = useCallback((accounts: AccountTokenAddress[], closeCallback?: VoidCallback) => {
     const processFunction = () => {
-      addressGroupModal.open({
+      accountTokenAddressModal.open({
         items: accounts,
-        onBack: addressGroupModal.close,
+        onBack: accountTokenAddressModal.close,
         onCancel: () => {
-          addressGroupModal.close();
+          accountTokenAddressModal.close();
           closeCallback?.();
         }
       });
     };
 
     processFunction();
-  }, [addressGroupModal]);
+  }, [accountTokenAddressModal]);
 
   /* --- token Selector */
 
@@ -168,24 +168,23 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    // current account is not All, just do show QR logic
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
 
     if (isBitcoinChain) {
-      const addressGroupList = transformBitcoinAccounts(
+      const accountTokenAddressList = transformBitcoinAccounts(
         currentAccountProxy?.accounts || [],
         chainSlug,
         item.slug,
         chainInfo
       );
 
-      if (addressGroupList.length > 1) {
-        openAddressGroupModal(addressGroupList, () => {
+      if (accountTokenAddressList.length > 1) {
+        openAccountTokenAddressModal(accountTokenAddressList, () => {
           inactiveModal(tokenSelectorModalId);
           setSelectedAccountAddressItem(undefined);
         });
       } else {
-        openAddressQrModal(addressGroupList[0].accountInfo.address, addressGroupList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+        openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
           inactiveModal(tokenSelectorModalId);
           setSelectedAccountAddressItem(undefined);
         });
@@ -225,7 +224,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, openAddressGroupModal, inactiveModal, getReformatAddress, openAddressFormatModal, openAddressQrModal]);
+  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, openAccountTokenAddressModal, inactiveModal, getReformatAddress, openAddressFormatModal, openAddressQrModal]);
 
   /* token Selector --- */
 
