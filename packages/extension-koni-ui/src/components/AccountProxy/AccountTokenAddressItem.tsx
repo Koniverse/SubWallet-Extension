@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressGroupItemInfo } from '@subwallet/extension-koni-ui/components/Modal/Global/AddressGroupModal';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddressGroupItemInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -87,7 +86,7 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-const AddressGroupItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AccountTokenAddressItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     background: token.colorBgSecondary,
     padding: token.paddingSM,
@@ -151,4 +150,4 @@ const AddressGroupItem = styled(Component)<Props>(({ theme: { token } }: Props) 
   };
 });
 
-export default AddressGroupItem;
+export default AccountTokenAddressItem;
