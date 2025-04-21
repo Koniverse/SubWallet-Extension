@@ -130,8 +130,7 @@ export interface SwapError {
 }
 
 export interface SwapPath {
-  path: DynamicSwapAction[],
-  directSwapRequest: SwapRequestV2 | undefined
+  path: DynamicSwapAction[]
 }
 
 export class SwapApi {

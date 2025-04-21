@@ -285,7 +285,15 @@ export class SwapService implements StoppableServiceInterface {
       throw Error('No available path');
     }
 
-    const { directSwapRequest, path } = availablePath;
+    const { path } = availablePath;
+
+    const swapAction = path.find((step) => step.action === DynamicSwapType.SWAP);
+
+    const directSwapRequest: SwapRequestV2 | undefined = swapAction
+      ? { ...request,
+        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from)))),
+        pair: swapAction.pair }
+      : undefined;
 
     if (!directSwapRequest) {
       throw Error('Swap pair is not found');
