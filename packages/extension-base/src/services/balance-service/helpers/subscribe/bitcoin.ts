@@ -87,7 +87,7 @@ export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _Bitco
         return balances.map(({ balance, bitcoinBalanceMetadata }, index): BalanceItem => {
           return {
             address: addresses[index],
-            tokenSlug: 'bitcoin',
+            tokenSlug: 'bitcoin-NATIVE-BTC',
             state: APIItemState.READY,
             free: balance,
             locked: '0',
