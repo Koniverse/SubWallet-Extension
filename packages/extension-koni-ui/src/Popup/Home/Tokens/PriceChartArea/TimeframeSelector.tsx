@@ -22,6 +22,7 @@ const Component: React.FC<Props> = (props: Props) => {
     '1W': '7d',
     '1M': '1m',
     '3M': '3m',
+    '1Y': '1y',
     YTD: 'YTD',
     ALL: 'Max'
   }), []);
@@ -58,6 +59,7 @@ export const TimeframeSelector = styled(Component)<ThemeProps>(({ theme: { token
     cursor: 'pointer',
     height: 32,
     display: 'flex',
+    fontSize: token.fontSizeSM,
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',

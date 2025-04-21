@@ -36,6 +36,7 @@ const TIMEFRAMES: Record<PriceChartTimeframe, TimeframeConfig> = {
   '1M': { seconds: 2592000, interval: 14400 },
   '3M': { seconds: 7776000, interval: 43200 },
   YTD: { seconds: 31536000, interval: 86400 },
+  '1Y': { seconds: 31536000, interval: 86400 },
   ALL: { seconds: 315360000, interval: 604800 }
 };
 
@@ -177,8 +178,12 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 };
 
 export const PriceChartArea = styled(Wrapper)<WrapperProps>(({ theme: { token } }: ThemeProps) => ({
+  '.__price-info-container, .__price-info-container-empty': {
+    paddingBottom: token.paddingXXS
+  },
+
   '.__price-info-container': {
-    marginBottom: token.margin
+    marginBottom: token.marginSM
   },
 
   '.__price-chart-area': {

@@ -4,5 +4,5 @@
 import { PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
 
 export const timeframes: PriceChartTimeframe[] = [
-  '1D', '1W', '1M', '3M', 'YTD', 'ALL'
+  '1D', '1W', '1M', '3M', 'YTD', '1Y'
 ];

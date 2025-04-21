@@ -21,6 +21,7 @@ const TYPE_INTERVAL: Record<PriceChartTimeframe, number> = {
   '1M': 4 * HOUR,
   '3M': 12 * HOUR,
   YTD: DAY,
+  '1Y': DAY,
   ALL: WEEK
 };
 

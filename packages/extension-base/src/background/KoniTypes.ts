@@ -425,7 +425,7 @@ export type CurrencyType = 'USD'
 | 'RUB'
 | 'VND'
 
-export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | 'ALL';
+export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | '1Y' | 'ALL';
 
 export interface PriceChartPoint {
   time: number;

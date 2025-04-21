@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
@@ -55,8 +56,6 @@ const TokenDetailModalId = 'tokenDetailModalId';
 
 function Component (): React.ReactElement {
   const { slug: tokenGroupSlug } = useParams();
-
-  console.log('tokenGroupSlug', tokenGroupSlug);
 
   const notify = useNotification();
   const { t } = useTranslation();
@@ -123,6 +122,20 @@ function Component (): React.ReactElement {
 
     return '';
   }, [tokenGroupSlug, assetRegistryMap, multiChainAssetMap]);
+
+  const priceId = useMemo<string | undefined>(() => {
+    if (!tokenGroupSlug) {
+      return;
+    }
+
+    if (assetRegistryMap[tokenGroupSlug]) {
+      return _getAssetPriceId(assetRegistryMap[tokenGroupSlug]);
+    } else if (multiChainAssetMap[tokenGroupSlug]) {
+      return _getMultiChainAssetPriceId(multiChainAssetMap[tokenGroupSlug]);
+    }
+
+    return undefined;
+  }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
 
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';
@@ -201,10 +214,12 @@ function Component (): React.ReactElement {
   const [currentTokenInfo, setCurrentTokenInfo] = useState<CurrentSelectToken| undefined>(undefined);
   const [isShrink, setIsShrink] = useState<boolean>(false);
 
+  const upperBlockHeight = priceId ? 486 : 272;
+
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       setIsShrink((value) => {
         if (!value && topBlockRef.current && containerRef.current) {
           const containerProps = containerRef.current.getBoundingClientRect();
@@ -247,7 +262,7 @@ function Component (): React.ReactElement {
         return false;
       });
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const handleResize = useCallback(() => {
     const topPosition = containerRef.current?.scrollTop || 0;
@@ -424,10 +439,14 @@ function Component (): React.ReactElement {
 
   return (
     <div
-      className={'token-detail-container'}
+      className={classNames('token-detail-container', {
+        '-no-chart': !priceId
+      })}
       onScroll={handleScroll}
       ref={containerRef}
     >
+      <div className={'__upper-block-placeholder'}></div>
+
       <div
         className={classNames('__upper-block-wrapper', {
           '-is-shrink': isShrink
@@ -445,19 +464,23 @@ function Component (): React.ReactElement {
           onOpenReceive={onOpenReceive}
           onOpenSendFund={onOpenSendFund}
           onOpenSwap={onOpenSwap}
+          priceId={priceId}
           symbol={symbol}
         />
       </div>
       <div
         className={'__scroll-container'}
       >
-        <div className={'token-detail-banner-wrapper'}>
-          {!!banners.length && (<BannerGenerator
-            banners={banners}
-            dismissBanner={dismissBanner}
-            onClickBanner={onClickBanner}
-          />)}
-        </div>
+        {!!banners.length && (
+          <div className={'token-detail-banner-wrapper'}>
+            <BannerGenerator
+              banners={banners}
+              dismissBanner={dismissBanner}
+              onClickBanner={onClickBanner}
+            />
+          </div>
+        )}
+
         {
           tokenBalanceItems.map((item) => (
             <TokenBalanceDetailItem
@@ -537,21 +560,18 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       fontSize: token.fontSizeLG,
       position: 'relative',
       display: 'flex',
-      flexDirection: 'column',
-      paddingTop: 206
+      flexDirection: 'column'
     },
 
-    '.__scroll-container': {
-      flex: 1,
-      paddingLeft: token.size,
-      paddingRight: token.size
+    '.__upper-block-placeholder': {
+      paddingTop: 486
     },
 
     '.__upper-block-wrapper': {
       position: 'absolute',
       backgroundColor: token.colorBgDefault,
       zIndex: 10,
-      height: 206,
+      height: 486,
       paddingTop: 8,
       top: 0,
       left: 0,
@@ -559,11 +579,27 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       display: 'flex',
       alignItems: 'center',
       backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
-      transition: 'opacity, padding-top 0.27s ease',
+      transition: 'opacity, padding-top 0.27s ease'
+    },
 
-      '&.-is-shrink': {
-        height: 128
+    '.token-detail-container.-no-chart': {
+      '.__upper-block-placeholder': {
+        paddingTop: 272
+      },
+
+      '.__upper-block-wrapper': {
+        height: 272
       }
+    },
+
+    '.__upper-block-wrapper.__upper-block-wrapper.-is-shrink': {
+      height: 128
+    },
+
+    '.__scroll-container': {
+      flex: 1,
+      paddingLeft: token.size,
+      paddingRight: token.size
     },
 
     '.tokens-upper-block': {
