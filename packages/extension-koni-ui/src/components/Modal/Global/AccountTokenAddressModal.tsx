@@ -1,26 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/types';
-import { CloseIcon, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
-import AddressGroupItem from '@subwallet/extension-koni-ui/components/TokenItem/AddressGroupItem';
+import {AccountTokenAddressItem, CloseIcon, GeneralEmptyList} from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_GROUP_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddressGroupItemInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft, FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
-
-export type AddressGroupItemInfo = {
-  accountInfo: AccountJson;
-  tokenSlug: string;
-  chainSlug: string;
-}
 
 export interface AddressGroupModalProps {
   items: AddressGroupItemInfo[];
@@ -73,7 +65,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   const renderItem = useCallback(
     (item: AddressGroupItemInfo) => {
       return (
-        <AddressGroupItem
+        <AccountTokenAddressItem
           className={'item-wrapper'}
           item={item}
           key={`${item.accountInfo.type}_${item.accountInfo.address}`}
@@ -126,7 +118,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   );
 };
 
-const AddressGroupModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AccountTokenAddressModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.address-group-list': {
       display: 'flex',
@@ -147,4 +139,4 @@ const AddressGroupModal = styled(Component)<Props>(({ theme: { token } }: Props)
   };
 });
 
-export default AddressGroupModal;
+export default AccountTokenAddressModal;

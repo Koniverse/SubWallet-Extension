@@ -5,13 +5,12 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountActions, AccountChainType, AccountJson, AccountProxyType } from '@subwallet/extension-base/types';
-import { AddressGroupItemInfo } from '@subwallet/extension-koni-ui/components/Modal/Global/AddressGroupModal';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressItemType, AddressGroupItemInfo, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -172,18 +171,26 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     // current account is not All, just do show QR logic
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
-    const addressGroupList = transformBitcoinAccounts(
-      currentAccountProxy?.accounts || [],
-      chainSlug,
-      item.slug,
-      chainInfo
-    );
 
-    if (isBitcoinChain && addressGroupList.length > 1) {
-      openAddressGroupModal(addressGroupList, () => {
-        inactiveModal(tokenSelectorModalId);
-        setSelectedAccountAddressItem(undefined);
-      });
+    if (isBitcoinChain) {
+      const addressGroupList = transformBitcoinAccounts(
+        currentAccountProxy?.accounts || [],
+        chainSlug,
+        item.slug,
+        chainInfo
+      );
+
+      if (addressGroupList.length > 1) {
+        openAddressGroupModal(addressGroupList, () => {
+          inactiveModal(tokenSelectorModalId);
+          setSelectedAccountAddressItem(undefined);
+        });
+      } else {
+        openAddressQrModal(addressGroupList[0].accountInfo.address, addressGroupList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+          inactiveModal(tokenSelectorModalId);
+          setSelectedAccountAddressItem(undefined);
+        });
+      }
     } else {
       for (const accountJson of currentAccountProxy.accounts) {
         const reformatedAddress = getReformatAddress(accountJson, chainInfo);

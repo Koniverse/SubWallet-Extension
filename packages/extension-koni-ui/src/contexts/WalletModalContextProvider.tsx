@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountMigrationInProgressWarningModal, AddressGroupModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
+import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
-import { AddressGroupModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AddressGroupModal';
+import { AddressGroupModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
 import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_GROUP_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -356,7 +356,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
 
     {
       !!addressGroupModalProps && (
-        <AddressGroupModal
+        <AccountTokenAddressModal
           {...addressGroupModalProps}
           onCancel={onCancelAddressGroupModal}
         />
