@@ -7,10 +7,11 @@ import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/typ
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { isAddressAndChainCompatible, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { isAddress, isCardanoTestnetAddress, isTonAddress } from '@subwallet/keyring';
+import { getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
 
 import { AnyJson } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -68,8 +69,9 @@ export function _isValidAddressForEcosystem (validateRecipientParams: ValidateRe
     if (_isChainEvmCompatible(destChainInfo) ||
       _isChainSubstrateCompatible(destChainInfo) ||
       _isChainTonCompatible(destChainInfo) ||
-      _isChainCardanoCompatible(destChainInfo)) {
-      return 'Recipient address must be the same type as sender address';
+      _isChainCardanoCompatible(destChainInfo) ||
+      _isChainBitcoinCompatible(destChainInfo)) {
+      return 'Recipient address must be the same type as sender address 1';
     }
 
     return 'Unknown chain type';
@@ -106,6 +108,18 @@ export function _isValidCardanoAddressFormat (validateRecipientParams: ValidateR
   const { destChainInfo, toAddress } = validateRecipientParams;
 
   if (isCardanoTestnetAddress(toAddress) !== destChainInfo.isTestnet) {
+    return `Recipient address must be a valid ${destChainInfo.name} address`;
+  }
+
+  return '';
+}
+
+// TODO: Temporarily allow the transfer flow, review this function later.
+export function _isValidBitcoinAddressFormat (validateRecipientParams: ValidateRecipientParams): string {
+  const { destChainInfo, toAddress } = validateRecipientParams;
+  const addressInfo = validateBitcoinAddress(toAddress) ? getBitcoinAddressInfo(toAddress) : null;
+
+  if (addressInfo?.network !== destChainInfo.bitcoinInfo?.bitcoinNetwork) {
     return `Recipient address must be a valid ${destChainInfo.name} address`;
   }
 

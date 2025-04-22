@@ -5,10 +5,11 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
 import { decodeAddress, encodeAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
@@ -305,8 +306,9 @@ export function isAddressAndChainCompatible (address: string, chain: _ChainInfo)
   const isTonCompatible = isTonAddress(address) && _isChainTonCompatible(chain);
   const isSubstrateCompatible = !isEthereumAddress(address) && !isTonAddress(address) && _isChainSubstrateCompatible(chain); // todo: need isSubstrateAddress util function to check exactly
   const isCardanoCompatible = isCardanoAddress(address) && _isChainCardanoCompatible(chain);
+  const isBitcoinCompatible = isBitcoinAddress(address) && _isChainBitcoinCompatible(chain);
 
-  return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible;
+  return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible || isBitcoinCompatible;
 }
 
 export function getDomainFromUrl (url: string): string {
