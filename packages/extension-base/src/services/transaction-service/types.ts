@@ -5,6 +5,7 @@ import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeDat
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { UserOperationV8 } from 'abstractionkit';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
 
@@ -25,7 +26,7 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   createdAt: number;
   updatedAt: number;
   estimateFee?: FeeData,
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | UserOperationV8;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
   isPassConfirmation?: boolean;

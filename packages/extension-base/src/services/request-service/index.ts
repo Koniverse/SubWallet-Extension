@@ -216,6 +216,16 @@ export default class RequestService {
     return this.#evmRequestHandler.addConfirmation(id, url, type, payload, options, validator);
   }
 
+  public addEip7702Confirmation<CT extends ConfirmationType> (
+    id: string,
+    url: string,
+    type: CT,
+    payload: ConfirmationDefinitions[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {}
+  ): Promise<ConfirmationDefinitions[CT][1]> {
+    return this.#evmRequestHandler.addEip7702Confirmation(id, url, type, payload, options);
+  }
+
   public addConfirmationTon<CT extends ConfirmationTypeTon> (
     id: string,
     url: string,

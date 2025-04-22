@@ -30,6 +30,7 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import { BN_ZERO } from '@subwallet/extension-base/utils/number';
 import keyring from '@subwallet/ui-keyring';
 import { Cell } from '@ton/core';
+import { Simple7702Account, UserOperationV8 } from 'abstractionkit';
 import BigN from 'bignumber.js';
 import { addHexPrefix } from 'ethereumjs-util';
 import { ethers, TransactionLike } from 'ethers';
@@ -405,14 +406,19 @@ export default class TransactionService {
   }
 
   private async sendTransaction (transaction: SWTransaction): Promise<TransactionEmitter> {
+    // @ts-ignore
+    const isEip7702Tx = !!transaction.transaction.eip7702Auth;
+
     // Send Transaction
     const emitter = await (transaction.chainType === 'substrate'
       ? this.signAndSendSubstrateTransaction(transaction)
-      : transaction.chainType === 'evm'
+      : transaction.chainType === 'evm' && !isEip7702Tx
         ? this.signAndSendEvmTransaction(transaction)
-        : transaction.chainType === 'cardano'
-          ? this.signAndSendCardanoTransaction(transaction)
-          : this.signAndSendTonTransaction(transaction));
+        : transaction.chainType === 'evm' && isEip7702Tx
+          ? this.signAndSendEip7702Transaction(transaction)
+          : transaction.chainType === 'cardano'
+            ? this.signAndSendCardanoTransaction(transaction)
+            : this.signAndSendTonTransaction(transaction));
 
     const { eventsHandler, step } = transaction;
 
@@ -1358,6 +1364,81 @@ export default class TransactionService {
     return emitter;
   }
 
+  private signAndSendEip7702Transaction ({ address, chain, id, isPassConfirmation, step, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+    const eip7702Tx = transaction as UserOperationV8;
+    const evmSignaturePayload: EvmSignatureRequest = {
+      id: id,
+      type: 'eth_sign',
+      payload: eip7702Tx,
+      address: address,
+      hashPayload: '',
+      canSign: true,
+      processId: step?.processId
+    };
+    const emitter = new EventEmitter<TransactionEventMap>();
+    const eventData: TransactionEventResponse = {
+      id,
+      errors: [],
+      warnings: [],
+      extrinsicHash: id,
+      processId: step?.processId
+    };
+
+    this.state.requestService.addEip7702Confirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
+      .then(async ({ isApproved, payload }) => {
+        if (isApproved) {
+          if (!payload) {
+            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+          }
+
+          // Emit signed event
+          emitter.emit('signed', eventData);
+
+          const userOp = payload as UserOperationV8;
+
+          // Send transaction
+          this.handleTransactionTimeout(emitter, eventData);
+
+          eventData.nonce = Number(userOp.nonce);
+          eventData.startBlock = await this.state.chainService.getEvmApi(chain).api.eth.getBlockNumber();
+          const smartAccount = new Simple7702Account(userOp.sender);
+
+          const userOpSubmit = await smartAccount.sendUserOperation(userOp, 'https://0xrpc.io/sep');
+
+          emitter.emit('send', eventData); // This event is needed after sending transaction with queue
+          console.log('submitted');
+
+          userOpSubmit.included()
+            .then((result) => {
+              console.log('receipt', result);
+              eventData.extrinsicHash = result.receipt.transactionHash;
+              eventData.blockHash = result.receipt.blockHash;
+              eventData.blockNumber = Number(result.receipt.blockNumber);
+
+              emitter.emit('success', eventData);
+            })
+            .catch((e) => {
+              eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED, t(e.message)));
+              emitter.emit('error', eventData);
+            });
+
+          console.log('done');
+        } else {
+          this.removeTransaction(id);
+          eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
+          emitter.emit('error', eventData);
+        }
+      })
+      .catch((e: Error) => {
+        this.removeTransaction(id);
+        eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, t(e.message)));
+
+        emitter.emit('error', eventData);
+      });
+
+    return Promise.resolve(emitter);
+  }
+
   private signAndSendEvmPermitTransaction ({ address, id, isPassConfirmation, step, transaction, url }: SWPermitTransaction): TransactionEmitter {
     // Allow sign transaction
     const canSign = true;
@@ -1382,7 +1463,9 @@ export default class TransactionService {
     };
 
     this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
-      .then(({ isApproved, payload: signature }) => {
+      .then(({ isApproved, payload: _signature }) => {
+        const signature = _signature as string;
+
         if (isApproved) {
           // Emit signed event
           emitter.emit('signed', eventData);

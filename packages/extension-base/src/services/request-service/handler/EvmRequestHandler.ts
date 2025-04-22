@@ -10,6 +10,7 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import { anyNumberToBN } from '@subwallet/extension-base/utils/eth';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
+import { createAndSignEip7702DelegationAuthorization, Simple7702Account, UserOperationV8 } from 'abstractionkit';
 import BigN from 'bignumber.js';
 import BN from 'bn.js';
 import { toBuffer } from 'ethereumjs-util';
@@ -51,6 +52,79 @@ export default class EvmRequestHandler {
 
   public getConfirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {
     return this.confirmationsQueueSubject;
+  }
+
+  public async addEip7702Confirmation<CT extends ConfirmationType> (
+    id: string,
+    url: string,
+    type: CT,
+    payload: ConfirmationDefinitions[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {},
+    validator?: (input: ConfirmationDefinitions[CT][1]) => Error | undefined
+  ): Promise<ConfirmationDefinitions[CT][1]> {
+    const confirmations = this.confirmationsQueueSubject.getValue();
+    const confirmationType = confirmations[type] as Record<string, ConfirmationDefinitions[CT][0]>;
+
+    const payloadJson = JSON.stringify(payload, (key: string, value: any) => {
+      if (typeof value === 'bigint') {
+        return value.toString() + 'n';
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return value;
+    });
+    // only for displaying purposes on UI, not for processing
+    const modifiedPayload = JSON.parse(payloadJson) as ConfirmationDefinitions[CT][0]['payload'];
+
+    const isInternal = isInternalRequest(url);
+
+    if (['evmSignatureRequest', 'evmSendTransactionRequest'].includes(type)) {
+      const isAlwaysRequired = await this.#requestService.settingService.isAlwaysRequired;
+
+      if (isAlwaysRequired) {
+        this.#requestService.keyringService.lock();
+      }
+    }
+
+    // Check duplicate request
+    const duplicated = Object.values(confirmationType).find((c) => (c.url === url) && (c.payloadJson === payloadJson));
+
+    if (duplicated) {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Duplicate request'));
+    }
+
+    confirmationType[id] = {
+      id,
+      url,
+      isInternal,
+      payload: modifiedPayload,
+      payloadJson,
+      ...options
+    } as ConfirmationDefinitions[CT][0];
+
+    const promise = new Promise<ConfirmationDefinitions[CT][1]>((resolve, reject) => {
+      this.confirmationsPromiseMap[id] = {
+        validator: validator,
+        resolver: {
+          resolve: resolve,
+          reject: reject
+        }
+      };
+    });
+
+    this.confirmationsQueueSubject.next(confirmations);
+
+    if (!isInternal) {
+      this.#requestService.popupOpen();
+    }
+
+    if (options.isPassConfirmation) {
+      await this.completeConfirmation({ [type]: { id, url, isApproved: true, payload: '' } });
+    }
+
+    this.#requestService.updateIconV2();
+
+    return promise;
   }
 
   public async addConfirmation<CT extends ConfirmationType> (
@@ -239,7 +313,38 @@ export default class EvmRequestHandler {
   private async decorateResult<T extends ConfirmationType> (t: T, request: ConfirmationDefinitions[T][0], result: ConfirmationDefinitions[T][1]) {
     if (result.payload === '') {
       if (t === 'evmSignatureRequest') {
-        result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
+        // result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
+
+        const data = request as ConfirmationDefinitions['evmSignatureRequest'][0];
+        const eip7702Payload = JSON.parse(data.payloadJson, (key: string, value: any) => {
+          if (typeof value === 'string' && /^\d+n$/.test(value)) {
+            return BigInt(value.slice(0, -1));
+          }
+
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return value;
+        });
+
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const userOp = eip7702Payload?.payload as UserOperationV8;
+
+        console.log('user op', eip7702Payload);
+
+        const privateKey = '';
+        const smartAccount = new Simple7702Account(userOp.sender);
+
+        userOp.eip7702Auth = createAndSignEip7702DelegationAuthorization(
+          BigInt(userOp.eip7702Auth.chainId),
+          userOp.eip7702Auth.address,
+          BigInt(userOp.eip7702Auth.nonce),
+          privateKey
+        );
+
+        userOp.signature = smartAccount.signUserOperation(userOp, privateKey, BigInt(userOp.eip7702Auth.chainId));
+
+        result.payload = userOp;
+        console.log('signed', userOp);
       } else if (t === 'evmSendTransactionRequest') {
         result.payload = await this.signTransaction(request as ConfirmationDefinitions['evmSendTransactionRequest'][0]);
       }
@@ -275,6 +380,8 @@ export default class EvmRequestHandler {
 
       // Validate response from confirmation popup some info like password, response format....
       const error = validator && validator(result);
+
+      console.log('error', error);
 
       if (error) {
         resolver.reject(error);

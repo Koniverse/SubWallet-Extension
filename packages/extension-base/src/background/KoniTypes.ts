@@ -37,6 +37,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { TransactionWarning } from './warnings/TransactionWarning';
+import {UserOperationV8} from "abstractionkit";
 
 export enum RuntimeEnvironment {
   Web = 'Web',
@@ -1201,7 +1202,7 @@ export interface ErrorNetworkConnection {
 export interface ConfirmationDefinitions {
   addNetworkRequest: [ConfirmationsQueueItem<_NetworkUpsertParams>, ConfirmationResult<null>],
   addTokenRequest: [ConfirmationsQueueItem<AddTokenRequestExternal>, ConfirmationResult<boolean>],
-  evmSignatureRequest: [ConfirmationsQueueItem<EvmSignatureRequest>, ConfirmationResult<string>],
+  evmSignatureRequest: [ConfirmationsQueueItem<EvmSignatureRequest>, ConfirmationResult<string | UserOperationV8>],
   evmSendTransactionRequest: [ConfirmationsQueueItem<EvmSendTransactionRequest>, ConfirmationResult<string>]
   evmWatchTransactionRequest: [ConfirmationsQueueItem<EvmWatchTransactionRequest>, ConfirmationResult<string>],
   errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>]
