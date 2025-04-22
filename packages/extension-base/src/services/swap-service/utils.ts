@@ -300,4 +300,20 @@ export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
   return swapChains;
 }
 
+export function processStepsToPathActions (steps: CommonStepDetail[]): DynamicSwapType[] {
+  const path: DynamicSwapType[] = [];
+
+  for (const step of steps) {
+    if (step.type === CommonStepType.XCM) {
+      path.push(DynamicSwapType.BRIDGE);
+    }
+
+    if (step.type === SwapStepType.SWAP) {
+      path.push(DynamicSwapType.SWAP);
+    }
+  }
+
+  return path;
+}
+
 export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.04; // add 2%
