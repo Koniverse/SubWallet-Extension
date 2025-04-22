@@ -3,7 +3,7 @@
 
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
+import { CRON_REFRESH_PRICE_INTERVAL, SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _getAssetsPalletLocked, _getAssetsPalletTransferable } from '@subwallet/extension-base/core/substrate/assets-pallet';
 import { _getForeignAssetPalletLockedBalance, _getForeignAssetPalletTransferable } from '@subwallet/extension-base/core/substrate/foreign-asset-pallet';
 import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/substrate/nominationpools-pallet';
@@ -21,6 +21,7 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
@@ -362,7 +363,21 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const tokenTypes = includeNativeToken ? [_AssetType.NATIVE, _AssetType.LOCAL] : [_AssetType.LOCAL];
   const tokenMap = filterAssetsByChainAndType(assetMap, chainInfo.slug, tokenTypes);
 
+  // Hotfix balance for gdot
+  const getGdotBalance = async () => {
+    const gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
+
+    callback(gdotBalances);
+  };
+
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
+    // Hotfix balance for gdot
+    if (tokenInfo.slug === gdotSlug) {
+      return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
+        getGdotBalance().catch(console.error);
+      });
+    }
+
     try {
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
@@ -586,3 +601,25 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
     clearInterval(interval);
   };
 };
+
+// Hot fix for gdot balance
+
+const gdotSlug = 'hydradx_main-LOCAL-GDOT';
+
+async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
+  return await Promise.all(addresses.map(async (address) => {
+    const _balanceInfo = await substrateApi.api.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address);
+    const balanceInfo = _balanceInfo.toPrimitive() as OrmlTokensAccountData;
+
+    const transferableBalance = _getTokensPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
+    const totalLockedFromTransfer = _getTokensPalletLocked(balanceInfo);
+
+    return {
+      address,
+      tokenSlug: tokenInfo.slug,
+      state: APIItemState.READY,
+      free: transferableBalance.toString(),
+      locked: totalLockedFromTransfer.toString()
+    } as unknown as BalanceItem;
+  }));
+}
