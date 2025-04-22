@@ -15,6 +15,7 @@ import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _get
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { HistoryService } from '@subwallet/extension-base/services/history-service';
 import { ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { CANDIDE_BUNDLER_URL } from '@subwallet/extension-base/services/keyring-service/context/handlers/Eip7702';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
@@ -1403,7 +1404,7 @@ export default class TransactionService {
           eventData.startBlock = await this.state.chainService.getEvmApi(chain).api.eth.getBlockNumber();
           const smartAccount = new Simple7702Account(userOp.sender);
 
-          const userOpSubmit = await smartAccount.sendUserOperation(userOp, 'https://0xrpc.io/sep');
+          const userOpSubmit = await smartAccount.sendUserOperation(userOp, CANDIDE_BUNDLER_URL);
 
           emitter.emit('send', eventData); // This event is needed after sending transaction with queue
           console.log('submitted');
