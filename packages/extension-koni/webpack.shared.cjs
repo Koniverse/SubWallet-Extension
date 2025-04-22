@@ -66,6 +66,7 @@ const _additionalEnv = {
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY),
   BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
 };
 
