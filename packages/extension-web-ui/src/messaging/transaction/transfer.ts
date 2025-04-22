@@ -5,7 +5,7 @@ import { AmountData, RequestMaxTransferable } from '@subwallet/extension-base/ba
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { RequestCrossChainTransfer, RequestTransfer, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { CommonOptimalTransferPath } from '@subwallet/extension-base/types/service-base';
 
 import { sendMessage } from '../base';
 
@@ -25,6 +25,6 @@ export async function getMaxTransfer (request: RequestMaxTransferable): Promise<
   return sendMessage('pri(transfer.getMaxTransferable)', request);
 }
 
-export async function getOptimalTransferProcess (request: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+export async function getOptimalTransferProcess (request: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
   return sendMessage('pri(accounts.getOptimalTransferProcess)', request);
 }

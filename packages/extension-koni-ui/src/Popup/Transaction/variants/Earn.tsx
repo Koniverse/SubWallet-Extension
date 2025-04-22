@@ -641,6 +641,7 @@ const Component = () => {
 
   const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [earningRate, setEarningRate] = useState<number>(0);
+  const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const isDisabledSubnetContent = useMemo(
     () =>
@@ -717,9 +718,11 @@ const Component = () => {
 
   const closeSlippageModal = useCallback(() => {
     inactiveModal(EARNING_SLIPPAGE_MODAL);
+    setIsSlippageModalVisible(false);
   }, [inactiveModal]);
 
   const onOpenSlippageModal = useCallback(() => {
+    setIsSlippageModalVisible(true);
     activeModal(EARNING_SLIPPAGE_MODAL);
   }, [activeModal]);
 
@@ -1389,13 +1392,14 @@ const Component = () => {
         openAlert={openAlert}
         slug={slug}
       />
-
-      <SlippageModal
-        modalId={EARNING_SLIPPAGE_MODAL}
-        onApplySlippage={onSelectSlippage}
-        onCancel={closeSlippageModal}
-        slippageValue={maxSlippage}
-      />
+      {isSlippageModalVisible && (
+        <SlippageModal
+          modalId={EARNING_SLIPPAGE_MODAL}
+          onApplySlippage={onSelectSlippage}
+          onCancel={closeSlippageModal}
+          slippageValue={maxSlippage}
+        />
+      )}
     </>
   );
 };

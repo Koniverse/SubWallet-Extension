@@ -1779,6 +1779,15 @@ export interface TokenPriorityDetails {
   token: Record<string, number>
 }
 
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect
@@ -2004,6 +2013,10 @@ export interface RequestPingSession {
   sessionId: string;
 }
 
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
+}
+
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
@@ -2034,6 +2047,7 @@ export interface KoniRequestSignatures {
   'pri(chainService.upsertChain)': [_NetworkUpsertParams, boolean];
   'pri(chainService.enableChains)': [EnableMultiChainParams, boolean];
   'pri(chainService.enableChain)': [EnableChainParams, boolean];
+  'pri(chainService.enableChainWithPriorityAssets)': [EnableChainParams, boolean];
   'pri(chainService.reconnectChain)': [string, boolean];
   'pri(chainService.disableChains)': [string[], boolean];
   'pri(chainService.disableChain)': [string, boolean];
