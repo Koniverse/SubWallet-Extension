@@ -29,7 +29,14 @@ export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer, Tra
   value: string;
   originNetworkKey: string,
   destinationNetworkKey: string,
-  showExtraWarning?: boolean
+  showExtraWarning?: boolean,
+  metadata?: AcrossMetadata
+}
+
+interface AcrossMetadata {
+  amountOut: string;
+  destChainSlug: string;
+  rate: string;
 }
 
 export type RequestCrossChainTransfer = InternalRequestSign<RequestCheckCrossChainTransfer>;

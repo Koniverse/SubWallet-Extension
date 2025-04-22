@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _Address } from '@subwallet/extension-base/background/KoniTypes';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { CommonOptimalTransferPath, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+
+import { _getEvmChainId } from '../../chain-service/utils';
+import { SpokePoolMapping } from '../transfer/xcm/acrossBridge';
 
 export interface RequestOptimalTransferProcess {
   originChain: string,
@@ -48,6 +51,33 @@ export async function getSnowbridgeTransferProcessFromEvm (address: string, evmA
   result.totalFee.push(MOCK_STEP_FEE);
   // if (!allowance || BigInt(allowance) < BigInt(amount)) {
   // }
+
+  result.steps.push({
+    id: result.steps.length,
+    type: CommonStepType.TRANSFER,
+    name: 'Transfer'
+  });
+  result.totalFee.push(MOCK_STEP_FEE);
+
+  return Promise.resolve(result);
+}
+
+export async function getAcrossbridgeTransferProcessFromEvm (originChainInfo: _ChainInfo): Promise<CommonOptimalTransferPath> {
+  const chainId = _getEvmChainId(originChainInfo) as number;
+  const SpokePoolAddress = SpokePoolMapping[chainId].SpokePool.address;
+
+  const result: CommonOptimalTransferPath = {
+    totalFee: [MOCK_STEP_FEE],
+    steps: [DEFAULT_FIRST_STEP]
+  };
+
+  result.steps.push({
+    id: result.steps.length,
+    type: CommonStepType.TOKEN_APPROVAL,
+    name: 'Approve spending',
+    metadata: { SpokePoolAddress }
+  });
+  result.totalFee.push(MOCK_STEP_FEE);
 
   result.steps.push({
     id: result.steps.length,
