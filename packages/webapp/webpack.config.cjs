@@ -74,6 +74,7 @@ const _additionalEnv = {
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY),
   BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
 };
 

@@ -362,7 +362,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   if (transaction) {
     try {
       if (isSubstrateTransaction(transaction)) {
-        estimateFee.value = (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
       } else if (isTonTransaction(transaction)) {
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {
@@ -508,4 +508,17 @@ async function isAccountActive (tonApi: _TonApi, address: string) {
   const state = await tonApi.getAccountState(address);
 
   return state === 'active';
+}
+
+export function validateXcmMinAmountToMythos (destChain: string, destToken: string, amount: string) {
+  const MYTHOS_DESTINATION_FEE = '2500000000000000000';
+  const errorMsg = 'Enter an amount higher than 2.5 MYTH to pay cross-chain fee and avoid your MYTH being lost after the transaction';
+
+  if (destChain === 'mythos' && destToken === 'mythos-NATIVE-MYTH') {
+    if (BigN(amount).lte(MYTHOS_DESTINATION_FEE)) {
+      return new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, t(errorMsg));
+    }
+  }
+
+  return undefined;
 }
