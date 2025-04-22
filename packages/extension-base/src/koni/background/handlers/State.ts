@@ -46,7 +46,7 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, isSameAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
@@ -1290,7 +1290,8 @@ export default class KoniState {
 
     networkKey = chainInfo?.slug || 'cardano';
     const cardanoApi = this.chainService.getCardanoApi(networkKey);
-    const balances = await cardanoApi.getBalanceMap(address);
+    const networkAddress = reformatAddress(address, chainInfo?.isTestnet ? 0 : 1);
+    const balances = await cardanoApi.getBalanceMap(networkAddress);
 
     return convertAssetToValue(balances);
   }
@@ -1434,7 +1435,6 @@ export default class KoniState {
     requireKeyHashes.push(...extractKeyHashesFromWithdrawals(transactionBody.withdrawals()));
     requireKeyHashes.push(...extractKeyHashesFromRequiredSigners(transactionBody.required_signers()));
     requireKeyHashes.push(...(await extractKeyHashesFromCollaterals(transactionBody.collateral(), getSpecificUtxo(networkKey))));
-
     requireKeyHashes.push(...extractKeyHashesFromScripts(tx.witness_set().native_scripts()));
 
     requireKeyHashes = [...new Set(requireKeyHashes)];

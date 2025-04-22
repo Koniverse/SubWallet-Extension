@@ -12,7 +12,7 @@ export class CIP30Api {
   }
 
   getExtension () {
-    // Implementation here
+    return [{ cip: 30 }];
   }
 
   async getNetworkId () {

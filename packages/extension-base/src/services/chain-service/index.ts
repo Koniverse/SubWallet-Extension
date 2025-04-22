@@ -225,7 +225,7 @@ export class ChainService {
   public async getUtxosByAddress (address: string, slug: string, paginate?: CardanoPaginate): Promise<TransactionUnspentOutput[]> {
     const cardanoApi = this.getCardanoApi(slug);
 
-    const isTestnet = true;
+    const isTestnet = slug === 'cardano_preproduction';
 
     const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
     const limit = paginate?.limit || 100;

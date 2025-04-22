@@ -3,7 +3,6 @@
 
 import { AddressCardanoTransactionBalance, CardanoSignTransactionRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
-import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, MetaInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { CardanoSignArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
@@ -31,8 +30,15 @@ const filterAddresses = (inputs: Record<string, AddressCardanoTransactionBalance
   }).filter(Boolean) as string[];
 };
 
+// TODO: Support displaying any native token, not just ADA/TADA.
 const calculateAccountBalance = (value: CardanoBalanceItem[]) => {
-  return value.reduce((acc, item) => acc.plus(new BigNumber(item.quantity)), BN_ZERO).toString();
+  const lovelaceAmount = value.find((item) => item.unit === 'lovelace');
+
+  if (!lovelaceAmount) {
+    return '0';
+  }
+
+  return new BigNumber(lovelaceAmount.quantity).toString();
 };
 
 function Component ({ className, request, type }: Props) {
@@ -46,11 +52,12 @@ function Component ({ className, request, type }: Props) {
   const onClickDetail = useOpenDetailModal();
   const ownerAddresses = useMemo(() => filterAddresses(txInputs, 'isOwner'), [txInputs]);
   const recipientAddresses = useMemo(() => filterAddresses(txOutputs, 'isRecipient'), [txOutputs]);
+
   const amount = useMemo(() => calculateAccountBalance(value), [value]);
 
   const renderAccountTransactionDetail = useCallback((accountMap: Record<string, AddressCardanoTransactionBalance>) => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div className={'transaction-detail-container'}>
         {
           Object.entries(accountMap).map(([address, balances]) => {
             const account = findAccountByAddress(accounts, address);
@@ -86,17 +93,13 @@ function Component ({ className, request, type }: Props) {
         <div className='title'>
           {t('Transaction request')}
         </div>
-        <MetaInfo>
-          {
-            (
-              <MetaInfo.Number
-                decimals={chainInfo?.cardanoInfo?.decimals}
-                label={t('Amount')}
-                suffix={chainInfo?.cardanoInfo?.symbol}
-                value={amount}
-              />
-            )
-          }
+        <MetaInfo className={'confirmation-content-body'}>
+          <MetaInfo.Number
+            decimals={chainInfo?.cardanoInfo?.decimals}
+            label={t('Amount')}
+            suffix={chainInfo?.cardanoInfo?.symbol}
+            value={amount}
+          />
           <div className='input-transaction'>
             <div className='account-label'>{t('From Account')}</div>
             <div className={'account-list'}>
@@ -154,6 +157,7 @@ function Component ({ className, request, type }: Props) {
       />
       {(!errors || errors.length === 0) &&
         <BaseDetailModal
+          className={CN(className, 'transaction-detail-modal')}
           title={t('Transaction details')}
         >
           <MetaInfo>
@@ -176,21 +180,30 @@ const EvmTransactionConfirmation = styled(Component)<Props>(({ theme: { token } 
     display: 'flex',
     flexDirection: 'column',
     gap: token.marginXS,
-    marginBottom: token.margin,
 
     '.__prop-label': {
       marginRight: token.marginMD,
       width: '50%',
       float: 'left'
-    }
-  },
+    },
 
-  '.to-account': {
-    marginTop: token.margin - 2
+    '.account-info-item': {
+      marginTop: 0
+    }
   },
 
   '.__label': {
     textAlign: 'left'
+  },
+
+  '.confirmation-content-body': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: token.size
+  },
+
+  '.__account-item-name': {
+    maxWidth: 155
   },
 
   '.account-info-item, .to-account': {
@@ -202,6 +215,41 @@ const EvmTransactionConfirmation = styled(Component)<Props>(({ theme: { token } 
   '.input-transaction, .output-transaction': {
     display: 'flex',
     justifyContent: 'space-between'
+  },
+
+  '.transaction-detail-container': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: token.sizeXS,
+
+    '.account-item': {
+      backgroundColor: token.colorBgSecondary
+    },
+
+    '.__account-name-item': {
+      fontWeight: 600,
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6,
+      color: token.colorTextLight1,
+      fontFamily: token.fontFamily
+    },
+
+    '.account-item-address-wrapper': {
+      fontWeight: 600,
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6,
+      fontFamily: token.fontFamily
+    },
+
+    '.__item-right-part .ant-number': {
+      color: token.colorTextLight1
+    }
+  },
+
+  '&.transaction-detail-modal': {
+    '.__col.__value-col, .-type-data': {
+      marginTop: `${token.marginXS}px !important`
+    }
   }
 }));
 

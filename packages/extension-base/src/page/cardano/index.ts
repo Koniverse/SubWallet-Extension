@@ -22,37 +22,6 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
     this.sendMessage = sendMessage;
   }
 
-  // protected subscribeExtensionEvents () {
-  //   if (subscribeFlag) {
-  //     return;
-  //   }
-  //
-  //   this.sendMessage('evm(events.subscribe)', null, ({ payload, type }) => {
-  //     if (['connect', 'disconnect', 'accountsChanged', 'chainChanged', 'message', 'data', 'reconnect', 'error'].includes(type)) {
-  //       if (type === 'connect') {
-  //         this._connected = true;
-  //       } else if (type === 'disconnect') {
-  //         this._connected = false;
-  //       }
-  //
-  //       const finalType = type === 'data' ? 'message' : type;
-  //
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  //       this.emit(finalType, payload);
-  //     } else {
-  //       console.warn('Can not handle event', type, payload);
-  //     }
-  //   })
-  //     .then((done) => {
-  //       subscribeFlag = true;
-  //     })
-  //     .catch(() => {
-  //       subscribeFlag = false;
-  //     });
-  //
-  //   subscribeFlag = true;
-  // }
-
   public async enable () {
     const isEnabled = await this.sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes: ['cardano'] });
 
@@ -64,20 +33,6 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
 
     return Object.freeze(CIP30);
   }
-
-  // public override on (eventName: string | symbol, listener: (...args: any[]) => void): this {
-  //   this.subscribeExtensionEvents();
-  //   super.on(eventName, listener);
-  //
-  //   return this;
-  // }
-  //
-  // public override once (eventName: string | symbol, listener: (...args: any[]) => void): this {
-  //   this.subscribeExtensionEvents();
-  //   super.once(eventName, listener);
-  //
-  //   return this;
-  // }
 
   async isEnable (): Promise<boolean> {
     const accountList = await this.sendMessage('pub(accounts.list)', { accountAuthType: 'cardano' });

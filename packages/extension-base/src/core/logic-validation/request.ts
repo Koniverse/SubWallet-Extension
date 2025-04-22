@@ -689,7 +689,7 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
 
   const pair = pair_ || keyring.getPair(address);
 
-  if (pair?.meta.isExtneral) {
+  if (!pair?.meta.isExtneral) {
     canSign = true;
   }
 

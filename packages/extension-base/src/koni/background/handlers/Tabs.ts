@@ -4,7 +4,6 @@
 import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import { TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';

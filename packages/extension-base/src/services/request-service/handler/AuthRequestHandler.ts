@@ -174,7 +174,7 @@ export default class AuthRequestHandler {
     if (options.accessType === 'cardano') {
       const cardanoChains = Object.values(chainInfoMaps).filter(_isChainCardanoCompatible);
 
-      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : cardanoChains.find((chain) => chainStateMap[chain.slug]?.active)) || cardanoChains[0];
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.cardano) || cardanoChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
 
       if (options.autoActive) {
         if (!needEnableChains.includes(chainInfo?.slug)) {

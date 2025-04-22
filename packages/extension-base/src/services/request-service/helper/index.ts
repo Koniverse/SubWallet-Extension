@@ -120,12 +120,9 @@ export const convertValueToAsset = (value: CardanoWasm.Value): CardanoBalanceIte
 export const convertUtxoRawToUtxo = (utxos: CardanoUtxosItem[]) => {
   return utxos.map((utxo) => {
     const txHash = CardanoWasm.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex'));
-
     const txIndex = utxo.output_index;
-
     const input = CardanoWasm.TransactionInput.new(txHash, txIndex);
     const value = convertAssetToValue(utxo.amount);
-
     const txOutput = CardanoWasm.TransactionOutput.new(
       CardanoWasm.Address.from_bech32(utxo.address),
       value
