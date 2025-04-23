@@ -6792,9 +6792,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/subwallet-api-sdk": ^1.3.30-0
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
     "@ton/ton": ^15.0.0
@@ -6895,7 +6895,7 @@ __metadata:
     "@polkadot/util": ^13.4.3
     "@polkadot/util-crypto": ^13.4.3
     "@polkadot/x-global": ^13.4.3
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@types/chrome": ^0.0.254
     "@types/firefox-webext-browser": ^120.0.0
     web3-core: ^1.10.0
@@ -6932,9 +6932,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/react-ui": 5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7073,9 +7073,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/react-ui": ^5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7138,9 +7138,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@file:C:\\Users\\ADMIN\\WebstormProjects\\SubWallet-Base\\packages\\keyring\\build::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.1.8
-  resolution: "@subwallet/keyring@file:/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/keyring/build#/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/keyring/build::hash=1eef90&locator=root-workspace-0b6124%40workspace%3A."
+"@subwallet/keyring@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@subwallet/keyring@npm:0.1.11"
   dependencies:
     "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
@@ -7162,7 +7162,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: be06da686b5876b9b29fa2b33f869067365be77de0be98b572b5f0f6b8ec392ce65b89486dbcd6919b5d7a9f4e6bae2572646f1ce9014befee41aa8ece05cf92
+  checksum: 837326dd891caad047fd0b665514748d8f04b8e322ba813ee82ae626ed81138d492227a455f7082445dfaaa3e28bc05ce6433f7cda64b54fe150d4c76d9bac8c
   languageName: node
   linkType: hard
 
@@ -7253,19 +7253,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@file:C:\\Users\\ADMIN\\WebstormProjects\\SubWallet-Base\\packages\\ui-keyring\\build::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.1.8
-  resolution: "@subwallet/ui-keyring@file:/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/ui-keyring/build#/C%3A/Users/ADMIN/WebstormProjects/SubWallet-Base/packages/ui-keyring/build::hash=2461da&locator=root-workspace-0b6124%40workspace%3A."
+"@subwallet/ui-keyring@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@subwallet/ui-keyring@npm:0.1.11"
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
-    "@subwallet/keyring": ^0.1.8
+    "@subwallet/keyring": ^0.1.11
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: ee667a5b5f314d12f2690728879adb24ad35789f7b2d9c56d9851d2c4daea18c1c1326ea9741417b8ce1562dbd3ffc7d3734afb69456c2ffec63ab5e519f8e5c
+  checksum: 39ccad8d6301a7006d569f3ea5f6e3788624d6780afac08a58738129a9179919aadb6d03a995acdb84d6268f16f101690ad9a91765ef331a78bbe3e42369ade8
   languageName: node
   linkType: hard
 
