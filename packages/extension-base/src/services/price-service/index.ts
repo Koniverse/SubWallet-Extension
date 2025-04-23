@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryCurrentTokenPrice, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyJson, CurrencyType, CurrentTokenPrice, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -10,10 +10,10 @@ import { getExchangeRateMap, getHistoryPrice, getPriceMap } from '@subwallet/ext
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
-import { getTimeRange, getTokenPriceHistoryId, resampleChartData, wait } from '@subwallet/extension-base/utils';
+import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
-import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
 
 const DEFAULT_CURRENCY: CurrencyType = 'USD';
 const DEFAULT_PRICE_SUBJECT: PriceJson = {
@@ -22,7 +22,8 @@ const DEFAULT_PRICE_SUBJECT: PriceJson = {
   currencyData: { label: 'United States Dollar', symbol: DEFAULT_CURRENCY, isPrefix: true },
   priceMap: {},
   price24hMap: {},
-  exchangeRateMap: {}
+  exchangeRateMap: {},
+  lastUpdatedMap: {}
 };
 
 const checkFetchSuccess = (obj1: Omit<PriceJson, 'exchangeRateMap'>, obj2: Record<CurrencyType, ExchangeRateJSON>) => {
@@ -121,7 +122,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   }
 
   private async calculatePriceMap (currency?: CurrencyType) {
-    let { price24hMap, priceMap } = this.rawPriceSubject.value;
+    let { lastUpdatedMap, price24hMap, priceMap } = this.rawPriceSubject.value;
     let exchangeRateData = this.rawExchangeRateMap.value;
     const priceStored = await this.dbService.getPriceStore(currency);
 
@@ -145,7 +146,8 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       price24hMap: { ...price24hMap },
       currency: currencyKey,
       exchangeRateMap: exchangeRateData,
-      currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson
+      currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson,
+      lastUpdatedMap: { ...lastUpdatedMap }
     };
 
     if (currencyKey === DEFAULT_CURRENCY) {
@@ -208,19 +210,23 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   public async getHistoryTokenPriceData (priceId: string, timeframe: PriceChartTimeframe): Promise<HistoryTokenPriceJSON> {
     const id = getTokenPriceHistoryId(priceId, timeframe);
     let historyTokenPriceData = this.historyTokenPriceSubject.value[id];
-    const now = Math.floor(Date.now() / 1000);
-    const { from, granularity, to } = getTimeRange(timeframe);
 
-    if (historyTokenPriceData && to - now <= granularity) {
-      return {
-        history: resampleChartData(historyTokenPriceData, timeframe)
-      };
-    } else {
-      const newHistoryTokenPriceData = await getHistoryPrice(priceId, DEFAULT_CURRENCY, from, to);
+    if (historyTokenPriceData) {
+      const now = Date.now();
+      const lastTime = historyTokenPriceData[historyTokenPriceData.length - 1].time;
+      const timeInterval = TIME_INTERVAL[timeframe];
 
-      if (newHistoryTokenPriceData.length) {
-        historyTokenPriceData = [...newHistoryTokenPriceData];
+      if (lastTime - now <= timeInterval) {
+        return {
+          history: historyTokenPriceData
+        };
       }
+    }
+
+    const newHistoryTokenPriceData = await getHistoryPrice(priceId, timeframe);
+
+    if (newHistoryTokenPriceData.history.length) {
+      historyTokenPriceData = [...newHistoryTokenPriceData.history];
     }
 
     const { promise, resolve } = createPromiseHandler<CurrencyType>();
@@ -247,57 +253,34 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     }
 
     return {
-      history: resampleChartData(historyTokenPriceData, timeframe)
+      history: historyTokenPriceData
     };
   }
 
-  public async getHistoryCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
-    const { lastUpdate, price24hMap, priceMap } = await getPriceMap(new Set([priceId]), DEFAULT_CURRENCY);
-    const { promise, resolve } = createPromiseHandler<CurrencyType>();
-    let priceResult = {} as HistoryCurrentTokenPrice;
+  public subscribeCurrentTokenPrice (priceId: string, callback: (price: CurrentTokenPrice) => void) {
+    const priceData = this.priceSubject.value;
 
-    if (Object.keys(price24hMap).length && Object.keys(priceMap).length) {
-      const priceStored = await this.getPrice();
+    const currentPrice = {
+      value: priceData.priceMap[priceId],
+      value24h: priceData.price24hMap[priceId],
+      time: priceData.lastUpdatedMap[priceId].getTime()
+    };
 
-      priceResult = {
-        value: priceStored.priceMap[priceId],
-        value24h: priceStored.price24hMap[priceId],
-        time: Date.now()
-      };
-    }
+    const unsubscribe = this.priceSubject.pipe<CurrentTokenPrice, CurrentTokenPrice>(
+      map<PriceJson, CurrentTokenPrice>((valueSubject) => ({
+        value: valueSubject.priceMap[priceId],
+        value24h: valueSubject.price24hMap[priceId],
+        time: valueSubject.lastUpdatedMap[priceId].getTime()
+      })),
+      distinctUntilChanged<CurrentTokenPrice>()
+    ).subscribe(callback);
 
-    this.getCurrentCurrency(resolve);
-
-    const currencyKey = await promise;
-
-    const exchangeRateMap = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY];
-
-    if (exchangeRateMap && currencyKey !== DEFAULT_CURRENCY) {
-      priceResult.value24h = exchangeRateMap.exchange * price24hMap[priceId];
-      priceResult.value = exchangeRateMap.exchange * priceMap[priceId];
-    }
-
-    if (lastUpdate) {
-      priceResult.time = lastUpdate.getTime();
-    }
-
-    if (priceResult.value && priceResult.value24h) {
-      const priceStored = await this.getPrice();
-
-      this.priceSubject.next({
-        ...priceStored,
-        priceMap: {
-          ...priceStored.priceMap,
-          [priceId]: priceResult.value
-        },
-        price24hMap: {
-          ...priceStored.price24hMap,
-          [priceId]: priceResult.value24h
-        }
-      });
-    }
-
-    return priceResult;
+    return {
+      unsubscribe: () => {
+        unsubscribe.unsubscribe();
+      },
+      currentPrice
+    };
   }
 
   async init (): Promise<void> {

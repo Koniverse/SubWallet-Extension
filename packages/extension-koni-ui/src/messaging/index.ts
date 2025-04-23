@@ -3,7 +3,7 @@
 
 import type { WindowOpenParams } from '@subwallet/extension-base/background/types';
 
-import { CronReloadRequest, HistoryCurrentTokenPrice, Notification, PriceChartTimeframe, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { CronReloadRequest, CurrentTokenPrice, Notification, PriceChartTimeframe, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging/base';
 
@@ -48,8 +48,8 @@ export async function getHistoryTokenPrice (priceId: string, timeframe: PriceCha
   return sendMessage('pri(price.getHistory)', { priceId, timeframe });
 }
 
-export async function getAndUpdateCurrentPrice (priceId: string): Promise<HistoryCurrentTokenPrice> {
-  return sendMessage('pri(price.getAndUpdateCurrentPrice)', priceId);
+export async function subscribeCurrentTokenPrice (priceId: string, callback: (item: CurrentTokenPrice) => void): Promise<ResponseSubscribeCurrentTokenPrice> {
+  return sendMessage('pri(price.subscribeCurrentTokenPrice)', priceId, callback);
 }
 
 export * from './accounts';

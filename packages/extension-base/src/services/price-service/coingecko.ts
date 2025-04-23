@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceChartPoint, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { isProductionMode } from '@subwallet/extension-base/constants';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
+import { subwalletApiSdk } from '@subwallet/subwallet-api-sdk';
 
 import { isArray } from '@polkadot/util';
 
@@ -13,7 +14,8 @@ interface GeckoItem {
   current_price: number,
   price_change_24h: number,
   symbol: string,
-  last_updated: string
+  last_updated?: string,
+  last_updated_at?: string
 }
 
 interface DerivativeTokenPrice {
@@ -33,12 +35,6 @@ interface ExchangeRateItem {
   time_next_update_utc: number,
   base_code: string,
   conversion_rates: Record<string, number>
-}
-
-interface HistoryTokenPriceItem {
-  prices: number[][],
-  market_caps: number[][],
-  total_volumes: number[][]
 }
 
 const DEFAULT_CURRENCY = 'USD';
@@ -161,6 +157,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
     const currencyData = staticData[StaticKey.CURRENCY_SYMBOL][currency || DEFAULT_CURRENCY] as CurrencyJson;
     const priceMap: Record<string, number> = {};
     const price24hMap: Record<string, number> = {};
+    const lastUpdatedMap: Record<string, Date> = {};
 
     responseDataPrice.forEach((val) => {
       const currentPrice = val.current_price || 0;
@@ -168,6 +165,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
 
       priceMap[val.id] = currentPrice;
       price24hMap[val.id] = price24h;
+      lastUpdatedMap[val.id] = new Date(val.last_updated || val.last_updated_at || Date.now());
     });
 
     const derivativeTokenSlugs = await fetchDerivativeTokenSlugs();
@@ -183,58 +181,28 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       });
     }
 
-    let lastUpdate: Date | undefined;
-
-    // Check if there is only one price ID, get the last updated date from this token
-    if (priceIds.size === 1 && responseDataPrice[0] && responseDataPrice[0].last_updated) {
-      lastUpdate = new Date(responseDataPrice[0].last_updated);
-    }
-
     return {
       currency,
       currencyData,
       priceMap,
       price24hMap,
-      lastUpdate
+      lastUpdatedMap
     };
   } catch (e) {
     return {} as Omit<PriceJson, 'exchangeRateMap'>;
   }
 };
 
-export const getHistoryPrice = async (priceId: string, currency: CurrencyType = 'USD', from: string | number, to: string | number = '365'): Promise<PriceChartPoint[]> => {
-  let response: Response | undefined;
-
+export const getHistoryPrice = async (priceId: string, type: PriceChartTimeframe): Promise<HistoryTokenPriceJSON> => {
   try {
-    response = await fetch(`https://api.coingecko.com/api/v3/coins/${priceId}/market_chart/range?vs_currency=${currency.toLowerCase()}&from=${from}&to=${to}`);
+    const response = await subwalletApiSdk.priceHistoryApi?.getPriceHistory(priceId, type);
 
-    // if (useBackupApi || response?.status !== 200) {
-    //   useBackupApi = true;
-    //
-    //   try {
-    //     response = await fetch(`${apiCacheDomain}/api/price/history-price?ids=${priceId}&vs_currency=${currency.toLowerCase()}&days=90&interval=${type}`);
-    //   } catch (e) {}
-    //
-    //   if (response?.status !== 200) {
-    //     try {
-    //       response = await fetch('https://static-cache.subwallet.app/price/data.json');
-    //     } catch (e) {}
-    //   }
-    // }
-
-    const historyData = (await response?.json() || {}) as HistoryTokenPriceItem;
-
-    if (historyData.prices) {
-      const prices = historyData.prices.map((item) => {
-        return {
-          time: item[0],
-          value: item[1]
-        };
-      });
-
-      return prices;
+    if (response) {
+      return response;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Error fetching price history:', e);
+  }
 
-  return [];
+  return { history: [] };
 };

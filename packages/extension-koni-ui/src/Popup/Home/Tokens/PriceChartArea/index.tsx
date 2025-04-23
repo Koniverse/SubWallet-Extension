@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
-import { getAndUpdateCurrentPrice, getHistoryTokenPrice } from '@subwallet/extension-koni-ui/messaging';
+import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -53,8 +53,8 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   const { interval } = TIMEFRAMES[selectedTimeframe];
 
   const mergedRawPricePoints = useMemo<PriceChartPoint[]>(() => {
-    if (!livePrice || rawPricePoints.length === 0) {
-      return rawPricePoints;
+    if (!livePrice || !rawPricePoints || rawPricePoints?.length === 0) {
+      return [];
     }
 
     const last = rawPricePoints[rawPricePoints.length - 1];
@@ -110,18 +110,25 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   }, [priceId, selectedTimeframe]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      (async () => {
-        const data = await getAndUpdateCurrentPrice(priceId);
+    let idSubscription: string;
 
-        setLivePrice({
-          time: data.time,
-          value: data.value
-        });
-      })().catch(console.error);
-    }, 30000);
+    const cb = (price: LivePrice) => {
+      setLivePrice(price);
+    };
 
-    return () => clearInterval(intervalId);
+    subscribeCurrentTokenPrice(priceId, cb).then((rs) => {
+      const { id, price } = rs;
+
+      idSubscription = id;
+
+      setLivePrice(price);
+    }).catch(console.error);
+
+    return () => {
+      if (idSubscription) {
+        cancelSubscription(idSubscription).catch(console.error);
+      }
+    };
   }, [priceId]);
 
   return (

@@ -191,14 +191,19 @@ export interface PriceJson {
   exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
   price24hMap: Record<string, number>,
-  lastUpdate?: Date
+  lastUpdatedMap: Record<string, Date>
 }
 
 export interface HistoryTokenPriceJSON {
   history: PriceChartPoint[];
 }
 
-export interface HistoryCurrentTokenPrice {
+export interface ResponseSubscribeCurrentTokenPrice {
+  id: string;
+  price: CurrentTokenPrice;
+}
+
+export interface CurrentTokenPrice {
   value: number;
   value24h: number;
   time: number;
@@ -2103,7 +2108,7 @@ export interface KoniRequestSignatures {
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
   'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
-  'pri(price.getAndUpdateCurrentPrice)': [string, HistoryCurrentTokenPrice];
+  'pri(price.subscribeCurrentTokenPrice)': [string, ResponseSubscribeCurrentTokenPrice, CurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
   'pri(crowdloan.getCrowdloan)': [RequestCrowdloan, CrowdloanJson];
