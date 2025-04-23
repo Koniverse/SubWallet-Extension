@@ -130,6 +130,7 @@ export class SwapService implements StoppableServiceInterface {
 
     console.group('Swap Logger');
     console.log('path', path);
+    console.log('swapQuoteResponse', swapQuoteResponse);
 
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
