@@ -4,6 +4,7 @@
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _Address } from '@subwallet/extension-base/background/KoniTypes';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -156,6 +157,9 @@ export function _isPosBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _Ch
   return _isPosChainBridge(originChainInfo.slug, destChainInfo.slug);
 }
 
+export function _isAcrossBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return _isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug);
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 function _getMultiLocationParent (originChainInfo: _ChainInfo, isWithinSameConsensus: boolean): number {
