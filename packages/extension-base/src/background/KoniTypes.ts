@@ -37,6 +37,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
+import { _ReferendumInfo, StandardVoteRequest } from '../services/open-gov/type';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2450,6 +2451,10 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+
+  /* Gov */
+  'pri(openGov.fetchReferendums)': [string, _ReferendumInfo[]];
+  'pri(openGov.standardVote)': [StandardVoteRequest, SWTransactionResponse];
 }
 
 export interface ApplicationMetadataType {

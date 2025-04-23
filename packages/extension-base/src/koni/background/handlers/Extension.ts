@@ -48,6 +48,7 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { _ReferendumInfo, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -4688,6 +4689,18 @@ export default class KoniExtension {
   }
   /* Migrate Unified Account */
 
+  /* Gov */
+  private async fetchReferendums (request: string): Promise<_ReferendumInfo[]> {
+    const data = await this.#koniState.openGovService.fetchReferendums(request);
+
+    return data;
+  }
+
+  // private standardVote (request: StandardVoteRequest): SWTransactionResponse {
+  //   return this.#koniState.openGovService.standardVote(request);
+  // }
+  /* Gov */
+
   // --------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], port: chrome.runtime.Port): Promise<ResponseType<TMessageType>> {
@@ -5341,6 +5354,14 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+
+        /* Gov */
+      case 'pri(openGov.fetchReferendums)':
+        return this.fetchReferendums(request as string);
+      case 'pri(openGov.standardVote)':
+        return this.standardVote(request as StandardVoteRequest);
+        /* Gov */
+
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

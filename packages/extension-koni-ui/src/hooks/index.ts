@@ -17,6 +17,7 @@ export * from './router';
 export * from './screen';
 export * from './wallet-connect';
 export * from './history';
+export * from './opengov';
 export * from './earning';
 export * from './staticContent';
 export * from './browser';
