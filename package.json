@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@types/node": "^17.0.10",
+    "bitcoinjs-lib": "^6.1.7",
     "dexie": "^3.2.2",
     "loglevel": "^1.8.1",
     "react-markdown": "^9.0.1",

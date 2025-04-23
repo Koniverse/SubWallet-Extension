@@ -9,6 +9,7 @@ import { AppConfig, BrowserConfig, OSConfig } from '@subwallet/extension-base/co
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
+import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
@@ -27,6 +28,8 @@ import { KeyringPair$Meta } from '@subwallet/keyring/types';
 import { KeyringOptions } from '@subwallet/ui-keyring/options/types';
 import { KeyringAddress } from '@subwallet/ui-keyring/types';
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
+import { Psbt } from 'bitcoinjs-lib';
+import BN from 'bn.js';
 import { DexieExportJsonStructure } from 'dexie-export-import';
 import Web3 from 'web3';
 import { RequestArguments, TransactionConfig } from 'web3-core';
@@ -1079,6 +1082,16 @@ export enum EvmProviderErrorType {
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
+export enum BitcoinProviderErrorType {
+  USER_REJECTED_REQUEST = 'USER_REJECTED_REQUEST',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  UNSUPPORTED_METHOD = 'UNSUPPORTED_METHOD',
+  DISCONNECTED = 'DISCONNECTED',
+  CHAIN_DISCONNECTED = 'CHAIN_DISCONNECTED',
+  INVALID_PARAMS = 'INVALID_PARAMS',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+}
+
 export interface EvmSendTransactionParams {
   from: string;
   to?: string;
@@ -1095,6 +1108,54 @@ export interface EvmSignRequest {
   address: string;
   hashPayload: string;
   canSign: boolean;
+}
+
+export interface BitcoinSignRequest {
+  account: AccountJson;
+  hashPayload: string;
+  canSign: boolean;
+}
+
+export interface BitcoinRecipientTransactionParams{
+  address: string;
+  amount: string;
+}
+
+export interface BitcoinSendTransactionParams {
+  account: string;
+  network: 'mainnet' | 'testnet';
+  recipients: BitcoinRecipientTransactionParams[]
+}
+
+export interface PsbtTransactionArg {
+  address?: string;
+  amount?: string;
+}
+
+export interface BitcoinSignPsbtPayload extends Omit<BitcoinSignPsbtRawRequest, 'psbt'>{
+  txInput: PsbtTransactionArg[];
+  txOutput: PsbtTransactionArg[];
+  to: string;
+  value: string;
+  psbt: Psbt;
+  tokenSlug: string;
+}
+
+enum SignatureHash {
+  DEFAULT = 0,
+  ALL = 1,
+  NONE = 2,
+  SINGLE = 3,
+  ANYONECANPAY = 128
+}
+
+export interface BitcoinSignPsbtRawRequest {
+  psbt: string;
+  allowedSighash?: SignatureHash[];
+  signAtIndex?: number | number[];
+  broadcast?: boolean;
+  network: string;
+  account: string;
 }
 
 export interface TonSignRequest {
@@ -1141,6 +1202,21 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   errors?: ErrorValidation[]
 }
 
+export interface BitcoinSendTransactionRequest extends BitcoinSignRequest, BitcoinTransactionConfig {}
+
+export interface BitcoinSignatureRequest extends BitcoinSignRequest {
+  id: string;
+  payload: unknown;
+  payloadJson: any;
+}
+
+export interface BitcoinAppState {
+  networkKey?: string,
+  isConnected?: boolean,
+  strategy?: BitcoinApiStrategy,
+  listenEvents?: string[]
+}
+
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
 export type CardanoSendTransactionRequest = CardanoTransactionConfig;
@@ -1148,12 +1224,36 @@ export type CardanoSendTransactionRequest = CardanoTransactionConfig;
 export type EvmWatchTransactionRequest = EvmSendTransactionRequest;
 export type TonWatchTransactionRequest = TonSendTransactionRequest;
 export type CardanoWatchTransactionRequest = CardanoSendTransactionRequest;
+export type BitcoinWatchTransactionRequest = BitcoinSendTransactionRequest;
+export type BitcoinSignPsbtRequest = BitcoinSignRequest & {
+  payload: BitcoinSignPsbtPayload;
+};
 
 export interface ConfirmationsQueueItemOptions {
   requiredPassword?: boolean;
   address?: string;
   networkKey?: string;
   isPassConfirmation?: boolean;
+}
+
+export interface BitcoinTransactionConfig{
+  id?: string,
+  from?: string | number;
+  to?: BitcoinRecipientTransactionParams[];
+  value?: number | string | BN;
+  networkKey?: string;
+  tokenSlug?: string;
+}
+
+export interface SignMessageBitcoinResult {
+  signature: string;
+  message: string;
+  address: string;
+}
+
+export interface SignPsbtBitcoinResult {
+  psbt: string;
+  txid?: string
 }
 
 export interface ConfirmationsQueueItem<T> extends ConfirmationsQueueItemOptions, ConfirmationRequestBase {
@@ -1220,6 +1320,14 @@ export interface ConfirmationDefinitionsCardano {
   cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
 }
 
+export interface ConfirmationDefinitionsBitcoin {
+  bitcoinSignatureRequest: [ConfirmationsQueueItem<BitcoinSignatureRequest>, ConfirmationResult<SignMessageBitcoinResult>],
+  bitcoinSendTransactionRequest: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
+  bitcoinSendTransactionRequestAfterConfirmation: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
+  bitcoinWatchTransactionRequest: [ConfirmationsQueueItem<BitcoinWatchTransactionRequest>, ConfirmationResult<string>],
+  bitcoinSignPsbtRequest: [ConfirmationsQueueItem<BitcoinSignPsbtRequest>, ConfirmationResult<SignPsbtBitcoinResult>],
+}
+
 export type ConfirmationType = keyof ConfirmationDefinitions;
 export type ConfirmationTypeTon = keyof ConfirmationDefinitionsTon;
 export type ConfirmationTypeCardano = keyof ConfirmationDefinitionsCardano;
@@ -1234,14 +1342,26 @@ export type ConfirmationsQueueCardano = {
   [CT in ConfirmationTypeCardano]: Record<string, ConfirmationDefinitionsCardano[CT][0]>;
 }
 
+export type ConfirmationTypeBitcoin = keyof ConfirmationDefinitionsBitcoin;
+
+export type ConfirmationsQueueBitcoin = {
+  [CT in ConfirmationTypeBitcoin]: Record<string, ConfirmationDefinitionsBitcoin[CT][0]>;
+}
+
 export type RequestConfirmationsSubscribe = null;
 export type RequestConfirmationsSubscribeTon = null;
 export type RequestConfirmationsSubscribeCardano = null;
+export type RequestConfirmationsSubscribeBitcoin = null;
 
 // Design to use only one confirmation
 export type RequestConfirmationComplete = {
   [CT in ConfirmationType]?: ConfirmationDefinitions[CT][1];
 }
+
+export type RequestConfirmationCompleteBitcoin = {
+  [CT in ConfirmationTypeBitcoin]?: ConfirmationDefinitionsBitcoin[CT][1];
+}
+
 export type RequestConfirmationCompleteTon = {
   [CT in ConfirmationTypeTon]?: ConfirmationDefinitionsTon[CT][1];
 }
@@ -2296,6 +2416,7 @@ export interface KoniRequestSignatures {
   'pri(confirmations.subscribe)': [RequestConfirmationsSubscribe, ConfirmationsQueue, ConfirmationsQueue];
   'pri(confirmationsTon.subscribe)': [RequestConfirmationsSubscribeTon, ConfirmationsQueueTon, ConfirmationsQueueTon];
   'pri(confirmationsCardano.subscribe)': [RequestConfirmationsSubscribeCardano, ConfirmationsQueueCardano, ConfirmationsQueueCardano];
+  'pri(confirmationsBitcoin.subscribe)': [RequestConfirmationsSubscribeBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueBitcoin];
   'pri(confirmations.complete)': [RequestConfirmationComplete, boolean];
   'pri(confirmationsTon.complete)': [RequestConfirmationCompleteTon, boolean];
   'pri(confirmationsCardano.complete)': [RequestConfirmationCompleteCardano, boolean];

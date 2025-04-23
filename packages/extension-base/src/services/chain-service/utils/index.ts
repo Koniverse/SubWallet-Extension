@@ -142,6 +142,11 @@ export function _isTokenTransferredByCardano (tokenInfo: _ChainAsset) {
   return _isCIP26Token(tokenInfo) || _isNativeToken(tokenInfo);
 }
 
+// TODO Note: Currently supports transferring only the native token, Bitcoin.
+export function _isTokenTransferredByBitcoin (tokenInfo: _ChainAsset) {
+  return _isNativeToken(tokenInfo);
+}
+
 // Utils for balance functions
 export function _getTokenOnChainAssetId (tokenInfo: _ChainAsset): string {
   return tokenInfo.metadata?.assetId as string || '-1';

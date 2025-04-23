@@ -11236,6 +11236,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bitcoinjs-lib@npm:^6.1.7":
+  version: 6.1.7
+  resolution: "bitcoinjs-lib@npm:6.1.7"
+  dependencies:
+    "@noble/hashes": ^1.2.0
+    bech32: ^2.0.0
+    bip174: ^2.1.1
+    bs58check: ^3.0.1
+    typeforce: ^1.11.3
+    varuint-bitcoin: ^1.1.2
+  checksum: 2fbac2bffc2fe0e1d5441fc09f092fa8a83a4572b10fd2601c960e19a60cdcab81b6bff8cefcefda80b952fe8795387c97219fc4676995bf554f26f3d9aadc58
+  languageName: node
+  linkType: hard
+
 "bitcoinjs-message@npm:^2.2.0":
   version: 2.2.0
   resolution: "bitcoinjs-message@npm:2.2.0"
@@ -25908,6 +25922,7 @@ __metadata:
     "@types/jest": ^29.5.0
     "@types/node": ^17.0.10
     axios: ^1.6.2
+    bitcoinjs-lib: ^6.1.7
     dexie: ^3.2.2
     discord-webhook-node: ^1.1.8
     i18next-scanner: ^4.0.0

@@ -30,6 +30,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
+import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -42,7 +43,7 @@ import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/
 import { DryRunInfo } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
@@ -67,6 +68,7 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { getKeypairTypeByAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { KeyringAddress, KeyringJson$Meta } from '@subwallet/ui-keyring/types';
@@ -74,6 +76,7 @@ import { ProposalTypes } from '@walletconnect/types/dist/types/sign-client/propo
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
+import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 import { t } from 'i18next';
 import { combineLatest, Subject } from 'rxjs';
 import { TransactionConfig } from 'web3-core';
@@ -1431,6 +1434,25 @@ export default class KoniExtension {
           cardanoApi,
           nativeTokenInfo
         });
+      } else if (isBitcoinAddress(from) && isBitcoinAddress(to) && _isTokenTransferredByBitcoin(transferTokenInfo)) {
+        // Note: Currently supports transferring only the native token, Bitcoin.
+        chainType = ChainType.BITCOIN;
+        const chainInfo = this.#koniState.getChainInfo(chain);
+
+        const network = chainInfo.isTestnet ? testnet : bitcoin;
+        const txVal: string = transferAll ? transferTokenAvailable.value : (value || '0');
+        const bitcoinApi = this.#koniState.getBitcoinApi(chain);
+        const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'bitcoin');
+
+        [transaction, transferAmount.value] = await createBitcoinTransaction({
+          bitcoinApi,
+          chain,
+          from,
+          feeInfo,
+          to,
+          transferAll: !!transferAll,
+          value: txVal,
+          network: network });
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 
@@ -2030,6 +2052,7 @@ export default class KoniExtension {
       srcToken,
       substrateApi: this.#koniState.chainService.getSubstrateApi(chain),
       tonApi: this.#koniState.chainService.getTonApi(chain),
+      bitcoinApi: this.#koniState.chainService.getBitcoinApi(chain),
       isTransferLocalTokenAndPayThatTokenAsFee,
       isTransferNativeTokenAndPayLocalTokenAsFee,
       nativeToken
@@ -2250,6 +2273,20 @@ export default class KoniExtension {
     });
 
     return this.#koniState.getConfirmationsQueueSubjectCardano().getValue();
+  }
+
+  private subscribeConfirmationsBitcoin (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(confirmationsBitcoin.subscribe)'>(id, port);
+
+    const subscription = this.#koniState.getConfirmationsQueueSubjectBitcoin().subscribe(cb);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.getConfirmationsQueueSubjectBitcoin().getValue();
   }
 
   private async completeConfirmation (request: RequestConfirmationComplete) {
@@ -5080,6 +5117,8 @@ export default class KoniExtension {
         return this.subscribeConfirmationsTon(id, port);
       case 'pri(confirmationsCardano.subscribe)':
         return this.subscribeConfirmationsCardano(id, port);
+      case 'pri(confirmationsBitcoin.subscribe)':
+        return this.subscribeConfirmationsBitcoin(id, port);
       case 'pri(confirmations.complete)':
         return await this.completeConfirmation(request as RequestConfirmationComplete);
       case 'pri(confirmationsTon.complete)':

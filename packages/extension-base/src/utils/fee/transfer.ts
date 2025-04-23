@@ -15,8 +15,8 @@ import { _isAcrossChainBridge, _isAcrossTestnetBridge } from '@subwallet/extensi
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getContractAddressOfToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals, _getContractAddressOfToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
@@ -45,6 +45,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   evmApi: _EvmApi;
   tonApi: _TonApi;
   cardanoApi: _CardanoApi;
+  bitcoinApi: _BitcoinApi;
   isTransferLocalTokenAndPayThatTokenAsFee: boolean;
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
@@ -68,6 +69,8 @@ export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo
       return 'ton';
     } else if (_isChainCardanoCompatible(srcChain) && _isTokenTransferredByCardano(srcToken)) {
       return 'cardano';
+    } else if (_isChainBitcoinCompatible(srcChain) && _isTokenTransferredByBitcoin(srcToken)) {
+      return 'bitcoin';
     } else {
       return 'substrate';
     }
@@ -98,7 +101,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, tonApi, value } = request;
+  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, tonApi, value } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
@@ -167,7 +170,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         cardanoApi,
         nativeTokenInfo: nativeToken
       });
-    } else {
+    } else { // TODO: Support maxTransferable for bitcoin
       [transaction] = await createSubstrateExtrinsic({
         transferAll: false,
         value,
