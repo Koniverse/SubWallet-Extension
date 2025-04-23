@@ -784,10 +784,6 @@ export default class DatabaseService {
     return JSON.parse(await this.exportDB()) as DexieExportJsonStructure;
   }
 
-  public hasRunScript (key: string): Promise<boolean> {
-    return this.stores.migration.hasRunScript(key);
-  }
-
   public upsertProcessTransaction (processTransaction: ProcessTransactionData) {
     return this.stores.processTransactions.upsert(processTransaction);
   }
