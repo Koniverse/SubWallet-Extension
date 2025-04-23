@@ -10,7 +10,7 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import { anyNumberToBN } from '@subwallet/extension-base/utils/eth';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
-import { createAndSignEip7702DelegationAuthorization, Simple7702Account, UserOperationV8 } from 'abstractionkit';
+import { UserOperationV8 } from 'abstractionkit';
 import BigN from 'bignumber.js';
 import BN from 'bn.js';
 import { toBuffer } from 'ethereumjs-util';
@@ -329,21 +329,15 @@ export default class EvmRequestHandler {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const userOp = eip7702Payload?.payload as UserOperationV8;
 
+        const pair = keyring.getPair(userOp.sender);
+
+        if (pair.isLocked) {
+          keyring.unlockPair(pair.address);
+        }
+
         console.log('user op', eip7702Payload);
 
-        const privateKey = '';
-        const smartAccount = new Simple7702Account(userOp.sender);
-
-        userOp.eip7702Auth = createAndSignEip7702DelegationAuthorization(
-          BigInt(userOp.eip7702Auth.chainId),
-          userOp.eip7702Auth.address,
-          BigInt(userOp.eip7702Auth.nonce),
-          privateKey
-        );
-
-        userOp.signature = smartAccount.signUserOperation(userOp, privateKey, BigInt(userOp.eip7702Auth.chainId));
-
-        result.payload = userOp;
+        result.payload = pair.evm.signUserOperationWith7702(userOp);
         console.log('signed', userOp);
       } else if (t === 'evmSendTransactionRequest') {
         result.payload = await this.signTransaction(request as ConfirmationDefinitions['evmSendTransactionRequest'][0]);
