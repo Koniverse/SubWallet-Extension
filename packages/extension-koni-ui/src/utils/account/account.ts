@@ -15,6 +15,7 @@ import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/c
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
 import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
+import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -179,6 +180,8 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return accountJson.address;
   } else if (accountJson.chainType === AccountChainType.TON && chainInfo.tonInfo) {
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
+  } else if (accountJson.chainType === AccountChainType.CARDANO && chainInfo.cardanoInfo) {
+    return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
   }
 
   return undefined;
@@ -217,6 +220,16 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
 
   return false;
 };
+
+export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, string> {
+  return {
+    [AccountChainType.SUBSTRATE]: logoMap.network.polkadot as string,
+    [AccountChainType.ETHEREUM]: logoMap.network.ethereum as string,
+    [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string,
+    [AccountChainType.TON]: logoMap.network.ton as string,
+    [AccountChainType.CARDANO]: logoMap.network.cardano as string
+  };
+}
 
 export const shouldShowAllAccount = (list: AccountProxy[], hasSearchValue = false) => {
   if (hasSearchValue) return false;

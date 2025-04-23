@@ -10,7 +10,7 @@ import { _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSym
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE } from '@subwallet/extension-base/types';
-import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { CommonFeeComponent, CommonOptimalSwapPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest, SwapStepType } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isAccountAll, isSameAddress, swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddMoreBalanceModal, AddressInputNew, AlertBox, ChooseFeeTokenModal, HiddenInput, MetaInfo, PageWrapper, QuoteResetTime, SlippageModal, SwapFromField, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapRoute, SwapTermsOfServiceModal, SwapToField } from '@subwallet/extension-web-ui/components';
@@ -105,7 +105,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
-  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
+  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
   // @ts-ignore
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);

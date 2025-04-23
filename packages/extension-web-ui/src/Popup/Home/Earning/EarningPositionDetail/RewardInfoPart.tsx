@@ -55,6 +55,8 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         return isDAppStaking;
       case YieldPoolType.NOMINATION_POOL:
         return true;
+      default:
+        return false;
     }
   }, [isDAppStaking, type]);
 

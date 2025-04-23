@@ -7,16 +7,19 @@ import { Resolver } from '@subwallet/extension-base/background/handlers/State';
 import { AccountAuthType, AuthorizeRequest, ConfirmationRequestBase, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeCancel, RequestAuthorizeReject, RequestAuthorizeSubscribe, RequestAuthorizeTab, RequestCurrentAccountAddress, ResponseAuthorizeList } from '@subwallet/extension-base/background/types';
 import { AppConfig, BrowserConfig, OSConfig } from '@subwallet/extension-base/constants';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
+import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
+import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { _NotificationInfo, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { CrowdloanContributionsResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, StorageDataInterface, SubmitYieldStepData, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningSlippage, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { InjectedAccount, InjectedAccountWithMeta, MetadataDefBase } from '@subwallet/extension-inject/types';
@@ -33,6 +36,7 @@ import { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
 import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
+import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -435,8 +439,12 @@ export interface UiSettings {
   unlockType: WalletUnlockType;
   enableChainPatrol: boolean;
   notificationSetup: NotificationSetup;
+  isAcknowledgedUnifiedAccountMigration: boolean;
+  isUnifiedAccountMigrationInProgress: boolean;
+  isUnifiedAccountMigrationDone: boolean;
   // On-ramp service account reference
   walletReference: string;
+  allowOneSign: boolean;
 }
 
 export type RequestSettingsType = UiSettings;
@@ -478,7 +486,9 @@ export enum TransactionDirection {
 export enum ChainType {
   EVM = 'evm',
   SUBSTRATE = 'substrate',
-  TON = 'ton'
+  BITCOIN = 'bitcoin',
+  TON = 'ton',
+  CARDANO = 'cardano'
 }
 
 export enum ExtrinsicType {
@@ -723,7 +733,8 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   additionalInfo?: any,
   startBlock?: number,
   nonce?: number,
-  addressPrefix?: number
+  addressPrefix?: number,
+  processId?: string;
 }
 
 export interface SWWarning {
@@ -1072,6 +1083,7 @@ export enum EvmProviderErrorType {
   UNSUPPORTED_METHOD = 'UNSUPPORTED_METHOD',
   DISCONNECTED = 'DISCONNECTED',
   CHAIN_DISCONNECTED = 'CHAIN_DISCONNECTED',
+  NETWORK_NOT_SUPPORTED= 'NETWORK_NOT_SUPPORTED',
   INVALID_PARAMS = 'INVALID_PARAMS',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
@@ -1100,6 +1112,12 @@ export interface TonSignRequest {
   canSign: boolean;
 }
 
+export interface CardanoSignRequest {
+  account: AccountJson;
+  hashPayload: string;
+  canSign: boolean;
+}
+
 export interface ErrorValidation {
   message: string;
   name: string;
@@ -1109,13 +1127,20 @@ export interface EvmSignatureRequest extends EvmSignRequest {
   id: string;
   type: string;
   payload: unknown;
-  errors?: ErrorValidation[]
+  errors?: ErrorValidation[];
+  processId?: string;
 }
 
 export interface TonSignatureRequest extends TonSignRequest {
   id: string;
   type: string;
   payload: unknown;
+}
+
+export interface CardanoSignatureRequest extends CardanoSignRequest {
+  id: string;
+  type: string;
+  payload: unknown
 }
 
 export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignRequest {
@@ -1127,14 +1152,17 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
 
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
+export type CardanoSendTransactionRequest = CardanoTransactionConfig;
 
 export type EvmWatchTransactionRequest = EvmSendTransactionRequest;
 export type TonWatchTransactionRequest = TonSendTransactionRequest;
+export type CardanoWatchTransactionRequest = CardanoSendTransactionRequest;
 
 export interface ConfirmationsQueueItemOptions {
   requiredPassword?: boolean;
   address?: string;
   networkKey?: string;
+  isPassConfirmation?: boolean;
 }
 
 export interface ConfirmationsQueueItem<T> extends ConfirmationsQueueItemOptions, ConfirmationRequestBase {
@@ -1195,8 +1223,15 @@ export interface ConfirmationDefinitionsTon {
   tonWatchTransactionRequest: [ConfirmationsQueueItem<TonWatchTransactionRequest>, ConfirmationResult<string>]
 }
 
+export interface ConfirmationDefinitionsCardano {
+  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<string>],
+  cardanoSendTransactionRequest: [ConfirmationsQueueItem<CardanoSendTransactionRequest>, ConfirmationResult<string>],
+  cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
+}
+
 export type ConfirmationType = keyof ConfirmationDefinitions;
 export type ConfirmationTypeTon = keyof ConfirmationDefinitionsTon;
+export type ConfirmationTypeCardano = keyof ConfirmationDefinitionsCardano;
 
 export type ConfirmationsQueue = {
   [CT in ConfirmationType]: Record<string, ConfirmationDefinitions[CT][0]>;
@@ -1204,18 +1239,23 @@ export type ConfirmationsQueue = {
 export type ConfirmationsQueueTon = {
   [CT in ConfirmationTypeTon]: Record<string, ConfirmationDefinitionsTon[CT][0]>;
 }
+export type ConfirmationsQueueCardano = {
+  [CT in ConfirmationTypeCardano]: Record<string, ConfirmationDefinitionsCardano[CT][0]>;
+}
 
 export type RequestConfirmationsSubscribe = null;
-
 export type RequestConfirmationsSubscribeTon = null;
+export type RequestConfirmationsSubscribeCardano = null;
 
 // Design to use only one confirmation
 export type RequestConfirmationComplete = {
   [CT in ConfirmationType]?: ConfirmationDefinitions[CT][1];
 }
-
 export type RequestConfirmationCompleteTon = {
   [CT in ConfirmationTypeTon]?: ConfirmationDefinitionsTon[CT][1];
+}
+export type RequestConfirmationCompleteCardano = {
+  [CT in ConfirmationTypeCardano]?: ConfirmationDefinitionsCardano[CT][1];
 }
 
 export interface BondingOptionParams {
@@ -1424,6 +1464,7 @@ export interface NominationInfo {
   hasUnstaking?: boolean;
   validatorMinStake?: string;
   status: EarningStatus;
+  originActiveStake?: string
 }
 
 export interface UnstakingInfo {
@@ -1476,7 +1517,15 @@ export interface BondingSubmitParams extends BaseRequestSign {
   amount: string,
   address: string,
   selectedValidators: ValidatorInfo[],
-  lockPeriod?: number // in month
+  lockPeriod?: number // in month,
+  poolInfo?: {
+    metadata: SubnetYieldPositionInfo,
+    type: YieldPoolType,
+    chain: string
+  },
+  poolPosition?: {
+    chain: string,
+  }
 }
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
@@ -1496,6 +1545,9 @@ export interface UnbondingSubmitParams extends BaseRequestSign {
   exchangeRate?: number;
   inputTokenInfo?: _ChainAsset;
   isFastUnbond: boolean;
+  poolInfo?: {
+    metadata: SubnetYieldPositionInfo,
+  },
 }
 
 export type RequestUnbondingSubmit = InternalRequestSign<UnbondingSubmitParams>;
@@ -1737,6 +1789,15 @@ export interface TokenPriorityDetails {
   token: Record<string, number>
 }
 
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect
@@ -1921,6 +1982,51 @@ export interface ResponseNftImport {
 
 /* Campaign */
 
+/* Migrate Unified Account */
+export interface RequestSaveMigrationAcknowledgedStatus {
+  isAcknowledgedUnifiedAccountMigration: boolean;
+}
+
+export interface RequestSaveUnifiedAccountMigrationInProgress {
+  isUnifiedAccountMigrationInProgress: boolean;
+}
+
+export interface RequestMigrateUnifiedAndFetchEligibleSoloAccounts {
+  password: string
+}
+
+export interface ResponseMigrateUnifiedAndFetchEligibleSoloAccounts {
+  migratedUnifiedAccountIds: string[],
+  soloAccounts: Record<string, SoloAccountToBeMigrated[]>
+  sessionId: string; // to keep linking to password in state
+}
+
+export interface SoloAccountToBeMigrated {
+  upcomingProxyId: string,
+  proxyId: string,
+  address: string,
+  name: string,
+  chainType: AccountChainType
+}
+
+export interface RequestMigrateSoloAccount {
+  soloAccounts: SoloAccountToBeMigrated[];
+  accountName: string;
+  sessionId: string;
+}
+
+export interface ResponseMigrateSoloAccount {
+  migratedUnifiedAccountId: string
+}
+
+export interface RequestPingSession {
+  sessionId: string;
+}
+
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
+}
+
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
@@ -1951,6 +2057,7 @@ export interface KoniRequestSignatures {
   'pri(chainService.upsertChain)': [_NetworkUpsertParams, boolean];
   'pri(chainService.enableChains)': [EnableMultiChainParams, boolean];
   'pri(chainService.enableChain)': [EnableChainParams, boolean];
+  'pri(chainService.enableChainWithPriorityAssets)': [EnableChainParams, boolean];
   'pri(chainService.reconnectChain)': [string, boolean];
   'pri(chainService.disableChains)': [string[], boolean];
   'pri(chainService.disableChain)': [string, boolean];
@@ -2100,11 +2207,15 @@ export interface KoniRequestSignatures {
   'pri(settings.saveAutoLockTime)': [RequestChangeTimeAutoLock, boolean];
   'pri(settings.saveUnlockType)': [RequestUnlockType, boolean];
   'pri(settings.saveEnableChainPatrol)': [RequestChangeEnableChainPatrol, boolean];
-  'pri(settings.saveNotificationSetup)': [NotificationSetup, boolean]
+  'pri(settings.saveNotificationSetup)': [NotificationSetup, boolean];
+  'pri(settings.saveUnifiedAccountMigrationInProgress)': [RequestSaveUnifiedAccountMigrationInProgress, boolean];
+  'pri(settings.pingUnifiedAccountMigrationDone)': [null, boolean];
+  'pri(settings.saveMigrationAcknowledgedStatus)': [RequestSaveMigrationAcknowledgedStatus, boolean];
   'pri(settings.saveLanguage)': [RequestChangeLanguage, boolean];
   'pri(settings.savePriceCurrency)': [RequestChangePriceCurrency, boolean];
   'pri(settings.saveShowZeroBalance)': [RequestChangeShowZeroBalance, boolean];
   'pri(settings.saveShowBalance)': [RequestChangeShowBalance, boolean];
+  'pri(settings.update.allowOneSign)': [RequestChangeAllowOneSign, boolean];
   'pri(settings.logo.assets.subscribe)': [null, Record<string, string>, Record<string, string>];
   'pri(settings.logo.chains.subscribe)': [null, Record<string, string>, Record<string, string>];
 
@@ -2157,6 +2268,7 @@ export interface KoniRequestSignatures {
   'pri(yield.withdraw.submit)': [RequestYieldWithdrawal, SWTransactionResponse];
   'pri(yield.cancelWithdrawal.submit)': [RequestStakeCancelWithdrawal, SWTransactionResponse];
   'pri(yield.claimReward.submit)': [RequestStakeClaimReward, SWTransactionResponse];
+  'pri(yield.getEarningSlippage)': [RequestEarningSlippage, EarningSlippageResult];
 
   /* Other */
 
@@ -2168,24 +2280,30 @@ export interface KoniRequestSignatures {
   'pri(transaction.history.getSubscription)': [null, TransactionHistoryItem[], TransactionHistoryItem[]];
   'pri(transaction.history.subscribe)': [RequestSubscribeHistory, ResponseSubscribeHistory, TransactionHistoryItem[]];
   'pri(transfer.getMaxTransferable)': [RequestMaxTransferable, AmountData];
+  'pri(transfer.subscribe)': [RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransfer];
   'pri(subscription.cancel)': [string, boolean];
   'pri(freeBalance.get)': [RequestFreeBalance, AmountData];
   'pri(freeBalance.subscribe)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
 
   // Transfer
   'pri(accounts.checkTransfer)': [RequestCheckTransfer, ValidateTransactionResponse];
-  'pri(accounts.transfer)': [RequestTransfer, SWTransactionResponse];
-  'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalPath];
+  'pri(accounts.transfer)': [RequestSubmitTransfer, SWTransactionResponse];
+  'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalTransferPath];
   'pri(accounts.approveSpending)': [TokenSpendingApprovalParams, SWTransactionResponse];
 
   'pri(accounts.checkCrossChainTransfer)': [RequestCheckCrossChainTransfer, ValidateTransactionResponse];
   'pri(accounts.crossChainTransfer)': [RequestCrossChainTransfer, SWTransactionResponse];
 
+  'pri(customFee.getTokensCanPayFee)': [RequestGetTokensCanPayFee, TokenPayFeeInfo];
+  'pri(customFee.getAmountForPair)': [RequestGetAmountForPair, string];
+
   // Confirmation Queues
   'pri(confirmations.subscribe)': [RequestConfirmationsSubscribe, ConfirmationsQueue, ConfirmationsQueue];
   'pri(confirmationsTon.subscribe)': [RequestConfirmationsSubscribeTon, ConfirmationsQueueTon, ConfirmationsQueueTon];
+  'pri(confirmationsCardano.subscribe)': [RequestConfirmationsSubscribeCardano, ConfirmationsQueueCardano, ConfirmationsQueueCardano];
   'pri(confirmations.complete)': [RequestConfirmationComplete, boolean];
   'pri(confirmationsTon.complete)': [RequestConfirmationCompleteTon, boolean];
+  'pri(confirmationsCardano.complete)': [RequestConfirmationCompleteCardano, boolean];
 
   'pub(utils.getRandom)': [RandomTestRequest, number];
   'pub(accounts.listV2)': [RequestAccountList, InjectedAccount[]];
@@ -2301,6 +2419,7 @@ export interface KoniRequestSignatures {
   /* Swap */
   'pri(swapService.subscribePairs)': [null, SwapPair[], SwapPair[]];
   'pri(swapService.handleSwapRequest)': [SwapRequest, SwapRequestResult];
+  'pri(swapService.handleSwapRequestV2)': [SwapRequestV2, SwapRequestResult];
   'pri(swapService.handleSwapStep)': [SwapSubmitParams, SWTransactionResponse];
   'pri(swapService.getLatestQuote)': [SwapRequest, SwapQuoteResponse];
   'pri(swapService.validateSwapProcess)': [ValidateSwapProcessParams, TransactionError[]];
@@ -2330,6 +2449,17 @@ export interface KoniRequestSignatures {
   /* Popular tokens */
   'pri(tokens.subscribePriority)': [null, TokenPriorityDetails, TokenPriorityDetails];
   /* Popular tokens */
+
+  /* Process multi steps */
+  'pri(process.transaction.submit)': [RequestSubmitProcessTransaction, SWTransactionResponse];
+  'pri(process.subscribe.id)': [RequestSubscribeProcessById, ResponseSubscribeProcessById, ResponseSubscribeProcessById];
+  'pri(process.subscribe.alive)': [null, ResponseSubscribeProcessAlive, ResponseSubscribeProcessAlive];
+  /* Process multi steps */
+
+  /* Migrate Unified Account */
+  'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
+  'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
+  'pri(migrate.pingSession)': [RequestPingSession, boolean];
 }
 
 export interface ApplicationMetadataType {

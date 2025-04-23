@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
@@ -71,7 +70,6 @@ function Component (): React.ReactElement {
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { tokens } = useSelector((state: RootState) => state.buyService);
-  const swapPairs = useSelector((state) => state.swap.swapPairs);
   const priorityTokens = useSelector((root: RootState) => root.chainStore.priorityTokens);
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
@@ -102,32 +100,6 @@ function Component (): React.ReactElement {
       };
     });
   }, [accountProxies]);
-
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const isEnableSwapButton = useMemo(() => {
-    return Object.keys(fromAndToTokenMap).some((tokenSlug) => {
-      const chainAsset = assetRegistryMap[tokenSlug];
-
-      if (chainAsset && !allowedChains.includes(_getAssetOriginChain(chainAsset))) {
-        return false;
-      }
-
-      return chainAsset.slug === tokenGroupSlug || chainAsset.multiChainAsset === tokenGroupSlug;
-    });
-  }, [allowedChains, assetRegistryMap, fromAndToTokenMap, tokenGroupSlug]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
@@ -465,7 +437,7 @@ function Component (): React.ReactElement {
           className={'__static-block'}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
-          isSupportSwap={isEnableSwapButton}
+          isSupportSwap={true}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}

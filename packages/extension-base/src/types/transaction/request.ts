@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-import { TransactionWarningType } from '@subwallet/extension-base/types';
+import { TransactionFee } from '../fee';
+import { TransactionWarningType } from './warning';
 
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
@@ -16,9 +16,10 @@ export interface RequestBaseTransfer {
   value?: string;
   transferAll?: boolean;
   transferBounceable?: boolean;
+  isPassConfirmation?: boolean;
 }
 
-export interface RequestCheckTransfer extends RequestBaseTransfer {
+export interface RequestCheckTransfer extends RequestBaseTransfer, TransactionFee {
   networkKey: string,
   orderId?: string,
   service?: string
@@ -26,11 +27,30 @@ export interface RequestCheckTransfer extends RequestBaseTransfer {
 
 export type RequestTransfer = InternalRequestSign<RequestCheckTransfer>;
 
-export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer {
+export interface RequestCheckCrossChainTransfer extends RequestBaseTransfer, TransactionFee {
   value: string;
   originNetworkKey: string,
   destinationNetworkKey: string,
-  showExtraWarning?: boolean
+  showExtraWarning?: boolean,
+  metadata?: AcrossMetadata
+}
+
+interface AcrossMetadata {
+  amountOut: string;
+  destChainSlug: string;
+  rate: string;
 }
 
 export type RequestCrossChainTransfer = InternalRequestSign<RequestCheckCrossChainTransfer>;
+
+export interface RequestGetTokensCanPayFee {
+  address: string;
+  chain: string;
+  feeAmount?: string;
+}
+
+export interface RequestGetAmountForPair {
+  nativeTokenFeeAmount: string,
+  nativeTokenSlug: string,
+  toTokenSlug: string
+}

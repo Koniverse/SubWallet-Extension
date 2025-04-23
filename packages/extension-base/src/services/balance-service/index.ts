@@ -6,16 +6,16 @@ import { AmountData, APIItemState, BalanceErrorType, DetectBalanceCache, Extrins
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
+import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson } from '@subwallet/extension-base/types';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
+import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -23,6 +23,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
 
+import { _isAcrossChainBridge } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
 import { subscribeBalance } from './helpers';
 
@@ -220,10 +221,11 @@ export class BalanceService implements StoppableServiceInterface {
       const evmApiMap = this.state.chainService.getEvmApiMap();
       const substrateApiMap = this.state.chainService.getSubstrateApiMap();
       const tonApiMap = this.state.chainService.getTonApiMap();
+      const cardanoApiMap = this.state.chainService.getCardanoApiMap();
 
       let unsub = noop;
 
-      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, (result) => {
+      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
         const rs = result[0];
 
         let value: string;
@@ -321,6 +323,23 @@ export class BalanceService implements StoppableServiceInterface {
     return await this.state.dbService.stores.balance.getBalanceMapByAddresses(address);
   }
 
+  public async getTokensHasBalance (address: string, chain: string, tokenSlug?: string): Promise<Record<string, BalanceItem>> {
+    const balanceItems = await this.state.dbService.stores.balance.getBalanceHasAmount(address, chain);
+    const tokenHasBalanceInfoMap: Record<string, BalanceItem> = {};
+
+    balanceItems.forEach((balanceItem) => {
+      tokenHasBalanceInfoMap[balanceItem.tokenSlug] = balanceItem;
+    });
+
+    if (tokenSlug) {
+      return {
+        [tokenSlug]: tokenHasBalanceInfoMap[tokenSlug]
+      };
+    }
+
+    return tokenHasBalanceInfoMap;
+  }
+
   public async handleResetBalance (forceRefresh?: boolean) {
     if (forceRefresh) {
       this.balanceMap.setData({});
@@ -398,6 +417,7 @@ export class BalanceService implements StoppableServiceInterface {
     const evmApiMap = this.state.chainService.getEvmApiMap();
     const substrateApiMap = this.state.chainService.getSubstrateApiMap();
     const tonApiMap = this.state.chainService.getTonApiMap();
+    const cardanoApiMap = this.state.chainService.getCardanoApiMap();
 
     const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
     const assetState = this.state.chainService.subscribeAssetSettings().value;
@@ -407,7 +427,7 @@ export class BalanceService implements StoppableServiceInterface {
       })
       .map((asset) => asset.slug);
 
-    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, (result) => {
+    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
       !cancel && this.setBalanceItem(result);
     }, ExtrinsicType.TRANSFER_BALANCE);
 
@@ -457,9 +477,34 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    const evmPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return new Promise<string[] | null>((resolve) => {
+          const timeOutPromise = new Promise<string[]>((_resolve) => {
+            setTimeout(() => _resolve([]), 30000);
+          });
+
+          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+
+          Promise.race([timeOutPromise, apiPromise])
+            .then((result) => resolve(result))
+            .catch((error) => {
+              console.error(error);
+              resolve(null);
+            });
+        });
+      } else {
+        return Promise.resolve(null);
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
     const balanceDataList = await Promise.all(promiseList);
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -501,6 +546,27 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        for (const slug of balanceData) {
+          const chainSlug = slug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            needEnableChains.push(chainSlug);
+            needActiveTokens.push(existedKey);
+            currentAssetSettings[existedKey] = { visible: true };
+          }
+        }
+      }
+    }
+
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
@@ -529,6 +595,7 @@ export class BalanceService implements StoppableServiceInterface {
     const scanBalance = () => {
       const addresses = keyring.getPairs().map((account) => account.address);
       const cache = this.balanceDetectSubject.value;
+
       const now = Date.now();
       const needDetectAddresses: string[] = [];
 
@@ -558,7 +625,7 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   // process
-  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+  public async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
     const originChainInfo = this.state.chainService.getChainInfoByKey(params.originChain);
 
     if (!params.destChain) { // normal transfers
@@ -573,6 +640,15 @@ export class BalanceService implements StoppableServiceInterface {
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       return getSnowbridgeTransferProcessFromEvm(params.address, evmApi, tokenInfo, params.amount);
+    }
+
+    // Across Bridge
+    if (_isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug)) {
+      const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
+
+      if (!_isNativeToken(tokenInfo)) {
+        return getAcrossbridgeTransferProcessFromEvm(originChainInfo);
+      }
     }
 
     return getDefaultTransferProcess();

@@ -6,9 +6,9 @@ import { EvmProviderError } from '@subwallet/extension-base/background/errors/Ev
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestConfirmationComplete, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
-import { EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
+import { BACKEND_API_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
@@ -43,9 +43,10 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
 import BN from 'bn.js';
 import { t } from 'i18next';
@@ -141,6 +142,9 @@ export default class KoniState {
   private waitStarting: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
+    // Init subwallet api sdk
+    subwalletApiSdk.init(BACKEND_API_URL);
+
     this.providers = providers;
 
     this.eventService = new EventService();
@@ -184,8 +188,8 @@ export default class KoniState {
     return this.requestService.knownMetadata;
   }
 
-  public injectMetadata (url: string, request: MetadataDef): Promise<boolean> {
-    return this.requestService.injectMetadata(url, request);
+  public injectMetadata (request: MetadataDef): boolean {
+    return this.requestService.injectMetadata(request);
   }
 
   public getMetaRequest (id: string): MetaRequest {
@@ -574,7 +578,7 @@ export default class KoniState {
 
     if (authUrls[shortenUrl]) {
       if (chainInfo && !_isChainEnabled(chainState)) {
-        await this.enableChain(networkKey);
+        await this.enableChainWithPriorityAssets(networkKey);
       }
 
       authUrls[shortenUrl].currentEvmNetworkKey = networkKey;
@@ -895,6 +899,14 @@ export default class KoniState {
     return this.chainService.enableChain(chainSlug);
   }
 
+  public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
+    if (enableTokens) {
+      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+    }
+
+    return this.chainService.enableChain(chainSlug);
+  }
+
   public resetDefaultChains () {
     const defaultChains = this.getDefaultNetworkKeys();
 
@@ -923,6 +935,14 @@ export default class KoniState {
 
   public getTonApi (networkKey: string) {
     return this.chainService.getTonApi(networkKey);
+  }
+
+  public getCardanoApiMap () {
+    return this.chainService.getCardanoApiMap();
+  }
+
+  public getCardanoApi (networkKey: string) {
+    return this.chainService.getCardanoApi(networkKey);
   }
 
   public getApiMap () {
@@ -1155,15 +1175,7 @@ export default class KoniState {
       })();
 
       promiseList.push(Promise.race([promise, timeoutPromise]).then((result) => {
-        return [slug, result
-          ? {
-            ...result,
-            gasPrice: result.gasPrice?.toString(),
-            maxFeePerGas: result.maxFeePerGas?.toString(),
-            maxPriorityFeePerGas: result.maxPriorityFeePerGas?.toString(),
-            baseGasFee: result.baseGasFee?.toString()
-          } as EvmFeeInfo
-          : null];
+        return [slug, result || null];
       }));
     });
 
@@ -1265,12 +1277,20 @@ export default class KoniState {
     return this.requestService.confirmationsQueueSubjectTon;
   }
 
+  public getConfirmationsQueueSubjectCardano (): BehaviorSubject<ConfirmationsQueueCardano> {
+    return this.requestService.confirmationsQueueSubjectCardano;
+  }
+
   public async completeConfirmation (request: RequestConfirmationComplete) {
     return await this.requestService.completeConfirmation(request);
   }
 
   public async completeConfirmationTon (request: RequestConfirmationCompleteTon) {
     return await this.requestService.completeConfirmationTon(request);
+  }
+
+  public async completeConfirmationCardano (request: RequestConfirmationCompleteCardano) {
+    return await this.requestService.completeConfirmationCardano(request);
   }
 
   private async onMV3Update () {
@@ -1564,9 +1584,16 @@ export default class KoniState {
     return result;
   }
 
+  scanAddressOnAdd: string[] = [];
+
   public onAccountAdd () {
     this.eventService.on('account.add', (address) => {
-      this.balanceService.autoEnableChains([address]).catch(this.logger.error);
+      this.scanAddressOnAdd.push(address);
+
+      addLazy('autoScanBalanceOnAdd', () => {
+        this.balanceService.autoEnableChains(this.scanAddressOnAdd).catch(this.logger.error);
+        this.scanAddressOnAdd = [];
+      }, 500, 5000, false);
     });
   }
 

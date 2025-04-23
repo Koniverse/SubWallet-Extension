@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { useChainInfoWithState, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useChainInfoWithState, useGetChainSlugsByAccount, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ChainItemType } from '@subwallet/extension-koni-ui/types';
-import { getReformatedAddressRelatedToChain, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ export default function useHistorySelection () {
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const chainInfoList = useChainInfoWithState();
   const allowedChains = useGetChainSlugsByAccount();
-
+  const getReformatAddress = useReformatAddress();
   const { accountProxies, currentAccountProxy } = useSelector((root) => root.accountState);
 
   const [selectedAddress, setSelectedAddress] = useState<string>(propAddress || '');
@@ -51,7 +51,7 @@ export default function useHistorySelection () {
       ap.accounts.forEach((a) => {
         // TODO: This is a temporary validation method.
         //  Find a more efficient way to get isValid.
-        const isValid = getReformatedAddressRelatedToChain(a, chainInfo);
+        const isValid = getReformatAddress(a, chainInfo);
 
         if (isValid) {
           result.push({
@@ -78,7 +78,7 @@ export default function useHistorySelection () {
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, selectedChain]);
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedChain]);
 
   useEffect(() => {
     if (chainItems.length) {
