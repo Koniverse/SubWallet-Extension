@@ -1,6 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+/**
+ * @TODO: Merge this file with transaction-process.ts
+ * */
+
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { YieldStepDetail, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { simpleDeepClone } from '@subwallet/extension-web-ui/utils';
@@ -23,6 +27,7 @@ export interface YieldProcessState {
   feeStructure: YieldTokenBaseInfo[]; // estimate fee
   currentStep: number; // Current step
   stepResults: Record<number, StepResult>;
+  processId: string;
 }
 
 export enum EarningActionType {
@@ -45,7 +50,8 @@ export const DEFAULT_YIELD_PROCESS: YieldProcessState = {
   steps: [],
   feeStructure: [],
   currentStep: 0,
-  stepResults: {}
+  stepResults: {},
+  processId: ''
 };
 
 interface InitAction extends AbstractEarningAction {
@@ -97,15 +103,19 @@ const handleStepCreateAction: ActionHandler<StepCreateAction> = (oldState, { pay
 
 interface StepSubmitAction extends AbstractEarningAction {
   type: EarningActionType.STEP_SUBMIT;
-  payload: null;
+  payload: { processId: string } | null;
 }
 
-const handleStepSubmitAction: ActionHandler<StepSubmitAction> = (oldState) => {
+const handleStepSubmitAction: ActionHandler<StepSubmitAction> = (oldState, { payload }) => {
   const result: YieldProcessState = { ...oldState };
   const currentStep = oldState.currentStep;
 
   result.stepResults = { ...oldState.stepResults };
   result.stepResults[currentStep].status = EarningStepStatus.SUBMITTING;
+
+  if (payload?.processId) {
+    result.processId = payload.processId;
+  }
 
   return result;
 };
