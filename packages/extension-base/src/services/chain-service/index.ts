@@ -25,6 +25,7 @@ import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAnd
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
 
+import { isArray } from '@polkadot/util';
 import { logger as createLogger } from '@polkadot/util/logger';
 import { HexString, Logger } from '@polkadot/util/types';
 import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
@@ -245,7 +246,7 @@ export class ChainService {
     while (!needStop) {
       const utxoRaw = await cardanoApi.getUtxos(formattedAddress, page, limit);
 
-      if (utxoRaw.length === 0) {
+      if (utxoRaw.length === 0 || !isArray(utxoRaw)) {
         needStop = true;
       } else {
         utxos.push(...utxoRaw);
@@ -262,7 +263,7 @@ export class ChainService {
     return async (txHash: string, txId: number): Promise<CardanoUtxosItem | undefined> => {
       const utxoRaw = await cardanoApi.getSpecificUtxo(txHash);
 
-      if (!utxoRaw.outputs) {
+      if (!utxoRaw?.outputs) {
         return undefined;
       }
 

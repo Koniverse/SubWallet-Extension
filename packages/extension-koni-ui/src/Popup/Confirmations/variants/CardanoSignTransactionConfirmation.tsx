@@ -101,7 +101,7 @@ function Component ({ className, request, type }: Props) {
             value={amount}
           />
           <div className='input-transaction'>
-            <div className='account-label'>{t('From Account')}</div>
+            <div className='account-label'>{t('From account')}</div>
             <div className={'account-list'}>
               {
                 ownerAddresses.map((address) => (
@@ -115,7 +115,7 @@ function Component ({ className, request, type }: Props) {
             </div>
           </div>
           <div className='output-transaction'>
-            <div className='account-label'>{t('To Account')}</div>
+            <div className='account-label'>{t('To account')}</div>
             <div className={'account-list'}>
               {
                 recipientAddresses.map((address) => (
@@ -132,7 +132,7 @@ function Component ({ className, request, type }: Props) {
 
           <MetaInfo.Number
             decimals={chainInfo?.cardanoInfo?.decimals}
-            label={t('Fee Transaction')}
+            label={t('Estimated fee')}
             suffix={chainInfo?.cardanoInfo?.symbol}
             value={estimateCardanoFee || '0'}
           />
@@ -223,7 +223,21 @@ const EvmTransactionConfirmation = styled(Component)<Props>(({ theme: { token } 
     gap: token.sizeXS,
 
     '.account-item': {
-      backgroundColor: token.colorBgSecondary
+      backgroundColor: token.colorBgSecondary,
+
+      '.__item-middle-part': {
+        flex: '0 1 auto',
+        minWidth: 0
+      },
+
+      '.__item-right-part': {
+        flex: '1 1 auto',
+        whiteSpace: 'nowrap',
+
+        '.ant-number': {
+          marginLeft: 'auto'
+        }
+      }
     },
 
     '.__account-name-item': {

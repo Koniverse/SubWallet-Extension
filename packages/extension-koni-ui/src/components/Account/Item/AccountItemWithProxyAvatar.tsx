@@ -53,7 +53,7 @@ function Component (props: Props): React.ReactElement<Props> {
           leftPartNode || (
             <AccountProxyAvatar
               size={24}
-              value={account?.proxyId || ''}
+              value={account?.proxyId || address}
             />
           )
         }
