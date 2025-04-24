@@ -231,8 +231,6 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
   };
 }
 
-export const shouldShowAllAccount = (list: AccountProxy[], hasSearchValue = false) => {
-  if (hasSearchValue) return false;
+export const shouldShowAccountAll = (list: AccountProxy[]) => {
   return list.filter(({ id }) => !isAccountAll(id)).length > 1;
 };
-
