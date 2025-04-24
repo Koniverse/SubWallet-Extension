@@ -426,7 +426,7 @@ export class UniswapHandler implements SwapBaseInterface {
     } catch (e) {
       console.error('Error creating bridge step', e);
 
-      return undefined;
+      throw new Error((e as Error).message);
     }
   }
 

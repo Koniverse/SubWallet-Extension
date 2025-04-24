@@ -113,6 +113,11 @@ export const SpokePoolMapping: Record<number, { SpokePool: { address: string; bl
   }
 };
 
+export const AcrossErrorMsg = {
+  AMOUNT_TOO_LOW: 'amount too low',
+  AMOUNT_TOO_HIGH: 'amount too high'
+};
+
 interface AcrossQuote {
   outputAmount: string;
   rate: string;
