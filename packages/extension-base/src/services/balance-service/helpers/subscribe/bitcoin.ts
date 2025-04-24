@@ -1,11 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
 import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -73,7 +71,9 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
       return {
         balance: '0',
         bitcoinBalanceMetadata: {
-          inscriptionCount: 0
+          inscriptionCount: 0,
+          runeBalance: 0,
+          inscriptionBalance: 0
         }
       };
     }
@@ -90,7 +90,10 @@ export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _Bitco
             tokenSlug: 'bitcoin-NATIVE-BTC',
             state: APIItemState.READY,
             free: balance,
-            locked: '0',
+            locked: (
+              parseInt(bitcoinBalanceMetadata.runeBalance.toString()) +
+              parseInt(bitcoinBalanceMetadata.inscriptionBalance.toString())
+            ).toString(),
             metadata: bitcoinBalanceMetadata
           };
         });
