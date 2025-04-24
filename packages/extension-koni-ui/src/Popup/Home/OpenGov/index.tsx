@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
-import { AccountAddressSelector, BasicInputEvent, ChainSelector, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, BasicInputEvent, ChainSelector, FilterModal, Layout, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import Search from '@subwallet/extension-koni-ui/components/Search';
@@ -33,6 +33,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { activeModal } = useContext(ModalContext);
   const [currentSelectItem, setCurrentSelectItem] = useState<_ReferendumInfo | null>(null);
   const [referendums, setReferendums] = useState<_ReferendumInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const filterOptions = useMemo(() => [
     ...govCategories.map((c) => ({
@@ -108,26 +109,30 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const renderItem = useCallback(
     (item: _ReferendumInfo) => {
       return (
-        <GovItem
-          className={'earning-option-item'}
-          data={item}
-          key={item._id}
-          onClick={onClickItem}
-        />
+        isLoading
+          ? <LoadingScreen />
+          : <GovItem
+            className={'earning-option-item'}
+            data={item}
+            key={item._id}
+            onClick={onClickItem}
+          />
       );
     },
-    [onClickItem]
+    [onClickItem, isLoading]
   );
 
   const emptyList = useCallback(() => {
     return (
-      <EmptyList
-        emptyMessage={t('No referendum found')}
-        emptyTitle={t('Your referendum will show up here')}
-        phosphorIcon={GlobeHemisphereWest}
-      />
+      isLoading
+        ? <LoadingScreen />
+        : <EmptyList
+          emptyMessage={t('No referendum found')}
+          emptyTitle={t('Your referendum will show up here')}
+          phosphorIcon={GlobeHemisphereWest}
+        />
     );
-  }, [t]);
+  }, [isLoading, t]);
 
   // START HERE
   const { isAllAccount } = useSelector((root) => root.accountState);
@@ -204,10 +209,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   useEffect(() => {
     const loadReferendums = async () => {
-      const data = await fetchReferendums(selectedChain);
+      setIsLoading(true);
 
-      console.log('Hi', data);
-      setReferendums(data);
+      try {
+        const data = await fetchReferendums(selectedChain);
+
+        setReferendums(data);
+      } catch (err) {
+        console.error('Failed to load referendums:', err);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadReferendums().catch((err) => {
@@ -298,6 +310,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         title={t('Filter')}
       />
       <GovDetailModal
+        address={selectedAddress}
         chain={selectedChain}
         data={currentSelectItem}
       />

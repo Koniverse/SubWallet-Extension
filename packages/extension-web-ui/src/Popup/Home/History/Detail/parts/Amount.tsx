@@ -49,6 +49,8 @@ const Component: React.FC<Props> = (props: Props) => {
         return t('Cancel unstake value');
       case ExtrinsicType.CROWDLOAN:
         return t('Contribute balance');
+      case ExtrinsicType.VOTE:
+        return t('Vote value');
       default:
         return t('Amount');
     }

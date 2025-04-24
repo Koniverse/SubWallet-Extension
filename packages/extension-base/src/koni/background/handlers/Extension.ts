@@ -4696,9 +4696,18 @@ export default class KoniExtension {
     return data;
   }
 
-  // private standardVote (request: StandardVoteRequest): SWTransactionResponse {
-  //   return this.#koniState.openGovService.standardVote(request);
-  // }
+  private async handleStandardVote (request: StandardVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleStandardVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.VOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
   /* Gov */
 
   // --------------------------------------------------------------
@@ -5359,7 +5368,7 @@ export default class KoniExtension {
       case 'pri(openGov.fetchReferendums)':
         return this.fetchReferendums(request as string);
       case 'pri(openGov.standardVote)':
-        return this.standardVote(request as StandardVoteRequest);
+        return this.handleStandardVote(request as StandardVoteRequest);
         /* Gov */
 
       // Default

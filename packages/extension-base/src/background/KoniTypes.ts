@@ -541,6 +541,7 @@ export enum ExtrinsicType {
   CLAIM_BRIDGE = 'claim.claim_bridge',
 
   // SET_FEE_TOKEN = 'set_fee-token',
+  VOTE = 'gov.vote',
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -597,6 +598,7 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
+  [ExtrinsicType.VOTE]: any, // TODO: avoid any
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }

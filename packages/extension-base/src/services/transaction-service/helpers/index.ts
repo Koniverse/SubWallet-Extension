@@ -70,6 +70,8 @@ const typeName = (type: SWTransaction['extrinsicType']) => {
       return 'Withdraw pool';
     case ExtrinsicType.JOIN_YIELD_POOL:
       return 'Start earning';
+    case ExtrinsicType.VOTE:
+      return 'Vote';
     case ExtrinsicType.UNKNOWN:
     default:
       return 'unknown';

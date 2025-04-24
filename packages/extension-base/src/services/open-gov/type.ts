@@ -1,12 +1,57 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { Conviction } from '@polkadot/types/interfaces';
-
 export interface StandardVoteRequest {
+  address: string,
+  chain: string,
+  referendumIndex: number;
   aye: boolean;
-  conviction: Conviction;
+  conviction: number;
   balance: string;
+}
+
+export interface SplitAbstainRequest{
+  address: string,
+  chain: string,
+  aye: string,
+  nay: string,
+  abstain: string
+}
+
+export enum Conviction {
+  None = 'None',
+  Locked1x = 'Locked1x',
+  Locked2x = 'Locked2x',
+  Locked3x = 'Locked3x',
+  Locked4x = 'Locked4x',
+  Locked5x = 'Locked5x',
+  Locked6x = 'Locked6x'
+}
+
+export const numberToConviction: Record<number, Conviction> = {
+  0: Conviction.None,
+  1: Conviction.Locked1x,
+  2: Conviction.Locked2x,
+  3: Conviction.Locked3x,
+  4: Conviction.Locked4x,
+  5: Conviction.Locked5x,
+  6: Conviction.Locked6x
+};
+
+export interface SplitAbstainVoteRequest {
+  address: string;
+  chain: string;
+  referendumIndex: number;
+  aye: string;
+  nay: string;
+  abstain: string;
+}
+
+export interface RemoveVoteRequest {
+  address: string;
+  chain: string;
+  trackId: number;
+  referendumIndex: number;
 }
 
 export interface _ReferendumInfo {

@@ -1,46 +1,115 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { _ReferendumInfo, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { useGetNativeTokenSlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
-import { CaretLeft } from 'phosphor-react';
-import React, { useCallback, useContext } from 'react';
+import { Button, Form, Icon, Image, ModalContext, SwModal } from '@subwallet/react-ui';
+import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import TransactionContent from '../../Transaction/parts/TransactionContent';
+import { isGovOngoing } from './utils';
 
 type Props = ThemeProps & {
-  data: _ReferendumInfo | null,
-  chain: string | null,
+  address: string;
+  data: _ReferendumInfo | null;
+  chain: string;
 };
+
+interface voteData{
+  value: string,
+  conviction: number
+}
 
 export const GovDetailModalId = 'openGovDetailModalId';
 
 const modalId = GovDetailModalId;
 
-function Component ({ className = '', data }: Props): React.ReactElement<Props> {
+function Component ({ address, chain, className = '', data }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
+  const [form] = Form.useForm();
+
+  const [convictionValue, setConvictionValue] = useState<number>(0);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
   }, [inactiveModal]);
 
-  const onClickVote = useCallback(() => {
+  const onClickGlobalIcon = useCallback(() => {
     inactiveModal(modalId);
   }, [inactiveModal]);
 
-  const modalCloseButton = <Icon
-    customSize={'24px'}
-    phosphorIcon={CaretLeft}
-    type='phosphor'
-    weight={'light'}
-  />;
+  const onClickTwitterIcon = useCallback(() => {
+    inactiveModal(modalId);
+  }, [inactiveModal]);
+
+  const onClickVote = useCallback(() => {
+    form.validateFields().then(async (values: voteData) => {
+      if (!data) {
+        return;
+      }
+
+      const voteData: StandardVoteRequest = {
+        address: address,
+        chain: chain,
+        referendumIndex: data.referendumIndex,
+        aye: true,
+        balance: values.value,
+        conviction: values.conviction
+      };
+
+      inactiveModal(modalId);
+      await handleStandardVote(voteData);
+    }).catch((error) => {
+      console.error('Form validation failed:', error);
+    });
+  }, [form, data, address, chain, inactiveModal]);
+
+  const modalCloseButton = (
+    <Icon
+      customSize={'24px'}
+      phosphorIcon={CaretLeft}
+      type='phosphor'
+      weight={'light'}
+    />
+  );
 
   const valueColorSchema = 'blue';
+
+  const convictionOptions = [
+    { label: t('0.1x (No lockup)'), value: 0, lockPeriod: 0 },
+    { label: t('1x (7 days)'), value: 1, lockPeriod: 7 },
+    { label: t('2x (14 days)'), value: 2, lockPeriod: 14 },
+    { label: t('3x (21 days)'), value: 3, lockPeriod: 21 },
+    { label: t('4x (28 days)'), value: 4, lockPeriod: 28 },
+    { label: t('5x (35 days)'), value: 5, lockPeriod: 35 },
+    { label: t('6x (42 days)'), value: 6, lockPeriod: 42 }
+  ];
+
+  const handleConvictionChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Number(e.target.value);
+
+      setConvictionValue(value);
+      form.setFieldsValue({ conviction: value });
+    },
+    [form]
+  );
+
+  const { assetRegistry } = useSelector((state) => state.assetRegistry);
+  const nativeTokenSlug = useGetNativeTokenSlug(chain);
+
+  const chainAsset = useMemo(() => {
+    return assetRegistry[nativeTokenSlug];
+  }, [assetRegistry, nativeTokenSlug]);
 
   return (
     <SwModal
@@ -50,63 +119,121 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
       onCancel={onCancel}
       title={t(data?.title || 'Referendum details')}
     >
-      {
-        data && (
-          <>
-            <MetaInfo
-              className={'__meta-block'}
-              spaceSize={'ms'}
-              valueColorScheme={'light'}
+      {data && (
+        <>
+          <MetaInfo
+            className={'__meta-block'}
+            spaceSize={'ms'}
+            valueColorScheme={'light'}
+          >
+            <MetaInfo.Default label={t('Name')}>{data.title}</MetaInfo.Default>
+
+            <MetaInfo.Default
+              className={'__status-pool'}
+              label={t('Status')}
+              valueColorSchema={valueColorSchema}
             >
-              <MetaInfo.Default
-                label={t('Name')}
-              >
-                {data.title}
-              </MetaInfo.Default>
+              {data.state.name}
+            </MetaInfo.Default>
+          </MetaInfo>
 
-              <MetaInfo.Default
-                className={'__status-pool'}
-                label={t('Status')}
-                valueColorSchema={valueColorSchema}
+          <TransactionContent>
+            <Form
+              className={'form-container form-space-sm'}
+              form={form}
+              onFinish={onClickVote}
+            >
+              <Form.Item
+                name={'value'}
+                statusHelpAsTooltip={true}
               >
-                {data.state.name}
-              </MetaInfo.Default>
+                <AmountInput
+                  decimals={_getAssetDecimals(chainAsset)}
+                  maxValue={'1'}
+                  placeholder={t('Enter vote amount')}
+                  showMaxButton={true}
+                />
+              </Form.Item>
 
-              {/* <MetaInfo.Default
-                className={'-vertical __markdown-container'}
-                label={t('Description')}
-                valueColorSchema={'gray'}
+              <Form.Item
+                name={'conviction'}
+                rules={[{ required: true, message: t('Please select a conviction') }]}
+                statusHelpAsTooltip={true}
               >
-                <div className='__markdown-wrapper'>
-                  <Markdown>{data.polkassemblyContentHtml}</Markdown>
+                <div className='conviction-slider-container'>
+                  <div className='conviction-label'>
+                    {convictionOptions[convictionValue].label}
+                  </div>
+                  <input
+                    className='conviction-slider'
+                    max={6}
+                    min={0}
+                    onChange={handleConvictionChange}
+                    step={1}
+                    type='range'
+                    value={convictionValue}
+                  />
+                  <div className='conviction-marks'>
+                    {convictionOptions.map((option) => (
+                      <span
+                        className='conviction-mark'
+                        key={option.value}
+                      >
+                        {option.value}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </MetaInfo.Default> */}
-            </MetaInfo>
+              </Form.Item>
+            </Form>
+          </TransactionContent>
 
-            {/* <div className='__modal-footer'>
-              <div className={'__modal-separator'}></div>
-              <TransactionContent>
-                <Form
-                  className={'form-container form-space-sm'}
-                  form={form}
-                  onFinish={onClickVote}
-                >
-                  <Form.Item
-                    name={'value'}
-                    statusHelpAsTooltip={true}
-                  >
-                    <AmountInput
-                      decimals={decimals}
-                      maxValue={bondedValue}
-                      showMaxButton={true}
-                    />
-                  </Form.Item>
-                </Form>
-              </TransactionContent>
-            </div> */}
-          </>
-        )
-      }
+          <div className='__modal-footer'>
+            <div className={'__modal-separator'}></div>
+
+            <div className={'__modal-buttons'}>
+              <Button
+                className={'__modal-icon-button'}
+                icon={
+                  <Icon
+                    phosphorIcon={GlobeHemisphereWest}
+                    size={'sm'}
+                    weight={'fill'}
+                  />}
+                onClick={onClickGlobalIcon}
+                size={'xs'}
+                type='ghost'
+              />
+              <Button
+                className={'__modal-icon-button'}
+                icon={
+                  <Image
+                    height={18}
+                    shape='square'
+                    src={DefaultLogosMap.xtwitter_transparent}
+                    width={20}
+                  />}
+                onClick={onClickTwitterIcon}
+                size={'xs'}
+                type='ghost'
+              />
+              <Button
+                disabled={!isGovOngoing(data.state.name)}
+                icon={
+                  <Icon
+                    phosphorIcon={PlusCircle}
+                    size={'sm'}
+                    weight={'fill'}
+                  />
+                }
+                onClick={onClickVote}
+              >
+                {t('Join now')}
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </SwModal>
   );
 }
@@ -191,7 +318,6 @@ export const GovDetailModal = styled(Component)<Props>(({ theme: { token } }: Pr
       '.__row.-vertical': {
         flexDirection: 'column',
         gap: token.sizeXS,
-
         '.__value-col': {
           textAlign: 'left'
         }
@@ -203,7 +329,6 @@ export const GovDetailModal = styled(Component)<Props>(({ theme: { token } }: Pr
       alignItems: 'center',
       justifyContent: 'center'
     },
-
     '.__markdown-wrapper': {
       overflowX: 'auto',
       maxWidth: '100%',
@@ -213,6 +338,62 @@ export const GovDetailModal = styled(Component)<Props>(({ theme: { token } }: Pr
     '.__meta-block .__row.-vertical .__value-col': {
       textAlign: 'left',
       width: '100%'
+    },
+
+    '.conviction-slider-container': {
+      position: 'relative',
+      padding: `${token.paddingSM}px 0`
+    },
+    '.conviction-label': {
+      marginBottom: token.marginXS,
+      fontSize: token.fontSizeSM,
+      color: token.colorTextLight1,
+      textAlign: 'center'
+    },
+    '.conviction-slider': {
+      '-webkit-appearance': 'none',
+      width: '100%',
+      height: 8,
+      background: token.colorBgSecondary,
+      borderRadius: token.borderRadiusLG,
+      outline: 'none',
+      cursor: 'pointer',
+      '&::-webkit-slider-thumb': {
+        '-webkit-appearance': 'none',
+        width: 20,
+        height: 20,
+        background: token.colorPrimary,
+        borderRadius: '50%',
+        border: `2px solid ${token.colorBgBase}`,
+        cursor: 'pointer',
+        transition: 'all 0.2s'
+      },
+      '&::-moz-range-thumb': {
+        width: 20,
+        height: 20,
+        background: token.colorPrimary,
+        borderRadius: '50%',
+        border: `2px solid ${token.colorBgBase}`,
+        cursor: 'pointer',
+        transition: 'all 0.2s'
+      },
+      '&:hover::-webkit-slider-thumb': {
+        transform: 'scale(1.2)'
+      },
+      '&:hover::-moz-range-thumb': {
+        transform: 'scale(1.2)'
+      }
+    },
+    '.conviction-marks': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: token.marginXS,
+      fontSize: token.fontSizeSM,
+      color: token.colorTextLight3
+    },
+    '.conviction-mark': {
+      flex: 1,
+      textAlign: 'center'
     }
   });
 });
