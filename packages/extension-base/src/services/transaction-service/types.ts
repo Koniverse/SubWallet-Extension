@@ -39,6 +39,10 @@ export interface SWPermitTransaction extends Omit<SWTransaction, 'transaction'> 
   transaction: SignTypedDataMessageV3V4;
 }
 
+export interface SWDutchTransaction extends Omit<SWTransaction, 'transaction'> {
+  transaction: { submitSwapOrder: () => Promise<Response> }
+}
+
 export interface SWTransactionResult extends Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {
   process?: ProcessTransactionData;
 }
@@ -60,6 +64,10 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
   transaction?: SWPermitTransaction['transaction'] | null;
+}
+
+export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
+  transaction?: SWDutchTransaction['transaction'] | null;
 }
 
 export type SWTransactionResponse = SwInputBase & Pick<SWTransaction, 'warnings' | 'errors'> & Partial<Pick<SWTransaction, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {

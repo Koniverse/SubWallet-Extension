@@ -62,7 +62,7 @@ interface UniswapDutchQuote {
       endAmount: string
       token: string
     },
-    output: {
+    outputs: {
       startAmount: string
       endAmount: string
       token: string
@@ -107,7 +107,7 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
   } else if (dutchQuote) {
     chainId = dutchQuote.orderInfo.chainId;
     tokenIn = dutchQuote.orderInfo.input.token;
-    tokenOut = dutchQuote.orderInfo.output[0].token;
+    tokenOut = dutchQuote.orderInfo.outputs[0].token;
   } else {
     return undefined;
   }
@@ -199,6 +199,9 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    // todo: remove
+    return undefined;
+
     if (stepIndex === 0) {
       return this.getApproveSwap(params);
     }
@@ -275,9 +278,9 @@ export class UniswapHandler implements SwapBaseInterface {
       // @ts-ignore
       metadata: {
         tokenApprove: fromTokenInfo.slug,
-        contractAddress: _getContractAddressOfToken(fromTokenInfo),
+        contractAddress: _getContractAddressOfToken(fromTokenInfo) || approval.to,
         spenderAddress: spender,
-        owner: sender,
+        owner: sender, // todo: use approval.from?
         amount: sendingValue,
         isUniswapApprove: true
       } as ApproveStepMetadata
@@ -349,6 +352,8 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    // todo: remove
+    return undefined;
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
@@ -566,7 +571,7 @@ export class UniswapHandler implements SwapBaseInterface {
     } else if (quoteMetadata.routing === 'DUTCH_LIMIT' || quoteMetadata.routing === 'DUTCH_V2') {
       const quote = quoteMetadata.quote as UniswapDutchQuote;
 
-      spenderAddress = quote.orderInfo.output[0].token;
+      spenderAddress = quote.orderInfo.outputs[0].token;
       contractAddress = quote.orderInfo.input.token;
       chainId = quote.orderInfo.chainId.toString();
       checkApprovalResponse = await fetchCheckApproval({
@@ -664,7 +669,7 @@ export class UniswapHandler implements SwapBaseInterface {
     const { permitData, quote, routing } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
 
-    let signature: string | undefined;
+    let signature: string | undefined = '';
 
     if (permitData) {
       signature = this.transactionService.getCacheInfo(processId, SwapStepType.PERMIT);
@@ -695,7 +700,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
       extrinsic = transactionResponse.swap;
     } else if (routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2') {
-      postTransactionResponse = await fetch(`${API_URL}/order`, {
+      // todo: create a confirmation to get approve before submit to API.
+
+      const submitSwapOrder = async () => await fetch(`${API_URL}/order`, {
         method: 'POST',
         headers: {
           ...headers,
@@ -707,16 +714,30 @@ export class UniswapHandler implements SwapBaseInterface {
         })
       });
 
-      const isSuccessOrder = postTransactionResponse.ok;
+      // emitEvent: (event) => {
+      //
+      // }
 
-      // todo: create a confirmation to get approve before submit to API.
-      // const { promise, reject, resolve } = createPromiseHandler<void>();
+      const txData: SwapBaseTxData = {
+        address: params.address,
+        provider: this.providerInfo,
+        quote: params.quote,
+        slippage: params.slippage, // todo: disable
+        recipient: params.recipient,
+        process: params.process
+      };
 
-      if (!isSuccessOrder) {
-        console.log('Fail');
-      }
-
-      console.log('Success');
+      return {
+        txChain: fromAsset.originChain,
+        txData,
+        extrinsic: {
+          submitSwapOrder
+        },
+        transferNativeAmount: _isNativeToken(fromAsset) ? params.quote.fromAmount : '0',
+        extrinsicType: ExtrinsicType.SWAP,
+        chainType: ChainType.EVM,
+        isDutch: true
+      } as SwapSubmitStepData;
     }
 
     const txData: SwapBaseTxData = {

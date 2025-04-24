@@ -51,7 +51,7 @@ import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/ext
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
-import { SWPermitTransaction, SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
@@ -4211,7 +4211,7 @@ export default class KoniExtension {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, isPermit, transferNativeAmount, txChain, txData } = submitData;
+    const { chainType, extrinsic, extrinsicType, isDutch, isPermit, transferNativeAmount, txChain, txData } = submitData;
 
     const eventsHandler = (eventEmitter: TransactionEmitter) => {
       if (onSend) {
@@ -4257,6 +4257,24 @@ export default class KoniExtension {
         address,
         chain: txChain,
         transaction: extrinsic as unknown as SWPermitTransaction['transaction'],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        eventsHandler,
+        step
+      });
+    }
+
+    if (isDutch) {
+      return await this.#koniState.transactionService.handleDutchTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic as unknown as SWDutchTransaction['transaction'],
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: txData,
         extrinsicType, // change this depends on step

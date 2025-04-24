@@ -19,7 +19,7 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
@@ -404,6 +404,61 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
+  public async handleDutchTransaction (transaction: SWDutchTransactionInput): Promise<SWTransactionResponse> {
+    const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
+    const validatedTransaction: SWTransactionResponse = {
+      ...transaction,
+      id: transactionId,
+      extrinsicHash: '',
+      status: undefined,
+      errors: transaction.errors || [],
+      warnings: transaction.warnings || [],
+      processId: transaction.step?.processId
+    };
+
+    const txInput: SWDutchTransaction = {
+      ...transaction,
+      isInternal: true,
+      status: ExtrinsicStatus.QUEUED,
+      id: transactionId,
+      extrinsicHash: transactionId,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime()
+    } as SWDutchTransaction;
+
+    const emitter = this.sendDutchTransaction(txInput);
+
+    await new Promise<void>((resolve, reject) => {
+      emitter.on('success', (data: TransactionEventResponse) => {
+        validatedTransaction.id = data.id;
+        validatedTransaction.extrinsicHash = data.extrinsicHash;
+
+        resolve();
+      });
+
+      emitter.on('error', (data: TransactionEventResponse) => {
+        if (data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+    });
+
+    // @ts-ignore
+    'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+    'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+    'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    return validatedTransaction;
+  }
+
   private async sendTransaction (transaction: SWTransaction): Promise<TransactionEmitter> {
     // Send Transaction
     const emitter = await (transaction.chainType === 'substrate'
@@ -489,6 +544,63 @@ export default class TransactionService {
   private sendPermitTransaction (transaction: SWPermitTransaction) {
     // Send Transaction
     const emitter = this.signAndSendEvmPermitTransaction(transaction);
+
+    const { eventsHandler, step } = transaction;
+
+    emitter.on('send', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { transactionId: transaction.id, status: StepStatus.SUBMITTING, chain: transaction.chain });
+      }
+    });
+
+    emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { extrinsicHash: data.extrinsicHash, status: StepStatus.PROCESSING });
+      }
+    });
+
+    emitter.on('success', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.COMPLETE });
+      }
+    });
+
+    emitter.on('error', (data: TransactionEventResponse) => {
+      // this.handlePostProcessing(data.id); // might enable this later
+      this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
+
+      if (step) {
+        const rejectError = data.errors.find((error) => {
+          // TODO: REFACTOR ERROR CODE
+          if (([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType)) {
+            return true;
+          }
+
+          return false;
+        });
+
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
+          this.deleteProcess(step);
+        } else {
+          this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+        }
+      }
+    });
+
+    // Todo: handle any event with transaction.eventsHandler
+
+    eventsHandler?.(emitter);
+
+    return emitter;
+  }
+
+  private sendDutchTransaction (transaction: SWDutchTransaction) {
+    // Send Transaction
+    const emitter = this.signAndSendEvmDutchTransaction(transaction);
 
     const { eventsHandler, step } = transaction;
 
@@ -1396,6 +1508,64 @@ export default class TransactionService {
 
           emitter.emit('extrinsicHash', eventData);
           emitter.emit('success', eventData);
+        } else {
+          eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
+          emitter.emit('error', eventData);
+        }
+      })
+      .catch((e: Error) => {
+        this.removeTransaction(id);
+        eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, t(e.message)));
+
+        emitter.emit('error', eventData);
+      });
+
+    return emitter;
+  }
+
+  private signAndSendEvmDutchTransaction ({ address, id, isPassConfirmation, step, transaction, url }: SWDutchTransaction): TransactionEmitter {
+    // Allow sign transaction
+    const canSign = true;
+    const emitter = new EventEmitter<TransactionEventMap>();
+
+    const eventData: TransactionEventResponse = {
+      id,
+      errors: [],
+      warnings: [],
+      extrinsicHash: id,
+      processId: step?.processId
+    };
+
+    const evmSignaturePayload: EvmSignatureRequest = {
+      id: id,
+      type: 'eth_signTypedData_v4',
+      payload: transaction,
+      address: address,
+      hashPayload: '',
+      canSign: canSign,
+      processId: step?.processId
+    };
+
+    this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
+      .then(({ isApproved, payload: signature }) => {
+        if (isApproved) {
+          // todo
+          transaction.submitSwapOrder()
+            .then(() => {
+              // Emit signed event
+              emitter.emit('signed', eventData);
+              emitter.emit('send', eventData); // This event is needed after sending transaction with queue
+
+              if (!signature) {
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+              }
+
+              eventData.extrinsicHash = signature;
+
+              emitter.emit('extrinsicHash', eventData);
+              emitter.emit('success', eventData);
+            })
+            .catch(console.error());
         } else {
           eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
           emitter.emit('error', eventData);
