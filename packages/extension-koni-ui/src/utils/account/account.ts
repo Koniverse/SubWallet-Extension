@@ -287,3 +287,19 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
     [AccountChainType.CARDANO]: logoMap.network.cardano as string
   };
 }
+
+export const getBitcoinLabelByKeypair = (keyPairType: KeypairType): string => {
+  switch (keyPairType) {
+    case 'bitcoin-44':
+    case 'bittest-44':
+      return 'BIP-44';
+    case 'bitcoin-86':
+    case 'bittest-86':
+      return 'BIP-86';
+    case 'bitcoin-84':
+    case 'bittest-84':
+      return 'BIP-84';
+    default:
+      return '';
+  }
+};
