@@ -62,7 +62,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const { balanceMap } = useSelector((state) => state.balance);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [form] = Form.useForm<FormState>();
-  const view = Form.useWatch('view', form);
+  const viewValue = Form.useWatch('view', form);
 
   const balanceInfo = useMemo(
     () => (currentTokenInfo ? tokenBalanceMap[currentTokenInfo.slug] : undefined),
@@ -82,13 +82,13 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     return _isChainBitcoinCompatible(chainInfo);
   }, [chainInfo]);
 
-  const saveView = useMemo(() => {
+  const currentView = useMemo(() => {
     if (isBitcoinChain) {
       return ViewValue.DETAIL;
     } else {
-      return view;
+      return viewValue;
     }
-  }, [isBitcoinChain, view]);
+  }, [isBitcoinChain, viewValue]);
 
   const defaultValues = useMemo((): FormState => ({
     view: isBitcoinChain ? ViewValue.DETAIL : ViewValue.OVERVIEW
@@ -107,7 +107,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     ];
   }, [t]);
 
-  const items = useMemo((): ItemType[] => {
+  const overviewItems = useMemo((): ItemType[] => {
     const symbol = currentTokenInfo?.symbol || '';
     const createItem = (key: string, label: string, value: BigN): ItemType => ({
       key,
@@ -125,7 +125,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     ];
   }, [balanceInfo?.free.value, balanceInfo?.locked.value, currentTokenInfo?.symbol, t]);
 
-  const processedItems = useMemo((): BalanceItemWithAddressType[] => {
+  const detailItems = useMemo((): BalanceItemWithAddressType[] => {
     if (!currentAccountProxy || !currentTokenInfo?.slug) {
       return [];
     }
@@ -208,10 +208,10 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       </Form>
       <div className='content-container'>
         {
-          saveView === ViewValue.OVERVIEW && (
+          currentView === ViewValue.OVERVIEW && (
             <>
               <div className={'__container'}>
-                {items.map((item) => (
+                {overviewItems.map((item) => (
                   <div
                     className={'__row'}
                     key={item.key}
@@ -235,10 +235,10 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
           )
         }
         {
-          saveView === ViewValue.DETAIL && (
+          currentView === ViewValue.DETAIL && (
             <>
-              {processedItems.length
-                ? (processedItems.map((item) => (
+              {detailItems.length
+                ? (detailItems.map((item) => (
                   <AccountTokenBalanceItem
                     item={item}
                     key={item.address}
