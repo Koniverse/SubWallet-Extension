@@ -1263,6 +1263,23 @@ export default class KoniTabs {
   }
 
   private async cardanoGetChangeAddress (id: string, url: string): Promise<string> {
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
+
     const { address, network } = await this.getCurrentInformationCardanoDapp(url);
 
     const isTestnet = network !== 'cardano_preproduction';
