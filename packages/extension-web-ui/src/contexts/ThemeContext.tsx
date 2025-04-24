@@ -28,6 +28,11 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
   applyPreloadStyle(extendToken.bodyBackgroundColor);
 
   return ({
+    '@keyframes swRotate': {
+      '100%': {
+        transform: 'rotate(360deg)'
+      }
+    },
     body: {
       fontFamily: token.fontFamily,
       color: token.colorText,
@@ -213,6 +218,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
     '.form-space-xxs': {
       '.ant-form-item': {
         marginBottom: token.marginXXS
+      }
+    },
+
+    '.ant-badge.g-filter-badge': {
+      '.ant-badge-dot.ant-badge-dot': {
+        width: 8,
+        height: 8,
+        transform: 'none',
+        top: 'auto',
+        bottom: 4,
+        right: 3
       }
     },
 
