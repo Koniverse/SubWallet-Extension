@@ -25,7 +25,7 @@ export default function useSidePanelUtils () {
       if (tab) {
         const windowId = tab.windowId;
 
-        chrome.sidePanel.open({ windowId: windowId }).catch((err: Error) => {
+        chrome.sidePanel?.open({ windowId: windowId }).catch((err: Error) => {
           console.log('Error occurred opening side panel', err);
         });
       }
