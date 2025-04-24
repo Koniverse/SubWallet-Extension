@@ -53,7 +53,7 @@ export default function useAssetChecker () {
         updateAssetSetting({
           tokenSlug: assetSlug,
           assetSetting: { visible: true },
-          autoEnableNativeToken: true
+          autoEnableNativeToken: false
         }).then(() => {
           setEnablingAsset(assetSlug);
           notify({ message: t('{{name}} is turning on.', { replace: { name: assetInfo?.symbol } }), duration: 1.5 });
