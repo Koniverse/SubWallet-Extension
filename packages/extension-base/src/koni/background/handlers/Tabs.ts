@@ -25,8 +25,8 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { isCardanoAddress } from '@subwallet/keyring';
 import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
 import Web3 from 'web3';
@@ -410,14 +410,14 @@ export default class KoniTabs {
   }
 
   // TODO: Update logic
-  private async getCurrentAccount (url: string, authType: AccountAuthType, preferredAuthCurrentAccount?: boolean): Promise<string[]> {
+  private async getCurrentAccount (url: string, authType: AccountAuthType): Promise<string[]> {
     return await new Promise((resolve) => {
       this.getAuthInfo(url).then((authInfo) => {
         const allAccounts = this.#koniState.keyringService.context.pairs;
         const accountList = transformAccountsV2(allAccounts, false, authInfo, [authType]).map((a) => a.address);
         let accounts: string[] = [];
 
-        const proxyId = (preferredAuthCurrentAccount && authInfo?.currentAccountProxy) || this.#koniState.keyringService.context.currentAccount.proxyId;
+        const proxyId = this.#koniState.keyringService.context.currentAccount.proxyId;
 
         if (proxyId === ALL_ACCOUNT_KEY || !proxyId) {
           accounts = accountList;
@@ -569,8 +569,6 @@ export default class KoniTabs {
 
                   value[urlStripped].accountAuthTypes = accountAuthTypes?.filter((type) => type !== 'evm');
                 }
-
-                value[urlStripped].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[urlStripped]);
               } else {
                 resolve();
               }
@@ -1203,26 +1201,51 @@ export default class KoniTabs {
 
   // Cardano
 
-  private getCardanoAddressByProxyId (proxyId: string) {
-    const addresses = this.#koniState.keyringService.context.addressesByProxyId(proxyId);
+  private async getCurrentInformationCardanoDapp (url: string) {
+    const authInfo = await this.getAuthInfo(url);
 
-    const cardanoAddress = addresses.find((address) => isCardanoAddress(address));
-
-    if (!cardanoAddress) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No Cardano address found');
+    if (!authInfo || !authInfo.isAllowedMap || !authInfo.isAllowed) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
     }
 
-    return cardanoAddress;
+    const cardanoAddress = authInfo.currentAccount;
+
+    if (!cardanoAddress || !authInfo.isAllowedMap[cardanoAddress]) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'No Cardano address found');
+    }
+
+    const keypair = keyring.getPair(cardanoAddress);
+
+    if (!keypair) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'No Cardano address found');
+    }
+
+    const network = authInfo?.currentNetworkMap.cardano;
+
+    if (!network) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
+    }
+
+    return { address: cardanoAddress, network };
   }
 
   private async cardanoGetAccountList (id: string, url: string): Promise<string[]> {
-    const authInfo = await this.getAuthInfo(url);
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
 
     if (!authInfo || !authInfo.isAllowedMap) {
       throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
     }
 
-    const accountList = await this.getCurrentAccount(url, 'cardano', true);
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
 
     return accountList.map((address) => {
       const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
@@ -1233,37 +1256,17 @@ export default class KoniTabs {
   }
 
   private async cardanoGetAccountBalance (id: string, url: string): Promise<string> {
-    const authInfo = await this.getAuthInfo(url);
-
-    if (!authInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-    const balanceValue = await this.#koniState.cardanoGetBalance(id, url, cardanoAddress);
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const balanceValue = await this.#koniState.cardanoGetBalance(id, url, address);
 
     return balanceValue.to_hex();
   }
 
   private async cardanoGetChangeAddress (id: string, url: string): Promise<string> {
-    const authInfo = await this.getAuthInfo(url);
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
 
-    if (!authInfo || !authInfo.isAllowedMap) {
-      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-
-    const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
-    const addressChainFormat = reformatAddress(cardanoAddress, +isTestnet);
+    const isTestnet = network !== 'cardano_preproduction';
+    const addressChainFormat = reformatAddress(address, +isTestnet);
 
     return convertCardanoAddressToHex(addressChainFormat);
   }
@@ -1299,24 +1302,8 @@ export default class KoniTabs {
   }
 
   private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[] | null> {
-    const authInfo = await this.getAuthInfo(url);
-
-    if (!authInfo?.isAllowedMap) {
-      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    const networkKey = authInfo?.currentNetworkMap.cardano;
-
-    if (!networkKey) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-    const utxos = await this.#koniState.chainService.getUtxosByAddress(cardanoAddress, networkKey, params?.paginate);
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(address, network, params?.paginate);
 
     if (!params?.amount) {
       return utxos.map((utxo) => utxo.to_hex());
@@ -1346,23 +1333,8 @@ export default class KoniTabs {
   }
 
   private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[] | null> {
-    const authInfo = await this.getAuthInfo(url);
-    const networkKey = authInfo?.currentNetworkMap.cardano;
-
-    if (!authInfo?.isAllowedMap) {
-      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    if (!networkKey) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-    const utxos = await this.#koniState.chainService.getUtxosByAddress(cardanoAddress, networkKey);
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(address, network);
 
     let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
 
@@ -1402,18 +1374,8 @@ export default class KoniTabs {
   }
 
   private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
-    const authInfo = await this.getAuthInfo(url);
-
-    if (!authInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-    const signResult = await this.#koniState.cardanoSignData(id, url, params, cardanoAddress);
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const signResult = await this.#koniState.cardanoSignData(id, url, params, address);
 
     if (signResult) {
       return signResult;
@@ -1423,18 +1385,8 @@ export default class KoniTabs {
   }
 
   private async cardanoSignTransaction (id: string, url: string, params: RequestCardanoSignTransaction): Promise<ResponseCardanoSignTransaction> {
-    const authInfo = await this.getAuthInfo(url);
-
-    if (!authInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'You need to connect to the wallet first');
-    }
-
-    if (!authInfo.currentAccountProxy) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'Current account is changed');
-    }
-
-    const cardanoAddress = this.getCardanoAddressByProxyId(authInfo.currentAccountProxy);
-    const signResult = await this.#koniState.cardanoSignTx(id, url, params, cardanoAddress);
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const signResult = await this.#koniState.cardanoSignTx(id, url, params, address);
 
     if (signResult) {
       return signResult;

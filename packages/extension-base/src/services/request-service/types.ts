@@ -26,7 +26,7 @@ export interface AuthUrlInfo {
   accountAuthTypes: AccountAuthType[];
   isAllowedMap: Record<string, boolean>;
   currentNetworkMap: Partial<Record<AccountAuthType, string>>;
-  currentAccountProxy?: string;
+  currentAccount?: string;
 }
 
 export interface AuthUrlInfoNeedMigration extends Omit<AuthUrlInfo, 'accountAuthTypes'> {

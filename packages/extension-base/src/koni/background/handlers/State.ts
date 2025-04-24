@@ -36,7 +36,7 @@ import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
 import { convertAssetToValue, convertValueToAsset, extractKeyHashesFromCollaterals, extractKeyHashesFromRequiredSigners, extractKeyHashesFromScripts, extractKeyHashesFromWithdrawals, extractKeyHashFromCertificate, getBalanceAddressMap } from '@subwallet/extension-base/services/request-service/helper';
-import { AuthUrlInfo, AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/services/request-service/types';
+import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/services/request-service/types';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
@@ -375,10 +375,6 @@ export default class KoniState {
 
   public setAuthorize (data: AuthUrls, callback?: () => void): void {
     this.requestService.setAuthorize(data, callback);
-  }
-
-  public getCurrentAccountToConnect (authInfo: AuthUrlInfo, needCheckPrevAccount?: boolean) {
-    return this.requestService.getCurrentAccountToConnect(authInfo, needCheckPrevAccount);
   }
 
   public getAuthorize (update: (value: AuthUrls) => void): void {

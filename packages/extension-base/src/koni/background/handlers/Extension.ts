@@ -513,7 +513,6 @@ export default class KoniExtension {
                 delete rs[url].isAllowedMap[address];
               }
             });
-            rs[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(rs[url], true);
           });
 
           this.#koniState.setAuthorize(rs);
@@ -689,8 +688,6 @@ export default class KoniExtension {
         targetAccounts.forEach((address) => {
           value[url].isAllowedMap[address] = connectValue;
         });
-
-        value[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[url], true);
       });
       this.#koniState.setAuthorize(value, () => {
         callBack && callBack(value);
@@ -723,7 +720,6 @@ export default class KoniExtension {
         value[url].isAllowedMap[address] = connectValue;
       });
 
-      value[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[url], true);
       this.#koniState.setAuthorize(value, () => {
         callBack && callBack(value);
       });
@@ -736,7 +732,6 @@ export default class KoniExtension {
         assert(value[url], 'The source is not known');
 
         value[url].isAllowed = !value[url].isAllowed;
-        value[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[url], true);
 
         this.#koniState.setAuthorize(value, () => {
           resolve({ list: value });
@@ -765,7 +760,6 @@ export default class KoniExtension {
 
       if (this.isAddressValidWithAuthType(address, value[url].accountAuthTypes)) {
         value[url].isAllowedMap[address] = connectValue;
-        value[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[url], true);
 
         this.#koniState.setAuthorize(value, () => {
           callBack && callBack(value);
@@ -781,7 +775,6 @@ export default class KoniExtension {
       assert(value, 'The source is not known');
 
       value[id].isAllowed = connectValue;
-      value[id].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[id], true);
 
       this.#koniState.setAuthorize(value);
     });
@@ -792,7 +785,6 @@ export default class KoniExtension {
       assert(value, 'The source is not known');
 
       value[id].isAllowedMap = values;
-      value[id].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[id], true);
 
       this.#koniState.setAuthorize(value);
     });
@@ -1125,8 +1117,6 @@ export default class KoniExtension {
             for (const address of addresses) {
               delete value[url].isAllowedMap[address];
             }
-
-            value[url].currentAccountProxy = this.#koniState.getCurrentAccountToConnect(value[url], true);
           });
 
           this.#koniState.setAuthorize(value, resolve);
