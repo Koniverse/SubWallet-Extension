@@ -4,13 +4,13 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AuthRequestV2, ResultResolver } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType, AuthorizeRequest, RequestAuthorizeTab, Resolver } from '@subwallet/extension-base/background/types';
-import { ALL_ACCOUNT_AUTH_TYPES } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_AUTH_TYPES, ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
-import { AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { AuthUrlInfo, AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -56,6 +56,10 @@ export default class AuthRequestHandler {
       if (existKeyEvmNetworkConnect) {
         value.currentNetworkMap = { evm: existKeyEvmNetworkConnect };
         needUpdateAuthList = true;
+      }
+
+      if (!value.currentAccountProxy && value.isAllowed) {
+        value.currentAccountProxy = this.getCurrentAccountProxyToConnect(value);
       }
 
       acc[key] = { ...value };
@@ -285,6 +289,8 @@ export default class AuthRequestHandler {
           currentNetworkMap: existed ? existed.currentNetworkMap : defaultNetworkMap
         };
 
+        authorizeList[stripUrl(url)].currentAccountProxy = this.getCurrentAccountProxyToConnect(authorizeList[stripUrl(url)]);
+
         this.setAuthorize(authorizeList, () => {
           cb();
           delete this.#authRequestsV2[id];
@@ -399,6 +405,15 @@ export default class AuthRequestHandler {
       }, []);
 
       if (!confirmAnotherType && !request.reConfirm && allowedListByRequestType.length !== 0) {
+        const currentAccountProxyNeedUpdate = this.getCurrentAccountProxyToConnect(existedAuth);
+
+        console.log('currentAccountProxyNeedUpdate', currentAccountProxyNeedUpdate, existedAuth.currentAccountProxy);
+
+        if (currentAccountProxyNeedUpdate !== existedAuth.currentAccountProxy) {
+          authList[idStr].currentAccountProxy = currentAccountProxyNeedUpdate;
+          this.setAuthorize(authList);
+        }
+
         // Prevent appear confirmation popup
         return true;
       }
@@ -421,6 +436,8 @@ export default class AuthRequestHandler {
           accountAuthTypes: ALL_ACCOUNT_AUTH_TYPES,
           currentNetworkMap: {}
         };
+
+        authList[stripUrl(url)].currentAccountProxy = this.getCurrentAccountProxyToConnect(authList[stripUrl(url)]);
 
         this.setAuthorize(authList);
 
@@ -483,6 +500,41 @@ export default class AuthRequestHandler {
         resolve(true);
       });
     });
+  }
+
+  public getCurrentAccountProxyToConnect (authInfo: AuthUrlInfo, needCheckPrevAccount?: boolean): string | undefined {
+    if (!authInfo.isAllowed) {
+      return undefined;
+    }
+
+    const allowedAccountMap = Object.keys(authInfo.isAllowedMap)
+      .filter((address) => authInfo.isAllowedMap[address]);
+
+    if (!allowedAccountMap.length) {
+      return undefined;
+    }
+
+    if (needCheckPrevAccount && authInfo.currentAccountProxy) {
+      const addresses = this.keyringService.context.addressesByProxyId(authInfo.currentAccountProxy);
+
+      const isExist = addresses.find((address) => allowedAccountMap.includes(address));
+
+      if (!isExist) {
+        return undefined;
+      }
+    }
+
+    const currentProxyId = this.keyringService.context.currentAccount.proxyId;
+
+    if (currentProxyId === ALL_ACCOUNT_KEY || !currentProxyId) {
+      return this.keyringService.context.belongUnifiedAccount(allowedAccountMap[0]);
+    }
+
+    const currentAddress = this.keyringService.context.addressesByProxyId(currentProxyId);
+
+    return currentAddress.find((address) => authInfo.isAllowedMap[address])
+      ? currentProxyId
+      : this.keyringService.context.belongUnifiedAccount(allowedAccountMap[0]);
   }
 
   public resetWallet () {

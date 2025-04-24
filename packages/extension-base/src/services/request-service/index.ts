@@ -15,7 +15,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 
 import TonRequestHandler from './handler/TonRequestHandler';
 import { AuthRequestHandler, ConnectWCRequestHandler, EvmRequestHandler, MetadataRequestHandler, NotSupportWCRequestHandler, PopupHandler, SubstrateRequestHandler } from './handler';
-import { AuthUrls, MetaRequest } from './types';
+import { AuthUrlInfo, AuthUrls, MetaRequest } from './types';
 
 export default class RequestService {
   // Common
@@ -121,6 +121,10 @@ export default class RequestService {
 
   public setAuthorize (data: AuthUrls, callback?: () => void): void {
     this.#authRequestHandler.setAuthorize(data, callback);
+  }
+
+  public getCurrentAccountToConnect (authInfo: AuthUrlInfo, needCheckPrevAccount?: boolean) {
+    return this.#authRequestHandler.getCurrentAccountProxyToConnect(authInfo, needCheckPrevAccount);
   }
 
   public getAuthorize (update: (value: AuthUrls) => void): void {

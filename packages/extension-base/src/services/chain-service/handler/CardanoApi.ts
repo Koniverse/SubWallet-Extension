@@ -12,7 +12,7 @@ import { hexAddPrefix, isHex } from '@polkadot/util';
 
 export const API_KEY = {
   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
-  testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
+  testnet: process.env.BLOCKFROST_API_KEY_PREP || 'preprodn4IaPVVX7FYJdOvW1qE6EshWbatZ4oPw'
 };
 
 export class CardanoApi implements _CardanoApi {

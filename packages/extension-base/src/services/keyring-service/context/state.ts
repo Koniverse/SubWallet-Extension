@@ -378,6 +378,8 @@ export class AccountState {
               value[url].isAllowedMap[address] = isAllowed;
             }
           });
+
+          value[url].currentAccountProxy = this.koniState.getCurrentAccountToConnect(value[url], true);
         });
 
         this.koniState.setAuthorize(value);
@@ -395,6 +397,8 @@ export class AccountState {
             authInfo.isAllowedMap[newAddress] = authInfo.isAllowedMap[oldAddress];
             delete authInfo.isAllowedMap[oldAddress];
           }
+
+          authInfo.currentAccountProxy = this.koniState.getCurrentAccountToConnect(authInfo, true);
 
           return { ...acc, [url]: { ...authInfo } };
         }, {});
