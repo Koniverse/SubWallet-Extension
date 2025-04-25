@@ -233,6 +233,7 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
 
+    // todo: validate data before sending
     const transactionConfig: TransactionConfig = {
       from: data?.sender,
       to: data?.to,

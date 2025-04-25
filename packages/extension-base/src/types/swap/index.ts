@@ -183,6 +183,7 @@ export interface SwapRequestV2 {
   recipient?: string;
   feeToken?: string;
   preferredProvider?: SwapProviderId; // allow user to designate a provider
+  isCrossChain?: boolean;
 }
 
 export interface SwapRequestResult {
