@@ -110,7 +110,8 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   }, [priceId, selectedTimeframe]);
 
   useEffect(() => {
-    let idSubscription: string;
+    let subscriptionId: string;
+    let isSync = true;
 
     const cb = (price: LivePrice) => {
       setLivePrice(price);
@@ -119,14 +120,18 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
     subscribeCurrentTokenPrice(priceId, cb).then((rs) => {
       const { id, price } = rs;
 
-      idSubscription = id;
+      subscriptionId = id;
 
-      setLivePrice(price);
+      if (isSync) {
+        setLivePrice(price);
+      }
     }).catch(console.error);
 
     return () => {
-      if (idSubscription) {
-        cancelSubscription(idSubscription).catch(console.error);
+      isSync = false;
+
+      if (subscriptionId) {
+        cancelSubscription(subscriptionId).catch(console.error);
       }
     };
   }, [priceId]);

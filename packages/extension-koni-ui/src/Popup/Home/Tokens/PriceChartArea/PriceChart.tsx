@@ -110,7 +110,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     const datetimeFormat = (() => {
-      if (['ALL', 'YTD'].includes(timeframe)) {
+      if (['ALL', 'YTD', '1Y'].includes(timeframe)) {
         return '#MMM# #D# #YYYY#';
       }
 

@@ -207,54 +207,58 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.refreshTimeout = setTimeout(this.refreshPriceData.bind(this), CRON_REFRESH_PRICE_INTERVAL);
   }
 
-  public async getHistoryTokenPriceData (priceId: string, timeframe: PriceChartTimeframe): Promise<HistoryTokenPriceJSON> {
+  public async getHistoryTokenPriceData (
+    priceId: string,
+    timeframe: PriceChartTimeframe
+  ): Promise<HistoryTokenPriceJSON> {
     const id = getTokenPriceHistoryId(priceId, timeframe);
-    let historyTokenPriceData = this.historyTokenPriceSubject.value[id];
+    const currentData = this.historyTokenPriceSubject.value[id];
+    const now = Date.now();
+    const timeInterval = TIME_INTERVAL[timeframe];
 
-    if (historyTokenPriceData) {
-      const now = Date.now();
-      const lastTime = historyTokenPriceData[historyTokenPriceData.length - 1].time;
-      const timeInterval = TIME_INTERVAL[timeframe];
+    let history: PriceChartPoint[] | undefined = currentData
+      ? structuredClone(currentData)
+      : undefined;
 
-      if (lastTime - now <= timeInterval) {
-        return {
-          history: historyTokenPriceData
-        };
+    const needsRefresh =
+      !history ||
+      history.length === 0 ||
+      now - history[history.length - 1].time > timeInterval;
+
+    if (needsRefresh) {
+      const { history: newHistory } = await getHistoryPrice(priceId, timeframe);
+
+      if (newHistory.length > 0) {
+        history = newHistory;
+
+        // Update internal cache
+        this.historyTokenPriceSubject.next({
+          ...this.historyTokenPriceSubject.value,
+          [id]: structuredClone(history)
+        });
       }
     }
 
-    const newHistoryTokenPriceData = await getHistoryPrice(priceId, timeframe);
-
-    if (newHistoryTokenPriceData.history.length) {
-      historyTokenPriceData = [...newHistoryTokenPriceData.history];
+    if (!history) {
+      return { history: [] };
     }
 
+    // Resolve current currency
     const { promise, resolve } = createPromiseHandler<CurrencyType>();
 
     this.getCurrentCurrency(resolve);
-
     const currencyKey = await promise;
-    const exchangeRateMap = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY];
+    const exchangeRate = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY]?.exchange;
 
-    if (exchangeRateMap && currencyKey !== DEFAULT_CURRENCY) {
-      historyTokenPriceData = historyTokenPriceData.map((price) => {
-        return {
-          ...price,
-          value: price.value * exchangeRateMap.exchange
-        };
-      });
+    // Convert value if needed
+    if (exchangeRate && currencyKey !== DEFAULT_CURRENCY) {
+      history = history.map((point) => ({
+        ...point,
+        value: point.value * exchangeRate
+      }));
     }
 
-    if (historyTokenPriceData?.length) {
-      this.historyTokenPriceSubject.next({
-        ...this.historyTokenPriceSubject.value,
-        [id]: [...historyTokenPriceData]
-      });
-    }
-
-    return {
-      history: historyTokenPriceData
-    };
+    return { history };
   }
 
   public subscribeCurrentTokenPrice (priceId: string, callback: (price: CurrentTokenPrice) => void) {
