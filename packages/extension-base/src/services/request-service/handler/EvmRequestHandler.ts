@@ -316,6 +316,7 @@ export default class EvmRequestHandler {
         // result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
 
         const data = request as ConfirmationDefinitions['evmSignatureRequest'][0];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const eip7702Payload = JSON.parse(data.payloadJson, (key: string, value: any) => {
           if (typeof value === 'string' && /^\d+n$/.test(value)) {
             return BigInt(value.slice(0, -1));

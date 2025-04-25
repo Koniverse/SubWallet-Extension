@@ -2180,6 +2180,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emurgo/cardano-message-signing-browser@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@emurgo/cardano-message-signing-browser@npm:1.1.0"
+  checksum: 5c1ecb18a378ffc539fe04d9211dc10b1d577cf0691ad1c7365d683966f21602b8fa83f3e0b2ad6bfd3109ad7e9ed110c517216391409ab2f3518a39d3fd8ae2
+  languageName: node
+  linkType: hard
+
 "@emurgo/cardano-serialization-lib-browser@npm:^13.2.0":
   version: 13.2.0
   resolution: "@emurgo/cardano-serialization-lib-browser@npm:13.2.0"
@@ -7224,10 +7231,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/keyring@npm:0.1.9"
+"@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.11
+  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build/#../SubWallet-Base/packages/keyring/build/::hash=fa8266&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
+    "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
     "@metamask/eth-sig-util": ^7.0.3
@@ -7237,6 +7245,7 @@ __metadata:
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
     "@ton/ton": ^15.0.0
+    abstractionkit: ^0.2.16
     bcryptjs: ^2.4.3
     bignumber.js: ^9.1.2
     bip322-js: ^2.0.0
@@ -7247,7 +7256,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: a04f8370c5af418e0d9220ad405dd2f376d5879b72a8cebfa214109cd52af173713df5d1e25ec92edae6d1df6871e59b90d1694eef57d2c5b0e039502631c2ee
+  checksum: 3ef80864e98c1049f205efa9dbd60419b03cd51c410fd761a9da479c9a3139b1ed693df87943a244165bc1ff84dcab2457ccf3c53ed2027cbda666b35863976c
   languageName: node
   linkType: hard
 
@@ -7338,19 +7347,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/ui-keyring@npm:0.1.9"
+"@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.11
+  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=42aa41&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
-    "@subwallet/keyring": ^0.1.8
+    "@subwallet/keyring": ^0.1.11
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 332502def6742a386e8c2001ea82ded2dfbcba274df669cb3b8166945ea975ca22b6e2a758733cc9cbbb38dca18a956ef92e6e7c45b85cb55f053d6a45bc07f9
+  checksum: 608559c2fac0237ddabbaf16bf5055de98cab0a4690f79758b91547d5ef4d4350b4e489247a8a675799874e7e9137a2f5de7ce244ddaa741fbda5b279c37872a
   languageName: node
   linkType: hard
 
