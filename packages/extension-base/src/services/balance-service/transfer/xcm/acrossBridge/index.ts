@@ -113,6 +113,11 @@ export const SpokePoolMapping: Record<number, { SpokePool: { address: string; bl
   }
 };
 
+export const AcrossErrorMsg = {
+  AMOUNT_TOO_LOW: 'amount too low',
+  AMOUNT_TOO_HIGH: 'amount too high'
+};
+
 interface AcrossQuote {
   outputAmount: string;
   rate: string;
@@ -127,8 +132,6 @@ export const getAcrossQuote = async ({ destinationChain,
   sender,
   sendingValue }: CreateXcmExtrinsicProps): Promise<AcrossQuote> => {
   const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
-
-  console.log('sendingValue', sendingValue);
 
   if (!isAcrossBridgeXcm) {
     throw new Error('This is not a valid AcrossBridge transfer');
