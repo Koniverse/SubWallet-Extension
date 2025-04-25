@@ -242,7 +242,7 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
           title={customScreenTitle || titleMap[transactionType]}
         >
           <TransactionContext.Provider value={contextValues}>
-            <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+            <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
               <div className={CN(className, 'transaction-wrapper')}>
                 <Outlet />
               </div>
@@ -262,7 +262,7 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
         showTabBar={false}
       >
         <TransactionContext.Provider value={contextValues}>
-          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
             <div className={CN(className, 'transaction-wrapper')}>
               <SwSubHeader
                 background={'transparent'}

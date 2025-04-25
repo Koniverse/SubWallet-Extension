@@ -4,20 +4,21 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SpecialYieldPoolMetadata, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, NominationSelector } from '@subwallet/extension-web-ui/components';
+import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-web-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-web-ui/constants';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
-import { yieldSubmitLeavePool } from '@subwallet/extension-web-ui/messaging';
+import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-web-ui/types';
-import { convertFieldToObject, getBannerButtonIcon, noop, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
+import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
-import BigN from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
 import { MinusCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -58,6 +59,7 @@ const Component: React.FC = () => {
   const poolType = poolInfo.type;
   const poolChain = poolInfo.chain;
   const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
 
   const [form] = Form.useForm<UnStakeParams>();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -71,6 +73,7 @@ const Component: React.FC = () => {
   const currentValidator = useWatchTransaction('validator', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const fastLeaveValue = useWatchTransaction('fastLeave', form, defaultData);
+  const amountValue = useWatchTransaction('value', form, defaultData);
 
   const { list: allPositions } = useYieldPositionDetail(slug);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
@@ -89,9 +92,124 @@ const Component: React.FC = () => {
 
   const bondedAsset = useGetChainAssetInfo(bondedSlug || poolInfo.metadata.inputAsset);
   const decimals = bondedAsset?.decimals || 0;
-  const symbol = bondedAsset?.symbol || '';
+  const symbol = (positionInfo as SubnetYieldPositionInfo).subnetData?.subnetSymbol || bondedAsset?.symbol || '';
   const altAsset = useGetChainAssetInfo((poolInfo?.metadata as SpecialYieldPoolMetadata)?.altInputAssets);
   const altSymbol = altAsset?.symbol || '';
+
+  // For subnet staking
+
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
+  const [earningRate, setEarningRate] = useState<number>(0);
+  const debounce = useRef<NodeJS.Timeout | null>(null);
+
+  const isDisabledSubnetContent = useMemo(
+    () =>
+      !isSubnetStaking ||
+      !amountValue,
+
+    [isSubnetStaking, amountValue]
+  );
+
+  useEffect(() => {
+    if (isDisabledSubnetContent) {
+      return;
+    }
+
+    setLoading(true);
+
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
+
+    debounce.current = setTimeout(() => {
+      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+      const data = {
+        slug: poolInfo.slug,
+        value: amountValue,
+        netuid: netuid,
+        type: ExtrinsicType.STAKING_UNBOND
+      };
+
+      getEarningSlippage(data)
+        .then((result) => {
+          console.log('Actual stake slippage:', result.slippage * 100);
+          setEarningSlippage(result.slippage);
+          setEarningRate(result.rate);
+        })
+        .catch((error) => {
+          console.error('Error fetching earning slippage:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 200);
+
+    return () => {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+    };
+  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
+
+  const isSlippageAcceptable = useMemo(() => {
+    if (earningSlippage === null || !amountValue) {
+      return true;
+    }
+
+    return earningSlippage <= maxSlippage.slippage.toNumber();
+  }, [amountValue, earningSlippage, maxSlippage]);
+
+  const alertBoxRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
+      alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHasScrolled(true);
+    }
+  }, [isSlippageAcceptable, hasScrolled]);
+
+  const renderRate = useCallback(() => {
+    return (
+      <MetaInfo
+        className='__rate-wrapper'
+        labelColorScheme={'gray'}
+        spaceSize={'sm'}
+        valueColorScheme={'gray'}
+      >
+        <MetaInfo.Number
+          className='__label-bottom'
+          decimals={decimals}
+          label={t('Expected TAO to receive')}
+          suffix={bondedAsset?.symbol || ''}
+          value={BigNumber(amountValue).multipliedBy(earningRate)}
+        />
+        <MetaInfo.Default
+          className='__label-bottom'
+          label={t('Conversion rate')}
+        >
+          <div className='__subnet-rate'>
+            <span
+              className='chain-name'
+              style={{ color: '#A6A6A6' }}
+            >
+              {`1 ${bondedAsset?.symbol || ''} = `}
+            </span>
+            <MetaInfo.Number
+              className='__label-bottom'
+              decimals={decimals}
+              suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
+              value={BigN(1).multipliedBy(10 ** decimals).multipliedBy(1 / earningRate)}
+            />
+          </div>
+        </MetaInfo.Default>
+      </MetaInfo>
+    );
+  }, [t, poolInfo.metadata?.subnetData?.subnetSymbol, amountValue, earningRate, decimals, bondedAsset?.symbol]);
+
+  // For subnet staking
 
   const selectedValidator = useMemo((): NominationInfo | undefined => {
     if (positionInfo) {
@@ -126,6 +244,10 @@ const Component: React.FC = () => {
         return new BigN(positionInfo?.activeStake || '0').multipliedBy(exchaneRate).toFixed(0);
       }
 
+      case YieldPoolType.SUBNET_STAKING: {
+        return selectedValidator?.activeStake || '0';
+      }
+
       case YieldPoolType.LIQUID_STAKING:
       case YieldPoolType.NOMINATION_POOL:
       default:
@@ -151,14 +273,7 @@ const Component: React.FC = () => {
     ) {
       const time = poolInfo.statistic.unstakingPeriod;
 
-      if (time >= 24) {
-        const days = Math.floor(time / 24);
-        const hours = time - days * 24;
-
-        return `${days} ${t('days')}${hours ? ` ${hours} ${t('hours')}` : ''}`;
-      } else {
-        return `${time} ${t('hours')}`;
-      }
+      return getEarningTimeText(time);
     } else {
       return t('unknown time');
     }
@@ -228,7 +343,8 @@ const Component: React.FC = () => {
       amount: value,
       fastLeave,
       slug,
-      poolInfo: poolInfo
+      poolInfo: poolInfo,
+      slippage: maxSlippage.slippage.toNumber()
     };
 
     if (mustChooseValidator) {
@@ -247,7 +363,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo]);
 
   const renderBounded = useCallback(() => {
     return (
@@ -255,10 +371,14 @@ const Component: React.FC = () => {
         bondedBalance={bondedValue}
         className={'bonded-balance'}
         decimals={decimals}
+        isSlippageAcceptable={isSlippageAcceptable}
+        isSubnetStaking={isSubnetStaking}
+        maxSlippage={maxSlippage}
+        setMaxSlippage={setMaxSlippage}
         symbol={symbol}
       />
     );
-  }, [bondedValue, decimals, symbol]);
+  }, [bondedValue, decimals, isSlippageAcceptable, isSubnetStaking, maxSlippage, symbol]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -300,6 +420,12 @@ const Component: React.FC = () => {
   }, [poolChain, form]);
 
   useEffect(() => {
+    if (isMythosStaking) {
+      form.setFieldValue('value', bondedValue);
+    }
+  }, [poolChain, form, isMythosStaking, bondedValue]);
+
+  useEffect(() => {
     if (!fromValue && accountList.length === 1) {
       form.setFieldValue('from', accountList[0].address);
     }
@@ -316,7 +442,7 @@ const Component: React.FC = () => {
   }, [poolType, setCustomScreenTitle, t]);
 
   const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING) {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
       return ExtrinsicType.STAKING_UNBOND;
     }
 
@@ -337,7 +463,7 @@ const Component: React.FC = () => {
 
   const unstakeAlertData = poolChain === 'bifrost_dot'
     ? UNSTAKE_BIFROST_ALERT_DATA
-    : poolChain === 'bittensor' ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
+    : poolChain.startsWith('bittensor') ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
 
   return (
     <>
@@ -367,7 +493,7 @@ const Component: React.FC = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance:')}
+            label={t('Available balance')}
             onBalanceReady={setIsBalanceReady}
           />
 
@@ -381,6 +507,7 @@ const Component: React.FC = () => {
               disabled={!fromValue}
               label={t(`Select ${handleValidatorLabel}`)}
               nominators={nominators}
+              poolInfo={poolInfo}
             />
           </Form.Item>
 
@@ -393,6 +520,7 @@ const Component: React.FC = () => {
           }
 
           <Form.Item
+            hidden={isMythosStaking}
             name={'value'}
             statusHelpAsTooltip={true}
           >
@@ -402,6 +530,14 @@ const Component: React.FC = () => {
               showMaxButton={true}
             />
           </Form.Item>
+
+          {
+            !isDisabledSubnetContent && earningRate > 0 && (
+              <>
+                {renderRate()}
+              </>
+            )
+          }
 
           {!mustChooseValidator && renderBounded()}
 
@@ -444,6 +580,18 @@ const Component: React.FC = () => {
                           />
                         );
                       })}
+                      {!isSlippageAcceptable && (
+                        <div
+                          className='__instruction-item'
+                          ref={alertBoxRef}
+                        >
+                          <AlertBox
+                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            title='Slippage too high!'
+                            type='error'
+                          />
+                        </div>
+                      )}
                     </>
                   )
                   : (
@@ -469,7 +617,7 @@ const Component: React.FC = () => {
       <TransactionFooter>
         {/* todo: recheck action type, it may not work as expected any more */}
         <Button
-          disabled={isDisable || !isBalanceReady}
+          disabled={isDisable || !isBalanceReady || !isSlippageAcceptable}
           icon={(
             <Icon
               phosphorIcon={MinusCircle}
@@ -530,6 +678,25 @@ const Unbond = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       '.ant-checkbox': {
         top: 0
       }
+    },
+
+    // TODO: recheck with other UI
+    '.__subnet-rate': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem'
+    },
+
+    '.__rate-wrapper': {
+      marginTop: token.paddingSM
+    },
+
+    '.__label-bottom, .__label-bottom *': {
+      color: `${token['gray-5']} !important`
+    },
+
+    '.__label-bottom, .__value': {
+      color: `${token['gray-5']} !important`
     }
   };
 });

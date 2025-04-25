@@ -85,6 +85,7 @@ const Statistics = new LazyLoader('Statistics', () => import('@subwallet/extensi
 const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-web-ui/Popup/Settings'));
 const GeneralSetting = new LazyLoader('GeneralSetting', () => import('@subwallet/extension-web-ui/Popup/Settings/GeneralSetting'));
 const ManageAddressBook = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-web-ui/Popup/Settings/AddressBook'));
+const AccountSettings = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-web-ui/Popup/Settings/AccountSettings'));
 
 const ManageChains = new LazyLoader('ManageChains', () => import('@subwallet/extension-web-ui/Popup/Settings/Chains/ManageChains'));
 const ChainImport = new LazyLoader('ChainImport', () => import('@subwallet/extension-web-ui/Popup/Settings/Chains/ChainImport'));
@@ -122,6 +123,7 @@ const AccountExport = new LazyLoader('AccountExport', () => import('@subwallet/e
 
 const Transaction = new LazyLoader('Transaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/Transaction'));
 const TransactionDone = new LazyLoader('TransactionDone', () => import('@subwallet/extension-web-ui/Popup/TransactionDone'));
+const TransactionSubmission = new LazyLoader('TransactionSubmission', () => import('@subwallet/extension-web-ui/Popup/TransactionSubmission'));
 const SendFund = new LazyLoader('SendFund', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/SendFund'));
 const SendNFT = new LazyLoader('SendNFT', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/SendNFT'));
 const Earn = new LazyLoader('Stake', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Earn'));
@@ -131,6 +133,7 @@ const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/exten
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw'));
 const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Swap'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimBridge'));
+const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-web-ui/Popup/MigrateAccount'));
 
 // Wallet Connect
 const ConnectWalletConnect = new LazyLoader('ConnectWalletConnect', () => import('@subwallet/extension-web-ui/Popup/WalletConnect/ConnectWalletConnect'));
@@ -260,6 +263,9 @@ export const router = createBrowserRouter([
         ]
       },
       {
+        ...TransactionSubmission.generateRouterObject('transaction-submission')
+      },
+      {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
       },
       {
@@ -284,6 +290,7 @@ export const router = createBrowserRouter([
         children: [
           Settings.generateRouterObject('/settings'),
           Settings.generateRouterObject('list'),
+          AccountSettings.generateRouterObject('account-settings'),
           GeneralSetting.generateRouterObject('general'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
@@ -330,6 +337,9 @@ export const router = createBrowserRouter([
           AccountExport.generateRouterObject('export/:accountProxyId'),
           ExportAllDone.generateRouterObject('export-all-done')
         ]
+      },
+      {
+        ...MigrateAccount.generateRouterObject('migrate-account')
       },
       {
         path: 'wallet-connect',

@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
-import { AlertBox, MetaInfo, SwapRoute, SwapTransactionBlock } from '@subwallet/extension-web-ui/components';
+import { AlertBox, MetaInfo, QuoteRateDisplay, SwapRoute, SwapTransactionBlock } from '@subwallet/extension-web-ui/components';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-web-ui/hooks';
-import { Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -54,26 +53,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return totalBalance;
   }, [assetRegistryMap, data.quote.feeInfo.feeComponent, priceMap]);
 
-  const renderRateConfirmInfo = () => {
-    return (
-      <div className={'__quote-rate-wrapper'}>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(fromAssetInfo)}
-          unitOpacity={0.45}
-          value={1}
-        />
-        <span>&nbsp;~&nbsp;</span>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(toAssetInfo)}
-          unitOpacity={0.45}
-          value={data.quote.rate}
-        />
-      </div>
-    );
-  };
-
   const isSwapXCM = useMemo(() => {
     return data.process.steps.some((item) => item.type === CommonStepType.XCM);
   }, [data.process.steps]);
@@ -81,6 +60,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const getWaitingTime = useMemo(() => {
     return Math.ceil((data.quote.estimatedArrivalTime || 0) / 60);
   }, [data.quote.estimatedArrivalTime]);
+
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(data.process.steps);
+  }, [data.process.steps]);
 
   useEffect(() => {
     let timer: NodeJS.Timer;
@@ -102,7 +85,10 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock
-        data={data}
+        fromAmount={data.quote.fromAmount}
+        fromAssetSlug={originSwapPair?.from}
+        toAmount={data.quote.toAmount}
+        toAssetSlug={originSwapPair?.to}
       />
       <MetaInfo
         hasBackgroundWrapper={false}
@@ -119,7 +105,12 @@ const Component: React.FC<Props> = (props: Props) => {
           label={t('Quote rate')}
           valueColorSchema={'gray'}
         >
-          {renderRateConfirmInfo()}
+          <QuoteRateDisplay
+            className={'__quote-estimate-swap-value'}
+            fromAssetInfo={fromAssetInfo}
+            rateValue={data.quote.rate}
+            toAssetInfo={toAssetInfo}
+          />
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}

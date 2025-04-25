@@ -10,7 +10,7 @@ import { useSetSelectedAccountTypes } from '@subwallet/extension-web-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-web-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-web-ui/utils';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -235,6 +235,7 @@ function Component ({ className, request }: Props) {
               {visibleAccountProxies.map((item) => (
                 <AccountProxyItem
                   accountProxy={item}
+                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes)}
                   className={'__account-proxy-item'}
                   isSelected={selectedMap[item.id]}
                   key={item.id}

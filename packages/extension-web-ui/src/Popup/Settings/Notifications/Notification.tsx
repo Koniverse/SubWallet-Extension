@@ -28,11 +28,13 @@ import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } fr
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+// todo: update once sign flow with this file
 
 type Props = {
   isInModal?: boolean;
@@ -67,7 +69,9 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM = 'yellow-7',
   CLAIM_AVAIL_BRIDGE_ON_AVAIL = 'yellow-7', // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
-  CLAIM_POLYGON_BRIDGE = 'yellow-7'
+  CLAIM_POLYGON_BRIDGE = 'yellow-7',
+  SWAP = 'blue-8',
+  EARNING = 'blue-8'
 }
 
 export const NotificationIconMap = {
@@ -77,7 +81,9 @@ export const NotificationIconMap = {
   CLAIM: Gift,
   CLAIM_AVAIL_BRIDGE_ON_AVAIL: Coins, // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
-  CLAIM_POLYGON_BRIDGE: Coins
+  CLAIM_POLYGON_BRIDGE: Coins,
+  SWAP: ArrowsLeftRight,
+  EARNING: Database
 };
 
 function Component ({ isInModal,
