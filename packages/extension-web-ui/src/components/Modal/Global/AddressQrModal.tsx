@@ -1,4 +1,4 @@
-// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
@@ -8,14 +8,14 @@ import { AccountActions } from '@subwallet/extension-base/types';
 import { BaseModal, CloseIcon } from '@subwallet/extension-web-ui/components';
 import { ADDRESS_QR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-web-ui/hooks';
+import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab, toShort } from '@subwallet/extension-web-ui/utils';
-import { Button, Icon, Logo, SwQRCode } from '@subwallet/react-ui';
+import { Button, Icon, Logo, SwQRCode, Tag } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowSquareOut, CaretLeft, CopySimple, Gear } from 'phosphor-react';
+import { ArrowSquareOut, CaretLeft, CopySimple, Gear, House } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
@@ -25,6 +25,7 @@ export interface AddressQrModalProps {
   chainSlug: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
+  isNewFormat?: boolean
 }
 
 type Props = ThemeProps & AddressQrModalProps & {
@@ -33,16 +34,22 @@ type Props = ThemeProps & AddressQrModalProps & {
 
 const modalId = ADDRESS_QR_MODAL;
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const notify = useNotification();
   const chainInfo = useFetchChainInfo(chainSlug);
   const accountInfo = useGetAccountByAddress(address);
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
+  const goHome = useDefaultNavigate().goHome;
 
   const scanExplorerAddressUrl = useMemo(() => {
     return getExplorerLink(chainInfo, address, 'account');
   }, [address, chainInfo]);
+
+  const onGoHome = useCallback(() => {
+    goHome();
+    onCancel();
+  }, [goHome, onCancel]);
 
   const handleClickViewOnExplorer = useCallback(() => {
     try {
@@ -147,6 +154,16 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
                 {toShort(address || '', 7, 7)}
               </div>
 
+              {isNewFormat !== undefined && <div className={'__address-tag'}>
+                <Tag
+                  bgType={'default'}
+                  className={CN(className, '__item-tag')}
+                  color={isNewFormat ? 'green' : 'yellow'}
+                >
+                  {t(isNewFormat ? 'New' : 'Legacy')}
+                </Tag>
+              </div>}
+
               <CopyToClipboard text={address}>
                 <Button
                   className='__copy-button'
@@ -165,20 +182,40 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
             </div>
           </div>
 
-          <Button
-            block
-            className={'__view-on-explorer'}
-            disabled={!scanExplorerAddressUrl}
-            icon={
-              <Icon
-                customSize={'28px'}
-                phosphorIcon={ArrowSquareOut}
-                size='sm'
-                weight={'fill'}
-              />
-            }
-            onClick={handleClickViewOnExplorer}
-          >{t('View on explorer')}</Button>
+          {isNewFormat === undefined || isNewFormat
+            ? (
+              <Button
+                block
+                className={'__view-on-explorer'}
+                disabled={!scanExplorerAddressUrl}
+                icon={
+                  <Icon
+                    customSize={'28px'}
+                    phosphorIcon={ArrowSquareOut}
+                    size='sm'
+                    weight={'fill'}
+                  />
+                }
+                onClick={handleClickViewOnExplorer}
+              >{t('View on explorer')}</Button>
+            )
+            : (
+              <Button
+                block
+                className={'__go-home-button'}
+                disabled={!scanExplorerAddressUrl}
+                icon={
+                  <Icon
+                    customSize={'28px'}
+                    phosphorIcon={House}
+                    size='sm'
+                    weight={'fill'}
+                  />
+                }
+                onClick={onGoHome}
+                schema={'secondary'}
+              >{t('Back to home')}</Button>
+            )}
         </>
       </BaseModal>
     </>
@@ -253,6 +290,24 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__view-on-explorer': {
       fontSize: token.fontSizeLG
+    },
+
+    '.__address-tag': {
+      alignItems: 'center',
+      display: 'flex',
+      paddingRight: token.paddingXS
+    },
+
+    '.__item-tag': {
+      marginRight: 0,
+      'white-space': 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      minWidth: 39,
+      padding: `2px ${token.paddingXS}px`,
+      fontSize: token.fontSizeXS,
+      fontWeight: 700,
+      lineHeight: token.lineHeightXS
     }
   };
 });

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import EarningTypeTag from '@subwallet/extension-web-ui/components/Earning/EarningTypeTag';
 import { BN_TEN } from '@subwallet/extension-web-ui/constants';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -65,17 +66,30 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }, [asset, priceMap, tvl]);
 
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+  const isBittensor = useMemo(() => poolInfo.chain === 'bittensor', [poolInfo.chain]);
+
   return (
     <div
       className={CN(className)}
       onClick={onClick}
     >
       <div className={'__item-upper-part'}>
-        <Logo
-          className={'__item-logo'}
-          network={logo || chain}
-          size={40}
-        />
+        {!isSubnetStaking || !DefaultLogosMap[`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`]
+          ? (
+            <Logo
+              className={'__item-logo'}
+              network={logo || chain}
+              size={40}
+            />)
+          : (
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={false}
+              network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
+              size={40}
+            />
+          )}
 
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
@@ -91,7 +105,7 @@ const Component: React.FC<Props> = (props: Props) => {
             {!!apy && (
               <div className='__item-rewards'>
                 <div className='__item-rewards-label'>
-                  {t('Rewards')}:
+                  {t(`${isSubnetStaking ? 'Emission' : isBittensor ? 'Max APY' : 'Rewards'}`)}:
                 </div>
                 <div className='__item-rewards-value'>
                   <Number

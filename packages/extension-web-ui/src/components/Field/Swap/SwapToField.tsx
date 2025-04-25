@@ -70,7 +70,9 @@ const Component = (props: Props) => {
         <div className={'__amount-wrapper'}>
           {
             loading && (
-              <ActivityIndicator size={24} />
+              <div className='__loading-wrapper'>
+                <ActivityIndicator size={24} />
+              </div>
             )
           }
           {
@@ -100,8 +102,7 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
-    marginBottom: 12,
-    paddingBottom: 8,
+    paddingBottom: 12,
 
     '&.swap-to-field': {
       '.ant-select-modal-input-border-default::before': {
@@ -113,7 +114,9 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
     '.__input-container': {
-      display: 'flex'
+      display: 'flex',
+      paddingLeft: token.padding,
+      paddingRight: token.padding
     },
     '.__label': {
       fontSize: token.fontSizeSM,
@@ -124,16 +127,29 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       paddingTop: 8,
       paddingBottom: 8
     },
+    '.__token-selector-wrapper': {
+      flex: 1,
+      paddingTop: 1,
+      overflow: 'hidden',
+
+      '.-modal-trigger': {
+        paddingRight: 24
+      }
+    },
 
     '.__amount-wrapper': {
       flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'flex-end',
-      paddingRight: 16,
-      overflow: 'hidden'
+      overflow: 'hidden',
+      textAlign: 'right'
     },
+
+    '.__loading-wrapper': {
+      height: 44,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end'
+    },
+
     '.__amount-destination': {
       maxHeight: 24,
       maxWidth: 185,
@@ -145,6 +161,7 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       lineHeight: token.lineHeightLG,
       color: token.colorWhite
     },
+
     '.__amount-convert': {
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,

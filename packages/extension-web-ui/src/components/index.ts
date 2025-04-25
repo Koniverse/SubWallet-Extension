@@ -14,6 +14,8 @@ export { default as SelectValidatorInput } from './SelectValidatorInput';
 export { default as SocialButtonGroup } from './SocialButtonGroup';
 export { default as SocialGroup } from './SocialGroup';
 export { default as WordPhrase } from './WordPhrase';
+export { default as AlertBoxInstant } from './AlertBoxInstant';
+export { default as NumberDisplay } from './NumberDisplay';
 
 export * from '../contexts';
 export * from './Common';
@@ -40,3 +42,4 @@ export * from './WalletConnect';
 export * from './Crowdloan';
 export * from './Table';
 export * from './NetworkTag';
+export * from './TransactionProcess';

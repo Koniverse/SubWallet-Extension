@@ -257,7 +257,7 @@ export const SeedPhraseTermModal = styled(Component)<Props>(({ theme: { token } 
         '.term-footer-checkbox': {
           alignItems: 'center',
           marginLeft: 0
-        },
+        }
       },
 
       '.annotation': {

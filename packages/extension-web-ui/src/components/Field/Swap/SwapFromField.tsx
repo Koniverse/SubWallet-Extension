@@ -115,9 +115,10 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
   return {
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
-    paddingBottom: 8,
+    paddingBottom: 12,
     position: 'relative',
     marginBottom: 4,
+
     '&.swap-form-field': {
       '.ant-input-container::before': {
         display: 'none'
@@ -144,12 +145,25 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
     },
 
     '.__input-container': {
-      display: 'flex'
+      display: 'flex',
+      paddingLeft: token.padding,
+      paddingRight: token.padding
+    },
+
+    '.__token-selector-wrapper': {
+      flex: 1,
+      paddingTop: 1,
+      overflow: 'hidden',
+
+      '.-modal-trigger': {
+        paddingRight: 24
+      }
     },
 
     '.__label-wrapper .__max-button': {
       maxHeight: 20
     },
+
     '.__label-wrapper .__label': {
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
@@ -158,15 +172,13 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
 
     '.__amount-wrapper': {
       flex: 1,
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      alignItems: 'end',
-      paddingRight: 4,
-      overflow: 'hidden'
+      overflow: 'hidden',
+      textAlign: 'right'
     },
+
     '.ant-input-wrapper .ant-input': {
       textAlign: 'right',
+      minWidth: 0,
       fontSize: 16,
       lineHeight: token.lineHeightLG,
       fontWeight: token.fontWeightStrong,

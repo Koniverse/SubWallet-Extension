@@ -2,53 +2,57 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { SwapTxData } from '@subwallet/extension-base/types/swap';
-import { swapCustomFormatter } from '@subwallet/extension-base/utils';
+import { swapNumberMetadata } from '@subwallet/extension-base/utils';
+import { NumberDisplay } from '@subwallet/extension-web-ui/components';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Icon, Logo, Number } from '@subwallet/react-ui';
+import { Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowRight } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps{
-  data: SwapTxData
+  fromAssetSlug: string | undefined;
+  fromAmount: string | undefined;
+  toAssetSlug: string | undefined;
+  toAmount: string | undefined;
+  logoSize?: number
 }
-const numberMetadata = { maxNumberFormat: 8 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, data } = props;
+  const { className, fromAmount,
+    fromAssetSlug,
+    logoSize = 24,
+    toAmount,
+    toAssetSlug } = props;
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
-  const swapInfo = data;
-
-  const toAssetInfo = useMemo(() => {
-    return assetRegistryMap[swapInfo.quote.pair.to] || undefined;
-  }, [assetRegistryMap, swapInfo.quote.pair.to]);
 
   const fromAssetInfo = useMemo(() => {
-    return assetRegistryMap[swapInfo.quote.pair.from] || undefined;
-  }, [assetRegistryMap, swapInfo.quote.pair.from]);
+    return fromAssetSlug ? assetRegistryMap[fromAssetSlug] : undefined;
+  }, [assetRegistryMap, fromAssetSlug]);
+
+  const toAssetInfo = useMemo(() => {
+    return toAssetSlug ? assetRegistryMap[toAssetSlug] : undefined;
+  }, [assetRegistryMap, toAssetSlug]);
 
   return (
-    <div className={CN(className, 'swap-confirmation-container')}>
+    <div className={CN(className)}>
       <div className={'__summary-quote'}>
         <div className={'__summary-from'}>
           <Logo
             className='token-logo'
             isShowSubLogo={true}
             shape='circle'
-            size={24}
+            size={logoSize}
             subNetwork={_getAssetOriginChain(fromAssetInfo)}
-            token={swapInfo.quote.pair.from.toLowerCase()}
+            token={fromAssetSlug?.toLowerCase()}
           />
-          <Number
+          <NumberDisplay
             className={'__amount-destination'}
-            customFormatter={swapCustomFormatter}
             decimal={_getAssetDecimals(fromAssetInfo)}
-            formatType={'custom'}
-            metadata={numberMetadata}
-            value={swapInfo.quote.fromAmount}
+            metadata={swapNumberMetadata}
+            value={fromAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(fromAssetInfo)}</span>
         </div>
@@ -62,17 +66,15 @@ const Component: React.FC<Props> = (props: Props) => {
             className='token-logo'
             isShowSubLogo={true}
             shape='circle'
-            size={24}
+            size={logoSize}
             subNetwork={_getAssetOriginChain(toAssetInfo)}
-            token={swapInfo.quote.pair.to.toLowerCase()}
+            token={toAssetSlug?.toLowerCase()}
           />
-          <Number
+          <NumberDisplay
             className={'__amount-destination'}
-            customFormatter={swapCustomFormatter}
             decimal={_getAssetDecimals(toAssetInfo)}
-            formatType={'custom'}
-            metadata={numberMetadata}
-            value={swapInfo.quote.toAmount || 0}
+            metadata={swapNumberMetadata}
+            value={toAmount || 0}
           />
           <span className={'__quote-footer-label'}>{_getAssetSymbol(toAssetInfo)}</span>
         </div>
@@ -86,6 +88,7 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
     '.__quote-estimate-swap-confirm-value': {
       display: 'flex'
     },
+
     '.__summary-quote': {
       display: 'flex',
       justifyContent: 'space-between',
@@ -98,33 +101,42 @@ const SwapTransactionBlock = styled(Component)<Props>(({ theme: { token } }: Pro
       borderRadius: 8,
       marginBottom: 16
     },
+
     '.__summary-quote .-sub-logo': {
       bottom: 0,
       right: 0
     },
+
     '.__summary-quote .ant-image': {
       fontSize: 0
     },
+
     '.__summary-to, .__summary-from': {
       display: 'flex',
       alignItems: 'center',
       flexDirection: 'column',
       flex: 1
     },
+
     '.__quote-footer-label': {
       color: token.colorTextTertiary,
       fontSize: 12,
       fontWeight: token.bodyFontWeight,
       lineHeight: token.lineHeightSM
     },
+
     '.__amount-destination': {
       color: token.colorTextLight2,
       fontSize: token.fontSizeLG,
       fontWeight: token.fontWeightStrong,
-      lineHeight: token.lineHeightLG
-    },
-    '&.swap-confirmation-container .__swap-route-container': {
-      marginBottom: 20
+      lineHeight: token.lineHeightLG,
+
+      '.ant-number, .ant-typography': {
+        color: 'inherit !important',
+        fontSize: 'inherit !important',
+        fontWeight: 'inherit !important',
+        lineHeight: 'inherit'
+      }
     }
   };
 });

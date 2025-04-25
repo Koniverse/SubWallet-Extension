@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NumberDisplay } from '@subwallet/extension-web-ui/components';
 import { Number } from '@subwallet/react-ui';
 import { SwNumberProps } from '@subwallet/react-ui/es/number';
 import BigN from 'bignumber.js';
@@ -25,6 +26,7 @@ export interface NumberInfoItem extends Omit<InfoItemBase, 'valueColorSchema'> {
   metadata?: Record<string, number>;
   customFormatter?: SwNumberProps['customFormatter'];
   formatType?: SwNumberProps['formatType'];
+  useNumberDisplay?: boolean
 }
 
 const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
@@ -41,7 +43,10 @@ const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
     size = 30,
     subFloatNumber = false,
     suffix,
-    suffixNode, value, valueColorSchema = 'default' } = props;
+    suffixNode,
+    useNumberDisplay, value, valueColorSchema = 'default' } = props;
+
+  const NumberComponent = useNumberDisplay ? NumberDisplay : Number;
 
   return (
     <div className={CN(className, '__row -type-number')}>
@@ -65,7 +70,7 @@ const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
           )}
           onClick={!disableClickValue ? onClickValue : undefined}
         >
-          <Number
+          <NumberComponent
             customFormatter={customFormatter}
             decimal={decimals}
             decimalOpacity={decimalOpacity}

@@ -3,6 +3,7 @@
 
 export { default as DeriveAccountActionModal } from './DeriveAccountActionModal';
 export { default as ReceiveModal } from './ReceiveModalNew';
+export { default as RemindDuplicateAccountNameModal } from './RemindDuplicateAccountNameModal';
 export { default as RequestCameraAccessModal } from './RequestCameraAccessModal';
 export { default as RequestCreatePasswordModal } from './RequestCreatePasswordModal';
 export { default as ResetWalletModal } from './ResetWalletModal';

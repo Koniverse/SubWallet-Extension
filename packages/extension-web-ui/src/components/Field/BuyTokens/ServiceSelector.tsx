@@ -39,13 +39,13 @@ export const baseServiceItems: ServiceItem[] = [
     disabled: false
   },
   {
-    key: 'moonpay',
-    name: 'MoonPay (Coming soon)',
-    disabled: true
+    key: 'meld',
+    name: 'Meld',
+    disabled: false
   },
   {
-    key: 'onramper',
-    name: 'Onramper (Coming soon)',
+    key: 'moonpay',
+    name: 'MoonPay (Coming soon)',
     disabled: true
   }
 ];

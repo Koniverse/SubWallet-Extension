@@ -52,6 +52,7 @@ function Component (
   const { isShowBalance } = useSelector((state) => state.settings);
 
   let amountValue = item?.amount?.value;
+  let symbol = item?.amount?.symbol;
 
   if (item.type === ExtrinsicType.CLAIM_BRIDGE) {
     const additionalInfo = item.additionalInfo as RequestClaimBridge;
@@ -60,6 +61,14 @@ function Component (
       const metadata = additionalInfo.notification.metadata as ClaimPolygonBridgeNotificationMetadata;
 
       amountValue = metadata.amounts[0];
+    }
+  }
+
+  if (item.type === ExtrinsicType.STAKING_UNBOND) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo?.symbol) {
+      symbol = additionalInfo.symbol;
     }
   }
 
@@ -145,7 +154,7 @@ function Component (
   }
 
   const chainAsset = Object.values(chainAssetMap).find((ca) => {
-    return item.chain === ca.originChain && item.amount?.symbol === ca.symbol;
+    return item.chain === ca.originChain && symbol === ca.symbol;
   });
 
   const price = chainAsset?.priceId ? priceMap[chainAsset?.priceId] : 0;
@@ -196,7 +205,7 @@ function Component (
           decimal={0}
           decimalOpacity={0.45}
           hide={!isShowBalance}
-          suffix={item?.amount?.symbol}
+          suffix={symbol}
           value={balanceValue.isNaN() ? '0' : balanceValue}
         />
         <Number
