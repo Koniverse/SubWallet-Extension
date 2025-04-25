@@ -6,7 +6,6 @@ import { _BITCOIN_CHAIN_SLUG, _BITCOIN_NAME, _BITCOIN_TESTNET_NAME } from '@subw
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BitcoinFeeInfo, BitcoinFeeRate, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineBitcoinFee, determineUtxosForSpend, determineUtxosForSpendAll } from '@subwallet/extension-base/utils';
-import { getId } from '@subwallet/extension-base/utils/getId';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { Network, Psbt } from 'bitcoinjs-lib';
@@ -24,7 +23,6 @@ export interface TransferBitcoinProps extends TransactionFee {
 
 export async function createBitcoinTransaction (params: TransferBitcoinProps): Promise<[Psbt, string]> {
   const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, from, network, to, transferAll, value } = params;
-  const id = getId();
   const feeCustom = _feeCustom as BitcoinFeeRate;
 
   console.log('_feeInfo', _feeInfo);
@@ -58,7 +56,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
     // console.log(outputs, (outputs as Array<{value: number}>).reduce((v, i) => v + i.value, 0));
     console.log('create.btc.bitcoinFee', bitcoinFee);
 
-    const pair = keyring.getPair('bc1qd3grc7qla07ml665t09s58le85ztc32f2xx5cs');
+    const pair = keyring.getPair('bc1qqn6ggclhsk2h5rmzy8v8akkh0mawcjesvcy6c9');
     const tx = new Psbt({ network });
     let transferAmount = new BigN(0);
 
@@ -91,7 +89,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
 
     for (const output of outputs) {
       tx.addOutput({
-        address: output.address || from,
+        address: 'bc1qqn6ggclhsk2h5rmzy8v8akkh0mawcjesvcy6c9',
         value: output.value
       });
 

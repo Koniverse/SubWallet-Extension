@@ -28,11 +28,11 @@ const defaultErrorMap: Record<BitcoinProviderErrorType, { message: string, code?
     code: 4901
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact OpenBit support'),
+    message: detectTranslate('Undefined error. Please contact SubWallet support'),
     code: -32602
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact OpenBit support'),
+    message: detectTranslate('Undefined error. Please contact SubWallet support'),
     code: -32603
   }
 };

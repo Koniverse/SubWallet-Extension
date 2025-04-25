@@ -5,6 +5,7 @@ import { BitcoinTransactionConfig, ChainType, ExtrinsicDataTypeMap, ExtrinsicSta
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { Psbt } from 'bitcoinjs-lib';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
 
@@ -26,7 +27,7 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   updatedAt: number;
   estimateFee?: FeeData,
   xcmFeeDryRun?: string;
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | BitcoinTransactionConfig;
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt | BitcoinTransactionConfig;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
   isPassConfirmation?: boolean;
@@ -68,6 +69,12 @@ export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'tran
 
 export type SWTransactionResponse = SwInputBase & Pick<SWTransaction, 'warnings' | 'errors'> & Partial<Pick<SWTransaction, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
   processId?: string;
+}
+
+export type BitcoinTransactionData = {
+  data: Psbt,
+  dataBase64: string,
+  dataToHex: string,
 }
 
 export type ValidateTransactionResponseInput = SWTransactionInput;
