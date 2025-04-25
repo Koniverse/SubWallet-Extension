@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
+import { t } from 'i18next';
 import { Coin, Cube, DiceSix, SelectionBackground, User } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 
 type GovCategory = {
   name: string;
   slug: string;
+}
+
+export interface voteData{
+  value: string,
+  conviction: number
 }
 
 export enum GovCategoryType {
@@ -89,3 +95,13 @@ export const tagMap: Record<string, TagInfo> = {
     iconWeight: 'fill'
   }
 };
+
+export const convictionOptions = [
+  { label: t('0.1x (No lockup)'), value: 0, lockPeriod: 0 },
+  { label: t('1x (7 days)'), value: 1, lockPeriod: 7 },
+  { label: t('2x (14 days)'), value: 2, lockPeriod: 14 },
+  { label: t('3x (21 days)'), value: 3, lockPeriod: 21 },
+  { label: t('4x (28 days)'), value: 4, lockPeriod: 28 },
+  { label: t('5x (35 days)'), value: 5, lockPeriod: 35 },
+  { label: t('6x (42 days)'), value: 6, lockPeriod: 42 }
+];

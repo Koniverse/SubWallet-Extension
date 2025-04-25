@@ -1,43 +1,57 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _ReferendumInfo, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo } from '@subwallet/extension-base/services/open-gov/type';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { useGetNativeTokenSlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
+import { handleDelegate } from '@subwallet/extension-koni-ui/messaging';
+import { TransactionContent } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Form, Icon, Image, ModalContext, SwModal } from '@subwallet/react-ui';
 import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import TransactionContent from '../../Transaction/parts/TransactionContent';
-import { isGovOngoing } from './utils';
+import { convictionOptions, voteData } from '../predefined';
 
 type Props = ThemeProps & {
   address: string;
-  data: _ReferendumInfo | null;
-  chain: string;
+  data: _DelegateInfo | null;
+  chainAsset: _ChainAsset | null;
 };
 
-interface voteData{
-  value: string,
-  conviction: number
-}
+export const DelegateDetailModalId = 'delegateDetailModalId';
 
-export const GovDetailModalId = 'openGovDetailModalId';
+const modalId = DelegateDetailModalId;
 
-const modalId = GovDetailModalId;
+const modalCloseButton = (
+  <Icon
+    customSize={'24px'}
+    phosphorIcon={CaretLeft}
+    type='phosphor'
+    weight={'light'}
+  />
+);
 
-function Component ({ address, chain, className = '', data }: Props): React.ReactElement<Props> {
+const trackOptions = [
+  { id: 0, name: 'Root' },
+  { id: 1, name: 'Whitelisted Caller' },
+  { id: 10, name: 'Staking Admin' },
+  { id: 11, name: 'Treasurer' },
+  { id: 33, name: 'Medium Spender' }
+];
+
+function Component ({ address, chainAsset, className = '', data }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const [form] = Form.useForm();
-
   const [convictionValue, setConvictionValue] = useState<number>(0);
+  const [selectedTrackIds, setSelectedTrackIds] = useState<number[]>([]);
+  const valueColorSchema = 'blue';
+  const chain = chainAsset?.originChain;
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
@@ -53,46 +67,26 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
 
   const onClickVote = useCallback(() => {
     form.validateFields().then(async (values: voteData) => {
-      if (!data) {
+      if (!data || !chain || selectedTrackIds.length === 0) {
         return;
       }
 
-      const voteData: StandardVoteRequest = {
-        address: address,
-        chain: chain,
-        referendumIndex: data.referendumIndex,
-        aye: true,
+      const delegateRequest = {
+        chain,
+        userAddress: address,
+        trackIds: selectedTrackIds,
+        delegateAddress: data.address,
+        conviction: values.conviction,
         balance: values.value,
-        conviction: values.conviction
+        removeOtherTracks: true
       };
 
       inactiveModal(modalId);
-      await handleStandardVote(voteData);
+      await handleDelegate(delegateRequest);
     }).catch((error) => {
       console.error('Form validation failed:', error);
     });
-  }, [form, data, address, chain, inactiveModal]);
-
-  const modalCloseButton = (
-    <Icon
-      customSize={'24px'}
-      phosphorIcon={CaretLeft}
-      type='phosphor'
-      weight={'light'}
-    />
-  );
-
-  const valueColorSchema = 'blue';
-
-  const convictionOptions = [
-    { label: t('0.1x (No lockup)'), value: 0, lockPeriod: 0 },
-    { label: t('1x (7 days)'), value: 1, lockPeriod: 7 },
-    { label: t('2x (14 days)'), value: 2, lockPeriod: 14 },
-    { label: t('3x (21 days)'), value: 3, lockPeriod: 21 },
-    { label: t('4x (28 days)'), value: 4, lockPeriod: 28 },
-    { label: t('5x (35 days)'), value: 5, lockPeriod: 35 },
-    { label: t('6x (42 days)'), value: 6, lockPeriod: 42 }
-  ];
+  }, [form, data, chain, selectedTrackIds, address, inactiveModal]);
 
   const handleConvictionChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,12 +98,16 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
     [form]
   );
 
-  const { assetRegistry } = useSelector((state) => state.assetRegistry);
-  const nativeTokenSlug = useGetNativeTokenSlug(chain);
-
-  const chainAsset = useMemo(() => {
-    return assetRegistry[nativeTokenSlug];
-  }, [assetRegistry, nativeTokenSlug]);
+  const handleTrackChange = useCallback(
+    (trackId: number) => () => {
+      setSelectedTrackIds((prev) =>
+        prev.includes(trackId)
+          ? prev.filter((id) => id !== trackId)
+          : [...prev, trackId]
+      );
+    },
+    []
+  );
 
   return (
     <SwModal
@@ -117,7 +115,7 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
       closeIcon={modalCloseButton}
       id={modalId}
       onCancel={onCancel}
-      title={t(data?.title || 'Referendum details')}
+      title={t(data?.manifesto?.shortDescription || 'Delegate details')}
     >
       {data && (
         <>
@@ -126,14 +124,13 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
             spaceSize={'ms'}
             valueColorScheme={'light'}
           >
-            <MetaInfo.Default label={t('Name')}>{data.title}</MetaInfo.Default>
-
+            <MetaInfo.Default label={t('Name')}>{data.manifesto?.name}</MetaInfo.Default>
             <MetaInfo.Default
               className={'__status-pool'}
               label={t('Status')}
               valueColorSchema={valueColorSchema}
             >
-              {data.state.name}
+              {data.address}
             </MetaInfo.Default>
           </MetaInfo>
 
@@ -148,7 +145,7 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
                 statusHelpAsTooltip={true}
               >
                 <AmountInput
-                  decimals={_getAssetDecimals(chainAsset)}
+                  decimals={_getAssetDecimals(chainAsset || undefined)}
                   maxValue={'1'}
                   placeholder={t('Enter vote amount')}
                   showMaxButton={true}
@@ -185,12 +182,34 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
                   </div>
                 </div>
               </Form.Item>
+
+              <Form.Item
+                name='trackIds'
+                rules={[{ required: true, message: t('Please select at least one track') }]}
+                statusHelpAsTooltip={true}
+              >
+                <div className='track-checkbox-container'>
+                  {trackOptions.map((track) => (
+                    <label
+                      className='track-checkbox-label'
+                      key={track.id}
+                    >
+                      <input
+                        checked={selectedTrackIds.includes(track.id)}
+                        onChange={handleTrackChange(track.id)}
+                        type='checkbox'
+                        value={track.id}
+                      />
+                      {track.name}
+                    </label>
+                  ))}
+                </div>
+              </Form.Item>
             </Form>
           </TransactionContent>
 
           <div className='__modal-footer'>
             <div className={'__modal-separator'}></div>
-
             <div className={'__modal-buttons'}>
               <Button
                 className={'__modal-icon-button'}
@@ -218,17 +237,15 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
                 type='ghost'
               />
               <Button
-                disabled={!isGovOngoing(data.state.name)}
                 icon={
                   <Icon
                     phosphorIcon={PlusCircle}
                     size={'sm'}
                     weight={'fill'}
-                  />
-                }
+                  />}
                 onClick={onClickVote}
               >
-                {t('Join now')}
+                {t('Delegate now')}
               </Button>
             </div>
           </div>
@@ -238,7 +255,7 @@ function Component ({ address, chain, className = '', data }: Props): React.Reac
   );
 }
 
-export const GovDetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const DelegateDetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-content': {
       paddingBottom: 0,

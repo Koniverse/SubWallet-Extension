@@ -46,6 +46,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.SWAP]: detectTranslate('Swap'),
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('Claim token'),
   [ExtrinsicType.VOTE]: detectTranslate('Vote'),
+  [ExtrinsicType.DELEGATE]: detectTranslate('Delegate'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('Unknown')
 };
 

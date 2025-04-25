@@ -238,7 +238,8 @@ const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.SEND_NFT,
   ExtrinsicType.SWAP,
   ExtrinsicType.CROWDLOAN,
-  ExtrinsicType.VOTE
+  ExtrinsicType.VOTE,
+  ExtrinsicType.DELEGATE
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
@@ -347,7 +348,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     const result: ExtrinsicType[] = [];
     const specialNetwork = _specialNetwork || '';
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN, ExtrinsicType.VOTE);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN, ExtrinsicType.VOTE, ExtrinsicType.DELEGATE);
 
     // NFT
     if (!['astar', 'avail_mainnet'].includes(specialNetwork)) {

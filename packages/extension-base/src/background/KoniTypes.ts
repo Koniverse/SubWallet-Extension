@@ -37,7 +37,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { _ReferendumInfo, StandardVoteRequest } from '../services/open-gov/type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, RemoveVoteRequest, StandardVoteRequest } from '../services/open-gov/type';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -542,6 +542,7 @@ export enum ExtrinsicType {
 
   // SET_FEE_TOKEN = 'set_fee-token',
   VOTE = 'gov.vote',
+  DELEGATE = 'gov.delegate',
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -599,6 +600,7 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
   [ExtrinsicType.VOTE]: any, // TODO: avoid any
+  [ExtrinsicType.DELEGATE]: any, // TODO: avoid any
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }
@@ -2457,6 +2459,10 @@ export interface KoniRequestSignatures {
   /* Gov */
   'pri(openGov.fetchReferendums)': [string, _ReferendumInfo[]];
   'pri(openGov.standardVote)': [StandardVoteRequest, SWTransactionResponse];
+  'pri(openGov.removeVote)': [RemoveVoteRequest, SWTransactionResponse];
+
+  'pri(openGov.fetchDelegates)': [string, _DelegateInfo[]];
+  'pri(openGov.delegate)': [DelegateRequest, SWTransactionResponse];
 }
 
 export interface ApplicationMetadataType {

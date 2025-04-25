@@ -13,7 +13,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Alien, Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Alien, Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, FlyingSaucer, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -34,7 +34,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
   swap: ArrowsLeftRight,
-  vote: Alien
+  vote: Alien,
+  delegate: FlyingSaucer
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -68,6 +69,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (item.type === ExtrinsicType.VOTE) {
     return IconMap.vote;
+  }
+
+  if (item.type === ExtrinsicType.DELEGATE) {
+    return IconMap.delegate;
   }
 
   return IconMap.default;
@@ -323,6 +328,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.SWAP]: t('Swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
     [ExtrinsicType.VOTE]: t('Vote'),
+    [ExtrinsicType.DELEGATE]: t('Delegate'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
@@ -369,6 +375,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.SWAP]: t('Swap transaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
     [ExtrinsicType.VOTE]: t('Vote transaction'),
+    [ExtrinsicType.DELEGATE]: t('Delegate transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 

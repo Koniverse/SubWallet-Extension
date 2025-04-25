@@ -48,7 +48,7 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { _ReferendumInfo, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -4708,6 +4708,38 @@ export default class KoniExtension {
       chainType: ChainType.SUBSTRATE
     });
   }
+
+  private async handleRemoveVote (request: RemoveVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleRemoveVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.VOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async fetchDelegates (request: string): Promise<_DelegateInfo[]> {
+    const data = await this.#koniState.openGovService.fetchDelegates(request);
+
+    return data;
+  }
+
+  private async handleDelegate (request: DelegateRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleDelegate(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.userAddress,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.DELEGATE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
   /* Gov */
 
   // --------------------------------------------------------------
@@ -5369,6 +5401,12 @@ export default class KoniExtension {
         return this.fetchReferendums(request as string);
       case 'pri(openGov.standardVote)':
         return this.handleStandardVote(request as StandardVoteRequest);
+      case 'pri(openGov.removeVote)':
+        return this.handleRemoveVote(request as RemoveVoteRequest);
+      case 'pri(openGov.fetchDelegates)':
+        return this.fetchDelegates(request as string);
+      case 'pri(openGov.delegate)':
+        return this.handleDelegate(request as DelegateRequest);
         /* Gov */
 
       // Default

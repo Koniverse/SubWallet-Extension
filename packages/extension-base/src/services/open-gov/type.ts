@@ -54,6 +54,13 @@ export interface RemoveVoteRequest {
   referendumIndex: number;
 }
 
+export interface UnlockVoteRequest {
+  address: string;
+  chain: string;
+  trackId: number;
+  target: string;
+}
+
 export interface _ReferendumInfo {
   _id: string;
   referendumIndex: number;
@@ -85,5 +92,35 @@ export interface _ReferendumInfo {
     info: {
       alarm: number[]
     }
+  };
+
+}
+
+export interface _EnhancedReferendumInfo extends _ReferendumInfo {
+  endTime: number;
+}
+
+// Delegate
+export interface _DelegateInfo {
+  address: string
+  delegatorsCount: number,
+  votes: string,
+  manifesto?: {
+    source: string;
+    name: string;
+    image: string;
+    shortDescription: string;
+    longDescription: string;
+    isOrganization: boolean
   }
+}
+
+export interface DelegateRequest {
+  userAddress: string,
+  chain: string,
+  trackIds: number[];
+  conviction: number;
+  balance: string;
+  delegateAddress: string
+  removeOtherTracks: boolean
 }

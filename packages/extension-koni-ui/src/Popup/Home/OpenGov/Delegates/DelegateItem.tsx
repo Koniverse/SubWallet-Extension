@@ -1,79 +1,48 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo } from '@subwallet/extension-base/services/open-gov/type';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { calculateTimeLeft } from './utils';
-
 type Props = ThemeProps & {
-  data: _ReferendumInfo,
-  onClick: (data: _ReferendumInfo) => void,
+  data: _DelegateInfo,
+  onClick: (data: _DelegateInfo) => void,
 };
 
-function Component (props: Props): React.ReactElement<Props> {
-  const { className, data, onClick } = props;
+function Component ({ className, data, onClick }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
 
   const onClickContainer = useCallback(() => {
     onClick(data);
   }, [data, onClick]);
 
-  const [timeLeft, setTimeLeft] = useState(
-    calculateTimeLeft(
-      data.state.indexer.blockTime,
-      data.state.indexer.blockHeight,
-      data.onchainData.info.alarm ? data.onchainData.info.alarm[0] : null,
-      data.trackInfo.decisionPeriod,
-      data.state.name
-    ).timeLeft
-  );
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(
-        calculateTimeLeft(
-          data.state.indexer.blockTime,
-          data.state.indexer.blockHeight,
-          data.onchainData.info.alarm ? data.onchainData.info.alarm[0] : null,
-          data.trackInfo.decisionPeriod,
-          data.state.name
-        ).timeLeft
-      );
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [data.state.indexer.blockTime, data.state.indexer.blockHeight, data.onchainData.info.alarm, data.trackInfo.decisionPeriod, data.state.name]);
-
   return (
     <div
       className={CN(className)}
       onClick={onClickContainer}
     >
-      <div className={'__item-inner'}>
-        <div className={'__right-block'}>
-          <div className='__item-name'>{data.title || ''}</div>
-          <div className={'__item-timeline'}>{timeLeft}</div>
-          <div className={'__item-rewards'}>
-            <div className='__item-label'>{t('Track')}: </div>
-            <div className='__item-value'>{data.trackInfo.name}</div>
+      <div className='__item-inner'>
+        <div className='__right-block'>
+          <div className='__item-name'>{data.address || ''}</div>
+          <div className='__item-timeline'>{data.votes}</div>
+          <div className='__item-rewards'>
+            <div className='__item-label'>{t('Name')}:</div>
+            <div className='__item-value'>{data.manifesto?.name || ''}</div>
           </div>
-          <div className='__separator'></div>
-          <div className={'__item-tags'}>
-          #{data.referendumIndex}
-          </div>
+          <div className='__separator' />
+          <div className='__item-tags'>#{data.manifesto?.source || ''}</div>
         </div>
       </div>
     </div>
   );
 }
 
-const GovItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const DelegateItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     backgroundColor: token.colorBgSecondary,
     borderRadius: token.borderRadiusLG,
@@ -149,4 +118,4 @@ const GovItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   };
 });
 
-export default GovItem;
+export default DelegateItem;
