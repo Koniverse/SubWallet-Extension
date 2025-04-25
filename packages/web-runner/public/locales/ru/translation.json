@@ -1495,5 +1495,12 @@
   "Do not close the app!": "",
   "View process": "",
   "Quote": "",
-  "Expected amount": ""
+  "Expected amount": "",
+  "Not found auth info": "",
+  "Not found owner key hash": "",
+  "No available Cardano account": "",
+  "Input": "",
+  "Output": "",
+  "Cardano dApp": "",
+  "No swap quote found. Adjust your amount and try again": ""
 }
