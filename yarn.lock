@@ -2173,6 +2173,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emurgo/cardano-message-signing-browser@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@emurgo/cardano-message-signing-browser@npm:1.1.0"
+  checksum: 5c1ecb18a378ffc539fe04d9211dc10b1d577cf0691ad1c7365d683966f21602b8fa83f3e0b2ad6bfd3109ad7e9ed110c517216391409ab2f3518a39d3fd8ae2
+  languageName: node
+  linkType: hard
+
 "@emurgo/cardano-serialization-lib-browser@npm:^13.2.0":
   version: 13.2.0
   resolution: "@emurgo/cardano-serialization-lib-browser@npm:13.2.0"
@@ -6785,9 +6792,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/subwallet-api-sdk": ^1.3.30-0
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
     "@ton/ton": ^15.0.0
@@ -6888,7 +6895,7 @@ __metadata:
     "@polkadot/util": ^13.4.3
     "@polkadot/util-crypto": ^13.4.3
     "@polkadot/x-global": ^13.4.3
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@types/chrome": ^0.0.254
     "@types/firefox-webext-browser": ^120.0.0
     web3-core: ^1.10.0
@@ -6925,9 +6932,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/react-ui": 5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7067,9 +7074,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.30-0
     "@subwallet/extension-inject": ^1.3.30-0
     "@subwallet/extension-mocks": ^1.3.30-0
-    "@subwallet/keyring": ^0.1.9
+    "@subwallet/keyring": ^0.1.11
     "@subwallet/react-ui": ^5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.9
+    "@subwallet/ui-keyring": ^0.1.11
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7132,10 +7139,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/keyring@npm:0.1.9"
+"@subwallet/keyring@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@subwallet/keyring@npm:0.1.11"
   dependencies:
+    "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
     "@metamask/eth-sig-util": ^7.0.3
@@ -7155,7 +7163,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: a04f8370c5af418e0d9220ad405dd2f376d5879b72a8cebfa214109cd52af173713df5d1e25ec92edae6d1df6871e59b90d1694eef57d2c5b0e039502631c2ee
+  checksum: 837326dd891caad047fd0b665514748d8f04b8e322ba813ee82ae626ed81138d492227a455f7082445dfaaa3e28bc05ce6433f7cda64b54fe150d4c76d9bac8c
   languageName: node
   linkType: hard
 
@@ -7246,19 +7254,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@npm:^0.1.9":
-  version: 0.1.9
-  resolution: "@subwallet/ui-keyring@npm:0.1.9"
+"@subwallet/ui-keyring@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@subwallet/ui-keyring@npm:0.1.11"
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": 2.9.14
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
-    "@subwallet/keyring": ^0.1.8
+    "@subwallet/keyring": ^0.1.11
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 332502def6742a386e8c2001ea82ded2dfbcba274df669cb3b8166945ea975ca22b6e2a758733cc9cbbb38dca18a956ef92e6e7c45b85cb55f053d6a45bc07f9
+  checksum: 39ccad8d6301a7006d569f3ea5f6e3788624d6780afac08a58738129a9179919aadb6d03a995acdb84d6268f16f101690ad9a91765ef331a78bbe3e42369ade8
   languageName: node
   linkType: hard
 

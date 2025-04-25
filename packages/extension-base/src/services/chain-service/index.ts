@@ -1,9 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import { AssetLogoMap, AssetRefMap, ChainAssetMap, ChainInfoMap, ChainLogoMap, MultiChainAssetMap } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _ChainInfo, _ChainStatus, _EvmInfo, _MultiChainAsset, _SubstrateChainType, _SubstrateInfo, _TonInfo } from '@subwallet/chain-list/types';
-import { AssetSetting, MetadataItem, SufficientChainsDetails, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AssetSetting, CardanoPaginate, MetadataItem, SufficientChainsDetails, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
@@ -15,13 +17,15 @@ import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _
 import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
+import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request-service/helper';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
-import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT } from '@subwallet/extension-base/utils';
+import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT, reformatAddress } from '@subwallet/extension-base/utils';
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
 
+import { isArray } from '@polkadot/util';
 import { logger as createLogger } from '@polkadot/util/logger';
 import { HexString, Logger } from '@polkadot/util/types';
 import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
@@ -226,6 +230,45 @@ export class ChainService {
 
   public getCardanoApi (slug: string) {
     return this.cardanoChainHandler.getCardanoApiByChain(slug);
+  }
+
+  public async getUtxosByAddress (address: string, slug: string, paginate?: CardanoPaginate): Promise<TransactionUnspentOutput[]> {
+    const cardanoApi = this.getCardanoApi(slug);
+
+    const isTestnet = slug === 'cardano_preproduction';
+
+    const formattedAddress = isTestnet ? reformatAddress(address, 0) : address;
+    const limit = paginate?.limit || 100;
+    const utxos: CardanoUtxosItem[] = [];
+    let needStop = false;
+    let page = (paginate?.page || 0) + 1;
+
+    while (!needStop) {
+      const utxoRaw = await cardanoApi.getUtxos(formattedAddress, page, limit);
+
+      if (utxoRaw.length === 0 || !isArray(utxoRaw)) {
+        needStop = true;
+      } else {
+        utxos.push(...utxoRaw);
+        page++;
+      }
+    }
+
+    return convertUtxoRawToUtxo(utxos);
+  }
+
+  public getSpecificUtxo (slug: string) {
+    const cardanoApi = this.getCardanoApi(slug);
+
+    return async (txHash: string, txId: number): Promise<CardanoUtxosItem | undefined> => {
+      const utxoRaw = await cardanoApi.getSpecificUtxo(txHash);
+
+      if (!utxoRaw?.outputs) {
+        return undefined;
+      }
+
+      return utxoRaw.outputs[txId];
+    };
   }
 
   public getCardanoApiMap () {

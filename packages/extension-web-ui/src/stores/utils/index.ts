@@ -10,7 +10,7 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
-import { addLazy, canDerive, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
+import { addLazy, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-web-ui/messaging';
 import { store } from '@subwallet/extension-web-ui/stores';
 import { DAppCategory, DAppInfo } from '@subwallet/extension-web-ui/types/dapp';
@@ -33,7 +33,7 @@ export const updateAccountData = (data: AccountsWithCurrentAddress) => {
   });
 
   const hierarchy = buildHierarchy(accounts);
-  const master = hierarchy.find(({ isExternal, type }) => !isExternal && canDerive(type));
+  const master = hierarchy.find(({ isExternal, type }) => !isExternal);
 
   updateCurrentAccountState(currentAccountJson);
   updateAccountsContext({
