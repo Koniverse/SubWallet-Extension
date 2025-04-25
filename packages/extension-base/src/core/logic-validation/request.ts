@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { ConfirmationType, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isSubstrateAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
@@ -25,16 +27,17 @@ import { isString } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export type ValidateStepFunction = (koni: KoniState, url: string, payload: PayloadValidated, topic?: string) => Promise<PayloadValidated>
-
+export type RequestAccountType = 'substrate' | 'evm' | 'ton' | 'cardano';
 export interface PayloadValidated {
   networkKey: string,
   address: string,
   pair?: KeyringPair,
   authInfo?: AuthUrlInfo,
+  type: AccountAuthType,
   method?: string,
   payloadAfterValidated: any,
   errorPosition?: 'dApp' | 'ui',
-  confirmationType?: ConfirmationType,
+  confirmationType?: ConfirmationType | ConfirmationTypeCardano,
   errors: Error[]
 }
 
@@ -246,7 +249,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
 export async function validationConnectMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
   let currentChain: string | undefined;
   let autoActiveChain = false;
-  let { address, authInfo, errors, networkKey } = { ...payload };
+  let { address, authInfo, errors, networkKey, type } = { ...payload };
 
   const handleError = (message_: string) => {
     payload.errorPosition = 'ui';
@@ -258,8 +261,8 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     errors.push(error);
   };
 
-  if (authInfo?.currentEvmNetworkKey) {
-    currentChain = authInfo?.currentEvmNetworkKey;
+  if (authInfo?.currentNetworkMap[type]) {
+    currentChain = authInfo?.currentNetworkMap[type];
   }
 
   if (authInfo?.isAllowed) {
@@ -656,6 +659,55 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
   }
 
   resolve({ ...payload, errors });
+
+  return promise;
+}
+
+export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { address, errors, pair: pair_ } = payload_;
+  const payload = payload_.payloadAfterValidated as DataMessageParam;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+  let canSign = false;
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'cardanoSignatureRequest';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (address === '' || !payload) {
+    handleError('Not found address or payload to sign');
+  }
+
+  if (!isCardanoAddress(address)) {
+    handleError('Not found cardano address');
+  }
+
+  const pair = pair_ || keyring.getPair(address);
+
+  if (!pair?.meta.isExtneral) {
+    canSign = true;
+  }
+
+  const payloadAfterValidated: CardanoSignatureRequest = {
+    address,
+    payload: payload,
+    hashPayload: payload as string,
+    canSign: canSign,
+    id: ''
+  };
+
+  resolve(
+    {
+      ...payload_,
+      errors,
+      payloadAfterValidated
+    }
+  );
 
   return promise;
 }
