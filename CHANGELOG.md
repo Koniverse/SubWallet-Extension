@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 1.3.32
+Build date: Apr 26, 2025.
+
+Features & Update:
+- Support CIP-30 on Cardano (#4100)
+- Support swap-bridge for EVM chains (#4220)
+- Swap support and direct cross-chain swap on more EVM chains (#4219)
+- Change TAO's position in Earning options (#4290)
+- Update features related to middleware services (#4312)
+- Update chain-list
+
+Bug fixed:
+- Fixed bug when stake for subnet (#4287)
+
+
 ## 1.3.31
 Build date: Apr 18, 2025.
 
