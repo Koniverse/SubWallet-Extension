@@ -1546,7 +1546,7 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
+    this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'submitApiRequest', evmSignaturePayload, { isPassConfirmation })
       .then(({ isApproved, payload: signature }) => {
         if (isApproved) {
           transaction.submitSwapOrder()

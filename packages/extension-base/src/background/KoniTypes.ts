@@ -1141,6 +1141,14 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   errors?: ErrorValidation[]
 }
 
+export interface SubmitApiRequest extends EvmSignRequest {
+  id: string;
+  type: string;
+  payload: unknown;
+  errors?: ErrorValidation[];
+  processId?: string;
+}
+
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
 export type CardanoSendTransactionRequest = CardanoTransactionConfig;
@@ -1205,7 +1213,8 @@ export interface ConfirmationDefinitions {
   evmSignatureRequest: [ConfirmationsQueueItem<EvmSignatureRequest>, ConfirmationResult<string>],
   evmSendTransactionRequest: [ConfirmationsQueueItem<EvmSendTransactionRequest>, ConfirmationResult<string>]
   evmWatchTransactionRequest: [ConfirmationsQueueItem<EvmWatchTransactionRequest>, ConfirmationResult<string>],
-  errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>]
+  errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>],
+  submitApiRequest: [ConfirmationsQueueItem<SubmitApiRequest>, ConfirmationResult<string>]
 }
 
 export interface ConfirmationDefinitionsTon {

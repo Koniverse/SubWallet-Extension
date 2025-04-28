@@ -222,10 +222,9 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     switch (signMode) {
-      // todo: for test
-      // case AccountSignMode.QR:
-      // onConfirmQr();
-      // break;
+      case AccountSignMode.QR:
+        onConfirmQr();
+        break;
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
         onConfirmLedger();

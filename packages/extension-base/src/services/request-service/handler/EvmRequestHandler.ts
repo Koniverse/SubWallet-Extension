@@ -29,7 +29,8 @@ export default class EvmRequestHandler {
     evmSignatureRequest: {},
     evmSendTransactionRequest: {},
     evmWatchTransactionRequest: {},
-    errorConnectNetwork: {}
+    errorConnectNetwork: {},
+    submitApiRequest: {}
   });
 
   private readonly confirmationsPromiseMap: Record<string, { resolver: Resolver<any>, validator?: (rs: any) => Error | undefined }> = {};
@@ -238,13 +239,12 @@ export default class EvmRequestHandler {
 
   private async decorateResult<T extends ConfirmationType> (t: T, request: ConfirmationDefinitions[T][0], result: ConfirmationDefinitions[T][1]) {
     if (result.payload === '') {
-      // todo: for test
-      return;
-
       if (t === 'evmSignatureRequest') {
         result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
       } else if (t === 'evmSendTransactionRequest') {
         result.payload = await this.signTransaction(request as ConfirmationDefinitions['evmSendTransactionRequest'][0]);
+      } else if (t === 'submitApiRequest') {
+        return;
       }
 
       if (t === 'evmSignatureRequest' || t === 'evmSendTransactionRequest') {

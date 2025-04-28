@@ -211,9 +211,6 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: for test
-    return undefined;
-
     if (stepIndex === 0) {
       return this.getApproveSwap(params);
     }
@@ -364,9 +361,6 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: for test
-    return undefined;
-
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
