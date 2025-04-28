@@ -29,7 +29,7 @@ import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
 const filterChainInfoMap = (data: Record<string, _ChainInfo>, ignoredChains: string[]): Record<string, _ChainInfo> => {
   return Object.fromEntries(
     Object.entries(data)
-      .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
+      .filter(([slug, info]) => !info.bitcoinInfo && !info.cardanoInfo && !ignoredChains.includes(slug))
   );
 };
 
