@@ -1,12 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { canDerive } from '@subwallet/extension-base/utils';
 import BackIcon from '@subwallet/extension-web-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { SettingItemSelection } from '@subwallet/extension-web-ui/components/Setting/SettingItemSelection';
-import { EVM_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants/account';
 import { CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_MODAL, NEW_SEED_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -49,8 +47,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const disableDerive = useMemo(
     () => !accounts
-      .filter(({ isExternal, isInjected }) => !isExternal && !isInjected)
-      .filter(({ isMasterAccount, type }) => canDerive(type) && (type !== EVM_ACCOUNT_TYPE || (isMasterAccount && type === EVM_ACCOUNT_TYPE))).length,
+      .filter(({ isExternal, isInjected }) => !isExternal && !isInjected).length,
     [accounts]
   );
 

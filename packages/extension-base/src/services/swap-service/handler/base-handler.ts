@@ -11,7 +11,7 @@ import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from 
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { _isAcrossChainBridge, AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -88,6 +88,12 @@ export class SwapBaseHandler {
 
       return result;
     } catch (e) {
+      const errorMessage = (e as Error).message;
+
+      if (errorMessage.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || errorMessage.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+        throw new Error(errorMessage);
+      }
+
       return result;
     }
   }

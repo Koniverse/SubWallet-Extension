@@ -17,10 +17,10 @@
     "./detectPackage.cjs"
   ],
   "type": "module",
-  "version": "1.3.30-0",
+  "version": "1.3.32-0",
   "main": "index.js",
   "dependencies": {
     "@polkadot/util": "^13.2.3",
-    "@subwallet/chain-list": "0.2.104-beta.3"
+    "@subwallet/chain-list": "0.2.104"
   }
 }
