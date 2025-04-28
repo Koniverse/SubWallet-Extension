@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, ConfirmationsQueueTon, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, TokenPriorityDetails, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, TokenPriorityDetails, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
@@ -79,6 +79,42 @@ export const getMissionPoolData = (() => {
   return rs;
 })();
 
+export const updateOldChainPrefixStore = (data: Record<string, number>) => {
+  store.dispatch({
+    type: 'chainStore/updateChainOldPrefixMap',
+    payload: data
+  });
+};
+
+export const getOldChainPrefixData = (() => {
+  const handler: {
+    resolve?: (value: Record<string, number>) => void,
+    reject?: (reason?: any) => void
+  } = {};
+
+  const promise = new Promise<Record<string, number>>((resolve, reject) => {
+    handler.resolve = resolve;
+    handler.reject = reject;
+  });
+
+  const rs = {
+    promise,
+    start: () => {
+      fetchStaticData<Record<string, number>>('old-chain-prefix')
+        .then((data) => {
+          handler.resolve?.(data);
+        })
+        .catch(handler.reject);
+    }
+  };
+
+  rs.promise.then((data) => {
+    updateOldChainPrefixStore(data);
+  }).catch(console.error);
+
+  return rs;
+})();
+
 export const updateCurrentAccountState = (currentAccountJson: AccountJson) => {
   store.dispatch({ type: 'accountState/updateCurrentAccount', payload: currentAccountJson });
 };
@@ -147,6 +183,12 @@ export const updateConfirmationRequestsTon = (data: ConfirmationsQueueTon) => {
 };
 
 export const subscribeConfirmationRequestsTon = lazySubscribeMessage('pri(confirmationsTon.subscribe)', null, updateConfirmationRequestsTon, updateConfirmationRequestsTon);
+
+export const updateConfirmationRequestsCardano = (data: ConfirmationsQueueCardano) => {
+  store.dispatch({ type: 'requestState/updateConfirmationRequestsCardano', payload: data });
+};
+
+export const subscribeConfirmationRequestsCardano = lazySubscribeMessage('pri(confirmationsCardano.subscribe)', null, updateConfirmationRequestsCardano, updateConfirmationRequestsCardano);
 
 export const updateTransactionRequests = (data: Record<string, SWTransactionResult>) => {
   // Convert data to object with key as id

@@ -3,11 +3,12 @@
 
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { AmountData, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, EvmSignatureRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY, fetchBlockedConfigObjects, fetchLastestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
 import { checkBalanceWithTransactionFee, checkSigningAccountForTransaction, checkSupportForAction, checkSupportForFeature, checkSupportForTransaction, estimateFeeForTransaction } from '@subwallet/extension-base/core/logic-validation/transfer';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { cellToBase64Str, externalMessage, getTransferCellPromise } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
+import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getEvmChainId, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
@@ -17,12 +18,12 @@ import { ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
-import { getBaseTransactionInfo, getTransactionId, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { getBaseTransactionInfo, getTransactionId, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
+import { SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { _isRuntimeUpdated, anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -59,6 +60,8 @@ export default class TransactionService {
 
   private readonly transactionSubject: BehaviorSubject<Record<string, SWTransaction>> = new BehaviorSubject<Record<string, SWTransaction>>({});
   private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
+
+  private cacheProcessInfo: Record<string, Record<string, string>> = {};
 
   private get transactions (): Record<string, SWTransaction> {
     return this.transactionSubject.getValue();
@@ -139,10 +142,14 @@ export default class TransactionService {
     const substrateApi = this.state.chainService.getSubstrateApi(chainInfo.slug);
     const evmApi = this.state.chainService.getEvmApi(chainInfo.slug);
     const tonApi = this.state.chainService.getTonApi(chainInfo.slug);
-    const isNoEvmApi = transaction && !isSubstrateTransaction(transaction) && !isTonTransaction(transaction) && !evmApi; // todo: should split isEvmTx && isNoEvmApi. Because other chains type also has no Evm Api
+    const cardanoApi = this.state.chainService.getCardanoApi(chainInfo.slug);
+    // todo: should split into isEvmTx && isNoEvmApi. Because other chains type also has no Evm Api. Same to all blockchain.
+    // todo: refactor check evmTransaction.
+    const isNoEvmApi = transaction && !isSubstrateTransaction(transaction) && !isTonTransaction(transaction) && !isCardanoTransaction(transaction) && !evmApi;
     const isNoTonApi = transaction && isTonTransaction(transaction) && !tonApi;
+    const isNoCardanoApi = transaction && isCardanoTransaction(transaction) && !cardanoApi;
 
-    if (isNoEvmApi || isNoTonApi) {
+    if (isNoEvmApi || isNoTonApi || isNoCardanoApi) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.CHAIN_DISCONNECTED, undefined));
     }
 
@@ -221,6 +228,10 @@ export default class TransactionService {
         return aliveProcessRecord;
       }
     };
+  }
+
+  public getCacheInfo (processId: string, step: BaseStepType): string {
+    return this.cacheProcessInfo[processId]?.[step] || '';
   }
 
   private updateAliveProcess () {
@@ -330,9 +341,75 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
+  public async handlePermitTransaction (transaction: SWPermitTransactionInput): Promise<SWTransactionResponse> {
+    const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
+    const validatedTransaction: SWTransactionResponse = {
+      ...transaction,
+      id: transactionId,
+      extrinsicHash: '',
+      status: undefined,
+      errors: transaction.errors || [],
+      warnings: transaction.warnings || [],
+      processId: transaction.step?.processId
+    };
+
+    const txInput: SWPermitTransaction = {
+      ...transaction,
+      isInternal: true,
+      status: ExtrinsicStatus.QUEUED,
+      id: transactionId,
+      extrinsicHash: transactionId,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime()
+    } as SWPermitTransaction;
+
+    const _data = transaction.data as PermitSwapData;
+    const emitter = this.sendPermitTransaction(txInput);
+
+    await new Promise<void>((resolve, reject) => {
+      emitter.on('success', (data: TransactionEventResponse) => {
+        validatedTransaction.id = data.id;
+        validatedTransaction.extrinsicHash = data.extrinsicHash;
+
+        this.cacheProcessInfo[_data.processId] = {
+          [_data.step]: data.extrinsicHash as string
+        };
+
+        resolve();
+      });
+
+      emitter.on('error', (data: TransactionEventResponse) => {
+        if (data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+    });
+
+    // @ts-ignore
+    'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+    'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+    'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    return validatedTransaction;
+  }
+
   private async sendTransaction (transaction: SWTransaction): Promise<TransactionEmitter> {
     // Send Transaction
-    const emitter = await (transaction.chainType === 'substrate' ? this.signAndSendSubstrateTransaction(transaction) : transaction.chainType === 'evm' ? this.signAndSendEvmTransaction(transaction) : this.signAndSendTonTransaction(transaction));
+    const emitter = await (transaction.chainType === 'substrate'
+      ? this.signAndSendSubstrateTransaction(transaction)
+      : transaction.chainType === 'evm'
+        ? this.signAndSendEvmTransaction(transaction)
+        : transaction.chainType === 'cardano'
+          ? this.signAndSendCardanoTransaction(transaction)
+          : this.signAndSendTonTransaction(transaction));
 
     const { eventsHandler, step } = transaction;
 
@@ -379,7 +456,11 @@ export default class TransactionService {
           return false;
         });
 
-        if (rejectError) {
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
           this.deleteProcess(step);
         } else {
           this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
@@ -392,6 +473,63 @@ export default class TransactionService {
 
       if (step) {
         this.updateProcessStepStatus(step, { status: StepStatus.TIMEOUT });
+      }
+    });
+
+    // Todo: handle any event with transaction.eventsHandler
+
+    eventsHandler?.(emitter);
+
+    return emitter;
+  }
+
+  private sendPermitTransaction (transaction: SWPermitTransaction) {
+    // Send Transaction
+    const emitter = this.signAndSendEvmPermitTransaction(transaction);
+
+    const { eventsHandler, step } = transaction;
+
+    emitter.on('send', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { transactionId: transaction.id, status: StepStatus.SUBMITTING, chain: transaction.chain });
+      }
+    });
+
+    emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { extrinsicHash: data.extrinsicHash, status: StepStatus.PROCESSING });
+      }
+    });
+
+    emitter.on('success', (data: TransactionEventResponse) => {
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.COMPLETE });
+      }
+    });
+
+    emitter.on('error', (data: TransactionEventResponse) => {
+      // this.handlePostProcessing(data.id); // might enable this later
+      this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
+
+      if (step) {
+        const rejectError = data.errors.find((error) => {
+          // TODO: REFACTOR ERROR CODE
+          if (([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType)) {
+            return true;
+          }
+
+          return false;
+        });
+
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
+          this.deleteProcess(step);
+        } else {
+          this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+        }
       }
     });
 
@@ -1211,6 +1349,59 @@ export default class TransactionService {
     return emitter;
   }
 
+  private signAndSendEvmPermitTransaction ({ address, id, isPassConfirmation, step, transaction, url }: SWPermitTransaction): TransactionEmitter {
+    // Allow sign transaction
+    const canSign = true;
+    const emitter = new EventEmitter<TransactionEventMap>();
+
+    const eventData: TransactionEventResponse = {
+      id,
+      errors: [],
+      warnings: [],
+      extrinsicHash: id,
+      processId: step?.processId
+    };
+
+    const evmSignaturePayload: EvmSignatureRequest = {
+      id: id,
+      type: 'eth_signTypedData_v4',
+      payload: transaction,
+      address: address,
+      hashPayload: '',
+      canSign: canSign,
+      processId: step?.processId
+    };
+
+    this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
+      .then(({ isApproved, payload: signature }) => {
+        if (isApproved) {
+          // Emit signed event
+          emitter.emit('signed', eventData);
+          emitter.emit('send', eventData); // This event is needed after sending transaction with queue
+
+          if (!signature) {
+            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+          }
+
+          eventData.extrinsicHash = signature;
+
+          emitter.emit('extrinsicHash', eventData);
+          emitter.emit('success', eventData);
+        } else {
+          eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
+          emitter.emit('error', eventData);
+        }
+      })
+      .catch((e: Error) => {
+        this.removeTransaction(id);
+        eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, t(e.message)));
+
+        emitter.emit('error', eventData);
+      });
+
+    return emitter;
+  }
+
   private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, nonNativeTokenPayFeeSlug, signAfterCreate, step, transaction, url }: SWTransaction): TransactionEmitter {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = nonNativeTokenPayFeeSlug ? this.state.chainService.getAssetBySlug(nonNativeTokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
@@ -1348,7 +1539,7 @@ export default class TransactionService {
       });
     };
 
-    const tonTransactionConfig = transaction as TonTransactionConfig;
+    const tonTransactionConfig = transaction as TonTransactionConfig; // todo: is this same as payload?
     const seqno = tonTransactionConfig.seqno;
     const messages = tonTransactionConfig.messages;
 
@@ -1397,6 +1588,77 @@ export default class TransactionService {
       eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, e.message));
       emitter.emit('error', eventData);
     });
+
+    return emitter;
+  }
+
+  private signAndSendCardanoTransaction ({ chain, id, transaction, url }: SWTransaction): TransactionEmitter {
+    const emitter = new EventEmitter<TransactionEventMap>();
+    const eventData: TransactionEventResponse = {
+      id,
+      errors: [],
+      warnings: [],
+      extrinsicHash: id
+    };
+
+    const transactionConfig = transaction as CardanoTransactionConfig;
+    const cardanoApi = this.state.chainService.getCardanoApi(chain);
+
+    this.state.requestService.addConfirmationCardano(id, url || EXTENSION_REQUEST_URL, 'cardanoSendTransactionRequest', transactionConfig, {})
+      .then(({ isApproved, payload }) => {
+        if (!isApproved) {
+          this.removeTransaction(id);
+          eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
+          emitter.emit('error', eventData);
+        } else {
+          if (!payload) {
+            throw new Error('Failed to sign');
+          }
+
+          // Emit signed event
+          emitter.emit('signed', eventData);
+
+          // Send transaction
+          this.handleTransactionTimeout(emitter, eventData);
+          emitter.emit('send', eventData);
+
+          // send qua api
+          cardanoApi.sendCardanoTxReturnHash(payload)
+            .then((txHash) => {
+              if (!txHash) {
+                eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED));
+                emitter.emit('error', eventData);
+              }
+
+              eventData.extrinsicHash = txHash;
+              emitter.emit('extrinsicHash', eventData);
+
+              // todo: wait transaction by fetch txHash by API
+              cardanoApi.getStatusByTxHash(txHash, transactionConfig.cardanoTtlOffset).then((status) => {
+                if (!status) {
+                  eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED));
+                  emitter.emit('error', eventData);
+                }
+
+                emitter.emit('success', eventData);
+              })
+                .catch((e: Error) => {
+                  eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED, e.message));
+                  emitter.emit('error', eventData);
+                });
+            })
+            .catch((e: Error) => {
+              eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED, e.message));
+              emitter.emit('error', eventData);
+            });
+        }
+      })
+      .catch((e: Error) => {
+        this.removeTransaction(id);
+        eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, t(e.message)));
+
+        emitter.emit('error', eventData);
+      });
 
     return emitter;
   }

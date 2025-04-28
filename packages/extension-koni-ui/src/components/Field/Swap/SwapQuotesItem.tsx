@@ -84,7 +84,8 @@ const ChooseFeeItem = styled(Component)<Props>(({ theme: { token } }: Props) => 
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
     padding: 16,
-    marginBottom: 8,
+    cursor: 'pointer',
+
     '.wavy-icon': {
       color: token.colorPrimary,
       paddingLeft: 4
