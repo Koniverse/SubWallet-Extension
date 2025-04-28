@@ -30,4 +30,6 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   transferAll: boolean;
   value: string;
   transferBounceable?: boolean;
+  orderId?: string;
+  service?: string
 }
