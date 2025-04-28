@@ -99,9 +99,9 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     switch (signMode) {
-      // case AccountSignMode.QR:
-      //   onConfirmQr();
-      //   break;
+      case AccountSignMode.QR:
+        onConfirmQr();
+        break;
       default:
         checkUnlock().then(() => {
           onApprovePassword();
