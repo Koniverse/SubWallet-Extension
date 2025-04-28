@@ -222,6 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     switch (signMode) {
+      // todo: for test
       // case AccountSignMode.QR:
       // onConfirmQr();
       // break;

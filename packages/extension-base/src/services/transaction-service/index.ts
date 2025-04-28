@@ -1549,23 +1549,32 @@ export default class TransactionService {
     this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'evmSignatureRequest', evmSignaturePayload, { isPassConfirmation })
       .then(({ isApproved, payload: signature }) => {
         if (isApproved) {
-          // todo
           transaction.submitSwapOrder()
-            .then(() => {
+            .then((isSendSuccess) => {
               // Emit signed event
               emitter.emit('signed', eventData);
               emitter.emit('send', eventData); // This event is needed after sending transaction with queue
 
-              if (!signature) {
+              if (!isSendSuccess) {
                 throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
               }
 
-              eventData.extrinsicHash = signature;
+              this.handleTransactionTimeout(emitter, eventData);
 
-              emitter.emit('extrinsicHash', eventData);
-              emitter.emit('success', eventData);
+              transaction.cronCheckTxSuccess()
+                .then((order) => {
+                  if (!order) {
+                    emitter.emit('error', eventData);
+                  } else {
+                    eventData.extrinsicHash = order.txHash;
+
+                    emitter.emit('extrinsicHash', eventData);
+                    emitter.emit('success', eventData);
+                  }
+                })
+                .catch(console.error);
             })
-            .catch(console.error());
+            .catch(console.error);
         } else {
           eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
           emitter.emit('error', eventData);

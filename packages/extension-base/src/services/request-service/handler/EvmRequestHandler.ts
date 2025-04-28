@@ -238,7 +238,7 @@ export default class EvmRequestHandler {
 
   private async decorateResult<T extends ConfirmationType> (t: T, request: ConfirmationDefinitions[T][0], result: ConfirmationDefinitions[T][1]) {
     if (result.payload === '') {
-      // todo: remove
+      // todo: for test
       return;
 
       if (t === 'evmSignatureRequest') {

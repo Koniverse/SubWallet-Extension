@@ -32,7 +32,7 @@ export type PermitData = {
   values: unknown;
 };
 
-interface UniswapMetadata {
+export interface UniswapMetadata {
   permitData: PermitData;
   quote: UniswapQuote;
   routing: string;
@@ -67,7 +67,19 @@ interface UniswapDutchQuote {
       endAmount: string
       token: string
     }[]
-  }
+  },
+  orderId: string
+}
+
+export interface UniswapOrders {
+  orders: UniswapOrderInfo[]
+}
+
+export interface UniswapOrderInfo {
+  orderStatus: 'open' | 'expired' | 'error' | 'cancelled' | 'filled' | 'unverified' | 'insufficient-funds',
+  orderId: string,
+  swapper: string,
+  txHash: string
 }
 
 interface SwapResponse {
@@ -199,7 +211,7 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: remove
+    // todo: for test
     return undefined;
 
     if (stepIndex === 0) {
@@ -352,8 +364,9 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: remove
+    // todo: for test
     return undefined;
+
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
@@ -700,29 +713,91 @@ export class UniswapHandler implements SwapBaseInterface {
 
       extrinsic = transactionResponse.swap;
     } else if (routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2') {
-      // todo: create a confirmation to get approve before submit to API.
+      const dutchQuote = quote as UniswapDutchQuote;
 
-      const submitSwapOrder = async () => await fetch(`${API_URL}/order`, {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          signature: signature,
-          quote: quote
-        })
-      });
+      const submitSwapOrder = async () => {
+        try {
+          const res = await fetch(`${API_URL}/order`, {
+            method: 'POST',
+            headers: {
+              ...headers,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              signature: signature,
+              quote: dutchQuote
+            })
+          });
 
-      // emitEvent: (event) => {
-      //
-      // }
+          return res.ok;
+        } catch (e) {
+          console.log(e);
+
+          return false;
+        }
+      };
+
+      const retryGetUniswapTx = async (fn: () => Promise<UniswapOrderInfo | undefined>, options: { retries: number, delay: number }): Promise<UniswapOrderInfo | undefined> => {
+        let lastError: Error | undefined;
+
+        for (let i = 0; i < options.retries; i++) {
+          try {
+            const orderInfo = await fn();
+
+            if (orderInfo && orderInfo.orderStatus === 'filled') {
+              return orderInfo;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          } catch (e) {
+            if (e instanceof Error) {
+              lastError = e;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          }
+        }
+
+        console.error('UniswapX order timeout', lastError); // throw only last error, in case no successful result from fn()
+
+        return undefined;
+      };
+
+      const cronCheckTxSuccess = async (): Promise<UniswapOrderInfo | undefined> => {
+        const delay = 10000;
+        const retries = 50;
+
+        const orderId = dutchQuote.orderId;
+        const swapper = dutchQuote.orderInfo.swapper;
+
+        return retryGetUniswapTx(async () => {
+          try {
+            const response = await fetch(`${API_URL}/orders?orderId=${orderId}&swapper=${swapper}`, {
+              method: 'GET',
+              headers: {
+                ...headers,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              const res = await response.json() as UniswapOrders;
+
+              return res.orders.find((e) => e.orderId === orderId && e.swapper === swapper);
+            }
+
+            return undefined;
+          } catch (e) {
+            return undefined;
+          }
+        }, { retries, delay });
+      };
 
       const txData: SwapBaseTxData = {
         address: params.address,
         provider: this.providerInfo,
         quote: params.quote,
-        slippage: params.slippage, // todo: disable
+        slippage: params.slippage,
         recipient: params.recipient,
         process: params.process
       };
@@ -731,7 +806,8 @@ export class UniswapHandler implements SwapBaseInterface {
         txChain: fromAsset.originChain,
         txData,
         extrinsic: {
-          submitSwapOrder
+          submitSwapOrder,
+          cronCheckTxSuccess
         },
         transferNativeAmount: _isNativeToken(fromAsset) ? params.quote.fromAmount : '0',
         extrinsicType: ExtrinsicType.SWAP,

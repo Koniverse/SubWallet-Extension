@@ -4,6 +4,7 @@
 import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
+import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
@@ -40,7 +41,10 @@ export interface SWPermitTransaction extends Omit<SWTransaction, 'transaction'> 
 }
 
 export interface SWDutchTransaction extends Omit<SWTransaction, 'transaction'> {
-  transaction: { submitSwapOrder: () => Promise<Response> }
+  transaction: {
+    submitSwapOrder: () => Promise<boolean>,
+    cronCheckTxSuccess: () => Promise<UniswapOrderInfo | undefined>,
+  }
 }
 
 export interface SWTransactionResult extends Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {

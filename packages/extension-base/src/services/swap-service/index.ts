@@ -27,7 +27,7 @@ import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
-import { UniswapHandler } from './handler/uniswap-handler';
+import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
 
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
@@ -131,6 +131,14 @@ export class SwapService implements StoppableServiceInterface {
     console.group('Swap Logger');
     console.log('path', path);
     console.log('swapQuoteResponse', swapQuoteResponse);
+
+    if (swapQuoteResponse.optimalQuote && swapQuoteResponse.optimalQuote.metadata) {
+      const routing = (swapQuoteResponse.optimalQuote.metadata as UniswapMetadata).routing;
+
+      if (routing) {
+        console.log('Uniswap routing', routing);
+      }
+    }
 
     const optimalProcess = await this.generateOptimalProcessV2({
       request,
