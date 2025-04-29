@@ -14,8 +14,6 @@ import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } 
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
 import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { KeypairType } from '@subwallet/keyring/types';
-import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
