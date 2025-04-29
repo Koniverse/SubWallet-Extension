@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-inject authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AuthRequestOption, Injected, InjectedWindow, InjectOptions } from './types';
+import type { AuthRequestOption, CardanoProvider, Injected, InjectedWindow, InjectOptions } from './types';
 
 import { EIP6963ProviderDetail, EIP6963ProviderInfo, EvmProvider } from './types';
 
@@ -96,3 +96,16 @@ export const inject6963EIP = (provider: EvmProvider) => {
 
   announceProvider();
 };
+
+// Inject Cardano Provider
+export function injectCardanoExtension (cardanoProvider: CardanoProvider): void {
+  const windowInject = window as Window & InjectedWindow;
+
+  if (!windowInject.cardano) {
+    windowInject.cardano = {};
+  }
+
+  windowInject.cardano.subwallet = Object.freeze(cardanoProvider);
+
+  windowInject.dispatchEvent(new Event('subwallet#initialized'));
+}

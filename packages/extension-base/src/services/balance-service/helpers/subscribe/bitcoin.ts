@@ -81,14 +81,19 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
   }));
 }
 
-export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _BitcoinApi, callback: (rs: BalanceItem[]) => void): () => void {
+export function subscribeBitcoinBalance (params: SusbcribeBitcoinPalletBalance): () => void {
+  const { addresses, assetMap, bitcoinApi, callback, chainInfo } = params;
+  const chain = chainInfo.slug;
+  const nativeTokenInfo = filterAssetsByChainAndType(assetMap, chain, [_AssetType.NATIVE]);
+  const nativeTokenSlug = Object.values(nativeTokenInfo)[0]?.slug || '';
+
   const getBalance = () => {
     getBitcoinBalance(bitcoinApi, addresses)
       .then((balances) => {
         return balances.map(({ balance, bitcoinBalanceMetadata }, index): BalanceItem => {
           return {
             address: addresses[index],
-            tokenSlug: 'bitcoin-NATIVE-BTC',
+            tokenSlug: nativeTokenSlug,
             state: APIItemState.READY,
             free: balance,
             locked: (
@@ -105,7 +110,7 @@ export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _Bitco
         return addresses.map((address): BalanceItem => {
           return {
             address: address,
-            tokenSlug: 'bitcoin-NATIVE-BTC',
+            tokenSlug: nativeTokenSlug,
             state: APIItemState.READY,
             free: '0',
             locked: '0'
