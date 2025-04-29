@@ -777,7 +777,7 @@ export class UniswapHandler implements SwapBaseInterface {
             if (response.ok) {
               const res = await response.json() as UniswapOrders;
 
-              return res.orders.find((e) => e.orderId === orderId && e.swapper === swapper);
+              return res.orders.find((e) => e.orderId === orderId && e.swapper === swapper.toLowerCase());
             }
 
             return undefined;

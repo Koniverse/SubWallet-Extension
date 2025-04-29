@@ -12,7 +12,7 @@ import { TransactionConfig } from 'web3-core';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee {
+export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee {
   id: string;
   url?: string;
   isInternal: boolean,
@@ -27,7 +27,7 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   updatedAt: number;
   estimateFee?: FeeData,
   xcmFeeDryRun?: string;
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
+  transaction: any;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
   isPassConfirmation?: boolean;
@@ -36,29 +36,33 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   step?: BriefProcessStep;
 }
 
-export interface SWPermitTransaction extends Omit<SWTransaction, 'transaction'> {
+export interface SWTransaction extends SWTransactionBase {
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
+}
+
+export interface SWPermitTransaction extends SWTransactionBase {
   transaction: SignTypedDataMessageV3V4;
 }
 
-export interface SWDutchTransaction extends Omit<SWTransaction, 'transaction'> {
+export interface SWDutchTransaction extends SWTransactionBase {
   transaction: {
     submitSwapOrder: () => Promise<boolean>,
     cronCheckTxSuccess: () => Promise<UniswapOrderInfo | undefined>,
   }
 }
 
-export interface SWTransactionResult extends Omit<SWTransaction, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {
+export interface SWTransactionResult extends Omit<SWTransactionBase, 'transaction' | 'additionalValidator' | 'eventsHandler' | 'process'> {
   process?: ProcessTransactionData;
 }
 
-type SwInputBase = Pick<SWTransaction, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
-& Partial<Pick<SWTransaction, 'additionalValidator' | 'eventsHandler'>>;
+type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
+& Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransaction, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun'>>, TransactionFee {
   id?: string;
-  transaction?: SWTransaction['transaction'] | null;
-  warnings?: SWTransaction['warnings'];
-  errors?: SWTransaction['errors'];
+  transaction?: SWTransactionBase['transaction'] | null;
+  warnings?: SWTransactionBase['warnings'];
+  errors?: SWTransactionBase['errors'];
   edAsWarning?: boolean;
   isTransferAll?: boolean;
   isTransferLocalTokenAndPayThatTokenAsFee?: boolean;
@@ -74,7 +78,7 @@ export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'trans
   transaction?: SWDutchTransaction['transaction'] | null;
 }
 
-export type SWTransactionResponse = SwInputBase & Pick<SWTransaction, 'warnings' | 'errors'> & Partial<Pick<SWTransaction, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
+export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
   processId?: string;
 }
 
