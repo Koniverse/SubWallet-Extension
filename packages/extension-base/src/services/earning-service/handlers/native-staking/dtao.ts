@@ -669,7 +669,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
-    const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, netuid, binaryAmount, BNlimitPrice, false);
+    const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed(), false);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
@@ -706,7 +706,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 - (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
-    const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(selectedTarget, netuid, binaryAmount, BNlimitPrice, false);
+    const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(selectedTarget, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed(), false);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
   }
