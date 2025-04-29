@@ -239,7 +239,8 @@ const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.SWAP,
   ExtrinsicType.CROWDLOAN,
   ExtrinsicType.VOTE,
-  ExtrinsicType.DELEGATE
+  ExtrinsicType.DELEGATE,
+  ExtrinsicType.UNLOCK
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
@@ -348,7 +349,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     const result: ExtrinsicType[] = [];
     const specialNetwork = _specialNetwork || '';
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN, ExtrinsicType.VOTE, ExtrinsicType.DELEGATE);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN, ExtrinsicType.VOTE, ExtrinsicType.DELEGATE, ExtrinsicType.UNLOCK);
 
     // NFT
     if (!['astar', 'avail_mainnet'].includes(specialNetwork)) {
@@ -522,8 +523,6 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
     case AccountSignMode.UNKNOWN:
       return AccountProxyType.UNKNOWN;
   }
-
-  return AccountProxyType.UNKNOWN;
 };
 
 export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPairStoreData, accountProxies: AccountProxyStoreData) => {

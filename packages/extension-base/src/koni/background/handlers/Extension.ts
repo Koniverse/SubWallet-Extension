@@ -48,7 +48,7 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest } from '@subwallet/extension-base/services/open-gov/type';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -4696,8 +4696,27 @@ export default class KoniExtension {
     return data;
   }
 
+  private async getAbstainTotal (request: GetAbstainTotalRequest): Promise<string> {
+    const data = await this.#koniState.openGovService.getAbstainTotal(request);
+
+    return data;
+  }
+
   private async handleStandardVote (request: StandardVoteRequest): Promise<SWTransactionResponse> {
     const extrinsic = await this.#koniState.openGovService.handleStandardVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.VOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async handleSplitAbstainVote (request: SplitAbstainVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleSplitAbstainVote(request);
 
     return await this.#koniState.transactionService.handleTransaction({
       address: request.address,
@@ -4732,11 +4751,43 @@ export default class KoniExtension {
     const extrinsic = await this.#koniState.openGovService.handleDelegate(request);
 
     return await this.#koniState.transactionService.handleTransaction({
-      address: request.userAddress,
+      address: request.address,
       chain: request.chain,
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.DELEGATE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async handleUndelegate (request: UndelegateRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleUndelegate(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.DELEGATE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async getLockedBalance (request: GetLockedBalanceRequest): Promise<LockedDetail[]> {
+    const data = await this.#koniState.openGovService.getLockedBalance(request);
+
+    return data;
+  }
+
+  private async handleUnlockBalance (request: UnlockBalanceRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleUnlockBalance(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.UNLOCK,
       chainType: ChainType.SUBSTRATE
     });
   }
@@ -5399,14 +5450,24 @@ export default class KoniExtension {
         /* Gov */
       case 'pri(openGov.fetchReferendums)':
         return this.fetchReferendums(request as string);
+      case 'pri(openGov.getAbstainTotal)':
+        return this.getAbstainTotal(request as GetAbstainTotalRequest);
       case 'pri(openGov.standardVote)':
         return this.handleStandardVote(request as StandardVoteRequest);
+      case 'pri(openGov.splitAbstainVote)':
+        return this.handleSplitAbstainVote(request as SplitAbstainVoteRequest);
       case 'pri(openGov.removeVote)':
         return this.handleRemoveVote(request as RemoveVoteRequest);
       case 'pri(openGov.fetchDelegates)':
         return this.fetchDelegates(request as string);
       case 'pri(openGov.delegate)':
         return this.handleDelegate(request as DelegateRequest);
+      case 'pri(openGov.undelegate)':
+        return this.handleUndelegate(request as UndelegateRequest);
+      case 'pri(openGov.getLockedBalance)':
+        return this.getLockedBalance(request as GetLockedBalanceRequest);
+      case 'pri(openGov.unlockBalance)':
+        return this.handleUnlockBalance(request as UnlockBalanceRequest);
         /* Gov */
 
       // Default

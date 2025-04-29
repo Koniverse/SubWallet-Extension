@@ -83,6 +83,8 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
     case ExtrinsicType.STAKING_COMPOUNDING:
     case ExtrinsicType.EVM_EXECUTE:
     case ExtrinsicType.VOTE:
+    case ExtrinsicType.DELEGATE:
+    case ExtrinsicType.UNLOCK:
     case ExtrinsicType.UNKNOWN:
     default:
       return BaseTransactionConfirmation;

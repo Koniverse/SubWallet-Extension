@@ -1,6 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+export interface GetAbstainTotalRequest {
+  chain: string;
+  referendumIndex: number;
+}
+
 export interface StandardVoteRequest {
   address: string,
   chain: string,
@@ -96,6 +101,37 @@ export interface _ReferendumInfo {
 
 }
 
+export interface Gov2Vote {
+  referendumIndex: number;
+  account: string;
+  isDelegating: boolean;
+  isStandard: boolean;
+  isSplit: boolean;
+  isSplitAbstain: boolean;
+  conviction: number;
+
+  // isStandard = true
+  balance?: string;
+  aye?: boolean;
+  votes?: string;
+
+  // isSplitAbstain = true
+  abstainBalance?: string;
+  abstainVotes?: string;
+  ayeBalance?: string;
+  ayeVotes?: string;
+  nayBalance?: string;
+  nayVotes?: string;
+
+  // isDelegating = true
+  delegations: {
+    votes: string;
+    capital: string;
+  };
+
+  queryAt: number;
+}
+
 export interface _EnhancedReferendumInfo extends _ReferendumInfo {
   endTime: number;
 }
@@ -116,11 +152,45 @@ export interface _DelegateInfo {
 }
 
 export interface DelegateRequest {
-  userAddress: string,
+  address: string,
   chain: string,
   trackIds: number[];
   conviction: number;
   balance: string;
   delegateAddress: string
   removeOtherTracks: boolean
+}
+
+export interface UndelegateRequest {
+  address: string,
+  chain: string,
+  trackIds: number[];
+}
+
+export interface GetLockedBalanceRequest {
+  chain: string,
+  address: string
+}
+
+export interface UnlockBalanceRequest {
+  address: string,
+  chain: string,
+  trackIds: number[];
+}
+
+export interface VotingFor {
+  casting?: {
+    prior: [string, string];
+    votes?: [string, unknown][];
+  };
+  delegating?: {
+    prior: [string, string];
+    target: string;
+  };
+}
+
+export interface LockedDetail {
+  trackId: number;
+  locked: VotingFor;
+  expireIn: string;
 }

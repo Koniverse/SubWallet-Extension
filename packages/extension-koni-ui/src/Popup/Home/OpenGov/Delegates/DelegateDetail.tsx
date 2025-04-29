@@ -73,7 +73,7 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
 
       const delegateRequest = {
         chain,
-        userAddress: address,
+        address: address,
         trackIds: selectedTrackIds,
         delegateAddress: data.address,
         conviction: values.conviction,

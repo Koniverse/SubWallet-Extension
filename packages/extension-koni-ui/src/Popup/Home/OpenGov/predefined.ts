@@ -18,8 +18,18 @@ export interface voteData{
 
 export enum GovCategoryType {
   ALL='all',
+  ONGOING='ongoing',
+  COMPLETED='completed',
   NOTVOTED='notvoted',
   VOTED='voted',
+}
+
+export enum DelegateCategoryType {
+  ALL='all',
+  ORGANIZATION='organization',
+  INDIVIDUAL='individual',
+  NOTDELEGATED='notDelegated',
+  DELEGATED='Delegated',
 }
 
 export const govCategoryMap: Record<string, GovCategory> = {
@@ -33,9 +43,25 @@ export const govCategoryMap: Record<string, GovCategory> = {
   }
 };
 
+export const delegateCategoryMap: Record<string, GovCategory> = {
+  [DelegateCategoryType.NOTDELEGATED]: {
+    slug: DelegateCategoryType.NOTDELEGATED,
+    name: 'Not delegated'
+  },
+  [DelegateCategoryType.DELEGATED]: {
+    slug: DelegateCategoryType.DELEGATED,
+    name: 'Delegated'
+  }
+};
+
 export const govCategories: GovCategory[] = [
   govCategoryMap[GovCategoryType.NOTVOTED],
   govCategoryMap[GovCategoryType.VOTED]
+];
+
+export const delegateCategories: GovCategory[] = [
+  delegateCategoryMap[DelegateCategoryType.NOTDELEGATED],
+  delegateCategoryMap[DelegateCategoryType.DELEGATED]
 ];
 
 enum TagType {

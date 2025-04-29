@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _DelegateInfo, _EnhancedReferendumInfo, _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, Layout } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenSlug, useOpenGovSelection, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { fetchDelegates, fetchReferendums } from '@subwallet/extension-koni-ui/messaging';
+import { fetchDelegates, fetchReferendums, getLockedBalance } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +23,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { accountAddressItems, selectedAddress, selectedChain, setSelectedAddress, setSelectedChain } = useOpenGovSelection();
   const [referendums, setReferendums] = useState<_EnhancedReferendumInfo[]>([]);
   const [delegates, setDelegates] = useState<_DelegateInfo[]>([]);
+  const [locks, setLocks] = useState<LockedDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDelegateLoading, setIsDelegateLoading] = useState(true);
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
@@ -34,8 +35,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       setIsLoading(true);
 
       try {
-        const data = await fetchReferendums(selectedChain);
-        const enhancedData = data.map((item: _ReferendumInfo) => ({
+        const referendums = await fetchReferendums(selectedChain);
+        const enhancedData = referendums.map((item: _ReferendumInfo) => ({
           ...item,
           endTime: calculateTimeLeft(
             item.state.indexer.blockTime,
@@ -62,9 +63,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       setIsDelegateLoading(true);
 
       try {
-        const data = await fetchDelegates(selectedChain);
+        const delegates = await fetchDelegates(selectedChain);
 
-        setDelegates(data);
+        setDelegates(delegates);
       } catch (err) {
         setDelegates([]);
         console.error('Failed to load delegates:', err);
@@ -75,6 +76,26 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
     loadDelegates().catch((err) => console.error('Failed to load delegates:', err));
   }, [selectedChain]);
+
+  useEffect(() => {
+    const loadLocks = async () => {
+      setIsDelegateLoading(true);
+
+      try {
+        const locks = await getLockedBalance({ chain: selectedChain, address: selectedAddress });
+
+        console.log('locks', locks);
+        setLocks(locks);
+      } catch (err) {
+        setLocks([]);
+        console.error('Failed to load locks:', err);
+      } finally {
+        setIsDelegateLoading(false);
+      }
+    };
+
+    loadLocks().catch((err) => console.error('Failed to load locks:', err));
+  }, [selectedChain, selectedAddress]);
 
   const onSelectAccount = useCallback((event: BasicInputEvent) => {
     setSelectedAddress(event.target.value);
@@ -141,6 +162,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               chainAsset={chainAsset}
               className={'referendum-container'}
               isLoading={isLoading}
+              locks={locks}
               referendums={referendums}
               selectedAddress={selectedAddress}
             />
@@ -151,6 +173,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               className={'delegate-container'}
               delegate={delegates}
               isLoading={isDelegateLoading}
+              locks={locks}
               selectedAddress={selectedAddress}
             />
           )}

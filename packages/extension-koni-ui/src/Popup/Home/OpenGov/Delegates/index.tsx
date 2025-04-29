@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _DelegateInfo, _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
 import { FilterModal, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -15,7 +15,7 @@ import React, { SyntheticEvent, useCallback, useContext, useMemo, useState } fro
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { govCategories, GovCategoryType } from '../predefined';
+import { delegateCategories, DelegateCategoryType } from '../predefined';
 import { DelegateDetailModal, DelegateDetailModalId } from './DelegateDetail';
 import DelegateItem from './DelegateItem';
 
@@ -24,15 +24,16 @@ type Props = ThemeProps & {
   isLoading: boolean;
   chainAsset: _ChainAsset;
   selectedAddress: string;
+  locks: LockedDetail[];
 };
 
 const FILTER_MODAL_ID = 'referendum-filter-modal';
 
-function Component ({ chainAsset, className, delegate, isLoading, selectedAddress }: Props): React.ReactElement<Props> {
+function Component ({ chainAsset, className, delegate, isLoading, locks, selectedAddress }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
-  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(GovCategoryType.ALL);
+  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(DelegateCategoryType.ALL);
   const [searchInput, setSearchInput] = useState<string>('');
   const [currentSelectItem, setCurrentSelectItem] = useState<_DelegateInfo | null>(null);
 
@@ -69,37 +70,53 @@ function Component ({ chainAsset, className, delegate, isLoading, selectedAddres
 
   const tabFilterFunction = useCallback((item: _DelegateInfo): boolean => {
     switch (selectedFilterTab) {
-      case GovCategoryType.VOTED:
-        return true;
-      case GovCategoryType.NOTVOTED:
-        return false;
+      case DelegateCategoryType.ORGANIZATION:
+        return item.manifesto?.isOrganization ?? false;
+      case DelegateCategoryType.INDIVIDUAL:
+        return !item.manifesto?.isOrganization;
       default:
         return true;
     }
   }, [selectedFilterTab]);
 
   const filterOptions = useMemo(() => [
-    ...govCategories.map((c) => ({
+    ...delegateCategories.map((c) => ({
       label: t(c.name),
       value: c.slug
     }))
   ], [t]);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => [
-    { label: t('All'), value: GovCategoryType.ALL },
-    { label: t('Ongoing'), value: GovCategoryType.VOTED },
-    { label: t('Completed'), value: GovCategoryType.NOTVOTED }
+    { label: t('All'), value: DelegateCategoryType.ALL },
+    { label: t('Organization'), value: DelegateCategoryType.ORGANIZATION },
+    { label: t('Individual'), value: DelegateCategoryType.INDIVIDUAL }
   ], [t]);
 
-  const filterFunction = useMemo<(item: _ReferendumInfo) => boolean>(() => {
+  const filterFunction = useMemo<(item: _DelegateInfo) => boolean>(() => {
     return (item) => {
       if (!selectedFilters.length) {
         return true;
       }
 
-      return selectedFilters.some((filter) => item.state.name === filter);
+      console.log('locks', locks);
+
+      if (selectedFilters.includes(DelegateCategoryType.DELEGATED)) {
+        return locks.some(
+          (lock) =>
+            lock.locked?.delegating?.target === item.address
+        );
+      }
+
+      if (selectedFilters.includes(DelegateCategoryType.NOTDELEGATED)) {
+        return locks.some(
+          (lock) =>
+            lock.locked?.delegating?.target !== item.address
+        );
+      }
+
+      return selectedFilters.some((filter) => item.address === filter);
     };
-  }, [selectedFilters]);
+  }, [locks, selectedFilters]);
 
   const filteredDelegates = useMemo(() => {
     return delegate.filter(tabFilterFunction).filter((item) => searchFunction(item, searchInput));

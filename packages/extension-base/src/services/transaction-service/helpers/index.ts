@@ -72,6 +72,8 @@ const typeName = (type: SWTransaction['extrinsicType']) => {
       return 'Start earning';
     case ExtrinsicType.VOTE:
       return 'Vote';
+    case ExtrinsicType.UNLOCK:
+      return 'Unlock';
     case ExtrinsicType.DELEGATE:
       return 'Delegate';
     case ExtrinsicType.UNKNOWN:

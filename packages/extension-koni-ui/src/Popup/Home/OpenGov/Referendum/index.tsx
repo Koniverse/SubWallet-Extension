@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _EnhancedReferendumInfo, _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
 import { FilterModal, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -25,11 +25,12 @@ type Props = ThemeProps & {
   isLoading: boolean;
   chainAsset: _ChainAsset;
   selectedAddress: string;
+  locks: LockedDetail[];
 };
 
 const FILTER_MODAL_ID = 'referendum-filter-modal';
 
-function Component ({ chainAsset, className, isLoading, referendums, selectedAddress }: Props): React.ReactElement<Props> {
+function Component ({ chainAsset, className, isLoading, locks, referendums, selectedAddress }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
@@ -90,9 +91,9 @@ function Component ({ chainAsset, className, isLoading, referendums, selectedAdd
 
   const tabFilterFunction = useCallback((item: _ReferendumInfo): boolean => {
     switch (selectedFilterTab) {
-      case GovCategoryType.VOTED:
+      case GovCategoryType.ONGOING:
         return isGovOngoing(item.state.name);
-      case GovCategoryType.NOTVOTED:
+      case GovCategoryType.COMPLETED:
         return !isGovOngoing(item.state.name);
       default:
         return true;
@@ -108,8 +109,8 @@ function Component ({ chainAsset, className, isLoading, referendums, selectedAdd
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => [
     { label: t('All'), value: GovCategoryType.ALL },
-    { label: t('Ongoing'), value: GovCategoryType.VOTED },
-    { label: t('Completed'), value: GovCategoryType.NOTVOTED }
+    { label: t('Ongoing'), value: GovCategoryType.ONGOING },
+    { label: t('Completed'), value: GovCategoryType.COMPLETED }
   ], [t]);
 
   const filterFunction = useMemo<(item: _ReferendumInfo) => boolean>(() => {
@@ -118,9 +119,29 @@ function Component ({ chainAsset, className, isLoading, referendums, selectedAdd
         return true;
       }
 
+      if (selectedFilters.length === 1) {
+        if (selectedFilters.includes(GovCategoryType.VOTED)) {
+          return locks.some(
+            (lock) =>
+              lock.locked?.casting?.votes?.some(
+                ([i]) => Number(i) === item.referendumIndex
+              )
+          );
+        }
+
+        if (selectedFilters.includes(GovCategoryType.NOTVOTED)) {
+          return !locks.some(
+            (lock) =>
+              lock.locked?.casting?.votes?.some(
+                ([i]) => Number(i) === item.referendumIndex
+              )
+          );
+        }
+      }
+
       return selectedFilters.some((filter) => item.state.name === filter);
     };
-  }, [selectedFilters]);
+  }, [locks, selectedFilters]);
 
   const sortedReferendums = useMemo(() => {
     return [...referendums].sort((a, b) => {

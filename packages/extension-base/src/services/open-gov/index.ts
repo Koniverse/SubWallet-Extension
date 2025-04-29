@@ -4,8 +4,9 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import BigN from 'bignumber.js';
 
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UnlockVoteRequest } from './type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest, VotingFor } from './type';
 
 interface Referendums {
   items: _ReferendumInfo[];
@@ -27,7 +28,7 @@ export default class OpenGovService {
     const res = await fetch(url);
 
     if (!res.ok) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
     const referendums = await res.json() as Referendums;
@@ -37,6 +38,30 @@ export default class OpenGovService {
     }
 
     return referendums.items;
+  }
+
+  public async getAbstainTotal (request: GetAbstainTotalRequest): Promise<string> {
+    const url = `https://${request.chain}.subsquare.io/api/gov2/referenda/${request.referendumIndex}/votes`;
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const votes = await res.json() as Gov2Vote[];
+
+    let totalAbstain = new BigN(0);
+
+    for (const vote of votes) {
+      console.log('vote', [request.referendumIndex, vote]);
+
+      if (vote.isSplitAbstain && vote.abstainVotes) {
+        totalAbstain = totalAbstain.plus(vote.abstainVotes);
+      }
+    }
+
+    return totalAbstain.toString();
   }
 
   public async handleStandardVote (request: StandardVoteRequest): Promise<TransactionData> {
@@ -124,7 +149,7 @@ export default class OpenGovService {
     const substrateApi = this.state.getSubstrateApi(request.chain);
     const api = await substrateApi.isReady;
 
-    const delegateExtrinsics = request.trackIds.map((trackId) => {
+    const tx = request.trackIds.map((trackId) => {
       return api.api.tx.convictionVoting.delegate(
         trackId,
         request.delegateAddress,
@@ -133,7 +158,72 @@ export default class OpenGovService {
       );
     }).filter((tx) => tx !== null);
 
-    const batchTx = api.api.tx.utility.batch([...delegateExtrinsics]);
+    const batchTx = api.api.tx.utility.batch([...tx]);
+
+    return batchTx;
+  }
+
+  public async handleUndelegate (request: UndelegateRequest): Promise<TransactionData> {
+    const substrateApi = this.state.getSubstrateApi(request.chain);
+    const api = await substrateApi.isReady;
+
+    const tx = request.trackIds.map((trackId) => {
+      return api.api.tx.convictionVoting.undelegate(
+        trackId
+      );
+    }).filter((tx) => tx !== null);
+
+    const batchTx = api.api.tx.utility.batch([...tx]);
+
+    return batchTx;
+  }
+
+  public async getLockedBalance (request: GetLockedBalanceRequest): Promise<LockedDetail[]> {
+    const substrateApi = this.state.getSubstrateApi(request.chain);
+    const api = await substrateApi.isReady;
+
+    const currentBlock = (await api.api.query.system.number()).toNumber();
+
+    const classLockedRaw = await api.api.query.convictionVoting.classLocksFor(request.address);
+    const classLocked = classLockedRaw.toPrimitive() as [number, string][];
+
+    const lockedDetails = [];
+
+    for (const [trackId, _] of classLocked) {
+      const locked = (await api.api.query.convictionVoting.votingFor(request.address, trackId)).toPrimitive() as VotingFor;
+
+      let priorBlockNumber = new BigN(0);
+
+      if (locked?.casting?.prior?.[0]) {
+        priorBlockNumber = new BigN(locked.casting.prior[0]);
+      } else if (locked?.delegating?.prior?.[0]) {
+        priorBlockNumber = new BigN(locked.delegating.prior[0]);
+      }
+
+      const expireIn = priorBlockNumber.gt(0) ? priorBlockNumber.minus(currentBlock) : new BigN(0);
+
+      lockedDetails.push({
+        trackId,
+        locked,
+        expireIn: expireIn.toString()
+      });
+    }
+
+    return lockedDetails;
+  }
+
+  public async handleUnlockBalance (request: UnlockBalanceRequest): Promise<TransactionData> {
+    const substrateApi = this.state.getSubstrateApi(request.chain);
+    const api = await substrateApi.isReady;
+
+    const tx = request.trackIds.map((trackId) => {
+      return api.api.tx.convictionVoting.unlock(
+        trackId,
+        request.address
+      );
+    }).filter((tx) => tx !== null);
+
+    const batchTx = api.api.tx.utility.batch([...tx]);
 
     return batchTx;
   }

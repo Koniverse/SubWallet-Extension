@@ -6,12 +6,12 @@ import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-serv
 import { _ReferendumInfo, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { handleRemoveVote, handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
+import { getAbstainTotal, handleRemoveVote, handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
 import { TransactionContent } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Form, Icon, Image, ModalContext, SwModal } from '@subwallet/react-ui';
 import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -40,6 +40,28 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
 
   const [convictionValue, setConvictionValue] = useState<number>(0);
   const chain = chainAsset?.originChain;
+
+  const [abstainTotal, setAbstainTotal] = useState<string>('0');
+
+  useEffect(() => {
+    const loadAbstainTotal = async () => {
+      try {
+        if (!data?.referendumIndex) {
+          return;
+        }
+
+        const total = await getAbstainTotal({ chain, referendumIndex: data.referendumIndex });
+
+        setAbstainTotal(total);
+      } catch (err) {
+        setAbstainTotal('0');
+        console.error('Failed to load referendums:', err);
+      }
+    };
+
+    loadAbstainTotal().catch((err) => console.error('Failed to load referendums:', err));
+  }, [chain, data?.referendumIndex]);
+
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
   }, [inactiveModal]);
@@ -146,6 +168,14 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
             >
               {data.state.name}
             </MetaInfo.Default>
+
+            <MetaInfo.Number
+              className={'__status-pool'}
+              decimals={_getAssetDecimals(chainAsset)}
+              label={t('Abstain total')}
+              suffix={'votes'}
+              value={abstainTotal}
+            />
           </MetaInfo>
 
           <TransactionContent>
