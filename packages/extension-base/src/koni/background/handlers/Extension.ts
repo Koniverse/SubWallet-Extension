@@ -3022,6 +3022,7 @@ export default class KoniExtension {
   }
 
   private getTransaction ({ id }: RequestGetTransaction): SWTransactionResult {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { transaction, ...transactionResult } = this.#koniState.transactionService.getTransaction(id);
 
     return transactionResult;
@@ -3032,6 +3033,7 @@ export default class KoniExtension {
 
     function convertRs (rs: Record<string, SWTransactionBase>, processMap: Record<string, ProcessTransactionData>): Record<string, SWTransactionResult> {
       return Object.fromEntries(Object.entries(rs).map(([key, value]) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { additionalValidator, eventsHandler, step, transaction, ..._transactionResult } = value;
         const transactionResult = _transactionResult as SWTransactionResult;
 
