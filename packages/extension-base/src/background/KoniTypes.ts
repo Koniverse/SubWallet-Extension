@@ -2026,6 +2026,11 @@ export type BitcoinBalanceMetadata = {
   inscriptionBalance: string // sum of BTC in UTXO which contains rune
 }
 
+export interface AddressBalanceResult {
+  balance: string;
+  bitcoinBalanceMetadata: BitcoinBalanceMetadata;
+}
+
 // Use stringify to communicate, pure boolean value will error with case 'false' value
 export interface KoniRequestSignatures {
   // Bonding functions

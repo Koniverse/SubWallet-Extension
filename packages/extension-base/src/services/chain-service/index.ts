@@ -808,18 +808,11 @@ export class ChainService {
 
     const assetSettings = this.assetSettingSubject.value;
     const chainStateMap = this.getChainStateMap();
-    const chainInfoMap = this.getChainInfoMap();
 
     for (const asset of autoEnableTokens) {
       const { originChain, slug: assetSlug } = asset;
       const assetState = assetSettings[assetSlug];
       const chainState = chainStateMap[originChain];
-      const chainInfo = chainInfoMap[originChain];
-
-      // todo: will add more condition if there are more networks to support
-      if (!(chainInfo && (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)))) {
-        continue;
-      }
 
       if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
         if (!chainState || !chainState.manualTurnOff) {
