@@ -1466,6 +1466,8 @@ export default class TransactionService {
       this.handleTransactionTimeout(emitter, eventData);
       emitter.emit('send', eventData); // This event is needed after sending transaction with queue
 
+      let finishBlock = false;
+
       rs.send((txState) => {
         // handle events, logs, history
         if (!txState || !txState.status) {
@@ -1479,10 +1481,23 @@ export default class TransactionService {
             eventData.extrinsicHash = txState.txHash.toHex();
             eventData.blockHash = txState.status.asInBlock.toHex();
             emitter.emit('extrinsicHash', eventData);
+
+            txState.events
+              .filter(({ event: { section } }) => section === 'system')
+              .forEach(({ event: { data: [error], method } }): void => {
+                if (method === 'ExtrinsicFailed') {
+                  eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED, error.toString()));
+                  emitter.emit('error', eventData);
+                  finishBlock = true;
+                } else if (method === 'ExtrinsicSuccess') {
+                  emitter.emit('success', eventData);
+                  finishBlock = true;
+                }
+              });
           }
         }
 
-        if (txState.status.isFinalized) {
+        if (txState.status.isFinalized && !finishBlock) {
           eventData.extrinsicHash = txState.txHash.toHex();
           eventData.eventLogs = txState.events;
           // TODO: push block hash and block number into eventData
