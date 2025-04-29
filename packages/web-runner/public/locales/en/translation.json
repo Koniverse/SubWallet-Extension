@@ -1502,5 +1502,6 @@
   "Input": "",
   "Output": "",
   "Cardano dApp": "",
-  "No swap quote found. Adjust your amount and try again": ""
+  "No swap quote found. Adjust your amount and try again": "",
+  "Your balance": ""
 }
