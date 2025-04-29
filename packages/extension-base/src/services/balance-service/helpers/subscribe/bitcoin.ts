@@ -6,7 +6,6 @@ import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/cons
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
 import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
-import BigN from 'bignumber.js';
 
 function getDefaultBalanceResult (): AddressBalanceResult {
   return {
