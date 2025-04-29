@@ -3,7 +3,7 @@
 
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { PageWrapper, WalletConnect } from '@subwallet/extension-koni-ui/components';
-import { EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
+import { CONTACT_SUPPORT_URL, EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
 import { useExtensionDisplayModes, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -243,9 +243,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIconBgColor: token['geekblue-6'],
           rightIcon: ArrowSquareOut,
           title: t('Contact support'),
-          onClick: () => {
-            window.open(`${SUPPORT_MAIL}?subject=[Extension - In-app support]`, '_self');
-          }
+          onClick: openInNewTab(CONTACT_SUPPORT_URL)
         },
         {
           key: 'user-manual',
