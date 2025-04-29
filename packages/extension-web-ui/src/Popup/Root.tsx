@@ -8,9 +8,10 @@ import BaseWeb from '@subwallet/extension-web-ui/components/Layout/base/BaseWeb'
 import { Logo2D } from '@subwallet/extension-web-ui/components/Logo';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
+import { FeatureModalContextProvider } from '@subwallet/extension-web-ui/contexts/FeatureModalContextProvider';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionModalContextProvider } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
-import { WalletModalContextProvider } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
+import { WalletModalContextProvider as GlobalModalContextProvider } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useSubscribeLanguage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useUILock from '@subwallet/extension-web-ui/hooks/common/useUILock';
@@ -349,15 +350,17 @@ export function Root (): React.ReactElement {
 
   return (
     <WebUIContextProvider>
-      <WalletModalContextProvider>
+      <GlobalModalContextProvider>
         <TransactionModalContextProvider>
-          <DefaultRoute>
-            <BaseWeb>
-              <Outlet />
-            </BaseWeb>
-          </DefaultRoute>
+          <FeatureModalContextProvider>
+            <DefaultRoute>
+              <BaseWeb>
+                <Outlet />
+              </BaseWeb>
+            </DefaultRoute>
+          </FeatureModalContextProvider>
         </TransactionModalContextProvider>
-      </WalletModalContextProvider>
+      </GlobalModalContextProvider>
     </WebUIContextProvider>
   );
 }
