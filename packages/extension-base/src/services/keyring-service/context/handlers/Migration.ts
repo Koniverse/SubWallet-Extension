@@ -208,7 +208,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     try {
       const mnemonic = this.parentService.context.exportAccountProxyMnemonic({ password, proxyId: firstAccountOldProxyId }).result;
 
-      const keypairTypes = SUPPORTED_ACCOUNT_CHAIN_TYPES.flatMap((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType as AccountChainType));
+      const keypairTypes = SUPPORTED_ACCOUNT_CHAIN_TYPES.flatMap((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType));
 
       keypairTypes.forEach((type) => {
         const suri = getSuri(mnemonic, type);

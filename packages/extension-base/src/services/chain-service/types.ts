@@ -257,3 +257,9 @@ export interface OBResponse<T> {
   message: string,
   result: T,
 }
+
+export interface OBRuneResponse<T> {
+  status_code: number,
+  message: string,
+  result: T,
+}
