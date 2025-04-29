@@ -24,8 +24,7 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
     const context = new BaseApiRequestContext();
 
     super(context);
-
-    this.baseUrl = 'https://btc-api.koni.studio';
+    this.baseUrl = url;
     this.isTestnet = url.includes('testnet');
 
     this.getBlockTime()

@@ -20,7 +20,7 @@ export class HiroService extends BaseApiRequestStrategy {
 
     super(context);
 
-    this.baseUrl = 'https://btc-api.koni.studio';
+    this.baseUrl = url;
   }
 
   private headers = {
