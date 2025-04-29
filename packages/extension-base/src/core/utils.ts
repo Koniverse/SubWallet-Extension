@@ -114,7 +114,6 @@ export function _isValidCardanoAddressFormat (validateRecipientParams: ValidateR
   return '';
 }
 
-// TODO: Temporarily allow the transfer flow, review this function later.
 export function _isValidBitcoinAddressFormat (validateRecipientParams: ValidateRecipientParams): string {
   const { destChainInfo, toAddress } = validateRecipientParams;
   const addressInfo = validateBitcoinAddress(toAddress) ? getBitcoinAddressInfo(toAddress) : null;

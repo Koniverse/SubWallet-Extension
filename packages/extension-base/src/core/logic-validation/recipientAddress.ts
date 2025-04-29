@@ -133,7 +133,5 @@ export function validateRecipientAddress (validateRecipientParams: ValidateRecip
   const conditions = getConditions(validateRecipientParams);
   const validationFunctions = getValidationFunctions(conditions);
 
-  console.log('conditions', conditions);
-
   return runValidationFunctions(validateRecipientParams, validationFunctions);
 }

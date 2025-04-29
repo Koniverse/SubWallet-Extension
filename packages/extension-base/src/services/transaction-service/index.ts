@@ -94,8 +94,6 @@ export default class TransactionService {
       .filter((item) => item.address === transaction.address && item.chain === transaction.chain);
 
     if (existed.length > 0) {
-      console.log('validate.3');
-
       return [new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION)];
     }
 
@@ -152,7 +150,6 @@ export default class TransactionService {
     const isNoCardanoApi = transaction && isCardanoTransaction(transaction) && !cardanoApi;
     const isNoBitcoinApi = transaction && isBitcoinTransaction(transaction) && !bitcoinApi;
 
-    // TODO: template pass validation for bitcoin transfer
     if (isNoEvmApi || isNoTonApi || isNoCardanoApi || isNoBitcoinApi) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.CHAIN_DISCONNECTED, undefined));
     }
@@ -261,7 +258,7 @@ export default class TransactionService {
       warnings: transaction.warnings || [],
       url: transaction.url || EXTENSION_REQUEST_URL,
       status: ExtrinsicStatus.QUEUED,
-      isInternal: false,
+      isInternal,
       id: transactionId,
       extrinsicHash: transactionId
     } as SWTransaction;

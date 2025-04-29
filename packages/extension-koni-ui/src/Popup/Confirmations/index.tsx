@@ -20,7 +20,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSendTransactionRequestConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
 
 type Props = ThemeProps
 
@@ -52,8 +52,6 @@ const Component = function ({ className }: Props) {
   const { t } = useTranslation();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const { transactionRequest } = useSelector((state) => state.requestState);
-
-  console.log('confirmation', confirmation);
 
   const nextConfirmation = useCallback(() => {
     setIndex((val) => Math.min(val + 1, numberOfConfirmations - 1));
@@ -177,27 +175,27 @@ const Component = function ({ className }: Props) {
           />
         );
 
-      case 'bitcoinSignatureRequest':
-        return (
-          <BitcoinSignatureConfirmation
-            request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]}
-            type={confirmation.type}
-          />
-        );
-      case 'bitcoinSignPsbtRequest':
-        return (
-          <BitcoinSignPsbtConfirmation
-            request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]}
-            type={confirmation.type}
-          />
-        );
-      case 'bitcoinSendTransactionRequestAfterConfirmation':
-        return (
-          <BitcoinSendTransactionRequestConfirmation
-            request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]}
-            type={confirmation.type}
-          />
-        );
+      // case 'bitcoinSignatureRequest':
+      //   return (
+      //     <BitcoinSignatureConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
+      // case 'bitcoinSignPsbtRequest':
+      //   return (
+      //     <BitcoinSignPsbtConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
+      // case 'bitcoinSendTransactionRequestAfterConfirmation':
+      //   return (
+      //     <BitcoinSendTransactionRequestConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
       case 'authorizeRequest':
         return (
           <AuthorizeConfirmation request={confirmation.item as AuthorizeRequest} />

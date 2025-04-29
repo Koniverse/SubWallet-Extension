@@ -111,9 +111,6 @@ export default class BitcoinRequestHandler {
       };
     });
 
-    console.log('confirmations.next', confirmations);
-    console.log('confirmations.isInternal', isInternal);
-
     this.confirmationsQueueSubjectBitcoin.next(confirmations);
 
     if (!isInternal) {
@@ -238,6 +235,8 @@ export default class BitcoinRequestHandler {
       bitcoinApi,
       chain,
       from,
+      feeCustom,
+      feeOption,
       feeInfo,
       to,
       transferAll: false,
