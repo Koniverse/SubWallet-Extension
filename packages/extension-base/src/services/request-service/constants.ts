@@ -6,7 +6,9 @@ export const EXTENSION_REQUEST_URL = 'extension';
 export const PREDEFINED_CHAIN_DAPP_CHAIN_MAP: Record<string, string[]> = {
   'portal.astar.network': ['astar', 'astarEvm'],
   'apps.moonbeam.network': ['moonbeam', 'moonriver'],
-  'app.stellaswap.com': ['moonbeam']
+  'app.stellaswap.com': ['moonbeam'],
+  'testnet-preprod.minswap.org': ['cardano_preproduction'],
+  'localhost:7777': ['cardano_preproduction']
 };
 
 export const WEB_APP_URL = [
@@ -16,7 +18,8 @@ export const WEB_APP_URL = [
   'web.subwallet.app' // Production,
 ];
 
-export const DAPP_CONNECT_ALL_TYPE_ACCOUNT_URL = [
+// List DApp can connect 'substrate' and 'evm' account
+export const DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL = [
   'https://polkadot.js.org/apps/',
   'https://ipfs.io/ipns/dotapps.io'
 ];

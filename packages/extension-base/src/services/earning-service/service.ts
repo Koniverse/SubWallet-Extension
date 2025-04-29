@@ -2,22 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BasicTxErrorType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL, CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { _isChainEnabled, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
+import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
-import { EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { addLazy, categoryAddresses, createPromiseHandler, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
-import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler } from './handlers';
+import { EarningSlippageResult } from './handlers/native-staking/dtao';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
@@ -28,6 +30,8 @@ const fetchPoolsData = async () => {
 export default class EarningService implements StoppableServiceInterface, PersistDataServiceInterface {
   protected readonly state: KoniState;
   protected handlers: Record<string, BasePoolHandler> = {};
+  private handlerCache: Map<string, BasePoolHandler | undefined> = new Map();
+
   private earningRewardSubject: BehaviorSubject<EarningRewardJson> = new BehaviorSubject<EarningRewardJson>({ ready: false, data: {} });
   private earningRewardHistorySubject: BehaviorSubject<Record<string, EarningRewardHistoryItem>> = new BehaviorSubject<Record<string, EarningRewardHistoryItem>>({});
   private minAmountPercentSubject: BehaviorSubject<Record<string, number>> = new BehaviorSubject<Record<string, number>>({});
@@ -80,6 +84,17 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
       if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {
         handlers.push(new AmplitudeNativeStakingPoolHandler(this.state, chain));
+      }
+
+      if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+        // todo: check support for testnet
+        // Mainnet only
+        handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
+        handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
+      }
+
+      if (_STAKING_CHAIN_GROUP.mythos.includes(chain)) {
+        handlers.push(new MythosNativeStakingPoolHandler(this.state, chain));
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {
@@ -309,7 +324,17 @@ export default class EarningService implements StoppableServiceInterface, Persis
   /* Pools' info methods */
 
   public getPoolHandler (slug: string): BasePoolHandler | undefined {
-    return this.handlers[slug];
+    if (this.handlerCache.has(slug)) {
+      return this.handlerCache.get(slug);
+    }
+
+    const handler = Object.values<BasePoolHandler>(this.handlers).find(
+      (h) => h.canHandleSlug(slug)
+    );
+
+    this.handlerCache.set(slug, handler);
+
+    return handler;
   }
 
   public isPoolSupportAlternativeFee (slug: string): boolean {
@@ -473,7 +498,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     await this.eventService.waitChainReady;
 
-    const [substrateAddresses, evmAddresses] = categoryAddresses(addresses);
+    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
+    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
@@ -533,7 +559,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
     await this.eventService.waitKeyringReady;
 
-    const addresses = this.state.getDecodedAddresses();
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     const existedYieldPosition = await this.dbService.getYieldNominationPoolPosition(addresses, this.state.activeChainSlugs);
 
@@ -608,7 +634,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitKeyringReady;
     this.runUnsubscribePoolsPosition();
 
-    const addresses = this.state.getDecodedAddresses();
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     this.subscribePoolPositions(addresses, (data) => {
       this.updateYieldPosition(data);
@@ -649,6 +675,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
       this.earningRewardSubject.next(stakingRewardState);
 
       this.earningsRewardQueue = [];
+      this.earningRewardReady.resolve();
     });
   }
 
@@ -657,7 +684,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     await this.eventService.waitChainReady;
 
-    const [substrateAddresses, evmAddresses] = categoryAddresses(addresses);
+    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
+    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
@@ -695,9 +723,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
   }
 
   earningsRewardInterval: NodeJS.Timer | undefined;
+  earningRewardReady: PromiseHandler<void> = createPromiseHandler<void>();
+
+  waitEarningRewardReady () {
+    return this.earningRewardReady.promise;
+  }
 
   runSubscribeStakingRewardInterval () {
-    const addresses = this.state.getDecodedAddresses();
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     if (!addresses.length) {
       return;
@@ -725,7 +758,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     await this.eventService.waitChainReady;
 
-    const [substrateAddresses, evmAddresses] = categoryAddresses(addresses);
+    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
+    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
@@ -785,7 +819,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   runSubscribeEarningRewardHistoryInterval () {
     this.runUnsubscribeEarningRewardHistoryInterval();
-    const addresses = this.state.getDecodedAddresses();
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     if (!addresses.length) {
       return;
@@ -845,6 +879,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = request;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -871,6 +906,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params.data;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -884,6 +920,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params.data;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
@@ -901,10 +938,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params;
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -915,14 +953,15 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     const { slug } = params;
     const handler = this.getPoolHandler(slug);
+    const netuid = params.poolInfo.metadata.subnetData?.netuid;
+    const slippage = params.slippage;
 
     if (handler) {
-      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget);
+      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid, slippage);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
   }
-
   /* Leave */
 
   /* Other */
@@ -961,6 +1000,19 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     if (handler) {
       return handler.handleYieldClaimReward(params.address, params.bondReward);
+    } else {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
+    }
+  }
+
+  public async yieldGetEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+    await this.eventService.waitChainReady;
+
+    const { slug } = params;
+    const handler = this.getPoolHandler(slug);
+
+    if (handler) {
+      return handler.getEarningSlippage(params);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

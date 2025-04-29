@@ -1,30 +1,37 @@
-    2785	AnhMTV                        	Release version 1.2.24
-    2520	Nam Phạm                      	[Issue 3440] fix: token balance formula
-    2175	S2kael                        	[Issue-3425] Update stable version for chain-list
-     832	lw-cdm                        	[Issue-3148] Refactor the navigation code in the Root component
-     537	nguyentiendung                	[Issue-3272] Improve usage of debounce for the swapFromField input
+    3017	AnhMTV                        	Release version 1.3.32
+    2668	Nam Phạm                      	disable block explorer for truth network
+    2549	S2kael                        	[Isssue-4163] Update stable version for chain-list
+     869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
+     799	bluezdot                      	[Issue-4219] build: update chain-list stable
+     568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
-     255	bluezdot                      	[Issue-3425] Update chainlist
-     186	Thiendekaco                   	[Issue 3307] [update]  Extension - Add validate in case sign multi chains
+     354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
+     286	Frenkie Nguyen                	
+     240	tunghp2002                    	[Issue-4290] Update: Change earning positions
+     217	lw                            	[Issue-4114] fix: Fix error in transaction submission screen
+     186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
-     145	dominhquang                   	[Issue-3414] Fix bug re-open popup
-     137	Automation Bot                	[CI Skip] Auto increase webapp build number
-     105	lw-cdm                        	
+     170	lw-cdm                        	
+     169	PDTnhah                       	[Issue-4163] Update logic to get explorer link
+     160	Automation Bot                	[CI Skip] Auto increase webapp build number
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
+      83	leewong                       	
       82	Thibaut Sardan                	Add account filtering feature (#832)
-      81	leewong                       	Swap - Change idle time to 300s
-      66	bluedot                       	[Issue-2965] fix: Handle earning status for request redeem
+      77	bluedot                       	[Issue-3888] build: upgrade version polkadot api
       63	Roman                         	fix ui issues
       53	Dominhquangdev                	update Bridge code
-      24	S2kael                        	
+      28	S2kael                        	[Issue-3658] Hide estimate fee field on Send Fund screen with cardano chain
+      24	Thiendekaco                   	[Issue-4100] fix: resolve PR feedback
       10	Trang Trịnh                   	api get karura and acala nfts
+      10	tunghp2002                    	
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
+       8	Thiendekaco                   	[Issue-4100] fix: resolve ui bug
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
-       5	Frenkie Nguyen                	[Issue-3148] Fix blank screen when import account
+       5	thiendekaco                   	[Issue-4100] fix: throw success target error code to Dapp #
        4	Amaury Martiny                	PostMessageProvider with on('connected' | 'disconnected') (#279)
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	

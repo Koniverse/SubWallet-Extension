@@ -2,108 +2,252 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
+import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
+import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
+import { buildXcm, DryRunInfo, dryRunXcmV2, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import BigN from 'bignumber.js';
+import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, RuntimeDispatchInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { combineEthFee } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { u8aToHex } from '@polkadot/util';
-import { addressToEvm, isEthereumAddress } from '@polkadot/util-crypto';
 
-type CreateXcmExtrinsicProps = {
-  originTokenInfo: _ChainAsset;
+import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
+
+export type CreateXcmExtrinsicProps = {
+  destinationChain: _ChainInfo;
   destinationTokenInfo: _ChainAsset;
+  evmApi?: _EvmApi;
+  originChain: _ChainInfo;
+  originTokenInfo: _ChainAsset;
   recipient: string;
+  sender: string;
   sendingValue: string;
+  substrateApi?: _SubstrateApi;
+  feeInfo: FeeInfo;
+} & TransactionFee;
 
-  substrateApi: _SubstrateApi;
-  chainInfoMap: Record<string, _ChainInfo>;
-}
+export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig | undefined>;
 
-type CreateSnowBridgeExtrinsicProps = Omit<CreateXcmExtrinsicProps, 'substrateApi'> & {
-  evmApi: _EvmApi;
-  sender: string
-}
-
-export const createSnowBridgeExtrinsic = async ({ chainInfoMap,
-  destinationTokenInfo,
+// SnowBridge
+export const createSnowBridgeExtrinsic = async ({ destinationChain,
   evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
   originTokenInfo,
   recipient,
   sender,
-  sendingValue }: CreateSnowBridgeExtrinsicProps): Promise<TransactionConfig> => {
-  const originChainInfo = chainInfoMap[originTokenInfo.originChain];
-  const destinationChainInfo = chainInfoMap[destinationTokenInfo.originChain];
-
-  if (!_isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  if (!_isSnowBridgeXcm(originChain, destinationChain)) {
     throw new Error('This is not a valid SnowBridge transfer');
   }
 
-  return getSnowBridgeEvmTransfer(originTokenInfo, originChainInfo, destinationChainInfo, sender, recipient, sendingValue, evmApi);
+  if (!evmApi) {
+    throw Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw Error('Sender is required');
+  }
+
+  return getSnowBridgeEvmTransfer(originTokenInfo, originChain, destinationChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
 
-export const createXcmExtrinsic = async ({ chainInfoMap,
-  destinationTokenInfo,
+export const createXcmExtrinsic = async ({ destinationChain,
+  originChain,
   originTokenInfo,
   recipient,
   sendingValue,
   substrateApi }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
-  const originChainInfo = chainInfoMap[originTokenInfo.originChain];
-  const destinationChainInfo = chainInfoMap[destinationTokenInfo.originChain];
+  if (!substrateApi) {
+    throw Error('Substrate API is not available');
+  }
 
   const chainApi = await substrateApi.isReady;
   const api = chainApi.api;
 
-  let extrinsic;
+  const polkadotXcmSpecialCases = _XCM_CHAIN_GROUP.polkadotXcmSpecialCases.includes(originChain.slug) && _isNativeToken(originTokenInfo);
 
-  if (_XCM_CHAIN_GROUP.polkadotXcm.includes(originTokenInfo.originChain)) {
-    if (['astar', 'shiden'].includes(originChainInfo.slug) && !_isNativeToken(originTokenInfo)) {
-      extrinsic = getExtrinsicByXtokensPallet(originTokenInfo, originChainInfo, destinationChainInfo, recipient, sendingValue, api);
-    } else {
-      extrinsic = getExtrinsicByPolkadotXcmPallet(originTokenInfo, originChainInfo, destinationChainInfo, recipient, sendingValue, api);
-    }
-  } else if (_XCM_CHAIN_GROUP.xcmPallet.includes(originTokenInfo.originChain)) {
-    extrinsic = getExtrinsicByXcmPalletPallet(originTokenInfo, originChainInfo, destinationChainInfo, recipient, sendingValue, api);
-  } else {
-    extrinsic = getExtrinsicByXtokensPallet(originTokenInfo, originChainInfo, destinationChainInfo, recipient, sendingValue, api);
+  if (_XCM_CHAIN_GROUP.polkadotXcm.includes(originTokenInfo.originChain) || polkadotXcmSpecialCases) {
+    return getExtrinsicByPolkadotXcmPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
   }
 
-  return extrinsic;
+  if (_XCM_CHAIN_GROUP.xcmPallet.includes(originTokenInfo.originChain)) {
+    return getExtrinsicByXcmPalletPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
+  }
+
+  return getExtrinsicByXtokensPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
 };
 
-export const getXcmMockTxFee = async (substrateApi: _SubstrateApi, chainInfoMap: Record<string, _ChainInfo>, originTokenInfo: _ChainAsset, destinationTokenInfo: _ChainAsset): Promise<BigN> => {
+export const createAvailBridgeTxFromEth = ({ evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  if (!evmApi) {
+    throw Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw Error('Sender is required');
+  }
+
+  return getAvailBridgeTxFromEth(originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createAvailBridgeExtrinsicFromAvail = async ({ recipient, sendingValue, substrateApi }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+  if (!substrateApi) {
+    throw Error('Substrate API is not available');
+  }
+
+  return await getAvailBridgeExtrinsicFromAvail(recipient, sendingValue, substrateApi);
+};
+
+export const createPolygonBridgeExtrinsic = async ({ destinationChain,
+  evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  const isPolygonBridgeXcm = _isPolygonBridgeXcm(originChain, destinationChain);
+
+  const isValidBridge = isPolygonBridgeXcm || _isPosBridgeXcm(originChain, destinationChain);
+
+  if (!isValidBridge) {
+    throw new Error('This is not a valid PolygonBridge transfer');
+  }
+
+  if (!evmApi) {
+    throw Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw Error('Sender is required');
+  }
+
+  const sourceChain = originChain.slug;
+
+  const createExtrinsic = isPolygonBridgeXcm
+    ? (sourceChain === 'polygonzkEvm_cardona' || sourceChain === 'polygonZkEvm')
+      ? _createPolygonBridgeL2toL1Extrinsic
+      : _createPolygonBridgeL1toL2Extrinsic
+    : (sourceChain === 'polygon_amoy' || sourceChain === 'polygon')
+      ? _createPosBridgeL2toL1Extrinsic
+      : _createPosBridgeL1toL2Extrinsic;
+
+  return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'> | undefined> => {
   try {
-    const destChainInfo = chainInfoMap[destinationTokenInfo.originChain];
-    const originChainInfo = chainInfoMap[originTokenInfo.originChain];
-    const address = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap';
-
-    // mock receiving account from sender
-    const recipient = !isEthereumAddress(address) && _isChainEvmCompatible(destChainInfo) && !_isChainEvmCompatible(originChainInfo)
-      ? u8aToHex(addressToEvm(address))
-      : address
-    ;
-
-    const mockTx = await createXcmExtrinsic({
-      chainInfoMap,
-      destinationTokenInfo,
-      originTokenInfo,
-      recipient: recipient,
-      sendingValue: '1000000000000000000',
-      substrateApi
-    });
-    const paymentInfo = await mockTx.paymentInfo(address);
-
-    return new BigN(paymentInfo?.partialFee?.toString() || '0');
+    return await buildXcm(request);
   } catch (e) {
-    console.error('error mocking xcm tx fee', e);
+    console.log('createXcmExtrinsicV2 error: ', e);
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
 
-    return new BigN(0);
+    if (isChainNotSupportPolkadotApi(errorMessage)) {
+      return createXcmExtrinsic(request);
+    }
+
+    return undefined;
+  }
+};
+
+export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<DryRunInfo> => {
+  try {
+    return await dryRunXcmV2(request);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
+
+    if (isChainNotSupportDryRun(errorMessage) || isChainNotSupportPolkadotApi(errorMessage)) {
+      const xcmTransfer = await createXcmExtrinsicV2(request);
+
+      if (!xcmTransfer) {
+        return {
+          success: false
+        };
+      }
+
+      const _xcmFeeInfo = await xcmTransfer.paymentInfo(request.sender);
+      const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+
+      // skip dry run in this case
+      return {
+        success: true,
+        fee: Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString()
+      };
+    }
+
+    return {
+      success: false
+    };
+  }
+};
+
+export const createAcrossBridgeExtrinsic = async ({ destinationChain,
+  destinationTokenInfo,
+  evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
+
+  if (!isAcrossBridgeXcm) {
+    throw new Error('This is not a valid AcrossBridge transfer');
+  }
+
+  if (!evmApi) {
+    throw new Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw new Error('Sender is required');
+  }
+
+  try {
+    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+
+    const _feeCustom = feeCustom as EvmEIP1559FeeOption;
+    const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
+
+    // todo: validate data before sending
+    const transactionConfig: TransactionConfig = {
+      from: data?.sender,
+      to: data?.to,
+      value: data?.value,
+      data: data?.transferEncodedCall,
+      ...feeCombine
+    };
+
+    const gasLimit = await evmApi.api.eth.estimateGas(transactionConfig).catch(() => 200000);
+
+    transactionConfig.gas = gasLimit.toString();
+
+    return transactionConfig;
+  } catch (error) {
+    return Promise.reject(error);
   }
 };

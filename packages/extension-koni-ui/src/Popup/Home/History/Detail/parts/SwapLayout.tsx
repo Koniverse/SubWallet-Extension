@@ -53,13 +53,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const assetFrom = assetRegistryMap[swapInfo.quote.pair.from];
   const assetTo = assetRegistryMap[swapInfo.quote.pair.to];
-  const recipientAddress = data.to || swapInfo.recipient as string;
+  const recipientAddress = data.to || swapInfo.recipient || data.from;
   const account = findAccountByAddress(accounts, recipientAddress);
 
   return (
     <MetaInfo className={CN(className)}>
       <SwapTransactionBlock
-        data={swapInfo}
+        fromAmount={swapInfo.quote.fromAmount}
+        fromAssetSlug={swapInfo.quote.pair.from}
+        toAmount={swapInfo.quote.toAmount}
+        toAssetSlug={swapInfo.quote.pair.to}
       />
       <MetaInfo.Transfer
         destinationChain={{
@@ -75,6 +78,12 @@ const Component: React.FC<Props> = (props: Props) => {
         senderAddress={data.from}
         senderName={data.fromName}
       />
+      {(assetTo.originChain === assetFrom.originChain) && (
+        <MetaInfo.Chain
+          chain={data.chain}
+          label={t('Network')}
+        />
+      )}
       <MetaInfo.DisplayType
         label={t('Transaction type')}
         typeName={t(TxTypeNameMap[data.type])}

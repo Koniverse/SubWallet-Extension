@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _Address, BaseRequestSign, ChainType, ExtrinsicType, InternalRequestSign } from '@subwallet/extension-base/background/KoniTypes';
+import { _Address, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
-import { TransactionData } from '../../../transaction';
-import { NominationPoolInfo, ValidatorInfo, YieldPositionInfo } from '../../info';
+import { BaseProcessRequestSign, BaseRequestSign, InternalRequestSign, TransactionData } from '../../../transaction';
+import { NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
 import { OptimalYieldPath } from './step';
 
 // Result after create extrinsic
@@ -24,7 +24,14 @@ export interface AbstractSubmitYieldJoinData {
 }
 
 export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
+  selectedPool?: {
+    mindBond: string
+  }
   selectedValidators: ValidatorInfo[];
+  subnetData: {
+    netuid: number,
+    slippage: number
+  }
 }
 
 export interface SubmitJoinNominationPool extends AbstractSubmitYieldJoinData {
@@ -41,7 +48,24 @@ export interface SubmitYieldStepData extends AbstractSubmitYieldJoinData { // TO
 
 export type SubmitYieldJoinData = SubmitYieldStepData | SubmitJoinNativeStaking | SubmitJoinNominationPool;
 
-export interface HandleYieldStepParams extends BaseRequestSign {
+export enum EarningProcessType {
+  NOMINATION_POOL = 'NOMINATION_POOL',
+  NATIVE_STAKING = 'NATIVE_STAKING',
+  YIELD = 'YIELD'
+}
+
+export interface SummaryEarningProcessData {
+  data: SubmitYieldJoinData;
+  type: EarningProcessType;
+  brief: {
+    token: string;
+    amount: string;
+    chain: string;
+    method: YieldPoolType;
+  }
+}
+
+export interface HandleYieldStepParams extends BaseRequestSign, BaseProcessRequestSign {
   path: OptimalYieldPath;
   data: SubmitYieldJoinData;
   currentStep: number;

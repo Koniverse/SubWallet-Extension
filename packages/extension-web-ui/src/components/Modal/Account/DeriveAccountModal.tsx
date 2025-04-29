@@ -1,12 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
-import { canDerive } from '@subwallet/extension-base/utils';
+import { AccountJson } from '@subwallet/extension-base/types';
 import AccountItemWithName from '@subwallet/extension-web-ui/components/Account/Item/AccountItemWithName';
 import BackIcon from '@subwallet/extension-web-ui/components/Icon/BackIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
-import { EVM_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants/account';
 import { CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -61,8 +59,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const filtered = useMemo(
     () => accounts
-      .filter(({ isExternal, isInjected }) => !isExternal && !isInjected)
-      .filter(({ isMasterAccount, type }) => canDerive(type) && (type !== EVM_ACCOUNT_TYPE || (isMasterAccount && type === EVM_ACCOUNT_TYPE))),
+      .filter(({ isExternal, isInjected }) => !isExternal && !isInjected),
     [accounts]
   );
 
@@ -83,7 +80,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setSelected(account.address);
         setTimeout(() => {
           deriveAccountV3({
-            address: account.address
+            proxyId: account.address
           }).then(() => {
             inactiveModal(modalId);
             clearSearch();

@@ -56,6 +56,8 @@ function Component ({ className }: Props) {
         return ExtrinsicType.SEND_NFT;
       case 'swap':
         return ExtrinsicType.SWAP;
+      case 'claim-bridge':
+        return ExtrinsicType.CLAIM_BRIDGE;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -171,7 +173,7 @@ function Component ({ className }: Props) {
           closeRecheckChainConnectionModal
         }}
         >
-          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
             <div className={CN(className, 'transaction-wrapper')}>
               <SwSubHeader
                 background={'transparent'}

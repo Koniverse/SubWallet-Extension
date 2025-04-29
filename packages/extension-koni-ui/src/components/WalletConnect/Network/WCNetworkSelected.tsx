@@ -32,7 +32,8 @@ const Component: React.FC<Props> = (props: Props) => {
             slug: '',
             name: t('settings.Screen.walletConnect.networkSelected.unSupportNetwork', { replace: { number: unSupportNetworks.length } })
           },
-          slug: ''
+          slug: '',
+          wcChain: ''
         }
       )
       : null;

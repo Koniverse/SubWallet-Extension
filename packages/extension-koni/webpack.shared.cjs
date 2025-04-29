@@ -9,7 +9,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-extension-manifest-plugin');
 
 const pkgJson = require('./package.json');
-const manifest = require('./manifest.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -36,7 +35,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui'
+  'extension-koni-ui',
+  'subwallet-api-sdk'
 ];
 
 const _additionalEnv = {
@@ -46,21 +46,41 @@ const _additionalEnv = {
   TRANSAK_TEST_MODE: JSON.stringify(false),
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
-  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET)
+  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
+  BITTENSOR_API_KEY_1: JSON.stringify(process.env.BITTENSOR_API_KEY_1),
+  BITTENSOR_API_KEY_2: JSON.stringify(process.env.BITTENSOR_API_KEY_2),
+  BITTENSOR_API_KEY_3: JSON.stringify(process.env.BITTENSOR_API_KEY_3),
+  BITTENSOR_API_KEY_4: JSON.stringify(process.env.BITTENSOR_API_KEY_4),
+  BITTENSOR_API_KEY_5: JSON.stringify(process.env.BITTENSOR_API_KEY_5),
+  BITTENSOR_API_KEY_6: JSON.stringify(process.env.BITTENSOR_API_KEY_6),
+  BITTENSOR_API_KEY_7: JSON.stringify(process.env.BITTENSOR_API_KEY_7),
+  BITTENSOR_API_KEY_8: JSON.stringify(process.env.BITTENSOR_API_KEY_8),
+  BITTENSOR_API_KEY_9: JSON.stringify(process.env.BITTENSOR_API_KEY_9),
+  BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
+  SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
+  UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
+  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
+  MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
+  MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
+  MELD_TEST_MODE: JSON.stringify(false),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
 };
 
 const additionalEnvDict = {
   extension: _additionalEnv
 };
 
-module.exports = (entry, alias = {}, compileWithHtml = false) => {
+module.exports = (entry, alias = {}, isFirefox = false) => {
   const additionalEnv = {};
 
   Object.keys(entry).forEach((key) => {
     Object.assign(additionalEnv, additionalEnvDict[key] || {});
   });
 
-  return {
+  const webpackConfig = {
     context: __dirname,
     devtool: false,
     entry,
@@ -95,7 +115,7 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       chunkFilename: '[name].js',
       filename: '[name].js',
       globalObject: '(typeof self !== \'undefined\' ? self : this)',
-      path: path.join(__dirname, 'build'),
+      path: path.join(__dirname, isFirefox ? 'build-firefox' : 'build'),
       publicPath: ''
     },
     performance: {
@@ -133,7 +153,7 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       }),
       new ManifestPlugin({
         config: {
-          base: manifest,
+          base: isFirefox ? require('./manifest-firefox.json') : require('./manifest.json'),
           extend: {
             version: pkgJson.version.split('-')[0] // remove possible -beta.xx
           }
@@ -148,7 +168,11 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
         filename: 'notification.html',
         template: 'public/notification.html',
         chunks: ['extension']
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({
@@ -162,7 +186,7 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       }),
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        crypto: require.resolve('crypto-browserify'),
+        crypto: false,
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         os: require.resolve('os-browserify/browser'),
@@ -178,8 +202,8 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
     },
     optimization: {
       splitChunks: {
-        chunks: (chunk) => (chunk.name === 'extension'),
-        maxSize: 3000000,
+        chunks: (chunk) => (chunk.name === 'extension' || (isFirefox && chunk.name === 'background')),
+        maxSize: 3600000,
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/,
@@ -197,4 +221,15 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       asyncWebAssembly: true
     }
   };
+
+  if (isFirefox) {
+    webpackConfig.plugins.push(new HtmlWebpackPlugin({
+      filename: 'background.html',
+      template: 'public/background.html',
+      chunks: ['background']
+    })
+    );
+  }
+
+  return webpackConfig;
 };

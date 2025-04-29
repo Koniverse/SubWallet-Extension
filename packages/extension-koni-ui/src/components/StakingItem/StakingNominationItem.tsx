@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
+import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Web3Block } from '@subwallet/react-ui';
@@ -16,16 +17,20 @@ import styled, { useTheme } from 'styled-components';
 type Props = ThemeProps & {
   nominationInfo: NominationInfo;
   isSelected?: boolean;
+  poolInfo: YieldPoolInfo
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isSelected, nominationInfo } = props;
+  const { className, isSelected, nominationInfo, poolInfo } = props;
   const { chain } = nominationInfo;
+  const networkPrefix = useGetChainPrefixBySlug(chain);
 
   const { token } = useTheme() as Theme;
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
+
+  const subnetSymbol = poolInfo.metadata.subnetData?.subnetSymbol;
 
   return (
     <div
@@ -35,6 +40,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'validator-item-content'}
         leftItem={
           <SwAvatar
+            identPrefix={networkPrefix}
             size={40}
             value={nominationInfo.validatorAddress}
           />
@@ -53,7 +59,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span>
                   &nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;
                 </span>
-                <span>{symbol}</span>
+                <span>{ subnetSymbol || symbol }</span>
               </div>
             </div>
           </>

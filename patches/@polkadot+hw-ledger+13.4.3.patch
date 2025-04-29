@@ -1,0 +1,15 @@
+diff --git a/node_modules/@polkadot/hw-ledger/defaults.js b/node_modules/@polkadot/hw-ledger/defaults.js
+index ed833ba..6929f9e 100644
+--- a/node_modules/@polkadot/hw-ledger/defaults.js
++++ b/node_modules/@polkadot/hw-ledger/defaults.js
+@@ -38,7 +38,9 @@ export const prevLedgerRecord = {
+     unique: 'Unique',
+     vtb: 'VTB',
+     xxnetwork: 'XXNetwork',
+-    zeitgeist: 'Zeitgeist'
++    zeitgeist: 'Zeitgeist',
++    avail: 'Avail',
++    availRecovery: 'AvailRecovery',
+ };
+ export const genericLedgerApps = {
+     bittensor: 'Bittensor',

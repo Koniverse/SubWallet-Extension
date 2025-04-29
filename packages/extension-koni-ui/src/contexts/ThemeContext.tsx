@@ -3,7 +3,9 @@
 
 import type { ThemeProps } from '../types';
 
+import { GLOBAL_ALERT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { useIsPopup } from '@subwallet/extension-koni-ui/hooks';
 import applyPreloadStyle from '@subwallet/extension-koni-ui/preloadStyle';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { generateTheme, SW_THEME_CONFIGS, SwThemeConfig } from '@subwallet/extension-koni-ui/themes';
@@ -27,6 +29,11 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
   applyPreloadStyle(extendToken.bodyBackgroundColor);
 
   return ({
+    '@keyframes swRotate': {
+      '100%': {
+        transform: 'rotate(360deg)'
+      }
+    },
     body: {
       fontFamily: token.fontFamily,
       color: token.colorText,
@@ -42,7 +49,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
     },
 
     '.main-page-container': {
-      border: `${token.lineWidth}px ${token.lineType} ${token.colorBgInput}`
+      '.main-layout-content': {
+        border: `${token.lineWidth}px ${token.lineType} ${token.colorBgInput}`,
+        height: 599,
+        width: 388,
+        maxWidth: '100%',
+        overflow: 'hidden',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        position: 'relative',
+        zIndex: 1
+      }
     },
 
     '.ant-sw-modal .ant-sw-modal-header': {
@@ -50,6 +67,9 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
     },
 
     '.ant-sw-modal': {
+      display: 'flex',
+      alignItems: 'flex-end',
+
       '&, &.ant-sw-qr-scanner': {
         '.ant-sw-modal-content': {
           width: 390 - token.lineWidth * 2,
@@ -74,6 +94,14 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         }
       }
     },
+
+    // make sure alert modal is above autocomplete dropdown
+    [`.modal-id-${GLOBAL_ALERT_MODAL}`]: {
+      '.ant-sw-modal-wrap': {
+        zIndex: 11000
+      }
+    },
+
     '.__currency-value-detail-tooltip': {
       paddingBottom: 0,
 
@@ -177,6 +205,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.ant-badge.g-filter-badge': {
+      '.ant-badge-dot.ant-badge-dot': {
+        width: 8,
+        height: 8,
+        transform: 'none',
+        top: 'auto',
+        bottom: 4,
+        right: 3
+      }
+    },
+
     '.form-row': {
       display: 'flex',
       gap: token.sizeSM,
@@ -253,6 +292,63 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         display: 'block',
         'white-space': 'nowrap'
       }
+    },
+
+    // field
+    '.ant-select-modal-input-suffix.ant-select-modal-input-suffix, .ant-field-suffix.ant-field-suffix': {
+      color: token.colorTextLight3
+    },
+
+    '.ant-field-container.-label-horizontal': {
+      flexDirection: 'row',
+      gap: token.sizeXXS,
+      alignItems: 'center',
+
+      '.ant-field-label': {
+        paddingRight: 0,
+        top: 0,
+        paddingTop: 0,
+        minWidth: 46
+      },
+
+      '.ant-field-wrapper': {
+        flex: 1,
+        gap: token.sizeXXS,
+        paddingLeft: 0,
+        paddingBottom: token.paddingXS
+      }
+    },
+
+    '.ant-field-container.is-selectable': {
+      cursor: 'pointer',
+
+      '&:not(.-status-success):not(.-status-warning):not(.-status-error):hover': {
+        '&:before': {
+          borderColor: token['geekblue-4']
+        }
+      }
+    },
+
+    '.ant-field-container.is-readonly': {
+      cursor: 'default'
+    },
+
+    '.ant-field-container.is-disabled': {
+      cursor: 'not-allowed'
+    },
+
+    '.ledger-warning-modal': {
+      '.ant-sw-modal-confirm-btns': {
+        flexDirection: 'row',
+
+        button: {
+          flex: 1,
+
+          '.anticon': {
+            display: 'none'
+          }
+        }
+      }
     }
   });
 });
@@ -291,6 +387,7 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   const themeName = useSelector((state: RootState) => state.settings.theme);
   const logoMaps = useSelector((state: RootState) => state.settings.logoMaps);
   const [themeReady, setThemeReady] = useState(false);
+  const isPopup = useIsPopup();
 
   const themeConfig = useMemo(() => {
     const config = SW_THEME_CONFIGS[themeName];
@@ -300,6 +397,14 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
 
     return config;
   }, [logoMaps, themeName]);
+
+  useEffect(() => {
+    if (isPopup) {
+      document.body.classList.remove('-expanse-mode');
+    } else {
+      document.body.classList.add('-expanse-mode');
+    }
+  }, [isPopup]);
 
   useEffect(() => {
     dataContext.awaitStores(['settings']).then(() => {

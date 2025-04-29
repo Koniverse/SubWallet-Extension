@@ -3,26 +3,30 @@
 
 import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
-import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestEvmProviderSend, RequestSettingsType, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
-import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, MAX_COLLATERAL_AMOUNT, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
 import { generateValidationProcess, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
-import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { hasSufficientCardanoValue } from '@subwallet/extension-base/services/request-service/helper';
+import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
-import { canDerive, getEVMChainInfo, stripUrl } from '@subwallet/extension-base/utils';
+import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
+import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
 import Web3 from 'web3';
@@ -32,14 +36,15 @@ import { JsonRpcPayload } from 'web3-core-helpers';
 import { checkIfDenied } from '@polkadot/phishing';
 import { JsonRpcResponse } from '@polkadot/rpc-provider/types';
 import { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
-import { isNumber } from '@polkadot/util';
+import { isArray, isNumber } from '@polkadot/util';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 interface AccountSub {
   subscription: Subscription;
   url: string;
 }
 
-function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthType?: AccountAuthType): InjectedAccount[] {
+function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[]): InjectedAccount[] {
   const accountSelected = authInfo
     ? (
       authInfo.isAllowed
@@ -51,18 +56,28 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     )
     : [];
 
-  let authTypeFilter = ({ type }: SingleAddress) => true;
+  const authTypeFilter = ({ type }: SingleAddress) => {
+    if (accountAuthTypes) {
+      if (!type) {
+        return false;
+      }
 
-  if (accountAuthType === 'substrate') {
-    authTypeFilter = ({ type }: SingleAddress) => (type !== 'ethereum');
-  } else if (accountAuthType === 'evm') {
-    authTypeFilter = ({ type }: SingleAddress) => (type === 'ethereum');
-  }
+      const validTypes = {
+        evm: EthereumKeypairTypes,
+        substrate: SubstrateKeypairTypes,
+        ton: TonKeypairTypes,
+        cardano: CardanoKeypairTypes
+      };
+
+      return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
+    } else {
+      return true;
+    }
+  };
 
   return Object
     .values(accounts)
     .filter(({ json: { meta: { isHidden } } }) => !isHidden)
-    .filter(({ type }) => anyType ? true : canDerive(type))
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))
@@ -135,31 +150,41 @@ export default class KoniTabs {
     const payloadValidate: PayloadValidated = {
       address,
       networkKey: '',
+      type: 'substrate',
       errors: [],
       payloadAfterValidated: request
     };
 
-    const { pair } = await generateValidationProcess(this.#koniState, url, payloadValidate, [validationAuthMiddleware]);
+    const { errors } = await generateValidationProcess(this.#koniState, url, payloadValidate, [validationAuthMiddleware]);
 
-    return this.#koniState.sign(url, new RequestBytesSign(request), { address, ...pair?.meta });
+    if (errors.length === 0) {
+      return this.#koniState.sign(url, new RequestBytesSign(request));
+    } else {
+      throw errors[0];
+    }
   }
 
   private async extrinsicSign (url: string, request: SignerPayloadJSON): Promise<ResponseSigning> {
     const address = request.address;
     const payloadValidate: PayloadValidated = {
       address,
+      type: 'substrate',
       networkKey: '',
       errors: [],
       payloadAfterValidated: request
     };
 
-    const { pair } = await generateValidationProcess(this.#koniState, url, payloadValidate, [validationAuthMiddleware]);
+    const { errors, pair } = await generateValidationProcess(this.#koniState, url, payloadValidate, [validationAuthMiddleware]);
 
-    return this.#koniState.sign(url, new RequestExtrinsicSign(request), { address, ...pair?.meta });
+    if (pair && errors.length === 0) {
+      return this.#koniState.sign(url, new RequestExtrinsicSign(request));
+    } else {
+      throw errors[0];
+    }
   }
 
-  private metadataProvide (url: string, request: MetadataDef): Promise<boolean> {
-    return this.#koniState.injectMetadata(url, request);
+  private metadataProvide (url: string, request: MetadataDef): boolean {
+    return this.#koniState.injectMetadata(request);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -280,32 +305,67 @@ export default class KoniTabs {
     return authList[shortenUrl];
   }
 
-  private async accountsListV2 (url: string, { accountAuthType,
-    anyType }: RequestAccountList): Promise<InjectedAccount[]> {
+  private async accountsListV2 (url: string, { accountAuthType, anyType }: RequestAccountList): Promise<InjectedAccount[]> {
     const authInfo = await this.getAuthInfo(url);
 
-    return transformAccountsV2(this.#koniState.keyringService.accounts, anyType, authInfo, authInfo?.accountAuthType || accountAuthType);
+    const accountAuthTypes: AccountAuthType[] = [];
+
+    if (accountAuthType) {
+      accountAuthTypes.push(accountAuthType);
+    } else if (authInfo) {
+      if (authInfo.accountAuthTypes.includes('substrate')) {
+        accountAuthTypes.push('substrate');
+      }
+
+      if (authInfo.accountAuthTypes.includes('evm')) {
+        accountAuthTypes.push('evm');
+      }
+
+      if (authInfo.accountAuthTypes.includes('ton')) {
+        accountAuthTypes.push('ton');
+      }
+
+      if (authInfo.accountAuthTypes.includes('cardano')) {
+        accountAuthTypes.push('cardano');
+      }
+    }
+
+    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
   }
 
-  private accountsSubscribeV2 (url: string, { accountAuthType }: RequestAccountSubscribe, id: string, port: chrome.runtime.Port): string {
+  // TODO: Update logic
+  private accountsSubstrateSubscribeV2 (url: string, { accountAuthType }: RequestAccountSubscribe, id: string, port: chrome.runtime.Port): string {
     const cb = createSubscription<'pub(accounts.subscribeV2)'>(id, port);
     const authInfoSubject = this.#koniState.requestService.subscribeAuthorizeUrlSubject;
 
-    // Update unsubscribe from @polkadot/extension-base
     this.#accountSubs[id] = {
       subscription: authInfoSubject.subscribe((infos: AuthUrls) => {
         this.getAuthInfo(url, infos)
           .then((authInfo) => {
-            const accountAuthType_ = authInfo?.accountAuthType || accountAuthType;
-            const accounts = this.#koniState.keyringService.accounts;
+            const accountAuthTypes: AccountAuthType[] = [];
 
-            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthType_));
+            if (accountAuthType) {
+              accountAuthTypes.push(accountAuthType);
+            } else if (authInfo) {
+              if (authInfo.accountAuthTypes.includes('substrate')) {
+                accountAuthTypes.push('substrate');
+              }
+
+              if (authInfo.accountAuthTypes.includes('evm')) {
+                accountAuthTypes.push('evm');
+              }
+            }
+
+            const accounts = this.#koniState.keyringService.context.pairs;
+
+            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes));
           })
           .catch(console.error);
       }),
       url
     };
 
+    // Update unsubscribe from @polkadot/extension-base
     port.onDisconnect.addListener((): void => {
       this.accountsUnsubscribe(url, { id });
     });
@@ -329,10 +389,19 @@ export default class KoniTabs {
   }
 
   private authorizeV2 (url: string, request: RequestAuthorizeTab): Promise<boolean> {
-    if (request.accountAuthType === 'evm') {
+    const isConnectOnlyEvmAccountType = request.accountAuthTypes?.length === 1 && request.accountAuthTypes?.includes('evm');
+    const isConnectOnlyCardanoAccountType = request.accountAuthTypes?.length === 1 && request.accountAuthTypes?.includes('cardano');
+
+    if (isConnectOnlyEvmAccountType) {
       return new Promise((resolve, reject) => {
         this.#koniState.authorizeUrlV2(url, request).then(resolve).catch((e: Error) => {
           reject(new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST));
+        });
+      });
+    } else if (isConnectOnlyCardanoAccountType) {
+      return new Promise((resolve, reject) => {
+        this.#koniState.authorizeUrlV2(url, request).then(resolve).catch((e: Error) => {
+          reject(new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST));
         });
       });
     } else {
@@ -340,26 +409,34 @@ export default class KoniTabs {
     }
   }
 
-  private async getEvmCurrentAccount (url: string): Promise<string[]> {
+  // TODO: Update logic
+  private async getCurrentAccount (url: string, authType: AccountAuthType): Promise<string[]> {
     return await new Promise((resolve) => {
       this.getAuthInfo(url).then((authInfo) => {
-        const allAccounts = this.#koniState.keyringService.accounts;
-        const accountList = transformAccountsV2(allAccounts, false, authInfo, 'evm').map((a) => a.address);
+        const allAccounts = this.#koniState.keyringService.context.pairs;
+        const accountList = transformAccountsV2(allAccounts, false, authInfo, [authType]).map((a) => a.address);
         let accounts: string[] = [];
 
-        const address = this.#koniState.keyringService.currentAccount.address;
+        const proxyId = this.#koniState.keyringService.context.currentAccount.proxyId;
 
-        if (address === ALL_ACCOUNT_KEY || !address) {
+        if (proxyId === ALL_ACCOUNT_KEY || !proxyId) {
           accounts = accountList;
         } else {
-          if (accountList.includes(address)) {
-            const result = accountList.filter((adr) => adr !== address);
+          const addresses = this.#koniState.keyringService.context.addressesByProxyId(proxyId);
 
-            result.unshift(address);
-            accounts = result;
-          } else {
-            accounts = accountList;
+          const result: string[] = [];
+          const inList: string[] = [];
+
+          for (const account of accountList) {
+            if (!addresses.includes(account)) {
+              result.push(account);
+            } else {
+              inList.push(account);
+            }
           }
+
+          result.unshift(...inList);
+          accounts = result;
         }
 
         resolve(accounts);
@@ -374,8 +451,8 @@ export default class KoniTabs {
     if (url) {
       const authInfo = await this.getAuthInfo(url);
 
-      if (authInfo?.currentEvmNetworkKey) {
-        currentChain = authInfo?.currentEvmNetworkKey;
+      if (authInfo?.currentNetworkMap.evm) {
+        currentChain = authInfo?.currentNetworkMap.evm;
       }
 
       if (authInfo?.isAllowed) {
@@ -434,7 +511,7 @@ export default class KoniTabs {
   }
 
   private async getEvmPermission (url: string, id: string) {
-    const accounts = await this.getEvmCurrentAccount(url);
+    const accounts = await this.getCurrentAccount(url, 'evm');
 
     return [{
       id: id,
@@ -443,6 +520,73 @@ export default class KoniTabs {
       caveats: [{ type: 'restrictReturnedAccounts', value: accounts }],
       date: new Date().getTime()
     }];
+  }
+
+  private async revokePermissions (url: string, id: string, { params }: RequestArguments) {
+    if (!params || !isArray(params) || params.length === 0) {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'No list of permissions found to revoke in the parameters.');
+    }
+
+    // Example of a request in MetaMask wallet
+    // await window.ethereum.request({
+    //   "method": "wallet_revokePermissions",
+    //   "params": [
+    //     {
+    //       "eth_accounts": {}
+    //     }
+    //   ]
+    // });
+    // Doc: https://docs.metamask.io/wallet/reference/wallet_revokepermissions/
+
+    const permissions = new Set(Object.keys(params[0] as Record<string, any>).filter((permission) => PERMISSIONS_TO_REVOKE.includes(permission)));
+
+    const permissionPromise = async (permission: string): Promise<void> => {
+      if (permission === 'eth_accounts') {
+        return new Promise((resolve) => {
+          this.#koniState.getAuthorize((value) => {
+            const urlStripped = stripUrl(url);
+
+            if (value && value[urlStripped]) {
+              const { accountAuthTypes, isAllowedMap } = { ...value[urlStripped] };
+
+              if (!accountAuthTypes) {
+                resolve();
+              }
+
+              if (accountAuthTypes?.includes('evm')) {
+                if (accountAuthTypes.length === 1) {
+                  delete value[urlStripped];
+                } else {
+                  value[urlStripped].isAllowedMap = Object.entries(isAllowedMap).reduce<Record<string, boolean>>((allowedMap, [address, value]) => {
+                    if (isEthereumAddress(address)) {
+                      allowedMap[address] = false;
+                    } else {
+                      allowedMap[address] = value;
+                    }
+
+                    return allowedMap;
+                  }, {});
+
+                  value[urlStripped].accountAuthTypes = accountAuthTypes?.filter((type) => type !== 'evm');
+                }
+              } else {
+                resolve();
+              }
+
+              this.#koniState.setAuthorize(value, () => {
+                resolve();
+              });
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+    };
+
+    await Promise.all(Array.from(permissions).map(permissionPromise));
+
+    return null;
   }
 
   private async switchEvmChain (id: string, url: string, { params }: RequestArguments) {
@@ -468,14 +612,14 @@ export default class KoniTabs {
           chainId: chainId,
           rpcUrls: onlineData.rpc.filter((url) => (url.startsWith('https://'))),
           chainName: onlineData.name,
-          blockExplorerUrls: onlineData.explorers.map((explorer) => explorer.url),
+          blockExplorerUrls: onlineData.explorers?.map((explorer) => explorer.url),
           nativeCurrency: onlineData.nativeCurrency,
           requestId: id
         };
 
         await this.addEvmChain(id, url, { method: 'wallet_addEthereumChain', params: [chainData] });
       } else {
-        throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'This network is currently not supported');
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
       }
     }
 
@@ -686,6 +830,7 @@ export default class KoniTabs {
     return evmState.chainId || '0x0';
   }
 
+  // TODO: Update logic
   private async evmSubscribeEvents (url: string, id: string, port: chrome.runtime.Port) {
     // This method will be called after DApp request connect to extension
     const cb = createSubscription<'evm(events.subscribe)'>(id, port);
@@ -697,10 +842,10 @@ export default class KoniTabs {
     };
 
     // Detect accounts changed
-    let currentAccountList = await this.getEvmCurrentAccount(url);
+    let currentAccountList = await this.getCurrentAccount(url, 'evm');
 
     const onCurrentAccountChanged = async () => {
-      const newAccountList = await this.getEvmCurrentAccount(url);
+      const newAccountList = await this.getCurrentAccount(url, 'evm');
 
       // Compare to void looping reload
       if (JSON.stringify(currentAccountList) !== JSON.stringify(newAccountList)) {
@@ -710,7 +855,7 @@ export default class KoniTabs {
       }
     };
 
-    const accountListSubscription = this.#koniState.keyringService.currentAccountSubject
+    const accountListSubscription = this.#koniState.keyringService.context.observable.currentAccount
       .subscribe(() => {
         onCurrentAccountChanged().catch(console.error);
       });
@@ -729,7 +874,7 @@ export default class KoniTabs {
       }
 
       // Detect account
-      const newAccountList = await this.getEvmCurrentAccount(url);
+      const newAccountList = await this.getCurrentAccount(url, 'evm');
 
       // Compare to void looping reload
       if (JSON.stringify(currentAccountList) !== JSON.stringify(newAccountList)) {
@@ -874,7 +1019,7 @@ export default class KoniTabs {
   }
 
   public async canUseAccount (address: string, url: string) {
-    const allowedAccounts = await this.getEvmCurrentAccount(url);
+    const allowedAccounts = await this.getCurrentAccount(url, 'evm');
 
     return !!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()));
   }
@@ -889,6 +1034,7 @@ export default class KoniTabs {
     }
   }
 
+  // TODO: Update logic
   public async evmSendTransaction (id: string, url: string, { params }: RequestArguments) {
     const transactionParams = (params as EvmSendTransactionParams[])[0];
 
@@ -911,7 +1057,7 @@ export default class KoniTabs {
         case 'net_version':
           return parseInt(await this.getEvmCurrentChainId(url), 16);
         case 'eth_accounts':
-          return await this.getEvmCurrentAccount(url);
+          return await this.getCurrentAccount(url, 'evm');
         case 'eth_sendTransaction':
           return await this.evmSendTransaction(id, url, request);
         case 'eth_sign':
@@ -927,11 +1073,13 @@ export default class KoniTabs {
         case 'eth_signTypedData_v4':
           return await this.evmSign(id, url, request);
         case 'wallet_requestPermissions':
-          await this.authorizeV2(url, { origin: '', accountAuthType: 'evm', reConfirm: true });
+          await this.authorizeV2(url, { origin: '', accountAuthTypes: ['evm'], reConfirm: true });
 
           return await this.getEvmPermission(url, id);
         case 'wallet_getPermissions':
           return await this.getEvmPermission(url, id);
+        case 'wallet_revokePermissions':
+          return await this.revokePermissions(url, id, request);
         case 'wallet_addEthereumChain':
           return await this.addEvmChain(id, url, request);
         case 'wallet_switchEthereumChain':
@@ -975,11 +1123,13 @@ export default class KoniTabs {
   }
 
   public isEvmPublicRequest (type: string, request: RequestArguments) {
-    return type === 'evm(request)' &&
+    return (type === 'evm(request)' &&
       [
         'eth_chainId',
-        'net_version'
-      ].includes(request?.method);
+        'net_version',
+        'wallet_requestPermissions',
+        'wallet_getPermissions'
+      ].includes(request?.method)) || type === 'evm(events.subscribe)';
   }
 
   public async addPspToken (id: string, url: string, { genesisHash, tokenInfo: input }: RequestAddPspToken) {
@@ -1049,6 +1199,229 @@ export default class KoniTabs {
     return await this.#koniState.addTokenConfirm(id, url, tokenInfo);
   }
 
+  // Cardano
+
+  private async getCurrentInformationCardanoDapp (url: string) {
+    const authInfo = await this.getAuthInfo(url);
+
+    if (!authInfo || !authInfo.isAllowedMap || !authInfo.isAllowed) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const cardanoAddress = authInfo.currentAccount;
+
+    if (!cardanoAddress || !authInfo.isAllowedMap[cardanoAddress]) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'No Cardano address found');
+    }
+
+    const keypair = keyring.getPair(cardanoAddress);
+
+    if (!keypair) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, 'No Cardano address found');
+    }
+
+    const network = authInfo?.currentNetworkMap.cardano;
+
+    if (!network) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'No network key found');
+    }
+
+    return { address: cardanoAddress, network };
+  }
+
+  private async cardanoGetAccountList (id: string, url: string): Promise<string[]> {
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
+
+    return accountList.map((address) => {
+      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isTestnet);
+
+      return convertCardanoAddressToHex(addressChainFormat);
+    });
+  }
+
+  private async cardanoGetAccountBalance (id: string, url: string): Promise<string> {
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const balanceValue = await this.#koniState.cardanoGetBalance(id, url, address);
+
+    return balanceValue.to_hex();
+  }
+
+  private async cardanoGetChangeAddress (id: string, url: string): Promise<string> {
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
+
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
+
+    const isTestnet = network !== 'cardano_preproduction';
+    const addressChainFormat = reformatAddress(address, +isTestnet);
+
+    return convertCardanoAddressToHex(addressChainFormat);
+  }
+
+  private async cardanoGetCurrentNetworkId (id: string, url: string): Promise<number> {
+    let currentChain: string | undefined;
+    let autoActiveChain = false;
+
+    if (url) {
+      const authInfo = await this.getAuthInfo(url);
+
+      if (authInfo?.currentNetworkMap.cardano) {
+        currentChain = authInfo.currentNetworkMap.cardano;
+      }
+
+      if (authInfo?.isAllowed) {
+        autoActiveChain = true;
+      }
+    }
+
+    const currentNetwork = this.#koniState.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: currentChain,
+      url
+    });
+
+    if (!currentNetwork?.cardanoInfo) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Can\'t get current network');
+    }
+
+    return +(!currentNetwork?.isTestnet);
+  }
+
+  private async cardanoGetUtxo (id: string, url: string, params: RequestCardanoGetUtxos): Promise<Cbor[] | null> {
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(address, network, params?.paginate);
+
+    if (!params?.amount) {
+      return utxos.map((utxo) => utxo.to_hex());
+    }
+
+    let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
+
+    try {
+      expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+    } catch (e) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
+
+    let currentTotalUtxoValue = CardanoWasm.Value.zero();
+    const utxosFiltered: CardanoWasm.TransactionUnspentOutput[] = [];
+
+    for (const utxo of utxos) {
+      currentTotalUtxoValue = currentTotalUtxoValue.checked_add(utxo.output().amount());
+      utxosFiltered.push(utxo);
+
+      if (hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue)) {
+        return utxosFiltered.map((utxo) => utxo.to_hex());
+      }
+    }
+
+    return null;
+  }
+
+  private async cardanoGetCollateral (id: string, url: string, params: RequestCardanoGetCollateral): Promise<Cbor[] | null> {
+    const { address, network } = await this.getCurrentInformationCardanoDapp(url);
+    const utxos = await this.#koniState.chainService.getUtxosByAddress(address, network);
+
+    let expectedValue: CardanoWasm.Value = CardanoWasm.Value.zero();
+
+    try {
+      if (params?.amount) {
+        expectedValue = CardanoWasm.Value.from_hex(params?.amount);
+      } else {
+        expectedValue = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT));
+      }
+    } catch (e) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
+
+    if (expectedValue.multiasset() || expectedValue.coin().compare(CardanoWasm.BigNum.from_str(MAX_COLLATERAL_AMOUNT)) > 0) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Amount is invalid');
+    }
+
+    let currentTotalUtxoValue = CardanoWasm.Value.zero();
+    const utxosFinal: CardanoWasm.TransactionUnspentOutput[] = [];
+
+    for (const utxo of utxos) {
+      const amount = utxo.output().amount();
+
+      if (amount.multiasset()) {
+        continue;
+      }
+
+      currentTotalUtxoValue = currentTotalUtxoValue.checked_add(amount);
+      utxosFinal.push(utxo);
+
+      if (hasSufficientCardanoValue(currentTotalUtxoValue, expectedValue)) {
+        break;
+      }
+    }
+
+    return utxosFinal.length ? utxosFinal.map((utxo) => utxo.to_hex()) : null;
+  }
+
+  private async cardanoSignData (id: string, url: string, params: RequestCardanoSignData): Promise<ResponseCardanoSignData> {
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const signResult = await this.#koniState.cardanoSignData(id, url, params, address);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Failed to sign data');
+    }
+  }
+
+  private async cardanoSignTransaction (id: string, url: string, params: RequestCardanoSignTransaction): Promise<ResponseCardanoSignTransaction> {
+    const { address } = await this.getCurrentInformationCardanoDapp(url);
+    const signResult = await this.#koniState.cardanoSignTx(id, url, params, address);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
+
+  private async cardanoSubmitTransaction (id: string, url: string, params: string): Promise<ResponseCardanoSignTransaction> {
+    const txHash = await this.#koniState.cardanoSubmitTx(id, url, params);
+
+    if (txHash) {
+      return txHash;
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INTERNAL_ERROR, 'Failed to submit transaction');
+    }
+  }
+
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], url: string, port: chrome.runtime.Port): Promise<ResponseTypes[keyof ResponseTypes]> {
     if (type === 'pub(phishing.redirectIfDenied)') {
       return this.redirectIfPhishing(url);
@@ -1061,7 +1434,7 @@ export default class KoniTabs {
     // Wait for account ready and chain ready
     await Promise.all([this.#koniState.eventService.waitAccountReady, this.#koniState.eventService.waitChainReady]);
 
-    if (type !== 'pub(authorize.tabV2)' && !this.isEvmPublicRequest(type, request as RequestArguments)) {
+    if (!['pub(authorize.tabV2)', 'pub(accounts.subscribeV2)'].includes(type) && !this.isEvmPublicRequest(type, request as RequestArguments)) {
       await this.#koniState.ensureUrlAuthorizedV2(url)
         .catch((e: Error) => {
           if (type.startsWith('evm')) {
@@ -1113,7 +1486,7 @@ export default class KoniTabs {
       case 'pub(accounts.listV2)':
         return this.accountsListV2(url, request as RequestAccountList);
       case 'pub(accounts.subscribeV2)':
-        return this.accountsSubscribeV2(url, request as RequestAccountSubscribe, id, port);
+        return this.accountsSubstrateSubscribeV2(url, request as RequestAccountSubscribe, id, port);
       case 'pub(accounts.unsubscribe)':
         return this.accountsUnsubscribe(url, request as RequestAccountUnsubscribe);
       case 'evm(events.subscribe)':
@@ -1122,6 +1495,26 @@ export default class KoniTabs {
         return await this.handleEvmRequest(id, url, request as RequestArguments);
       case 'evm(provider.send)':
         return await this.handleEvmSend(id, url, port, request as RequestEvmProviderSend);
+
+      // Cardano
+      case 'cardano(account.get.address)':
+        return await this.cardanoGetAccountList(id, url);
+      case 'cardano(account.get.balance)':
+        return await this.cardanoGetAccountBalance(id, url);
+      case 'cardano(account.get.change.address)':
+        return await this.cardanoGetChangeAddress(id, url);
+      case 'cardano(account.get.collateral)':
+        return await this.cardanoGetCollateral(id, url, request as RequestCardanoGetCollateral);
+      case 'cardano(account.get.utxos)':
+        return await this.cardanoGetUtxo(id, url, request as RequestCardanoGetUtxos);
+      case 'cardano(network.get.current)':
+        return await this.cardanoGetCurrentNetworkId(id, url);
+      case 'cardano(data.sign)':
+        return await this.cardanoSignData(id, url, request as RequestCardanoSignData);
+      case 'cardano(transaction.sign)':
+        return await this.cardanoSignTransaction(id, url, request as RequestCardanoSignTransaction);
+      case 'cardano(transaction.submit)':
+        return await this.cardanoSubmitTransaction(id, url, request as string);
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }

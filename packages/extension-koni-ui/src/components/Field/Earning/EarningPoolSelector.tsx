@@ -21,8 +21,6 @@ import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContex
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { isEthereumAddress } from '@polkadot/util-crypto';
-
 interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;
   chain: string;
@@ -52,7 +50,10 @@ const SORTING_MODAL_ID = 'pool-sorting-modal';
 const FILTER_MODAL_ID = 'pool-filter-modal';
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', defaultValue, disabled,
+  const { chain,
+    className = '',
+    defaultValue: cachedValue,
+    disabled,
     from,
     id = 'pool-selector',
     label, loading, onChange,
@@ -129,7 +130,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return compound?.nominations.map((item) => item.validatorAddress) || [];
   }, [compound?.nominations]);
 
-  const defaultSelectPool = defaultPoolMap?.[chain];
+  const stakedPool = useMemo(() => nominationPoolValueList[0], [nominationPoolValueList]);
+
+  const recommendPool = useMemo(() => {
+    const recommendPools: number[] = defaultPoolMap?.[chain] || [];
+
+    if (recommendPools.length) {
+      return recommendPools[0].toString();
+    } else {
+      return '';
+    }
+  }, [defaultPoolMap, chain]);
 
   const resultList = useMemo((): NominationPoolDataType[] => {
     const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSessionHeader: true, disabled: true };
@@ -203,6 +214,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       return [];
     }
   }, [chain, defaultPoolMap, items, selectedFilters, sortSelection]);
+
+  const selectedAddress = useMemo(() => {
+    return resultList.filter((item) => item.idStr === value)[0]?.address;
+  }, [resultList, value]);
 
   const isDisabled = useMemo(() =>
     disabled ||
@@ -362,11 +377,11 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, []);
 
   useEffect(() => {
-    const defaultSelectedPool = defaultValue || nominationPoolValueList[0] || `${defaultSelectPool?.[0] || ''}`;
+    const defaultSelectedPool = stakedPool || value || cachedValue || recommendPool;
 
     onChange && onChange({ target: { value: defaultSelectedPool } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominationPoolValueList, items]);
+  }, [stakedPool, recommendPool, items]);
 
   useEffect(() => {
     if (!isActive) {
@@ -384,7 +399,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     <>
       <SelectModal
         actionBtnIcon={(
-          <Badge dot={!!selectedFilters.length}>
+          <Badge
+            className={'g-filter-badge'}
+            dot={!!selectedFilters.length}
+          >
             <Icon phosphorIcon={FadersHorizontal} />
           </Badge>
         )}
@@ -407,9 +425,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         placeholder={placeholder || t('Select pool')}
         prefix={(
           <Avatar
+            identPrefix={networkPrefix}
             size={20}
-            theme={value ? isEthereumAddress(value) ? 'ethereum' : 'polkadot' : undefined}
-            value={value}
+            value={selectedAddress}
           />
         )}
         renderItem={renderItem}
@@ -417,7 +435,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),

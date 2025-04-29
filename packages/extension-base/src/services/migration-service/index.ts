@@ -29,12 +29,9 @@ export default class MigrationService {
         const key = keys[i];
         const name = JobClass.name;
 
-        const check = await this.state.dbService.stores.migration.table.where({
-          name,
-          key
-        }).first();
+        const existed = await this.state.dbService.hasRunScript(key);
 
-        if (!check || key.startsWith(EVERYTIME)) {
+        if (!existed || key.startsWith(EVERYTIME)) {
           const job = new JobClass(this.state);
 
           await job.run();

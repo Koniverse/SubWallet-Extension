@@ -7,7 +7,7 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 
 const defaultErrorMap: Record<SwapErrorType, { message: string, code?: number }> = {
   ERROR_FETCHING_QUOTE: {
-    message: detectTranslate('No swap quote found. Adjust your amount or try again later'),
+    message: detectTranslate('No swap quote found. Change your network endpoint or adjust amount and try again'),
     code: undefined
   },
   NOT_MEET_MIN_SWAP: {
@@ -48,6 +48,11 @@ const defaultErrorMap: Record<SwapErrorType, { message: string, code?: number }>
   },
   MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT: {
     message: detectTranslate('Insufficient liquidity to complete the swap. Lower your amount and try again'),
+    code: undefined
+  },
+  NOT_MEET_MIN_EXPECTED: {
+    // TODO: update message
+    message: detectTranslate('Unable to process this swap at the moment. Try again later'),
     code: undefined
   }
 };

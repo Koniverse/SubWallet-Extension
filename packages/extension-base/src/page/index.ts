@@ -1,16 +1,17 @@
 // Copyright 2019-2022 @polkadot/extension authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MessageTypes, MessageTypesWithNoSubscriptions, MessageTypesWithNullRequest, MessageTypesWithSubscriptions, RequestTypes, ResponseTypes, SubscriptionMessageTypes, TransportRequestMessage, TransportResponseMessage } from '../background/types';
+import type { AccountAuthType, MessageTypes, MessageTypesWithNoSubscriptions, MessageTypesWithNullRequest, MessageTypesWithSubscriptions, RequestTypes, ResponseTypes, SubscriptionMessageTypes, TransportRequestMessage, TransportResponseMessage } from '../background/types';
 
 import { ProviderError } from '@subwallet/extension-base/background/errors/ProviderError';
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
-import { SubWalletEvmProvider } from '@subwallet/extension-base/page/SubWalleEvmProvider';
-import { AuthRequestOption, EvmProvider } from '@subwallet/extension-inject/types';
+import SubWalletCardanoProvider from '@subwallet/extension-base/page/cardano';
+import SubWalletEvmProvider from '@subwallet/extension-base/page/evm';
+import Injected from '@subwallet/extension-base/page/substrate';
+import { AuthRequestOption, CardanoProvider, EvmProvider } from '@subwallet/extension-inject/types';
 
 import { MESSAGE_ORIGIN_PAGE } from '../defaults';
 import { getId } from '../utils/getId';
-import Injected from './Injected';
 // when sending a message from the injector to the extension, we
 //  - create an event - this we send to the loader
 //  - the loader takes this event and uses port.postMessage to background
@@ -56,7 +57,9 @@ export function sendMessage<TMessageType extends MessageTypes> (message: TMessag
 // the enable function, called by the dapp to allow access
 
 export async function enable (origin: string, opt?: AuthRequestOption): Promise<Injected> {
-  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthType: opt?.accountAuthType || 'substrate' });
+  const accountAuthTypes: AccountAuthType[] = opt?.accountAuthType === 'both' ? ['substrate', 'evm'] : [opt?.accountAuthType || 'substrate'];
+
+  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes });
 
   return new Injected(sendMessage);
 }
@@ -78,7 +81,7 @@ export function handleResponse<TMessageType extends MessageTypes> (data: Transpo
     // eslint-disable-next-line @typescript-eslint/ban-types
     (handler.subscriber as Function)(data.subscription);
   } else if (data.error) {
-    handler.reject(new ProviderError(ProviderErrorType.INTERNAL_ERROR, data.error, data.errorCode));
+    handler.reject(new ProviderError(ProviderErrorType.INTERNAL_ERROR, data.error, data.errorCode, data.errorCode));
   } else {
     handler.resolve(data.response);
   }
@@ -86,4 +89,8 @@ export function handleResponse<TMessageType extends MessageTypes> (data: Transpo
 
 export function initEvmProvider (version: string): EvmProvider {
   return new SubWalletEvmProvider(sendMessage, version);
+}
+
+export function initCardanoProvider (): CardanoProvider {
+  return new SubWalletCardanoProvider(sendMessage);
 }

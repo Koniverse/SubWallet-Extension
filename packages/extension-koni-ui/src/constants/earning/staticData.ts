@@ -183,6 +183,43 @@ export const EARNING_DATA_RAW = {
       iconColor: '#008dff'
     }
   ],
+  BITTENOSR_STAKING: [
+    {
+      icon: 'ThumbsUp',
+      title: 'Select {validatorNumber} {validatorType}',
+      description:
+        'It is recommended that you select {validatorNumber} {validatorType} to optimize your staking rewards',
+      iconColor: '#aada62'
+    },
+    {
+      icon: 'Coins',
+      title: 'Unstake and withdraw',
+      description:
+        'Once staked, your funds will be locked. Unstake your funds anytime and they will be <strong>automatically withdrawn</strong> to your account. Keep in mind that the unstaking action will incur network fees',
+      iconColor: '#e6dc25'
+    },
+    {
+      icon: 'CheckCircle',
+      title: 'Keep your transferable balance',
+      description:
+        'Ensure that your transferable balance includes <strong>a minimum of {maintainBalance} {maintainSymbol}</strong> to cover your existential deposit and network fees associated with staking, unstaking, and withdrawals',
+      iconColor: '#4cd9ac'
+    },
+    {
+      icon: 'Wallet',
+      title: 'Check your rewards',
+      description:
+        'Your staking rewards will be paid out every {paidOut} {paidOutTimeUnit} and will be automatically compounded to your stake',
+      iconColor: '#51BC5E'
+    },
+    {
+      icon: 'Eye',
+      title: 'Manage your stake',
+      description:
+        'You need to monitor your stake constantly and change {validatorType} when needed as staking status can fluctuate over time',
+      iconColor: '#008dff'
+    }
+  ],
   [YieldPoolType.PARACHAIN_STAKING]: [],
   [YieldPoolType.SINGLE_FARMING]: []
 };
@@ -213,3 +250,23 @@ export const UNSTAKE_ALERT_DATA = [
     iconColor: '#aada62'
   }
 ];
+
+export const UNSTAKE_BIFROST_ALERT_DATA = UNSTAKE_ALERT_DATA.map((item, index) => ({
+  ...item,
+  title: index === 2 ? 'Automatic withdrawal' : item.title,
+  description: index === 0
+    ? 'Once unstaked, your funds will become available within {unBondedTime}'
+    : index === 1
+      ? 'During the unstaking period, your tokens produce no rewards'
+      : index === 2
+        ? 'The funds will be automatically withdrawn to your account once the wait time is over'
+        : item.description
+}));
+
+export const UNSTAKE_BITTENSOR_ALERT_DATA = UNSTAKE_ALERT_DATA.filter((_, index) => index === 2).map((item) => ({
+  ...item,
+  title: 'Automatic withdrawal',
+  description: 'Once unstaked, the funds will be automatically withdrawn to your account',
+  icon: 'Coins',
+  iconColor: '#e6dc25'
+}));

@@ -1,12 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { TransactionData } from '@subwallet/extension-base/types';
-import { BaseStepDetail, CommonOptimalPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
+import { BaseStepDetail, BaseStepType, CommonOptimalSwapPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
+
+import { BaseProcessRequestSign, TransactionData } from '../transaction';
 
 // core
 export type SwapRate = number;
@@ -16,6 +17,12 @@ export interface SwapPair {
   from: string;
   to: string;
   metadata?: Record<string, any>;
+}
+
+export interface ActionPair {
+  slug: string;
+  from: string;
+  to: string;
 }
 
 export interface SwapQuote {
@@ -53,10 +60,12 @@ export enum SwapErrorType {
   NOT_ENOUGH_LIQUIDITY = 'NOT_ENOUGH_LIQUIDITY',
   MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT = 'MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT',
   AMOUNT_CANNOT_BE_ZERO = 'AMOUNT_CANNOT_BE_ZERO',
+  NOT_MEET_MIN_EXPECTED = 'NOT_MEET_MIN_EXPECTED',
 }
 
 export enum SwapStepType {
-  SWAP = 'SWAP'
+  SWAP = 'SWAP',
+  PERMIT = 'PERMIT'
 }
 
 export enum SwapProviderId {
@@ -67,16 +76,22 @@ export enum SwapProviderId {
   POLKADOT_ASSET_HUB = 'POLKADOT_ASSET_HUB',
   KUSAMA_ASSET_HUB = 'KUSAMA_ASSET_HUB',
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
+  WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
+  SIMPLE_SWAP = 'SIMPLE_SWAP',
+  UNISWAP = 'UNISWAP'
 }
 
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.CHAIN_FLIP_TESTNET,
   SwapProviderId.CHAIN_FLIP_MAINNET,
   SwapProviderId.HYDRADX_MAINNET,
-  SwapProviderId.HYDRADX_TESTNET,
+  // SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
-  SwapProviderId.ROCOCO_ASSET_HUB
+  // SwapProviderId.ROCOCO_ASSET_HUB,
+  // SwapProviderId.WESTEND_ASSET_HUB,
+  SwapProviderId.SIMPLE_SWAP,
+  SwapProviderId.UNISWAP
 ];
 
 export interface SwapProvider {
@@ -93,7 +108,7 @@ export enum SwapFeeType {
   WALLET_FEE = 'WALLET_FEE'
 }
 
-export type SwapTxData = ChainflipSwapTxData | HydradxSwapTxData; // todo: will be more
+export type SwapTxData = ChainflipSwapTxData | HydradxSwapTxData | SimpleSwapTxData; // todo: will be more
 
 export interface SwapBaseTxData {
   provider: SwapProvider;
@@ -101,7 +116,7 @@ export interface SwapBaseTxData {
   address: string;
   slippage: number;
   recipient?: string;
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
 }
 
 export interface ChainflipSwapTxData extends SwapBaseTxData {
@@ -110,12 +125,16 @@ export interface ChainflipSwapTxData extends SwapBaseTxData {
   estimatedDepositChannelExpiryTime?: number;
 }
 
+export interface SimpleSwapTxData extends SwapBaseTxData {
+  id: string;
+}
+
 export interface HydradxSwapTxData extends SwapBaseTxData {
   txHex: string;
 }
 
 // parameters & responses
-export type GenSwapStepFunc = (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
+export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2, stepIndex: number) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
 export interface ChainflipPreValidationMetadata {
   minSwap: AmountData;
@@ -135,6 +154,12 @@ export interface AssetHubPreValidationMetadata {
   priceImpactPct?: string;
 }
 
+export interface SimpleSwapValidationMetadata{
+  minSwap: AmountData;
+  maxSwap: AmountData;
+  chain: _ChainInfo;
+}
+
 export interface QuoteAskResponse {
   quote?: SwapQuote;
   error?: SwapError;
@@ -147,10 +172,22 @@ export interface SwapRequest {
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
   feeToken?: string;
+  currentQuote?: SwapProvider
+}
+
+export interface SwapRequestV2 {
+  address: string;
+  pair: SwapPair;
+  fromAmount: string;
+  slippage: number; // Example: 0.01 for 1%
+  recipient?: string;
+  feeToken?: string;
+  preferredProvider?: SwapProviderId; // allow user to designate a provider
+  isCrossChain?: boolean;
 }
 
 export interface SwapRequestResult {
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
   quote: SwapQuoteResponse;
 }
 
@@ -161,13 +198,14 @@ export interface SwapQuoteResponse {
   error?: SwapError; // only if there's no available quote
 }
 
-export interface SwapSubmitParams {
-  process: CommonOptimalPath;
+export interface SwapSubmitParams extends BaseProcessRequestSign {
+  process: CommonOptimalSwapPath;
   currentStep: number;
   quote: SwapQuote;
   address: string;
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
+  cacheProcessId: string;
 }
 
 export interface SwapSubmitStepData {
@@ -176,12 +214,29 @@ export interface SwapSubmitStepData {
   extrinsic: TransactionData;
   transferNativeAmount: string;
   extrinsicType: ExtrinsicType;
-  chainType: ChainType
+  chainType: ChainType;
+  isPermit?: boolean;
 }
 
-export interface OptimalSwapPathParams {
+export enum DynamicSwapType {
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE'
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  pair: ActionPair;
+}
+
+export const enum BridgeStepPosition {
+  FIRST = 0,
+  AFTER_SWAP = 1
+}
+
+export interface OptimalSwapPathParamsV2 {
   request: SwapRequest;
   selectedQuote?: SwapQuote;
+  path: DynamicSwapAction[];
 }
 
 export interface SwapEarlyValidation {
@@ -195,12 +250,40 @@ export interface AssetHubSwapEarlyValidation extends SwapEarlyValidation {
 
 export interface ValidateSwapProcessParams {
   address: string;
-  process: CommonOptimalPath;
+  process: CommonOptimalSwapPath;
   selectedQuote: SwapQuote;
   recipient?: string;
+  currentStep: number;
 }
 
 export interface SlippageType {
   slippage: BigN,
   isCustomType: boolean
+}
+
+export interface PermitSwapData {
+  processId: string;
+  step: BaseStepType;
+}
+
+export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
+export const SIMPLE_SWAP_SLIPPAGE = 0.05;
+
+export interface BaseSwapStepMetadata {
+  sendingValue: string;
+  expectedReceive: string;
+  originTokenInfo: _ChainAsset;
+  destinationTokenInfo: _ChainAsset;
+  sender: string;
+  receiver: string;
+  version: number;
+}
+
+export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
+  txHex: `0x${string}`
+}
+
+export interface ChainFlipSwapStepMetadata extends BaseSwapStepMetadata {
+  srcChain: string,
+  destChain: string
 }

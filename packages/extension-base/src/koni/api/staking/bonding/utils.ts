@@ -190,7 +190,11 @@ export function calculateChainStakedReturn (inflation: number, totalEraStake: BN
   return stakedReturn;
 }
 
-export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+export async function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+  if (chainInfo.slug === 'analog_timechain') {
+    return await calculateAnalogChainStakedReturn();
+  }
+
   const DAYS_PER_YEAR = 365;
   const { decimals } = _getChainNativeTokenBasicInfo(chainInfo);
 
@@ -210,7 +214,7 @@ export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuan
     inflationToStakers = new BigNumber(100).multipliedBy(multiplier).minus(100);
   }
 
-  const averageRewardRate = (['avail_mainnet'].includes(chainInfo.slug) ? inflation : inflationToStakers).dividedBy(supplyStaked);
+  const averageRewardRate = (['avail_mainnet', 'dentnet'].includes(chainInfo.slug) ? inflation : inflationToStakers).dividedBy(supplyStaked);
 
   return averageRewardRate.toNumber();
 }
@@ -228,10 +232,41 @@ export function calculateTernoaValidatorReturn (rewardPerValidator: number, vali
   return stakeRatio * 365 * 100;
 }
 
+export async function calculateAnalogChainStakedReturn (): Promise<number | undefined> {
+  const url = 'https://explorer-api.analog.one/api/nominations?projection=apy,rewardsClaimed,eraEndsTime';
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      throw new Error(`API error: ${response.status} - ${errorText}`);
+    }
+
+    const apyInfo = await response.json() as {
+      data: {
+        apy: number;
+      }
+    };
+
+    return apyInfo?.data?.apy as number | undefined;
+  } catch (e) {
+    console.error('Fetch error:', e);
+
+    return undefined;
+  }
+}
+
 export function calculateValidatorStakedReturn (chainStakedReturn: number, totalValidatorStake: BN, avgStake: BN, commission: number) {
   const bnAdjusted = avgStake.mul(BN_HUNDRED).div(totalValidatorStake);
   const adjusted = bnAdjusted.toNumber() * chainStakedReturn;
-
+  // todo: should calculated in bignumber instead number?
   const stakedReturn = (adjusted > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : adjusted) / 100;
 
   return stakedReturn * (100 - commission) / 100; // Deduct commission
@@ -541,7 +576,7 @@ export function getEarningStatusByNominations (bnTotalActiveStake: BN, nominatio
 export function getValidatorLabel (chain: string) {
   if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
     return 'dApp';
-  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain)) {
+  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
     return 'Validator';
   }
 
@@ -568,10 +603,10 @@ export function getAvgValidatorEraReward (supportedDays: number, eraRewardHistor
 }
 
 export function getSupportedDaysByHistoryDepth (erasPerDay: number, maxSupportedEras: number, liveDay?: number) {
-  const maxSupportDay = maxSupportedEras / erasPerDay;
+  const maxSupportDay = Math.floor(maxSupportedEras / erasPerDay);
 
   if (liveDay && liveDay <= 30) {
-    return Math.min(liveDay - 1, maxSupportDay);
+    return Math.min(Math.floor(liveDay - 1), maxSupportDay);
   }
 
   if (maxSupportDay > 30) {

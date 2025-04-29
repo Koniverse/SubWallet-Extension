@@ -1,10 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicStatus, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionHistoryItem, XCMTransactionAdditionalInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_RECOVER_HISTORY_INTERVAL } from '@subwallet/extension-base/constants';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { historyRecover, HistoryRecoverStatus } from '@subwallet/extension-base/services/history-service/helpers/recoverHistoryStatus';
 import { getExtrinsicParserKey } from '@subwallet/extension-base/services/history-service/helpers/subscan-extrinsic-parser-helper';
@@ -12,14 +13,14 @@ import { parseSubscanExtrinsicData, parseSubscanTransferData } from '@subwallet/
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { keyring } from '@subwallet/ui-keyring';
 import { BehaviorSubject } from 'rxjs';
 
-function filterHistoryItemByAddressAndChain (chain: string, address: string) {
+function filterHistoryItemByAddressAndChain (chain: string, addresses: string[]) {
   return (item: TransactionHistoryItem) => {
-    return item.chain === chain && item.address === address;
+    return item.chain === chain && addresses.includes(item.address);
   };
 }
 
@@ -52,7 +53,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     const historyRecords = [] as TransactionHistoryItem[];
 
     // Fill additional info
-    const accountMap = Object.entries(this.keyringService.accounts).reduce((map, [address, account]) => {
+    const accountMap = Object.entries(this.keyringService.context.pairs).reduce((map, [address, account]) => {
       map[address.toLowerCase()] = account.json.meta.name || address;
 
       return map;
@@ -89,12 +90,17 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     return this.historySubject;
   }
 
-  private fetchSubscanTransactionHistory (chain: string, address: string) {
-    if (!this.subscanService.checkSupportedSubscanChain(chain)) {
+  /**
+   * @todo: Must improve performance of this function
+   * */
+  private fetchSubscanTransactionHistory (chain: string, addresses: string[]) {
+    if (!this.subscanService.checkSupportedSubscanChain(chain) || !addresses.length) {
       return;
     }
 
     const chainInfo = this.chainService.getChainInfoByKey(chain);
+    // For now, we only use the first address
+    const address = addresses[0];
 
     const excludeExtrinsicParserKeys: string[] = [
       'balances.transfer_all'
@@ -173,18 +179,28 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     });
   }
 
-  subscribeHistories (chain: string, address: string, cb: (items: TransactionHistoryItem[]) => void) {
-    const _address = reformatAddress(address);
+  subscribeHistories (chain: string, proxyId: string, cb: (items: TransactionHistoryItem[]) => void) {
+    const addresses = this.keyringService.context.getDecodedAddresses(proxyId, false);
+    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
+    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
 
     const subscription = this.historySubject.subscribe((items) => {
-      cb(items.filter(filterHistoryItemByAddressAndChain(chain, _address)));
+      cb(items.filter(filterHistoryItemByAddressAndChain(chain, addresses)));
     });
 
-    this.fetchSubscanTransactionHistory(chain, _address);
+    const chainInfo = this.chainService.getChainInfoByKey(chain);
+
+    if (_isChainSubstrateCompatible(chainInfo)) {
+      if (_isChainEvmCompatible(chainInfo)) {
+        this.fetchSubscanTransactionHistory(chain, evmAddresses);
+      } else {
+        this.fetchSubscanTransactionHistory(chain, substrateAddresses);
+      }
+    }
 
     return {
       unsubscribe: subscription.unsubscribe,
-      value: this.historySubject.getValue().filter(filterHistoryItemByAddressAndChain(chain, _address))
+      value: this.historySubject.getValue().filter(filterHistoryItemByAddressAndChain(chain, addresses))
     };
   }
 
@@ -197,8 +213,8 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     await this.addHistoryItems(updatedRecords);
   }
 
-  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>) {
-    await this.dbService.updateHistoryByExtrinsicHash(extrinsicHash, updateData);
+  async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>, isRecover = false) {
+    await this.dbService.updateHistoryByExtrinsicHash(extrinsicHash, updateData, isRecover);
     this.historySubject.next(await this.dbService.getHistories());
   }
 
@@ -295,11 +311,11 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
           delete this.#needRecoveryHistories[currentExtrinsicHash];
           break;
         default:
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
           delete this.#needRecoveryHistories[currentExtrinsicHash];
       }
     });
@@ -314,6 +330,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
     await this.eventService.waitCryptoReady;
+    this.restoreProcessTransaction().catch(console.error);
     await this.loadData();
     Promise.all([this.eventService.waitKeyringReady, this.eventService.waitChainReady]).then(() => {
       this.getHistories().catch(console.log);
@@ -326,16 +343,31 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     this.status = ServiceStatus.INITIALIZED;
   }
 
+  async restoreProcessTransaction () {
+    await this.dbService.restoreProcessTransaction();
+  }
+
   async recoverProcessingHistory () {
     const histories = await this.dbService.getHistories();
 
     this.#needRecoveryHistories = {};
 
-    histories.filter((history) => {
-      return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
-    }).forEach((history) => {
-      this.#needRecoveryHistories[history.extrinsicHash] = history;
-    });
+    histories
+      .filter((history) => {
+        return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
+      })
+      .filter((history) => {
+        if (history.type === ExtrinsicType.TRANSFER_XCM) {
+          const data = history.additionalInfo as XCMTransactionAdditionalInfo;
+
+          return data.originalChain === history.chain;
+        } else {
+          return true;
+        }
+      })
+      .forEach((history) => {
+        this.#needRecoveryHistories[history.extrinsicHash] = history;
+      });
 
     const recoverNumber = Object.keys(this.#needRecoveryHistories).length;
 

@@ -7,8 +7,8 @@ import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/backg
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { CommonFeeComponent, CommonOptimalPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
+import { CommonFeeComponent, CommonOptimalSwapPath, CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapFeeType, SwapProviderId, SwapQuote, SwapRequest } from '@subwallet/extension-base/types/swap';
 import { formatNumberString, isAccountAll, swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { AccountSelector, AddMoreBalanceModal, AddressInput, AlertBox, ChooseFeeTokenModal, HiddenInput, MetaInfo, PageWrapper, QuoteResetTime, SlippageModal, SwapFromField, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapRoute, SwapTermsOfServiceModal, SwapToField } from '@subwallet/extension-web-ui/components';
 import { BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, DEFAULT_SWAP_PARAMS, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_MORE_BALANCE_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -98,7 +98,7 @@ const Component = () => {
   const [currentSlippage, setCurrentSlippage] = useState<SlippageType>({ slippage: new BigN(0.01), isCustomType: true });
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
-  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalPath | undefined>(undefined);
+  const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
   // @ts-ignore
   const [confirmedTerm, setConfirmedTerm] = useLocalStorage(CONFIRM_SWAP_TERM, '');
   const [showQuoteArea, setShowQuoteArea] = useState<boolean>(false);
@@ -209,6 +209,20 @@ const Component = () => {
     return chainInfoMap[toChain] && isEthereumAddress(fromValue) === _isChainEvmCompatible(chainInfoMap[toChain]);
   }, [chainInfoMap, fromAndToTokenMap, fromValue, toAssetInfo, toTokenSlugValue]);
 
+  // Unable to use useEffect due to infinity loop caused by conflict setCurrentSlippage and currentQuote
+  const slippage = useMemo(() => {
+    const providerId = currentQuote?.provider?.id;
+    const slippageMap = {
+      [SwapProviderId.CHAIN_FLIP_MAINNET]: CHAINFLIP_SLIPPAGE,
+      [SwapProviderId.CHAIN_FLIP_TESTNET]: CHAINFLIP_SLIPPAGE,
+      [SwapProviderId.SIMPLE_SWAP]: SIMPLE_SWAP_SLIPPAGE
+    };
+
+    return providerId && providerId in slippageMap
+      ? slippageMap[providerId as keyof typeof slippageMap]
+      : currentSlippage.slippage.toNumber();
+  }, [currentQuote?.provider?.id, currentSlippage.slippage]);
+
   const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     if (!_recipientAddress) {
       return Promise.reject(t('Recipient address is required'));
@@ -265,8 +279,18 @@ const Component = () => {
     form.setFieldValue('toTokenSlug', tokenSlug);
   }, [form]);
 
-  const supportSlippageSelection = useMemo(() => {
-    if (currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_TESTNET || currentQuote?.provider.id === SwapProviderId.CHAIN_FLIP_MAINNET) {
+  const notSupportSlippageSelection = useMemo(() => {
+    const unsupportedProviders = [
+      SwapProviderId.CHAIN_FLIP_TESTNET,
+      SwapProviderId.CHAIN_FLIP_MAINNET,
+      SwapProviderId.SIMPLE_SWAP
+    ];
+
+    return currentQuote?.provider.id ? unsupportedProviders.includes(currentQuote.provider.id) : false;
+  }, [currentQuote?.provider.id]);
+
+  const isSimpleSwapSlippage = useMemo(() => {
+    if (currentQuote?.provider.id === SwapProviderId.SIMPLE_SWAP) {
       return true;
     }
 
@@ -274,10 +298,10 @@ const Component = () => {
   }, [currentQuote?.provider.id]);
 
   const onOpenSlippageModal = useCallback(() => {
-    if (!supportSlippageSelection) {
+    if (!notSupportSlippageSelection) {
       activeModal(SWAP_SLIPPAGE_MODAL);
     }
-  }, [activeModal, supportSlippageSelection]);
+  }, [activeModal, notSupportSlippageSelection]);
 
   const openAllQuotesModal = useCallback(() => {
     activeModal(SWAP_ALL_QUOTES_MODAL);
@@ -291,6 +315,17 @@ const Component = () => {
     setCurrentQuote(quote);
     setFeeOptions(quote.feeInfo.feeOptions);
     setCurrentFeeOption(quote.feeInfo.feeOptions?.[0]);
+
+    setCurrentQuoteRequest((oldRequest) => {
+      if (!oldRequest) {
+        return undefined;
+      }
+
+      return {
+        ...oldRequest,
+        currentQuote: quote.provider
+      };
+    });
   }, []);
 
   const onSelectFeeOption = useCallback((slug: string) => {
@@ -364,7 +399,7 @@ const Component = () => {
     const feeTypeMap: Record<SwapFeeType, FeeItem> = {
       NETWORK_FEE: { label: 'Network fee', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.NETWORK_FEE },
       PLATFORM_FEE: { label: 'Protocol fee', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.PLATFORM_FEE },
-      WALLET_FEE: { label: 'Wallet commission', value: new BigN(0), suffix: '%', type: SwapFeeType.WALLET_FEE }
+      WALLET_FEE: { label: 'Wallet commission', value: new BigN(0), prefix: `${(currencyData.isPrefix && currencyData.symbol) || ''}`, suffix: `${(!currencyData.isPrefix && currencyData.symbol) || ''}`, type: SwapFeeType.WALLET_FEE }
     };
 
     currentQuote?.feeInfo.feeComponent.forEach((feeItem) => {
@@ -373,10 +408,11 @@ const Component = () => {
       feeTypeMap[feeType].value = feeTypeMap[feeType].value.plus(getConvertedBalance(feeItem));
     });
 
-    result.push(
-      feeTypeMap.NETWORK_FEE,
-      feeTypeMap.PLATFORM_FEE
-    );
+    Object.values(feeTypeMap).forEach((fee) => {
+      if (!fee.value.lte(new BigN(0))) {
+        result.push(fee);
+      }
+    });
 
     return result;
   }, [currencyData.isPrefix, currencyData.symbol, currentQuote?.feeInfo.feeComponent, getConvertedBalance]);
@@ -631,7 +667,7 @@ const Component = () => {
               currentStep: step,
               quote: latestOptimalQuote,
               address: from,
-              slippage: [SwapProviderId.CHAIN_FLIP_MAINNET, SwapProviderId.CHAIN_FLIP_TESTNET].includes(latestOptimalQuote.provider.id) ? 0 : currentSlippage.slippage.toNumber(),
+              slippage: slippage,
               recipient
             });
 
@@ -685,19 +721,15 @@ const Component = () => {
   }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, currentQuoteRequest, currentSlippage.slippage, notify, onError, onSuccess, openAlert, processState.currentStep, processState.steps.length, t]);
 
   const minimumReceived = useMemo(() => {
-    const calcMinimumReceived = (value: string) => {
-      const adjustedValue = supportSlippageSelection
-        ? value
-        : new BigN(value).multipliedBy(new BigN(1).minus(currentSlippage.slippage)).integerValue(BigN.ROUND_DOWN);
+    const adjustedValue = new BigN(currentQuote?.toAmount || '0').multipliedBy(new BigN(1).minus(new BigN(slippage))).integerValue(BigN.ROUND_DOWN);
 
-      return adjustedValue.toString().includes('e')
-        ? formatNumberString(adjustedValue.toString())
-        : adjustedValue.toString();
-    };
+    const adjustedValueStr = adjustedValue.toString();
 
-    return calcMinimumReceived(currentQuote?.toAmount || '0');
-  }, [currentQuote?.toAmount, currentSlippage.slippage, supportSlippageSelection]);
-
+    return adjustedValueStr.includes('e')
+      ? formatNumberString(adjustedValueStr)
+      : adjustedValueStr;
+  }, [slippage, currentQuote?.toAmount]);
+  
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
   }, [setConfirmedTerm]);
@@ -728,6 +760,9 @@ const Component = () => {
     return undefined;
   }, [currentPair]);
 
+  const slippageTitle = isSimpleSwapSlippage ? 'Slippage can be up to 5% due to market conditions' : '';
+  const slippageContent = isSimpleSwapSlippage ? `Up to ${(slippage * 100).toString()}%` : `${(slippage * 100).toString()}%`;
+
   const renderSlippage = () => {
     return (
       <>
@@ -736,43 +771,23 @@ const Component = () => {
             className='__slippage-action'
             onClick={onOpenSlippageModal}
           >
-            {supportSlippageSelection
-              ? (<>
                 <Tooltip
                   placement={'topRight'}
-                  title={'Chainflip uses Just In Time AMM to optimize swap quote without setting slippage'}
+                  title={slippageTitle}
                 >
-                  <div className={'__slippage-title-wrapper'}>Slippage
+                  <div className='__slippage-title-wrapper'>Slippage
                     <Icon
-                      customSize={'16px'}
+                      customSize='16px'
                       iconColor={token.colorSuccess}
                       phosphorIcon={Info}
                       size='sm'
                       weight='fill'
                     />
-                :
+                        : &nbsp;<span>{slippageContent}</span>
                   </div>
                 </Tooltip>
-                      &nbsp;<span>0%</span>
-              </>
-              )
-              : (
-                <>
-                  <div className={'__slippage-title-wrapper'}>Slippage
-                    <Icon
-                      customSize={'16px'}
-                      iconColor={token.colorSuccess}
-                      phosphorIcon={Info}
-                      size='sm'
-                      weight='fill'
-                    />
-                    :
-                  </div>
-                    &nbsp;<span>{currentSlippage.slippage.multipliedBy(100).toString()}%</span>
-                </>
-              )}
 
-            {!supportSlippageSelection && (
+            {!notSupportSlippageSelection && (
               <div className='__slippage-editor-button'>
                 <Icon
                   className='__slippage-editor-button-icon'
@@ -1614,13 +1629,9 @@ const Swap = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     '.__swap-provider .__value ': {
       display: 'flex',
       gap: 8,
+      justifyContent: 'flex-end',
+      alignSelf: 'stretch',
       overflow: 'hidden'
-    },
-    '.__swap-provider .__col': {
-      alignItems: 'unset',
-      flexDirection: 'row',
-      justifyContent: 'flex-end'
-
     },
     '.ant-background-icon': {
       width: 24,

@@ -4,7 +4,7 @@
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { AppOnlineContentContextProvider } from '@subwallet/extension-koni-ui/contexts/AppOnlineContentProvider';
-import { AppPopupModalContextProvider } from '@subwallet/extension-koni-ui/contexts/AppPopupModalContext';
+import { MktCampaignModalContextProvider } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import ErrorFallback from '@subwallet/extension-koni-ui/Popup/ErrorFallback';
 import { Root } from '@subwallet/extension-koni-ui/Popup/Root';
 import { i18nPromise } from '@subwallet/extension-koni-ui/utils/common/i18n';
@@ -76,6 +76,7 @@ const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-k
 const GeneralSetting = new LazyLoader('GeneralSetting', () => import('@subwallet/extension-koni-ui/Popup/Settings/GeneralSetting'));
 const MissionPools = new LazyLoader('MissionPools', () => import('@subwallet/extension-koni-ui/Popup/Settings/MissionPool/index'));
 const ManageAddressBook = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-koni-ui/Popup/Settings/AddressBook'));
+const AccountSettings = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-koni-ui/Popup/Settings/AccountSettings'));
 
 const ManageChains = new LazyLoader('ManageChains', () => import('@subwallet/extension-koni-ui/Popup/Settings/Chains/ManageChains'));
 const ChainImport = new LazyLoader('ChainImport', () => import('@subwallet/extension-koni-ui/Popup/Settings/Chains/ChainImport'));
@@ -88,6 +89,8 @@ const TokenDetail = new LazyLoader('TokenDetail', () => import('@subwallet/exten
 
 const SecurityList = new LazyLoader('SecurityList', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security'));
 const ManageWebsiteAccess = new LazyLoader('ManageWebsiteAccess', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security/ManageWebsiteAccess'));
+const Notifications = new LazyLoader('Notification', () => import('@subwallet/extension-koni-ui/Popup/Settings/Notifications/Notification'));
+const NotificationSetting = new LazyLoader('NotificationSetting', () => import('@subwallet/extension-koni-ui/Popup/Settings/Notifications/NotificationSetting'));
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/NewSeedPhrase'));
@@ -111,6 +114,7 @@ const AccountExport = new LazyLoader('AccountExport', () => import('@subwallet/e
 
 const Transaction = new LazyLoader('Transaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/Transaction'));
 const TransactionDone = new LazyLoader('TransactionDone', () => import('@subwallet/extension-koni-ui/Popup/TransactionDone'));
+const TransactionSubmission = new LazyLoader('TransactionSubmission', () => import('@subwallet/extension-koni-ui/Popup/TransactionSubmission'));
 const SendFund = new LazyLoader('SendFund', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendFund'));
 const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap'));
 const SendNFT = new LazyLoader('SendNFT', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SendNFT'));
@@ -119,6 +123,8 @@ const Unstake = new LazyLoader('Unstake', () => import('@subwallet/extension-kon
 const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/CancelUnstake'));
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
+const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
+const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
 
 // Earning
 
@@ -144,11 +150,11 @@ export function Example () {
 
 export function RootWrapper () {
   return (
-    <AppPopupModalContextProvider>
+    <MktCampaignModalContextProvider>
       <AppOnlineContentContextProvider>
         <Root />
       </AppOnlineContentContextProvider>
-    </AppPopupModalContextProvider>
+    </MktCampaignModalContextProvider>
   );
 }
 
@@ -205,11 +211,15 @@ export const router = createHashRouter([
           CancelUnstake.generateRouterObject('cancel-unstake'),
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
+          ClaimBridge.generateRouterObject('claim-bridge'),
           {
             path: 'compound',
             element: <Example />
           }
         ]
+      },
+      {
+        ...TransactionSubmission.generateRouterObject('transaction-submission')
       },
       {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
@@ -230,10 +240,13 @@ export const router = createHashRouter([
         children: [
           Settings.generateRouterObject('list'),
           GeneralSetting.generateRouterObject('general'),
+          AccountSettings.generateRouterObject('account-settings'),
           Crowdloans.generateRouterObject('crowdloans'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
+          Notifications.generateRouterObject('notification'),
+          NotificationSetting.generateRouterObject('notification-config'),
           ManageWebsiteAccessDetail.generateRouterObject('dapp-access-edit'),
           {
             path: 'chains',
@@ -270,10 +283,13 @@ export const router = createHashRouter([
           ConnectPolkadotVault.generateRouterObject('connect-polkadot-vault'),
           ConnectKeystone.generateRouterObject('connect-keystone'),
           ConnectLedger.generateRouterObject('connect-ledger'),
-          AccountDetail.generateRouterObject('detail/:accountAddress'),
-          AccountExport.generateRouterObject('export/:accountAddress'),
+          AccountDetail.generateRouterObject('detail/:accountProxyId'),
+          AccountExport.generateRouterObject('export/:accountProxyId'),
           ExportAllDone.generateRouterObject('export-all-done')
         ]
+      },
+      {
+        ...MigrateAccount.generateRouterObject('migrate-account')
       },
       {
         path: 'wallet-connect',

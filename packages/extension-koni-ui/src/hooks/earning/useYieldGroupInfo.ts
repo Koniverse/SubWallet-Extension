@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
+import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
-import { useAccountBalance, useGetChainSlugsByCurrentAccount, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
+import { useAccountBalance, useGetChainSlugsByAccount, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
 import { useMemo } from 'react';
 
@@ -11,7 +12,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const chainsByAccountType = useGetChainSlugsByCurrentAccount();
+  const chainsByAccountType = useGetChainSlugsByAccount();
   const { tokenGroupMap } = useTokenGroup(chainsByAccountType);
   const { tokenBalanceMap } = useAccountBalance(tokenGroupMap, true);
 
@@ -40,7 +41,13 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           }
 
           if (apy !== undefined) {
-            exists.maxApy = Math.max(exists.maxApy || 0, apy);
+            if (pool.chain === 'bittensor' || pool.chain === 'bittensor_testnet') {
+              if (pool.type === YieldPoolType.SUBNET_STAKING) {
+                exists.maxApy = Math.max(exists.maxApy || 0, 0);
+              }
+            } else {
+              exists.maxApy = Math.max(exists.maxApy || 0, apy);
+            }
           }
 
           exists.isTestnet = exists.isTestnet || chainInfo.isTestnet;

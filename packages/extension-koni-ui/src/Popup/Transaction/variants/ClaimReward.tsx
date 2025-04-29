@@ -3,10 +3,9 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
@@ -70,11 +69,12 @@ const filterAccount = (
     const reward = rewardList.find((value) => isSameAddress(value.address, account.address));
 
     const isAstarNetwork = _STAKING_CHAIN_GROUP.astar.includes(_poolChain);
+    const isMythosNetwork = _STAKING_CHAIN_GROUP.mythos.includes(_poolChain);
     const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(_poolChain);
     const bnUnclaimedReward = new BigN(reward?.unclaimedReward || '0');
 
     return (
-      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
       isAstarNetwork
     );
   };
@@ -99,6 +99,7 @@ const Component = () => {
   const poolInfo = useMemo(() => poolInfoMap[slug], [poolInfoMap, slug]);
   const poolType = poolInfo.type;
   const poolChain = poolInfo.chain;
+  const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
 
   const { list: allPositions } = useYieldPositionDetail(slug);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
@@ -106,6 +107,8 @@ const Component = () => {
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
+
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
 
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
@@ -197,6 +200,7 @@ const Component = () => {
             name={'from'}
           >
             <AccountSelector
+              addressPrefix={networkPrefix}
               disabled={!isAllAccount}
               doFilter={false}
               externalAccounts={accountList}
@@ -206,7 +210,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance:')}
+            label={t('Available balance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -231,6 +235,7 @@ const Component = () => {
             </MetaInfo>
           </Form.Item>
           <Form.Item
+            hidden={isMythosStaking}
             name={'bondReward'}
             valuePropName='checked'
           >

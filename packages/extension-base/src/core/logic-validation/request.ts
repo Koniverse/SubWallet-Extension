@@ -1,38 +1,191 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BasicTxErrorType, ConfirmationType, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
-import { BN_ZERO, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
+import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
+import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
+import { getId } from '@subwallet/extension-base/utils/getId';
+import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
 import BN from 'bn.js';
 import { t } from 'i18next';
+import Joi from 'joi';
 import { TransactionConfig } from 'web3-core';
 
 import { isString } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export type ValidateStepFunction = (koni: KoniState, url: string, payload: PayloadValidated, topic?: string) => Promise<PayloadValidated>
-
+export type RequestAccountType = 'substrate' | 'evm' | 'ton' | 'cardano';
 export interface PayloadValidated {
   networkKey: string,
   address: string,
   pair?: KeyringPair,
   authInfo?: AuthUrlInfo,
+  type: AccountAuthType,
   method?: string,
   payloadAfterValidated: any,
   errorPosition?: 'dApp' | 'ui',
-  confirmationType?: ConfirmationType,
+  confirmationType?: ConfirmationType | ConfirmationTypeCardano,
   errors: Error[]
+}
+
+export type SignTypedDataMessageV3V4 = {
+  types: Record<string, unknown>;
+  domain: Record<string, unknown>;
+  primaryType: string;
+  message: unknown;
+};
+
+export type DataMessageParam = Record<string, unknown>[] | string | SignTypedDataMessageV3V4
+
+export interface TypedMessageParams {
+  from: string;
+  data: DataMessageParam;
+}
+
+export interface PersonalMessageParams {
+  data: string;
+  from: string;
+}
+
+export const joiValidate = Joi.object({
+  types: Joi.object()
+    .pattern(
+      Joi.string(), // Key của object types
+      Joi.array().items(
+        Joi.object({
+          name: Joi.string().required(),
+          type: Joi.string().required()
+        })
+      )
+    )
+    .required(),
+  primaryType: Joi.string().required(),
+  domain: Joi.object().required(),
+  message: Joi.object().required()
+});
+
+function validateAddress (address: string, propertyName: string) {
+  if (!address || typeof address !== 'string' || !isEthereumAddress(address)) {
+    throw new Error(
+      `Invalid "${propertyName}" address: ${address} must be a valid string.`
+    );
+  }
+}
+
+export function validateSignMessageData (messageData: PersonalMessageParams) {
+  const { data, from } = messageData;
+
+  validateAddress(from, 'from');
+
+  if (!data || typeof data !== 'string') {
+    throw new Error(`Invalid message "data": ${data} must be a valid string.`);
+  }
+
+  return data;
+}
+
+export function validateTypedSignMessageDataV1 (messageData: TypedMessageParams) {
+  validateAddress(messageData.from, 'from');
+
+  if (!messageData.data || !Array.isArray(messageData.data)) {
+    throw new Error(
+      // TODO: Either fix this lint violation or explain why it's necessary to ignore.
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `Invalid message "data": ${messageData.data} must be a valid array.`
+    );
+  }
+
+  try {
+    // typedSignatureHash will throw if the data is invalid.
+    // TODO: Replace `any` with type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    typedSignatureHash(messageData.data as TypedDataV1Field[]);
+
+    return messageData.data;
+  } catch (e) {
+    throw new Error('Invalid message "data": Expected EIP712 typed data.');
+  }
+}
+
+export function validateTypedSignMessageDataV3V4 (
+  messageData: TypedMessageParams
+) {
+  validateAddress(messageData.from, 'from');
+
+  if (
+    !messageData.data ||
+    Array.isArray(messageData.data) ||
+    (typeof messageData.data !== 'object' &&
+      typeof messageData.data !== 'string')
+  ) {
+    throw new Error(
+      'Invalid message "data": Must be a valid string or object.'
+    );
+  }
+
+  let data;
+
+  if (typeof messageData.data === 'object') {
+    data = messageData.data;
+  } else {
+    try {
+      data = JSON.parse(messageData.data) as SignTypedDataMessageV3V4;
+    } catch (e) {
+      throw new Error('Invalid message "data" must be passed as a valid JSON string.');
+    }
+  }
+
+  const validation = joiValidate.validate(data);
+
+  if (validation.error) {
+    throw new Error(
+      'Invalid message "data" must conform to EIP-712 schema. See https://git.io/fNtcx.'
+    );
+  }
+
+  // if (!currentChainId) {
+  //   throw new Error('Current chainId cannot be null or undefined.');
+  // }
+
+  // let { chainId } = data.domain;
+  //
+  // if (chainId) {
+  //   if (typeof chainId === 'string') {
+  //     chainId = parseInt(chainId, chainId.startsWith('0x') ? 16 : 10);
+  //   }
+  //
+  //   const activeChainId = parseInt(currentChainId, 16);
+  //
+  //   if (Number.isNaN(activeChainId)) {
+  //     throw new Error(
+  //       // TODO: Either fix this lint violation or explain why it's necessary to ignore.
+  //       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  //       `Cannot sign messages for chainId "${chainId}", because MetaMask is switching networks.`
+  //     );
+  //   }
+  //
+  //   if (chainId !== activeChainId) {
+  //     throw new Error(
+  //       // TODO: Either fix this lint violation or explain why it's necessary to ignore.
+  //       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  //       `Provided chainId "${chainId}" must match the active chainId "${activeChainId}"`
+  //     );
+  //   }
+  // }
+  return data;
 }
 
 export async function generateValidationProcess (koni: KoniState, url: string, payloadValidate: PayloadValidated, validationMiddlewareSteps: ValidateStepFunction[], topic?: string): Promise<PayloadValidated> {
@@ -96,7 +249,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
 export async function validationConnectMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
   let currentChain: string | undefined;
   let autoActiveChain = false;
-  let { address, authInfo, errors, networkKey } = { ...payload };
+  let { address, authInfo, errors, networkKey, type } = { ...payload };
 
   const handleError = (message_: string) => {
     payload.errorPosition = 'ui';
@@ -108,8 +261,8 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     errors.push(error);
   };
 
-  if (authInfo?.currentEvmNetworkKey) {
-    currentChain = authInfo?.currentEvmNetworkKey;
+  if (authInfo?.currentNetworkMap[type]) {
+    currentChain = authInfo?.currentNetworkMap[type];
   }
 
   if (authInfo?.isAllowed) {
@@ -178,7 +331,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   const errors: Error[] = payload.errors || [];
   let estimateGas = '';
   const transactionParams = payload.payloadAfterValidated as EvmSendTransactionParams;
-  const { address: fromAddress, networkKey, pair } = payload;
+  const { address: fromAddress, networkKey } = payload;
   const evmApi = koni.getEvmApi(networkKey || '');
   const web3 = evmApi?.api;
 
@@ -284,18 +437,26 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       estimateGas = new BigN(transactionParams.gasPrice).multipliedBy(transaction.gas).toFixed(0);
     } else {
       try {
-        const priority = await calculateGasFeeParams(evmApi, networkKey || '');
+        const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
+        const id = getId();
+        const feeInfo = await koni.feeService.subscribeChainFee(id, networkKey, 'evm') as EvmFeeInfo;
+        const feeCombine = combineEthFee(feeInfo);
 
-        if (priority.baseGasFee) {
-          transaction.maxPriorityFeePerGas = priority.maxPriorityFeePerGas.toString();
-          transaction.maxFeePerGas = priority.maxFeePerGas.toString();
-
-          const maxFee = priority.maxFeePerGas;
-
-          estimateGas = maxFee.multipliedBy(transaction.gas).toFixed(0);
+        if (transaction.maxFeePerGas) {
+          estimateGas = new BigN(transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
+        } else if (transaction.gasPrice) {
+          estimateGas = new BigN(transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
         } else {
-          transaction.gasPrice = priority.gasPrice;
-          estimateGas = new BigN(priority.gasPrice).multipliedBy(transaction.gas).toFixed(0);
+          if (feeCombine.maxFeePerGas) {
+            const maxFee = new BigN(feeCombine.maxFeePerGas); // TODO: Need review
+
+            estimateGas = maxFee.multipliedBy(gasLimit).toFixed(0);
+            transaction.maxFeePerGas = feeCombine.maxFeePerGas;
+            transaction.maxPriorityFeePerGas = feeCombine.maxPriorityFeePerGas;
+          } else if (feeCombine.gasPrice) {
+            estimateGas = new BigN((feeCombine.gasPrice || 0)).multipliedBy(gasLimit).toFixed(0);
+            transaction.maxPriorityFeePerGas = feeCombine.gasPrice;
+          }
         }
       } catch (e) {
         handleError((e as Error).message);
@@ -315,9 +476,6 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       handleError((e as Error).message);
     }
   }
-
-  const pair_ = pair || keyring.getPair(fromAddress);
-  const account: AccountJson = { address: fromAddress, ...pair_?.meta };
 
   try {
     transaction.nonce = await web3.eth.getTransactionCount(fromAddress);
@@ -348,7 +506,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     errors,
     payloadAfterValidated: {
       ...transaction,
-      account,
+      address: fromAddress,
       estimateGas,
       hashPayload,
       isToContract,
@@ -360,7 +518,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
 
 export async function validationEvmSignMessageMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
   const { address, errors, method, pair: pair_ } = payload_;
-  let payload = payload_.payloadAfterValidated as string;
+  let payload = payload_.payloadAfterValidated as DataMessageParam;
   const { promise, resolve } = createPromiseHandler<PayloadValidated>();
   let hashPayload = '';
   let canSign = false;
@@ -372,7 +530,7 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
     const error = new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message, undefined, name);
 
     console.error(error);
-    errors.push(new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message, undefined, name));
+    errors.push(error);
   };
 
   if (address === '' || !payload) {
@@ -381,42 +539,56 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
 
   const pair = pair_ || keyring.getPair(address);
 
-  const account: AccountJson = { address: pair.address, ...pair.meta };
-
   if (method) {
     if (['eth_sign', 'personal_sign', 'eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].indexOf(method) < 0) {
       handleError('Unsupported action');
     }
 
-    if (['eth_signTypedData_v3', 'eth_signTypedData_v4'].indexOf(method) > -1) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-assignment
-      payload = JSON.parse(payload);
-    }
-
-    switch (method) {
-      case 'personal_sign':
-        canSign = true;
-        hashPayload = payload;
-        break;
-      case 'eth_sign':
-      case 'eth_signTypedData':
-      case 'eth_signTypedData_v1':
-      case 'eth_signTypedData_v3':
-      case 'eth_signTypedData_v4':
-        if (!account.isExternal) {
+    try {
+      switch (method) {
+        case 'personal_sign':
           canSign = true;
-        }
+          payload = validateSignMessageData({ data: payload as string, from: address });
+          hashPayload = payload;
+          break;
+        case 'eth_sign':
+          if (!pair.meta.isExternal) {
+            canSign = true;
+          }
 
-        break;
-      default:
-        handleError('Unsupported action');
+          break;
+        case 'eth_signTypedData':
+        case 'eth_signTypedData_v1':
+          if (!pair.meta.isExternal) {
+            canSign = true;
+          }
+
+          payload = validateTypedSignMessageDataV1({ data: payload as Record<string, unknown>[], from: address });
+
+          break;
+
+        case 'eth_signTypedData_v3':
+        case 'eth_signTypedData_v4':
+          if (!pair.meta.isExternal) {
+            canSign = true;
+          }
+
+          payload = validateTypedSignMessageDataV3V4({ data: payload as SignTypedDataMessageV3V4, from: address });
+
+          break;
+        default:
+          throw new Error('Unsupported action');
+      }
+    } catch (e) {
+      console.error(e);
+      handleError((e as Error).message);
     }
   } else {
     handleError('Unsupported method');
   }
 
   const payloadAfterValidated: EvmSignatureRequest = {
-    account: account,
+    address,
     type: method || '',
     payload: payload as unknown,
     hashPayload: hashPayload,
@@ -449,7 +621,7 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
 
     if (isEthereumAddress(address)) {
       sessionAccounts = requestSession.namespaces.eip155.accounts?.map((account) => account.split(':')[2]) || sessionAccounts;
-    } else {
+    } else if (isSubstrateAddress(address)) {
       sessionAccounts = requestSession.namespaces.polkadot.accounts?.map((account) => account.split(':')[2]) || sessionAccounts;
     }
 
@@ -491,6 +663,55 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
   return promise;
 }
 
+export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { address, errors, pair: pair_ } = payload_;
+  const payload = payload_.payloadAfterValidated as DataMessageParam;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+  let canSign = false;
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'cardanoSignatureRequest';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (address === '' || !payload) {
+    handleError('Not found address or payload to sign');
+  }
+
+  if (!isCardanoAddress(address)) {
+    handleError('Not found cardano address');
+  }
+
+  const pair = pair_ || keyring.getPair(address);
+
+  if (!pair?.meta.isExtneral) {
+    canSign = true;
+  }
+
+  const payloadAfterValidated: CardanoSignatureRequest = {
+    address,
+    payload: payload,
+    hashPayload: payload as string,
+    canSign: canSign,
+    id: ''
+  };
+
+  resolve(
+    {
+      ...payload_,
+      errors,
+      payloadAfterValidated
+    }
+  );
+
+  return promise;
+}
+
 export function convertErrorMessage (message_: string, name?: string): string[] {
   const message = message_.toLowerCase();
 
@@ -506,7 +727,7 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
   }
 
   if (message.includes('network is currently not supported')) {
-    return [t('This network is not yet supported on SubWallet. |Import the network|https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks| on SubWallet and try again'), t('Network not supported')];
+    return [t('This network is not yet supported on SubWallet. (Import the network)[https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks] on SubWallet and try again'), t('Network not supported')];
   }
 
   // Authentication
@@ -551,12 +772,24 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
 
   // Sign Message
   if (message.includes('not found address or payload to sign')) {
-    return [t('An error occurred when signing this request. Try again or contact support at agent@subwallet.app'), t('Unable to sign message')];
+    return [t('An error occurred when signing this request. Try again or contact support at agent@subwallet.app'), t('Unable to sign')];
   }
 
   if (message.includes('unsupported method') || message.includes('unsupported action')) {
     return [t('This sign method is not supported by SubWallet. Try again or contact support at agent@subwallet.app'), t('Method not supported')];
   }
 
-  return [message, name || ''];
+  if (message.includes('eip712 typed data') || message.includes('invalid message')) {
+    return [t('An error occurred when attempting to sign this request. Contact support at email: agent@subwallet.app'), t('Unable to sign')];
+  }
+
+  return [message, name || 'Error'];
+}
+
+export function convertErrorFormat (errors: Error[]): ErrorValidation[] {
+  if (errors.length > 0) {
+    return [{ name: errors[0].name, message: errors[0].message }];
+  }
+
+  return [];
 }

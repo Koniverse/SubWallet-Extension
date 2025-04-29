@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
+import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { RequestClaimBridge } from '@subwallet/extension-base/types';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { isAbleToShowFee } from '@subwallet/extension-koni-ui/utils';
@@ -20,6 +22,27 @@ function Component (
   { className = '', item, onClick }: Props) {
   const displayData = item.displayData;
   const { isShowBalance } = useSelector((state) => state.settings);
+
+  let amountValue = item?.amount?.value;
+  let symbol = item?.amount?.symbol;
+
+  if (item.type === ExtrinsicType.CLAIM_BRIDGE) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo.notification.actionType === NotificationActionType.CLAIM_POLYGON_BRIDGE) {
+      const metadata = additionalInfo.notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+
+      amountValue = metadata.amounts[0];
+    }
+  }
+
+  if (item.type === ExtrinsicType.STAKING_UNBOND) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo?.symbol) {
+      symbol = additionalInfo.symbol;
+    }
+  }
 
   return (
     <Web3Block
@@ -55,8 +78,8 @@ function Component (
               decimal={item?.amount?.decimals || 0}
               decimalOpacity={0.45}
               hide={!isShowBalance}
-              suffix={item?.amount?.symbol}
-              value={item?.amount?.value || '0'}
+              suffix={symbol}
+              value={amountValue || '0'}
             />
             <Number
               className={CN('__fee', {
