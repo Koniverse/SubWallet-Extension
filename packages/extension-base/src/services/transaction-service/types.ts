@@ -90,6 +90,7 @@ export interface TransactionEventResponse extends ValidateTransactionResponse {
   eventLogs?: EventRecord[],
   nonce?: number,
   startBlock?: number,
+  blockTime?: number,
 }
 export interface TransactionEventMap {
   send: (response: TransactionEventResponse) => void;

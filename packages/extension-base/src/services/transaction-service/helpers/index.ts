@@ -3,10 +3,10 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { TransferBitcoinProps } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
+import { Psbt } from 'bitcoinjs-lib';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 
@@ -37,11 +37,8 @@ export const isCardanoTransaction = (tx: SWTransaction['transaction']): tx is Ca
   return cardanoTransactionConfig.cardanoPayload !== null && cardanoTransactionConfig.cardanoPayload !== undefined;
 };
 
-// TODO: Implement logic to check if the transaction is a Bitcoin transaction.
-export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is TransferBitcoinProps => {
-  const bitcoinTransactionConfig = tx as TransferBitcoinProps;
-
-  return true;
+export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is Psbt => {
+  return 'data' in tx && Array.isArray((tx as Psbt).data.inputs);
 };
 
 const typeName = (type: SWTransaction['extrinsicType']) => {

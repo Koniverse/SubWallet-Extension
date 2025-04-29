@@ -22,7 +22,7 @@ import { getBaseTransactionInfo, getTransactionId, isBitcoinTransaction, isCarda
 import { SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
 import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -110,7 +110,7 @@ export default class TransactionService {
       warnings: transactionInput.warnings || [],
       processId: transactionInput.step?.processId
     };
-    const { additionalValidator, address, chain, extrinsicType } = validationResponse;
+    const { additionalValidator, address, chain, chainType, extrinsicType } = validationResponse;
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 
     const blockedConfigObjects = await fetchBlockedConfigObjects();
@@ -137,7 +137,6 @@ export default class TransactionService {
     checkSupportForTransaction(validationResponse, transaction);
 
     if (!chainInfo) {
-      console.log('validate.2');
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Cannot find network')));
     }
 
@@ -148,22 +147,19 @@ export default class TransactionService {
     const bitcoinApi = this.state.chainService.getBitcoinApi(chainInfo.slug);
     // todo: should split into isEvmTx && isNoEvmApi. Because other chains type also has no Evm Api. Same to all blockchain.
     // todo: refactor check evmTransaction.
-    const isNoEvmApi = transaction && !isSubstrateTransaction(transaction) && !isTonTransaction(transaction) && !isCardanoTransaction(transaction) && !evmApi;
+    const isNoEvmApi = transaction && !isSubstrateTransaction(transaction) && !isTonTransaction(transaction) && !isCardanoTransaction(transaction) && !isBitcoinTransaction(transaction) && !evmApi;
     const isNoTonApi = transaction && isTonTransaction(transaction) && !tonApi;
     const isNoCardanoApi = transaction && isCardanoTransaction(transaction) && !cardanoApi;
     const isNoBitcoinApi = transaction && isBitcoinTransaction(transaction) && !bitcoinApi;
 
     // TODO: template pass validation for bitcoin transfer
-    if (isNoTonApi || isNoCardanoApi) {
-      console.log('validate.isNoEvmApi', isNoEvmApi);
-      console.log('validate.isNoTonApi', isNoTonApi);
-      console.log('validate.isNoCardanoApi', isNoCardanoApi);
+    if (isNoEvmApi || isNoTonApi || isNoCardanoApi || isNoBitcoinApi) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.CHAIN_DISCONNECTED, undefined));
     }
 
     // Estimate fee for transaction
     const id = getId();
-    const feeInfo = await this.state.feeService.subscribeChainFee(id, chain, 'evm') as EvmFeeInfo;
+    const feeInfo = await this.state.feeService.subscribeChainFee(id, chain, chainType);
     const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(chain);
     const tokenPayFeeSlug = transactionInput.tokenPayFeeSlug;
     const isNonNativeTokenPayFee = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug);
@@ -176,7 +172,7 @@ export default class TransactionService {
 
     // Check account signing transaction
 
-    // TODO: template pass validation for bitcoin transfer
+    // TODO: If you want to test, remove the line below.
     // checkSigningAccountForTransaction(validationResponse, chainInfoMap);
 
     const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(address, chain, nativeTokenInfo.slug, extrinsicType);
@@ -303,11 +299,6 @@ export default class TransactionService {
     const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
     const stopByErrors = validatedTransaction.errors.length > 0;
     const stopByWarnings = validatedTransaction.warnings.length > 0 && validatedTransaction.warnings.some((warning) => !ignoreWarnings.includes(warning.warningType));
-
-    console.log('handle.validatedTransaction', validatedTransaction);
-    console.log('handle.ignoreWarnings', ignoreWarnings);
-    console.log('handle.stopByErrors', stopByErrors);
-    console.log('handle.stopByWarnings', stopByWarnings);
 
     if (stopByErrors || stopByWarnings) {
       // @ts-ignore

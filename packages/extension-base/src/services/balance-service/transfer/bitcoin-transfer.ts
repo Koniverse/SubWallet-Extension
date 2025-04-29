@@ -1,11 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { getTransferableBitcoinUtxos } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/bitcoin';
 import { _BITCOIN_CHAIN_SLUG, _BITCOIN_NAME, _BITCOIN_TESTNET_NAME } from '@subwallet/extension-base/services/chain-service/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BitcoinFeeInfo, BitcoinFeeRate, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
-import { combineBitcoinFee, determineUtxosForSpend, determineUtxosForSpendAll } from '@subwallet/extension-base/utils';
+import { combineBitcoinFee, determineUtxosForSpend, determineUtxosForSpendAll, getTransferableBitcoinUtxos } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { Network, Psbt } from 'bitcoinjs-lib';
@@ -25,21 +24,16 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
   const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, from, network, to, transferAll, value } = params;
   const feeCustom = _feeCustom as BitcoinFeeRate;
 
-  console.log('_feeInfo', _feeInfo);
-
   const feeInfo = _feeInfo as BitcoinFeeInfo;
   const bitcoinFee = combineBitcoinFee(feeInfo, feeOption, feeCustom);
   const utxos = await getTransferableBitcoinUtxos(bitcoinApi, from);
-
-  console.log('create.btc.bitcoinFee', bitcoinFee);
-  console.log('create.btc.utxos', utxos);
 
   try {
     const amountValue = parseFloat(value);
 
     const determineUtxosArgs = {
       amount: amountValue,
-      feeRate: 0,
+      feeRate: bitcoinFee.feeRate,
       recipient: to,
       sender: from,
       utxos
@@ -49,22 +43,9 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       ? determineUtxosForSpendAll(determineUtxosArgs)
       : determineUtxosForSpend(determineUtxosArgs);
 
-    console.log('create.btc.inputs', inputs);
-    console.log('create.btc.outputs', outputs);
-    console.log('create.btc.fee', fee);
-    // console.log(inputs, inputs.reduce((v, i) => v + i.value, 0));
-    // console.log(outputs, (outputs as Array<{value: number}>).reduce((v, i) => v + i.value, 0));
-    console.log('create.btc.bitcoinFee', bitcoinFee);
-
     const pair = keyring.getPair('bc1qqn6ggclhsk2h5rmzy8v8akkh0mawcjesvcy6c9');
     const tx = new Psbt({ network });
     let transferAmount = new BigN(0);
-
-    console.log('create.btc.from', from);
-    console.log('create.btc.pair', pair);
-    console.log('create.btc.network', network);
-    console.log('create.btc.pair.bitcoin', pair.bitcoin);
-    console.log('create.btc.pair.bitcoin.output', pair.bitcoin.output);
 
     for (const input of inputs) {
       if (pair.type === 'bitcoin-44' || pair.type === 'bittest-44') {
@@ -101,8 +82,6 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
     console.log(inputs, inputs.reduce((v, i) => v + i.value, 0));
     console.log(outputs, (outputs as Array<{value: number}>).reduce((v, i) => v + i.value, 0));
     console.log(fee, bitcoinFee);
-
-    console.log('Transfer Amount:', transferAmount.toString());
 
     return [tx, transferAmount.toString()];
   } catch (e) {

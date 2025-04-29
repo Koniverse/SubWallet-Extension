@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { UtxoResponseItem } from '@subwallet/extension-base/types';
+import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
 import { BtcSizeFeeEstimator, getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
 import BigN from 'bignumber.js';
@@ -63,3 +65,35 @@ export function getSpendableAmount ({ feeRate,
     fee
   };
 }
+
+export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
+  try {
+    const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
+      await bitcoinApi.api.getUtxos(address),
+      await getRuneUtxos(bitcoinApi, address),
+      await getInscriptionUtxos(bitcoinApi, address)
+    ]);
+
+    let filteredUtxos: UtxoResponseItem[];
+
+    if (!utxos || !utxos.length) {
+      return [];
+    }
+
+    // filter out pending utxos
+    // filteredUtxos = filterOutPendingTxsUtxos(utxos);
+
+    // filter out rune utxos
+    filteredUtxos = filteredOutTxsUtxos(utxos, runeTxsUtxos);
+
+    // filter out dust utxos
+    // filter out inscription utxos
+    filteredUtxos = filteredOutTxsUtxos(utxos, inscriptionUtxos);
+
+    return filteredUtxos;
+  } catch (error) {
+    console.log('Error while fetching Bitcoin balances', error);
+
+    return [];
+  }
+};
