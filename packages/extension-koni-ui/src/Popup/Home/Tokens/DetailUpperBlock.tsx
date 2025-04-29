@@ -227,8 +227,8 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
       display: 'flex',
       justifyContent: 'space-between',
       'white-space': 'nowrap',
-      paddingLeft: token.paddingXS,
-      paddingRight: token.paddingXS,
+      paddingLeft: token.padding,
+      paddingRight: token.padding,
       fontSize: token.fontSizeHeading4,
       lineHeight: token.lineHeightHeading4
     },

@@ -73,6 +73,13 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   }, []);
 
   useEffect(() => {
+    priceHistoryCacheRef.current = {};
+    lastFetchPriceHistoryTimeRef.current = {};
+    setRawPricePoints([]);
+  },
+  [priceId]);
+
+  useEffect(() => {
     let sync = true;
 
     const loadPriceHistory = async () => {

@@ -267,7 +267,7 @@ function Component (): React.ReactElement {
   const handleResize = useCallback(() => {
     const topPosition = containerRef.current?.scrollTop || 0;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       if (topBlockRef.current && containerRef.current) {
         const containerProps = containerRef.current.getBoundingClientRect();
 
@@ -284,7 +284,7 @@ function Component (): React.ReactElement {
         topBlockRef.current.style.width = '100%';
       }
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const onCloseDetail = useCallback(() => {
     setCurrentTokenInfo(undefined);
@@ -578,8 +578,19 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       right: 0,
       display: 'flex',
       alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
-      transition: 'opacity, padding-top 0.27s ease'
+      transition: 'opacity, height 0.2s ease',
+
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
+        display: 'block',
+        zIndex: 1
+      }
     },
 
     '.token-detail-container.-no-chart': {
@@ -593,7 +604,11 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     },
 
     '.__upper-block-wrapper.__upper-block-wrapper.-is-shrink': {
-      height: 128
+      height: 128,
+
+      '&:before': {
+        height: 80
+      }
     },
 
     '.__scroll-container': {
@@ -603,7 +618,9 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     },
 
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scrolling-block': {
