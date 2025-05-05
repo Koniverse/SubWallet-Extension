@@ -2468,6 +2468,7 @@ export interface KoniRequestSignatures {
   'pri(openGov.fetchDelegates)': [string, _DelegateInfo[]];
   'pri(openGov.delegate)': [DelegateRequest, SWTransactionResponse];
   'pri(openGov.undelegate)': [UndelegateRequest, SWTransactionResponse];
+  'pri(openGov.editDelegate)': [DelegateRequest, SWTransactionResponse];
   'pri(openGov.getLockedBalance)': [GetLockedBalanceRequest, LockedDetail[]];
   'pri(openGov.unlockBalance)': [UnlockBalanceRequest, SWTransactionResponse];
 }

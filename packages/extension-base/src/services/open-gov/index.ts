@@ -6,6 +6,9 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 
+import { SubmittableExtrinsic } from '@polkadot/api-base/types';
+import { ISubmittableResult } from '@polkadot/types/types';
+
 import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest, VotingFor } from './type';
 
 interface Referendums {
@@ -172,6 +175,59 @@ export default class OpenGovService {
         trackId
       );
     }).filter((tx) => tx !== null);
+
+    const batchTx = api.api.tx.utility.batch([...tx]);
+
+    return batchTx;
+  }
+
+  public async handleEditDelegate (request: DelegateRequest): Promise<TransactionData> {
+    const substrateApi = this.state.getSubstrateApi(request.chain);
+    const api = await substrateApi.isReady;
+
+    const lockedDetails = await this.getLockedBalance({ chain: request.chain, address: request.address });
+
+    const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+
+    const requestConviction = numberToConviction[request.conviction];
+    const requestBalance = new BigN(request.balance);
+
+    for (const trackId of request.trackIds) {
+      const existed = lockedDetails.find((detail) => detail.trackId === trackId);
+
+      const currentDelegate = existed?.locked?.delegating?.target;
+      const currentConviction = existed?.locked?.delegating?.conviction;
+      const currentBalance = new BigN(existed?.locked?.delegating?.balance || 0);
+
+      const needUpdate = currentDelegate !== request.delegateAddress ||
+        currentConviction !== requestConviction ||
+        currentBalance.toString() !== requestBalance.toString();
+
+      if (needUpdate && currentDelegate) {
+        tx.push(api.api.tx.convictionVoting.undelegate(trackId));
+      }
+
+      if (needUpdate) {
+        tx.push(api.api.tx.convictionVoting.delegate(
+          trackId,
+          request.delegateAddress,
+          requestConviction,
+          request.balance
+        ));
+      }
+    }
+
+    const requestTrackSet = new Set(request.trackIds);
+    const tracksToUndelegate = lockedDetails
+      .filter((detail) =>
+        detail.locked?.delegating?.target === request.delegateAddress &&
+        !requestTrackSet.has(detail.trackId)
+      )
+      .map((detail) => detail.trackId);
+
+    for (const trackId of tracksToUndelegate) {
+      tx.push(api.api.tx.convictionVoting.undelegate(trackId));
+    }
 
     const batchTx = api.api.tx.utility.batch([...tx]);
 

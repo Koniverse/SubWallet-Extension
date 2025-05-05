@@ -4773,6 +4773,19 @@ export default class KoniExtension {
     });
   }
 
+  private async handleEditDelegate (request: DelegateRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleEditDelegate(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.DELEGATE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
   private async getLockedBalance (request: GetLockedBalanceRequest): Promise<LockedDetail[]> {
     const data = await this.#koniState.openGovService.getLockedBalance(request);
 
@@ -5464,6 +5477,8 @@ export default class KoniExtension {
         return this.handleDelegate(request as DelegateRequest);
       case 'pri(openGov.undelegate)':
         return this.handleUndelegate(request as UndelegateRequest);
+      case 'pri(openGov.editDelegate)':
+        return this.handleEditDelegate(request as DelegateRequest);
       case 'pri(openGov.getLockedBalance)':
         return this.getLockedBalance(request as GetLockedBalanceRequest);
       case 'pri(openGov.unlockBalance)':

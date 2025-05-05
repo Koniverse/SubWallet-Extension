@@ -36,6 +36,10 @@ export async function handleUndelegate (data: DelegateRequest) {
   return sendMessage('pri(openGov.undelegate)', data);
 }
 
+export async function handleEditDelegate (data: DelegateRequest) {
+  return sendMessage('pri(openGov.editDelegate)', data);
+}
+
 export async function getLockedBalance (data: GetLockedBalanceRequest) {
   return sendMessage('pri(openGov.getLockedBalance)', data);
 }

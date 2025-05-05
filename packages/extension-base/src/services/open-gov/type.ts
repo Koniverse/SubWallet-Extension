@@ -186,6 +186,8 @@ export interface VotingFor {
   delegating?: {
     prior: [string, string];
     target: string;
+    balance: string;
+    conviction: Conviction
   };
 }
 
