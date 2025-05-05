@@ -1711,7 +1711,7 @@ export default class TransactionService {
     // const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 
     const accountPair = keyring.getPair(address);
-    const account: AccountJson = { address, ...accountPair.meta };
+    const account: AccountJson = pairToAccount(accountPair);
 
     const payload: BitcoinSignatureRequest = {
       payload: undefined,
