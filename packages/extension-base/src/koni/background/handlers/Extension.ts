@@ -2300,20 +2300,6 @@ export default class KoniExtension {
     return await this.#koniState.completeConfirmationCardano(request);
   }
 
-  private subscribeBitcoinConfirmations (id: string, port: chrome.runtime.Port) {
-    const cb = createSubscription<'pri(confirmations.bitcoin.subscribe)'>(id, port);
-
-    const subscription = this.#koniState.requestService.confirmationsQueueSubjectBitcoin.subscribe(cb);
-
-    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
-
-    port.onDisconnect.addListener((): void => {
-      this.cancelSubscription(id);
-    });
-
-    return this.#koniState.requestService.confirmationsQueueSubjectBitcoin.getValue();
-  }
-
   private async completeConfirmationBitcoin (request: RequestConfirmationCompleteBitcoin) {
     return await this.#koniState.completeConfirmationBitcoin(request);
   }
@@ -5141,9 +5127,7 @@ export default class KoniExtension {
         return await this.completeConfirmationTon(request as RequestConfirmationCompleteTon);
       case 'pri(confirmationsCardano.complete)':
         return await this.completeConfirmationCardano(request as RequestConfirmationCompleteCardano);
-      case 'pri(confirmations.bitcoin.subscribe)':
-        return this.subscribeBitcoinConfirmations(id, port);
-      case 'pri(confirmations.bitcoin.complete)':
+      case 'pri(confirmationsBitcoin.complete)':
         return await this.completeConfirmationBitcoin(request as RequestConfirmationCompleteBitcoin);
 
       /// Stake

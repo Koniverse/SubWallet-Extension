@@ -41,5 +41,5 @@ export async function completeConfirmationCardano<CT extends ConfirmationTypeCar
 }
 
 export async function completeConfirmationBitcoin<CT extends ConfirmationTypeBitcoin> (type: CT, payload: ConfirmationDefinitionsBitcoin[CT][1]): Promise<boolean> {
-  return sendMessage('pri(confirmations.bitcoin.complete)', { [type]: payload });
+  return sendMessage('pri(confirmationsBitcoin.complete)', { [type]: payload });
 }
