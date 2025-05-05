@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
-import { ExtrinsicType, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, SufficientChainsDetails, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { SUFFICIENT_CHAIN } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
@@ -148,31 +147,57 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
   return '';
 }
 
-export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<boolean> => {
-  // todo: remove const and detect by pallets instead
-  if (SUFFICIENT_CHAIN.includes(tokenInfo.originChain) && tokenInfo.assetType !== _AssetType.NATIVE) {
+export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi, sufficientChain: SufficientChainsDetails): Promise<boolean> => {
+  if (tokenInfo.assetType !== _AssetType.NATIVE) {
     const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
+    const chainSlug = tokenInfo.originChain;
 
     const queryParams: _SubstrateAdapterQueryArgs = {
       section: 'query',
-      module: 'foreignAssets',
-      method: 'asset',
       args: [assetId]
     };
 
-    if (!_isBridgedToken(tokenInfo)) {
-      queryParams.module = 'assets';
+    if (sufficientChain.assetHubPallet.includes(chainSlug)) {
+      if (!_isBridgedToken(tokenInfo)) {
+        queryParams.module = 'assets';
+      } else {
+        queryParams.module = 'foreignAssets';
+      }
+
+      queryParams.method = 'asset';
     }
 
-    const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+    if (sufficientChain.assetRegistryPallet.includes(chainSlug)) {
+      queryParams.module = 'assetRegistry';
+      queryParams.method = 'assets';
+    }
 
-    return metadata.isSufficient;
+    if (sufficientChain.assetsPallet.includes(chainSlug)) {
+      queryParams.module = 'assets';
+      queryParams.method = 'asset';
+    }
+
+    if (sufficientChain.foreignAssetsPallet.includes(chainSlug)) {
+      queryParams.module = 'foreignAsset';
+      queryParams.method = 'asset';
+    }
+
+    try {
+      if (queryParams.method && queryParams.module) {
+        const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+
+        if (metadata?.isSufficient !== undefined) {
+          return metadata?.isSufficient;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  // todo
-  // if (tokenInfo.metadata?.isSufficient) {
-  //   return tokenInfo.metadata?.isSufficient;
-  // }
+  if (tokenInfo.metadata?.isSufficient) {
+    return tokenInfo.metadata?.isSufficient;
+  }
 
   return false;
 };

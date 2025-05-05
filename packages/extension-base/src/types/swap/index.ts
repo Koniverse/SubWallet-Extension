@@ -4,7 +4,6 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
 import { BaseStepDetail, BaseStepType, CommonOptimalSwapPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
@@ -137,8 +136,7 @@ export interface HydradxSwapTxData extends SwapBaseTxData {
 }
 
 // parameters & responses
-export type GenSwapStepFunc = (params: OptimalSwapPathParams) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
-export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
+export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2, stepIndex: number) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
 export interface ChainflipPreValidationMetadata {
   minSwap: AmountData;
@@ -179,6 +177,17 @@ export interface SwapRequest {
   currentQuote?: SwapProvider
 }
 
+export interface SwapRequestV2 {
+  address: string;
+  pair: SwapPair;
+  fromAmount: string;
+  slippage: number; // Example: 0.01 for 1%
+  recipient?: string;
+  feeToken?: string;
+  preferredProvider?: SwapProviderId; // allow user to designate a provider
+  isCrossChain?: boolean;
+}
+
 export interface SwapRequestResult {
   process: CommonOptimalSwapPath;
   quote: SwapQuoteResponse;
@@ -211,9 +220,19 @@ export interface SwapSubmitStepData {
   isPermit?: boolean;
 }
 
-export interface OptimalSwapPathParams {
-  request: SwapRequest;
-  selectedQuote?: SwapQuote;
+export enum DynamicSwapType {
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE'
+}
+
+export interface DynamicSwapAction {
+  action: DynamicSwapType;
+  pair: ActionPair;
+}
+
+export const enum BridgeStepPosition {
+  FIRST = 0,
+  AFTER_SWAP = 1
 }
 
 export interface OptimalSwapPathParamsV2 {
@@ -254,12 +273,12 @@ export const SIMPLE_SWAP_SLIPPAGE = 0.05;
 
 export interface BaseSwapStepMetadata {
   sendingValue: string;
+  expectedReceive: string;
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
-}
-
-export interface BriefXCMStep extends BaseSwapStepMetadata {
-  expectedReceive?: string;
+  sender: string;
+  receiver: string;
+  version: number;
 }
 
 export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {

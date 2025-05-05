@@ -1,5 +1,75 @@
 # CHANGELOG
 
+## 1.3.32
+Build date: Apr 26, 2025.
+
+Features & Update:
+- Support CIP-30 on Cardano (#4100)
+- Support swap-bridge for EVM chains (#4220)
+- Swap support and direct cross-chain swap on more EVM chains (#4219)
+- Change TAO's position in Earning options (#4290)
+- Update features related to middleware services (#4312)
+- Update chain-list
+
+Bug fixed:
+- Fixed bug when stake for subnet (#4287)
+
+
+## 1.3.31
+Build date: Apr 18, 2025.
+
+Features & Update:
+- Improve token enabling (#3960)
+- Update XCM feature:
+  - Estimate delivery fee when XCM (#4133)
+  - Dry run XCM (#4134)
+  - Improve validate recipient when make XCM transfer (#4233)
+- Support Across bridge (#3918, #4299)
+- Update chain-list stable v0.2.103 (#4163)
+- Support GIGADOT token for Hydration (#4283)
+
+
+Bug fixed:
+- Fixed XCM bugs:
+  - Fixed bug XCM USDT: PAH -> ASTR (#3606)
+  - Fixed bug XCM for Acala (#3725)
+  - Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903)
+
+## 1.3.30
+Build date: Apr 14, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain Round 2 (#4114):
+  - Improve swap feature (#4069)
+  - Improve Select provider in Swap feature (#3933)
+  - Optimize swap pair selection (#3902)
+  - Update New UI for Swap quote (#4204)
+  - Recheck swap quote with asset hub (#4113)
+- Support custom slippage for TAO subnet staking (#4145)
+- Add APY information for TAO and dTao staking (#4217)
+
+
+Bug fixed:
+- Fixed enforcing the minimum miner tip 1 wei (#2393)
+- Fixed UX for swap cross-chain Round 2 (#4114)
+  - Error when swap on hydration (#3993)
+  - Fixed bug Cannot read properties of undefined (reading 'destinationTokenInfo') when open the old Notification details (#4195)
+  - Fixed bug Error page when perform sign permit from Uniswap (#4248)
+
+
+## 1.3.29
+Build date: Apr 08, 2025.
+
+Features & Update:
+- Support auto detect balance for EVM (#2836)
+- Sort token by balance (#2339)
+- Update for Meld on-ramp (#4198)
+- Add validate sufficient token for XCM transfer (#3895)
+
+Bug fixed:
+- Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
+
+
 ## 1.3.28
 Build date: Apr 02, 2025.
 
@@ -11,9 +81,6 @@ Features & Update:
 Bug fixed:
 - Fixed bug related to subnet staking feature (#4140)
 - Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
-
-Bug fixed:
-- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
 
 ## 1.3.27
 Build date: Mar 29, 2025.

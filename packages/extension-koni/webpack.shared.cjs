@@ -66,7 +66,8 @@ const _additionalEnv = {
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
-  MELD_TEST_MODE: JSON.stringify(false)
+  MELD_TEST_MODE: JSON.stringify(false),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
 };
 
 const additionalEnvDict = {
@@ -162,6 +163,11 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: 'public/index.html',
+        chunks: ['extension']
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'side-panel.html',
+        template: 'public/side-panel.html',
         chunks: ['extension']
       }),
       new HtmlWebpackPlugin({

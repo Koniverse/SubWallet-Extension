@@ -3,6 +3,23 @@
 
 import { SubWalletResponse } from '../sdk';
 
+// todo: use interface from @subwallet/extension-base/types
+interface ActionPair {
+  slug: string;
+  from: string;
+  to: string;
+}
+
+enum DynamicSwapType {
+  SWAP = 'SWAP',
+  BRIDGE = 'BRIDGE'
+}
+
+interface DynamicSwapAction {
+  action: DynamicSwapType;
+  pair: ActionPair;
+}
+
 export interface SwapPair {
   slug: string;
   from: string;
@@ -38,6 +55,17 @@ export interface SwapRequest {
   recipient?: string;
   feeToken?: string;
   currentQuote?: SwapProvider
+}
+
+interface SwapRequestV2 {
+  address: string;
+  pair: SwapPair;
+  fromAmount: string;
+  slippage: number; // Example: 0.01 for 1%
+  recipient?: string;
+  feeToken?: string;
+  preferredProvider?: SwapProviderId; // allow user to designate a provider
+  isCrossChain?: boolean;
 }
 
 export interface HydrationRateRequest {
@@ -102,6 +130,10 @@ export interface SwapError {
   name: string;
 }
 
+export interface SwapPath {
+  path: DynamicSwapAction[]
+}
+
 export class SwapApi {
   private baseUrl: string;
 
@@ -156,6 +188,33 @@ export class SwapApi {
       }
 
       return response.result.rate;
+    } catch (error) {
+      console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+
+      return undefined;
+    }
+  }
+
+  async findAvailablePath (availablePathRequest: SwapRequestV2) {
+    const url = `${this.baseUrl}/swap/find-available-path`;
+
+    try {
+      const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ availablePathRequest })
+      });
+
+      const response = await rawResponse.json() as SubWalletResponse<SwapPath>;
+
+      if (response.statusCode !== 200) {
+        return undefined;
+      }
+
+      return response.result;
     } catch (error) {
       console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
 

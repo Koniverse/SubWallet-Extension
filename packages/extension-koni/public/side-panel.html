@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SubWallet</title>
+  <link href="fonts/PlusJakartaSans/index.css" rel="stylesheet">
+  <link href="./main.css" rel="stylesheet">
+  <style>
+    .root-wrapper {
+      overflow: hidden;
+      box-sizing: border-box;
+      margin: 0 auto;
+      padding: 0;
+      text-align: left;
+      width: 100%;
+      height: 100%;
+    }
+
+    #root {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ant-sw-modal {
+      width: 100% !important;
+    }
+  </style>
+</head>
+<body style="background-color: rgb(12, 12, 12);" class="-side-panel-mode">
+  <div class="root-wrapper">
+    <div id="root"></div>
+  </div>
+  <div id="loading-placeholder" style="background-color: rgb(12, 12, 12); position:fixed; top: 0; left: 0; right: 0; bottom: 0">
+    <img src="/images/loading.svg" style="position: absolute; top: calc(50% - 50px); left: calc(50% - 50px)" alt="Loading">
+  </div>
+</body>
+</html>

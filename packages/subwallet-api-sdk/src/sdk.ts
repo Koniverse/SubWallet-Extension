@@ -4,8 +4,10 @@
 import { fetchUnsignedPayload } from '@subwallet/subwallet-api-sdk/cardano';
 import { BuildCardanoTxParams } from '@subwallet/subwallet-api-sdk/cardano/utils';
 import { BalanceDetectionApi } from '@subwallet/subwallet-api-sdk/modules/balanceDetectionApi';
+import { PriceHistoryApi } from '@subwallet/subwallet-api-sdk/modules/priceHistoryApi';
 
 import { SwapApi } from './modules/swapApi';
+import { XcmApi } from './modules/xcmApi';
 
 export interface CardanoTransactionConfigProps {
   cardanoId: string;
@@ -22,16 +24,25 @@ export interface SubWalletResponse<T> {
   message: string
 }
 
+export interface SubWalletApiUrl {
+  url: string;
+  priceHistoryUrl: string;
+}
+
 export class SubWalletApiSdk {
   private baseUrl = '';
   private static _instance: SubWalletApiSdk | undefined = undefined;
   public swapApi: SwapApi | undefined;
+  public xcmApi: XcmApi | undefined;
   public balanceDetectionApi: BalanceDetectionApi | undefined;
+  public priceHistoryApi: PriceHistoryApi | undefined;
 
-  public init (url: string) {
+  public init ({ priceHistoryUrl, url }: SubWalletApiUrl) {
     this.baseUrl = url;
     this.swapApi = new SwapApi(url);
+    this.xcmApi = new XcmApi(url);
     this.balanceDetectionApi = new BalanceDetectionApi(url);
+    this.priceHistoryApi = new PriceHistoryApi(priceHistoryUrl);
   }
 
   async fetchUnsignedPayload (params: BuildCardanoTxParams): Promise<string> {
