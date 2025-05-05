@@ -1202,7 +1202,7 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   errors?: ErrorValidation[]
 }
 
-export interface BitcoinSendTransactionRequest extends BitcoinSignRequest, BitcoinTransactionConfig {}
+export type BitcoinSendTransactionRequest = BitcoinSignRequest
 
 export interface BitcoinSignatureRequest extends BitcoinSignRequest {
   id: string;
@@ -2409,9 +2409,6 @@ export interface KoniRequestSignatures {
   'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalTransferPath];
   'pri(accounts.approveSpending)': [TokenSpendingApprovalParams, SWTransactionResponse];
 
-  'pri(confirmations.bitcoin.subscribe)': [RequestConfirmationsSubscribe, ConfirmationsQueueBitcoin, ConfirmationsQueueBitcoin];
-  'pri(confirmations.bitcoin.complete)': [RequestConfirmationCompleteBitcoin, boolean];
-
   'pri(accounts.checkCrossChainTransfer)': [RequestCheckCrossChainTransfer, ValidateTransactionResponse];
   'pri(accounts.crossChainTransfer)': [RequestCrossChainTransfer, SWTransactionResponse];
 
@@ -2426,6 +2423,7 @@ export interface KoniRequestSignatures {
   'pri(confirmations.complete)': [RequestConfirmationComplete, boolean];
   'pri(confirmationsTon.complete)': [RequestConfirmationCompleteTon, boolean];
   'pri(confirmationsCardano.complete)': [RequestConfirmationCompleteCardano, boolean];
+  'pri(confirmationsBitcoin.complete)': [RequestConfirmationCompleteBitcoin, boolean];
 
   'pub(utils.getRandom)': [RandomTestRequest, number];
   'pub(accounts.listV2)': [RequestAccountList, InjectedAccount[]];

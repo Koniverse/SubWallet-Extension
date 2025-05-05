@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BitcoinTransactionConfig, ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
@@ -27,7 +27,7 @@ export interface SWTransaction extends ValidateTransactionResponse, Partial<Pick
   updatedAt: number;
   estimateFee?: FeeData,
   xcmFeeDryRun?: string;
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt | BitcoinTransactionConfig;
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
   isPassConfirmation?: boolean;
