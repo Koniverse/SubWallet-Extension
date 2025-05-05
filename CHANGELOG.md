@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.34
+Build date: May 05, 2025.
+
+Features & Update:
+- Support extension side panel (#4091)
+- Update padding for the time frame selector for price chart
+
+
 ## 1.3.33
 Build date: Apr 30, 2025.
 
