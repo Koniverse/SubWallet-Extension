@@ -43,7 +43,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       ? determineUtxosForSpendAll(determineUtxosArgs)
       : determineUtxosForSpend(determineUtxosArgs);
 
-    const pair = keyring.getPair('bc1qqn6ggclhsk2h5rmzy8v8akkh0mawcjesvcy6c9');
+    const pair = keyring.getPair(from);
     const tx = new Psbt({ network });
     let transferAmount = new BigN(0);
 
@@ -70,7 +70,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
 
     for (const output of outputs) {
       tx.addOutput({
-        address: 'bc1qqn6ggclhsk2h5rmzy8v8akkh0mawcjesvcy6c9',
+        address: output.address || from,
         value: output.value
       });
 
