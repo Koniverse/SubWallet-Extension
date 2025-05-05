@@ -8,8 +8,12 @@
   "permissions": [
     "notifications",
     "storage",
-    "tabs"
+    "tabs",
+    "sidePanel"
   ],
+  "side_panel": {
+    "default_path": "side-panel.html"
+  },
   "background": {
     "service_worker": "background.js"
   },
