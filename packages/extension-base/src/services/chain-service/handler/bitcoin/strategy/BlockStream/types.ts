@@ -34,7 +34,9 @@ export interface BitcoinAddressSummaryInfo {
     tx_count: number
   },
   balance: number,
-  total_inscription: number
+  total_inscription: number,
+  balance_rune: string,
+  balance_inscription: string,
 }
 
 // todo: combine RunesByAddressResponse & RunesCollectionInfoResponse
@@ -247,9 +249,8 @@ export interface BlockStreamTransactionDetail {
 }
 
 export interface RuneUtxoResponse {
-  start: number,
   total: number,
-  utxo: RuneUtxo[]
+  results: RuneUtxo[]
 }
 
 export interface RuneUtxo {
