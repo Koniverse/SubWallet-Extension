@@ -6,6 +6,7 @@ import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
+import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -25,7 +26,9 @@ import { EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import BigN from 'bignumber.js';
+import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -170,7 +173,20 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         cardanoApi,
         nativeTokenInfo: nativeToken
       });
-    } else { // TODO: Support maxTransferable for bitcoin
+    } else if (isBitcoinAddress(address) && _isTokenTransferredByBitcoin(srcToken)) {
+      const network = srcChain.isTestnet ? testnet : bitcoin;
+
+      [transaction] = await createBitcoinTransaction({
+        chain: srcChain.slug,
+        from: address,
+        to: address,
+        value,
+        feeInfo: fee,
+        transferAll: false,
+        bitcoinApi,
+        network: network
+      });
+    } else {
       [transaction] = await createSubstrateExtrinsic({
         transferAll: false,
         value,
@@ -223,6 +239,15 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         ...fee,
         estimatedFee
       };
+    } else if (feeChainType === 'bitcoin') {
+      // Calculate fee for bitcoin transaction
+      // TODO: Support maxTransferable for bitcoin
+      estimatedFee = '0';
+      feeOptions = {
+        ...fee,
+        vSize: 0,
+        estimatedFee
+      };
     } else {
       if (transaction) {
         if (isTonTransaction(transaction)) {
@@ -262,6 +287,12 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         ...fee,
         estimatedFee,
         gasLimit: '0'
+      };
+    } else if (fee.type === 'bitcoin') {
+      feeOptions = {
+        ...fee,
+        estimatedFee,
+        vSize: 0
       };
     } else {
       feeOptions = {
@@ -429,6 +460,12 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
         ...fee,
         estimatedFee
       };
+    } else if (feeChainType === 'bitcoin') {
+      feeOptions = {
+        ...fee,
+        estimatedFee,
+        vSize: 0
+      };
     } else {
       // Not implemented yet
       estimatedFee = '0';
@@ -445,6 +482,12 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
         ...fee,
         estimatedFee,
         gasLimit: '0'
+      };
+    } else if (fee.type === 'bitcoin') {
+      feeOptions = {
+        ...fee,
+        estimatedFee,
+        vSize: 0
       };
     } else {
       feeOptions = {
