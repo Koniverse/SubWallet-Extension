@@ -1029,6 +1029,10 @@ export default class KoniExtension {
     return this.#koniState.priceService.getHistoryTokenPriceData(priceId, timeframe);
   }
 
+  private async checkCoinGeckoPriceSupport (priceId: string): Promise<boolean> {
+    return this.#koniState.priceService.checkCoinGeckoPriceSupport(priceId);
+  }
+
   private subscribeCurrentTokenPrice (priceId: string, id: string, port: chrome.runtime.Port): ResponseSubscribeCurrentTokenPrice {
     const cb = createSubscription<'pri(price.subscribeCurrentTokenPrice)'>(id, port);
 
@@ -4827,6 +4831,8 @@ export default class KoniExtension {
         return await this.subscribePrice(id, port);
       case 'pri(price.getHistory)':
         return await this.getHistoryTokenPrice(request as RequestGetHistoryTokenPriceData);
+      case 'pri(price.checkCoinGeckoPriceSupport)':
+        return await this.checkCoinGeckoPriceSupport(request as string);
       case 'pri(price.subscribeCurrentTokenPrice)':
         return this.subscribeCurrentTokenPrice(request as string, id, port);
       case 'pri(settings.savePriceCurrency)':

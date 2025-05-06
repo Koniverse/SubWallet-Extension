@@ -315,6 +315,12 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.eventService.on('asset.updateState', eventHandler);
   }
 
+  async checkCoinGeckoPriceSupport (priceId: string): Promise<boolean> {
+    const priceData = await getPriceMap(new Set([priceId]), DEFAULT_CURRENCY, true);
+
+    return priceId in (priceData?.priceMap || {});
+  }
+
   async loadData (): Promise<void> {
     const data = await this.dbService.getPriceStore(this.priceSubject.value.currency);
 
