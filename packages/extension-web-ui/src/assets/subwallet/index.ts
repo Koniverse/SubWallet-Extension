@@ -41,7 +41,7 @@ const SwLogosMap: Record<string, string> = {
   [SwapProviderId.ROCOCO_ASSET_HUB.toLowerCase()]: DefaultLogosMap.rococo_assethub,
   ton: DefaultLogosMap.ton,
   ...Object.fromEntries(
-    Array.from({ length: 86 }, (_, i) => [`subnet-${i}`, `./images/bittensor/subnet-${i}.png`])
+    Array.from({ length: 86 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
   ),
   meld: DefaultLogosMap.meld
 };

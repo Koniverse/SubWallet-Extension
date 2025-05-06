@@ -567,7 +567,7 @@ const SecurityList = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
       },
       '.__item-center-part': {
-
+        flex: 1
       },
       '.__item-right-part': {
 
