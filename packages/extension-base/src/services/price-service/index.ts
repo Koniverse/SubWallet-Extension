@@ -21,6 +21,7 @@ const DEFAULT_PRICE_SUBJECT: PriceJson = {
   ready: false,
   currencyData: { label: 'United States Dollar', symbol: DEFAULT_CURRENCY, isPrefix: true },
   priceMap: {},
+  priceCoinGeckoSupported: [],
   price24hMap: {},
   exchangeRateMap: {},
   lastUpdatedMap: {}
@@ -122,7 +123,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   }
 
   private async calculatePriceMap (currency?: CurrencyType) {
-    let { lastUpdatedMap, price24hMap, priceMap } = this.rawPriceSubject.value;
+    let { lastUpdatedMap, price24hMap, priceCoinGeckoSupported, priceMap } = this.rawPriceSubject.value;
     let exchangeRateData = this.rawExchangeRateMap.value;
     const priceStored = await this.dbService.getPriceStore(currency);
 
@@ -146,6 +147,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       price24hMap: { ...price24hMap },
       currency: currencyKey,
       exchangeRateMap: exchangeRateData,
+      priceCoinGeckoSupported,
       currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson,
       lastUpdatedMap: { ...lastUpdatedMap }
     };
@@ -315,10 +317,14 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.eventService.on('asset.updateState', eventHandler);
   }
 
-  async checkCoinGeckoPriceSupport (priceId: string): Promise<boolean> {
-    const priceData = await getPriceMap(new Set([priceId]), DEFAULT_CURRENCY, true);
+  checkCoinGeckoPriceSupport (priceId: string): boolean {
+    const { priceCoinGeckoSupported } = this.priceSubject.value;
 
-    return priceId in (priceData?.priceMap || {});
+    if (!priceCoinGeckoSupported) {
+      return false;
+    }
+
+    return priceCoinGeckoSupported.includes(priceId);
   }
 
   async loadData (): Promise<void> {

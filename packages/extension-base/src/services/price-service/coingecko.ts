@@ -161,11 +161,13 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
     const currencyData = staticData[StaticKey.CURRENCY_SYMBOL][currency || DEFAULT_CURRENCY] as CurrencyJson;
     const priceMap: Record<string, number> = {};
     const price24hMap: Record<string, number> = {};
+    const priceCoinGeckoSupported: string[] = [];
 
     responseDataPrice.forEach((val) => {
       const currentPrice = val.current_price || 0;
       const price24h = currentPrice - (val.price_change_24h || 0);
 
+      priceCoinGeckoSupported.push(val.id);
       priceMap[val.id] = currentPrice;
       price24hMap[val.id] = price24h;
       lastUpdatedMap[val.id] = new Date(val.last_updated || val.last_updated_at || Date.now());
@@ -189,6 +191,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       currencyData,
       priceMap,
       price24hMap,
+      priceCoinGeckoSupported,
       lastUpdatedMap
     };
   } catch (e) {

@@ -192,6 +192,7 @@ export interface PriceJson {
   exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
   price24hMap: Record<string, number>,
+  priceCoinGeckoSupported: string[],
   lastUpdatedMap: Record<string, Date>
 }
 
