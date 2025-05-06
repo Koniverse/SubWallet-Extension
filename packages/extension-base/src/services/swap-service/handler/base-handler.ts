@@ -440,7 +440,7 @@ export class SwapBaseHandler {
       const isEvmAddress = isEthereumAddress(recipient);
       const isEvmDestChain = _isChainEvmCompatible(swapToChain);
 
-      if ((isEvmAddress && !isEvmDestChain) || (!isEvmAddress && isEvmDestChain)) { // todo: update this condition
+      if (isEvmAddress !== isEvmDestChain) {
         return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
       }
     }
