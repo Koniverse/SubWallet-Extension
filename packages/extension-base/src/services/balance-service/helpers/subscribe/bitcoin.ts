@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
-import { BalanceItem, SusbcribeBitcoinPalletBalance, UtxoResponseItem } from '@subwallet/extension-base/types';
-import { filterAssetsByChainAndType, filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
-import { getTransferableBitcoinUtxos } from '@subwallet/extension-base/utils';
+import { BalanceItem, SusbcribeBitcoinPalletBalance } from '@subwallet/extension-base/types';
+import { filterAssetsByChainAndType, getTransferableBitcoinUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) {

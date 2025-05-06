@@ -1400,6 +1400,7 @@ export interface ConfirmationDefinitionsBitcoin {
 export type ConfirmationType = keyof ConfirmationDefinitions;
 export type ConfirmationTypeTon = keyof ConfirmationDefinitionsTon;
 export type ConfirmationTypeCardano = keyof ConfirmationDefinitionsCardano;
+export type ConfirmationTypeBitcoin = keyof ConfirmationDefinitionsBitcoin;
 
 export type ConfirmationsQueue = {
   [CT in ConfirmationType]: Record<string, ConfirmationDefinitions[CT][0]>;
@@ -1410,8 +1411,6 @@ export type ConfirmationsQueueTon = {
 export type ConfirmationsQueueCardano = {
   [CT in ConfirmationTypeCardano]: Record<string, ConfirmationDefinitionsCardano[CT][0]>;
 }
-
-export type ConfirmationTypeBitcoin = keyof ConfirmationDefinitionsBitcoin;
 
 export type ConfirmationsQueueBitcoin = {
   [CT in ConfirmationTypeBitcoin]: Record<string, ConfirmationDefinitionsBitcoin[CT][0]>;
