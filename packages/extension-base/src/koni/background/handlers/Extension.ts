@@ -76,7 +76,7 @@ import { ProposalTypes } from '@walletconnect/types/dist/types/sign-client/propo
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
-import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
+import * as bitcoin from 'bitcoinjs-lib';
 import { t } from 'i18next';
 import { combineLatest, Subject } from 'rxjs';
 import { TransactionConfig } from 'web3-core';
@@ -1443,7 +1443,7 @@ export default class KoniExtension {
         chainType = ChainType.BITCOIN;
         const chainInfo = this.#koniState.getChainInfo(chain);
 
-        const network = chainInfo.isTestnet ? testnet : bitcoin;
+        const network = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
         const txVal: string = transferAll ? transferTokenAvailable.value : (value || '0');
         const bitcoinApi = this.#koniState.getBitcoinApi(chain);
         const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'bitcoin');

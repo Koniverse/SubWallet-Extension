@@ -28,7 +28,7 @@ import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import BigN from 'bignumber.js';
-import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
+import * as bitcoin from 'bitcoinjs-lib';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -174,7 +174,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         nativeTokenInfo: nativeToken
       });
     } else if (isBitcoinAddress(address) && _isTokenTransferredByBitcoin(srcToken)) {
-      const network = srcChain.isTestnet ? testnet : bitcoin;
+      const network = srcChain.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
 
       [transaction] = await createBitcoinTransaction({
         chain: srcChain.slug,

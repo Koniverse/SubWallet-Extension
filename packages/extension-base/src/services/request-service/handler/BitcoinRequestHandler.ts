@@ -17,7 +17,7 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
 import { Psbt } from 'bitcoinjs-lib';
-import { bitcoin, testnet } from 'bitcoinjs-lib/src/networks';
+import * as bitcoin from 'bitcoinjs-lib';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
@@ -228,8 +228,7 @@ export default class BitcoinRequestHandler {
       extrinsicHash: id
     };
 
-    const network = chainInfo.isTestnet ? testnet : bitcoin;
-
+    const network = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
     const feeInfo = await this.#feeService.subscribeChainFee(getId(), chain, 'bitcoin');
     const [psbt] = await createBitcoinTransaction({
       bitcoinApi,
