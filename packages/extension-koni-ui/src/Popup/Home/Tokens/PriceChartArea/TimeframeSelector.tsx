@@ -52,8 +52,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
 export const TimeframeSelector = styled(Component)<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
   display: 'flex',
-  paddingLeft: token.paddingXXS,
-  paddingRight: token.paddingXXS,
+  paddingLeft: token.padding,
+  paddingRight: token.padding,
 
   '.__timeframe-item': {
     cursor: 'pointer',

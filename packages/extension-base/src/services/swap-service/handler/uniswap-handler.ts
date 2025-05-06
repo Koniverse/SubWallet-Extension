@@ -5,8 +5,8 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
-import { createAcrossBridgeExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { SpokePoolMapping } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { createAcrossBridgeExtrinsic, CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, GenSwapStepFuncV2, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
@@ -248,6 +248,9 @@ export class UniswapHandler implements SwapBaseInterface {
     const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
     const tokenContract = _getContractAddressOfToken(fromTokenInfo);
 
+    const toTokenInfo = this.chainService.getAssetBySlug(params.request.pair.to);
+    const toChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(toTokenInfo));
+
     if (_isNativeToken(fromTokenInfo)) {
       return Promise.resolve(undefined);
     }
@@ -256,7 +259,21 @@ export class UniswapHandler implements SwapBaseInterface {
       throw Error('Error getting Evm chain Id');
     }
 
-    const spokePoolAddress = SpokePoolMapping[fromChainId].SpokePool.address;
+    const inputData = {
+      destinationTokenInfo: toTokenInfo,
+      originTokenInfo: fromTokenInfo,
+      sendingValue: sendingAmount,
+      sender: senderAddress,
+      recipient: senderAddress,
+      destinationChain: toChainInfo,
+      originChain: fromChainInfo
+    } as CreateXcmExtrinsicProps;
+
+    const acrossQuote = await getAcrossQuote(
+      inputData
+    );
+
+    const spokePoolAddress = acrossQuote.to;
 
     const allowance = await getERC20Allowance(spokePoolAddress, senderAddress, tokenContract, evmApi);
 
@@ -412,8 +429,7 @@ export class UniswapHandler implements SwapBaseInterface {
     }
 
     try {
-      const _evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
-      const evmApi = await _evmApi.isReady;
+      const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
       const feeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
 
       const tx = await createAcrossBridgeExtrinsic({
