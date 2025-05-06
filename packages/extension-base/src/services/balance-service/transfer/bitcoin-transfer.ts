@@ -5,6 +5,8 @@ import { _BITCOIN_CHAIN_SLUG, _BITCOIN_NAME, _BITCOIN_TESTNET_NAME } from '@subw
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BitcoinFeeInfo, BitcoinFeeRate, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineBitcoinFee, determineUtxosForSpend, determineUtxosForSpendAll, getTransferableBitcoinUtxos } from '@subwallet/extension-base/utils';
+import { BitcoinAddressType } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { Network, Psbt } from 'bitcoinjs-lib';
@@ -48,7 +50,10 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
     let transferAmount = new BigN(0);
 
     for (const input of inputs) {
-      if (pair.type === 'bitcoin-44' || pair.type === 'bittest-44') {
+      const addressInfo = getBitcoinAddressInfo(pair.address);
+
+      if (addressInfo.type === BitcoinAddressType.p2pkh || addressInfo.type === BitcoinAddressType.p2sh) {
+        // BIP-44 (Legacy)
         const hex = await bitcoinApi.api.getTxHex(input.txid);
 
         tx.addInput({
@@ -56,7 +61,8 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
           index: input.vout,
           nonWitnessUtxo: Buffer.from(hex, 'hex')
         });
-      } else {
+      } else if (addressInfo.type === BitcoinAddressType.p2wpkh) {
+        // BIP-84 (Native SegWit)
         tx.addInput({
           hash: input.txid,
           index: input.vout,
@@ -65,6 +71,19 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
             value: input.value
           }
         });
+      } else if (addressInfo.type === BitcoinAddressType.p2tr) {
+        // BIP-86 (Taproot)
+        tx.addInput({
+          hash: input.txid,
+          index: input.vout,
+          witnessUtxo: {
+            script: pair.bitcoin.output,
+            value: input.value // UTXO value in satoshis
+          },
+          tapInternalKey: pair.bitcoin.internalPubkey.slice(1) // X-only public key (32 bytes)
+        });
+      } else {
+        throw new Error(`Unsupported address type: ${addressInfo.type}`);
       }
     }
 
