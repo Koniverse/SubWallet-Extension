@@ -15,9 +15,9 @@ import { t } from 'i18next';
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 
-export { canDerive } from './canDerive';
 export * from './mv3';
 export * from './fetch';
+export { convertCardanoAddressToHex } from './cardano';
 
 export const notDef = (x: any) => x === null || typeof x === 'undefined';
 export const isDef = (x: any) => !notDef(x);

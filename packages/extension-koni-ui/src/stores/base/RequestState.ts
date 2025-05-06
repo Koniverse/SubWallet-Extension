@@ -34,6 +34,7 @@ const initialState: RequestState = {
   cardanoSignatureRequest: {},
   cardanoSendTransactionRequest: {},
   cardanoWatchTransactionRequest: {},
+  cardanoSignTransactionRequest: {},
 
   bitcoinSendTransactionRequest: {},
   bitcoinSignatureRequest: {},
@@ -65,6 +66,8 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'tonWatchTransactionRequest',
   'cardanoSignatureRequest',
   'cardanoSendTransactionRequest',
+  'cardanoSignTransactionRequest',
+  'tonWatchTransactionRequest',
   'bitcoinSignatureRequest',
   'bitcoinSendTransactionRequest',
   'bitcoinWatchTransactionRequest',

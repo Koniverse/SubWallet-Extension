@@ -487,6 +487,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
     blockExplorer = chainInfo?.evmInfo?.blockExplorer;
   } else if (_isPureCardanoChain(chainInfo)) {
     blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
+  } else if (_isPureBitcoinChain(chainInfo)) {
+    blockExplorer = chainInfo?.bitcoinInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }
