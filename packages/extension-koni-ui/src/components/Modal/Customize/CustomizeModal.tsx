@@ -77,6 +77,11 @@ export const CustomizeModal = styled(Component)<Props>(({ theme: { token } }: Pr
       overflow: 'hidden'
     },
 
+    '.-side-panel-mode & .ant-sw-modal-content': {
+      maxHeight: 'calc(100vh - 56px)',
+      height: 'calc(100vh - 56px)'
+    },
+
     '.ant-sw-modal-body': {
       paddingLeft: 0,
       paddingRight: 0,
