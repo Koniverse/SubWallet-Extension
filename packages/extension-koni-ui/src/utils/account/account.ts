@@ -13,7 +13,7 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
@@ -275,6 +275,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
     return true;
   }
 
+  if (isCardanoAddress(address) && authAccountTypes?.includes('cardano')) {
+    return true;
+  }
+
   return false;
 };
 
@@ -287,3 +291,19 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
     [AccountChainType.CARDANO]: logoMap.network.cardano as string
   };
 }
+
+export const getBitcoinLabelByKeypair = (keyPairType: KeypairType): string => {
+  switch (keyPairType) {
+    case 'bitcoin-44':
+    case 'bittest-44':
+      return 'BIP-44';
+    case 'bitcoin-86':
+    case 'bittest-86':
+      return 'BIP-86';
+    case 'bitcoin-84':
+    case 'bittest-84':
+      return 'BIP-84';
+    default:
+      return '';
+  }
+};

@@ -42,7 +42,7 @@ export const getAccountJsonByAddress = (address: string): AccountJson | null => 
 
 /** Filter addresses to subscribe by chain info */
 const filterAddress = (addresses: string[], chainInfo: _ChainInfo): [string[], string[]] => {
-  const { bitcoin, cardano, evm, substrate, ton } = getAddressesByChainTypeMap(addresses);
+  const { bitcoin, cardano, evm, substrate, ton } = getAddressesByChainTypeMap(addresses, chainInfo);
 
   if (_isChainEvmCompatible(chainInfo)) {
     return [evm, [...bitcoin, ...substrate, ...ton, ...cardano]];
@@ -192,11 +192,13 @@ export function subscribeBalance (
     const bitcoinApi = bitcoinApiMap[chainSlug];
 
     if (_isPureBitcoinChain(chainInfo)) {
-      return subscribeBitcoinBalance(
-        useAddresses,
+      return subscribeBitcoinBalance({
+        addresses: useAddresses,
+        assetMap: chainAssetMap,
         bitcoinApi,
-        callback
-      );
+        callback,
+        chainInfo
+      });
     }
 
     // If the chain is not ready, return pending state

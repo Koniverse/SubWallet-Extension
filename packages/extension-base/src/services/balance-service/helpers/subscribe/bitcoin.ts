@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { BalanceItem, UtxoResponseItem } from '@subwallet/extension-base/types';
-import { filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
+import { BalanceItem, SusbcribeBitcoinPalletBalance, UtxoResponseItem } from '@subwallet/extension-base/types';
+import { filterAssetsByChainAndType, filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
@@ -73,24 +72,34 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
       return {
         balance: '0',
         bitcoinBalanceMetadata: {
-          inscriptionCount: 0
+          inscriptionCount: 0,
+          runeBalance: 0,
+          inscriptionBalance: 0
         }
       };
     }
   }));
 }
 
-export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _BitcoinApi, callback: (rs: BalanceItem[]) => void): () => void {
+export function subscribeBitcoinBalance (params: SusbcribeBitcoinPalletBalance): () => void {
+  const { addresses, assetMap, bitcoinApi, callback, chainInfo } = params;
+  const chain = chainInfo.slug;
+  const nativeTokenInfo = filterAssetsByChainAndType(assetMap, chain, [_AssetType.NATIVE]);
+  const nativeTokenSlug = Object.values(nativeTokenInfo)[0]?.slug || '';
+
   const getBalance = () => {
     getBitcoinBalance(bitcoinApi, addresses)
       .then((balances) => {
         return balances.map(({ balance, bitcoinBalanceMetadata }, index): BalanceItem => {
           return {
             address: addresses[index],
-            tokenSlug: 'bitcoin-NATIVE-BTC',
+            tokenSlug: nativeTokenSlug,
             state: APIItemState.READY,
             free: balance,
-            locked: '0',
+            locked: (
+              parseInt(bitcoinBalanceMetadata.runeBalance.toString()) +
+              parseInt(bitcoinBalanceMetadata.inscriptionBalance.toString())
+            ).toString(),
             metadata: bitcoinBalanceMetadata
           };
         });
@@ -101,7 +110,7 @@ export function subscribeBitcoinBalance (addresses: string[], bitcoinApi: _Bitco
         return addresses.map((address): BalanceItem => {
           return {
             address: address,
-            tokenSlug: 'bitcoin',
+            tokenSlug: nativeTokenSlug,
             state: APIItemState.READY,
             free: '0',
             locked: '0'
