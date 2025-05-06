@@ -48,7 +48,7 @@ export async function getHistoryTokenPrice (priceId: string, timeframe: PriceCha
   return sendMessage('pri(price.getHistory)', { priceId, timeframe });
 }
 
-export async function checkCoinGeckoPriceSupport (priceId: string): Promise<boolean> {
+export async function canShowChart (priceId: string): Promise<boolean> {
   return sendMessage('pri(price.checkCoinGeckoPriceSupport)', priceId);
 }
 
