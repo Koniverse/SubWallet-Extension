@@ -3,16 +3,17 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { getERC20Contract } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
+import { estimateTxFee, getERC20Contract, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { _ERC20_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
-import { _getContractAddressOfToken, _isNativeToken } from '../../chain-service/utils';
+import { _getChainNativeTokenSlug, _getContractAddressOfToken, _isNativeToken } from '../../chain-service/utils';
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import TransactionService from '../../transaction-service';
@@ -150,14 +151,16 @@ export class KyberHandler implements SwapBaseInterface {
   }
 
   async getApprovalStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (params.selectedQuote) {
-      const fromAsset = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
+    const selectedQuote = params.selectedQuote;
+
+    if (selectedQuote) {
+      const fromAsset = this.chainService.getAssetBySlug(selectedQuote.pair.from);
 
       if (_isNativeToken(fromAsset)) {
         return Promise.resolve(undefined);
       }
 
-      const metadata = params.selectedQuote.metadata as KyberMetadata;
+      const metadata = selectedQuote.metadata as KyberMetadata;
       const routerContract = metadata.routerAddress;
 
       const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
@@ -170,12 +173,42 @@ export class KyberHandler implements SwapBaseInterface {
         return Promise.resolve(undefined);
       }
 
+      const sendingAmount = selectedQuote.toAmount;
+      const senderAddress = params.request.address;
+      const fromTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+
+      const tokenContract = _getContractAddressOfToken(fromTokenInfo);
+      const spenderAddress = metadata.routerAddress;
+
       const submitStep: BaseStepDetail = {
         name: 'Approve token',
-        type: CommonStepType.TOKEN_APPROVAL
+        type: CommonStepType.TOKEN_APPROVAL,
+        metadata: {
+          tokenApprove: fromTokenInfo.slug,
+          contractAddress: tokenContract,
+          spenderAddress: spenderAddress,
+          amount: sendingAmount,
+          owner: senderAddress
+        }
       };
 
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+      const tx = await getERC20SpendingApprovalTx(spenderAddress, senderAddress, tokenContract, evmApi);
+      const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+      const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+      const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+      const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+      const feeInfo: CommonStepFeeInfo = {
+        feeComponent: [{
+          feeType: SwapFeeType.NETWORK_FEE,
+          amount: estimatedFee,
+          tokenSlug: nativeTokenSlug
+        }],
+        defaultFeeToken: nativeTokenSlug,
+        feeOptions: [nativeTokenSlug]
+      };
+
+      return Promise.resolve([submitStep, feeInfo]);
     }
 
     return Promise.resolve(undefined);
@@ -251,16 +284,18 @@ export class KyberHandler implements SwapBaseInterface {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const approveData = tokenContract.methods.approve(routerContract, amount).encodeABI();
 
+    const fee = combineEthFee(priority, FeeOptionKey.AVERAGE);
+
     transactionConfig = {
       from: params.address,
       to: fromContract,
       value: 0,
       data: approveData as string,
-      gasPrice: priority.gasPrice,
-      maxFeePerGas: priority.options?.[FeeOptionKey.AVERAGE].maxFeePerGas?.toString(),
-      maxPriorityFeePerGas: priority.options?.[FeeOptionKey.AVERAGE].maxPriorityFeePerGas.toString()
+      ...fee
     };
-    const gasLimit = await evmApi.api.eth.estimateGas(transactionConfig).catch(() => 200000);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const gasLimit = await tokenContract.methods.approve(routerContract, amount).estimateGas({ from: params.address }) as number;
 
     transactionConfig.gas = gasLimit.toString();
     const _data: TokenSpendingApprovalParams = {
@@ -293,12 +328,17 @@ export class KyberHandler implements SwapBaseInterface {
     const metadata = params.quote.metadata as KyberMetadata;
     const slippageTolerance = params.slippage * 10000;
 
-    const transactionConfig: TransactionConfig = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
+    const rawTx = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
     const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
     const priority = await calculateGasFeeParams(evmApi, evmApi.chainSlug);
+    const fee = combineEthFee(priority, FeeOptionKey.AVERAGE);
 
-    transactionConfig.gasPrice = priority.gasPrice;
+    const transactionConfig: TransactionConfig = {
+      ...rawTx,
+      ...fee
+    };
+
     const txData = {
       address: params.address,
       provider: this.providerInfo,
