@@ -1,22 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BitcoinSignatureRequest, BitcoinSignPsbtRequest, ConfirmationDefinitionsBitcoin, ConfirmationResult, EvmSendTransactionRequest, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinSignatureRequest, BitcoinSignPsbtRequest, ConfirmationDefinitionsBitcoin, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSubmitTransferWithId } from '@subwallet/extension-base/types/balance/transfer';
 import { wait } from '@subwallet/extension-base/utils';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainInfoByChainId, useLedger, useNotification, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
+import { useNotification, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { completeConfirmationBitcoin, makeBitcoinDappTransferConfirmation, makePSBTTransferAfterConfirmation } from '@subwallet/extension-koni-ui/messaging';
 import { AccountSignMode, BitcoinSignatureSupportType, PhosphorIcon, SigData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getSignMode, isBitcoinMessage, removeTransactionPersist } from '@subwallet/extension-koni-ui/utils';
+import { getSignMode, removeTransactionPersist } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, QrCode, Swatches, Wallet, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import { hexToU8a, u8aToU8a } from '@polkadot/util';
 
 import { ScanSignature } from '../Qr';
 
@@ -54,40 +52,40 @@ const handleSignature = async (type: BitcoinSignatureSupportType, id: string, si
 
 const Component: React.FC<Props> = (props: Props) => {
   const { canSign, className, editedPayload, extrinsicType, id, payload, type } = props;
-  const { payload: { hashPayload } } = payload;
+  // const { payload: { hashPayload } } = payload;
   const { account } = (payload.payload as BitcoinSignatureRequest);
   // TODO: [Review] Error eslint
-  const chainId = (payload.payload as EvmSendTransactionRequest)?.chainId || 1;
+  // const chainId = (payload.payload as EvmSendTransactionRequest)?.chainId || 1;
 
   const { t } = useTranslation();
   const notify = useNotification();
 
   const { activeModal } = useContext(ModalContext);
 
-  const chain = useGetChainInfoByChainId(chainId);
+  // const chain = useGetChainInfoByChainId(chainId);
 
   const checkUnlock = useUnlockChecker();
   const signMode = useMemo(() => getSignMode(account), [account]);
   // TODO: [Review] type generic_ledger or legacy_ledger
-  const isLedger = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER, [signMode]);
-  const isMessage = isBitcoinMessage(payload);
+  // const isLedger = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER, [signMode]);
+  // const isMessage = isBitcoinMessage(payload);
 
   const [loading, setLoading] = useState(false);
 
-  const { error: ledgerError,
-    isLoading: isLedgerLoading,
-    isLocked,
-    ledger,
-    refresh: refreshLedger,
-    signMessage: ledgerSignMessage,
-    signTransaction: ledgerSignTransaction,
-    warning: ledgerWarning } = useLedger(chain?.slug, isLedger);
+  // const { error: ledgerError,
+  //   isLoading: isLedgerLoading,
+  //   isLocked,
+  //   ledger,
+  //   refresh: refreshLedger,
+  //   signMessage: ledgerSignMessage,
+  //   signTransaction: ledgerSignTransaction,
+  //   warning: ledgerWarning } = useLedger(chain?.slug, isLedger);
 
-  const isLedgerConnected = useMemo(() => !isLocked && !isLedgerLoading && !!ledger, [
-    isLedgerLoading,
-    isLocked,
-    ledger
-  ]);
+  // const isLedgerConnected = useMemo(() => !isLocked && !isLedgerLoading && !!ledger, [
+  //   isLedgerLoading,
+  //   isLocked,
+  //   ledger
+  // ]);
 
   const approveIcon = useMemo((): PhosphorIcon => {
     switch (signMode) {
@@ -165,33 +163,33 @@ const Component: React.FC<Props> = (props: Props) => {
     activeModal(CONFIRMATION_QR_MODAL);
   }, [activeModal]);
 
-  const onConfirmLedger = useCallback(() => {
-    if (!hashPayload) {
-      return;
-    }
-
-    if (!isLedgerConnected || !ledger) {
-      refreshLedger();
-
-      return;
-    }
-
-    setLoading(true);
-
-    setTimeout(() => {
-      // TODO: Review metadata of ledgerSignTransaction
-      const signPromise = isMessage ? ledgerSignMessage(u8aToU8a(hashPayload), account?.accountIndex, account?.addressOffset) : ledgerSignTransaction(hexToU8a(hashPayload), new Uint8Array(0), account?.accountIndex, account?.addressOffset);
-
-      signPromise
-        .then(({ signature }) => {
-          onApproveSignature({ signature });
-        })
-        .catch((e: Error) => {
-          console.log(e);
-          setLoading(false);
-        });
-    });
-  }, [account?.accountIndex, account?.addressOffset, hashPayload, isLedgerConnected, isMessage, ledger, ledgerSignMessage, ledgerSignTransaction, onApproveSignature, refreshLedger]);
+  // const onConfirmLedger = useCallback(() => {
+  //   if (!hashPayload) {
+  //     return;
+  //   }
+  //
+  //   if (!isLedgerConnected || !ledger) {
+  //     refreshLedger();
+  //
+  //     return;
+  //   }
+  //
+  //   setLoading(true);
+  //
+  //   setTimeout(() => {
+  //     // TODO: Review metadata of ledgerSignTransaction
+  //     const signPromise = isMessage ? ledgerSignMessage(u8aToU8a(hashPayload), account?.accountIndex, account?.addressOffset) : ledgerSignTransaction(hexToU8a(hashPayload), new Uint8Array(0), account?.accountIndex, account?.addressOffset);
+  //
+  //     signPromise
+  //       .then(({ signature }) => {
+  //         onApproveSignature({ signature });
+  //       })
+  //       .catch((e: Error) => {
+  //         console.log(e);
+  //         setLoading(false);
+  //       });
+  //   });
+  // }, [account?.accountIndex, account?.addressOffset, hashPayload, isLedgerConnected, isMessage, ledger, ledgerSignMessage, ledgerSignTransaction, onApproveSignature, refreshLedger]);
 
   const onConfirmInject = useCallback(() => {
     console.error('Not implemented yet');
@@ -240,9 +238,9 @@ const Component: React.FC<Props> = (props: Props) => {
       case AccountSignMode.QR:
         onConfirmQr();
         break;
-      case AccountSignMode.GENERIC_LEDGER:
-        onConfirmLedger();
-        break;
+      // case AccountSignMode.GENERIC_LEDGER:
+      //   onConfirmLedger();
+      //   break;
       case AccountSignMode.INJECTED:
         onConfirmInject();
         break;
@@ -253,21 +251,21 @@ const Component: React.FC<Props> = (props: Props) => {
           // Unlock is cancelled
         });
     }
-  }, [checkUnlock, extrinsicType, onConfirmInject, onApprovePassword, onConfirmLedger, onConfirmQr, signMode]);
+  }, [checkUnlock, extrinsicType, onConfirmInject, onApprovePassword, onConfirmQr, signMode]);
 
-  useEffect(() => {
-    !!ledgerError && notify({
-      message: ledgerError,
-      type: 'error'
-    });
-  }, [ledgerError, notify]);
+  // useEffect(() => {
+  //   !!ledgerError && notify({
+  //     message: ledgerError,
+  //     type: 'error'
+  //   });
+  // }, [ledgerError, notify]);
 
-  useEffect(() => {
-    !!ledgerWarning && notify({
-      message: ledgerWarning,
-      type: 'warning'
-    });
-  }, [ledgerWarning, notify]);
+  // useEffect(() => {
+  //   !!ledgerWarning && notify({
+  //     message: ledgerWarning,
+  //     type: 'warning'
+  //   });
+  // }, [ledgerWarning, notify]);
 
   return (
     <div className={CN(className, 'confirmation-footer')}>
