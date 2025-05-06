@@ -455,7 +455,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
             transaction.maxPriorityFeePerGas = feeCombine.maxPriorityFeePerGas;
           } else if (feeCombine.gasPrice) {
             estimateGas = new BigN((feeCombine.gasPrice || 0)).multipliedBy(gasLimit).toFixed(0);
-            transaction.maxPriorityFeePerGas = feeCombine.gasPrice;
+            transaction.gasPrice = feeCombine.gasPrice;
           }
         }
       } catch (e) {

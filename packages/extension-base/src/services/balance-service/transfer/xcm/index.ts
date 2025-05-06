@@ -233,12 +233,15 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
 
-    // todo: validate data before sending
+    if (!data) {
+      throw new Error('Failed to fetch Across Bridge Data. Please try again later');
+    }
+
     const transactionConfig: TransactionConfig = {
-      from: data?.sender,
-      to: data?.to,
-      value: data?.value,
-      data: data?.transferEncodedCall,
+      from: data.sender,
+      to: data.to,
+      value: data.value,
+      data: data.transferEncodedCall,
       ...feeCombine
     };
 

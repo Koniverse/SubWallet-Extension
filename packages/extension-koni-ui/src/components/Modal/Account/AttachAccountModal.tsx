@@ -5,10 +5,9 @@ import BackIcon from '@subwallet/extension-koni-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-koni-ui/components/Icon/CloseIcon';
 import { SettingItemSelection } from '@subwallet/extension-koni-ui/components/Setting/SettingItemSelection';
 import { ATTACH_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
-import { useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes, useSetSessionLatest, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useClickOutSide from '@subwallet/extension-koni-ui/hooks/dom/useClickOutSide';
-import useIsPopup from '@subwallet/extension-koni-ui/hooks/dom/useIsPopup';
 import useGoBackSelectAccount from '@subwallet/extension-koni-ui/hooks/modal/useGoBackSelectAccount';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -38,7 +37,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { t } = useTranslation();
   const { checkActive, inactiveModal } = useContext(ModalContext);
   const { token } = useTheme() as Theme;
-  const isPopup = useIsPopup();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
   const { setStateSelectAccount } = useSetSessionLatest();
 
   const isActive = checkActive(modalId);
@@ -76,12 +76,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     inactiveModal(modalId);
     setStateSelectAccount(true);
 
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({ allowedPath: '/accounts/connect-ledger' }).catch(console.error);
+      isSidePanelMode && closeSidePanel();
     } else {
       navigate('accounts/connect-ledger');
     }
-  }, [inactiveModal, isPopup, navigate, setStateSelectAccount]);
+  }, [closeSidePanel, inactiveModal, isExpanseMode, isSidePanelMode, navigate, setStateSelectAccount]);
 
   const items = useMemo((): AttachAccountItem[] => ([
     {
