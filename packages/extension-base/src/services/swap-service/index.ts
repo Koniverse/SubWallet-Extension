@@ -8,6 +8,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetOriginChain, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
@@ -131,6 +132,14 @@ export class SwapService implements StoppableServiceInterface {
     console.group('Swap Logger');
     console.log('path', path);
     console.log('swapQuoteResponse', swapQuoteResponse);
+
+    if (swapQuoteResponse.error) {
+      const errMsg = swapQuoteResponse.error.message.toLowerCase();
+
+      if (errMsg.startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH) || (errMsg.startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW))) {
+        throw new Error(errMsg);
+      }
+    }
 
     let optimalProcess;
 
