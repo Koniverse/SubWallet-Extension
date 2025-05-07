@@ -699,7 +699,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toString();
+    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
@@ -710,7 +710,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toString();
+    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toFixed();
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);

@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { estimateTxFee, getERC20Contract, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { _ERC20_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -52,7 +53,7 @@ interface BuildTxForSwapParams {
 
 interface KyberSwapBuildTxResponse {
   routerAddress: string;
-  encodedSwapData: string;
+  data: string;
   gas: string;
 }
 
@@ -60,6 +61,7 @@ interface KyberApiResponse<T> {
   data: T;
   success: boolean;
   message?: string;
+  details?: string[];
 }
 
 export interface KyberSwapQuoteMetadata {
@@ -91,19 +93,28 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
     });
 
     const data = await res.json() as KyberApiResponse<KyberSwapBuildTxResponse>;
+
+    if (data.details?.some((detail) => detail.toLowerCase().includes('insufficient liquidity'))) {
+      throw new SwapError(SwapErrorType.NOT_ENOUGH_LIQUIDITY);
+    }
+
     const requestData = data.data;
 
-    if (!requestData) {
+    if (!requestData || !requestData.routerAddress || !requestData.data || !requestData.gas) {
       throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction');
     }
 
     return {
       from: sender,
       to: requestData.routerAddress,
-      data: requestData.encodedSwapData,
+      data: requestData.data,
       gas: requestData.gas
     } as TransactionConfig;
   } catch (error) {
+    if (error instanceof SwapError) {
+      throw error;
+    }
+
     throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction');
   }
 }
