@@ -69,6 +69,7 @@ const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftImport'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-koni-ui/Popup/Home/History'));
+const Governance = new LazyLoader('Governance', () => import('@subwallet/extension-koni-ui/Popup/Home/OpenGov'));
 const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-koni-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-koni-ui/Popup/Home'));
 
@@ -197,7 +198,8 @@ export const router = createHashRouter([
           },
           MissionPools.generateRouterObject('mission-pools'),
           History.generateRouterObject('history'),
-          History.generateRouterObject('history/:address/:chain/:extrinsicHashOrId')
+          History.generateRouterObject('history/:address/:chain/:extrinsicHashOrId'),
+          Governance.generateRouterObject('openGov')
         ]
       },
       {
