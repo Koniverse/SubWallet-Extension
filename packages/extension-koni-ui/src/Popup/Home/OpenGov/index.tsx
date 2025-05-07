@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _DelegateInfo, _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
+import { calculateTimeLeft, govChainSupportItems } from '@subwallet/extension-base/services/open-gov/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, Layout } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenSlug, useOpenGovSelection, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { fetchDelegates, fetchReferendums, getLockedBalance } from '@subwallet/extension-koni-ui/messaging';
@@ -13,7 +14,6 @@ import styled from 'styled-components';
 
 import DelegateTab from './Delegates';
 import ReferendumTab from './Referendum';
-import { calculateTimeLeft, govChainSupportItems } from './utils';
 
 type Props = ThemeProps;
 

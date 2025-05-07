@@ -308,6 +308,7 @@ export default class KoniState {
     await this.earningService.init();
     await this.swapService.init();
     await this.inappNotificationService.init();
+    await this.openGovService.init();
 
     this.onReady();
     this.onAccountAdd();

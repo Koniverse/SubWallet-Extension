@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
+import { calculateTimeLeft, getTimeLeft, isGovOngoing } from '@subwallet/extension-base/services/open-gov/utils';
 import { FilterModal, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -16,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { govCategories, GovCategoryType } from '../predefined';
-import { calculateTimeLeft, getTimeLeft, isGovOngoing } from '../utils';
 import { ReferendumDetailModal, ReferendumDetailModalId } from './ReferendumDetail';
 import ReferendumItem from './ReferendumItem';
 

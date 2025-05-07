@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { govChainSupportItems } from '@subwallet/extension-base/services/open-gov/utils';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { useChainInfoWithState, useGetChainSlugsByAccount, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ChainItemType } from '@subwallet/extension-koni-ui/types';
@@ -18,6 +19,8 @@ export default function useOpenGovSelection () {
 
   const [selectedAddress, setSelectedAddress] = useState<string>(propAddress || '');
   const [selectedChain, setSelectedChain] = useState<string>(propChain || '');
+
+  const supportedChains = useMemo(() => govChainSupportItems.map((item) => item.slug), []);
 
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
@@ -83,12 +86,10 @@ export default function useOpenGovSelection () {
   useEffect(() => {
     if (chainItems.length) {
       setSelectedChain((prevChain) => {
-        if (!prevChain) {
-          return chainItems[0].slug;
-        }
+        console.log('Checking', [prevChain, supportedChains]);
 
-        if (!chainItems.some((c) => c.slug === prevChain)) {
-          return chainItems[0].slug;
+        if (!prevChain || !supportedChains.includes(prevChain)) {
+          return supportedChains[0];
         }
 
         return prevChain;
@@ -96,7 +97,7 @@ export default function useOpenGovSelection () {
     } else {
       setSelectedChain('');
     }
-  }, [chainInfoMap, chainItems]);
+  }, [chainInfoMap, chainItems, supportedChains]);
 
   useEffect(() => {
     setSelectedAddress((prevResult) => {

@@ -4,6 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { _ReferendumInfo, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { isGovOngoing } from '@subwallet/extension-base/services/open-gov/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { getAbstainTotal, handleRemoveVote, handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
@@ -14,8 +15,6 @@ import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import { isGovOngoing } from '../utils';
 
 type Props = ThemeProps & {
   address: string;
