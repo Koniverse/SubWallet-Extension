@@ -5,7 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { estimateTxFee, getERC20Contract, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { _ERC20_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
@@ -284,7 +284,7 @@ export class KyberHandler implements SwapBaseInterface {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const approveData = tokenContract.methods.approve(routerContract, amount).encodeABI();
 
-    const fee = combineEthFee(priority, FeeOptionKey.AVERAGE);
+    const fee = combineEthFee(priority);
 
     transactionConfig = {
       from: params.address,
@@ -332,7 +332,7 @@ export class KyberHandler implements SwapBaseInterface {
 
     const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
     const priority = await calculateGasFeeParams(evmApi, evmApi.chainSlug);
-    const fee = combineEthFee(priority, FeeOptionKey.AVERAGE);
+    const fee = combineEthFee(priority);
 
     const transactionConfig: TransactionConfig = {
       ...rawTx,
