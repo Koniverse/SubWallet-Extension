@@ -10,7 +10,7 @@ import { withErrorLog } from '@subwallet/extension-base/background/handlers/help
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
 import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
-import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
+import { BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
@@ -148,7 +148,8 @@ export default class KoniState {
   constructor (providers: Providers = {}) {
     // Init subwallet api sdk
     subwalletApiSdk.init({
-      url: BACKEND_API_URL,
+      // url: BACKEND_API_URL, todo: remove after test
+      url: 'https://sw-services.subwallet.app/api',
       priceHistoryUrl: BACKEND_PRICE_HISTORY_URL
     });
 
