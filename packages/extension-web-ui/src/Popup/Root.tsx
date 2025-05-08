@@ -16,8 +16,9 @@ import { useSubscribeLanguage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useUILock from '@subwallet/extension-web-ui/hooks/common/useUILock';
 import { subscribeNotifications } from '@subwallet/extension-web-ui/messaging';
+import { MainWrapper } from '@subwallet/extension-web-ui/Popup/MainWrapper';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { OffRampParams, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { OffRampParams } from '@subwallet/extension-web-ui/types';
 import { removeStorage } from '@subwallet/extension-web-ui/utils';
 import { changeHeaderLogo, ModalContext } from '@subwallet/react-ui';
 import { NotificationProps } from '@subwallet/react-ui/es/notification/NotificationProvider';
@@ -25,7 +26,6 @@ import CN from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { CONFIRMATION_MODAL, DEFAULT_OFF_RAMP_PARAMS, OFF_RAMP_DATA, TRANSACTION_STORAGES } from '../constants';
@@ -63,17 +63,6 @@ const offRampLoading = '/off-ramp-loading';
 const allowImportAccountUrls = allowImportAccountPaths.map((path) => `${baseAccountPath}/${path}`);
 const allowPreventWelcomeUrls = [...allowImportAccountUrls, welcomeUrl, createPasswordUrl, securityUrl,
   earningOptionsPreviewUrl, earningPoolsPreviewUrl, checkCrowdloanUrl, crowdloanResultUrl, offRampLoading];
-
-export const MainWrapper = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
-  display: 'flex',
-  height: '100%',
-  flexDirection: 'column',
-  overflow: 'auto',
-
-  '.web-layout-container': {
-    height: '100%'
-  }
-}));
 
 function removeLoadingPlaceholder (animation: boolean): void {
   const element = document.getElementById('loading-placeholder');

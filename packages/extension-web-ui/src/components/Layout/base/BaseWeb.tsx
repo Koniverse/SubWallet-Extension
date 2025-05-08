@@ -10,6 +10,7 @@ import CN from 'classnames';
 import React, { useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
+import { TransactionProcessWarning } from '../..';
 import SideMenu from '../parts/SideMenu';
 
 export interface LayoutBaseWebProps {
@@ -139,6 +140,10 @@ const StyledLayout = styled('div')<ThemeProps>(({ theme: { extendToken, token } 
           fontSize: 30
         }
       }
+    },
+
+    '.transaction-process-warning-container': {
+      padding: '24px 44px'
     }
   };
 });
@@ -200,6 +205,8 @@ const BaseWeb = ({ children }: LayoutBaseWebProps) => {
         <div className={CN('web-layout-content', { '__with-padding': showSidebar })}>
           {children}
         </div>
+
+        <TransactionProcessWarning />
       </div>
     </StyledLayout>
   );

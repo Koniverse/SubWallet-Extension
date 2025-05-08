@@ -48,8 +48,16 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
     },
 
     '.main-page-container': {
-      border: `${token.lineWidth}px ${token.lineType} ${token.colorBgInput}`,
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      display: 'flex',
+      height: '100%',
+      flexDirection: 'column',
+      overflow: 'auto',
+
+      '.main-layout-content': {
+        flex: 1,
+        overflow: 'auto'
+      }
     },
 
     '.main-page-container.web-ui-enable': {

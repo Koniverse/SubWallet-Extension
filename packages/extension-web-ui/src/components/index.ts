@@ -43,3 +43,4 @@ export * from './Crowdloan';
 export * from './Table';
 export * from './NetworkTag';
 export * from './TransactionProcess';
+export * from './TransactionProcessWarning';
