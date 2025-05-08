@@ -298,7 +298,8 @@ const TARGET_BRANCH = process.env.NODE_ENV !== 'production' ? 'koni-dev' : 'mast
 
 export const _BITCOIN_CHAIN_SLUG = 'bitcoin';
 export const _BITCOIN_TESTNET_CHAIN_SLUG = 'bitcoinTestnet';
-
+export const _BITCOIN_NAME = 'Bitcoin';
+export const _BITCOIN_TESTNET_NAME = 'Bitcoin Testnet';
 export const _CHAIN_INFO_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainInfo.json`;
 export const _CHAIN_ASSET_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainAsset.json`;
 export const _ASSET_REF_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/AssetRef.json`;

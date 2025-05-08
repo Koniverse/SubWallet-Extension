@@ -3,7 +3,8 @@
 
 import '@polkadot/types-augment';
 
-import { BlockStreamRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream';
+import { BlockStreamTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStreamTestnet';
+import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { BehaviorSubject } from 'rxjs';
@@ -32,7 +33,14 @@ export class BitcoinApi implements _BitcoinApi {
     this.apiUrl = apiUrl;
     this.providerName = providerName || 'unknown';
     this.isReadyHandler = createPromiseHandler<_BitcoinApi>();
-    this.api = new BlockStreamRequestStrategy(apiUrl);
+
+    const isTestnet = apiUrl.includes('testnet');
+
+    if (isTestnet) {
+      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
+    } else {
+      this.api = new SubWalletMainnetRequestStrategy(apiUrl);
+    }
 
     this.connect();
   }
@@ -68,7 +76,15 @@ export class BitcoinApi implements _BitcoinApi {
 
     await this.disconnect();
     this.apiUrl = apiUrl;
-    this.api = new BlockStreamRequestStrategy(apiUrl);
+
+    const isTestnet = apiUrl.includes('testnet');
+
+    if (isTestnet) {
+      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
+    } else {
+      this.api = new SubWalletMainnetRequestStrategy(apiUrl);
+    }
+
     this.connect();
   }
 
