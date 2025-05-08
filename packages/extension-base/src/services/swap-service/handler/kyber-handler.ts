@@ -55,6 +55,7 @@ interface KyberSwapBuildTxResponse {
   routerAddress: string;
   data: string;
   gas: string;
+  transactionValue: string;
 }
 
 interface KyberApiResponse<T> {
@@ -79,7 +80,7 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
     throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Invalid swap input parameters');
   }
 
-  const body = { routeSummary, sender, recipient, slippageTolerance, ignoreCappedSlippage: true };
+  const body = { routeSummary, sender, recipient, slippageTolerance, ignoreCappedSlippage: true, enableGasEstimation: true };
 
   try {
     const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
@@ -101,12 +102,13 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
     const requestData = data.data;
 
     if (!requestData || !requestData.routerAddress || !requestData.data || !requestData.gas) {
-      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction');
+      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction. Try again later');
     }
 
     return {
       from: sender,
       to: requestData.routerAddress,
+      value: requestData.transactionValue,
       data: requestData.data,
       gas: requestData.gas
     } as TransactionConfig;
@@ -350,6 +352,7 @@ export class KyberHandler implements SwapBaseInterface {
       ...fee
     };
 
+    console.log('transactionConfig', transactionConfig);
     const txData = {
       address: params.address,
       provider: this.providerInfo,
