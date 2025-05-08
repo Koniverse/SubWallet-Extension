@@ -122,6 +122,7 @@ const SwapToField = styled(Component)<Props>(({ theme: { token } }: Props) => {
       fontSize: token.fontSizeSM,
       fontWeight: token.bodyFontWeight,
       lineHeight: token.lineHeightSM,
+      color: token.colorTextLight4,
       paddingRight: 16,
       paddingLeft: 16,
       paddingTop: 8,

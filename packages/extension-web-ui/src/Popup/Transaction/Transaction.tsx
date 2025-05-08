@@ -332,7 +332,7 @@ const Transaction = styled(Component)(({ theme }) => {
     '.transaction-footer': {
       display: 'flex',
       flexWrap: 'wrap',
-      padding: `${token.paddingMD}px ${token.padding}px ${token.padding}px`,
+      padding: `${token.padding}px ${token.padding}px ${token.padding}px`,
       marginBottom: token.padding,
       gap: token.paddingXS,
 

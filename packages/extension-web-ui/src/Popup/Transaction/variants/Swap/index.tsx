@@ -18,6 +18,8 @@ import { SwapFromField, SwapToField } from '@subwallet/extension-web-ui/componen
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-web-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
 import { submitProcess } from '@subwallet/extension-web-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-web-ui/messaging/transaction/swap';
@@ -26,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-web-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-web-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, getFirstClass, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -108,6 +110,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const { closeAlert, defaultData, openAlert, persistData } = useTransactionContext<SwapParams>();
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
+  const { isWebUI } = useContext(ScreenContext);
 
   const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
@@ -489,7 +492,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
 
     if (isChainConnected && swapError) {
-      notify({
+      !isWebUI && notify({
         message: swapError?.message,
         type: 'error',
         duration: 5
@@ -499,7 +502,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
 
     if (!currentQuote || !currentOptimalSwapPath) {
-      notifyNoQuote();
+      !isWebUI && notifyNoQuote();
 
       return;
     }
@@ -645,7 +648,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, isWebUI, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -871,7 +874,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
             if (sync) {
               if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-                notifyNoQuote();
+                !isWebUI && notifyNoQuote();
               }
 
               setHandleRequestLoading(false);
@@ -893,7 +896,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, isWebUI, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -914,7 +917,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           console.log('Error when doing refreshSwapRequestResult', e);
 
           if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-            notifyNoQuote();
+            !isWebUI && notifyNoQuote();
           }
         }).finally(() => {
           if (sync) {
@@ -958,7 +961,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, isWebUI, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
@@ -1044,14 +1047,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [fromValue]);
 
   useEffect(() => {
-    if (isChainConnected && swapError) {
+    if (!isWebUI && isChainConnected && swapError) {
       notify({
         message: swapError?.message,
         type: 'error',
         duration: 5
       });
     }
-  }, [isChainConnected, notify, swapError, swapError?.message, t]);
+  }, [isChainConnected, isWebUI, notify, swapError, swapError?.message, t]);
 
   return (
     <>
@@ -1061,7 +1064,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             className={'__transaction-swap-wrapper'}
           >
             <Form
-              className={'form-container form-space-xs'}
+              className={CN('form-container', isWebUI ? 'form-space-sm' : 'form-space-xs')}
               form={form}
               initialValues={formDefault}
               onFieldsChange={onFieldsChange}
@@ -1292,6 +1295,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className } = props;
   const dataContext = useContext(DataContext);
+  const { setWebBaseClassName } = useContext(WebUIContext);
+  const { isWebUI } = useContext(ScreenContext);
   const { defaultData } = useTransactionContext<SwapParams>();
   const { goHome } = useDefaultNavigate();
   const accountProxies = useSelector((state) => state.accountState.accountProxies);
@@ -1312,6 +1317,14 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     }
   }, [goHome, targetAccountProxy]);
 
+  useEffect(() => {
+    setWebBaseClassName(`${getFirstClass(className)}-web-base-container`);
+
+    return () => {
+      setWebBaseClassName('');
+    };
+  }, [className, setWebBaseClassName]);
+
   if (!targetAccountProxy) {
     return (
       <></>
@@ -1320,7 +1333,9 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   return (
     <PageWrapper
-      className={CN(className)}
+      className={CN(className, {
+        '-desktop': isWebUI
+      })}
       resolve={dataContext.awaitStores(['swap', 'price'])}
     >
       <Component targetAccountProxy={targetAccountProxy} />
@@ -1406,6 +1421,54 @@ const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) 
     '.__address-input-toggle.-active': {
       color: token.colorTextLight1,
       cursor: 'not-allowed'
+    },
+
+    // desktop
+    '.web-ui-enable &-web-base-container': {
+      '.title-group .ant-btn': {
+        display: 'none'
+      }
+    },
+
+    '&.-desktop': {
+      '.transaction-content': {
+        flexGrow: 0,
+        flexShrink: 1,
+        flexBasis: 'auto',
+        paddingBottom: token.paddingXS
+      },
+
+      '.transaction-footer': {
+        maxWidth: 416,
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__transaction-swap-wrapper': {
+        maxWidth: 384,
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__swap-from-field': {
+        marginBottom: token.marginXS
+      },
+
+      '.__switch-side-container': {
+        '.__switch-button': {
+          bottom: -12
+        }
+      },
+
+      '.__swap-field-area': {
+        marginBottom: token.marginSM
+      },
+
+      '.__balance-display': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight
+      }
     }
   };
 });

@@ -8,6 +8,7 @@ import { getAmountAfterSlippage, getSwapChainsFromPath } from '@subwallet/extens
 import { CommonOptimalSwapPath, ProcessType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types';
 import { MetaInfo, NumberDisplay, TransactionProcessPreview } from '@subwallet/extension-web-ui/components';
 import { QuoteRateDisplay, QuoteResetTime } from '@subwallet/extension-web-ui/components/Swap';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useGetSwapProcessSteps, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-web-ui/types';
@@ -45,6 +46,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const currencyData = useSelector((state) => state.price.currencyData);
 
   const { transactionStepsModal } = useContext(WalletModalContext);
+  const { isWebUI } = useContext(ScreenContext);
 
   const getSwapProcessSteps = useGetSwapProcessSteps();
 
@@ -108,17 +110,19 @@ const Component: React.FC<Props> = (props: Props) => {
   const renderQuoteEmptyBlock = () => {
     const _loading = handleRequestLoading && !isFormInvalid;
 
-    if (swapError || (!currentQuote && !_loading)) {
+    if (!isWebUI && (swapError || (!currentQuote && !_loading))) {
       return null;
     }
 
-    const isError = isFormInvalid;
+    const isError = !!swapError || isFormInvalid;
     let message = '';
 
     if (isFormInvalid) {
       message = t('Invalid input. Re-enter information in the red field and try again');
     } else if (handleRequestLoading) {
       message = t('Loading...');
+    } else {
+      message = swapError ? swapError?.message : t('Swap pair not supported. Select another pair and try again');
     }
 
     return (
@@ -407,13 +411,13 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
     '.__quote-empty-block': {
       background: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
-      paddingBottom: token.paddingLG,
+      paddingBottom: token.paddingSM,
       paddingLeft: token.paddingLG,
       paddingRight: token.paddingLG,
-      paddingTop: token.paddingXL,
+      paddingTop: 28,
       textAlign: 'center',
       gap: token.size,
-      minHeight: 184
+      minHeight: 164
     },
 
     '.__quote-empty-icon-wrapper': {

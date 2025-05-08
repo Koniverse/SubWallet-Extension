@@ -117,7 +117,6 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
     borderRadius: 8,
     paddingBottom: 12,
     position: 'relative',
-    marginBottom: 4,
 
     '&.swap-form-field': {
       '.ant-input-container::before': {
@@ -160,6 +159,11 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
       }
     },
 
+    '.__amount-wrapper .ant-input-affix-wrapper': {
+      paddingLeft: 0,
+      paddingRight: 0
+    },
+
     '.__label-wrapper .__max-button': {
       maxHeight: 20
     },
@@ -167,7 +171,8 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
     '.__label-wrapper .__label': {
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
-      fontWeight: token.bodyFontWeight
+      fontWeight: token.bodyFontWeight,
+      color: token.colorTextLight4
     },
 
     '.__amount-wrapper': {
@@ -189,9 +194,6 @@ const SwapFromField = styled(Component)<Props>(({ theme: { token } }: Props) => 
     '.__amount-wrapper .ant-input-container': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0
-    },
-    '.__amount-wrapper .__amount-convert': {
-      paddingRight: 12
     },
 
     '.__amount-convert': {

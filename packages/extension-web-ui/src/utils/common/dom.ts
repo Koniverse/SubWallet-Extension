@@ -48,3 +48,7 @@ export const clickOutside = (selector: string, callback: () => void, enable: boo
 export const renderModalSelector = (className?: string): string => {
   return `.${(className || '').replace(' ', '.')}.ant-sw-modal`;
 };
+
+export function getFirstClass (classStr = ''): string {
+  return classStr.trim().split(/\s+/)[0] || '';
+}

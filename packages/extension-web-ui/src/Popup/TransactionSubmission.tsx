@@ -5,15 +5,18 @@ import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-se
 import { ProcessTransactionData, ProcessType, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { CloseIcon, Layout, LoadingScreen, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-web-ui/components/Swap';
+import { FeatureModalContext } from '@subwallet/extension-web-ui/contexts/FeatureModalContextProvider';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-web-ui/messaging';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subwallet/extension-web-ui/utils';
+import { getFirstClass, isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subwallet/extension-web-ui/utils';
 import { PageIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
 import { CheckCircle, ClockCounterClockwise, ProhibitInset, SpinnerGap } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -86,6 +89,9 @@ const Component: React.FC<Props> = (props: Props) => {
   const [searchParams] = useSearchParams();
   const transactionProcessId = searchParams.get('transaction-process-id') || '';
   const [processData, setProcessData] = useState<ProcessTransactionData | undefined>();
+  const { isWebUI } = useContext(ScreenContext);
+  const { notificationModal: { open: openNotificationModal } } = useContext(FeatureModalContext);
+  const { setWebBaseClassName } = useContext(WebUIContext);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -93,16 +99,25 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const viewProgress = useCallback(
     () => {
-      navigate('/settings/notification', {
-        state: {
+      if (!isWebUI) {
+        navigate('/settings/notification', {
+          state: {
+            transactionProcess: {
+              processId: transactionProcessId,
+              triggerTime: `${Date.now()}`
+            }
+          } as NotificationScreenParam
+        });
+      } else {
+        openNotificationModal({
           transactionProcess: {
             processId: transactionProcessId,
             triggerTime: `${Date.now()}`
           }
-        } as NotificationScreenParam
-      });
+        });
+      }
     },
-    [navigate, transactionProcessId]
+    [isWebUI, navigate, openNotificationModal, transactionProcessId]
   );
 
   const isFinal = useMemo(() => {
@@ -156,10 +171,19 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [transactionProcessId]);
 
+  useEffect(() => {
+    setWebBaseClassName(`${getFirstClass(className)}-web-base-container`);
+
+    return () => {
+      setWebBaseClassName('');
+    };
+  }, [className, setWebBaseClassName]);
+
   const isSwapProcessing = processData?.type === ProcessType.SWAP;
 
   return (
     <PageWrapper className={CN(className, {
+      '-desktop': isWebUI,
       '-transaction-done': isFinal,
       '-swap-processing': isSwapProcessing,
       '-common-processing': !isSwapProcessing,
@@ -302,6 +326,72 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '&.-timeout': {
       '--page-icon-color': token.gold
+    },
+
+    // desktop
+    '.web-ui-enable &-web-base-container': {
+      '.title-group .ant-btn': {
+        display: 'none'
+      }
+    },
+
+    '&.-desktop': {
+      '.container': {
+        width: '100%',
+        maxWidth: 416,
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.title': {
+        marginBottom: 24
+      },
+
+      '.ant-sw-screen-layout-body': {
+        flexGrow: 0,
+        flexShrink: 1,
+        flexBasis: 'auto'
+      },
+
+      '.ant-sw-screen-layout-footer': {
+        maxWidth: 416,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: '100%'
+      },
+
+      '.page-icon.page-icon.page-icon': {
+        marginTop: 52
+      },
+
+      '&.-swap-processing': {
+        '.container': {
+          paddingBottom: token.padding
+        },
+
+        '.description': {
+          minHeight: 44,
+          marginBottom: 24
+        }
+      },
+
+      '.ant-sw-screen-layout-footer-button-container': {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        paddingLeft: token.padding,
+        paddingRight: token.padding,
+
+        button: {
+          marginRight: 0,
+          marginLeft: 0
+        },
+
+        '.ant-sw-screen-layout-footer-right-button': {
+          order: -1,
+          marginBottom: token.marginSM
+        }
+      }
     }
   };
 });
