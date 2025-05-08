@@ -9,8 +9,8 @@ import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-r
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { getRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
 
-const OPENBIT_URL = 'https://api.openbit.app';
-const OPENBIT_URL_TEST = 'https://api-testnet.openbit.app';
+const BITCOIN_API_URL = 'https://btc-api.koni.studio';
+const BITCOIN_API_URL_TEST = 'https://api-testnet.openbit.app';
 
 export class HiroService extends BaseApiRequestStrategy {
   baseUrl: string;
@@ -20,7 +20,7 @@ export class HiroService extends BaseApiRequestStrategy {
 
     super(context);
 
-    this.baseUrl = 'https://btc-api.koni.studio';
+    this.baseUrl = url;
   }
 
   private headers = {
@@ -90,7 +90,7 @@ export class HiroService extends BaseApiRequestStrategy {
 
   // todo: handle token authen for url preview
   getPreviewUrl (inscriptionId: string) {
-    return `${OPENBIT_URL}/inscriptions/${inscriptionId}/content`;
+    return `${BITCOIN_API_URL}/inscriptions/${inscriptionId}/content`;
   }
 
   // Singleton
@@ -100,13 +100,13 @@ export class HiroService extends BaseApiRequestStrategy {
   public static getInstance (isTestnet = false) {
     if (isTestnet) {
       if (!HiroService.testnet) {
-        HiroService.testnet = new HiroService(OPENBIT_URL_TEST);
+        HiroService.testnet = new HiroService(BITCOIN_API_URL_TEST);
       }
 
       return HiroService.testnet;
     } else {
       if (!HiroService.mainnet) {
-        HiroService.mainnet = new HiroService(OPENBIT_URL);
+        HiroService.mainnet = new HiroService(BITCOIN_API_URL);
       }
 
       return HiroService.mainnet;
