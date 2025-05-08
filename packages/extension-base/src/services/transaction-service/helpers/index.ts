@@ -37,6 +37,7 @@ export const isCardanoTransaction = (tx: SWTransaction['transaction']): tx is Ca
   return cardanoTransactionConfig.cardanoPayload !== null && cardanoTransactionConfig.cardanoPayload !== undefined;
 };
 
+// TODO: [Review] this function
 export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is Psbt => {
   return 'data' in tx && Array.isArray((tx as Psbt).data.inputs);
 };
