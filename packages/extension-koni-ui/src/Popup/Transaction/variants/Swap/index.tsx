@@ -899,7 +899,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 notifyTooHighAmount();
               }
 
-
               setHandleRequestLoading(false);
             }
           });
