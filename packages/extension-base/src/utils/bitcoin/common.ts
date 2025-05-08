@@ -69,9 +69,21 @@ export function getSpendableAmount ({ feeRate,
 export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
   try {
     const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
-      await bitcoinApi.api.getUtxos(address),
-      await getRuneUtxos(bitcoinApi, address),
-      await getInscriptionUtxos(bitcoinApi, address)
+      bitcoinApi.api.getUtxos(address).catch((error) => {
+        console.log('Error fetching UTXOs:', error);
+
+        return [];
+      }),
+      getRuneUtxos(bitcoinApi, address).catch((error) => {
+        console.log('Error fetching Rune UTXOs:', error);
+
+        return [];
+      }),
+      getInscriptionUtxos(bitcoinApi, address).catch((error) => {
+        console.log('Error fetching Inscription UTXOs:', error);
+
+        return [];
+      })
     ]);
 
     let filteredUtxos: UtxoResponseItem[];
