@@ -97,12 +97,14 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
 
     if (data.details?.some((detail) => detail.toLowerCase().includes('insufficient liquidity'))) {
       throw new SwapError(SwapErrorType.NOT_ENOUGH_LIQUIDITY);
+    } else if (data.details?.some((detail) => detail.toLowerCase().includes('execution reverted'))) {
+      throw new SwapError(SwapErrorType.NOT_MEET_MIN_EXPECTED);
     }
 
     const requestData = data.data;
 
     if (!requestData || !requestData.routerAddress || !requestData.data || !requestData.gas) {
-      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction. Try again later');
+      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
     }
 
     return {
@@ -117,7 +119,7 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
       throw error;
     }
 
-    throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Failed to build Kyber transaction');
+    throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
   }
 }
 
@@ -352,7 +354,6 @@ export class KyberHandler implements SwapBaseInterface {
       ...fee
     };
 
-    console.log('transactionConfig', transactionConfig);
     const txData = {
       address: params.address,
       provider: this.providerInfo,
