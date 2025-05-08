@@ -43,7 +43,8 @@ export enum SwapProviderId {
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP',
-  UNISWAP = 'UNISWAP'
+  UNISWAP = 'UNISWAP',
+  ONE_INCH = '1INCH'
 }
 
 export interface SwapRequest {
@@ -141,7 +142,7 @@ export class SwapApi {
   }
 
   async fetchSwapQuoteData (quoteRequest: SwapRequest): Promise<QuoteAskResponse[]> {
-    const url = `${this.baseUrl}/swap`;
+    const url = 'http://localhost:3000/api/swap';
 
     try {
       const rawResponse = await fetch(url, {

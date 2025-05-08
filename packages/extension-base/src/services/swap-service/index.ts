@@ -26,6 +26,7 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
+import { OneInchHandler } from './handler/1inch-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler } from './handler/uniswap-handler';
 
@@ -410,6 +411,9 @@ export class SwapService implements StoppableServiceInterface {
           break;
         case SwapProviderId.UNISWAP:
           this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
+        case SwapProviderId.ONE_INCH:
+          this.handlers[providerId] = new OneInchHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
           break;
         default:
           throw new Error('Unsupported provider');
