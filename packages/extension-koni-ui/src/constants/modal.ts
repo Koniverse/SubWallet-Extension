@@ -90,4 +90,6 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+export const SELECT_NETWORK_TYPE_AUTHORIZE_MODAL = 'select_network_type_authorize_modal';
+export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch_current_network_authorize_modal';
 /* Other */

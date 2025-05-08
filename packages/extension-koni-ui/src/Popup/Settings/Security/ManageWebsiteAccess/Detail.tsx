@@ -4,8 +4,9 @@
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
-import { AccountProxyItem, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyItem, EmptyList, Layout, PageWrapper, SwitchNetworkAuthorizeModal } from '@subwallet/extension-koni-ui/components';
 import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components/Modal/ActionModal';
+import { SELECT_NETWORK_TYPE_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { changeAuthorization, changeAuthorizationPerSite, forgetSite, toggleAuthorization } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -45,6 +46,8 @@ const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?
 
   return false;
 };
+
+const switchNetworkAuthorizeModalId = SELECT_NETWORK_TYPE_AUTHORIZE_MODAL;
 
 function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -115,12 +118,22 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
             changeAuthorization(true, origin, updateAuthUrls).catch(console.error);
             onCloseActionModal();
           }
+        },
+        {
+          key: 'switch-network',
+          icon: Plugs,
+          iconBackgroundColor: token['gray-3'],
+          title: t('Switch current network'),
+          onClick: () => {
+            activeModal(switchNetworkAuthorizeModalId);
+            onCloseActionModal();
+          }
         }
       );
     }
 
     return result;
-  }, [authInfo.isAllowed, onCloseActionModal, origin, t, token]);
+  }, [activeModal, authInfo.isAllowed, onCloseActionModal, origin, t, token]);
 
   const renderItem = useCallback((item: AccountProxy) => {
     const isEnabled: boolean = item.accounts.some((account) => authInfo.isAllowedMap[account.address]);
@@ -239,6 +252,11 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           id={ActionModalId}
           onCancel={onCloseActionModal}
           title={t('dApp configuration')}
+        />
+
+        <SwitchNetworkAuthorizeModal
+          authUrlInfo={authInfo}
+          onComplete={updateAuthUrls}
         />
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
