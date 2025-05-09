@@ -33,6 +33,13 @@ export type AccountChainAddress = {
   slug: string;
   address: string;
   accountType: KeypairType;
+  logoKey?: string
+}
+
+export interface BitcoinAccountInfo {
+  name: string;
+  logoKey?: string;
+  order: number;
 }
 
 export type AccountAddressItemType = {
