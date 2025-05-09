@@ -418,9 +418,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
   }, [notify, t]);
 
-  const notifyInvalidAmount = useCallback(() => {
+  const notifyTooLowAmount = useCallback(() => {
     notify({
-      message: t('No swap quote found. Adjust your amount and try again'),
+      message: t('Amount too low. Increase your amount and try again'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
+  const notifyTooHighAmount = useCallback(() => {
+    notify({
+      message: t('Amount too high. Lower your amount and try again'),
       type: 'error',
       duration: 5
     });
@@ -883,8 +891,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 notifyNoQuote();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-                notifyInvalidAmount();
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+                notifyTooLowAmount();
+              }
+
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+                notifyTooHighAmount();
               }
 
               setHandleRequestLoading(false);
@@ -906,7 +918,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyInvalidAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -930,8 +942,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             notifyNoQuote();
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-            notifyInvalidAmount();
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+            notifyTooLowAmount();
+          }
+
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+            notifyTooHighAmount();
           }
         }).finally(() => {
           if (sync) {
@@ -975,7 +991,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyInvalidAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
