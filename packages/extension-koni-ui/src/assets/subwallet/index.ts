@@ -21,6 +21,7 @@ const SwLogosMap: Record<string, string> = {
   chain_flip_testnet: DefaultLogosMap.chain_flip,
   simple_swap: DefaultLogosMap.simple_swap,
   uniswap: DefaultLogosMap.uniswap,
+  kyber: DefaultLogosMap.kyber,
   hydradx_mainnet: DefaultLogosMap.hydradx,
   hydradx_testnet: DefaultLogosMap.hydradx,
   [SUBSTRATE_GENERIC_KEY]: DefaultLogosMap[SUBSTRATE_GENERIC_KEY],
