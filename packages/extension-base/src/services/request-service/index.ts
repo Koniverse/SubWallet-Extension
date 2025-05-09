@@ -317,4 +317,8 @@ export default class RequestService {
     this.#connectWCRequestHandler.resetWallet();
     this.#notSupportWCRequestHandler.resetWallet();
   }
+
+  public async restoreAuthUrls () {
+    await this.#authRequestHandler.restoreAuthUrls();
+  }
 }

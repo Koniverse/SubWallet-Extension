@@ -194,6 +194,7 @@ export default class Mobile {
       const storageData = JSON.parse(storage) as Record<string, string>;
 
       for (const key in storageData) {
+        console.log('key', key, storageData);
         await swStorage.setItem(key, storageData[key]);
       }
     }
@@ -204,6 +205,9 @@ export default class Mobile {
       // Backup the last restore data to memory
       await this.state.dbService.importDB(indexedDB);
     }
+
+
+    await this.state.requestService.restoreAuthUrls();
 
     this.restoreHandler.resolve();
   }

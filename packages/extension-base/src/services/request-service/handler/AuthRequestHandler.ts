@@ -41,6 +41,7 @@ export default class AuthRequestHandler {
 
   private async init () {
     const authList = await this.getAuthList();
+    console.log('authList', authList);
     let needUpdateAuthList = false;
 
     const updatedAuthList = Object.entries(authList).reduce((acc, [key, value]) => {
@@ -104,6 +105,7 @@ export default class AuthRequestHandler {
   }
 
   public setAuthorize (data: AuthUrls, callback?: () => void): void {
+    console.log('setAuthorize data', data);
     this.authorizeStore.set(AUTH_URLS_KEY, data, () => {
       this.authorizeCached = data;
       this.evmChainSubject.next(this.authorizeCached);
@@ -114,10 +116,12 @@ export default class AuthRequestHandler {
 
   public getAuthorize (update: (value: AuthUrls) => void): void {
     // This action can be use many by DApp interaction => caching it in memory
+    console.log('this.authorizeCached', this.authorizeCached);
     if (this.authorizeCached) {
       update(this.authorizeCached);
     } else {
       this.authorizeStore.get('authUrls', (data) => {
+        console.log('data', data);
         this.authorizeCached = data || {};
         this.evmChainSubject.next(this.authorizeCached);
         this.authorizeUrlSubject.next(this.authorizeCached);
@@ -132,6 +136,18 @@ export default class AuthRequestHandler {
         resolve(rs);
       });
     });
+  }
+
+  public restoreAuthUrls (): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.authorizeStore.get('authUrls', (rs) => {
+        this.authorizeCached = rs;
+        this.evmChainSubject.next(this.authorizeCached);
+        this.authorizeUrlSubject.next(this.authorizeCached);
+
+        resolve();
+      });
+    })
   }
 
   public getDAppChainInfo (options: {accessType: AccountAuthType, autoActive?: boolean, defaultChain?: string, url?: string}): _ChainInfo | undefined {
