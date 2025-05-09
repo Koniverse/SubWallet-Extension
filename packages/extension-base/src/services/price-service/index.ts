@@ -1,19 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyJson, CurrencyType, CurrentTokenPrice, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { getExchangeRateMap, getPriceMap } from '@subwallet/extension-base/services/price-service/coingecko';
+import { getExchangeRateMap, getHistoryPrice, getPriceMap } from '@subwallet/extension-base/services/price-service/coingecko';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
-import { wait } from '@subwallet/extension-base/utils';
+import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
-import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
 
 const DEFAULT_CURRENCY: CurrencyType = 'USD';
 const DEFAULT_PRICE_SUBJECT: PriceJson = {
@@ -21,8 +21,10 @@ const DEFAULT_PRICE_SUBJECT: PriceJson = {
   ready: false,
   currencyData: { label: 'United States Dollar', symbol: DEFAULT_CURRENCY, isPrefix: true },
   priceMap: {},
+  priceCoinGeckoSupported: [],
   price24hMap: {},
-  exchangeRateMap: {}
+  exchangeRateMap: {},
+  lastUpdatedMap: {}
 };
 
 const checkFetchSuccess = (obj1: Omit<PriceJson, 'exchangeRateMap'>, obj2: Record<CurrencyType, ExchangeRateJSON>) => {
@@ -37,6 +39,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   private priceSubject: BehaviorSubject<PriceJson>;
   private rawPriceSubject: BehaviorSubject<Omit<PriceJson, 'exchangeRateMap'>>;
   private rawExchangeRateMap: BehaviorSubject<Record<CurrencyType, ExchangeRateJSON>>;
+  private historyTokenPriceSubject: BehaviorSubject<Record<string, PriceChartPoint[]>>;
   private refreshTimeout: NodeJS.Timeout | undefined;
   private priceIds = new Set<string>();
   private readonly currency = new CurrentCurrencyStore();
@@ -45,6 +48,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.priceSubject = new BehaviorSubject({ ...DEFAULT_PRICE_SUBJECT });
     this.rawPriceSubject = new BehaviorSubject({} as Omit<PriceJson, 'exchangeRateMap'>);
     this.rawExchangeRateMap = new BehaviorSubject({} as Record<CurrencyType, ExchangeRateJSON>);
+    this.historyTokenPriceSubject = new BehaviorSubject({});
     this.status = ServiceStatus.NOT_INITIALIZED;
     this.dbService = dbService;
     this.eventService = eventService;
@@ -119,7 +123,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   }
 
   private async calculatePriceMap (currency?: CurrencyType) {
-    let { price24hMap, priceMap } = this.rawPriceSubject.value;
+    let { lastUpdatedMap, price24hMap, priceCoinGeckoSupported, priceMap } = this.rawPriceSubject.value;
     let exchangeRateData = this.rawExchangeRateMap.value;
     const priceStored = await this.dbService.getPriceStore(currency);
 
@@ -143,7 +147,9 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       price24hMap: { ...price24hMap },
       currency: currencyKey,
       exchangeRateMap: exchangeRateData,
-      currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson
+      priceCoinGeckoSupported,
+      currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson,
+      lastUpdatedMap: { ...lastUpdatedMap }
     };
 
     if (currencyKey === DEFAULT_CURRENCY) {
@@ -203,6 +209,86 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.refreshTimeout = setTimeout(this.refreshPriceData.bind(this), CRON_REFRESH_PRICE_INTERVAL);
   }
 
+  public async getHistoryTokenPriceData (
+    priceId: string,
+    timeframe: PriceChartTimeframe
+  ): Promise<HistoryTokenPriceJSON> {
+    const id = getTokenPriceHistoryId(priceId, timeframe);
+    const currentData = this.historyTokenPriceSubject.value[id];
+    const now = Date.now();
+    const timeInterval = TIME_INTERVAL[timeframe];
+
+    let history: PriceChartPoint[] | undefined = currentData
+      ? structuredClone(currentData)
+      : undefined;
+
+    const needsRefresh =
+      !history ||
+      history.length === 0 ||
+      now - history[history.length - 1].time > timeInterval;
+
+    if (needsRefresh) {
+      const { history: newHistory } = await getHistoryPrice(priceId, timeframe);
+
+      if (newHistory.length > 0) {
+        history = newHistory;
+
+        // Update internal cache
+        this.historyTokenPriceSubject.next({
+          ...this.historyTokenPriceSubject.value,
+          [id]: structuredClone(history)
+        });
+      }
+    }
+
+    if (!history) {
+      return { history: [] };
+    }
+
+    // Resolve current currency
+    const { promise, resolve } = createPromiseHandler<CurrencyType>();
+
+    this.getCurrentCurrency(resolve);
+    const currencyKey = await promise;
+    const exchangeRate = this.rawExchangeRateMap.value[currencyKey || DEFAULT_CURRENCY]?.exchange;
+
+    // Convert value if needed
+    if (exchangeRate && currencyKey !== DEFAULT_CURRENCY) {
+      history = history.map((point) => ({
+        ...point,
+        value: point.value * exchangeRate
+      }));
+    }
+
+    return { history };
+  }
+
+  public subscribeCurrentTokenPrice (priceId: string, callback: (price: CurrentTokenPrice) => void) {
+    const priceData = this.priceSubject.value;
+
+    const currentPrice = {
+      value: priceData.priceMap[priceId],
+      value24h: priceData.price24hMap[priceId],
+      time: priceData.lastUpdatedMap[priceId].getTime()
+    };
+
+    const unsubscribe = this.priceSubject.pipe<CurrentTokenPrice, CurrentTokenPrice>(
+      map<PriceJson, CurrentTokenPrice>((valueSubject) => ({
+        value: valueSubject.priceMap[priceId],
+        value24h: valueSubject.price24hMap[priceId],
+        time: valueSubject.lastUpdatedMap[priceId].getTime()
+      })),
+      distinctUntilChanged<CurrentTokenPrice>()
+    ).subscribe(callback);
+
+    return {
+      unsubscribe: () => {
+        unsubscribe.unsubscribe();
+      },
+      currentPrice
+    };
+  }
+
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
     // Fetch data from storage
@@ -229,6 +315,16 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     this.status = ServiceStatus.INITIALIZED;
 
     this.eventService.on('asset.updateState', eventHandler);
+  }
+
+  checkCoinGeckoPriceSupport (priceId: string): boolean {
+    const { priceCoinGeckoSupported } = this.priceSubject.value;
+
+    if (!priceCoinGeckoSupported) {
+      return false;
+    }
+
+    return priceCoinGeckoSupported.includes(priceId);
   }
 
   async loadData (): Promise<void> {
