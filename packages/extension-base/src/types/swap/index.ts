@@ -216,6 +216,7 @@ export interface SwapSubmitStepData {
   extrinsicType: ExtrinsicType;
   chainType: ChainType;
   isPermit?: boolean;
+  isDutch?: boolean;
 }
 
 export enum DynamicSwapType {
