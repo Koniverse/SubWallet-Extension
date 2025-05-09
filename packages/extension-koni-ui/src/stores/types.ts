@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { AddressBookState, AllLogoMap, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationDefinitions, ConfirmationsQueue, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, KeyringState, LanguageType, MantaPayConfig, NftCollection, NftItem, NominatorMetadata, PriceJson, StakingItem, StakingRewardItem, TokenPriorityDetails, TransactionHistoryItem, UiSettings, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressBookState, AllLogoMap, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationDefinitions, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, KeyringState, LanguageType, MantaPayConfig, NftCollection, NftItem, NominatorMetadata, PriceJson, StakingItem, StakingRewardItem, TokenPriorityDetails, TransactionHistoryItem, UiSettings, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountsContext, AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountProxy, BalanceMap, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardItem, NominationPoolInfo, YieldPoolInfo, YieldPoolTarget, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, AccountProxy, BalanceMap, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardItem, NominationPoolInfo, ProcessTransactionData, YieldPoolInfo, YieldPoolTarget, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
@@ -97,12 +97,13 @@ export interface AccountState extends AccountsContext, KeyringState, AddressBook
   isAllAccount: boolean
 }
 
-export interface RequestState extends ConfirmationsQueue, ConfirmationsQueueTon, BaseReduxStore {
+export interface RequestState extends ConfirmationsQueue, ConfirmationsQueueTon, ConfirmationsQueueCardano, BaseReduxStore {
   authorizeRequest: Record<string, AuthorizeRequest>;
   metadataRequest: Record<string, MetadataRequest>;
   signingRequest: Record<string, SigningRequest>;
   hasConfirmations: boolean;
   hasInternalConfirmations: boolean;
+  aliveProcess: Record<string, ProcessTransactionData>;
   numberOfConfirmations: number;
   transactionRequest: Record<string, SWTransactionResult>;
   connectWCRequest: Record<string, WalletConnectSessionRequest>;
@@ -127,6 +128,7 @@ export interface ChainStore extends BaseReduxStore {
   chainStatusMap: Record<string, _ChainApiStatus>
   ledgerGenericAllowNetworks: string[];
   priorityTokens: TokenPriorityDetails;
+  chainOldPrefixMap: Record<string, number>
 }
 
 export interface BalanceStore extends BaseReduxStore {

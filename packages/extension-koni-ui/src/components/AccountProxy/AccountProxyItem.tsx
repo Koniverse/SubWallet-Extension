@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountProxy } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon } from '@subwallet/react-ui';
@@ -10,6 +10,7 @@ import { CheckCircle } from 'phosphor-react';
 import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
+import AccountChainTypeLogos from './AccountChainTypeLogos';
 import AccountProxyAvatar from './AccountProxyAvatar';
 
 type Props = ThemeProps & {
@@ -17,6 +18,7 @@ type Props = ThemeProps & {
   isSelected?: boolean;
   showUnselectIcon?: boolean;
   renderRightPart?: (checkedIconNode: React.ReactNode) => React.ReactNode;
+  chainTypes?: AccountChainType[];
   rightPartNode?: React.ReactNode;
   leftPartNode?: React.ReactNode;
   onClick?: VoidFunction;
@@ -25,7 +27,7 @@ type Props = ThemeProps & {
 
 // Todo: Recheck this component's style
 function Component (props: Props): React.ReactElement<Props> {
-  const { accountProxy, accountProxyName, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showUnselectIcon } = props;
+  const { accountProxy, accountProxyName, chainTypes, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showUnselectIcon } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
 
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
@@ -41,7 +43,9 @@ function Component (props: Props): React.ReactElement<Props> {
 
   return (
     <div
-      className={CN(className)}
+      className={CN(className, {
+        '-show-chain-type': !!chainTypes?.length
+      })}
       onClick={onClick}
     >
       <div className='__item-left-part'>
@@ -55,7 +59,13 @@ function Component (props: Props): React.ReactElement<Props> {
         }
       </div>
       <div className='__item-middle-part'>
-        {accountProxyName || accountProxy.name}
+        <div className={'__account-name'}>
+          {accountProxyName || accountProxy.name}
+        </div>
+        {!!chainTypes?.length && <AccountChainTypeLogos
+          chainTypes={chainTypes}
+          className={'__item-chain-type-logos'}
+        />}
       </div>
       <div className='__item-right-part'>
         {rightPartNode || (renderRightPart ? renderRightPart(checkedIconNode) : checkedIconNode)}
@@ -79,13 +89,34 @@ const AccountProxyItem = styled(Component)<Props>(({ theme }) => {
     transition: `background ${token.motionDurationMid} ease-in-out`,
     gap: token.sizeXS,
 
+    '&.-show-chain-type': {
+      paddingTop: token.paddingXS,
+      paddingBottom: token.paddingXS
+    },
+
     '.__item-middle-part': {
       flex: 1,
-      textAlign: 'left'
+      textAlign: 'left',
+      'white-space': 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      display: 'flex',
+      flexDirection: 'column'
+    },
+
+    '.__account-name': {
+      textAlign: 'left',
+      'white-space': 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
     },
 
     '.__item-right-part': {
       display: 'flex'
+    },
+
+    '.__item-chain-type-logos': {
+      minHeight: 20
     },
 
     '.__checked-icon-wrapper': {

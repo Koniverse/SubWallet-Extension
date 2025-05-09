@@ -183,6 +183,43 @@ export const EARNING_DATA_RAW = {
       iconColor: '#008dff'
     }
   ],
+  BITTENOSR_STAKING: [
+    {
+      icon: 'ThumbsUp',
+      title: 'Select {validatorNumber} {validatorType}',
+      description:
+        'It is recommended that you select {validatorNumber} {validatorType} to optimize your staking rewards',
+      iconColor: '#aada62'
+    },
+    {
+      icon: 'Coins',
+      title: 'Unstake and withdraw',
+      description:
+        'Once staked, your funds will be locked. Unstake your funds anytime and they will be <strong>automatically withdrawn</strong> to your account. Keep in mind that the unstaking action will incur network fees',
+      iconColor: '#e6dc25'
+    },
+    {
+      icon: 'CheckCircle',
+      title: 'Keep your transferable balance',
+      description:
+        'Ensure that your transferable balance includes <strong>a minimum of {maintainBalance} {maintainSymbol}</strong> to cover your existential deposit and network fees associated with staking, unstaking, and withdrawals',
+      iconColor: '#4cd9ac'
+    },
+    {
+      icon: 'Wallet',
+      title: 'Check your rewards',
+      description:
+        'Your staking rewards will be paid out every {paidOut} {paidOutTimeUnit} and will be automatically compounded to your stake',
+      iconColor: '#51BC5E'
+    },
+    {
+      icon: 'Eye',
+      title: 'Manage your stake',
+      description:
+        'You need to monitor your stake constantly and change {validatorType} when needed as staking status can fluctuate over time',
+      iconColor: '#008dff'
+    }
+  ],
   [YieldPoolType.PARACHAIN_STAKING]: [],
   [YieldPoolType.SINGLE_FARMING]: []
 };

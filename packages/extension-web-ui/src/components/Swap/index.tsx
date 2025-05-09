@@ -4,3 +4,4 @@
 export { default as SwapRoute } from './SwapRoute';
 export { default as SwapTransactionBlock } from './SwapTransactionBlock';
 export { default as QuoteResetTime } from './QuoteResetTime';
+export { default as QuoteRateDisplay } from './QuoteRateDisplay';

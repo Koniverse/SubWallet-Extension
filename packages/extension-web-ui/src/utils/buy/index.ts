@@ -4,3 +4,4 @@
 export { createBanxaOrder } from './banxa';
 export { createCoinbaseOrder } from './coinbase';
 export { createTransakOrder } from './transak';
+export { createMeldOrder } from './meld';

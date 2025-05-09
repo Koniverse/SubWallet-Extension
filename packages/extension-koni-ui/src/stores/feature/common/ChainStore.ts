@@ -13,6 +13,7 @@ const initialState: ChainStore = {
   chainStatusMap: {},
   ledgerGenericAllowNetworks: [],
   priorityTokens: { tokenGroup: {}, token: {} },
+  chainOldPrefixMap: {},
   reduxStatus: ReduxStatus.INIT
 };
 
@@ -62,6 +63,15 @@ const chainStoreSlice = createSlice({
       return {
         ...state,
         priorityTokens: payload,
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updateChainOldPrefixMap (state, action: PayloadAction<Record<string, number>>) {
+      const { payload } = action;
+
+      return {
+        ...state,
+        chainOldPrefixMap: payload,
         reduxStatus: ReduxStatus.READY
       };
     }

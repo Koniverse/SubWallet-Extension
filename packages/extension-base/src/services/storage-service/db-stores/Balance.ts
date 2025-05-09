@@ -11,6 +11,10 @@ export default class BalanceStore extends BaseStoreWithAddress<IBalance> {
     return this.table.where('address').anyOf(addresses).toArray();
   }
 
+  async getBalanceHasAmount (address: string, chain: string): Promise<BalanceItem[]> {
+    return this.table.filter((item) => item.address === address && item.free !== '0' && item.tokenSlug.startsWith(chain)).toArray();
+  }
+
   async removeBySlugs (tokenSlugs: string[]) {
     return this.table.where('tokenSlug').anyOfIgnoreCase(tokenSlugs).delete();
   }

@@ -143,7 +143,7 @@ function isPassVersion (versionStr: string, versionCondition?: string) { // todo
   return versionStr === versionConditionStr;
 }
 
-export async function fetchLastestBlockedActionsAndFeatures (ids: string[]) {
+export async function fetchLatestBlockedActionsAndFeatures (ids: string[]) {
   if (ids.length === 0) {
     return [staticData[StaticKey.BLOCKED_ACTIONS_FEATURES]];
   }

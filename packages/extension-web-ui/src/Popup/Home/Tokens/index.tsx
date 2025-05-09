@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, EmptyList, PageWrapper, ReceiveModal, TokenBalance, TokenItem, TokenPrice } from '@subwallet/extension-web-ui/components';
@@ -70,32 +69,12 @@ const Component = (): React.ReactElement => {
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const allowedChains = useGetChainSlugsByAccount();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
-  const swapPairs = useSelector((state: RootState) => state.swap.swapPairs);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const isEnableSwapButton = useMemo(() => {
-    return Object.keys(fromAndToTokenMap).some((tokenSlug) => {
-      return allowedChains.includes(_getOriginChainOfAsset(tokenSlug));
-    });
-  }, [allowedChains, fromAndToTokenMap]);
 
   const outletContext: {
     searchInput: string,
@@ -516,7 +495,7 @@ const Component = (): React.ReactElement => {
             isPriceDecrease={isTotalBalanceDecrease}
             isShrink={isShrink}
             isSupportBuyTokens={isSupportBuyTokens}
-            isSupportSwap={isEnableSwapButton}
+            isSupportSwap={true}
             onOpenBuyTokens={onOpenBuyTokens}
             onOpenReceive={onOpenReceive}
             onOpenSendFund={onOpenSendFund}

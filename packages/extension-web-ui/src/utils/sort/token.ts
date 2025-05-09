@@ -7,6 +7,7 @@ import { BalanceValueInfo } from '@subwallet/extension-web-ui/types';
 export interface SortableTokenItem {
   slug: string,
   symbol: string,
+  isTestnet?: boolean,
   total?: BalanceValueInfo,
 }
 
@@ -55,6 +56,7 @@ export const sortTokenByPriority = (a: string, b: string, aIsPrioritizedToken: b
   }
 };
 
+// Todo: Merge sortTokensByStandard and sortTokensByBalanceInSelector to one function
 export function sortTokensByStandard (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails, isTokenGroup = false) {
   const priorityTokenGroupKeys = Object.keys(priorityTokenGroups.tokenGroup);
   const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
@@ -91,5 +93,68 @@ export function sortTokensByStandard (targetTokens: SortableTokenItem[], priorit
 
       return sortTokenByPriority(a.symbol, b.symbol, aIsPrioritizedToken, bIsPrioritizedToken, aPriority, bPriority);
     }
+  });
+}
+
+export function sortTokensByBalanceInSelector (targetTokens: SortableTokenItem[], priorityTokenGroups: TokenPriorityDetails) {
+  const priorityTokenKeys = Object.keys(priorityTokenGroups.token);
+
+  targetTokens.sort((a, b) => {
+    const getTokenGroupLevel = (token: SortableTokenItem): number => {
+      if (token.total) {
+        const convertedValue = token.total.convertedValue.toNumber();
+        const value = token.total.value.toNumber();
+
+        if (!token.isTestnet) {
+          if (convertedValue > 0) {
+            return 1; // Mainnet, has convert balance
+          } else if (value > 0) {
+            return 2; // Mainnet, has balance, no convert balance
+          } else {
+            return 3; // Mainnet, has zero balance
+          }
+        } else {
+          if (value > 0) {
+            return 4; // Testnet, has balance
+          } else {
+            return 5; // Testnet, 0
+          }
+        }
+      }
+
+      return 6; // No chain enabled
+    };
+
+    const aLevel = getTokenGroupLevel(a);
+    const bLevel = getTokenGroupLevel(b);
+
+    // Different group levels → sort by group level
+    if (aLevel !== bLevel) {
+      return aLevel - bLevel;
+    }
+
+    // Same group
+    if (aLevel === 1 || aLevel === 2 || aLevel === 4) {
+      return sortTokenByValue(a, b); // Groups 1, 2, 4: sort by value
+    }
+
+    // Groups 3, 5, 6: sort by priority
+    const aSlug = a.slug;
+    const bSlug = b.slug;
+
+    const aIsPrioritized = priorityTokenKeys.includes(aSlug);
+    const bIsPrioritized = priorityTokenKeys.includes(bSlug);
+
+    const aPriority = aIsPrioritized ? priorityTokenGroups.token[aSlug] : 0;
+    const bPriority = bIsPrioritized ? priorityTokenGroups.token[bSlug] : 0;
+
+    return sortTokenByPriority(
+      a.symbol,
+      b.symbol,
+      aIsPrioritized,
+      bIsPrioritized,
+      aPriority,
+      bPriority
+    );
   });
 }

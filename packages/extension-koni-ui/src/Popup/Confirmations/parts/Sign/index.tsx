@@ -3,3 +3,4 @@
 
 export { default as EvmSignArea } from './Evm';
 export { default as SubstrateSignArea } from './Substrate';
+export { default as TonSignArea } from './Ton';
