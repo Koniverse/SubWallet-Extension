@@ -11,7 +11,7 @@ import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext'
 import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-web-ui/messaging';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getFirstClass, isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subwallet/extension-web-ui/utils';
+import { appendSuffixToClasses, isStepCompleted, isStepFailed, isStepFinal, isStepTimeout } from '@subwallet/extension-web-ui/utils';
 import { PageIcon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
@@ -172,7 +172,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [transactionProcessId]);
 
   useEffect(() => {
-    setWebBaseClassName(`${getFirstClass(className)}-web-base-container`);
+    setWebBaseClassName(appendSuffixToClasses(className, '-web-base-container'));
 
     return () => {
       setWebBaseClassName('');

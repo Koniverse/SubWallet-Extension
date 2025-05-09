@@ -49,6 +49,10 @@ export const renderModalSelector = (className?: string): string => {
   return `.${(className || '').replace(' ', '.')}.ant-sw-modal`;
 };
 
-export function getFirstClass (classStr = ''): string {
-  return classStr.trim().split(/\s+/)[0] || '';
+export function appendSuffixToClasses (classStr = '', suffix: string): string {
+  return classStr
+    .trim()
+    .split(/\s+/)
+    .map((cls) => cls + suffix)
+    .join(' ');
 }

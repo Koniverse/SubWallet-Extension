@@ -152,8 +152,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           title: t('Account settings'),
           onClick: () => {
             navigate('/settings/account-settings');
-          },
-          isHidden: !isPopup
+          }
         }
       ]
     },

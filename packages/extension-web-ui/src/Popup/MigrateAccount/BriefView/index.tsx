@@ -3,12 +3,13 @@
 
 import { LoadingScreen } from '@subwallet/extension-web-ui/components';
 import ContentGenerator from '@subwallet/extension-web-ui/components/StaticContent/ContentGenerator';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useFetchMarkdownContentData } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, PageIcon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Warning, XCircle } from 'phosphor-react';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -25,6 +26,7 @@ type ContentDataType = {
 
 function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow }: Props) {
   const { t } = useTranslation();
+  const { isWebUI } = useContext(ScreenContext);
   const [contentData, setContentData] = useState<ContentDataType>({
     content: '',
     title: ''
@@ -66,7 +68,8 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
 
   return (
     <div className={CN(className, {
-      '-forced-migration': isForcedMigration
+      '-forced-migration': isForcedMigration,
+      '-desktop': isWebUI
     })}
     >
       <div className='__header-area'>
@@ -79,7 +82,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
         </div>
       </div>
 
-      <div className='__body-area'>
+      <div className='__body-area'><div className='__body-area-inner'>
         {
           !isForcedMigration && (
             <ContentGenerator
@@ -100,6 +103,14 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                   }}
                 />
               </div>
+              {
+                isWebUI && (
+                  <div className={'__subtitle'}>
+                    {t('Migration incomplete!')}
+                  </div>
+                )
+              }
+
               <div className={'__forced-migration-content'}>
                 <div className='__content-line'>
                   {t('Account migration is not yet complete. If this process remains incomplete, you will not be able to perform any action on SubWallet extension.')}
@@ -111,7 +122,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
             </>
           )
         }
-      </div>
+      </div></div>
 
       <div className='__footer-area'>
         {
@@ -235,6 +246,8 @@ export const BriefView = styled(Component)<Props>(({ theme: { extendToken, token
 
     '.md-banner': {
       maxWidth: '100%',
+      marginLeft: 'auto',
+      marginRight: 'auto',
       display: 'block'
     },
 
@@ -253,6 +266,70 @@ export const BriefView = styled(Component)<Props>(({ theme: { extendToken, token
         paddingTop: 40,
         paddingRight: 32,
         paddingLeft: 32
+      }
+    },
+
+    // desktop
+
+    '&.-desktop': {
+      '.__header-area': {
+        display: 'none'
+      },
+
+      '.__body-area': {
+        paddingTop: 52,
+        flex: '0 1 auto',
+        marginBottom: 28
+      },
+
+      '.__body-area-inner': {
+        maxWidth: 584,
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__footer-area': {
+        maxWidth: 616,
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.md-subtitle': {
+        fontSize: token.fontSizeHeading3,
+        lineHeight: token.lineHeightHeading3,
+        marginBottom: 40
+      },
+
+      '.md-element + .md-element': {
+        marginTop: 24
+      },
+
+      '&.-forced-migration': {
+        '.__body-area': {
+          paddingTop: 34,
+          marginBottom: token.margin
+        },
+
+        '.__body-area-inner': {
+          maxWidth: 384
+        },
+
+        '.__warning-icon': {
+          marginBottom: 24
+        },
+
+        '.__subtitle': {
+          fontSize: token.fontSizeHeading3,
+          lineHeight: token.lineHeightHeading3,
+          color: token.colorTextLight1,
+          marginBottom: token.margin,
+          textAlign: 'center'
+        },
+
+        '.__footer-area': {
+          maxWidth: 416
+        }
       }
     }
   });

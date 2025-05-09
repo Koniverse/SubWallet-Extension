@@ -3,16 +3,19 @@
 
 import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { hasAnyAccountForMigration } from '@subwallet/extension-base/services/keyring-service/utils';
-import { useDefaultNavigate, useIsPopup } from '@subwallet/extension-web-ui/hooks';
+import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
+import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { saveMigrationAcknowledgedStatus } from '@subwallet/extension-web-ui/messaging';
 import { migrateSoloAccount, migrateUnifiedAndFetchEligibleSoloAccounts } from '@subwallet/extension-web-ui/messaging/migrate-unified-account';
 import { BriefView } from '@subwallet/extension-web-ui/Popup/MigrateAccount/BriefView';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { appendSuffixToClasses } from '@subwallet/extension-web-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { EnterPasswordModal, enterPasswordModalId } from './EnterPasswordModal';
@@ -34,13 +37,13 @@ function Component ({ className = '' }: Props) {
   const [currentScreenView, setCurrentScreenView] = useState<ScreenView>(ScreenView.BRIEF);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState<boolean>(false);
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { setTitle, setWebBaseClassName } = useContext(WebUIContext);
   const { goHome } = useDefaultNavigate();
-  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [resultProxyIds, setResultProxyIds] = useState<string[]>([]);
   const [soloAccountToBeMigratedGroups, setSoloAccountToBeMigratedGroups] = useState<SoloAccountToBeMigrated[][]>([]);
   const isAcknowledgedUnifiedAccountMigration = useSelector((state: RootState) => state.settings.isAcknowledgedUnifiedAccountMigration);
-  const isPopup = useIsPopup();
 
   const accountProxies = useSelector((root: RootState) => root.accountState.accountProxies);
 
@@ -65,10 +68,8 @@ function Component ({ className = '' }: Props) {
 
   const onClickDismiss = useCallback(() => {
     onInteractAction();
-
-    // close this screen
-    isMigrationNotion ? goHome() : navigate('/settings/account-settings');
-  }, [goHome, isMigrationNotion, navigate, onInteractAction]);
+    goHome();
+  }, [goHome, onInteractAction]);
 
   const onClickMigrateNow = useCallback(() => {
     onInteractAction();
@@ -122,10 +123,16 @@ function Component ({ className = '' }: Props) {
   }, [goHome]);
 
   useEffect(() => {
-    if (!isPopup) {
-      goHome();
-    }
-  }, [goHome, isPopup]);
+    setTitle(t('Account migration'));
+  }, [setTitle, t]);
+
+  useEffect(() => {
+    setWebBaseClassName(appendSuffixToClasses(className, '-web-base-container'));
+
+    return () => {
+      setWebBaseClassName('');
+    };
+  }, [className, setWebBaseClassName]);
 
   return (
     <>
@@ -167,7 +174,12 @@ function Component ({ className = '' }: Props) {
 
 const MigrateAccount = styled(Component)<Props>(({ theme: { extendToken, token } }: Props) => {
   return ({
-
+    // desktop
+    '&-web-base-container': {
+      '.web-layout-header-simple .__back-button': {
+        display: 'none'
+      }
+    }
   });
 });
 

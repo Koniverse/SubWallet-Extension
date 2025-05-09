@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-web-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-web-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, getFirstClass, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { appendSuffixToClasses, convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -1318,7 +1318,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }, [goHome, targetAccountProxy]);
 
   useEffect(() => {
-    setWebBaseClassName(`${getFirstClass(className)}-web-base-container`);
+    setWebBaseClassName(appendSuffixToClasses(className, '-web-base-container'));
 
     return () => {
       setWebBaseClassName('');

@@ -476,8 +476,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
 export const AccountSelectorModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.ant-sw-header-center-part': {
+    '.ant-sw-header-center-part.ant-sw-header-center-part': {
       position: 'relative',
+      marginLeft: 'auto',
+      marginRight: 'auto',
       height: 40
     },
 

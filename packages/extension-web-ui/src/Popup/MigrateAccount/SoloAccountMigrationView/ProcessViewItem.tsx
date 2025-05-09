@@ -4,6 +4,7 @@
 import { SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxyType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag } from '@subwallet/extension-web-ui/components';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { validateAccountName } from '@subwallet/extension-web-ui/messaging';
 import { SoloAccountToBeMigratedItem } from '@subwallet/extension-web-ui/Popup/MigrateAccount/SoloAccountMigrationView/SoloAccountToBeMigratedItem';
@@ -13,7 +14,7 @@ import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import { Callbacks, FieldData, RuleObject } from 'rc-field-form/lib/interface';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -30,6 +31,7 @@ interface FormProps {
 
 function Component ({ className = '', currentProcessOrdinal, currentSoloAccountToBeMigratedGroup, onApprove, onSkip, totalProcessSteps }: Props) {
   const { t } = useTranslation();
+  const { isWebUI } = useContext(ScreenContext);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
   const defaultValues = useMemo(() => ({
@@ -82,12 +84,15 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
   }, []);
 
   return (
-    <div className={className}>
+    <div className={CN(className, {
+      '-desktop': isWebUI
+    })}
+    >
       <div className='__header-area'>
         {headerContent}
       </div>
 
-      <div className='__body-area'>
+      <div className='__body-area'><div className={'__body-area-inner'}>
         <div className='__brief'>
           {t('Enter a name for this unified account to complete the migration')}
         </div>
@@ -156,7 +161,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
             </Form.Item>
           </div>
         </Form>
-      </div>
+      </div></div>
 
       <div className='__footer-area'>
         <Button
@@ -275,6 +280,33 @@ export const ProcessViewItem = styled(Component)<Props>(({ theme: { extendToken,
 
     '.__account-name-input .ant-input-suffix': {
       paddingLeft: token.paddingXS
+    },
+
+    // desktop
+
+    '&.-desktop': {
+      '.__header-area': {
+        paddingTop: 32,
+        paddingBottom: token.padding
+      },
+
+      '.__body-area': {
+        flex: '0 1 auto',
+        paddingBottom: token.padding
+      },
+
+      '.__body-area-inner': {
+        maxWidth: 384,
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__footer-area': {
+        maxWidth: 416,
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      }
     }
   });
 });

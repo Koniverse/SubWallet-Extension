@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { pingUnifiedAccountMigrationDone } from '@subwallet/extension-web-ui/messaging';
 import { ResultAccountProxyItem, ResultAccountProxyItemType } from '@subwallet/extension-web-ui/Popup/MigrateAccount/SummaryView/ResultAccountProxyItem';
@@ -23,6 +24,7 @@ type Props = ThemeProps & {
 
 function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
   const { t } = useTranslation();
+  const { isWebUI } = useContext(ScreenContext);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const [isAccountListModalOpen, setIsAccountListModalOpen] = useState<boolean>(false);
   const accountProxies = useSelector((root: RootState) => root.accountState.accountProxies);
@@ -39,7 +41,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   const resultAccountProxies = useMemo<ResultAccountProxyItemType[]>(() => {
     return resultProxyIds.map((id) => ({
-      accountName: accountProxyNameMapById[id] || '',
+      accountName: accountProxyNameMapById[id] || 'This is long address, very very long, of course',
       accountProxyId: id
     }));
   }, [accountProxyNameMapById, resultProxyIds]);
@@ -54,7 +56,8 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
     setIsAccountListModalOpen(false);
   }, [inactiveModal]);
 
-  const showAccountListModalTrigger = resultAccountProxies.length > 2;
+  // const showAccountListModalTrigger = resultAccountProxies.length > 2;
+  const showAccountListModalTrigger = false;
 
   const getAccountListModalTriggerLabel = () => {
     if (resultAccountProxies.length === 3) {
@@ -74,14 +77,15 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
   return (
     <>
       <div className={CN(className, {
-        '-no-account': !hasAnyAccountToMigrate
+        '-no-account': !hasAnyAccountToMigrate,
+        '-desktop': isWebUI
       })}
       >
         <div className='__header-area'>
           {t('Finish')}
         </div>
 
-        <div className='__body-area'>
+        <div className='__body-area'><div className='__body-area-inner'>
           <div className='__page-icon'>
             <PageIcon
               color='var(--page-icon-color)'
@@ -154,7 +158,8 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
                 <div className='__account-list-container'>
                   {
-                    resultAccountProxies.slice(0, 2).map((ap) => (
+                    // resultAccountProxies.slice(0, 2).map((ap) => (
+                    resultAccountProxies.map((ap) => (
                       <ResultAccountProxyItem
                         className={'__account-item'}
                         key={ap.accountProxyId}
@@ -179,7 +184,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
               </>
             )
           }
-        </div>
+        </div></div>
 
         <div className='__footer-area'>
           <Button
@@ -307,6 +312,60 @@ export const SummaryView = styled(Component)<Props>(({ theme: { extendToken, tok
         paddingTop: 40,
         paddingRight: 32,
         paddingLeft: 32
+      },
+
+      '.__brief': {
+        color: token.colorTextLight4
+      }
+    },
+
+    '&.-desktop': {
+      '.__header-area': {
+        display: 'none'
+      },
+
+      '.__body-area': {
+        paddingTop: 32,
+        flex: '0 1 auto',
+        paddingBottom: token.padding
+      },
+
+      '.__body-area-inner': {
+        maxWidth: 384,
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__page-icon': {
+        marginBottom: 24
+      },
+
+      '.__footer-area': {
+        maxWidth: 416,
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto'
+      },
+
+      '.__account-item': {
+        '.__chain-type-logo': {
+          width: 24,
+          height: 24,
+          boxShadow: '-6px 0px 6px 0px rgba(0, 0, 0, 0.40)'
+        }
+      },
+
+      '&.-no-account': {
+        '.__body-area-inner': {
+          maxWidth: 326,
+          marginLeft: 'auto',
+          marginRight: 'auto'
+        },
+
+        '.__brief': {
+          fontSize: token.fontSize,
+          lineHeight: token.lineHeight
+        }
       }
     }
   });

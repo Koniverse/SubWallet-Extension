@@ -7,6 +7,7 @@ import { Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import gfm from 'remark-gfm';
 import styled from 'styled-components';
 
@@ -106,6 +107,7 @@ const Component = ({ className, content }: Props) => {
           );
         }
       }}
+      rehypePlugins={[rehypeRaw]}
       remarkPlugins={[gfm]}
     >{content}</ReactMarkdown>
   );
