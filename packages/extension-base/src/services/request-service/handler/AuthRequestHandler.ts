@@ -282,7 +282,7 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentNetworkMap: existed ? existed.currentNetworkMap : defaultNetworkMap
+          currentNetworkMap: existed ? { ...existed.currentNetworkMap, ...defaultNetworkMap } : defaultNetworkMap
         };
 
         this.setAuthorize(authorizeList, () => {

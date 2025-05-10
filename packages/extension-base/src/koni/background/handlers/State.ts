@@ -47,7 +47,7 @@ import WalletConnectService from '@subwallet/extension-base/services/wallet-conn
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
 import { addLazy, isManifestV3, isSameAddress, reformatAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
-import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
+import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -1367,14 +1367,14 @@ export default class KoniState {
       autoActiveChain = true;
     }
 
-    const currentEvmNetwork = this.requestService.getDAppChainInfo({
+    const currentCardanoNetwork = this.requestService.getDAppChainInfo({
       autoActive: autoActiveChain,
       accessType: 'cardano',
       defaultChain: networkKey,
       url
     });
 
-    networkKey = currentEvmNetwork?.slug || 'cardano';
+    networkKey = currentCardanoNetwork?.slug || 'cardano';
     const allUtxos = await this.chainService.getUtxosByAddress(currentAddress, networkKey);
 
     const outputTransactionUnSpend = CardanoWasm.TransactionOutputs.new();
@@ -1417,13 +1417,26 @@ export default class KoniState {
       addressOutputAmountMap[address] = { values: convertValueToAsset(output) };
 
       if (isSameAddress(currentAddress, address)) {
+        if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+          throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, t('Current network is changed'));
+        }
+
         transactionValue = transactionValue.checked_add(amount);
         addressInputAmountMap[address].isOwner = true;
         addressOutputAmountMap[address].isOwner = true;
       }
+
+      // Check if address is valid with current network
+      if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with input address'));
+      }
     }
 
     for (const address in addressOutputMap) {
+      if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with output address'));
+      }
+
       if (!addressInputAmountMap[address] && !addressOutputMap[address].is_zero()) {
         addressOutputAmountMap[address] = { values: convertValueToAsset(addressOutputMap[address]), isRecipient: true };
       }
