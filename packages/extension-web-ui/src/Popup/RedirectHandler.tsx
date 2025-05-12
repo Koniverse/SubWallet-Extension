@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LoadingScreen } from '@subwallet/extension-web-ui/components';
-import { CREATE_RETURN, DEFAULT_ROUTER_PATH, DEFAULT_SWAP_PARAMS, SWAP_PATH, SWAP_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { CREATE_RETURN, DEFAULT_ROUTER_PATH, DEFAULT_SWAP_PARAMS, SELL_TOKEN_TAB, SWAP_PATH, SWAP_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-web-ui/utils';
@@ -18,6 +18,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const isNoAccount = useSelector((state) => state.accountState.isNoAccount);
   const [, setReturnStorage] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
+  const [, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
   const currentAccountProxy = useSelector((root) => root.accountState.currentAccountProxy);
   const { feature } = useParams();
 
@@ -37,8 +38,16 @@ const Component: React.FC<Props> = (props: Props) => {
         });
         navigate(SWAP_PATH);
       }
+    } else if (feature === 'sell-token') {
+      if (isNoAccount) {
+        setReturnStorage('/home/tokens?openBuyTokens=true');
+        navigate(DEFAULT_ROUTER_PATH);
+      } else {
+        setBuyTokenModalTab('SELL');
+        navigate('/home/tokens?openBuyTokens=true');
+      }
     }
-  }, [feature, isNoAccount, navigate, setReturnStorage, setSwapStorage, transactionFromAccountProxyValue]);
+  }, [feature, isNoAccount, navigate, setReturnStorage, setBuyTokenModalTab, setSwapStorage, transactionFromAccountProxyValue]);
 
   return (
     <LoadingScreen />

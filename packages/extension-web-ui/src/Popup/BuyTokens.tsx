@@ -8,6 +8,7 @@ import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { ServiceSelector } from '@subwallet/extension-web-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
+import { SELL_TOKEN_TAB } from '@subwallet/extension-web-ui/constants';
 import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
@@ -22,6 +23,7 @@ import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type SharedProps = {
   modalContent?: boolean;
@@ -68,8 +70,9 @@ const modalId = 'disclaimer-modal';
 function Component ({ className, currentAccountProxy, modalContent, slug }: Props) {
   const locationState = useLocation().state as BuyTokensParam;
   const [_currentSymbol] = useState<string | undefined>(locationState?.symbol);
+  const [buyTokenTab, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
 
-  const [buyForm, setBuyForm] = useState(true);
+  const [buyForm, setBuyForm] = useState(buyTokenTab !== 'SELL');
 
   const currentSymbol = slug || _currentSymbol;
 
@@ -99,7 +102,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   }, [currentSymbol, tokens]);
 
   const { t } = useTranslation();
-  const { goBack } = useDefaultNavigate();
+  const { goHome } = useDefaultNavigate();
   const [form] = Form.useForm<BuyTokensFormProps>();
   const formDefault = useMemo((): BuyTokensFormProps => ({
     address: '',
@@ -488,6 +491,10 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     }
   }, [selectedTokenSlug, form, getServiceItems]);
 
+  useEffect(() => {
+    setBuyTokenModalTab('');
+  }, [setBuyTokenModalTab]);
+
   return (
     <PageWrapper className={CN(className, 'transaction-wrapper', {
       '__web-wrapper': modalContent
@@ -498,7 +505,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           background={'transparent'}
           center
           className={'transaction-header'}
-          onBack={goBack}
+          onBack={goHome}
           paddingVertical
           showBackButton
           title={t('Buy & sell tokens')}
