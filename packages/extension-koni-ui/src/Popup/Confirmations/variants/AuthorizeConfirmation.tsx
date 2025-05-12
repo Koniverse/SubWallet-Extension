@@ -62,30 +62,30 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('settings.Screen.authorize.Confirmation.noAvailableTitle.substrate');
+          return t('confirmation.authorize.noAvailableTitle.substrate');
         case 'evm':
-          return t('settings.Screen.authorize.Confirmation.noAvailableTitle.evm');
+          return t('confirmation.authorize.noAvailableTitle.evm');
         case 'ton':
-          return t('No available TON account');
+          return t('confirmation.authorize.noAvailableTitle.ton');
         case 'cardano':
-          return t('No available Cardano account');
+          return t('confirmation.authorize.noAvailableTitle.cardano');
       }
     }
 
-    return t('settings.Screen.authorize.Confirmation.noAvailableTitle.default');
+    return t('confirmation.authorize.noAvailableTitle.default');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('settings.Screen.authorize.Confirmation.description.evm');
+          return t('confirmation.authorize.Description.substrate');
         case 'evm':
-          return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('confirmation.authorize.Description.evm');
       }
     }
 
-    return t('settings.Screen.authorize.Confirmation.description.default');
+    return t('confirmation.authorize.Description.default');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -220,7 +220,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('settings.Popup.authorizeRequest.heading')
+              : t('confirmation.authorize.Title')
           }
         </div>
         {
@@ -256,7 +256,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('settings.Popup.authorizeRequest.description')
+              : t('confirmation.authorize.Description')
           }
         </div>
       </div>
@@ -284,7 +284,7 @@ function Component ({ className, request }: Props) {
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('settings.Popup.authorizeRequest.Button.connect')}
+                {t('confirmation.authorize.Button.connect')}
               </Button>
             </>
           )
@@ -316,7 +316,7 @@ function Component ({ className, request }: Props) {
                   )}
                   onClick={onAddAccount}
                 >
-                  {t('settings.Popup.authorizeRequest.Button.create')}
+                  {t('confirmation.authorize.Button.create')}
                 </Button>
               </>
             )

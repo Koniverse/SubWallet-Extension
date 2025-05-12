@@ -42,13 +42,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('settings.Screen.importNetwork.Input.providerUrl.ErrorTooltip.connectFailure');
+        return t('confirmation.addNetwork.Input.providerUrl.ErrorTooltip.connectFailure');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('settings.Screen.importNetwork.Input.providerUrl.ErrorTooltip.providerAdded');
+        return t('confirmation.addNetwork.Input.providerUrl.ErrorTooltip.providerAdded');
       case _CHAIN_VALIDATION_ERROR.EXISTED_CHAIN:
-        return t('settings.Screen.importNetwork.Input.providerUrl.ErrorTooltip.chainAdded');
+        return t('confirmation.addNetwork.Input.providerUrl.ErrorTooltip.chainAdded');
       default:
-        return t('settings.Screen.importNetwork.Input.providerUrl.ErrorTooltip.validating');
+        return t('confirmation.addNetwork.Input.providerUrl.ErrorTooltip.validating');
     }
   }, [t]);
 

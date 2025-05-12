@@ -51,8 +51,8 @@ function Component ({ className, request }: Props) {
   const [networkNeedToImport, setNetworkNeedToImport] = useState<string[]>([]);
 
   const accountTypeNameMap = useMemo((): Record<string, string> => ({
-    [AccountChainType.ETHEREUM]: t('settings.Screen.walletConnect.Modal.Connect.evmNetwork'),
-    [AccountChainType.SUBSTRATE]: t('settings.Screen.walletConnect.Modal.Connect.substrateNetwork')
+    [AccountChainType.ETHEREUM]: t('confirmation.connectWalletConnect.Type.Name.evmNetwork'),
+    [AccountChainType.SUBSTRATE]: t('confirmation.connectWalletConnect.Type.Name.substrateNetwork')
   }), [t]);
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
@@ -215,8 +215,8 @@ function Component ({ className, request }: Props) {
           noNetwork && (
             (
               <AlertBox
-                description={t('settings.Screen.walletConnect.Confirmation.unDetected.description')}
-                title={t('settings.Screen.walletConnect.Confirmation.unDetected.title')}
+                description={t('confirmation.connectWalletConnect.Alert.unDetected.Description')}
+                title={t('confirmation.connectWalletConnect.Alert.unDetected.Title')}
                 type='warning'
               />
             )
@@ -226,8 +226,8 @@ function Component ({ className, request }: Props) {
           !isUnSupportCase && !noNetwork && isExpired && (
             <>
               <AlertBox
-                description={t('settings.Screen.walletConnect.Confirmation.connectionExpired.description')}
-                title={t('settings.Screen.walletConnect.Confirmation.connectionExpired.title')}
+                description={t('confirmation.connectWalletConnect.Alert.connectionExpired.description')}
+                title={t('confirmation.connectWalletConnect.Alert.connectionExpired.Title')}
                 type='warning'
               />
             </>
@@ -259,7 +259,7 @@ function Component ({ className, request }: Props) {
                       {
                         supportOneAccountType && (
                           <div className='account-list-title'>
-                            {t('Choose the account(s) you’d like to connect')}
+                            {t('confirmation.connectWalletConnect.List.Title')}
                           </div>
                         )
                       }
