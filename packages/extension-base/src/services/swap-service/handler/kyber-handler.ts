@@ -20,7 +20,15 @@ import { calculateGasFeeParams } from '../../fee-service/utils';
 import TransactionService from '../../transaction-service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
 
+interface KyberRouteData {
+  routeSummary: KyberSwapQuoteData;
+  routerAddress: string;
+}
+
 interface KyberSwapQuoteData {
+  amountIn: string;
+  tokenIn: string;
+  tokenOut: string;
   amountOut: string;
   amountInUsd: string;
   amountOutUsd: string;
@@ -74,13 +82,51 @@ export const KYBER_CLIENT_ID = process.env.KYBER_CLIENT_ID || '';
 const kyberUrl = 'https://aggregator-api.kyberswap.com';
 
 export async function buildTxForSwap (params: BuildTxForSwapParams, chain: string): Promise<TransactionConfig> {
-  const { recipient, routeSummary, sender, slippageTolerance } = params;
+  const { recipient, sender, slippageTolerance } = params;
 
-  if (!recipient || !sender || !routeSummary || !slippageTolerance) {
-    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Invalid swap input parameters');
+  let routeSummary = params.routeSummary;
+
+  if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
+    const queryParams = new URLSearchParams({
+      tokenIn: routeSummary.tokenIn,
+      tokenOut: routeSummary.tokenOut,
+      amountIn: routeSummary.amountIn,
+      gasInclude: 'true'
+    });
+
+    const url = `${kyberUrl}/${chain}/api/v1/routes?${queryParams.toString()}`;
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-client-id': KYBER_CLIENT_ID,
+          accept: 'application/json'
+        }
+      });
+
+      const routeData = (await res.json()) as KyberApiResponse<KyberRouteData>;
+
+      if (!routeData.success || !routeData.data || !routeData.data.routeSummary) {
+        throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, routeData.message);
+      }
+
+      routeSummary = routeData.data.routeSummary;
+    } catch (error) {
+      console.error('Error:', error);
+      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
+    }
   }
 
-  const body = { routeSummary, sender, recipient, slippageTolerance, ignoreCappedSlippage: true, enableGasEstimation: true };
+  const body = {
+    routeSummary,
+    sender,
+    recipient,
+    slippageTolerance,
+    ignoreCappedSlippage: true,
+    enableGasEstimation: true
+  };
 
   try {
     const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
@@ -92,11 +138,13 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
       },
       body: JSON.stringify(body)
     });
-    const data = await res.json() as KyberApiResponse<KyberSwapBuildTxResponse>;
+
+    const data = (await res.json()) as KyberApiResponse<KyberSwapBuildTxResponse>;
+
     const requestData = data.data;
 
     if (!requestData || !requestData.routerAddress || !requestData.data || !requestData.gas) {
-      console.log('error message', data.message);
+      console.log('Kyber error:', data.message);
 
       if (data.details?.some((detail) => detail.toLowerCase().includes('insufficient liquidity'))) {
         throw new SwapError(SwapErrorType.NOT_ENOUGH_LIQUIDITY);
@@ -119,6 +167,7 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
       throw error;
     }
 
+    console.error('Kyber error:', error);
     throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
   }
 }
@@ -343,6 +392,7 @@ export class KyberHandler implements SwapBaseInterface {
     const metadata = params.quote.metadata as KyberMetadata;
     const slippageTolerance = params.slippage * 10000;
 
+    console.log('metadata', params.quote);
     const rawTx = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
     const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
