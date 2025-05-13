@@ -8,8 +8,7 @@ import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, Number, SwNumberProps, Tag, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowsClockwise, ArrowsLeftRight, CopySimple, Eye, EyeSlash, PaperPlaneTilt, PlusMinus } from 'phosphor-react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -43,9 +42,6 @@ function Component (
   const { isShowBalance } = useSelector((state) => state.settings);
   const [reloading, setReloading] = useState(false);
   const { currencyData } = useSelector((state) => state.price);
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const openBuyTokens = searchParams.get('openBuyTokens') || '';
 
   const onChangeShowBalance = useCallback(() => {
     saveShowBalance(!isShowBalance).catch(console.error);
@@ -59,13 +55,6 @@ function Component (
         setReloading(false);
       });
   }, []);
-
-  useEffect(() => {
-    if (openBuyTokens === 'true') {
-      searchParams.delete('openBuyTokens');
-      navigate('/buy-tokens', { replace: true });
-    }
-  }, [openBuyTokens, onOpenBuyTokens, searchParams, navigate, setSearchParams]);
 
   return (
     <div className={`tokens-upper-block ${className} ${isShrink ? '-shrink' : ''}`}>
