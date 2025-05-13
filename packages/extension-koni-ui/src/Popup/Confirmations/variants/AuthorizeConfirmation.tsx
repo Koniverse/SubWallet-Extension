@@ -72,7 +72,7 @@ function Component ({ className, request }: Props) {
       }
     }
 
-    return t('confirmation.authorize.noAvailableTitle.default');
+    return t('confirmation.authorize.Title.noAccount.default');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
