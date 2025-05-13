@@ -338,6 +338,11 @@ export class KyberHandler implements SwapBaseInterface {
 
     const chain = fromAsset.originChain;
     const metadata = params.quote.metadata as KyberMetadata;
+
+    if (!metadata || !metadata.routerAddress) {
+      throw new TransactionError(BasicTxErrorType.INVALID_PARAMS);
+    }
+
     const routerContract = metadata.routerAddress;
     let transactionConfig: TransactionConfig = {} as TransactionConfig;
 
