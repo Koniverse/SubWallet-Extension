@@ -62,19 +62,23 @@ export function _isEqualSmartContractAsset (asset1: _ChainAsset, asset2: _ChainA
 }
 
 export function _isPureEvmChain (chainInfo: _ChainInfo) {
-  return (!!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureSubstrateChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !!chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !!chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureTonChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureCardanoChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
+}
+
+export function _isPureBitcoinChain (chainInfo: _ChainInfo) {
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !!chainInfo.bitcoinInfo);
 }
 
 export function _getOriginChainOfAsset (assetSlug: string) {
@@ -473,6 +477,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
     blockExplorer = chainInfo?.evmInfo?.blockExplorer;
   } else if (_isPureCardanoChain(chainInfo)) {
     blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
+  } else if (_isPureBitcoinChain(chainInfo)) {
+    blockExplorer = chainInfo?.bitcoinInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }
