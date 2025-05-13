@@ -135,7 +135,7 @@ export const ACCOUNT_CHAIN_TYPE_ORDINAL_MAP: Record<string, number> = {
   [AccountChainType.BITCOIN]: 5
 };
 
-export const SUPPORTED_ACCOUNT_CHAIN_TYPES = ['substrate', 'ethereum', 'ton', 'cardano', 'bitcoin'];
+export const SUPPORTED_ACCOUNT_CHAIN_TYPES: AccountChainType[] = [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN];
 
 export enum AccountActions {
   DERIVE = 'DERIVE',
