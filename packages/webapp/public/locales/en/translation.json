@@ -1656,5 +1656,9 @@
   "Input": "",
   "Output": "",
   "Cardano dApp": "",
-  "No swap quote found. Adjust your amount and try again": ""
+  "Your balance": "",
+  "Network display": "",
+  "Open in sidebar": "",
+  "Open in popup": "",
+  "Amount too high. Lower your amount and try again": ""
 }

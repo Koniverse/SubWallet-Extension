@@ -257,7 +257,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         title={t('Account info')}
       >
 
-        {isAllAccount
+        {isAllAccount && list.length > 1
           ? (
             <div className={'__slider-container'}>
               <Slider
@@ -301,7 +301,7 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
   '&.-horizontal-mode.-has-one-item': {
     '.__account-info-item.-box-mode': {
-      minWidth: 300
+      flex: 1
     }
   },
 
