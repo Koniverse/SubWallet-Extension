@@ -200,8 +200,8 @@ function Component ({ className, request }: Props) {
           (isUnSupportCase || blockAddNetwork) && (
             <>
               <AlertBox
-                description={t('settings.Screen.walletConnect.Confirmation.unSupportNetwork.description')}
-                title={t('settings.Screen.walletConnect.Confirmation.unSupportNetwork.title')}
+                description={t('confirmation.connectWalletConnect.Alert.unSupportNetwork.description')}
+                title={t('confirmation.connectWalletConnect.Alert.unSupportNetwork.title')}
                 type='warning'
               />
               <WCNetworkSupported
@@ -215,8 +215,8 @@ function Component ({ className, request }: Props) {
           noNetwork && (
             (
               <AlertBox
-                description={t('confirmation.connectWalletConnect.Alert.unDetected.Description')}
-                title={t('confirmation.connectWalletConnect.Alert.unDetected.Title')}
+                description={t('confirmation.connectWalletConnect.Alert.unDetected.description')}
+                title={t('confirmation.connectWalletConnect.Alert.unDetected.title')}
                 type='warning'
               />
             )
@@ -227,7 +227,7 @@ function Component ({ className, request }: Props) {
             <>
               <AlertBox
                 description={t('confirmation.connectWalletConnect.Alert.connectionExpired.description')}
-                title={t('confirmation.connectWalletConnect.Alert.connectionExpired.Title')}
+                title={t('confirmation.connectWalletConnect.Alert.connectionExpired.title')}
                 type='warning'
               />
             </>
@@ -248,7 +248,7 @@ function Component ({ className, request }: Props) {
                       {!supportOneChain && (
                         <>
                           <div className='namespace-title'>
-                            {supportOneAccountType ? t('Networks') : accountTypeNameMap[namespace]}
+                            {supportOneAccountType ? t('common.Text.networks') : accountTypeNameMap[namespace]}
                           </div>
                           <WCNetworkSelected
                             id={`${namespace}-networks`}
@@ -259,7 +259,7 @@ function Component ({ className, request }: Props) {
                       {
                         supportOneAccountType && (
                           <div className='account-list-title'>
-                            {t('confirmation.connectWalletConnect.List.Title')}
+                            {t('confirmation.connectWalletConnect.accountListTitle')}
                           </div>
                         )
                       }

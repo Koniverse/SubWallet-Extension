@@ -62,13 +62,13 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('confirmation.authorize.noAvailableTitle.substrate');
+          return t('confirmation.authorize.Title.noAccount.substrate');
         case 'evm':
-          return t('confirmation.authorize.noAvailableTitle.evm');
+          return t('confirmation.authorize.Title.noAccount.evm');
         case 'ton':
-          return t('confirmation.authorize.noAvailableTitle.ton');
+          return t('confirmation.authorize.Title.noAccount.ton');
         case 'cardano':
-          return t('confirmation.authorize.noAvailableTitle.cardano');
+          return t('confirmation.authorize.Title.noAccount.cardano');
       }
     }
 
@@ -79,13 +79,13 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('confirmation.authorize.Description.substrate');
+          return t('confirmation.authorize.Description.noAccount.substrate');
         case 'evm':
-          return t('confirmation.authorize.Description.evm');
+          return t('confirmation.authorize.Description.noAccount.evm');
       }
     }
 
-    return t('confirmation.authorize.Description.default');
+    return t('confirmation.authorize.Description.noAccount.default');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -220,7 +220,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('confirmation.authorize.Title')
+              : t('confirmation.authorize.Title.default')
           }
         </div>
         {
@@ -256,7 +256,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('confirmation.authorize.Description')
+              : t('confirmation.authorize.Description.default')
           }
         </div>
       </div>

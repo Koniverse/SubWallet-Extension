@@ -51,10 +51,10 @@ function Component ({ className, request }: Props) {
         <ConfirmationGeneralInfo request={request} />
         <div className={'account-list text-center'}>
           <Typography.Title level={4}>
-            {t('confirmation.metadata.Title')}
+            {t('confirmation.metadata.title')}
           </Typography.Title>
           <Typography.Paragraph className='text-tertiary'>
-            {t('confirmation.metadata.Text', { replace: { dAppUrl: request.url, chainName: chain } })}
+            {t('confirmation.metadata.description', { replace: { dAppUrl: request.url, chainName: chain } })}
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
             <span className='__prop-label text-tertiary text-right'>{t('Symbol')}</span> <span>{tokenSymbol}</span>

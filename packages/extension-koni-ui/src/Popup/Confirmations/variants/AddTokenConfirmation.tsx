@@ -115,7 +115,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           }
           status={contractError ? 'error' : slug ? 'warning' : ''}
-          statusHelp={contractError ? t('confirmation.addToken.Input.contractAddress.invalid') : slug ? t('confirmation.addToken.Input.contractAddress.exists') : ''}
+          statusHelp={contractError ? t('confirmation.addToken.Input.contractAddress.Error.invalid') : slug ? t('confirmation.addToken.Input.contractAddress.Error.exists') : ''}
           suffix={contractSuffix}
         />
         <Row gutter={token.margin}>
