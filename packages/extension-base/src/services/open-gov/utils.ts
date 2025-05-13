@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _ReferendumInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import BigNumber from 'bignumber.js';
 
 export const govChainSupportItems = [

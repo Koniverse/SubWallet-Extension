@@ -8,7 +8,7 @@ import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/typ
 import { ServiceStatus } from '../base/types';
 import { EventService } from '../event-service';
 import BaseOpenGovHandler from './handler';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest } from './type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest } from './interface';
 import { govChainSupportItems } from './utils';
 
 class OpenGovChainHandler extends BaseOpenGovHandler {
@@ -81,6 +81,12 @@ export default class OpenGovService {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
+    const errors = await handler.validateReferendumVote(request.address, request.trackId);
+
+    if (errors.length > 0) {
+      return Promise.reject(errors[0]);
+    }
+
     return handler.handleStandardVote(request);
   }
 
@@ -89,6 +95,12 @@ export default class OpenGovService {
 
     if (!handler) {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const errors = await handler.validateReferendumVote(request.address, request.trackId);
+
+    if (errors.length > 0) {
+      return Promise.reject(errors[0]);
     }
 
     return handler.handleSplitAbstainVote(request);

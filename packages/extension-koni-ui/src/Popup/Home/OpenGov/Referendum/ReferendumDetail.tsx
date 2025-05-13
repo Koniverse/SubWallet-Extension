@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _ReferendumInfo, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { _ReferendumInfo, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { isGovOngoing } from '@subwallet/extension-base/services/open-gov/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -85,7 +85,8 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
         referendumIndex: data.referendumIndex,
         aye: true,
         balance: values.value,
-        conviction: values.conviction
+        conviction: values.conviction,
+        trackId: data.track
       };
 
       inactiveModal(modalId);

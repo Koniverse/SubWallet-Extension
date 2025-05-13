@@ -10,7 +10,7 @@ import { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import { _SubstrateApi } from '../chain-service/types';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest, VotingFor } from './type';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest, VotingFor } from './interface';
 
 interface Referendums {
   items: _ReferendumInfo[];
@@ -108,6 +108,18 @@ export default abstract class BaseOpenGovHandler {
     );
 
     return extrinsic;
+  }
+
+  public async validateReferendumVote (address: string, trackId: number): Promise<TransactionError[]> {
+    const substrateApi = await this.substrateApi.isReady;
+    const locked = (await substrateApi.api.query.convictionVoting.votingFor(address, trackId)).toPrimitive() as VotingFor;
+
+    if ((locked?.delegating?.balance && new BigN(locked.delegating.balance).gt(0)) ||
+    (locked?.casting?.votes && locked.casting.votes.length > 0)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Already delegating votes')];
+    }
+
+    return [];
   }
 
   public async handleRemoveVote (request: RemoveVoteRequest): Promise<TransactionData> {

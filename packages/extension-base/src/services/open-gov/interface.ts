@@ -7,6 +7,7 @@ export interface GetAbstainTotalRequest {
 }
 
 export interface StandardVoteRequest {
+  trackId: number;
   address: string,
   chain: string,
   referendumIndex: number;
@@ -14,13 +15,14 @@ export interface StandardVoteRequest {
   conviction: number;
   balance: string;
 }
-
-export interface SplitAbstainRequest{
-  address: string,
-  chain: string,
-  aye: string,
-  nay: string,
-  abstain: string
+export interface SplitAbstainVoteRequest {
+  trackId: number;
+  address: string;
+  chain: string;
+  referendumIndex: number;
+  aye: string;
+  nay: string;
+  abstain: string;
 }
 
 export enum Conviction {
@@ -42,15 +44,6 @@ export const numberToConviction: Record<number, Conviction> = {
   5: Conviction.Locked5x,
   6: Conviction.Locked6x
 };
-
-export interface SplitAbstainVoteRequest {
-  address: string;
-  chain: string;
-  referendumIndex: number;
-  aye: string;
-  nay: string;
-  abstain: string;
-}
 
 export interface RemoveVoteRequest {
   address: string;
@@ -98,7 +91,6 @@ export interface _ReferendumInfo {
       alarm: number[]
     }
   };
-
 }
 
 export interface Gov2Vote {
