@@ -152,6 +152,13 @@ export class SwapService implements StoppableServiceInterface {
       throw new Error((e as Error).message);
     }
 
+    if (swapQuoteResponse.error) {
+      return {
+        process: optimalProcess,
+        quote: swapQuoteResponse
+      };
+    }
+
     console.log('optimalProcess', optimalProcess);
     console.groupEnd();
 
