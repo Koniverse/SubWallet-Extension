@@ -154,7 +154,7 @@ function Component ({ className }: Props) {
     <>
       <Layout.Home
         isDisableHeader={isDisableHeader}
-        showFilterIcon
+        showFaderIcon
         showTabBar={false}
       >
         <TransactionContext.Provider value={{

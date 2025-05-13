@@ -17,6 +17,7 @@ import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 
 export * from './mv3';
 export * from './fetch';
+export * from './price';
 export { convertCardanoAddressToHex } from './cardano';
 
 export const notDef = (x: any) => x === null || typeof x === 'undefined';

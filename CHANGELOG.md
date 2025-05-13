@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.3.34
+Build date: May 05, 2025.
+
+Features & Update:
+- Support extension side panel (#4091)
+- Update padding for the time frame selector for price chart
+
+
+## 1.3.33
+Build date: Apr 30, 2025.
+
+Features & Update:
+- Support price chart (#4122, #4266)
+- Update link for "Contact support" (#4324)
+
+
 ## 1.3.32
 Build date: Apr 26, 2025.
 
