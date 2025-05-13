@@ -2,12 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType } from '@subwallet/chain-list/types';
-import { APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressBalanceResult, APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BalanceItem, SusbcribeBitcoinPalletBalance, UtxoResponseItem } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
-import BigN from 'bignumber.js';
+
+function getDefaultBalanceResult (): AddressBalanceResult {
+  return {
+    balance: '0',
+    bitcoinBalanceMetadata: {
+      inscriptionCount: 0,
+      runeBalance: '0',
+      inscriptionBalance: '0'
+    }
+  };
+}
 
 export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
   try {
@@ -44,39 +54,30 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
 async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) {
   return await Promise.all(addresses.map(async (address) => {
     try {
-      const [filteredUtxos, addressSummaryInfo] = await Promise.all([
-        getTransferableBitcoinUtxos(bitcoinApi, address),
+      const [addressSummaryInfo] = await Promise.all([
         bitcoinApi.api.getAddressSummaryInfo(address)
       ]);
 
       console.log('addressSummaryInfo', addressSummaryInfo);
+
+      if (Number(addressSummaryInfo.balance) < 0) {
+        return getDefaultBalanceResult();
+      }
+
       const bitcoinBalanceMetadata = {
         inscriptionCount: addressSummaryInfo.total_inscription,
         runeBalance: addressSummaryInfo.balance_rune,
         inscriptionBalance: addressSummaryInfo.balance_inscription
       } as BitcoinBalanceMetadata;
 
-      let balanceValue = new BigN(0);
-
-      filteredUtxos.forEach((utxo) => {
-        balanceValue = balanceValue.plus(utxo.value);
-      });
-
       return {
-        balance: balanceValue.toString(),
+        balance: addressSummaryInfo.balance.toString(),
         bitcoinBalanceMetadata: bitcoinBalanceMetadata
       };
     } catch (error) {
       console.log('Error while fetching Bitcoin balances', error);
 
-      return {
-        balance: '0',
-        bitcoinBalanceMetadata: {
-          inscriptionCount: 0,
-          runeBalance: 0,
-          inscriptionBalance: 0
-        }
-      };
+      return getDefaultBalanceResult();
     }
   }));
 }

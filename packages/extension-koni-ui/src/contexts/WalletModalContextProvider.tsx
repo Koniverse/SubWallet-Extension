@@ -8,7 +8,7 @@ import { AccountTokenAddressModalProps } from '@subwallet/extension-koni-ui/comp
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
 import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_GROUP_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useAlert, useGetConfig, useIsPopup, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useExtensionDisplayModes, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps } from '@subwallet/extension-koni-ui/types';
@@ -141,7 +141,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const { onHandleSessionLatest, setTimeBackUp } = useSetSessionLatest();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const isUnifiedAccountMigrationInProgress = useSelector((state: RootState) => state.settings.isUnifiedAccountMigrationInProgress);
-  const isPopup = useIsPopup();
+  const { isPopupMode } = useExtensionDisplayModes();
 
   useExcludeModal('confirmations');
   useExcludeModal(EARNING_INSTRUCTION_MODAL);
@@ -278,10 +278,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   }, [hasMasterPassword, inactiveAll, isLocked]);
 
   useEffect(() => {
-    if (!isPopup && isUnifiedAccountMigrationInProgress) {
+    if (!isPopupMode && isUnifiedAccountMigrationInProgress) {
       activeModal(ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL);
     }
-  }, [activeModal, isPopup, isUnifiedAccountMigrationInProgress]);
+  }, [activeModal, isPopupMode, isUnifiedAccountMigrationInProgress]);
 
   useEffect(() => {
     const confirmID = searchParams.get('popup');

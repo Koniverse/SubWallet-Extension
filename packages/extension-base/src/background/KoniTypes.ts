@@ -191,7 +191,24 @@ export interface PriceJson {
   currencyData: CurrencyJson,
   exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
-  price24hMap: Record<string, number>
+  price24hMap: Record<string, number>,
+  priceCoinGeckoSupported: string[],
+  lastUpdatedMap: Record<string, Date>
+}
+
+export interface HistoryTokenPriceJSON {
+  history: PriceChartPoint[];
+}
+
+export interface ResponseSubscribeCurrentTokenPrice {
+  id: string;
+  price: CurrentTokenPrice;
+}
+
+export interface CurrentTokenPrice {
+  value: number;
+  value24h: number;
+  time: number;
 }
 
 export interface ExchangeRateJSON {
@@ -415,6 +432,13 @@ export type CurrencyType = 'USD'
 | 'RUB'
 | 'VND'
 
+export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | '1Y' | 'ALL';
+
+export interface PriceChartPoint {
+  time: number;
+  value: number;
+}
+
 export type LanguageOptionType = {
   text: string;
   value: LanguageType;
@@ -463,6 +487,8 @@ export type RequestChangeShowZeroBalance = { show: boolean };
 export type RequestChangeLanguage = { language: LanguageType };
 
 export type RequestChangePriceCurrency = { currency: CurrencyType }
+
+export type RequestGetHistoryTokenPriceData = { priceId: string, timeframe: PriceChartTimeframe };
 
 export type RequestChangeShowBalance = { enable: boolean };
 
@@ -2095,6 +2121,11 @@ export type BitcoinBalanceMetadata = {
   inscriptionBalance: string // sum of BTC in UTXO which contains rune
 }
 
+export interface AddressBalanceResult {
+  balance: string;
+  bitcoinBalanceMetadata: BitcoinBalanceMetadata;
+}
+
 // Use stringify to communicate, pure boolean value will error with case 'false' value
 export interface KoniRequestSignatures {
   // Bonding functions
@@ -2156,6 +2187,9 @@ export interface KoniRequestSignatures {
   // Price, balance, crowdloan functions
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
+  'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
+  'pri(price.checkCoinGeckoPriceSupport)': [string, boolean];
+  'pri(price.subscribeCurrentTokenPrice)': [string, ResponseSubscribeCurrentTokenPrice, CurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
   'pri(crowdloan.getCrowdloan)': [RequestCrowdloan, CrowdloanJson];
