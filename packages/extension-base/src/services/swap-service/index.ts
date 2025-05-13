@@ -26,6 +26,7 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
+import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
 
@@ -425,6 +426,9 @@ export class SwapService implements StoppableServiceInterface {
           break;
         case SwapProviderId.UNISWAP:
           this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
+        case SwapProviderId.KYBER:
+          this.handlers[providerId] = new KyberHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
           break;
         default:
           throw new Error('Unsupported provider');

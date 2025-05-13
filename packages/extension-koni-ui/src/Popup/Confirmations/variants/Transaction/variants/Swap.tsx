@@ -66,6 +66,10 @@ const Component: React.FC<Props> = (props: Props) => {
     return getTokenPairFromStep(data.process.steps);
   }, [data.process.steps]);
 
+  const isKyberProvider = useMemo(() => {
+    return data.provider.name === 'Kyber';
+  }, [data.provider.name]);
+
   useEffect(() => {
     let timer: NodeJS.Timer;
 
@@ -138,6 +142,14 @@ const Component: React.FC<Props> = (props: Props) => {
           <AlertBox
             className={'__swap-quote-expired'}
             description={t('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')}
+            title={t('Pay attention!')}
+            type='warning'
+          />
+        )}
+        {isKyberProvider && (
+          <AlertBox
+            className={'__swap-quote-expired'}
+            description={t('Due to market conditions, you may receive more or less than expected')}
             title={t('Pay attention!')}
             type='warning'
           />
