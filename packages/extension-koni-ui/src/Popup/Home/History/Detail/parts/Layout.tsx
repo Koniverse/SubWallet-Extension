@@ -57,6 +57,7 @@ const Component: React.FC<Props> = (props: Props) => {
       />
       <MetaInfo.Default label={t('Extrinsic hash')}>{extrinsicHash}</MetaInfo.Default>
       <MetaInfo.Default label={t('Transaction time')}>{formatHistoryDate(data.time, language, 'detail')}</MetaInfo.Default>
+      {data.blockTime && (<MetaInfo.Default label={t('Block time')}>{formatHistoryDate(data.blockTime, language, 'detail')}</MetaInfo.Default>)}
       <HistoryDetailAmount data={data} />
 
       {

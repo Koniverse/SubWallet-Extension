@@ -71,7 +71,7 @@ export function _isValidAddressForEcosystem (validateRecipientParams: ValidateRe
       _isChainTonCompatible(destChainInfo) ||
       _isChainCardanoCompatible(destChainInfo) ||
       _isChainBitcoinCompatible(destChainInfo)) {
-      return 'Recipient address must be the same type as sender address 1';
+      return 'Recipient address must be the same type as sender address';
     }
 
     return 'Unknown chain type';
