@@ -186,6 +186,7 @@ export interface SwapRequestV2 {
   feeToken?: string;
   preferredProvider?: SwapProviderId; // allow user to designate a provider
   isCrossChain?: boolean;
+  isSupportKyberVersion?: boolean;
 }
 
 export interface SwapRequestResult {

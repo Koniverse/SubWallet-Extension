@@ -47,12 +47,23 @@ export class SwapService implements StoppableServiceInterface {
     this.chainService = state.chainService;
   }
 
-  private async askProvidersForQuote (request: SwapRequestV2) {
+  private async askProvidersForQuote (_request: SwapRequestV2) {
     const availableQuotes: QuoteAskResponse[] = [];
+
+    // hotfix
+    const request = {
+      ..._request,
+      isSupportKyberVersion: true
+    };
+
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
+        if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
+          return;
+        }
+
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
           return;
         }
