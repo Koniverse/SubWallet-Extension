@@ -392,7 +392,6 @@ export class KyberHandler implements SwapBaseInterface {
     const metadata = params.quote.metadata as KyberMetadata;
     const slippageTolerance = params.slippage * 10000;
 
-    console.log('metadata', params.quote);
     const rawTx = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
     const evmApi = this.chainService.getEvmApi(fromAsset.originChain);

@@ -149,8 +149,8 @@ const Component: React.FC<Props> = (props: Props) => {
         {isKyberProvider && (
           <AlertBox
             className={'__swap-quote-expired'}
-            description={t('Waiting for content')}
-            title={t('Waiting for it!')}
+            description={t('Due to market conditions, you may receive more or less than expected')}
+            title={t('Pay attention!')}
             type='warning'
           />
         )}
