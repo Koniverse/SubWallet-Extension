@@ -4,8 +4,7 @@
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { estimateTxFee, getERC20Contract, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
-import { _ERC20_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -81,9 +80,10 @@ export const KYBER_CLIENT_ID = process.env.KYBER_CLIENT_ID || '';
 
 const kyberUrl = 'https://aggregator-api.kyberswap.com';
 
-export async function buildTxForSwap (params: BuildTxForSwapParams, chain: string): Promise<TransactionConfig> {
-  const { recipient, sender, slippageTolerance } = params;
+type BuildTxForSwapResult = { data?: TransactionConfig; error?: SwapError | TransactionError };
 
+async function buildTxForSwap (params: BuildTxForSwapParams, chain: string): Promise<BuildTxForSwapResult> {
+  const { recipient, sender, slippageTolerance } = params;
   let routeSummary = params.routeSummary;
 
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
@@ -108,14 +108,15 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
 
       const routeData = (await res.json()) as KyberApiResponse<KyberRouteData>;
 
-      if (!routeData.success || !routeData.data || !routeData.data.routeSummary) {
-        throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR, routeData.message);
+      if (!routeData.success || !routeData.data?.routeSummary) {
+        return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, routeData.message) };
       }
 
       routeSummary = routeData.data.routeSummary;
     } catch (error) {
       console.error('Error:', error);
-      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
+
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
     }
   }
 
@@ -140,35 +141,36 @@ export async function buildTxForSwap (params: BuildTxForSwapParams, chain: strin
     });
 
     const data = (await res.json()) as KyberApiResponse<KyberSwapBuildTxResponse>;
-
     const requestData = data.data;
 
     if (!requestData || !requestData.routerAddress || !requestData.data || !requestData.gas) {
-      console.log('Kyber error:', data.message);
+      const lowerDetails = data.details?.map((d) => d.toLowerCase()) ?? [];
+      const msg = data.message?.toLowerCase() ?? '';
 
-      if (data.details?.some((detail) => detail.toLowerCase().includes('insufficient liquidity'))) {
-        throw new SwapError(SwapErrorType.NOT_ENOUGH_LIQUIDITY);
-      } else if (data.details?.some((detail) => detail.toLowerCase().includes('execution reverted')) || data.message?.includes('smaller than estimated')) {
-        throw new SwapError(SwapErrorType.NOT_MEET_MIN_EXPECTED);
+      if (lowerDetails.some((d) => d.includes('insufficient liquidity'))) {
+        return { error: new SwapError(SwapErrorType.NOT_ENOUGH_LIQUIDITY) };
       }
 
-      throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
+      if (lowerDetails.some((d) => d.includes('execution reverted')) || msg.includes('smaller than estimated')) {
+        return { error: new SwapError(SwapErrorType.NOT_MEET_MIN_EXPECTED) };
+      }
+
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, data.message) };
     }
 
     return {
-      from: sender,
-      to: requestData.routerAddress,
-      value: requestData.transactionValue,
-      data: requestData.data,
-      gas: requestData.gas
-    } as TransactionConfig;
+      data: {
+        from: sender,
+        to: requestData.routerAddress,
+        value: requestData.transactionValue,
+        data: requestData.data,
+        gas: requestData.gas
+      }
+    };
   } catch (error) {
-    if (error instanceof SwapError) {
-      throw error;
-    }
-
     console.error('Kyber error:', error);
-    throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
+
+    return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
   }
 }
 
@@ -229,9 +231,7 @@ export class KyberHandler implements SwapBaseInterface {
 
       const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
       const fromContractAddress = _getContractAddressOfToken(fromAsset);
-      const fromTokenContract = getERC20Contract(fromContractAddress, evmApi);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      const allowance = await fromTokenContract.methods.allowance(params.request.address, routerContract).call() as string;
+      const allowance = await getERC20Allowance(routerContract, params.request.address, fromContractAddress, evmApi);
 
       if (allowance && new BigNumber(allowance).gt(params.request.fromAmount)) {
         return Promise.resolve(undefined);
@@ -344,29 +344,9 @@ export class KyberHandler implements SwapBaseInterface {
     }
 
     const routerContract = metadata.routerAddress;
-    let transactionConfig: TransactionConfig = {} as TransactionConfig;
 
-    const priority = await calculateGasFeeParams(evmApi, evmApi.chainSlug);
+    const transactionConfig = await getERC20SpendingApprovalTx(routerContract, params.address, fromContract, evmApi);
 
-    const amount = params.quote.fromAmount;
-    const tokenContract = new evmApi.api.eth.Contract(_ERC20_ABI, fromContract);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const approveData = tokenContract.methods.approve(routerContract, amount).encodeABI();
-
-    const fee = combineEthFee(priority);
-
-    transactionConfig = {
-      from: params.address,
-      to: fromContract,
-      value: 0,
-      data: approveData as string,
-      ...fee
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const gasLimit = await tokenContract.methods.approve(routerContract, amount).estimateGas({ from: params.address }) as number;
-
-    transactionConfig.gas = gasLimit.toString();
     const _data: TokenSpendingApprovalParams = {
       spenderAddress: routerContract,
       contractAddress: fromContract,
@@ -399,12 +379,17 @@ export class KyberHandler implements SwapBaseInterface {
 
     const rawTx = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
+    if (rawTx.error) {
+      console.error('Kyber error:', rawTx.error);
+      throw rawTx.error;
+    }
+
     const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
     const priority = await calculateGasFeeParams(evmApi, evmApi.chainSlug);
     const fee = combineEthFee(priority);
 
     const transactionConfig: TransactionConfig = {
-      ...rawTx,
+      ...rawTx.data,
       ...fee
     };
 
