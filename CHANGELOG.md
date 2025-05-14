@@ -1,5 +1,50 @@
 # CHANGELOG
 
+## 1.3.35
+Build date: May 09, 2025.
+
+Features & Update:
+- Refactor Across bridge (#4282)
+- Review extrinsic status subscription (#4240)
+- Update content in-app for swap (#4259)
+
+Bug fixed:
+- Fixed bug Cannot sign transaction when chain connection not be initialized (#4300)
+- Fixed bug connecting to Aleph Zero EVM dapp (#4320)
+- Fixed bug related to price chart for derivation token (#4332, #4344)
+
+
+## 1.3.34
+Build date: May 05, 2025.
+
+Features & Update:
+- Support extension side panel (#4091)
+- Update padding for the time frame selector for price chart
+
+
+## 1.3.33
+Build date: Apr 30, 2025.
+
+Features & Update:
+- Support price chart (#4122, #4266)
+- Update link for "Contact support" (#4324)
+
+
+## 1.3.32
+Build date: Apr 26, 2025.
+
+Features & Update:
+- Support CIP-30 on Cardano (#4100)
+- Support swap-bridge for EVM chains (#4220)
+- Swap support and direct cross-chain swap on more EVM chains (#4219)
+- Change TAO's position in Earning options (#4290)
+- Update features related to middleware services (#4312)
+- Update chain-list
+
+Bug fixed:
+- Fixed bug when stake for subnet (#4287)
+
+
 ## 1.3.31
 Build date: Apr 18, 2025.
 

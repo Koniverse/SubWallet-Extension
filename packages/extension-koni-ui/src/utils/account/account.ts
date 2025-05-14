@@ -13,7 +13,7 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
@@ -215,6 +215,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
   }
 
   if (isTonAddress(address) && authAccountTypes?.includes('ton')) {
+    return true;
+  }
+
+  if (isCardanoAddress(address) && authAccountTypes?.includes('cardano')) {
     return true;
   }
 

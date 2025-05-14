@@ -55,7 +55,10 @@ export class XcmApi {
 
       return response.data;
     } catch (error) {
-      console.error(error);
+      if (error instanceof SyntaxError) {
+        throw new Error('Unable to perform this transaction at the moment. Try again later');
+      }
+
       throw new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later');
     }
   }

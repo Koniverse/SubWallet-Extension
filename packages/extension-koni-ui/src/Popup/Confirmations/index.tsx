@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, ProcessType } from '@subwallet/extension-base/types';
@@ -20,7 +20,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
 
 type Props = ThemeProps
 
@@ -30,6 +30,8 @@ const titleMap: Record<ConfirmationType, string> = {
   authorizeRequest: detectTranslate('Connect with SubWallet'),
   evmSendTransactionRequest: detectTranslate('Transaction request'),
   evmSignatureRequest: detectTranslate('Signature request'),
+  cardanoSignatureRequest: detectTranslate('Signature request'),
+  cardanoSignTransactionRequest: detectTranslate('Transaction request'),
   metadataRequest: detectTranslate('Update metadata'),
   signingRequest: detectTranslate('Signature request'),
   connectWCRequest: detectTranslate('WalletConnect'),
@@ -98,6 +100,12 @@ const Component = function ({ className }: Props) {
         account = findAccountByAddress(accounts, request.payload.address) || undefined;
         canSign = request.payload.canSign;
         isMessage = confirmation.type === 'evmSignatureRequest';
+      } else if (['cardanoSignatureRequest', 'cardanoSendTransactionRequest', 'cardanoWatchTransactionRequest', 'cardanoSignTransactionRequest'].includes(confirmation.type)) {
+        const request = confirmation.item as ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0];
+
+        account = findAccountByAddress(accounts, request.payload.address) || undefined;
+        canSign = request.payload.canSign;
+        isMessage = confirmation.type === 'cardanoSignatureRequest';
       }
 
       const signMode = getSignMode(account);
@@ -161,6 +169,20 @@ const Component = function ({ className }: Props) {
         return (
           <EvmTransactionConfirmation
             request={confirmation.item as ConfirmationDefinitions['evmSendTransactionRequest'][0]}
+            type={confirmation.type}
+          />
+        );
+      case 'cardanoSignatureRequest':
+        return (
+          <CardanoSignatureConfirmation
+            request={confirmation.item as ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]}
+            type={confirmation.type}
+          />
+        );
+      case 'cardanoSignTransactionRequest':
+        return (
+          <CardanoSignTransactionConfirmation
+            request={confirmation.item as ConfirmationDefinitionsCardano['cardanoSignTransactionRequest'][0]}
             type={confirmation.type}
           />
         );
