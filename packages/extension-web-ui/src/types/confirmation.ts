@@ -8,4 +8,4 @@ export type EvmErrorSupportType = keyof Pick<ConfirmationDefinitions, 'errorConn
 
 export type TonSignatureSupportType = keyof Pick<ConfirmationDefinitionsTon, 'tonSignatureRequest' | 'tonWatchTransactionRequest' | 'tonSendTransactionRequest'>;
 
-export type CardanoSignatureSupportType = keyof Pick<ConfirmationDefinitionsCardano, 'cardanoSignatureRequest' | 'cardanoWatchTransactionRequest' | 'cardanoSendTransactionRequest'>;
+export type CardanoSignatureSupportType = keyof Pick<ConfirmationDefinitionsCardano, 'cardanoSignatureRequest' | 'cardanoWatchTransactionRequest' | 'cardanoSendTransactionRequest' | 'cardanoSignTransactionRequest'>;

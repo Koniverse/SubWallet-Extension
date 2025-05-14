@@ -13,7 +13,7 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-web-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-web-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-web-ui/utils/types';
-import { decodeAddress, encodeAddress, isAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { decodeAddress, encodeAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
@@ -215,6 +215,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
   }
 
   if (isTonAddress(address) && authAccountTypes?.includes('ton')) {
+    return true;
+  }
+
+  if (isCardanoAddress(address) && authAccountTypes?.includes('cardano')) {
     return true;
   }
 
