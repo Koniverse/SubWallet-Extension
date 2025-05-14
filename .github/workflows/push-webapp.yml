@@ -4,11 +4,15 @@ on:
     branches:
       - webapp
       - webapp-dev
+      - koni/dev/issue-3784-PR
+      - koni/dev/issue-3784-PR1
   push:
     branches:
       - webapp
       - webapp-dev
       - webapp-demo
+      - koni/dev/issue-3784-PR
+      - koni/dev/issue-3784-PR1
 
 jobs:
   master:
