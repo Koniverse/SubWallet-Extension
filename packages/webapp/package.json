@@ -15,13 +15,13 @@
   },
   "sideEffects": false,
   "type": "module",
-  "version": "1.3.23-0",
+  "version": "1.3.26-0",
   "dependencies": {
     "@babel/runtime": "^7.20.6",
     "@emurgo/cardano-serialization-lib-browser": "^13.2.0",
-    "@subwallet/extension-base": "^1.3.23-0",
-    "@subwallet/extension-inject": "^1.3.23-0",
-    "@subwallet/extension-web-ui": "^1.3.23-0"
+    "@subwallet/extension-base": "^1.3.26-0",
+    "@subwallet/extension-inject": "^1.3.26-0",
+    "@subwallet/extension-web-ui": "^1.3.26-0"
   },
   "devDependencies": {
     "@polkadot/dev": "^0.65.23",

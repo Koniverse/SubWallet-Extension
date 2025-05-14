@@ -57,6 +57,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('taostats.io')) {
+    return 'account';
+  }
+
   return 'address';
 }
 
@@ -90,10 +94,6 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   }
 
   if (explorerLink && isHex(hexAddPrefix(value))) {
-    if (chainInfo.slug === 'bittensor') {
-      return undefined;
-    }
-
     const route = getBlockExplorerTxRoute(chainInfo);
 
     if (chainInfo.slug === 'tangle') {

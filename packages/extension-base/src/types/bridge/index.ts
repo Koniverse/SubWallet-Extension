@@ -7,4 +7,5 @@ export interface RequestClaimBridge {
   address: string,
   chain: string,
   notification: _NotificationInfo
+  symbol?: string
 }
