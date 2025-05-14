@@ -3,6 +3,12 @@
 
 import { AddressCardanoTransactionBalance, CardanoSignTransactionRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, MetaInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
+import { useOpenDetailModal } from '@subwallet/extension-web-ui/hooks';
+import { BaseDetailModal, CardanoSignArea } from '@subwallet/extension-web-ui/Popup/Confirmations/parts';
+import { RootState } from '@subwallet/extension-web-ui/stores';
+import { CardanoSignatureSupportType, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { findAccountByAddress } from '@subwallet/extension-web-ui/utils';
 import { Button, Number } from '@subwallet/react-ui';
 import { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
@@ -10,18 +16,6 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-
-import { CardanoSignatureSupportType, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { RootState } from '@subwallet/extension-web-ui/stores';
-import { useOpenDetailModal } from '@subwallet/extension-web-ui/hooks';
-import { findAccountByAddress } from '@subwallet/extension-web-ui/utils';
-import {
-  AccountItemWithProxyAvatar,
-  ConfirmationGeneralInfo,
-  MetaInfo,
-  ViewDetailIcon
-} from '@subwallet/extension-web-ui/components';
-import { BaseDetailModal, CardanoSignArea } from '@subwallet/extension-web-ui/Popup/Confirmations/parts';
 
 interface Props extends ThemeProps {
   type: CardanoSignatureSupportType

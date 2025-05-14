@@ -1,11 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  ConfirmationDefinitions,
-  ConfirmationDefinitionsCardano,
-  ExtrinsicType
-} from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, ProcessType } from '@subwallet/extension-base/types';
@@ -24,22 +20,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import {
-  AddNetworkConfirmation,
-  AddTokenConfirmation,
-  AuthorizeConfirmation,
-  CardanoSignatureConfirmation, CardanoSignTransactionConfirmation,
-  ConnectWalletConnectConfirmation,
-  EvmSignatureConfirmation,
-  EvmSignatureWithProcess,
-  EvmTransactionConfirmation,
-  MetadataConfirmation,
-  NetworkConnectionErrorConfirmation,
-  NotSupportConfirmation,
-  NotSupportWCConfirmation,
-  SignConfirmation,
-  TransactionConfirmation
-} from './variants';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
 
 type Props = ThemeProps
 

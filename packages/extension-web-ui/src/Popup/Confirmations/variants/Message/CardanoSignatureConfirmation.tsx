@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CardanoSignatureRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
-import { CardanoMessageDetail } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
 import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-web-ui/hooks';
+import { CardanoMessageDetail } from '@subwallet/extension-web-ui/Popup/Confirmations/parts';
 import { CardanoSignatureSupportType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
