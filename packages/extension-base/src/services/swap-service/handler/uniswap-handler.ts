@@ -694,7 +694,7 @@ export class UniswapHandler implements SwapBaseInterface {
     const { permitData, quote, routing } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
 
-    let signature: string | undefined = '';
+    let signature: string | undefined;
 
     if (permitData) {
       signature = this.transactionService.getCacheInfo(processId, SwapStepType.PERMIT);
