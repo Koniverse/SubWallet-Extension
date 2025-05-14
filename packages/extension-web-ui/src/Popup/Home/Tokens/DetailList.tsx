@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
@@ -144,6 +145,20 @@ function Component (): React.ReactElement {
     return '';
   }, [tokenGroupSlug, assetRegistryMap, multiChainAssetMap]);
 
+  const priceId = useMemo<string | undefined>(() => {
+    if (!tokenGroupSlug) {
+      return;
+    }
+
+    if (assetRegistryMap[tokenGroupSlug]) {
+      return _getAssetPriceId(assetRegistryMap[tokenGroupSlug]);
+    } else if (multiChainAssetMap[tokenGroupSlug]) {
+      return _getMultiChainAssetPriceId(multiChainAssetMap[tokenGroupSlug]);
+    }
+
+    return undefined;
+  }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
+
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';
     const slugs = tokenGroupMap[slug] ? tokenGroupMap[slug] : [slug];
@@ -237,10 +252,12 @@ function Component (): React.ReactElement {
   const [currentTokenInfo, setCurrentTokenInfo] = useState<CurrentSelectToken| undefined>(undefined);
   const [isShrink, setIsShrink] = useState<boolean>(false);
 
+  const upperBlockHeight = priceId ? 486 : 272;
+
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       setIsShrink((value) => {
         if (!value && topBlockRef.current && containerRef.current) {
           const containerProps = containerRef.current.getBoundingClientRect();
@@ -283,12 +300,12 @@ function Component (): React.ReactElement {
         return false;
       });
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const handleResize = useCallback(() => {
     const topPosition = containerRef.current?.scrollTop || 0;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       if (topBlockRef.current && containerRef.current) {
         const containerProps = containerRef.current.getBoundingClientRect();
 
@@ -305,7 +322,7 @@ function Component (): React.ReactElement {
         topBlockRef.current.style.width = '100%';
       }
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const onCloseDetail = useCallback(() => {
     setCurrentTokenInfo(undefined);
@@ -504,11 +521,13 @@ function Component (): React.ReactElement {
   return (
     <div
       className={CN('token-detail-container', {
+        '-no-chart': !priceId,
         '__web-ui': isWebUI
       })}
       onScroll={handleScroll}
       ref={containerRef}
     >
+      <div className={'__upper-block-placeholder'}></div>
       {!isWebUI && (
         <div
           className={CN('__upper-block-wrapper', {
@@ -527,6 +546,7 @@ function Component (): React.ReactElement {
             onOpenReceive={onOpenReceive}
             onOpenSendFund={onOpenSendFund}
             onOpenSwap={onOpenSwap}
+            priceId={priceId}
             symbol={symbol}
           />
         </div>
@@ -697,9 +717,56 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: 210,
       '&.__web-ui': {
         padding: 0
+      }
+    },
+
+    '.__upper-block-placeholder': {
+      paddingTop: 486
+    },
+
+    '.__upper-block-wrapper': {
+      position: 'absolute',
+      backgroundColor: token.colorBgDefault,
+      zIndex: 10,
+      height: 486,
+      paddingTop: 8,
+      top: 0,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      alignItems: 'center',
+      transition: 'opacity, height 0.2s ease',
+
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
+        display: 'block',
+        zIndex: 1
+      }
+    },
+
+    '.token-detail-container.-no-chart': {
+      '.__upper-block-placeholder': {
+        paddingTop: 272
+      },
+
+      '.__upper-block-wrapper': {
+        height: 272
+      }
+    },
+
+    '.__upper-block-wrapper.__upper-block-wrapper.-is-shrink': {
+      height: 128,
+
+      '&:before': {
+        height: 80
       }
     },
 
@@ -709,27 +776,10 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       paddingRight: token.size
     },
 
-    '.__upper-block-wrapper': {
-      position: 'absolute',
-      backgroundColor: token.colorBgDefault,
-      zIndex: 10,
-      height: 206,
-      paddingTop: 8,
-      top: 0,
-      left: 0,
-      right: 0,
-      display: 'flex',
-      alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
-      transition: 'opacity, padding-top 0.27s ease',
-
-      '&.-is-shrink': {
-        height: 128
-      }
-    },
-
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scrolling-block': {
