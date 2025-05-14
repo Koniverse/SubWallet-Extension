@@ -57,28 +57,32 @@ function Component ({ className = '' }: Props) {
     activeModal(enterPasswordModalId);
   }, [activeModal]);
 
-  const onInteractAction = useCallback(() => {
+  const onInteractAction = useCallback(async () => {
     if (isMigrationNotion && !isAcknowledgedUnifiedAccountMigration) {
       // flag that user acknowledge the migration
-      saveMigrationAcknowledgedStatus({ isAcknowledgedUnifiedAccountMigration: true }).catch(console.error);
+      await saveMigrationAcknowledgedStatus({ isAcknowledgedUnifiedAccountMigration: true });
     }
 
     // for now, do nothing
   }, [isAcknowledgedUnifiedAccountMigration, isMigrationNotion]);
 
   const onClickDismiss = useCallback(() => {
-    onInteractAction();
-    goHome();
+    (async () => {
+      await onInteractAction();
+      goHome();
+    })().catch(console.error);
   }, [goHome, onInteractAction]);
 
   const onClickMigrateNow = useCallback(() => {
-    onInteractAction();
+    (async () => {
+      await onInteractAction();
 
-    if (!hasAnyAccountForMigration(accountProxies)) {
-      setCurrentScreenView(ScreenView.SUMMARY);
-    } else {
-      onOpenPasswordModal();
-    }
+      if (!hasAnyAccountForMigration(accountProxies)) {
+        setCurrentScreenView(ScreenView.SUMMARY);
+      } else {
+        onOpenPasswordModal();
+      }
+    })().catch(console.error);
   }, [accountProxies, onInteractAction, onOpenPasswordModal]);
 
   const onSubmitPassword = useCallback(async (password: string) => {
