@@ -57,18 +57,23 @@ interface UniswapDutchQuote {
   orderInfo: {
     swapper: string
     chainId: number
-    input: {
-      startAmount: string
-      endAmount: string
-      token: string
-    },
-    outputs: {
-      startAmount: string
-      endAmount: string
-      token: string
-    }[]
+    input: UniswapDutchInput,
+    outputs: UniswapDutchOutput[]
   },
   orderId: string
+}
+
+interface UniswapDutchInput {
+  startAmount: string
+  endAmount: string
+  token: string
+}
+
+interface UniswapDutchOutput {
+  startAmount: string
+  endAmount: string
+  token: string,
+  recipient: string
 }
 
 export interface UniswapOrders {
@@ -117,9 +122,21 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
     tokenIn = classicQuote.input.token;
     tokenOut = classicQuote.output.token;
   } else if (dutchQuote) {
+    /**
+     *  In Dutch order swap, the outputs field is an array instead of a single output since it might contain filler's output to pay fee.
+     *  Need to filter exactly output that come to recipient address.
+     */
+    const output = dutchQuote.orderInfo.outputs.find((output) =>
+      output.recipient.toLowerCase() === address.toLowerCase()
+    );
+
+    if (!output) {
+      return undefined; // todo: recheck
+    }
+
     chainId = dutchQuote.orderInfo.chainId;
     tokenIn = dutchQuote.orderInfo.input.token;
-    tokenOut = dutchQuote.orderInfo.outputs[0].token;
+    tokenOut = output.token;
   } else {
     return undefined;
   }
@@ -132,7 +149,7 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
     },
     body: JSON.stringify({
       walletAddress: address,
-      amount: BigNumber(amount).multipliedBy(2).toString(),
+      amount: BigNumber(amount).multipliedBy(2).toFixed(0),
       token: tokenIn,
       chainId: chainId,
       tokenOut: tokenOut,
