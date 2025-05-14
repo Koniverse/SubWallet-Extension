@@ -11,9 +11,11 @@ import { PriceChart } from './PriceChart';
 import { PriceInfoContainer } from './PriceInfoContainer';
 import { PriceInfoUI } from './PriceInfoUI';
 import { TimeframeSelector } from './TimeframeSelector';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
 
 type WrapperProps = ThemeProps & {
   priceId?: string;
+  isChartSupported?: boolean;
 };
 
 type ComponentProps = {
@@ -169,12 +171,13 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
 };
 
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
-  const { className, priceId } = props;
+  const { className, isChartSupported, priceId } = props;
+  const priceMap = useSelector((state) => state.price.priceMap);
 
   return (
     <div className={className}>
       {
-        priceId
+        priceId && isChartSupported
           ? (
             <Component
               priceId={priceId}
@@ -186,7 +189,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
                 change={0}
                 className={'__price-info-container-empty'}
                 percent={0}
-                value={0}
+                value={priceId ? priceMap[priceId] || 0 : 0}
               />
             </>
           )

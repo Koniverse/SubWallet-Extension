@@ -5,7 +5,7 @@ import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extensi
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, ReceiveModal, TokenBalance, TokenItem } from '@subwallet/extension-web-ui/components';
+import { AccountSelectorModal, AlertBox, LoadingScreen, ReceiveModal, TokenBalance, TokenItem } from '@subwallet/extension-web-ui/components';
 import PageWrapper from '@subwallet/extension-web-ui/components/Layout/PageWrapper';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenBalanceDetailItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenBalanceDetailItem';
@@ -15,6 +15,7 @@ import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeCon
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useCoreReceiveModalHelper, useDefaultNavigate, useGetChainSlugsByAccount, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { canShowChart } from '@subwallet/extension-web-ui/messaging';
 import Banner from '@subwallet/extension-web-ui/Popup/Home/Tokens/Banner';
 import { DetailModal } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailUpperBlock';
@@ -104,6 +105,8 @@ function Component (): React.ReactElement {
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isChartSupported, setIsChartSupported] = useState(false);
 
   const filteredAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => {
@@ -444,6 +447,33 @@ function Component (): React.ReactElement {
     });
   }, [inactiveModal, setIsShowTonWarning, tonWalletContractSelectorModal]);
 
+  useEffect(() => {
+    let sync = true;
+
+    setIsLoading(true);
+
+    if (priceId) {
+      canShowChart(priceId).then((result) => {
+        if (sync) {
+          setIsChartSupported(result);
+          setIsLoading(false);
+        }
+      }).catch(() => {
+        if (sync) {
+          setIsChartSupported(false);
+          setIsLoading(false);
+        }
+      });
+    } else {
+      setIsChartSupported(false);
+      setIsLoading(false);
+    }
+
+    return () => {
+      sync = false;
+    };
+  }, [priceId]);
+
   const onOpenTonWalletContactModal = useCallback(() => {
     if (isAllAccount) {
       activeModal(tonAccountSelectorModalId);
@@ -518,10 +548,14 @@ function Component (): React.ReactElement {
     }
   }, [navigate, symbol, tokenGroupMap, tokenGroupSlug]);
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div
       className={CN('token-detail-container', {
-        '-no-chart': !priceId,
+        '-no-chart': !isChartSupported,
         '__web-ui': isWebUI
       })}
       onScroll={handleScroll}
@@ -538,6 +572,7 @@ function Component (): React.ReactElement {
           <DetailUpperBlock
             balanceValue={tokenBalanceValue}
             className={'__static-block'}
+            isChartSupported={isChartSupported}
             isShrink={isShrink}
             isSupportBuyTokens={isSupportBuyTokens}
             isSupportSwap={true}
