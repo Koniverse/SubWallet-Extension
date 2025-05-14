@@ -18,6 +18,7 @@ import { isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+import { EventService } from '@subwallet/extension-base/services/event-service';
 
 const AUTH_URLS_KEY = 'authUrls';
 
@@ -31,7 +32,7 @@ export default class AuthRequestHandler {
   private readonly evmChainSubject = new BehaviorSubject<AuthUrls>({});
   public readonly authSubjectV2: BehaviorSubject<AuthorizeRequest[]> = new BehaviorSubject<AuthorizeRequest[]>([]);
 
-  constructor (requestService: RequestService, chainService: ChainService, private keyringService: KeyringService) {
+  constructor (requestService: RequestService, chainService: ChainService, private keyringService: KeyringService, private eventService: EventService) {
     this.#requestService = requestService;
     this.#chainService = chainService;
     this.migrateAuthUrlInfoToUnified().then(() => {
@@ -41,7 +42,6 @@ export default class AuthRequestHandler {
 
   private async init () {
     const authList = await this.getAuthList();
-    console.log('authList', authList);
     let needUpdateAuthList = false;
 
     const updatedAuthList = Object.entries(authList).reduce((acc, [key, value]) => {
@@ -63,6 +63,7 @@ export default class AuthRequestHandler {
   }
 
   private async migrateAuthUrlInfoToUnified (): Promise<void> {
+    await this.eventService.waitCryptoReady;
     const authList = await this.getAuthList();
     let needUpdateAuthList = false;
     const updatedAuthList = Object.entries(authList).reduce((acc, [key, value]) => {
@@ -105,7 +106,6 @@ export default class AuthRequestHandler {
   }
 
   public setAuthorize (data: AuthUrls, callback?: () => void): void {
-    console.log('setAuthorize data', data);
     this.authorizeStore.set(AUTH_URLS_KEY, data, () => {
       this.authorizeCached = data;
       this.evmChainSubject.next(this.authorizeCached);
@@ -116,12 +116,10 @@ export default class AuthRequestHandler {
 
   public getAuthorize (update: (value: AuthUrls) => void): void {
     // This action can be use many by DApp interaction => caching it in memory
-    console.log('this.authorizeCached', this.authorizeCached);
     if (this.authorizeCached) {
       update(this.authorizeCached);
     } else {
       this.authorizeStore.get('authUrls', (data) => {
-        console.log('data', data);
         this.authorizeCached = data || {};
         this.evmChainSubject.next(this.authorizeCached);
         this.authorizeUrlSubject.next(this.authorizeCached);
@@ -136,18 +134,6 @@ export default class AuthRequestHandler {
         resolve(rs);
       });
     });
-  }
-
-  public restoreAuthUrls (): Promise<void> {
-    return new Promise<void>((resolve) => {
-      this.authorizeStore.get('authUrls', (rs) => {
-        this.authorizeCached = rs;
-        this.evmChainSubject.next(this.authorizeCached);
-        this.authorizeUrlSubject.next(this.authorizeCached);
-
-        resolve();
-      });
-    })
   }
 
   public getDAppChainInfo (options: {accessType: AccountAuthType, autoActive?: boolean, defaultChain?: string, url?: string}): _ChainInfo | undefined {

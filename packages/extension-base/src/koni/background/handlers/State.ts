@@ -155,12 +155,12 @@ export default class KoniState {
     this.chainService = new ChainService(this.dbService, this.eventService);
     this.subscanService = SubscanService.getInstance();
     this.settingService = new SettingService();
-    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService);
+    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.eventService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
     this.balanceService = new BalanceService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
     this.mintCampaignService = new MintCampaignService(this);
-    this.walletConnectService = new WalletConnectService(this, this.requestService);
+    this.walletConnectService = new WalletConnectService(this, this.requestService, this.eventService);
     this.migrationService = new MigrationService(this, this.eventService);
 
     this.campaignService = new CampaignService(this);

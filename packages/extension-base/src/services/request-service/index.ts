@@ -16,6 +16,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 import TonRequestHandler from './handler/TonRequestHandler';
 import { AuthRequestHandler, ConnectWCRequestHandler, EvmRequestHandler, MetadataRequestHandler, NotSupportWCRequestHandler, PopupHandler, SubstrateRequestHandler } from './handler';
 import { AuthUrls, MetaRequest } from './types';
+import { EventService } from '@subwallet/extension-base/services/event-service';
 
 export default class RequestService {
   // Common
@@ -33,13 +34,13 @@ export default class RequestService {
   readonly #notSupportWCRequestHandler: NotSupportWCRequestHandler;
 
   // Common
-  constructor (chainService: ChainService, settingService: SettingService, keyringService: KeyringService) {
+  constructor (chainService: ChainService, settingService: SettingService, keyringService: KeyringService, eventService: EventService) {
     this.#chainService = chainService;
     this.settingService = settingService;
     this.keyringService = keyringService;
     this.#popupHandler = new PopupHandler(this);
     this.#metadataRequestHandler = new MetadataRequestHandler(this);
-    this.#authRequestHandler = new AuthRequestHandler(this, this.#chainService, this.keyringService);
+    this.#authRequestHandler = new AuthRequestHandler(this, this.#chainService, this.keyringService, eventService);
     this.#substrateRequestHandler = new SubstrateRequestHandler(this);
     this.#evmRequestHandler = new EvmRequestHandler(this);
     this.#tonRequestHandler = new TonRequestHandler(this);
@@ -316,9 +317,5 @@ export default class RequestService {
     this.#metadataRequestHandler.resetWallet();
     this.#connectWCRequestHandler.resetWallet();
     this.#notSupportWCRequestHandler.resetWallet();
-  }
-
-  public async restoreAuthUrls () {
-    await this.#authRequestHandler.restoreAuthUrls();
   }
 }

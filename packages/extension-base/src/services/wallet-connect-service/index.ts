@@ -16,6 +16,7 @@ import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
 import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
+import { EventService } from '@subwallet/extension-base/services/event-service';
 
 const storage = SWStorage.instance;
 const methodDOTRequire = [POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_MESSAGE, POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_TRANSACTION];
@@ -49,6 +50,7 @@ class WCStorage implements IKeyValueStorage {
 
 export default class WalletConnectService {
   readonly #requestService: RequestService;
+  readonly #eventService: EventService;
   readonly #polkadotRequestHandler: PolkadotRequestHandler;
   readonly #eip155RequestHandler: Eip155RequestHandler;
   readonly #koniState: KoniState;
@@ -58,9 +60,10 @@ export default class WalletConnectService {
 
   public readonly sessionSubject: BehaviorSubject<SessionTypes.Struct[]> = new BehaviorSubject<SessionTypes.Struct[]>([]);
 
-  constructor (koniState: KoniState, requestService: RequestService, option: SignClientTypes.Options = DEFAULT_WALLET_CONNECT_OPTIONS) {
+  constructor (koniState: KoniState, requestService: RequestService, eventService: EventService, option: SignClientTypes.Options = DEFAULT_WALLET_CONNECT_OPTIONS) {
     this.#koniState = koniState;
     this.#requestService = requestService;
+    this.#eventService = eventService;
     option.storage = new WCStorage();
     this.#option = option;
     this.#polkadotRequestHandler = new PolkadotRequestHandler(this, requestService);
@@ -83,7 +86,7 @@ export default class WalletConnectService {
 
   public async initClient (force?: boolean) {
     this.#removeListener();
-
+    await this.#eventService.waitCryptoReady;
     if (force || await this.haveData()) {
       this.#client = await SignClient.init(this.#option);
     }
