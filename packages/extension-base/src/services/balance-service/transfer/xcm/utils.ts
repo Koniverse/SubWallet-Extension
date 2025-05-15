@@ -10,9 +10,24 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
-export interface DryRunInfo {
-  success: boolean,
-  fee?: string // has fee in case dry run success
+export type DryRunNodeFailure = {
+  success: false,
+  failureReason: string
+}
+
+export type DryRunNodeSuccess = {
+  success: true
+  fee: string
+  forwardedXcms: any
+  // destParaId?: number
+  // currency: string
+}
+
+export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
+
+export type DryRunResult = {
+  origin: DryRunNodeResult
+  destination?: DryRunNodeResult
 }
 
 interface GetXcmFeeRequest {
@@ -167,51 +182,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   return txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
 }
 
-// dry run can fail due to sender address & amount token
-// export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
-//   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
-//   const paraSpellChainMap = await fetchParaSpellChainMap();
-//   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
-//   const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
-//
-//   if (!psAssetType || !psAssetValue) {
-//     throw new Error('Token is not support XCM at this time'); // todo: content
-//   }
-//
-//   let dryRunInfo: DryRunInfo | undefined;
-//
-//   try {
-//     const bodyData = {
-//       senderAddress: sender,
-//       address: recipient,
-//       from: paraSpellChainMap[originChain.slug],
-//       to: paraSpellChainMap[destinationChain.slug],
-//       currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
-//     };
-//
-//     const response = await fetch(paraSpellApi.dryRunXcm, {
-//       method: 'POST',
-//       body: JSON.stringify(bodyData),
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Accept: 'application/json',
-//         'X-API-KEY': paraSpellKey
-//       }
-//     });
-//
-//     dryRunInfo = await response.json() as DryRunInfo;
-//   } catch (e) {
-//     console.error('Unable to dry run', e);
-//   }
-//
-//   if (!dryRunInfo || !dryRunInfo.success) {
-//     throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
-//   }
-//
-//   return dryRunInfo;
-// }
-
-export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
+export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
@@ -240,12 +211,10 @@ export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
   });
 
   if (!response.ok) {
-    const error = await response.json() as ParaSpellError;
-
-    throw new Error(error.message);
+    throw new Error('Failed to dry run XCM');
   }
 
-  return await response.json() as DryRunInfo;
+  return await response.json() as DryRunResult;
 }
 
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
@@ -279,7 +248,20 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    console.error('Estimate xcm fee failed:', error.message);
+    if ((isChainNotSupportDryRun(error.message) || isChainNotSupportPolkadotApi(error.message))) {
+      // todo: estimate fee for interlay
+      console.log('Interlay ngu xcmFee');
+      // const xcmTransfer = await createXcmExtrinsicV2(request);
+      //
+      // if (!xcmTransfer) {
+      //   return undefined;
+      // }
+      //
+      // const _xcmFeeInfo = await xcmTransfer.paymentInfo(request.sender);
+      // const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
+      //
+      // return Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
+    }
 
     return undefined;
   }
