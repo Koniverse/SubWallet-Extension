@@ -561,30 +561,32 @@ function Component (): React.ReactElement {
       onScroll={handleScroll}
       ref={containerRef}
     >
-      <div className={'__upper-block-placeholder'}></div>
       {!isWebUI && (
-        <div
-          className={CN('__upper-block-wrapper', {
-            '-is-shrink': isShrink
-          })}
-          ref={topBlockRef}
-        >
-          <DetailUpperBlock
-            balanceValue={tokenBalanceValue}
-            className={'__static-block'}
-            isChartSupported={isChartSupported}
-            isShrink={isShrink}
-            isSupportBuyTokens={isSupportBuyTokens}
-            isSupportSwap={true}
-            onClickBack={goHome}
-            onOpenBuyTokens={onOpenBuyTokens}
-            onOpenReceive={onOpenReceive}
-            onOpenSendFund={onOpenSendFund}
-            onOpenSwap={onOpenSwap}
-            priceId={priceId}
-            symbol={symbol}
-          />
-        </div>
+        <>
+          <div className={'__upper-block-placeholder'}></div>
+          <div
+            className={CN('__upper-block-wrapper', {
+              '-is-shrink': isShrink
+            })}
+            ref={topBlockRef}
+          >
+            <DetailUpperBlock
+              balanceValue={tokenBalanceValue}
+              className={'__static-block'}
+              isChartSupported={isChartSupported}
+              isShrink={isShrink}
+              isSupportBuyTokens={isSupportBuyTokens}
+              isSupportSwap={true}
+              onClickBack={goHome}
+              onOpenBuyTokens={onOpenBuyTokens}
+              onOpenReceive={onOpenReceive}
+              onOpenSendFund={onOpenSendFund}
+              onOpenSwap={onOpenSwap}
+              priceId={priceId}
+              symbol={symbol}
+            />
+          </div>
+        </>
       )}
 
       {!tokenBalanceItems.length
