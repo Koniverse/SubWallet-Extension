@@ -1,11 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
-import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -15,6 +13,38 @@ import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 export interface DryRunInfo {
   success: boolean,
   fee?: string // has fee in case dry run success
+}
+
+interface TGetXcmFeeRequest {
+  sender: string,
+  recipient: string,
+  value: string,
+  fromChainInfo: _ChainInfo,
+  toChainInfo: _ChainInfo,
+  fromTokenInfo: _ChainAsset
+}
+
+export type TFeeType = 'dryRun' | 'paymentInfo'
+
+export type TXcmFeeDetail =
+  | {
+    fee: string
+    currency: string
+    feeType: TFeeType
+    dryRunError?: string
+  }
+  | {
+    fee?: bigint
+    currency?: string
+    feeType?: TFeeType
+    dryRunError: string
+  }
+
+export type TGetXcmFeeResult = {
+  origin: TXcmFeeDetail
+  destination: TXcmFeeDetail
+  assetHub?: TXcmFeeDetail
+  bridgeHub?: TXcmFeeDetail
 }
 
 interface ParaSpellCurrency {
@@ -28,11 +58,12 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const paraSpellEndpoint = 'https://api.lightspell.xyz';
+const paraSpellEndpoint = 'https://api.lightspell.xyz/v2';
 
 const paraSpellApi = {
   buildXcm: `${paraSpellEndpoint}/x-transfer`,
-  dryRunXcm: `${paraSpellEndpoint}/dry-run`
+  dryRunXcm: `${paraSpellEndpoint}/dry-run`,
+  feeXcm: `${paraSpellEndpoint}/xcm-fee`
 };
 
 const paraSpellKey = process.env.PARASPELL_API_KEY || '';
@@ -104,7 +135,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
-    return Promise.reject(new Error('Substrate API is not available'));
+    return Promise.reject(new Error('Substrate API is not available')); // todo
   }
 
   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
@@ -146,48 +177,48 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 }
 
 // dry run can fail due to sender address & amount token
-export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
-  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
-  const paraSpellChainMap = await fetchParaSpellChainMap();
-  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
-  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
-
-  if (!psAssetType || !psAssetValue) {
-    throw new Error('Token is not support XCM at this time'); // todo: content
-  }
-
-  let dryRunInfo: DryRunInfo | undefined;
-
-  try {
-    const bodyData = {
-      senderAddress: sender,
-      address: recipient,
-      from: paraSpellChainMap[originChain.slug],
-      to: paraSpellChainMap[destinationChain.slug],
-      currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
-    };
-
-    const response = await fetch(paraSpellApi.dryRunXcm, {
-      method: 'POST',
-      body: JSON.stringify(bodyData),
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-API-KEY': paraSpellKey
-      }
-    });
-
-    dryRunInfo = await response.json() as DryRunInfo;
-  } catch (e) {
-    console.error('Unable to dry run', e);
-  }
-
-  if (!dryRunInfo || !dryRunInfo.success) {
-    throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
-  }
-
-  return dryRunInfo;
-}
+// export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
+//   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+//   const paraSpellChainMap = await fetchParaSpellChainMap();
+//   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
+//   const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
+//
+//   if (!psAssetType || !psAssetValue) {
+//     throw new Error('Token is not support XCM at this time'); // todo: content
+//   }
+//
+//   let dryRunInfo: DryRunInfo | undefined;
+//
+//   try {
+//     const bodyData = {
+//       senderAddress: sender,
+//       address: recipient,
+//       from: paraSpellChainMap[originChain.slug],
+//       to: paraSpellChainMap[destinationChain.slug],
+//       currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
+//     };
+//
+//     const response = await fetch(paraSpellApi.dryRunXcm, {
+//       method: 'POST',
+//       body: JSON.stringify(bodyData),
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Accept: 'application/json',
+//         'X-API-KEY': paraSpellKey
+//       }
+//     });
+//
+//     dryRunInfo = await response.json() as DryRunInfo;
+//   } catch (e) {
+//     console.error('Unable to dry run', e);
+//   }
+//
+//   if (!dryRunInfo || !dryRunInfo.success) {
+//     throw new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again');
+//   }
+//
+//   return dryRunInfo;
+// }
 
 export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
@@ -226,8 +257,46 @@ export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunInfo;
 }
 
+export async function estimateXcmFee (request: TGetXcmFeeRequest) {
+  const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const psAssetType = fromTokenInfo.metadata?.paraSpellAssetType;
+  const psAssetValue = fromTokenInfo.metadata?.paraSpellValue;
+
+  if (!psAssetType || !psAssetValue) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[fromChainInfo.slug],
+    to: paraSpellChainMap[toChainInfo.slug],
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, value)
+  };
+
+  const response = await fetch(paraSpellApi.feeXcm, {
+    method: 'POST',
+    body: JSON.stringify(bodyData),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-API-KEY': paraSpellKey
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return await response.json() as TGetXcmFeeResult;
+}
+
 function createParaSpellCurrency (assetType: string, assetValue: string, amount: string): ParaSpellCurrency {
   // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
+  // todo: or update all asset to use multi-location
   return {
     [assetType]: assetValue,
     amount
