@@ -15,7 +15,7 @@ export interface DryRunInfo {
   fee?: string // has fee in case dry run success
 }
 
-interface TGetXcmFeeRequest {
+interface GetXcmFeeRequest {
   sender: string,
   recipient: string,
   value: string,
@@ -24,27 +24,18 @@ interface TGetXcmFeeRequest {
   fromTokenInfo: _ChainAsset
 }
 
-export type TFeeType = 'dryRun' | 'paymentInfo'
+export type XcmFeeType = 'dryRun' | 'paymentInfo'
 
-export type TXcmFeeDetail =
-  | {
-    fee: string
-    currency: string
-    feeType: TFeeType
-    dryRunError?: string
-  }
-  | {
-    fee?: bigint
-    currency?: string
-    feeType?: TFeeType
-    dryRunError: string
-  }
+export interface XcmFeeDetail {
+  fee: string
+  currency: string
+  feeType: XcmFeeType
+  dryRunError?: string
+}
 
-export type TGetXcmFeeResult = {
-  origin: TXcmFeeDetail
-  destination: TXcmFeeDetail
-  assetHub?: TXcmFeeDetail
-  bridgeHub?: TXcmFeeDetail
+export type GetXcmFeeResult = {
+  origin: XcmFeeDetail
+  destination: XcmFeeDetail
 }
 
 interface ParaSpellCurrency {
@@ -257,7 +248,7 @@ export async function dryRunXcmV2 (request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunInfo;
 }
 
-export async function estimateXcmFee (request: TGetXcmFeeRequest) {
+export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const psAssetType = fromTokenInfo.metadata?.paraSpellAssetType;
@@ -288,10 +279,12 @@ export async function estimateXcmFee (request: TGetXcmFeeRequest) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    throw new Error(error.message);
+    console.error('Estimate xcm fee failed:', error.message);
+
+    return undefined;
   }
 
-  return await response.json() as TGetXcmFeeResult;
+  return await response.json() as GetXcmFeeResult;
 }
 
 function createParaSpellCurrency (assetType: string, assetValue: string, amount: string): ParaSpellCurrency {
