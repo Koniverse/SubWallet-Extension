@@ -314,7 +314,7 @@ export class SwapService implements StoppableServiceInterface {
         swapQuoteResponse: {
           quotes: [],
           aliveUntil: Date.now() + SWAP_QUOTE_TIMEOUT_MAP.error,
-          error: new SwapError(SwapErrorType.UNKNOWN, 'No available path')
+          error: new SwapError(SwapErrorType.ERROR_FETCHING_QUOTE)
         }
       };
     }
@@ -330,14 +330,7 @@ export class SwapService implements StoppableServiceInterface {
       : undefined;
 
     if (!directSwapRequest) {
-      return {
-        path: [],
-        swapQuoteResponse: {
-          quotes: [],
-          aliveUntil: Date.now() + SWAP_QUOTE_TIMEOUT_MAP.error,
-          error: new SwapError(SwapErrorType.UNKNOWN, 'Swap pair is not found')
-        }
-      };
+      throw Error('Swap pair is not found');
     }
 
     if (path.length > 1 && path.map((action) => action.action).includes(DynamicSwapType.BRIDGE)) {

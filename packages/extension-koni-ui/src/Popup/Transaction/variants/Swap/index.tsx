@@ -725,6 +725,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [currentFromTokenAvailableBalance, onChangeAmount]);
 
   useEffect(() => {
+    if (!currentQuote) {
+      setIsSwapQuotesSelectorModalVisible(false);
+    }
+  }, [currentQuote]);
+
+  useEffect(() => {
     const updateFromValue = () => {
       if (!accountAddressItems.length) {
         return;
