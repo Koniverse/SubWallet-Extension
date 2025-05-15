@@ -309,7 +309,14 @@ export class SwapService implements StoppableServiceInterface {
     const availablePath = await subwalletApiSdk.swapApi?.findAvailablePath(request);
 
     if (!availablePath) {
-      throw Error('No available path');
+      return {
+        path: [],
+        swapQuoteResponse: {
+          quotes: [],
+          aliveUntil: Date.now() + SWAP_QUOTE_TIMEOUT_MAP.error,
+          error: new SwapError(SwapErrorType.UNKNOWN, 'No available path')
+        }
+      };
     }
 
     const { path } = availablePath;
@@ -323,7 +330,14 @@ export class SwapService implements StoppableServiceInterface {
       : undefined;
 
     if (!directSwapRequest) {
-      throw Error('Swap pair is not found');
+      return {
+        path: [],
+        swapQuoteResponse: {
+          quotes: [],
+          aliveUntil: Date.now() + SWAP_QUOTE_TIMEOUT_MAP.error,
+          error: new SwapError(SwapErrorType.UNKNOWN, 'Swap pair is not found')
+        }
+      };
     }
 
     if (path.length > 1 && path.map((action) => action.action).includes(DynamicSwapType.BRIDGE)) {
