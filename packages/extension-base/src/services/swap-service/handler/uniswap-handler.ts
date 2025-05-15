@@ -281,6 +281,9 @@ export class UniswapHandler implements SwapBaseInterface {
     }
 
     const fromTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+    const fromChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(fromTokenInfo));
+    const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
+    const tokenContract = _getContractAddressOfToken(fromTokenInfo);
 
     const approval = checkApprovalResponse.approval;
 
@@ -298,6 +301,21 @@ export class UniswapHandler implements SwapBaseInterface {
       // Empty
     }
 
+    const tx = await getERC20SpendingApprovalTx(spender, sender, tokenContract, evmApi);
+    const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+    const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+    const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+    const feeInfo: CommonStepFeeInfo = {
+      feeComponent: [{
+        feeType: SwapFeeType.NETWORK_FEE,
+        amount: estimatedFee,
+        tokenSlug: nativeTokenSlug
+      }],
+      defaultFeeToken: nativeTokenSlug,
+      feeOptions: [nativeTokenSlug]
+    };
+
     const submitStep: BaseStepDetail = {
       name: 'Approve token for swap',
       type: CommonStepType.TOKEN_APPROVAL,
@@ -312,7 +330,7 @@ export class UniswapHandler implements SwapBaseInterface {
       } as ApproveStepMetadata
     };
 
-    return Promise.resolve([submitStep, selectedQuote.feeInfo]); // todo: wrong feeInfo, please check
+    return Promise.resolve([submitStep, feeInfo]);
   }
 
   async getApproveBridge (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
