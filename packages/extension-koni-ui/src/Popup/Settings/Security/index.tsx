@@ -339,10 +339,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </div>
               <div className='__item-center-part'>
                 <div className='__item-title'>
-                  {t('Sign for multiple transactions')}
+                  {t('settings.Screen.securitySetting.Item.signMultiple.title')}
                 </div>
                 <div className='__item-description'>
-                  {t('Allow signing once for multiple transactions')}
+                  {t('settings.Screen.securitySetting.Item.signMultiple.description')}
                 </div>
               </div>
               <div className='__item-right-part'>

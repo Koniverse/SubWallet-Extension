@@ -121,7 +121,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
         onBack={goBack}
         paddingVertical
         showBackButton
-        title={t('Notification settings')}
+        title={t('settings.Screen.notificationSetting.title')}
       />
 
       <div className={'body-container'}>
@@ -137,7 +137,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
                 weight='fill'
               />
             )}
-            name={t('Enable notifications')}
+            name={t('settings.Screen.notificationSetting.Item.enable')}
             rightItem={(
               <Switch
                 checked={currentNotificationSetting.isEnabled}
@@ -147,7 +147,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
           />
           {currentNotificationSetting.isEnabled && <div className={'content-wrapper'}>
             <div className={'options-container'}>
-              <div className={'option-title'}>{t('Show notifications about')}</div>
+              <div className={'option-title'}>{t('settings.Screen.notificationSetting.aboutListTitle')}</div>
               {
                 notificationOptions.map((option) => (
                   <div
@@ -175,7 +175,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
           // todo: handle params for notification setup
           onClick={onSaveNotificationSetup(currentNotificationSetting)}
         >
-          {t('Save settings')}
+          {t('settings.Screen.notificationSetting.Button.save')}
         </Button>
       </div>
     </PageWrapper>

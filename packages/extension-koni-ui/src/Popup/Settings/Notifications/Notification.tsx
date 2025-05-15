@@ -241,11 +241,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('settings.Screen.notification.AlertModal.warning.withdrawing.content')
+      : detectTranslate('settings.Screen.notification.AlertModal.warning.claiming.content');
 
     openAlert({
-      title: t('Enable network'),
+      title: t('settings.Screen.notification.AlertModal.warning.title'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -254,23 +254,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         icon: XCircle,
         onClick: closeAlert,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('common.Button.cancel')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('common.Button.enable')
       }
     });
   }, [closeAlert, openAlert, t, updateAlertProps, chainInfoMap]);
 
   const showWarningModal = useCallback((action: string) => {
     openAlert({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('settings.Screen.notification.AlertModal.info.title', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('settings.Screen.notification.AlertModal.info.content', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('settings.Screen.notification.AlertModal.info.Button.close'),
         onClick: closeAlert,
         icon: CheckCircle
       }
@@ -464,8 +464,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('settings.Screen.notification.emptyList.message')}
+        emptyTitle={t('settings.Screen.notification.emptyList.title')}
         phosphorIcon={ListBullets}
       />
     );
@@ -484,10 +484,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('settings.Screen.notification.emptyList.Disable.Button.enable')
         }}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('settings.Screen.notification.emptyList.Disable.message')}
+        emptyTitle={t('settings.Screen.notification.emptyList.Disable.title')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -559,7 +559,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('Notifications')}
+        title={t('settings.Screen.notification.Header.title')}
       />
 
       <div className={'tool-area'}>
@@ -593,7 +593,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('settings.Screen.notification.search.placeholder')}
                 searchValue={currentSearchText}
               />
               {loading
