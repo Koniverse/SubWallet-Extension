@@ -5,7 +5,7 @@ import type { ThemeProps } from '../types';
 
 import { GLOBAL_ALERT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useIsPopup } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import applyPreloadStyle from '@subwallet/extension-koni-ui/preloadStyle';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { generateTheme, SW_THEME_CONFIGS, SwThemeConfig } from '@subwallet/extension-koni-ui/themes';
@@ -62,6 +62,18 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.-side-panel-mode': {
+      '.main-page-container': {
+        height: '100%',
+
+        '.main-layout-content': {
+          border: 0,
+          height: '100%',
+          width: '100%'
+        }
+      }
+    },
+
     '.ant-sw-modal .ant-sw-modal-header': {
       borderRadius: '24px 24px 0 0'
     },
@@ -95,6 +107,23 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.-side-panel-mode .ant-sw-modal': {
+      '&, &.ant-sw-qr-scanner': {
+        '.ant-sw-modal-content': {
+          width: '100%',
+          left: 0,
+          maxHeight: 'calc(100vh - 56px)'
+        }
+      },
+
+      '&.modal-full, &.ant-sw-qr-scanner': {
+        '.ant-sw-modal-content': {
+          height: '100vh',
+          maxHeight: '100vh'
+        }
+      }
+    },
+
     // make sure alert modal is above autocomplete dropdown
     [`.modal-id-${GLOBAL_ALERT_MODAL}`]: {
       '.ant-sw-modal-wrap': {
@@ -124,6 +153,54 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         fontWeight: 700,
         padding: `2px ${token.paddingXS}px`,
         minHeight: 'auto'
+      }
+    },
+
+    // dropdown menu
+
+    '.sw-dropdown-trigger': {
+      position: 'absolute',
+      inset: 0,
+      zIndex: 10
+    },
+
+    '.sw-dropdown-menu.sw-dropdown-menu': {
+      '&.ant-dropdown-placement-bottomLeft, &.ant-dropdown-placement-bottomRight, &.ant-dropdown-placement-bottom': {
+        '.ant-dropdown-menu': {
+
+          marginTop: -4
+        }
+
+      },
+
+      '.ant-dropdown-menu': {
+        minWidth: 150,
+        backgroundColor: token.colorBgDefault,
+        padding: 0
+      },
+
+      '.ant-dropdown-menu-item-disabled': {
+        opacity: 0.4
+      },
+
+      '.ant-dropdown-menu-item.ant-dropdown-menu-item': {
+        paddingTop: token.paddingXS,
+        paddingBottom: token.paddingXS,
+        color: token.colorTextLight1
+      },
+
+      '.ant-dropdown-menu-item-icon.ant-dropdown-menu-item-icon': {
+        fontSize: 16,
+        minWidth: 24,
+        height: 24,
+        justifyContent: 'center',
+        marginRight: token.marginXXS
+      },
+
+      '.ant-dropdown-menu-title-content': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        fontWeight: token.headingFontWeight
       }
     },
 
@@ -387,7 +464,7 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   const themeName = useSelector((state: RootState) => state.settings.theme);
   const logoMaps = useSelector((state: RootState) => state.settings.logoMaps);
   const [themeReady, setThemeReady] = useState(false);
-  const isPopup = useIsPopup();
+  const { isExpanseMode } = useExtensionDisplayModes();
 
   const themeConfig = useMemo(() => {
     const config = SW_THEME_CONFIGS[themeName];
@@ -399,12 +476,12 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   }, [logoMaps, themeName]);
 
   useEffect(() => {
-    if (isPopup) {
-      document.body.classList.remove('-expanse-mode');
-    } else {
+    if (isExpanseMode) {
       document.body.classList.add('-expanse-mode');
+    } else {
+      document.body.classList.remove('-expanse-mode');
     }
-  }, [isPopup]);
+  }, [isExpanseMode]);
 
   useEffect(() => {
     dataContext.awaitStores(['settings']).then(() => {

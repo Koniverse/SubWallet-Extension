@@ -5,7 +5,7 @@ import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EDIT_AUTO_LOCK_TIME_MODAL, EDIT_UNLOCK_TYPE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-koni-ui/constants/router';
-import useIsPopup from '@subwallet/extension-koni-ui/hooks/dom/useIsPopup';
+import { useExtensionDisplayModes, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { saveAllowOneSign, saveAutoLockTime, saveCameraSetting, saveEnableChainPatrol, saveUnlockType, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -59,7 +59,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const canGoBack = !!location.state;
-  const isPopup = useIsPopup();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
@@ -134,7 +135,7 @@ const Component: React.FC<Props> = (props: Props) => {
       let openNewTab = false;
 
       if (!currentValue) {
-        if (isPopup) {
+        if (!isExpanseMode) {
           openNewTab = true;
         }
       }
@@ -146,6 +147,8 @@ const Component: React.FC<Props> = (props: Props) => {
               .catch((e: Error) => {
                 console.log(e);
               });
+
+            isSidePanelMode && closeSidePanel();
           }
         })
         .catch(console.error)
@@ -153,7 +156,7 @@ const Component: React.FC<Props> = (props: Props) => {
           setLoadingCamera(false);
         });
     };
-  }, [isPopup]);
+  }, [closeSidePanel, isExpanseMode, isSidePanelMode]);
 
   const updateSignOneStatus = useCallback((currentValue: boolean) => {
     return () => {

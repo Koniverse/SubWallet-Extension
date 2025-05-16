@@ -1234,6 +1234,10 @@ const SendFund = styled(Wrapper)(({ theme }) => {
       marginBottom: token.marginSM
     },
 
+    '.__warning_message_cross_chain': {
+      marginTop: token.marginXS
+    },
+
     '.free-balance-block': {
       marginBottom: token.marginSM,
       justifyContent: 'end'

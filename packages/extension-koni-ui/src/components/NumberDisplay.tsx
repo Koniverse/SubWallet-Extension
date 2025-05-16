@@ -53,7 +53,16 @@ const { decimal: decimalSeparator, thousand: thousandSeparator } = getNumberSepa
 
 function roundFraction (raw: string, digits: number): string {
   const numStr = `0.${raw}`;
-  const rounded = new BigN(numStr).decimalPlaces(digits, BigN.ROUND_HALF_UP);
+  const original = new BigN(numStr);
+
+  let rounded = original.decimalPlaces(digits, BigN.ROUND_HALF_UP);
+  const [intUp] = rounded.toFixed().split('.');
+
+  if (intUp !== '0') {
+    // Rounding up changes the integer part from 0 to 1 (e.g., 0.9999 → 1.0000)
+    // Reject this case and fallback to ROUND_DOWN to avoid increasing the integer part
+    rounded = original.decimalPlaces(digits, BigN.ROUND_DOWN);
+  }
 
   return rounded.toFixed(digits).split('.')[1];
 }

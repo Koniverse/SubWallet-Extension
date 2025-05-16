@@ -165,6 +165,11 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
         chunks: ['extension']
       }),
       new HtmlWebpackPlugin({
+        filename: 'side-panel.html',
+        template: 'public/side-panel.html',
+        chunks: ['extension']
+      }),
+      new HtmlWebpackPlugin({
         filename: 'notification.html',
         template: 'public/notification.html',
         chunks: ['extension']

@@ -127,7 +127,7 @@ function Component ({ className = '' }: Props) {
   }, [goHome]);
 
   useEffect(() => {
-    setTitle(t('Account migration'));
+    setTitle(t('Migrate to unified account'));
   }, [setTitle, t]);
 
   useEffect(() => {

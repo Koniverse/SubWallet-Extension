@@ -388,7 +388,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
   return (
     <Layout.Home
-      showFilterIcon
+      showFaderIcon
       showTabBar={false}
     >
       <PageWrapper className={CN(className, 'transaction-wrapper')}>
