@@ -1426,8 +1426,20 @@ export interface LedgerNetwork {
   slip44: number;
 }
 
+export const enum LEDGER_SCHEME {
+  ED25519 = 0,
+  /**
+   * @deprecated This is deprecated and will be removed in future versions.
+   */
+  SR25519 = 1,
+  ECDSA = 2
+}
+
 export interface MigrationLedgerNetwork extends Omit<LedgerNetwork, 'isGeneric' | 'isEthereum' | 'isDevMode' | 'icon' > {
-  ss58_addr_type: number
+  ss58_addr_type: number;
+
+  /** Signature scheme */
+  scheme: LEDGER_SCHEME;
 }
 
 /// Qr Sign

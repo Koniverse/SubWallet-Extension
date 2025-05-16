@@ -72,7 +72,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
 
         assert(def, 'There is no known Ledger app available for this chain');
 
-        return new SubstrateMigrationLedger('webusb', def.slip44, def.ss58_addr_type);
+        return new SubstrateMigrationLedger('webusb', def.slip44, def.ss58_addr_type, def.scheme);
       } else {
         return new SubstrateGenericLedger('webusb', def.slip44);
       }
