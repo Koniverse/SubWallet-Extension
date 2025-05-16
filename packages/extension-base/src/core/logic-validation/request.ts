@@ -690,7 +690,7 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
 
   const currentCardanoNetwork = koni.requestService.getDAppChainInfo({
     autoActive: true,
-    accessType: 'evm',
+    accessType: 'cardano',
     defaultChain: authInfo?.currentNetworkMap[type],
     url
   });
