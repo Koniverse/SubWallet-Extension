@@ -28,7 +28,7 @@ import { Coins, FadersHorizontal, SlidersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -191,6 +191,9 @@ const Component = (): React.ReactElement => {
       accountActions: item.accountActions
     }));
   }, [accountProxies]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openBuyTokens = searchParams.get('openBuyTokens') || '';
 
   const onCloseAccountSelector = useCallback(() => {
     setIsShowTonWarning(false);
@@ -362,6 +365,13 @@ const Component = (): React.ReactElement => {
     setSearchPlaceholder?.(t('Token name'));
     setShowSearchInput?.(true);
   }, [setSearchPlaceholder, setShowSearchInput, t]);
+
+  useEffect(() => {
+    if (openBuyTokens === 'true' && isSupportBuyTokens && !isWebUI) {
+      searchParams.delete('openBuyTokens');
+      onOpenBuyTokens();
+    }
+  }, [openBuyTokens, onOpenBuyTokens, searchParams, navigate, setSearchParams, isSupportBuyTokens, isWebUI]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
