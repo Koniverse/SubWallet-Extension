@@ -1506,5 +1506,9 @@
   "Network display": "",
   "Open in sidebar": "",
   "Open in popup": "",
-  "Amount too high. Lower your amount and try again": ""
+  "Amount too high. Lower your amount and try again": "",
+  "Approve request": "",
+  "Due to market conditions, you may receive more or less than expected.": "",
+  "Due to market conditions, you may receive more or less than expected": "",
+  "High price impact!": ""
 }
