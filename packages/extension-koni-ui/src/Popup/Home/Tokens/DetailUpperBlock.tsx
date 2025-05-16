@@ -25,6 +25,7 @@ type Props = ThemeProps & {
   isSupportBuyTokens: boolean;
   isSupportSwap: boolean;
   isShrink: boolean;
+  isChartSupported?: boolean;
   onClickBack: () => void;
   onOpenSendFund: () => void;
   onOpenBuyTokens: () => void;
@@ -35,6 +36,7 @@ type Props = ThemeProps & {
 function Component (
   { balanceValue,
     className = '',
+    isChartSupported,
     isShrink,
     isSupportBuyTokens,
     isSupportSwap,
@@ -73,6 +75,7 @@ function Component (
       <div className='__middle-part'>
         <PriceChartArea
           className={'__price-chart-area'}
+          isChartSupported={isChartSupported}
           priceId={priceId}
         />
       </div>
