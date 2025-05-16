@@ -162,6 +162,10 @@ export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, u
   }
 
   try {
+    if (networkKey === 'ternoaZkEvm_testnet' || networkKey === 'ternoaZkEvm') {
+      throw new Error('This chain is not support EIP1559 Fee');
+    }
+
     if (networkKey === 'polygonzkEvm_cardona' || networkKey === 'polygonZkEvm') {
       const isTestnet = networkKey === 'polygonzkEvm_cardona';
       const gasDomain = isTestnet ? POLYGON_GAS_INDEXER.TESTNET : POLYGON_GAS_INDEXER.MAINNET;
