@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.36
+Build date: May 16, 2025.
+
+Features & Update:
+- Support KyberSwap Aggregator (#4144)
+- Support UniswapX Dutch Swap (#4293)
+- Review Uniswap fee (#4088)
+
+
 ## 1.3.35
 Build date: May 09, 2025.
 
