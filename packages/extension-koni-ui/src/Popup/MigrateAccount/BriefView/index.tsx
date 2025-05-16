@@ -74,7 +74,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
           {
             !isForcedMigration
               ? contentData.title
-              : t('settings.Screen.migrateAccount.briefView.header.noContent.title')
+              : t('settings.Screen.migrateAccount.forcedMigrationView.title')
           }
         </div>
       </div>
@@ -102,10 +102,10 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               </div>
               <div className={'__forced-migration-content'}>
                 <div className='__content-line'>
-                  {t('settings.Screen.migrateAccount.briefView.contentLine1.text')}
+                  {t('settings.Screen.migrateAccount.forcedMigrationView.content1')}
                 </div>
                 <div className='__content-line'>
-                  {t('settings.Screen.migrateAccount.briefView.contentLine2.text')}
+                  {t('settings.Screen.migrateAccount.forcedMigrationView.content2')}
                 </div>
               </div>
             </>
@@ -140,7 +140,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 )}
                 onClick={onMigrateNow}
               >
-                {t('settings.Screen.migrateAccount.briefView.Button.migrateNow.text')}
+                {t('settings.Screen.migrateAccount.forcedMigrationView.migrateNow')}
               </Button>
             </>
           )

@@ -147,7 +147,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
           />
           {currentNotificationSetting.isEnabled && <div className={'content-wrapper'}>
             <div className={'options-container'}>
-              <div className={'option-title'}>{t('settings.Screen.notificationSetting.aboutListTitle')}</div>
+              <div className={'option-title'}>{t('settings.Screen.notificationSetting.optionListTitle')}</div>
               {
                 notificationOptions.map((option) => (
                   <div

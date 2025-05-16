@@ -241,11 +241,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('settings.Screen.notification.AlertModal.warning.withdrawing.content')
-      : detectTranslate('settings.Screen.notification.AlertModal.warning.claiming.content');
+      ? detectTranslate('settings.Screen.notification.WarningModal.enableNetwork.contentForWithdrawing')
+      : detectTranslate('settings.Screen.notification.WarningModal.enableNetwork.contentForClaiming');
 
     openAlert({
-      title: t('settings.Screen.notification.AlertModal.warning.title'),
+      title: t('settings.Screen.notification.WarningModal.enableNetwork.title'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -266,11 +266,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const showWarningModal = useCallback((action: string) => {
     openAlert({
-      title: t('settings.Screen.notification.AlertModal.info.title', { replace: { action: action } }),
+      title: t('settings.Screen.notification.InfoModal.actionDone.title', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('settings.Screen.notification.AlertModal.info.content', { replace: { action: action } }),
+      content: t('settings.Screen.notification.InfoModal.actionDone.content', { replace: { action: action } }),
       okButton: {
-        text: t('settings.Screen.notification.AlertModal.info.Button.close'),
+        text: t('settings.Screen.notification.InfoModal.actionDone.Button.ok'),
         onClick: closeAlert,
         icon: CheckCircle
       }
@@ -484,10 +484,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('settings.Screen.notification.emptyList.Disable.Button.enable')
+          children: t('settings.Screen.notification.enableNotificationCTA.Button.enable')
         }}
-        emptyMessage={t('settings.Screen.notification.emptyList.Disable.message')}
-        emptyTitle={t('settings.Screen.notification.emptyList.Disable.title')}
+        emptyMessage={t('settings.Screen.notification.enableNotificationCTA.message')}
+        emptyTitle={t('settings.Screen.notification.enableNotificationCTA.title')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -559,7 +559,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('settings.Screen.notification.Header.title')}
+        title={t('settings.Screen.notification.title')}
       />
 
       <div className={'tool-area'}>

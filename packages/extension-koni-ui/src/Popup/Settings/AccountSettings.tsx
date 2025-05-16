@@ -91,7 +91,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           title: t('settings.Screen.accountSetting.Item.split'),
           onClick: () => {
             notify({
-              message: t('settings.Screen.accountSetting.Item.split.message')
+              message: t('common.Message.comingSoon')
             });
           }
         }
@@ -103,7 +103,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <PageWrapper className={`account-settings ${className}`}>
       <Layout.WithSubHeaderOnly
         onBack={goBack}
-        title={t('settings.Screen.accountSetting.header.title')}
+        title={t('settings.Screen.accountSetting.title')}
       >
         <div className={'__scroll-container'}>
           {
