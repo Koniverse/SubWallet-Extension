@@ -148,7 +148,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: UserCircleGear,
           leftIconBgColor: token['purple-8'],
           rightIcon: CaretRight,
-          title: t('Account settings'),
+          title: t('settings.Screen.settingsEntry.Item.accountSettings'),
           onClick: () => {
             navigate('/settings/account-settings');
           },

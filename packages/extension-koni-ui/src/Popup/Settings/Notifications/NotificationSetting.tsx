@@ -41,19 +41,19 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
   const notificationOptions = useMemo((): ShowNoticeOption[] => {
     return [
       {
-        label: t('Claim tokens'),
+        label: t('settings.Screen.notificationSetting.optionList.earningClaim'),
         value: 'earningClaim'
       },
       {
-        label: t('Withdraw tokens'),
+        label: t('settings.Screen.notificationSetting.optionList.earningWithdraw'),
         value: 'earningWithdraw'
       },
       {
-        label: t('Claim AVAIL bridge'),
+        label: t('settings.Screen.notificationSetting.optionList.availBridgeClaim'),
         value: 'availBridgeClaim'
       },
       {
-        label: t('Claim POLYGON bridge'),
+        label: t('settings.Screen.notificationSetting.optionList.polygonBridgeClaim'),
         value: 'polygonBridgeClaim'
       }
     ];
