@@ -5,12 +5,12 @@ import { AccountAuthType, AuthorizeRequest } from '@subwallet/extension-base/bac
 import { ALL_ACCOUNT_AUTH_TYPES, ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { AccountProxyItem, AccountProxySelectorAllItem, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
+import { CARDANO_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -67,6 +67,8 @@ function Component ({ className, request }: Props) {
           return t('No available EVM account');
         case 'ton':
           return t('No available TON account');
+        case 'cardano':
+          return t('No available Cardano account');
       }
     }
 
@@ -110,6 +112,7 @@ function Component ({ className, request }: Props) {
           case AccountChainType.SUBSTRATE: return accountAuthTypes?.includes('substrate');
           case AccountChainType.ETHEREUM: return accountAuthTypes?.includes('evm');
           case AccountChainType.TON: return accountAuthTypes?.includes('ton');
+          case AccountChainType.CARDANO: return accountAuthTypes?.includes('cardano');
         }
       }
 
@@ -127,7 +130,8 @@ function Component ({ className, request }: Props) {
     const addAccountType: Record<AccountAuthType, KeypairType> = {
       evm: EVM_ACCOUNT_TYPE,
       substrate: SUBSTRATE_ACCOUNT_TYPE,
-      ton: TON_ACCOUNT_TYPE
+      ton: TON_ACCOUNT_TYPE,
+      cardano: CARDANO_ACCOUNT_TYPE
     };
 
     if (accountAuthTypes) {
@@ -185,6 +189,8 @@ function Component ({ className, request }: Props) {
                   return accountAuthTypes?.includes('evm');
                 case AccountChainType.TON:
                   return accountAuthTypes?.includes('ton');
+                case AccountChainType.CARDANO:
+                  return accountAuthTypes?.includes('cardano');
               }
             }
 
@@ -235,6 +241,7 @@ function Component ({ className, request }: Props) {
               {visibleAccountProxies.map((item) => (
                 <AccountProxyItem
                   accountProxy={item}
+                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes)}
                   className={'__account-proxy-item'}
                   isSelected={selectedMap[item.id]}
                   key={item.id}

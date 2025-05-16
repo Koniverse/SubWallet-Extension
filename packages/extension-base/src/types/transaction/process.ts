@@ -73,11 +73,28 @@ export interface BriefProcessStep {
   stepId: number;
 }
 
-export interface BriefXCMStep {
+export interface BriefXcmStep {
   sendingValue: string;
   originTokenInfo: _ChainAsset;
   destinationTokenInfo: _ChainAsset;
 }
+
+export interface BriefXcmStepV2 {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationValue: string;
+  destinationTokenInfo: _ChainAsset;
+}
+
+// temp for avoid conflict // todo: recheck to refactor BriefXcmStepV2 and BriefSwapStepV2 later;
+export interface BriefSwapStepV2 {
+  sendingValue: string;
+  originTokenInfo: _ChainAsset;
+  destinationValue: string;
+  destinationTokenInfo: _ChainAsset;
+}
+
+export type BriefStepV2 = BriefXcmStepV2 | BriefSwapStepV2;
 
 export interface BriefSwapStep {
   pair: SwapPair;
@@ -94,6 +111,8 @@ export interface ApproveStepMetadata {
   contractAddress: string;
   spenderAddress: string;
   amount?: string;
+  owner?: string;
+  isUniswapApprove?: boolean;
 }
 
 export interface RequestSubscribeProcessById {

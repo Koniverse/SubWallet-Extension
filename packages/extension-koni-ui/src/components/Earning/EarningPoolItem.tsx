@@ -66,7 +66,8 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }, [asset, priceMap, tvl]);
 
-  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+  const isBittensor = useMemo(() => poolInfo.chain === 'bittensor', [poolInfo.chain]);
 
   return (
     <div
@@ -86,7 +87,6 @@ const Component: React.FC<Props> = (props: Props) => {
               className='__item-logo'
               isShowSubLogo={false}
               network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
-              shape='squircle'
               size={40}
             />
           )}
@@ -105,7 +105,7 @@ const Component: React.FC<Props> = (props: Props) => {
             {!!apy && (
               <div className='__item-rewards'>
                 <div className='__item-rewards-label'>
-                  {t('Rewards')}:
+                  {t(`${isSubnetStaking ? 'Emission' : isBittensor ? 'Max APY' : 'Rewards'}`)}:
                 </div>
                 <div className='__item-rewards-value'>
                   <Number

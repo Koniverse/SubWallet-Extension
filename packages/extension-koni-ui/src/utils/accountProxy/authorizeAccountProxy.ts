@@ -18,6 +18,8 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
         return chainTypes.includes(AccountChainType.ETHEREUM);
       } else if (type === 'ton') {
         return chainTypes.includes(AccountChainType.TON);
+      } else if (type === 'cardano') {
+        return chainTypes.includes(AccountChainType.CARDANO);
       }
 
       return false;
@@ -29,4 +31,26 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
   }
 
   return rs;
+};
+
+export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthType[] = [], accountChainTypes: AccountChainType[]): AccountChainType[] => {
+  if (!accountAuthTypes) {
+    return [];
+  }
+
+  const chainTypes: AccountChainType[] = [];
+
+  accountAuthTypes.forEach((type) => {
+    if (type === 'substrate') {
+      chainTypes.push(AccountChainType.SUBSTRATE);
+    } else if (type === 'evm') {
+      chainTypes.push(AccountChainType.ETHEREUM);
+    } else if (type === 'ton') {
+      chainTypes.push(AccountChainType.TON);
+    } else if (type === 'cardano') {
+      chainTypes.push(AccountChainType.CARDANO);
+    }
+  });
+
+  return chainTypes.filter((type) => accountChainTypes.includes(type));
 };

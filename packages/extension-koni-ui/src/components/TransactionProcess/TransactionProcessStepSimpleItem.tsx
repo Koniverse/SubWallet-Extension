@@ -1,27 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { StepStatus } from '@subwallet/extension-base/types';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing } from '@subwallet/extension-koni-ui/utils';
+import { ThemeProps, TransactionProcessStepItemType } from '@subwallet/extension-koni-ui/types';
+import { isStepCompleted, isStepFailed, isStepPending, isStepProcessing, isStepTimeout } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
-import { CheckCircle, ProhibitInset, SpinnerGap } from 'phosphor-react';
+import { CheckCircle, ClockCounterClockwise, ProhibitInset, SpinnerGap } from 'phosphor-react';
 import React, { FC, useMemo } from 'react';
 import styled from 'styled-components';
 
-export type ProcessStepItemType = {
-  status: StepStatus;
-  text: string;
-  index: number,
-  isLastItem?: boolean;
-}
-
-type Props = ThemeProps & ProcessStepItemType;
+type Props = ThemeProps & TransactionProcessStepItemType;
 
 const Component: FC<Props> = (props: Props) => {
-  const { className, index, isLastItem, status, text } = props;
+  const { className, content, index, isLastItem, status } = props;
 
   const iconProp = useMemo<SwIconProps>(() => {
     const iconInfo: SwIconProps = (() => {
@@ -33,6 +25,11 @@ const Component: FC<Props> = (props: Props) => {
       } else if (isStepFailed(status)) {
         return {
           phosphorIcon: ProhibitInset,
+          weight: 'fill'
+        };
+      } else if (isStepTimeout(status)) {
+        return {
+          phosphorIcon: ClockCounterClockwise,
           weight: 'fill'
         };
       } else if (isStepProcessing(status)) {
@@ -70,12 +67,15 @@ const Component: FC<Props> = (props: Props) => {
         '-pending': isStepPending(status),
         '-processing': isStepProcessing(status),
         '-complete': isStepCompleted(status),
-        '-failed': isStepFailed(status)
+        '-failed': isStepFailed(status),
+        '-timeout': isStepTimeout(status)
       })}
       >
         <Icon
           {...iconProp}
-          className={CN('__icon')}
+          className={CN('__icon', {
+            '-spinner': isStepProcessing(status)
+          })}
         />
 
         {
@@ -85,13 +85,13 @@ const Component: FC<Props> = (props: Props) => {
         }
       </div>
       <div className='__item-right-part'>
-        <div className='__text'>{text}</div>
+        <div className='__content'>{content}</div>
       </div>
     </div>
   );
 };
 
-export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const TransactionProcessStepSimpleItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
     gap: token.sizeXS,
@@ -109,6 +109,12 @@ export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: P
       borderRadius: '100%',
       alignItems: 'center',
       justifyContent: 'center'
+    },
+
+    '.__icon.-spinner': {
+      '> span, > svg': {
+        animation: 'swRotate 1.2s linear infinite'
+      }
     },
 
     '.__line': {
@@ -151,11 +157,15 @@ export const ProcessStepItem = styled(Component)<Props>(({ theme: { token } }: P
       color: token.colorError
     },
 
+    '.__item-left-part.-timeout': {
+      color: token.gold
+    },
+
     '.__item-right-part': {
       paddingBottom: 4
     },
 
-    '.__text': {
+    '.__content': {
       marginTop: -8,
       minHeight: 40,
       display: 'flex',

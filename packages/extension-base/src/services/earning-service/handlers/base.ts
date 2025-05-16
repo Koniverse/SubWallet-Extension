@@ -9,10 +9,12 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { DEFAULT_YIELD_FIRST_STEP } from '@subwallet/extension-base/services/earning-service/constants';
 import { createClaimNotification, createWithdrawNotifications } from '@subwallet/extension-base/services/inapp-notification-service/utils';
-import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
 import { BN, BN_TEN } from '@polkadot/util';
+
+import { EarningSlippageResult } from './native-staking/dtao';
 
 /**
  * @class BasePoolHandler
@@ -329,17 +331,17 @@ export default abstract class BasePoolHandler {
   /* Leave action */
 
   /** Validate param to leave the pool */
-  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string): Promise<TransactionError[]>
+  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]>
   /** Create `transaction` to leave the pool normal (default unstake) */
-  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]>;
+  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool fast (swap token) */
   protected abstract handleYieldRedeem (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool */
-  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]> {
+  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
     if (fastLeave) {
       return this.handleYieldRedeem(amount, address, selectedTarget);
     } else {
-      return this.handleYieldUnstake(amount, address, selectedTarget, netuid);
+      return this.handleYieldUnstake(amount, address, selectedTarget, netuid, slippage);
     }
   }
 
@@ -357,6 +359,13 @@ export default abstract class BasePoolHandler {
   /** Check handler can handle slug */
   public canHandleSlug (slug: string): boolean {
     return this.slug === slug;
+  }
+
+  public getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+    return Promise.resolve({
+      slippage: 0,
+      rate: 1
+    });
   }
   /* Other actions */
 }

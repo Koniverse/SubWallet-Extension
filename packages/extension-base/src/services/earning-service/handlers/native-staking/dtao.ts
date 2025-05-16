@@ -8,12 +8,14 @@ import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subw
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import { reformatAddress } from '@subwallet/extension-base/utils';
-import BigN, { BigNumber } from 'bignumber.js';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import BigN from 'bignumber.js';
+import { t } from 'i18next';
 
-import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
 import { BittensorCache, TaoStakeInfo } from './tao';
@@ -25,12 +27,13 @@ export interface SubnetData {
   ownerHotkey: string;
   maxAllowedValidators: number;
   taoIn: number;
+  taoInEmission: number;
 }
 
 interface TaoStakingStakeOption {
   owner: string;
   amount: string;
-  rate?: BigNumber;
+  rate?: BigN;
   identity?: string
 }
 
@@ -102,6 +105,7 @@ interface RateSubnetData {
   netuid: number;
   taoIn: string;
   alphaIn: string;
+  alphaOut: string;
 }
 
 interface DynamicInfo {
@@ -112,7 +116,8 @@ interface DynamicInfo {
   subnetIdentity?: {
     subnetName: `0x${string}`;
   },
-  taoIn: number
+  taoIn: number;
+  taoInEmission: number;
 }
 
 interface SubnetsInfo {
@@ -120,28 +125,51 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
-export const getTaoToAlphaMapping = async (substrateApi: _SubstrateApi) => {
+export interface EarningSlippageResult {
+  slippage: number;
+  rate: number;
+}
+
+const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
+
+export const DEFAULT_DTAO_MINBOND = '600000';
+
+const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
-  if (!allSubnets) {
+  if (!allSubnets || allSubnets.length === 0) {
     return {};
   }
 
-  return allSubnets.reduce((acc, subnet) => {
+  const result = Object.create(null) as Record<number, string>;
+
+  for (const subnet of allSubnets) {
     const netuid = subnet?.netuid;
+
+    if (netuid === undefined) {
+      continue;
+    }
+
     const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
     const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
 
-    if (netuid === 0) {
-      acc[netuid] = '1';
-    } else if (alphaIn.gt(0)) {
-      acc[netuid] = taoIn.dividedBy(alphaIn).toString();
-    } else {
-      acc[netuid] = '1';
-    }
+    result[netuid] = netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
+  }
 
-    return acc;
-  }, {} as Record<number, string>);
+  return result;
+};
+
+const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number): Promise<string> => {
+  const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(netuid)).toJSON() as RateSubnetData | undefined;
+
+  if (!subnetInfo) {
+    return '1';
+  }
+
+  const taoIn = subnetInfo.taoIn ? new BigN(subnetInfo.taoIn) : new BigN(0);
+  const alphaIn = subnetInfo.alphaIn ? new BigN(subnetInfo.alphaIn) : new BigN(0);
+
+  return netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
 };
 
 export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHandler {
@@ -189,9 +217,50 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return slug.startsWith(`${this.slug}__`);
   }
 
+  public override async getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+    const substrateApi = await this.substrateApi.isReady;
+    const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
+
+    const alphaIn = new BigN(subnetInfo?.alphaIn || 0);
+    const taoIn = new BigN(subnetInfo?.taoIn || 0);
+    const k = alphaIn.multipliedBy(taoIn);
+
+    const value = new BigN(params.value);
+    const rate = taoIn.dividedBy(alphaIn);
+
+    if (params.type === ExtrinsicType.STAKING_BOND) {
+      const newTaoIn = taoIn.plus(value);
+      const newAlphaIn = k.dividedBy(newTaoIn);
+      const alphaReturned = alphaIn.minus(newAlphaIn);
+      const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
+      const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
+
+      return {
+        slippage: slippage.plus(0.0001).toNumber(),
+        rate: rate.toNumber()
+      };
+    } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
+      const newAlphaIn = alphaIn.plus(value);
+      const newTaoReserve = k.dividedBy(newAlphaIn);
+      const taoReturned = taoIn.minus(newTaoReserve);
+      const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
+      const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
+
+      return {
+        slippage: slippage.plus(0.0001).toNumber(),
+        rate: rate.toNumber()
+      };
+    }
+
+    return {
+      slippage: 0,
+      rate: 1
+    };
+  }
+
   public override get maintainBalance (): string {
-    const ed = new BN(this.nativeToken.minAmount || '0');
-    const calculateMaintainBalance = new BN(15).mul(ed).div(BN_TEN);
+    const ed = new BigN(this.nativeToken.minAmount || '0');
+    const calculateMaintainBalance = new BigN(15).multipliedBy(ed).dividedBy(10);
 
     const maintainBalance = calculateMaintainBalance;
 
@@ -200,6 +269,10 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   private async init (): Promise<void> {
     try {
+      if (this.isInit || !this.substrateApi) {
+        return;
+      }
+
       const substrateApi = await this.substrateApi.isReady;
       const dynamicInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as DynamicInfo[] | undefined;
       const subnetsInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getSubnetsInfoV2()).toJSON() as SubnetsInfo[] | undefined;
@@ -226,7 +299,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               symbol,
               ownerHotkey: dynInfo.ownerHotkey,
               maxAllowedValidators: extraInfo ? extraInfo.maxAllowedValidators : 0,
-              taoIn: dynInfo.taoIn
+              taoIn: dynInfo.taoIn,
+              taoInEmission: dynInfo.taoInEmission
             };
           });
 
@@ -246,27 +320,24 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     let cancel = false;
-    const substrateApi = await this.substrateApi.isReady;
 
     const updateStakingInfo = async () => {
+      await this.substrateApi.isReady;
+
       try {
         if (cancel) {
           return;
         }
 
-        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
-        const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
-
         this.subnetData.forEach((subnet) => {
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
-          const bnTaoIn = new BN(subnet.taoIn);
+          const bnTaoIn = new BigN(subnet.taoIn);
+          const emission = new BigN(subnet.taoInEmission).dividedBy(new BigN(10).pow(new BigN(7)));
 
           const data: NativeYieldPoolInfo = {
             ...this.baseInfo,
@@ -291,14 +362,15 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               maxCandidatePerFarmer: subnet.maxAllowedValidators,
               maxWithdrawalRequestPerFarmer: 1,
               earningThreshold: {
-                join: BNminDelegatorStake.toString(),
+                join: DEFAULT_DTAO_MINBOND,
                 defaultUnstake: '0',
                 fastUnstake: '0'
               },
               eraTime: 24,
               era: 0,
               unstakingPeriod: 1.2,
-              tvl: bnTaoIn.toString()
+              tvl: bnTaoIn.toString(),
+              totalApy: emission.toNumber()
             }
           };
 
@@ -313,8 +385,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       updateStakingInfo().catch(console.error);
     };
 
-    await substrateApi.isReady;
-
     subscribeStakingMetadataInterval();
     const interval = setInterval(subscribeStakingMetadataInterval, BITTENSOR_REFRESH_STAKE_APY);
 
@@ -327,9 +397,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Subscribe pool position */
 
   async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, delegatorState: TaoStakingStakeOption[]): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+    await this.substrateApi.isReady;
     const nominationList: NominationInfo[] = [];
-    const getMinDelegatorStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-    const minDelegatorStake = (await getMinDelegatorStake).toString();
     let allActiveStake = BN_ZERO;
 
     for (const delegate of delegatorState) {
@@ -348,7 +417,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           chain: chainInfo.slug,
           validatorAddress: delegate.owner,
           activeStake: delegate.amount,
-          validatorMinStake: minDelegatorStake,
+          validatorMinStake: DEFAULT_DTAO_MINBOND,
           originActiveStake: originActiveStake,
           validatorIdentity: delegate.identity
         });
@@ -370,9 +439,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   override async subscribePoolPosition (useAddresses: string[], rsCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
@@ -388,7 +455,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
         )
       );
 
-      const price = await getTaoToAlphaMapping(this.substrateApi);
+      const price = await getAlphaToTaoMapping(this.substrateApi);
 
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
@@ -402,7 +469,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             const netuid = delegate.netuid;
             const stake = new BigN(delegate.stake);
 
-            const taoToAlphaPrice = new BigN(price[netuid]);
+            const aplhaToTaoPrice = new BigN(price[netuid]);
 
             if (!subnetPositions[netuid]) {
               subnetPositions[netuid] = {
@@ -423,7 +490,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             subnetPositions[netuid].delegatorState.push({
               owner: hotkey,
               amount: stake.toString(),
-              rate: taoToAlphaPrice,
+              rate: aplhaToTaoPrice,
               identity: identity
             });
 
@@ -508,9 +575,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (): Promise<ValidatorInfo[]> {
     const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
-    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
-    const bnMinBond = new BN(nominatorMinRequiredStake);
+    const bnMinBond = new BigN(DEFAULT_DTAO_MINBOND);
 
     const filteredDelegates = testnetDelegate.filter((delegate) => {
       return delegate.returnPer1000 !== 0;
@@ -535,18 +600,16 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
-    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
-    const bnMinBond = new BN(nominatorMinRequiredStake);
+    const bnMinBond = new BigN(DEFAULT_DTAO_MINBOND);
     const validatorList = topValidator.data;
     const validatorAddresses = Object.keys(validatorList);
 
     const results = await Promise.all(
       validatorAddresses.map((i) => {
         const address = (validatorList[i].hotkey as unknown as Hotkey).ss58;
-        const bnTotalStake = new BN(validatorList[i].stake);
-        const bnOwnStake = new BN(validatorList[i].validator_stake);
-        const otherStake = bnTotalStake.sub(bnOwnStake);
+        const bnTotalStake = new BigN(validatorList[i].stake);
+        const bnOwnStake = new BigN(validatorList[i].validator_stake);
+        const otherStake = bnTotalStake.minus(bnOwnStake);
         const nominatorCount = validatorList[i].nominators;
         const commission = validatorList[i].take;
         const roundedCommission = (parseFloat(commission) * 100).toFixed(0);
@@ -578,9 +641,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
-    if (!this.isInit) {
-      await this.init();
-    }
+    await this.init();
 
     if (this.chain === 'bittensor') {
       return this.getMainnetPoolTargets();
@@ -594,32 +655,84 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Join pool action */
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
-    const { amount, netuid, selectedValidators: targetValidators } = data;
+    const { amount, selectedValidators: targetValidators, subnetData } = data;
+    const { netuid, slippage } = subnetData;
+
     const chainApi = await this.substrateApi.isReady;
-    const binaryAmount = new BN(amount);
+    const binaryAmount = new BigN(amount);
+
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 + (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
+
+    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
+
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
-    const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, netuid, binaryAmount);
+    const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(hotkey, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed(), false);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
+  }
+
+  public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldJoin(data, path);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    const { amount } = data;
+
+    if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+    }
+
+    return baseErrors;
   }
 
   /* Join pool action */
 
   /* Leave pool action */
 
-  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number): Promise<[ExtrinsicType, TransactionData]> {
+  async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
-    const binaryAmount = new BN(amount);
 
     if (!selectedTarget) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const extrinsic = apiPromise.api.tx.subtensorModule.removeStake(selectedTarget, netuid, binaryAmount);
+    const binaryAmount = new BigN(amount);
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 - (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
+    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
+
+    const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(selectedTarget, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed(), false);
 
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
+  }
+
+  public override async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldLeave(amount, address, fastLeave, selectedTarget, slug);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    if (!poolInfo) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
+    }
+
+    const netuid = poolInfo.metadata.subnetData?.netuid;
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(alphaToTaoPrice);
+
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
+
+    if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formattedMinUnstake.toString()} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`))];
+    }
+
+    return baseErrors;
   }
 
   /* Leave pool action */

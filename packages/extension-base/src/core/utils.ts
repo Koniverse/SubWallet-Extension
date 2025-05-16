@@ -1,15 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
+import { ExtrinsicType, SufficientChainsDetails, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { isAddressAndChainCompatible, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { isAddress, isCardanoTestnetAddress, isTonAddress } from '@subwallet/keyring';
 
+import { AnyJson } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export function getStrictMode (type: string, extrinsicType?: ExtrinsicType) {
@@ -143,3 +146,58 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 
   return '';
 }
+
+export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _SubstrateApi, sufficientChain: SufficientChainsDetails): Promise<boolean> => {
+  if (tokenInfo.assetType !== _AssetType.NATIVE) {
+    const assetId = _isBridgedToken(tokenInfo) ? _getXcmAssetMultilocation(tokenInfo) : _getTokenOnChainAssetId(tokenInfo);
+    const chainSlug = tokenInfo.originChain;
+
+    const queryParams: _SubstrateAdapterQueryArgs = {
+      section: 'query',
+      args: [assetId]
+    };
+
+    if (sufficientChain.assetHubPallet.includes(chainSlug)) {
+      if (!_isBridgedToken(tokenInfo)) {
+        queryParams.module = 'assets';
+      } else {
+        queryParams.module = 'foreignAssets';
+      }
+
+      queryParams.method = 'asset';
+    }
+
+    if (sufficientChain.assetRegistryPallet.includes(chainSlug)) {
+      queryParams.module = 'assetRegistry';
+      queryParams.method = 'assets';
+    }
+
+    if (sufficientChain.assetsPallet.includes(chainSlug)) {
+      queryParams.module = 'assets';
+      queryParams.method = 'asset';
+    }
+
+    if (sufficientChain.foreignAssetsPallet.includes(chainSlug)) {
+      queryParams.module = 'foreignAsset';
+      queryParams.method = 'asset';
+    }
+
+    try {
+      if (queryParams.method && queryParams.module) {
+        const metadata = (await substrateApi.makeRpcQuery<AnyJson>(queryParams)) as unknown as SufficientMetadata;
+
+        if (metadata?.isSufficient !== undefined) {
+          return metadata?.isSufficient;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (tokenInfo.metadata?.isSufficient) {
+    return tokenInfo.metadata?.isSufficient;
+  }
+
+  return false;
+};
