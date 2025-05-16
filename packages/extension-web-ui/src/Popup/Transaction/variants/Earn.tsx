@@ -1620,7 +1620,7 @@ const Component = ({ className }: ComponentProps) => {
                     />
                   </div>
 
-                  {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
+                  {(poolType === YieldPoolType.NOMINATION_POOL) && (
                     <Form.Item
                       name={'target'}
                     >
@@ -1637,7 +1637,7 @@ const Component = ({ className }: ComponentProps) => {
                     </Form.Item>
                   )}
 
-                  {poolType === YieldPoolType.NATIVE_STAKING && (
+                  {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
                     <Form.Item
                       name={'target'}
                     >

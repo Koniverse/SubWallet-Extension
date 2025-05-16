@@ -324,6 +324,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
+    if (!toTokenSlugValue) {
+      return false;
+    }
+
     return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap);
   }, [chainInfoMap, targetAccountProxy.chainTypes, toTokenSlugValue]);
 
