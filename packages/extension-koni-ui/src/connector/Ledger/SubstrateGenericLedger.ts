@@ -47,7 +47,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
   getAddress (confirm?: boolean, accountOffset?: number, addressOffset?: number, accountOptions?: Partial<AccountOptions>): Promise<LedgerAddress> {
     return this.withApp(async (app): Promise<LedgerAddress> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
-      const { address, pubKey } = await this.wrapError(app.getAddress(path, this.ss58_addr_type, confirm));
+      const { address, pubKey } = await this.wrapError(app.getAddressEd25519(path, this.ss58_addr_type, confirm));
 
       return {
         address,
@@ -59,7 +59,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
   async signTransaction (message: Uint8Array, metadata: Uint8Array, accountOffset?: number, addressOffset?: number, accountOptions?: Partial<AccountOptions>): Promise<LedgerSignature> {
     return this.withApp(async (app): Promise<LedgerSignature> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
-      const rs = await this.wrapError((app.signWithMetadata(path, Buffer.from(message), Buffer.from(metadata))));
+      const rs = await this.wrapError((app.signWithMetadataEd25519(path, Buffer.from(message), Buffer.from(metadata))));
 
       return {
         signature: hexAddPrefix(u8aToHex(rs.signature))
@@ -71,7 +71,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
     return this.withApp(async (app): Promise<LedgerSignature> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
 
-      const rs = await this.wrapError(app.signRaw(path, Buffer.from(wrapBytes(message))));
+      const rs = await this.wrapError(app.signRawEd25519(path, Buffer.from(wrapBytes(message))));
 
       const raw = hexStripPrefix(u8aToHex(rs.signature));
       const firstByte = raw.slice(0, 2);
