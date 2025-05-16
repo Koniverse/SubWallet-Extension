@@ -141,7 +141,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
-    return Promise.reject(new Error('Substrate API is not available')); // todo
+    throw new Error('Substrate API is not available');
   }
 
   const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
@@ -224,7 +224,9 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const psAssetValue = fromTokenInfo.metadata?.paraSpellValue;
 
   if (!psAssetType || !psAssetValue) {
-    throw new Error('Token is not support XCM at this time');
+    console.error('Lack of paraspell metadata');
+
+    return undefined;
   }
 
   const bodyData = {
@@ -246,22 +248,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   });
 
   if (!response.ok) {
-    const error = await response.json() as ParaSpellError;
-
-    if ((isChainNotSupportDryRun(error.message) || isChainNotSupportPolkadotApi(error.message))) {
-      // todo: estimate fee for interlay
-      console.log('Interlay ngu xcmFee');
-      // const xcmTransfer = await createXcmExtrinsicV2(request);
-      //
-      // if (!xcmTransfer) {
-      //   return undefined;
-      // }
-      //
-      // const _xcmFeeInfo = await xcmTransfer.paymentInfo(request.sender);
-      // const xcmFeeInfo = _xcmFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
-      //
-      // return Math.round(xcmFeeInfo.partialFee * XCM_MIN_AMOUNT_RATIO).toString();
-    }
+    console.error('Failed to request estimate fee');
 
     return undefined;
   }

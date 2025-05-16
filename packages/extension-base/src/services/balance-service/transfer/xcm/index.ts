@@ -63,6 +63,7 @@ export const createSnowBridgeExtrinsic = async ({ destinationChain,
   return getSnowBridgeEvmTransfer(originTokenInfo, originChain, destinationChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
 
+// deprecated
 export const createXcmExtrinsic = async ({ destinationChain,
   originChain,
   originTokenInfo,
@@ -160,13 +161,6 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
     return await buildXcm(request);
   } catch (e) {
     console.log('createXcmExtrinsicV2 error: ', e);
-    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
-
-    if (isChainNotSupportPolkadotApi(errorMessage)) {
-      console.log('Interlay ngu build xcm');
-
-      return createXcmExtrinsic(request);
-    }
 
     return undefined;
   }
