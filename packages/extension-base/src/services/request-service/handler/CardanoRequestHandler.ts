@@ -164,14 +164,14 @@ export default class CardanoRequestHandler {
   }
 
   private signMessage (confirmation: ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]): ResponseCardanoSignData {
-    const { address, payload } = confirmation.payload;
-    const pair = keyring.getPair(address);
+    const { address: addressToSign, currentAddress, payload } = confirmation.payload;
+    const pair = keyring.getPair(currentAddress);
 
     if (pair.isLocked) {
       keyring.unlockPair(pair.address);
     }
 
-    return pair.cardano.signMessage(payload as string, true);
+    return pair.cardano.signMessage(payload as string, addressToSign);
   }
 
   private signTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]): string { // alibaba

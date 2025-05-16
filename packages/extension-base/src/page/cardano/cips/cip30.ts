@@ -5,57 +5,74 @@ import { CardanoPaginate, Cbor } from '@subwallet/extension-base/background/Koni
 import { SendRequest } from '@subwallet/extension-base/page/types';
 
 export class CIP30Api {
-  private sendMessage: SendRequest;
+  private readonly sendMessage: SendRequest;
 
   constructor (sendMessage: SendRequest) {
     this.sendMessage = sendMessage;
   }
 
-  getExtension () {
+  private getExtension () {
     return [{ cip: 30 }];
   }
 
-  async getNetworkId () {
+  private async getNetworkId () {
     return await this.sendMessage('cardano(network.get.current)');
   }
 
-  async getCollateral (payload: { amount: Cbor }) {
+  private async getCollateral (payload: { amount: Cbor }) {
     return await this.sendMessage('cardano(account.get.collateral)', payload);
   }
 
-  async getUtxos (amount?: Cbor, paginate?: CardanoPaginate) {
+  private async getUtxos (amount?: Cbor, paginate?: CardanoPaginate) {
     return await this.sendMessage('cardano(account.get.utxos)', { amount, paginate });
   }
 
-  async getUsedAddresses () {
+  private async getUsedAddresses () {
     return await this.sendMessage('cardano(account.get.address)');
   }
 
-  async getChangeAddress () {
+  private async getChangeAddress () {
     return await this.sendMessage('cardano(account.get.change.address)');
   }
 
-  async getUnusedAddresses (): Promise<string[]> {
+  private async getUnusedAddresses (): Promise<string[]> {
     return new Promise((resolve) => resolve([]));
   }
 
-  async getRewardAddresses (): Promise<string[]> {
-    return new Promise((resolve) => resolve([]));
+  private async getRewardAddresses (): Promise<string[]> {
+    return await this.sendMessage('cardano(account.get.reward.address)');
   }
 
-  async signTx (tx: Cbor, partialSign = false) {
+  private async signTx (tx: Cbor, partialSign = false) {
     return await this.sendMessage('cardano(transaction.sign)', { tx, partialSign });
   }
 
-  async signData (address: string, payload: string) {
+  private async signData (address: string, payload: string) {
     return await this.sendMessage('cardano(data.sign)', { address, payload });
   }
 
-  async submitTx (tx: Cbor) {
+  private async submitTx (tx: Cbor) {
     return await this.sendMessage('cardano(transaction.submit)', tx);
   }
 
-  async getBalance () {
+  private async getBalance () {
     return await this.sendMessage('cardano(account.get.balance)');
+  }
+
+  get apis () {
+    return {
+      getExtension: () => this.getExtension(),
+      getNetworkId: () => this.getNetworkId(),
+      getCollateral: (payload: { amount: Cbor }) => this.getCollateral(payload),
+      getUtxos: (amount?: Cbor, paginate?: CardanoPaginate) => this.getUtxos(amount, paginate),
+      getUsedAddresses: () => this.getUsedAddresses(),
+      getChangeAddress: () => this.getChangeAddress(),
+      getUnusedAddresses: () => this.getUnusedAddresses(),
+      getRewardAddresses: () => this.getRewardAddresses(),
+      signTx: (tx: Cbor, partialSign = false) => this.signTx(tx, partialSign),
+      signData: (address: string, payload: string) => this.signData(address, payload),
+      submitTx: (tx: Cbor) => this.submitTx(tx),
+      getBalance: () => this.getBalance()
+    };
   }
 }

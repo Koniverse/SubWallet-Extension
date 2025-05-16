@@ -10,10 +10,10 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
-import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
+import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, reformatAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isCardanoBaseAddress, isCardanoRewardAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
@@ -204,42 +204,37 @@ export async function generateValidationProcess (koni: KoniState, url: string, p
   return resultValidated;
 }
 
+function handleAuthError (payload: PayloadValidated, message: string, errorPosition: 'dApp' | 'ui', errors: Error[]): PayloadValidated {
+  payload.errorPosition = errorPosition;
+  errors.push(new Error(convertErrorMessage(message)[0]));
+
+  return payload;
+}
+
 export async function validationAuthMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
   const { address, errors } = payload;
 
   if (!address || !isString(address)) {
-    payload.errorPosition = 'dApp';
-    const [message] = convertErrorMessage('Not found address to sign');
-
-    errors.push(new Error(message));
+    return handleAuthError(payload, 'Not found address to sign', 'dApp', errors);
   } else {
     try {
       payload.pair = keyring.getPair(address);
 
       if (!payload.pair) {
-        payload.errorPosition = 'dApp';
-        const [message] = convertErrorMessage('Unable to find account');
-
-        errors.push(new Error(message));
+        return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
       } else {
         const authList = await koni.getAuthList();
 
         const authInfo = authList[stripUrl(url)];
 
         if (!authInfo || !authInfo.isAllowed || !authInfo.isAllowedMap[payload.pair.address]) {
-          payload.errorPosition = 'dApp';
-          const [message] = convertErrorMessage('Account not in allowed list', '');
-
-          errors.push(new Error(message));
+          return handleAuthError(payload, 'Account not in allowed list', 'dApp', errors);
         }
 
         payload.authInfo = authInfo;
       }
     } catch (e) {
-      const [message] = convertErrorMessage((e as Error).message);
-
-      payload.errorPosition = 'dApp';
-      errors.push(new Error(message));
+      return handleAuthError(payload, (e as Error).message, 'dApp', errors);
     }
   }
 
@@ -663,8 +658,55 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
   return promise;
 }
 
+export async function validationAuthCardanoMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
+  const authList = await koni.getAuthList();
+  const authInfo = authList[stripUrl(url)];
+  const { address, errors } = payload;
+
+  if (!authInfo || !authInfo.isAllowed) {
+    return handleAuthError(payload, 'Account not in allowed list', 'dApp', errors);
+  }
+
+  const currentAddress = authInfo.currentAccount;
+  const currentNetwork = authInfo.currentNetworkMap.cardano || 'cardano';
+  const currentNetworkId = +(currentNetwork === 'cardano');
+
+  if (!currentAddress || !authInfo.isAllowedMap[currentAddress]) {
+    return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
+  }
+
+  const pair = keyring.getPair(currentAddress);
+
+  if (!pair) {
+    return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
+  }
+
+  payload.pair = pair;
+
+  if (isCardanoBaseAddress(address)) {
+    if (!authInfo.isAllowedMap[address]) {
+      return handleAuthError(payload, 'Account not in allowed list', 'dApp', errors);
+    }
+
+    const addressByChainFormat = reformatAddress(currentAddress, currentNetworkId);
+
+    if (!isSameAddress(addressByChainFormat, address)) {
+      return handleAuthError(payload, 'Current account is changed', 'dApp', errors);
+    }
+  } else if (isCardanoRewardAddress(address)) {
+    const rewardAddress = pair.cardano.rewardAddress;
+    const addressByChainFormat = reformatAddress(rewardAddress, currentNetworkId);
+
+    if (!isSameAddress(addressByChainFormat, address)) {
+      return handleAuthError(payload, 'Current account is changed', 'dApp', errors);
+    }
+  }
+
+  return payload;
+}
+
 export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
-  const { address, errors, pair: pair_ } = payload_;
+  const { address, authInfo, errors, pair: pair_ } = payload_;
   const payload = payload_.payloadAfterValidated as DataMessageParam;
   const { promise, resolve } = createPromiseHandler<PayloadValidated>();
   let canSign = false;
@@ -696,6 +738,7 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
   const payloadAfterValidated: CardanoSignatureRequest = {
     address,
     payload: payload,
+    currentAddress: authInfo?.currentAccount as string,
     hashPayload: payload as string,
     canSign: canSign,
     id: ''

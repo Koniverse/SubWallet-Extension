@@ -50,30 +50,32 @@ export const convertAssetToValue = (amount: CardanoBalanceItem[]): CardanoWasm.V
   const value = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
   const multiAsset = CardanoWasm.MultiAsset.new();
 
-  for (const item of amount) {
-    if (item.unit === 'lovelace') {
-      value.set_coin(CardanoWasm.BigNum.from_str(item.quantity));
-    } else {
-      const policyIdHex = item.unit.slice(0, 56);
-      const assetNameHex = item.unit.slice(56);
+  if (amount?.length) {
+    for (const item of amount) {
+      if (item.unit === 'lovelace') {
+        value.set_coin(CardanoWasm.BigNum.from_str(item.quantity));
+      } else {
+        const policyIdHex = item.unit.slice(0, 56);
+        const assetNameHex = item.unit.slice(56);
 
-      const scriptHash = CardanoWasm.ScriptHash.from_bytes(Buffer.from(policyIdHex, 'hex'));
-      const assetName = CardanoWasm.AssetName.new(Buffer.from(assetNameHex, 'hex'));
-      const quantity = CardanoWasm.BigNum.from_str(item.quantity);
+        const scriptHash = CardanoWasm.ScriptHash.from_bytes(Buffer.from(policyIdHex, 'hex'));
+        const assetName = CardanoWasm.AssetName.new(Buffer.from(assetNameHex, 'hex'));
+        const quantity = CardanoWasm.BigNum.from_str(item.quantity);
 
-      let assets = multiAsset.get(scriptHash);
+        let assets = multiAsset.get(scriptHash);
 
-      if (!assets) {
-        assets = CardanoWasm.Assets.new();
+        if (!assets) {
+          assets = CardanoWasm.Assets.new();
+        }
+
+        assets.insert(assetName, quantity);
+        multiAsset.insert(scriptHash, assets);
       }
-
-      assets.insert(assetName, quantity);
-      multiAsset.insert(scriptHash, assets);
     }
-  }
 
-  if (multiAsset.len() > 0) {
-    value.set_multiasset(multiAsset);
+    if (multiAsset.len() > 0) {
+      value.set_multiasset(multiAsset);
+    }
   }
 
   return value;
