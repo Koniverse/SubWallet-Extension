@@ -634,11 +634,6 @@ div#popup-container {
     border-radius: 8px;
 }
 
-.ant-sw-modal .ant-sw-header-container-center .ant-sw-header-center-part {
-    width: auto;
-    margin-left: 48px;
-    margin-right: 48px;
-}
 
 .ant-sw-modal .ant-sw-modal-footer .ant-btn + .ant-btn:not(.ant-dropdown-trigger) {
     margin-inline-start: 12px;

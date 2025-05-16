@@ -22,26 +22,17 @@ import styled, { useTheme } from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
-type Props = ThemeProps
+type WrapperProps = ThemeProps;
 
-function Component ({ className = '' }: Props): React.ReactElement<Props> {
+type ComponentProps = {
+  tokenInfo: _ChainAsset;
+};
+
+function Component ({ tokenInfo }: ComponentProps): React.ReactElement<ComponentProps> {
   const { t } = useTranslation();
-  const dataContext = useContext(DataContext);
   const { token } = useTheme() as Theme;
   const goBack = useDefaultNavigate().goBack;
-  const location = useLocation();
   const showNotification = useNotification();
-
-  const tokenSlug = useMemo(() => {
-    return location.state as string;
-  }, [location.state]);
-  const tokenInfo = useGetChainAssetInfo(tokenSlug) as _ChainAsset;
-
-  useEffect(() => {
-    if (!tokenInfo) {
-      goBack();
-    }
-  }, [goBack, tokenInfo]);
 
   const originChainInfo = useFetchChainInfo(tokenInfo.originChain);
 
@@ -211,10 +202,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [isSubmitDisabled, loading, onSubmit, t, tokenInfo.slug]);
 
   return (
-    <PageWrapper
-      className={`token_detail ${className}`}
-      resolve={dataContext.awaitStores(['assetRegistry'])}
-    >
+    <>
       <Layout.Base
         leftFooterButton={leftFooterButtonProps()}
         onBack={goBack}
@@ -328,11 +316,53 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           </div>
         </div>
       </Layout.Base>
-    </PageWrapper>
+    </>
   );
 }
 
-const TokenDetail = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
+  const { className = '' } = props;
+  const dataContext = useContext(DataContext);
+  const goBack = useDefaultNavigate().goBack;
+  const location = useLocation();
+
+  const tokenSlug = useMemo(() => {
+    return location.state as string;
+  }, [location.state]);
+
+  const tokenInfo: _ChainAsset | undefined = useGetChainAssetInfo(tokenSlug);
+
+  const storePromise = useMemo(() => {
+    return dataContext.awaitStores(['assetRegistry']);
+  }, [dataContext]);
+
+  useEffect(() => {
+    let sync = true;
+
+    storePromise.then(() => {
+      if (sync && !tokenInfo) {
+        goBack();
+      }
+    }).catch(console.error);
+
+    return () => {
+      sync = false;
+    };
+  }, [goBack, storePromise, tokenInfo]);
+
+  return (
+    <PageWrapper
+      className={`token_detail ${className}`}
+      resolve={storePromise}
+    >
+      {
+        !!tokenInfo && <Component tokenInfo={tokenInfo} />
+      }
+    </PageWrapper>
+  );
+};
+
+const TokenDetail = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
     '.token_detail__container': {
       marginLeft: token.margin,

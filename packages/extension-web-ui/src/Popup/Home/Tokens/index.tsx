@@ -502,6 +502,7 @@ const Component = (): React.ReactElement => {
           ref={topBlockRef}
         >
           <UpperBlock
+            className={'__upper-block'}
             isPriceDecrease={isTotalBalanceDecrease}
             isShrink={isShrink}
             isSupportBuyTokens={isSupportBuyTokens}
@@ -652,7 +653,7 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingTop: 210
+      paddingTop: 206
     },
 
     '.__scroll-container': {
@@ -664,27 +665,44 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       backgroundColor: token.colorBgDefault,
       position: 'absolute',
       paddingTop: '32px',
-      height: 210,
+      height: 206,
       zIndex: 10,
       top: 0,
       left: 0,
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
       transition: 'opacity, padding-top 0.27s ease',
 
-      '&.-is-shrink': {
-        height: 104
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
+        display: 'block',
+        zIndex: 1
       },
 
-      '&.-decrease': {
+      '&.-decrease:before': {
         backgroundImage: extendToken.tokensScreenDangerBackgroundColor
+      },
+
+      '&.-is-shrink': {
+        height: 104,
+
+        '&:before': {
+          height: 80
+        }
       }
     },
 
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scroll-footer': {

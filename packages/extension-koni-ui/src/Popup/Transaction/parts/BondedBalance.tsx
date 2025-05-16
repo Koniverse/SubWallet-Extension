@@ -10,7 +10,7 @@ import { Icon, ModalContext, Number, Tooltip, Typography } from '@subwallet/reac
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PencilSimpleLine } from 'phosphor-react';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps & {
@@ -30,6 +30,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
 
   // For subnet staking
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const onSelectSlippage = useCallback((slippage: SlippageType) => {
     setMaxSlippage(slippage);
@@ -37,9 +38,11 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
 
   const closeSlippageModal = useCallback(() => {
     inactiveModal(EARNING_SLIPPAGE_MODAL);
+    setIsSlippageModalVisible(false);
   }, [inactiveModal]);
 
   const onOpenSlippageModal = useCallback(() => {
+    setIsSlippageModalVisible(true);
     activeModal(EARNING_SLIPPAGE_MODAL);
   }, [activeModal]);
 
@@ -94,12 +97,14 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
           </Tooltip>
         )}
       </div>
-      <SlippageModal
-        modalId={EARNING_SLIPPAGE_MODAL}
-        onApplySlippage={onSelectSlippage}
-        onCancel={closeSlippageModal}
-        slippageValue={slippageValue}
-      />
+      {isSlippageModalVisible && (
+        <SlippageModal
+          modalId={EARNING_SLIPPAGE_MODAL}
+          onApplySlippage={onSelectSlippage}
+          onCancel={closeSlippageModal}
+          slippageValue={slippageValue}
+        />
+      )}
     </Typography.Paragraph>
   );
 };
