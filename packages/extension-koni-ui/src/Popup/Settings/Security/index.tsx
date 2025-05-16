@@ -73,7 +73,7 @@ const Component: React.FC<Props> = (props: Props) => {
     if (value > 0) {
       return {
         value: value,
-        label: t('{{time}} minutes', { replace: { time: value } })
+        label: t('settings.Screen.securitySetting.Selector.autoLock.itemLabel', { replace: { time: value } })
       };
     } else if (value < 0) {
       return {
@@ -92,21 +92,21 @@ const Component: React.FC<Props> = (props: Props) => {
     {
       icon: Key,
       key: SecurityType.WALLET_PASSWORD,
-      title: t('Change wallet password'),
+      title: t('settings.Screen.securitySetting.Item.changePassword'),
       url: '/keyring/change-password',
       disabled: noAccount
     },
     {
       icon: LockLaminated,
       key: SecurityType.AUTO_LOCK,
-      title: t('Extension auto lock'),
+      title: t('settings.Screen.securitySetting.Item.autoLock'),
       url: '',
       disabled: false
     },
     {
       icon: LockKeyOpen,
       key: SecurityType.UNLOCK_TYPE,
-      title: t('Authenticate with password'),
+      title: t('settings.Screen.securitySetting.Item.authPassword'),
       url: '',
       disabled: false
     }
@@ -278,7 +278,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
         onBack={onBack}
-        title={t('Security settings')}
+        title={t('settings.Screen.securitySetting.title')}
       >
         <div className='body-container'>
           <div className='items-container'>
@@ -297,7 +297,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     weight='fill'
                   />
                 )}
-                name={t('Advanced phishing detection')}
+                name={t('settings.Screen.securitySetting.Item.phishingDetection')}
                 rightItem={(
                   <Switch
                     checked={enableChainPatrol}
@@ -318,7 +318,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight='fill'
                 />
               )}
-              name={t('Camera access for QR')}
+              name={t('settings.Screen.securitySetting.Item.cameraAccess')}
               rightItem={(
                 <Switch
                   checked={camera}
@@ -339,10 +339,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </div>
               <div className='__item-center-part'>
                 <div className='__item-title'>
-                  {t('Sign for multiple transactions')}
+                  {t('settings.Screen.securitySetting.Item.signMultiple.title')}
                 </div>
                 <div className='__item-description'>
-                  {t('Allow signing once for multiple transactions')}
+                  {t('settings.Screen.securitySetting.Item.signMultiple.description')}
                 </div>
               </div>
               <div className='__item-right-part'>
@@ -359,7 +359,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editAutoLockTimeModalId}
           onCancel={onCloseAutoLockTimeModal}
-          title={t('Auto lock')}
+          title={t('settings.Screen.securitySetting.Selector.autoLock.title')}
         >
           <div className='modal-body-container'>
             {
@@ -396,13 +396,13 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editUnlockTypeModalId}
           onCancel={onCloseUnlockTypeModal}
-          title={t('Authenticate with password')}
+          title={t('settings.security.Modal.authPassword.title')}
         >
           <div className='modal-body-container'>
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.ALWAYS_REQUIRED}
-              name={t('Always required')}
+              name={t('settings.Screen.securitySetting.Selector.authPassword.Item.alwaysRequired')}
               onPressItem={onSetUnlockType(WalletUnlockType.ALWAYS_REQUIRED)}
               rightItem={
                 unlockType === WalletUnlockType.ALWAYS_REQUIRED
@@ -422,7 +422,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.WHEN_NEEDED}
-              name={t('When needed')}
+              name={t('settings.Screen.securitySetting.Selector.authPassword.Item.whenNeeded')}
               onPressItem={onSetUnlockType(WalletUnlockType.WHEN_NEEDED)}
               rightItem={
                 unlockType === WalletUnlockType.WHEN_NEEDED

@@ -74,7 +74,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
           {
             !isForcedMigration
               ? contentData.title
-              : t('Migration incomplete!')
+              : t('settings.Screen.migrateAccount.forcedMigrationView.title')
           }
         </div>
       </div>
@@ -102,10 +102,10 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               </div>
               <div className={'__forced-migration-content'}>
                 <div className='__content-line'>
-                  {t('Account migration is not yet complete. If this process remains incomplete, you will not be able to perform any action on SubWallet extension.')}
+                  {t('settings.Screen.migrateAccount.forcedMigrationView.content1')}
                 </div>
                 <div className='__content-line'>
-                  {t('Make sure to complete the migration to avoid any potential issues with your accounts. Hit “Continue” to resume and complete the process. ')}
+                  {t('settings.Screen.migrateAccount.forcedMigrationView.content2')}
                 </div>
               </div>
             </>
@@ -128,7 +128,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 onClick={onDismiss}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('common.Button.cancel')}
               </Button>
               <Button
                 block={true}
@@ -140,7 +140,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 )}
                 onClick={onMigrateNow}
               >
-                {t('Migrate now')}
+                {t('settings.Screen.migrateAccount.forcedMigrationView.migrateNow')}
               </Button>
             </>
           )
@@ -152,7 +152,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               block={true}
               onClick={onMigrateNow}
             >
-              {t('Continue')}
+              {t('common.Button.continue')}
             </Button>
           )
         }

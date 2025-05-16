@@ -752,7 +752,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('Cancel'),
+              text: t('common.Button.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);

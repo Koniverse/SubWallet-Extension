@@ -44,7 +44,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const filterOptions = useMemo(() => [
     ...missionCategories.map((c) => ({
-      label: t(c.name),
+      label: t(`${c.name}`),
       value: c.slug
     }))
   ], [t]);
@@ -175,8 +175,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No mission found')}
-        emptyTitle={t('Your missions will show up here')}
+        emptyMessage={t('emptyContent.missionPools.description')}
+        emptyTitle={t('emptyContent.missionPools.title')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -189,7 +189,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       subHeaderBackground={'transparent'}
       subHeaderCenter={false}
       subHeaderPaddingVertical={true}
-      title={t<string>('Mission Pools')}
+      title={t<string>('settings.Screen.missionPools.title')}
     >
       <div className={'__tool-area'}>
         {!!banners.length && (
@@ -212,7 +212,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-item'}
           onClickActionBtn={onClickActionBtn}
           onSearch={handleSearch}
-          placeholder={t('Campaign name...')}
+          placeholder={t('settings.missionPools.searchPlaceHolder')}
           searchValue={searchInput}
           showActionBtn
         />
@@ -234,19 +234,19 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Campaign name...')}
+          searchPlaceholder={t<string>('settings.missionPools.searchPlaceHolder')}
           showActionBtn
         />
       </div>
       <FilterModal
-        applyFilterButtonTitle={t('Apply filter')}
+        applyFilterButtonTitle={t('common.Button.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('common.Text.filter')}
       />
       <MissionDetailModal data={currentSelectItem} />
     </Layout.Base>

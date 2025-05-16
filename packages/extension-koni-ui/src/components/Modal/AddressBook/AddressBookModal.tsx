@@ -67,15 +67,15 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Your wallet'),
+      label: t('settings.manageAddressBook.Filter.yourWallet'),
       value: AnalyzedGroup.WALLET
     },
     {
-      label: t('Saved contacts'),
+      label: t('settings.manageAddressBook.Filter.saveContact'),
       value: AnalyzedGroup.CONTACT
     },
     {
-      label: t('Recent'),
+      label: t('settings.manageAddressBook.Filter.recent'),
       value: AnalyzedGroup.RECENT
     }
   ]), [t]);
@@ -187,13 +187,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AnalyzedGroup.WALLET:
-        groupLabel = t('Your wallet');
+        groupLabel = t('settings.addressBook.SectionTitle.yourWallet');
         break;
       case AnalyzedGroup.CONTACT:
-        groupLabel = t('Saved contacts');
+        groupLabel = t('settings.addressBook.SectionTitle.saveContact');
         break;
       case AnalyzedGroup.RECENT:
-        groupLabel = t('Recent');
+        groupLabel = t('settings.addressBook.SectionTitle.recent');
         break;
     }
 
@@ -257,9 +257,10 @@ const Component: React.FC<Props> = (props: Props) => {
           ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
+          rowGap='var(--row-gap)'
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('common.Search.Account.placeHolder')}
           showActionBtn={true}
         />
       </SwModal>

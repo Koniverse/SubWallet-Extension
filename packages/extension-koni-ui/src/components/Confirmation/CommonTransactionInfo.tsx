@@ -27,8 +27,8 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       <MetaInfo.Account
         address={account?.address || address}
+        label={t('common.Account.label')}
         chainSlug={network}
-        label={t('Account')}
         name={account?.name}
         networkPrefix={networkPrefix}
       />
