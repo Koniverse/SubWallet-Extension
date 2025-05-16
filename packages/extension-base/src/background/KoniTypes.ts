@@ -38,7 +38,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest } from '../services/open-gov/interface';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, Tracks, UndelegateRequest, UnlockBalanceRequest } from '../services/open-gov/interface';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2578,6 +2578,7 @@ export interface KoniRequestSignatures {
   'pri(openGov.editDelegate)': [DelegateRequest, SWTransactionResponse];
   'pri(openGov.getLockedBalance)': [GetLockedBalanceRequest, LockedDetail[]];
   'pri(openGov.unlockBalance)': [UnlockBalanceRequest, SWTransactionResponse];
+  'pri(openGov.getTracks)': [string, Tracks[]];
 }
 
 export interface ApplicationMetadataType {

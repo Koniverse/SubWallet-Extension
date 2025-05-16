@@ -7,7 +7,8 @@ import BigNumber from 'bignumber.js';
 export const govChainSupportItems = [
   { name: 'Polkadot', slug: 'polkadot' },
   { name: 'Kusama', slug: 'kusama' },
-  { name: 'Westend', slug: 'westend' }
+  { name: 'Westend', slug: 'westend' },
+  { name: 'Paseo', slug: 'paseoTest' }
 ];
 
 export const calculateTimeLeft = (blockTime: number, currentBlock: number, alarmBlock: number | null, state: string, blockDuration = 6): { timeLeft: string; endTime: number } => {

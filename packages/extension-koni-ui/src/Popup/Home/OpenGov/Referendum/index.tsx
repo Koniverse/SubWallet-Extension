@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
+import { _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/interface';
 import { calculateTimeLeft, getTimeLeft, isGovOngoing } from '@subwallet/extension-base/services/open-gov/utils';
 import { FilterModal, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';

@@ -8,7 +8,7 @@ import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/typ
 import { ServiceStatus } from '../base/types';
 import { EventService } from '../event-service';
 import BaseOpenGovHandler from './handler';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest } from './interface';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, Tracks, UndelegateRequest, UnlockBalanceRequest } from './interface';
 import { govChainSupportItems } from './utils';
 
 class OpenGovChainHandler extends BaseOpenGovHandler {
@@ -81,10 +81,16 @@ export default class OpenGovService {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
-    const errors = await handler.validateReferendumVote(request.address, request.trackId);
+    const earlyError = await handler.validateConvictionAndBalance(request.address, request.balance, request.conviction);
 
-    if (errors.length > 0) {
-      return Promise.reject(errors[0]);
+    if (earlyError) {
+      return Promise.reject(earlyError);
+    }
+
+    const error = await handler.validateReferendumDelegate(request.address, [request.trackId]);
+
+    if (error) {
+      return Promise.reject(error);
     }
 
     return handler.handleStandardVote(request);
@@ -97,10 +103,16 @@ export default class OpenGovService {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
-    const errors = await handler.validateReferendumVote(request.address, request.trackId);
+    const earlyError = await handler.validateSplitAbstainAmount(request.address, request.aye, request.nay, request.abstain);
 
-    if (errors.length > 0) {
-      return Promise.reject(errors[0]);
+    if (earlyError) {
+      return Promise.reject(earlyError);
+    }
+
+    const error = await handler.validateReferendumDelegate(request.address, [request.trackId]);
+
+    if (error) {
+      return Promise.reject(error);
     }
 
     return handler.handleSplitAbstainVote(request);
@@ -114,16 +126,6 @@ export default class OpenGovService {
     }
 
     return handler.handleRemoveVote(request);
-  }
-
-  public async handleUnlockVote (request: UnlockVoteRequest): Promise<TransactionData> {
-    const handler = this.handlers[request.chain];
-
-    if (!handler) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-    }
-
-    return handler.handleUnlockVote(request);
   }
 
   public async fetchDelegates (chain: string): Promise<_DelegateInfo[]> {
@@ -143,6 +145,18 @@ export default class OpenGovService {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
+    const earlyError = await handler.validateConvictionAndBalance(request.address, request.balance, request.conviction);
+
+    if (earlyError) {
+      return Promise.reject(earlyError);
+    }
+
+    const error = await handler.validateReferendumDelegate(request.address, request.trackIds);
+
+    if (error) {
+      return Promise.reject(error);
+    }
+
     return handler.handleDelegate(request);
   }
 
@@ -151,6 +165,10 @@ export default class OpenGovService {
 
     if (!handler) {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    if (!request.trackIds || request.trackIds.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
 
     return handler.handleUndelegate(request);
@@ -183,6 +201,20 @@ export default class OpenGovService {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
+    if (!request.trackIds || request.trackIds.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
+    }
+
     return handler.handleUnlockBalance(request);
+  }
+
+  public async getTracks (chain: string): Promise<Tracks[]> {
+    const handler = this.handlers[chain];
+
+    if (!handler) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    return handler.getTracks();
   }
 }

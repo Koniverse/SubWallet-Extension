@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _DelegateInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, LockedDetail, Tracks } from '@subwallet/extension-base/services/open-gov/interface';
 import { FilterModal, LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import EmptyList from '@subwallet/extension-koni-ui/components/EmptyList/EmptyList';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -25,11 +25,12 @@ type Props = ThemeProps & {
   chainAsset: _ChainAsset;
   selectedAddress: string;
   locks: LockedDetail[];
+  trackOptions: Tracks[]
 };
 
 const FILTER_MODAL_ID = 'referendum-filter-modal';
 
-function Component ({ chainAsset, className, delegate, isLoading, locks, selectedAddress }: Props): React.ReactElement<Props> {
+function Component ({ chainAsset, className, delegate, isLoading, locks, selectedAddress, trackOptions }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
@@ -203,6 +204,7 @@ function Component ({ chainAsset, className, delegate, isLoading, locks, selecte
         address={selectedAddress}
         chainAsset={chainAsset}
         data={currentSelectItem}
+        trackOptions={trackOptions}
       />
     </div>
   );

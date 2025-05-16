@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _DelegateInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';

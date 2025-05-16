@@ -52,13 +52,6 @@ export interface RemoveVoteRequest {
   referendumIndex: number;
 }
 
-export interface UnlockVoteRequest {
-  address: string;
-  chain: string;
-  trackId: number;
-  target: string;
-}
-
 export interface _ReferendumInfo {
   _id: string;
   referendumIndex: number;
@@ -187,4 +180,10 @@ export interface LockedDetail {
   trackId: number;
   locked: VotingFor;
   expireIn: string;
+}
+
+// Tracks
+export interface Tracks{
+  id: number;
+  name: string;
 }

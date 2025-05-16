@@ -4,13 +4,15 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { formatNumber } from '@subwallet/extension-base/utils/number';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import { _SubstrateApi } from '../chain-service/types';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest, UnlockVoteRequest, VotingFor } from './interface';
+import { _getAssetDecimals } from '../chain-service/utils';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, Gov2Vote, LockedDetail, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, Tracks, UndelegateRequest, UnlockBalanceRequest, VotingFor } from './interface';
 
 interface Referendums {
   items: _ReferendumInfo[];
@@ -32,8 +34,11 @@ export default abstract class BaseOpenGovHandler {
     return this.state.getSubstrateApi(this.chain);
   }
 
+  /* Referendum related actions */
+
   public async fetchReferendums (): Promise<_ReferendumInfo[]> {
-    const url = `https://${this.chain}.subsquare.io/api/gov2/referendums?page=1&page_size=100`;
+    const chain = this.chain === 'paseoTest' ? 'paseo' : this.chain;
+    const url = `https://${chain}.subsquare.io/api/gov2/referendums?page=1&page_size=100`;
 
     const res = await fetch(url);
 
@@ -51,7 +56,8 @@ export default abstract class BaseOpenGovHandler {
   }
 
   public async getAbstainTotal (request: GetAbstainTotalRequest): Promise<string> {
-    const url = `https://${request.chain}.subsquare.io/api/gov2/referenda/${request.referendumIndex}/votes`;
+    const chain = this.chain === 'paseoTest' ? 'paseo' : this.chain;
+    const url = `https://${chain}.subsquare.io/api/gov2/referenda/${request.referendumIndex}/votes`;
 
     const res = await fetch(url);
 
@@ -110,18 +116,6 @@ export default abstract class BaseOpenGovHandler {
     return extrinsic;
   }
 
-  public async validateReferendumVote (address: string, trackId: number): Promise<TransactionError[]> {
-    const substrateApi = await this.substrateApi.isReady;
-    const locked = (await substrateApi.api.query.convictionVoting.votingFor(address, trackId)).toPrimitive() as VotingFor;
-
-    if ((locked?.delegating?.balance && new BigN(locked.delegating.balance).gt(0)) ||
-    (locked?.casting?.votes && locked.casting.votes.length > 0)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Already delegating votes')];
-    }
-
-    return [];
-  }
-
   public async handleRemoveVote (request: RemoveVoteRequest): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
 
@@ -133,19 +127,11 @@ export default abstract class BaseOpenGovHandler {
     return extrinsic;
   }
 
-  public async handleUnlockVote (request: UnlockVoteRequest): Promise<TransactionData> {
-    const substrateApi = await this.substrateApi.isReady;
-
-    const extrinsic = substrateApi.api.tx.convictionVoting.unlock(
-      request.trackId,
-      request.target
-    );
-
-    return extrinsic;
-  }
+  /* Delegate related actions */
 
   public async fetchDelegates (): Promise<_DelegateInfo[]> {
-    const url = `https://${this.chain}.subsquare.io/api/delegation/referenda/delegates?sort=&page=1&page_size=100`;
+    const chain = this.chain === 'paseoTest' ? 'paseo' : this.chain;
+    const url = `https://${chain}.subsquare.io/api/delegation/referenda/delegates?sort=&page=1&page_size=100`;
 
     const res = await fetch(url);
 
@@ -245,6 +231,8 @@ export default abstract class BaseOpenGovHandler {
     return batchTx;
   }
 
+  /* Locked balance related actions */
+
   public async getLockedBalance (request: GetLockedBalanceRequest): Promise<LockedDetail[]> {
     const substrateApi = await this.substrateApi.isReady;
 
@@ -280,6 +268,16 @@ export default abstract class BaseOpenGovHandler {
 
   public async handleUnlockBalance (request: UnlockBalanceRequest): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
+
+    if (request.trackIds.length === 1) {
+      const tx = substrateApi.api.tx.convictionVoting.unlock(
+        request.trackIds[0],
+        request.address
+      );
+
+      return tx;
+    }
+
     const tx = request.trackIds.map((trackId) => {
       return substrateApi.api.tx.convictionVoting.unlock(
         trackId,
@@ -290,5 +288,104 @@ export default abstract class BaseOpenGovHandler {
     const batchTx = substrateApi.api.tx.utility.batch([...tx]);
 
     return batchTx;
+  }
+
+  /* Validate open-gov */
+
+  public async validateReferendumDelegate (address: string, trackIds: number[]): Promise<TransactionError | null> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    for (const trackId of trackIds) {
+      const locked = (await substrateApi.api.query.convictionVoting.votingFor(address, trackId)).toPrimitive() as VotingFor;
+
+      if (
+        (locked?.delegating?.balance && new BigN(locked.delegating.balance).gt(0)) ||
+        (locked?.casting?.votes && locked.casting.votes.length > 0)
+      ) {
+        return new TransactionError(
+          BasicTxErrorType.INVALID_PARAMS,
+          `Already delegating or voting on track ${trackId}`
+        );
+      }
+    }
+
+    return null;
+  }
+
+  public async validateConvictionAndBalance (address: string, balance: string, conviction: number): Promise<TransactionError | null> {
+    const transferableBalance = await this.state.balanceService.getTransferableBalance(address, this.chain);
+
+    if (!balance) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, ('Amount is required'));
+    }
+
+    const bnBalance = new BigN(balance);
+
+    if (bnBalance.lte(0)) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0');
+    }
+
+    if (bnBalance.gt(transferableBalance.value)) {
+      const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
+      const maxString = formatNumber(transferableBalance.value, _getAssetDecimals(chainAsset));
+
+      const msg = maxString !== '0'
+        ? `Amount must be equal or less than ${maxString}`
+        : 'You need balance greater than 0 to continue';
+
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, msg);
+    }
+
+    if (conviction < 0 || conviction > 6) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Invalid conviction');
+    }
+
+    return null;
+  }
+
+  public async validateSplitAbstainAmount (address: string, aye: string, nay: string, abstain: string): Promise<TransactionError | null> {
+    if (!nay || !aye || !abstain) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, ('Amount is required'));
+    }
+
+    const values = [new BigN(aye), new BigN(nay), new BigN(abstain)];
+
+    if (values.some((v) => v.lt(0))) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'All values must begreater than 0');
+    }
+
+    const total = values.reduce((acc, val) => acc.plus(val), new BigN(0));
+
+    if (total.lte(0)) {
+      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Total amount must be greater than 0');
+    }
+
+    const transferableBalance = await this.state.balanceService.getTransferableBalance(address, this.chain);
+
+    if (total.gt(transferableBalance.value)) {
+      const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
+      const maxString = formatNumber(transferableBalance.value, _getAssetDecimals(chainAsset));
+
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Amount must be equal or less than ${maxString}`);
+    }
+
+    return null;
+  }
+
+  // get Tracks
+
+  public async getTracks (): Promise<Tracks[]> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    const rawTracks = substrateApi.api.consts.referenda.tracks.toJSON() as [number, { name: string }][];
+
+    const tracks: Tracks[] = rawTracks.map(([id, info]) => ({
+      id,
+      name: info.name
+    }));
+
+    console.log('tracks', tracks);
+
+    return tracks;
   }
 }

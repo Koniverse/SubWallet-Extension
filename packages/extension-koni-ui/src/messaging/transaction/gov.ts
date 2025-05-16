@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UnlockBalanceRequest } from '@subwallet/extension-base/services/open-gov/type';
+import { DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UnlockBalanceRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
 export async function fetchReferendums (slug: string) {
@@ -46,4 +46,8 @@ export async function getLockedBalance (data: GetLockedBalanceRequest) {
 
 export async function handleUnlockBalance (data: UnlockBalanceRequest) {
   return sendMessage('pri(openGov.unlockBalance)', data);
+}
+
+export async function getTracks (slug: string) {
+  return sendMessage('pri(openGov.getTracks)', slug);
 }

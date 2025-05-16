@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _DelegateInfo } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, Tracks } from '@subwallet/extension-base/services/open-gov/interface';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { handleDelegate } from '@subwallet/extension-koni-ui/messaging';
 import { TransactionContent } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -13,6 +15,7 @@ import { Button, Form, Icon, Image, ModalContext, SwModal } from '@subwallet/rea
 import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 
 import { convictionOptions, voteData } from '../predefined';
@@ -21,6 +24,7 @@ type Props = ThemeProps & {
   address: string;
   data: _DelegateInfo | null;
   chainAsset: _ChainAsset | null;
+  trackOptions: Tracks[];
 };
 
 export const DelegateDetailModalId = 'delegateDetailModalId';
@@ -36,23 +40,19 @@ const modalCloseButton = (
   />
 );
 
-const trackOptions = [
-  { id: 0, name: 'Root' },
-  { id: 1, name: 'Whitelisted Caller' },
-  { id: 10, name: 'Staking Admin' },
-  { id: 11, name: 'Treasurer' },
-  { id: 33, name: 'Medium Spender' }
-];
-
-function Component ({ address, chainAsset, className = '', data }: Props): React.ReactElement<Props> {
+function Component ({ address, chainAsset, className = '', data, trackOptions }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const [form] = Form.useForm();
   const [convictionValue, setConvictionValue] = useState<number>(0);
   const [selectedTrackIds, setSelectedTrackIds] = useState<number[]>([]);
   const valueColorSchema = 'blue';
+  const { onError, onSuccess } = useHandleSubmitTransaction();
   const chain = chainAsset?.originChain;
 
+  const onPreCheck = usePreCheckAction(address);
+
+  const navigate = useNavigate();
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
   }, [inactiveModal]);
@@ -66,7 +66,7 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
   }, [inactiveModal]);
 
   const onClickVote = useCallback(() => {
-    form.validateFields().then(async (values: voteData) => {
+    form.validateFields().then((values: voteData) => {
       if (!data || !chain || selectedTrackIds.length === 0) {
         return;
       }
@@ -81,12 +81,14 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
         removeOtherTracks: true
       };
 
-      inactiveModal(modalId);
-      await handleDelegate(delegateRequest);
-    }).catch((error) => {
-      console.error('Form validation failed:', error);
-    });
-  }, [form, data, chain, selectedTrackIds, address, inactiveModal]);
+      handleDelegate(delegateRequest)
+        .then((tx) => {
+          onSuccess(tx);
+          navigate('/home/tokens');
+        })
+        .catch(onError);
+    }).catch(onError);
+  }, [form, onError, onSuccess, data, chain, address, selectedTrackIds, navigate]);
 
   const handleConvictionChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,7 +245,7 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
                     size={'sm'}
                     weight={'fill'}
                   />}
-                onClick={onClickVote}
+                onClick={onPreCheck(form.submit, ExtrinsicType.DELEGATE)}
               >
                 {t('Delegate now')}
               </Button>

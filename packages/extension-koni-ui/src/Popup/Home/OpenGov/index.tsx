@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _DelegateInfo, _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail } from '@subwallet/extension-base/services/open-gov/type';
+import { _DelegateInfo, _EnhancedReferendumInfo, _ReferendumInfo, LockedDetail, Tracks } from '@subwallet/extension-base/services/open-gov/interface';
 import { calculateTimeLeft, govChainSupportItems } from '@subwallet/extension-base/services/open-gov/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, Layout } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenSlug, useOpenGovSelection, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { fetchDelegates, fetchReferendums, getLockedBalance } from '@subwallet/extension-koni-ui/messaging';
+import { fetchDelegates, fetchReferendums, getLockedBalance, getTracks } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +23,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { accountAddressItems, selectedAddress, selectedChain, setSelectedAddress, setSelectedChain } = useOpenGovSelection();
   const [referendums, setReferendums] = useState<_EnhancedReferendumInfo[]>([]);
   const [delegates, setDelegates] = useState<_DelegateInfo[]>([]);
+  const [tracks, setTracks] = useState<Tracks[]>([]);
   const [locks, setLocks] = useState<LockedDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDelegateLoading, setIsDelegateLoading] = useState(true);
@@ -75,6 +76,25 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     };
 
     loadDelegates().catch((err) => console.error('Failed to load delegates:', err));
+  }, [selectedChain]);
+
+  useEffect(() => {
+    const loadTracks = async () => {
+      setIsDelegateLoading(true);
+
+      try {
+        const tracks = await getTracks(selectedChain);
+
+        setTracks(tracks);
+      } catch (err) {
+        setTracks([]);
+        console.error('Failed to load tracks:', err);
+      } finally {
+        setIsDelegateLoading(false);
+      }
+    };
+
+    loadTracks().catch((err) => console.error('Failed to load delegates:', err));
   }, [selectedChain]);
 
   useEffect(() => {
@@ -175,6 +195,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               isLoading={isDelegateLoading}
               locks={locks}
               selectedAddress={selectedAddress}
+              trackOptions={tracks}
             />
           )}
       </>

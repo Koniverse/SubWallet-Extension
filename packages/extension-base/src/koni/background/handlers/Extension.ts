@@ -48,7 +48,7 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, UndelegateRequest, UnlockBalanceRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, Tracks, UndelegateRequest, UnlockBalanceRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -4826,6 +4826,13 @@ export default class KoniExtension {
       chainType: ChainType.SUBSTRATE
     });
   }
+
+  private async getTracks (request: string): Promise<Tracks[]> {
+    const data = await this.#koniState.openGovService.getTracks(request);
+
+    return data;
+  }
+
   /* Gov */
 
   // --------------------------------------------------------------
@@ -5509,6 +5516,8 @@ export default class KoniExtension {
         return this.getLockedBalance(request as GetLockedBalanceRequest);
       case 'pri(openGov.unlockBalance)':
         return this.handleUnlockBalance(request as UnlockBalanceRequest);
+      case 'pri(openGov.getTracks)':
+        return this.getTracks(request as string);
         /* Gov */
 
       // Default

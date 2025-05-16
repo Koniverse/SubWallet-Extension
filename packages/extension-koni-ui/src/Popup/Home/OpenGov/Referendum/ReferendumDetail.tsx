@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { _ReferendumInfo, RemoveVoteRequest, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { isGovOngoing } from '@subwallet/extension-base/services/open-gov/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AmountInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { getAbstainTotal, handleRemoveVote, handleStandardVote } from '@subwallet/extension-koni-ui/messaging';
 import { TransactionContent } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -14,6 +16,7 @@ import { Button, Form, Icon, Image, ModalContext, SwModal } from '@subwallet/rea
 import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -38,9 +41,13 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
   const [form] = Form.useForm();
 
   const [convictionValue, setConvictionValue] = useState<number>(0);
-  const chain = chainAsset?.originChain;
 
   const [abstainTotal, setAbstainTotal] = useState<string>('0');
+  const { onError, onSuccess } = useHandleSubmitTransaction();
+  const chain = chainAsset?.originChain;
+
+  const onPreCheck = usePreCheckAction(address);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadAbstainTotal = async () => {
@@ -74,14 +81,14 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
   }, [inactiveModal]);
 
   const onClickVote = useCallback(() => {
-    form.validateFields().then(async (values: voteData) => {
+    form.validateFields().then((values: voteData) => {
       if (!data) {
         return;
       }
 
       const voteData: StandardVoteRequest = {
-        address: address,
-        chain: chain,
+        address,
+        chain,
         referendumIndex: data.referendumIndex,
         aye: true,
         balance: values.value,
@@ -89,12 +96,14 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
         trackId: data.track
       };
 
-      inactiveModal(modalId);
-      await handleStandardVote(voteData);
-    }).catch((error) => {
-      console.error('Form validation failed:', error);
-    });
-  }, [form, data, address, chain, inactiveModal]);
+      handleStandardVote(voteData)
+        .then((rs) => {
+          onSuccess(rs);
+          navigate('/home/tokens');
+        })
+        .catch(onError);
+    }).catch(onError);
+  }, [form, onError, data, address, chain, onSuccess, navigate]);
 
   const onClickRemoveVote = useCallback(() => {
     if (!data) {
@@ -108,10 +117,15 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
       referendumIndex: data.referendumIndex
     };
 
-    inactiveModal(modalId);
-
-    handleRemoveVote(removeVoteData).catch(console.error);
-  }, [data, address, chain, inactiveModal]);
+    handleRemoveVote(removeVoteData)
+      .then((rs) => {
+        onSuccess(rs);
+        navigate('/home/tokens');
+      })
+      .catch((error: Error) => {
+        onError(error);
+      });
+  }, [data, address, chain, onSuccess, navigate, onError]);
 
   const modalCloseButton = (
     <Icon
@@ -198,7 +212,6 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
 
               <Form.Item
                 name={'conviction'}
-                rules={[{ required: true, message: t('Please select a conviction') }]}
                 statusHelpAsTooltip={true}
               >
                 <div className='conviction-slider-container'>
@@ -267,7 +280,7 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
                     weight={'fill'}
                   />
                 }
-                onClick={onClickVote}
+                onClick={onPreCheck(form.submit, ExtrinsicType.VOTE)}
               >
                 {t('Join now')}
               </Button>
@@ -280,7 +293,7 @@ function Component ({ address, chainAsset, className = '', data }: Props): React
                     weight={'fill'}
                   />
                 }
-                onClick={onClickRemoveVote}
+                onClick={onPreCheck(onClickRemoveVote, ExtrinsicType.VOTE)}
               >
                 {t('Remove now')}
               </Button>
