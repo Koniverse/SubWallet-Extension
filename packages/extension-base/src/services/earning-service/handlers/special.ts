@@ -282,7 +282,11 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
             value: bnAmount.toString()
           });
 
-          const xcmFee = BigN(xcmFeeInfo?.origin.fee || '0').multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
+          if (!xcmFeeInfo) {
+            throw new Error('Error estimating XCM fee');
+          }
+
+          const xcmFee = BigN(xcmFeeInfo.origin.fee).multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
 
           const fee: YieldTokenBaseInfo = {
             slug: altInputTokenSlug,
