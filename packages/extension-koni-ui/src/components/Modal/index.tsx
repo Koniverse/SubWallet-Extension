@@ -6,12 +6,14 @@ export { default as DeriveAccountActionModal } from './DeriveAccountActionModal'
 export { default as DisconnectExtensionModal } from './DisconnectExtensionModal';
 export { default as ReceiveModal } from './ReceiveModalNew';
 export { default as RemindBackupSeedPhraseModal } from './RemindBackupSeedPhraseModal';
-export { default as RemindUpgradeUnifiedAccount } from './RemindDuplicateAccountNameModal';
+export { default as RemindDuplicateAccountNameModal } from './RemindDuplicateAccountNameModal';
 export { default as RemindUpgradeVersionModal } from './RemindUpgradeFirefoxVersion';
 export { default as RequestCameraAccessModal } from './RequestCameraAccessModal';
 export { default as RequestCreatePasswordModal } from './RequestCreatePasswordModal';
 export { default as ResetWalletModal } from './ResetWalletModal';
 export { default as TonWalletContractSelectorModal } from './TonWalletContractSelectorModal';
+export { default as TransactionProcessDetailModal } from './TransactionProcessDetailModal';
+export { default as TransactionStepsModal } from './TransactionStepsModal';
 
 export { SortingModal } from './SortingModal';
 

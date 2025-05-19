@@ -33,6 +33,10 @@ export type ExtraYieldPositionInfo = YieldPositionInfo & {
   price: number;
   currency?: CurrencyJson;
   // exchangeRate: number;
+  subnetData?: { // for Subnet staking
+    subnetSymbol: string;
+    subnetShortName: string;
+  }
 }
 
 export interface YieldGroupInfo {

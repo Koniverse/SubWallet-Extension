@@ -3,12 +3,15 @@
 
 export { default as DeriveAccountActionModal } from './DeriveAccountActionModal';
 export { default as ReceiveModal } from './ReceiveModalNew';
+export { default as RemindDuplicateAccountNameModal } from './RemindDuplicateAccountNameModal';
 export { default as RequestCameraAccessModal } from './RequestCameraAccessModal';
 export { default as RequestCreatePasswordModal } from './RequestCreatePasswordModal';
 export { default as ResetWalletModal } from './ResetWalletModal';
 export { default as AddNetworkWCModal } from './AddNetworkWCModal';
 export { SortingModal } from './SortingModal';
 export { default as TonWalletContractSelectorModal } from './TonWalletContractSelectorModal';
+export { default as TransactionProcessDetailModal } from './TransactionProcessDetailModal';
+export { default as TransactionStepsModal } from './TransactionStepsModal';
 
 export * from './Global';
 export * from './Account';

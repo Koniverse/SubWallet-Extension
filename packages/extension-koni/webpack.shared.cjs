@@ -35,7 +35,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui'
+  'extension-koni-ui',
+  'subwallet-api-sdk'
 ];
 
 const _additionalEnv = {
@@ -57,7 +58,15 @@ const _additionalEnv = {
   BITTENSOR_API_KEY_8: JSON.stringify(process.env.BITTENSOR_API_KEY_8),
   BITTENSOR_API_KEY_9: JSON.stringify(process.env.BITTENSOR_API_KEY_9),
   BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
-  SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY)
+  SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
+  UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
+  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
+  MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
+  MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
+  MELD_TEST_MODE: JSON.stringify(false),
+  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
 };
 
 const additionalEnvDict = {
@@ -156,10 +165,19 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
         chunks: ['extension']
       }),
       new HtmlWebpackPlugin({
+        filename: 'side-panel.html',
+        template: 'public/side-panel.html',
+        chunks: ['extension']
+      }),
+      new HtmlWebpackPlugin({
         filename: 'notification.html',
         template: 'public/notification.html',
         chunks: ['extension']
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({

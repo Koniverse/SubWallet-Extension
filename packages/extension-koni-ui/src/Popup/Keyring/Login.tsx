@@ -159,6 +159,10 @@ const Login = styled(Component)<Props>(({ theme }: Props) => {
       top: 0
     },
 
+    '.-side-panel-mode & .bg-image': {
+      backgroundSize: 'cover'
+    },
+
     '.body-container': {
       padding: `0 ${token.padding}px`,
       textAlign: 'center',
