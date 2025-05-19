@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getAssetDecimals, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
@@ -18,17 +18,27 @@ import { BalanceService } from '../../balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '../../balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '../../balance-service/transfer/token';
 import { ChainService } from '../../chain-service';
-import { SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING } from '../utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
 
-interface ExchangeSimpleSwapData{
+interface ExchangeSimpleSwapResult {
   id: string;
-  trace_id: string;
-  address_from: string;
-  amount_to: string;
+  addressFrom: string;
+  addressTo: string;
+  amountFrom: string;
+  amountTo: string;
 }
 
-const apiUrl = 'https://api.simpleswap.io';
+interface ExchangeSimpleSwapData {
+  result: ExchangeSimpleSwapResult;
+  traceId: string;
+}
+
+interface SimpleSwapMetadata{
+  fromChainSymbol: string;
+  toChainSymbol: string
+}
+
+const apiUrl = 'https://api.simpleswap.io/v3';
 
 export const simpleSwapApiKey = process.env.SIMPLE_SWAP_API_KEY || '';
 
@@ -38,40 +48,78 @@ const toBNString = (input: string | number | BigNumber, decimal: number): string
   return raw.shiftedBy(decimal).integerValue(BigNumber.ROUND_CEIL).toFixed();
 };
 
-const createSwapRequest = async (params: {fromSymbol: string; toSymbol: string; fromAmount: string; fromAsset: _ChainAsset; receiver: string; sender: string; toAsset: _ChainAsset;}) => {
-  const fromDecimals = _getAssetDecimals(params.fromAsset);
-  const toDecimals = _getAssetDecimals(params.toAsset);
-  const formatedAmount = formatNumber(params.fromAmount, fromDecimals, (s) => s);
-  const requestBody = {
-    fixed: false,
-    currency_from: params.fromSymbol,
-    currency_to: params.toSymbol,
-    amount: formatedAmount, // Convert to small number due to require of api
-    address_to: params.receiver,
-    extra_id_to: '',
-    user_refund_address: params.sender,
-    user_refund_extra_id: ''
-  };
+type BuildTxForSimpleSwapResult =
+  | { data: { id: string; addressFrom: string; amountTo: string }; error?: undefined }
+  | { data?: undefined; error: SwapError | TransactionError };
 
-  const response = await fetch(
-    `${apiUrl}/create_exchange?api_key=${simpleSwapApiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(requestBody)
+const buildTxForSimpleSwap = async (params: {
+  fromSymbol: string;
+  toSymbol: string;
+  fromAmount: string;
+  fromAsset: _ChainAsset;
+  receiver: string;
+  sender: string;
+  toAsset: _ChainAsset;
+  metadata: SimpleSwapMetadata;
+}): Promise<BuildTxForSimpleSwapResult> => {
+  try {
+    const { fromAmount, fromAsset, fromSymbol,
+      metadata, receiver, sender, toAsset, toSymbol } = params;
+
+    const fromDecimals = _getAssetDecimals(fromAsset);
+    const toDecimals = _getAssetDecimals(toAsset);
+    const formattedAmount = formatNumber(fromAmount, fromDecimals, (s) => s);
+
+    const requestBody = {
+      fixed: false,
+      tickerFrom: fromSymbol,
+      tickerTo: toSymbol,
+      amount: formattedAmount,
+      networkFrom: metadata.fromChainSymbol,
+      networkTo: metadata.toChainSymbol,
+      addressTo: receiver,
+      extraIdTo: '',
+      userRefundAddress: sender,
+      userRefundExtraId: ''
+    };
+
+    const response = await fetch(
+      `${apiUrl}/exchanges`,
+      {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+          'x-api-key': simpleSwapApiKey
+        },
+        body: JSON.stringify(requestBody)
+      }
+    );
+
+    if (!response.ok) {
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
     }
-  );
 
-  const depositAddressResponse = await response.json() as ExchangeSimpleSwapData;
+    const depositAddressResponse = await response.json() as ExchangeSimpleSwapData;
 
-  return {
-    id: depositAddressResponse.id,
-    addressFrom: depositAddressResponse.address_from,
-    amountTo: toBNString(depositAddressResponse.amount_to, toDecimals)
-  };
+    const result = depositAddressResponse.result;
+
+    if (!result?.id || !result.addressFrom || !result.amountTo) {
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
+    }
+
+    return {
+      data: {
+        id: result.id,
+        addressFrom: result.addressFrom,
+        amountTo: toBNString(result.amountTo, toDecimals)
+      }
+    };
+  } catch (err) {
+    console.error('Error:', err);
+
+    return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
+  }
 };
 
 export class SimpleSwapHandler implements SwapBaseInterface {
@@ -170,13 +218,29 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     const sender = _reformatAddressWithChain(address, chainInfo);
     const receiver = _reformatAddressWithChain(recipient ?? sender, toChainInfo);
 
-    const fromSymbol = SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING[fromAsset.slug];
-    const toSymbol = SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING[toAsset.slug];
+    const fromSymbol = _getAssetSymbol(fromAsset).toLowerCase();
+    const toSymbol = _getAssetSymbol(toAsset).toLowerCase();
+    const metadata = quote.metadata as SimpleSwapMetadata;
 
     const { fromAmount } = quote;
-    const { addressFrom, amountTo, id } = await createSwapRequest({ fromSymbol, toSymbol, fromAmount, fromAsset, receiver, sender, toAsset });
+    const result = await buildTxForSimpleSwap({
+      fromSymbol,
+      toSymbol,
+      fromAmount,
+      fromAsset,
+      receiver,
+      sender,
+      toAsset,
+      metadata
+    });
 
-    console.log('simpleswap data', id, addressFrom);
+    if (result.error) {
+      console.error('Simple swap error:', result.error);
+
+      throw result.error;
+    }
+
+    const { addressFrom, amountTo, id } = result.data;
 
     if (!id || id.length === 0 || !addressFrom || addressFrom.length === 0) {
       throw new SwapError(SwapErrorType.UNKNOWN);
