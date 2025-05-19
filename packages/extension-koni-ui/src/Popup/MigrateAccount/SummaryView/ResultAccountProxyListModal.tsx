@@ -33,7 +33,7 @@ function Component ({ accountProxies, className = '', onClose }: Props): React.R
       )}
       id={resultAccountProxyListModal}
       onCancel={onClose}
-      title={t('settings.Screen.migrateAccount.resultAccountProxyListModal.title')}
+      title={t('settings.Screen.migrateAccount.Modal.resultAccountProxyList.title')}
       zIndex={9999}
     >
       {

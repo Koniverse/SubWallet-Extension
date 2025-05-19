@@ -58,10 +58,10 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   const getAccountListModalTriggerLabel = () => {
     if (resultAccountProxies.length === 3) {
-      return t('settings.Screen.migrateAccount.summaryView.accountListModal.andOneOther');
+      return t('settings.Screen.migrateAccount.summaryView.accountListModalTriggerLabel.forOneItem');
     }
 
-    return t('settings.Screen.migrateAccount.summaryView.accountListModal.andNumberOther', { replace: { number: resultAccountProxies.length - 2 } });
+    return t('settings.Screen.migrateAccount.summaryView.accountListModalTriggerLabel.forMultiItems', { replace: { number: resultAccountProxies.length - 2 } });
   };
 
   const hasAnyAccountToMigrate = !!resultAccountProxies.length;
@@ -131,7 +131,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migratedAccountList')}
+                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migrateToMultiAccounts')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -145,7 +145,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migratedAccount')}
+                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migrateToOneAccount')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )

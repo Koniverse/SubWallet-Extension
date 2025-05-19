@@ -89,11 +89,11 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
         </>
       )}
       id={enterPasswordModalId}
-      title={t('settings.Screen.migrateAccount.enterPasswordModal.title')}
+      title={t('settings.Screen.migrateAccount.Modal.enterPassword.title')}
       zIndex={9999}
     >
       <div className='__brief'>
-        {t('settings.Screen.migrateAccount.enterPasswordModal.description')}
+        {t('settings.Screen.migrateAccount.Modal.enterPassword.description')}
       </div>
 
       <Form
@@ -105,7 +105,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           name={FormFieldName.PASSWORD}
           rules={[
             {
-              message: t('settings.Screen.migrateAccount.enterPasswordModal.passwordRequired'),
+              message: t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.Error.required'),
               required: true
             }
           ]}
@@ -114,8 +114,8 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           <Input.Password
             containerClassName='__password-input'
             id={passwordInputId}
-            label={t('settings.Screen.migrateAccount.enterPasswordModal.Input.passwordLabel')}
-            placeholder={t('settings.Screen.migrateAccount.enterPasswordModal.Input.passwordPlaceholder')}
+            label={t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.label')}
+            placeholder={t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.placeholder')}
             suffix={<span />}
           />
         </Form.Item>
