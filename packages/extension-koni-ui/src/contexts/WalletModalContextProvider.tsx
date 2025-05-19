@@ -5,8 +5,9 @@ import { AccountMigrationInProgressWarningModal, AddressQrModal, AlertModal, Att
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
+import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-koni-ui/components/Modal/Swap/SwapFeesModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
-import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useExtensionDisplayModes, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -81,6 +82,9 @@ export interface WalletModalContextType {
   },
   transactionStepsModal: {
     open: (props: TransactionStepsModalProps) => void
+  },
+  swapFeesModal: {
+    open: (props: SwapFeesModalProps) => void
   }
 }
 
@@ -116,6 +120,9 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
   },
   transactionStepsModal: {
     open: noop
+  },
+  swapFeesModal: {
+    open: noop
   }
 });
 
@@ -150,6 +157,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
   const [transactionProcessId, setTransactionProcessId] = useState('');
   const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
+  const [swapFeesModalProps, setSwapFeesModalProps] = useState<SwapFeesModalProps | undefined>(undefined);
 
   const openAddressQrModal = useCallback((props: AddressQrModalProps) => {
     setAddressQrModalProps(props);
@@ -213,6 +221,16 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setTransactionStepsModalProps(undefined);
     inactiveModal(TRANSACTION_STEPS_MODAL);
   }, [inactiveModal]);
+
+  const openSwapFeesModal = useCallback((props: SwapFeesModalProps) => {
+    setSwapFeesModalProps(props);
+    activeModal(SWAP_FEES_MODAL);
+  }, [activeModal]);
+
+  const closeSwapFeesModal = useCallback(() => {
+    setSwapFeesModalProps(undefined);
+    inactiveModal(SWAP_FEES_MODAL);
+  }, [inactiveModal]);
   /* Process modal */
 
   const contextValue: WalletModalContextType = useMemo(() => ({
@@ -238,8 +256,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     },
     transactionStepsModal: {
       open: openTransactionStepsModal
+    },
+    swapFeesModal: {
+      open: openSwapFeesModal
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -351,6 +372,15 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         <TransactionStepsModal
           {...transactionStepsModalProps}
           onCancel={closeTransactionStepsModal}
+        />
+      )
+    }
+
+    {
+      swapFeesModalProps && (
+        <SwapFeesModal
+          {...swapFeesModalProps}
+          onCancel={closeSwapFeesModal}
         />
       )
     }

@@ -67,6 +67,7 @@ export const SWAP_MORE_BALANCE_MODAL = 'swap-more-balance-modal';
 export const SWAP_CHOOSE_FEE_TOKEN_MODAL = 'swap-choose-fee-token-modal';
 export const SWAP_TERMS_OF_SERVICE_MODAL = 'swap-terms-of-service-modal';
 export const SWAP_IDLE_WARNING_MODAL = 'swap-idle-warning-modal';
+export const SWAP_FEES_MODAL = 'swap-fees-modal';
 /* Swap */
 
 /* Announcement */
