@@ -5,9 +5,8 @@ import { AmountData, RequestMaxTransferable } from '@subwallet/extension-base/ba
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
+import { CommonOptimalTransferPath, RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
 import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
-import { CommonOptimalPath } from '@subwallet/extension-base/types/service-base';
 
 import { sendMessage } from '../base';
 
@@ -31,7 +30,7 @@ export async function subscribeMaxTransfer (request: RequestSubscribeTransfer, c
   return sendMessage('pri(transfer.subscribe)', request, callback);
 }
 
-export async function getOptimalTransferProcess (request: RequestOptimalTransferProcess): Promise<CommonOptimalPath> {
+export async function getOptimalTransferProcess (request: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
   return sendMessage('pri(accounts.getOptimalTransferProcess)', request);
 }
 
