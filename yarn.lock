@@ -7310,7 +7310,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.101-beta.0-beta.0
+    "@subwallet/chain-list": 0.2.101
   languageName: unknown
   linkType: soft
 
