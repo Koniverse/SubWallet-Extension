@@ -9,7 +9,6 @@ on:
       - webapp
       - webapp-dev
       - webapp-demo
-      - koni/dev/issue-3843-webapp
 
 jobs:
   master:
