@@ -1091,7 +1091,8 @@
   "settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.Error.required": "Account name is required",
   "settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.label": "Account name",
   "settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.placeholder": "Enter the account name",
-  "settings.Screen.migrateAccount.soloAccountMigrationView.text": "Migrate from",
+  "settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateFrom": "Migrate from",
+  "settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateTo": "To",
   "settings.Screen.migrateAccount.soloAccountMigrationView.title": "Accounts migrated",
   "settings.Screen.migrateAccount.summaryView.accountListModal.andOneOther": "And 1 other",
   "settings.Screen.migrateAccount.summaryView.accountListModalTriggerLabel.forMultiItems": "And {{number}} others",
@@ -1289,8 +1290,8 @@
   "Sync ZK mode?": "",
   "Tap on all checkboxes to confirm you understand the importance of your seed phrase": "",
   "TBD": "",
-  "Terms of Service": "",
   "Terms of service": "",
+  "Terms of Service": "",
   "Terms of services": "",
   "Terms of use": "",
   "Terms of Use": "",
@@ -1480,8 +1481,8 @@
   "User Rejected Request": "",
   "Using the app is not advised until synchronization finishes. First-time synchronization can take up to 45 minutes or longer. Proceed?": "",
   "Validating": "",
-  "validator": "",
   "Validator": "",
+  "validator": "",
   "Validator details": "",
   "Value": "",
   "Version": "",
@@ -1633,6 +1634,5 @@
   "ZK mode is syncing": "",
   "Zk mode is syncing: {{percent}}%": "",
   "ZK mode requires data synchronization": "",
-  "texterify_timestamp": "2025-05-19T03:25:54Z"
+  "texterify_timestamp": "2025-05-19T04:15:02Z"
 }
-

@@ -93,7 +93,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         </div>
 
         <div className='__section-label'>
-          {t('settings.Screen.migrateAccount.soloAccountMigrationView.text')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateFrom')}
         </div>
 
         <div className='__account-list'>
@@ -109,7 +109,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         </div>
 
         <div className='__section-label'>
-          {t('To')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateTo')}
         </div>
 
         <Form
