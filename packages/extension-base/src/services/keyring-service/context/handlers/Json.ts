@@ -190,8 +190,6 @@ export class AccountJsonHandler extends AccountBaseHandler {
           rs.isExistAccount = !!accountExists;
           rs.isExistName = nameExists;
           rs.name = accountExists ? accountExists.name : proxy.name;
-
-          console.log('rs', rs);
           return rs;
         });
 
