@@ -4,15 +4,15 @@
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
-import { AccountProxyItem, SwitchNetworkAuthorizeModal } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyItem } from '@subwallet/extension-koni-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Confirmation/ConfirmationGeneralInfo';
-import { SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, ModalContext, NetworkItem, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, NetworkItem, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight, CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -33,23 +33,20 @@ type ConnectIcon = {
   linkIcon?: React.ReactNode;
   linkIconBg?: string;
 };
-const switchNetworkAuthorizeModalId = SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL;
 
 function Component ({ authInfo, className = '', id, isBlocked = true, isNotConnected = false, onCancel, url }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-
+  const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   // const [oldConnected, setOldConnected] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
-  const { activeModal } = useContext(ModalContext);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const { token } = useTheme() as Theme;
   const _isNotConnected = isNotConnected || !authInfo;
-  const [currentNetwork, setCurrentNetwork] = useState<string | undefined>();
   const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
-  const currentEvmNetworkInfo = useMemo(() => currentNetwork ? chainInfoMap[currentNetwork] : undefined, [chainInfoMap, currentNetwork]);
+  const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap.evm, chainInfoMap]);
 
   const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
@@ -68,9 +65,17 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     };
   }, [authInfo?.accountAuthTypes]);
 
-  const showSwitchNetworkAuthorizeModal = useCallback(() => {
-    activeModal(switchNetworkAuthorizeModalId);
-  }, [activeModal]);
+  const openSwitchNetworkAuthorizeModal = useCallback(() => {
+    authInfo && switchNetworkAuthorizeModal.open(
+      {
+        authUrlInfo: authInfo,
+        onComplete: (list) => {
+          updateAuthUrls(list);
+        },
+        needsTabAuthCheck: true
+      }
+    );
+  }, [authInfo, switchNetworkAuthorizeModal]);
 
   const handlerSubmit = useCallback(() => {
     if (!isSubmit && authInfo?.id) {
@@ -122,14 +127,6 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       setAllowedMap({});
     }
   }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap]);
-
-  useEffect(() => {
-    if (isEvmAuthorize && authInfo?.isAllowed) {
-      const currentNetwork = authInfo.currentNetworkMap.evm;
-
-      setCurrentNetwork(currentNetwork);
-    }
-  }, [authInfo?.currentNetworkMap.evm, authInfo?.isAllowed, isEvmAuthorize]);
 
   const actionButtons = useMemo(() => {
     if (_isNotConnected) {
@@ -321,51 +318,43 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   };
 
   return (
-    <>
-      <SwModal
-        className={className}
-        footer={actionButtons}
-        id={id}
-        onCancel={onCancel}
-        title={t('Connect website')}
-      >
-        {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
-          <div className={'__switch-network-authorize-label'}>
-            {t('Switch network')}
-          </div>
-          <NetworkItem
-            name={currentEvmNetworkInfo.name}
-            networkKey={currentEvmNetworkInfo.slug}
-            networkMainLogoShape='circle'
-            networkMainLogoSize={20}
-            onPressItem={showSwitchNetworkAuthorizeModal}
-            rightItem={<div className={'__check-icon'}>
-              <Icon
-                className='__right-icon'
-                customSize={'16px'}
-                phosphorIcon={CaretRight}
-                type='phosphor'
-              />
-            </div>}
-          />
-        </div>}
-
-        <ConfirmationGeneralInfo
-          request={{
-            id: url,
-            url: url
-          }}
-          {...connectIconProps}
+    <SwModal
+      className={className}
+      footer={actionButtons}
+      id={id}
+      onCancel={onCancel}
+      title={t('Connect website')}
+    >
+      {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
+        <div className={'__switch-network-authorize-label'}>
+          {t('Switch network')}
+        </div>
+        <NetworkItem
+          name={currentEvmNetworkInfo.name}
+          networkKey={currentEvmNetworkInfo.slug}
+          networkMainLogoShape='circle'
+          networkMainLogoSize={20}
+          onPressItem={openSwitchNetworkAuthorizeModal}
+          rightItem={<div className={'__check-icon'}>
+            <Icon
+              className='__right-icon'
+              customSize={'16px'}
+              phosphorIcon={CaretRight}
+              type='phosphor'
+            />
+          </div>}
         />
-        {renderContent()}
-      </SwModal>
+      </div>}
 
-      { !!authInfo && isEvmAuthorize && <SwitchNetworkAuthorizeModal
-        authUrlInfo={authInfo}
-        onComplete={updateAuthUrls}
-      /> }
-    </>
-
+      <ConfirmationGeneralInfo
+        request={{
+          id: url,
+          url: url
+        }}
+        {...connectIconProps}
+      />
+      {renderContent()}
+    </SwModal>
   );
 }
 

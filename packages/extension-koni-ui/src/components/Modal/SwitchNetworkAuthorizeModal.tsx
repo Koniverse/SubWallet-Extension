@@ -6,7 +6,7 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { BasicInputEvent, ChainSelector } from '@subwallet/extension-koni-ui/components';
 import { AUTHORIZE_TYPE_SUPPORTS_NETWORK_SWITCH, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetCurrentAuth, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { switchCurrentNetworkAuthorization } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -14,27 +14,25 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-type Props = ThemeProps & {
+export interface SwitchNetworkAuthorizeModalProps {
   authUrlInfo: AuthUrlInfo;
   onComplete: (authInfo: AuthUrls) => void;
+  needsTabAuthCheck?: boolean;
 }
+
+type Props = ThemeProps & SwitchNetworkAuthorizeModalProps &{
+  onCancel: () => void;
+};
 
 const networkSelectModalId = SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL;
 const networkTypeSupported = AUTHORIZE_TYPE_SUPPORTS_NETWORK_SWITCH;
 
-function Component ({ authUrlInfo, className, onComplete }: Props): React.ReactElement<Props> {
+function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onComplete }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [networkSelected, setNetworkSelected] = useState('');
+  const [networkSelected, setNetworkSelected] = useState(authUrlInfo.currentNetworkMap[networkTypeSupported] || '');
   const chainInfoMap = useSelector((root: RootState) => root.chainStore.chainInfoMap);
-
-  useEffect(() => {
-    const currentNetwork = authUrlInfo.currentNetworkMap[networkTypeSupported];
-
-    if (currentNetwork) {
-      setNetworkSelected(currentNetwork);
-    }
-  }, [authUrlInfo.currentNetworkMap]);
+  const currentAuthByActiveTab = useGetCurrentAuth();
 
   const networkItems = useMemo(() => {
     return Object.values(chainInfoMap)
@@ -52,18 +50,37 @@ function Component ({ authUrlInfo, className, onComplete }: Props): React.ReactE
   }, []);
 
   useEffect(() => {
-    if (networkSelected !== authUrlInfo.currentNetworkMap[networkTypeSupported]) {
+    let isSync = true;
+
+    if (networkSelected && networkSelected !== authUrlInfo.currentNetworkMap[networkTypeSupported]) {
       const url = stripUrl(authUrlInfo.url);
 
-      setLoading(true);
+      if (isSync) {
+        setLoading(true);
+      }
+
       switchCurrentNetworkAuthorization({ networkKey: networkSelected, authSwitchNetworkType: networkTypeSupported, url }).then(({ list }) => {
         onComplete(list);
       }).catch(console.error).finally(() => {
-        setNetworkSelected('');
-        setLoading(false);
+        onCancel();
+
+        if (isSync) {
+          setNetworkSelected('');
+          setLoading(false);
+        }
       });
     }
-  }, [authUrlInfo, networkSelected, onComplete]);
+
+    return () => {
+      isSync = false;
+    };
+  }, [authUrlInfo, networkSelected, onCancel, onComplete]);
+
+  useEffect(() => {
+    if (needsTabAuthCheck && currentAuthByActiveTab && currentAuthByActiveTab.id !== authUrlInfo.id) {
+      onCancel();
+    }
+  }, [authUrlInfo.id, currentAuthByActiveTab, needsTabAuthCheck, onCancel]);
 
   return (
     <ChainSelector
