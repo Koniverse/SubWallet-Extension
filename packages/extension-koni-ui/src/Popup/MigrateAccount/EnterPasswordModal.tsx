@@ -54,7 +54,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           setLoading(false);
         });
     }, 500);
-  }, [onError, onSubmit]);
+  }, [onError, onSubmit, t]);
 
   useFocusById(passwordInputId);
 
