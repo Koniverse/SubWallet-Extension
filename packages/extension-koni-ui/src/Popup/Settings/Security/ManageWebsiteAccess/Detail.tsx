@@ -6,7 +6,7 @@ import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/
 import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
 import { AccountProxyItem, EmptyList, Layout, PageWrapper, SwitchNetworkAuthorizeModal } from '@subwallet/extension-koni-ui/components';
 import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components/Modal/ActionModal';
-import { SELECT_NETWORK_TYPE_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { changeAuthorization, changeAuthorizationPerSite, forgetSite, toggleAuthorization } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -15,7 +15,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
 import { convertAuthorizeTypeToChainTypes } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
-import { GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
+import { ArrowsLeftRight, GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -47,7 +47,7 @@ const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?
   return false;
 };
 
-const switchNetworkAuthorizeModalId = SELECT_NETWORK_TYPE_AUTHORIZE_MODAL;
+const switchNetworkAuthorizeModalId = SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL;
 
 function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -69,6 +69,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
 
   const actions: ActionItemType[] = useMemo(() => {
     const isAllowed = authInfo.isAllowed;
+    const isEvmAuthorize = authInfo.accountAuthTypes.includes('evm');
 
     const result: ActionItemType[] = [
       {
@@ -118,22 +119,25 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
             changeAuthorization(true, origin, updateAuthUrls).catch(console.error);
             onCloseActionModal();
           }
-        },
-        {
+        }
+      );
+
+      if (isEvmAuthorize) {
+        result.push({
           key: 'switch-network',
-          icon: Plugs,
-          iconBackgroundColor: token['gray-3'],
-          title: t('Switch current network'),
+          icon: ArrowsLeftRight,
+          iconBackgroundColor: token['geekblue-6'],
+          title: t('Switch network'),
           onClick: () => {
             activeModal(switchNetworkAuthorizeModalId);
             onCloseActionModal();
           }
-        }
-      );
+        });
+      }
     }
 
     return result;
-  }, [activeModal, authInfo.isAllowed, onCloseActionModal, origin, t, token]);
+  }, [activeModal, authInfo.accountAuthTypes, authInfo.isAllowed, onCloseActionModal, origin, t, token]);
 
   const renderItem = useCallback((item: AccountProxy) => {
     const isEnabled: boolean = item.accounts.some((account) => authInfo.isAllowedMap[account.address]);
