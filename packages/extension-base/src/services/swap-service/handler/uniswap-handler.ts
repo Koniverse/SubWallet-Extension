@@ -565,18 +565,19 @@ export class UniswapHandler implements SwapBaseInterface {
         recipient: receiverAddress
       });
 
-      // // todo: wait until this ready to get destination fee. the real receiveAmount is deduce by this fee
-      // const acrossQuote = await getAcrossQuote({
-      //   destinationChain: toChainInfo,
-      //   destinationTokenInfo: toTokenInfo,
-      //   originChain: fromChainInfo,
-      //   originTokenInfo: fromTokenInfo,
-      //   recipient: receiverAddress,
-      //   sender: senderAddress,
-      //   sendingValue,
-      //   feeInfo
-      // });
+      const acrossQuote = await getAcrossQuote({
+        destinationChain: toChainInfo,
+        destinationTokenInfo: toTokenInfo,
+        originChain: fromChainInfo,
+        originTokenInfo: fromTokenInfo,
+        recipient: receiverAddress,
+        sender: senderAddress,
+        sendingValue: mockSendingValue,
+        feeInfo
+      });
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
+      const destinationFee = BigNumber(mockSendingValue).minus(acrossQuote.metadata.outputAmount).toFixed(0, 1);
       const estimatedBridgeFee = await estimateTxFee(tx, evmApi, feeInfo);
 
       let sendingValue;
@@ -584,23 +585,28 @@ export class UniswapHandler implements SwapBaseInterface {
 
       if (isBridgeFirst) {
         expectedReceive = selectedQuote.fromAmount;
+        sendingValue = BigNumber(destinationFee).multipliedBy(1.02).plus(expectedReceive).toFixed(0, 1);
 
-        if (isBridgeNativeToken) {
-          sendingValue = BigNumber(expectedReceive).plus(estimatedBridgeFee).toFixed(0, 1);
-        } else {
-          sendingValue = BigNumber(expectedReceive).toFixed(0, 1);
-        }
+        // if (isBridgeNativeToken) {
+        //   sendingValue = BigNumber(expectedReceive).plus(estimatedBridgeFee).toFixed(0, 1);
+        // } else {
+        //   sendingValue = BigNumber(expectedReceive).toFixed(0, 1);
+        // }
       } else if (isBridgeSecond) {
         sendingValue = BigNumber(selectedQuote.toAmount).div(1.02).toFixed(0, 1);
+        expectedReceive = BigNumber(sendingValue).minus(destinationFee).toFixed(0, 1);
 
-        if (isBridgeNativeToken) {
-          expectedReceive = BigNumber(sendingValue).minus(estimatedBridgeFee).toFixed(0, 1);
-        } else {
-          expectedReceive = sendingValue;
-        }
+        // if (isBridgeNativeToken) {
+        //   expectedReceive = BigNumber(sendingValue).minus(estimatedBridgeFee).toFixed(0, 1);
+        // } else {
+        //   expectedReceive = sendingValue;
+        // }
       } else {
         return undefined;
       }
+
+      console.log('send bridge amount', sendingValue);
+      console.log('receive bridge amount', expectedReceive);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
