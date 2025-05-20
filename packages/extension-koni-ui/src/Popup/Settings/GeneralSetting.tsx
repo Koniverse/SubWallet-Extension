@@ -180,7 +180,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       title: t(item.text),
       disabled: !ENABLE_LANGUAGES.includes(item.value)
     }));
-  }, [token]);
+  }, [token, t]);
 
   // TODO: 'after will be update data online or refactor this function'
   const staticDataCurrencySymbol = useMemo<Record<string, CurrencyJson> | undefined>(() => {
@@ -197,7 +197,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subTitle: staticDataCurrencySymbol[item].symbol
       }))
       : [];
-  }, [staticDataCurrencySymbol, token]);
+  }, [staticDataCurrencySymbol, token, t]);
 
   const browserConfirmationItems = useMemo<SelectionItemType[]>(() => {
     return [
