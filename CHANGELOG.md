@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.3.35
+Build date: May 09, 2025.
+
+Features & Update:
+- Refactor Across bridge (#4282)
+- Review extrinsic status subscription (#4240)
+- Update content in-app for swap (#4259)
+
+Bug fixed:
+- Fixed bug Cannot sign transaction when chain connection not be initialized (#4300)
+- Fixed bug connecting to Aleph Zero EVM dapp (#4320)
+- Fixed bug related to price chart for derivation token (#4332, #4344)
+
+
 ## 1.3.34
 Build date: May 05, 2025.
 

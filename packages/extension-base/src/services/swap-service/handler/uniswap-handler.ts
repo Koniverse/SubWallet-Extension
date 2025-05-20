@@ -32,26 +32,71 @@ export type PermitData = {
   values: unknown;
 };
 
-interface UniswapMetadata {
+export interface UniswapMetadata {
   permitData: PermitData;
   quote: UniswapQuote;
   routing: string;
 }
 
-interface UniswapQuote {
-  swapper: string;
-  chainId: number;
+type UniswapQuote = UniswapClassicQuote | UniswapDutchQuote;
+
+interface UniswapClassicQuote {
+  swapper: string
+  chainId: number
   input: {
-    amount: string;
-    token: string;
-  };
+    amount: string
+    token: string
+  }
   output: {
-    amount: string;
-    token: string;
-  };
+    amount: string
+    token: string
+  }
 }
+
+interface UniswapDutchQuote {
+  orderInfo: {
+    swapper: string
+    chainId: number
+    input: UniswapDutchInput,
+    outputs: UniswapDutchOutput[]
+  },
+  orderId: string
+}
+
+interface UniswapDutchInput {
+  startAmount: string
+  endAmount: string
+  token: string
+}
+
+interface UniswapDutchOutput {
+  startAmount: string
+  endAmount: string
+  token: string,
+  recipient: string
+}
+
+export interface UniswapOrders {
+  orders: UniswapOrderInfo[]
+}
+
+export interface UniswapOrderInfo {
+  orderStatus: 'open' | 'expired' | 'error' | 'cancelled' | 'filled' | 'unverified' | 'insufficient-funds',
+  orderId: string,
+  swapper: string,
+  txHash: string
+}
+
 interface SwapResponse {
   swap: TransactionConfig
+}
+
+interface CheckApprovalRequest {
+  address: string,
+  amount: string,
+  // only one in two quote is provided.
+  dutchQuote?: UniswapDutchQuote,
+  classicQuote?: UniswapClassicQuote
 }
 
 interface CheckApprovalResponse {
@@ -65,8 +110,37 @@ interface CheckApprovalResponse {
   cancel: any;
 }
 
-async function fetchCheckApproval (walletAddress: string, fromAmount: string, quote: UniswapQuote): Promise<CheckApprovalResponse> {
-  const chainId = quote.chainId;
+async function fetchCheckApproval (request: CheckApprovalRequest): Promise<CheckApprovalResponse | undefined> {
+  const { address, amount, classicQuote, dutchQuote } = request;
+
+  let chainId;
+  let tokenIn;
+  let tokenOut;
+
+  if (classicQuote) {
+    chainId = classicQuote.chainId;
+    tokenIn = classicQuote.input.token;
+    tokenOut = classicQuote.output.token;
+  } else if (dutchQuote) {
+    /**
+     *  In Dutch order swap, the outputs field is an array instead of a single output since it might contain filler's output to pay fee.
+     *  Need to filter exactly output that come to recipient address.
+     */
+    const output = dutchQuote.orderInfo.outputs.find((output) =>
+      output.recipient.toLowerCase() === address.toLowerCase()
+    );
+
+    if (!output) {
+      return undefined; // todo: recheck
+    }
+
+    chainId = dutchQuote.orderInfo.chainId;
+    tokenIn = dutchQuote.orderInfo.input.token;
+    tokenOut = output.token;
+  } else {
+    return undefined;
+  }
+
   const response = await fetch(`${API_URL}/check_approval`, {
     method: 'POST',
     headers: {
@@ -74,18 +148,16 @@ async function fetchCheckApproval (walletAddress: string, fromAmount: string, qu
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      walletAddress,
-      amount: BigNumber(fromAmount).multipliedBy(2).toString(),
-      token: quote.input.token,
+      walletAddress: address,
+      amount: BigNumber(amount).multipliedBy(2).toFixed(0),
+      token: tokenIn,
       chainId: chainId,
-      tokenOut: quote.output.token,
-      tokenOutChainId: chainId
+      tokenOut: tokenOut,
+      tokenOutChainId: chainId // swap in-chain
     })
   });
 
-  const data = await response.json() as CheckApprovalResponse;
-
-  return data;
+  return await response.json() as CheckApprovalResponse;
 }
 
 export class UniswapHandler implements SwapBaseInterface {
@@ -174,13 +246,45 @@ export class UniswapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    const quoteMetadata = (selectedQuote.metadata as UniswapMetadata).quote;
+    const quoteMetadata = selectedQuote.metadata as UniswapMetadata;
 
-    const sender = quoteMetadata.swapper;
-    const sendingValue = quoteMetadata.input.amount;
+    let sender;
+    let sendingValue;
+    let checkApprovalResponse;
+
+    if (quoteMetadata.routing === 'CLASSIC') {
+      const quote = quoteMetadata.quote as UniswapClassicQuote;
+
+      sender = quote.swapper;
+      sendingValue = quote.input.amount;
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        classicQuote: quote
+      });
+    } else if (quoteMetadata.routing === 'DUTCH_LIMIT' || quoteMetadata.routing === 'DUTCH_V2') {
+      const quote = quoteMetadata.quote as UniswapDutchQuote;
+
+      sender = quote.orderInfo.swapper;
+      sendingValue = quote.orderInfo.input.startAmount;
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        dutchQuote: quote
+      });
+    } else {
+      return undefined;
+    }
+
+    if (!checkApprovalResponse) {
+      return undefined;
+    }
+
     const fromTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+    const fromChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(fromTokenInfo));
+    const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
+    const tokenContract = _getContractAddressOfToken(fromTokenInfo);
 
-    const checkApprovalResponse = await fetchCheckApproval(sender, sendingValue, quoteMetadata);
     const approval = checkApprovalResponse.approval;
 
     if (!approval) {
@@ -197,21 +301,36 @@ export class UniswapHandler implements SwapBaseInterface {
       // Empty
     }
 
+    const tx = await getERC20SpendingApprovalTx(spender, sender, tokenContract, evmApi);
+    const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+    const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+    const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+    const feeInfo: CommonStepFeeInfo = {
+      feeComponent: [{
+        feeType: SwapFeeType.NETWORK_FEE,
+        amount: estimatedFee,
+        tokenSlug: nativeTokenSlug
+      }],
+      defaultFeeToken: nativeTokenSlug,
+      feeOptions: [nativeTokenSlug]
+    };
+
     const submitStep: BaseStepDetail = {
       name: 'Approve token for swap',
       type: CommonStepType.TOKEN_APPROVAL,
       // @ts-ignore
       metadata: {
         tokenApprove: fromTokenInfo.slug,
-        contractAddress: _getContractAddressOfToken(fromTokenInfo),
+        contractAddress: _getContractAddressOfToken(fromTokenInfo) || approval.to,
         spenderAddress: spender,
-        owner: sender,
+        owner: sender, // todo: use approval.from?
         amount: sendingValue,
         isUniswapApprove: true
       } as ApproveStepMetadata
     };
 
-    return Promise.resolve([submitStep, selectedQuote.feeInfo]); // todo: wrong feeInfo, please check
+    return Promise.resolve([submitStep, feeInfo]);
   }
 
   async getApproveBridge (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
@@ -491,12 +610,44 @@ export class UniswapHandler implements SwapBaseInterface {
       throw new Error('Sender or value is not found');
     }
 
-    // todo: move quote param to metadata;
+    const quoteMetadata = params.quote.metadata as UniswapMetadata;
 
-    const { quote } = params.quote.metadata as UniswapMetadata;
+    let spenderAddress;
+    let contractAddress;
+    let chainId;
+    let checkApprovalResponse;
 
-    const checkApprovalResponse = await fetchCheckApproval(sender, sendingValue, quote);
+    if (quoteMetadata.routing === 'CLASSIC') {
+      const quote = quoteMetadata.quote as UniswapClassicQuote;
+
+      spenderAddress = quote.output.token;
+      contractAddress = quote.input.token;
+      chainId = quote.chainId.toString();
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        classicQuote: quote
+      });
+    } else if (quoteMetadata.routing === 'DUTCH_LIMIT' || quoteMetadata.routing === 'DUTCH_V2') {
+      const quote = quoteMetadata.quote as UniswapDutchQuote;
+
+      spenderAddress = quote.orderInfo.outputs[0].token;
+      contractAddress = quote.orderInfo.input.token;
+      chainId = quote.orderInfo.chainId.toString();
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        dutchQuote: quote
+      });
+    } else {
+      throw Error('Unsupported quote route');
+    }
+
     let transactionConfig: TransactionConfig = {} as TransactionConfig;
+
+    if (!checkApprovalResponse) {
+      throw new Error('Check approval fail');
+    }
 
     const approval = checkApprovalResponse.approval as TransactionConfig;
 
@@ -521,11 +672,11 @@ export class UniswapHandler implements SwapBaseInterface {
     const chain = fromAsset.originChain;
 
     const _data: TokenSpendingApprovalParams = {
-      spenderAddress: quote.output.token,
-      contractAddress: quote.input.token,
+      spenderAddress,
+      contractAddress,
       amount: params.quote.fromAmount,
       owner: params.address,
-      chain: quote.chainId.toString()
+      chain: chainId
     };
 
     return Promise.resolve({
@@ -609,19 +760,107 @@ export class UniswapHandler implements SwapBaseInterface {
 
       extrinsic = transactionResponse.swap;
     } else if (routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2') {
-      // todo: update condition and add handle exception
-      // UniswapX, UniswapX_V2, and UniswapX_V3 are alternately referred to as DutchQuote, DutchQuoteV2, and DutchQuoteV3
-      postTransactionResponse = await fetch(`${API_URL}/order`, {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json'
+      const dutchQuote = quote as UniswapDutchQuote;
+
+      const submitSwapOrder = async () => {
+        try {
+          const res = await fetch(`${API_URL}/order`, {
+            method: 'POST',
+            headers: {
+              ...headers,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              signature: signature,
+              quote: dutchQuote
+            })
+          });
+
+          return res.ok;
+        } catch (e) {
+          console.log(e);
+
+          return false;
+        }
+      };
+
+      const retryGetUniswapTx = async (fn: () => Promise<UniswapOrderInfo | undefined>, options: { retries: number, delay: number }): Promise<UniswapOrderInfo | undefined> => {
+        let lastError: Error | undefined;
+
+        for (let i = 0; i < options.retries; i++) {
+          try {
+            const orderInfo = await fn();
+
+            if (orderInfo && orderInfo.orderStatus === 'filled') {
+              return orderInfo;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          } catch (e) {
+            if (e instanceof Error) {
+              lastError = e;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          }
+        }
+
+        console.error('UniswapX order timeout', lastError); // throw only last error, in case no successful result from fn()
+
+        return undefined;
+      };
+
+      const cronCheckTxSuccess = async (): Promise<UniswapOrderInfo | undefined> => {
+        const delay = 10000;
+        const retries = 50;
+
+        const orderId = dutchQuote.orderId;
+        const swapper = dutchQuote.orderInfo.swapper;
+
+        return retryGetUniswapTx(async () => {
+          try {
+            const response = await fetch(`${API_URL}/orders?orderId=${orderId}&swapper=${swapper}`, {
+              method: 'GET',
+              headers: {
+                ...headers,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              const res = await response.json() as UniswapOrders;
+
+              return res.orders.find((e) => e.orderId === orderId && e.swapper === swapper.toLowerCase());
+            }
+
+            return undefined;
+          } catch (e) {
+            return undefined;
+          }
+        }, { retries, delay });
+      };
+
+      const txData: SwapBaseTxData = {
+        address: params.address,
+        provider: this.providerInfo,
+        quote: params.quote,
+        slippage: params.slippage,
+        recipient: params.recipient,
+        process: params.process
+      };
+
+      return {
+        txChain: fromAsset.originChain,
+        txData,
+        extrinsic: {
+          submitSwapOrder,
+          cronCheckTxSuccess
         },
-        body: JSON.stringify({
-          signature: signature,
-          quote: quote
-        })
-      });
+        transferNativeAmount: _isNativeToken(fromAsset) ? params.quote.fromAmount : '0',
+        extrinsicType: ExtrinsicType.SWAP,
+        chainType: ChainType.EVM,
+        isDutch: true
+      } as SwapSubmitStepData;
     }
 
     const txData: SwapBaseTxData = {
@@ -645,8 +884,13 @@ export class UniswapHandler implements SwapBaseInterface {
 
   public handlePermitStep (params: SwapSubmitParams) {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
-    const { permitData } = params.quote.metadata as UniswapMetadata;
+    const { permitData, routing } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
+    const primaryType = routing === 'CLASSIC'
+      ? 'PermitSingle'
+      : routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2'
+        ? 'PermitWitnessTransferFrom'
+        : ''; // todo
 
     let validatePayload;
 
@@ -661,7 +905,7 @@ export class UniswapHandler implements SwapBaseInterface {
           ...permitData.types
         },
         domain: permitData.domain,
-        primaryType: 'PermitSingle',
+        primaryType,
         message: permitData.values
       };
 

@@ -9,6 +9,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
@@ -418,9 +419,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
   }, [notify, t]);
 
-  const notifyInvalidAmount = useCallback(() => {
+  const notifyTooLowAmount = useCallback(() => {
     notify({
-      message: t('No swap quote found. Adjust your amount and try again'),
+      message: t('Amount too low. Increase your amount and try again'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
+  const notifyTooHighAmount = useCallback(() => {
+    notify({
+      message: t('Amount too high. Lower your amount and try again'),
       type: 'error',
       duration: 5
     });
@@ -633,10 +642,15 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     };
 
     if (currentQuote.isLowLiquidity) {
+      const metadata = currentQuote.metadata as KyberSwapQuoteMetadata;
+      const isHighPriceImpact = metadata?.priceImpact;
+
       openAlert({
-        title: t('Pay attention!'),
+        title: isHighPriceImpact ? t('High price impact!') : t('Pay attention!'),
         type: NotificationType.WARNING,
-        content: t('Low liquidity. Swap is available but not recommended as swap rate is unfavorable'),
+        content: isHighPriceImpact && metadata.priceImpact
+          ? t(`Swapping this amount will result in a -${metadata.priceImpact}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk`)
+          : t('Low liquidity. Swap is available but not recommended as swap rate is unfavorable'),
         okButton: {
           text: t('Continue'),
           onClick: () => {
@@ -693,7 +707,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toString();
+    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
@@ -704,11 +718,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toString();
+    const result = new BigN(currentFromTokenAvailableBalance.value).dividedToIntegerBy(2).toFixed();
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
   }, [currentFromTokenAvailableBalance, onChangeAmount]);
+
+  useEffect(() => {
+    if (!currentQuote) {
+      setIsSwapQuotesSelectorModalVisible(false);
+    }
+  }, [currentQuote]);
 
   useEffect(() => {
     const updateFromValue = () => {
@@ -883,8 +903,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 notifyNoQuote();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-                notifyInvalidAmount();
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+                notifyTooLowAmount();
+              }
+
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+                notifyTooHighAmount();
               }
 
               setHandleRequestLoading(false);
@@ -906,7 +930,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyInvalidAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -930,8 +954,12 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
             notifyNoQuote();
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-            notifyInvalidAmount();
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+            notifyTooLowAmount();
+          }
+
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+            notifyTooHighAmount();
           }
         }).finally(() => {
           if (sync) {
@@ -975,7 +1003,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyInvalidAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {

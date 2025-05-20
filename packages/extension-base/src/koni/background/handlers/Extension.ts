@@ -51,7 +51,7 @@ import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/ext
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
-import { SWPermitTransaction, SWTransaction, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
@@ -1029,6 +1029,10 @@ export default class KoniExtension {
     return this.#koniState.priceService.getHistoryTokenPriceData(priceId, timeframe);
   }
 
+  private checkCoinGeckoPriceSupport (priceId: string): boolean {
+    return this.#koniState.priceService.checkCoinGeckoPriceSupport(priceId);
+  }
+
   private subscribeCurrentTokenPrice (priceId: string, id: string, port: chrome.runtime.Port): ResponseSubscribeCurrentTokenPrice {
     const cb = createSubscription<'pri(price.subscribeCurrentTokenPrice)'>(id, port);
 
@@ -1377,7 +1381,7 @@ export default class KoniExtension {
 
     const transferAmount: AmountData = { value: '0', symbol: _getAssetSymbol(transferTokenInfo), decimals: _getAssetDecimals(transferTokenInfo) };
 
-    let transaction: ValidateTransactionResponseInput['transaction'];
+    let transaction: SWTransaction['transaction'] | null | undefined;
 
     const transferTokenAvailable = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug, extrinsicType });
 
@@ -3036,6 +3040,7 @@ export default class KoniExtension {
   }
 
   private getTransaction ({ id }: RequestGetTransaction): SWTransactionResult {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { transaction, ...transactionResult } = this.#koniState.transactionService.getTransaction(id);
 
     return transactionResult;
@@ -3044,8 +3049,9 @@ export default class KoniExtension {
   private async subscribeTransactions (id: string, port: chrome.runtime.Port): Promise<Record<string, SWTransactionResult>> {
     const cb = createSubscription<'pri(transactions.subscribe)'>(id, port);
 
-    function convertRs (rs: Record<string, SWTransaction>, processMap: Record<string, ProcessTransactionData>): Record<string, SWTransactionResult> {
+    function convertRs (rs: Record<string, SWTransactionBase>, processMap: Record<string, ProcessTransactionData>): Record<string, SWTransactionResult> {
       return Object.fromEntries(Object.entries(rs).map(([key, value]) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { additionalValidator, eventsHandler, step, transaction, ..._transactionResult } = value;
         const transactionResult = _transactionResult as SWTransactionResult;
 
@@ -4229,7 +4235,7 @@ export default class KoniExtension {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, isPermit, transferNativeAmount, txChain, txData } = submitData;
+    const { chainType, extrinsic, extrinsicType, isDutch, isPermit, transferNativeAmount, txChain, txData } = submitData;
 
     const eventsHandler = (eventEmitter: TransactionEmitter) => {
       if (onSend) {
@@ -4275,6 +4281,24 @@ export default class KoniExtension {
         address,
         chain: txChain,
         transaction: extrinsic as unknown as SWPermitTransaction['transaction'],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        eventsHandler,
+        step
+      });
+    }
+
+    if (isDutch) {
+      return await this.#koniState.transactionService.handleDutchTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic as unknown as SWDutchTransaction['transaction'],
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: txData,
         extrinsicType, // change this depends on step
@@ -4823,6 +4847,8 @@ export default class KoniExtension {
         return await this.subscribePrice(id, port);
       case 'pri(price.getHistory)':
         return await this.getHistoryTokenPrice(request as RequestGetHistoryTokenPriceData);
+      case 'pri(price.checkCoinGeckoPriceSupport)':
+        return this.checkCoinGeckoPriceSupport(request as string);
       case 'pri(price.subscribeCurrentTokenPrice)':
         return this.subscribeCurrentTokenPrice(request as string, id, port);
       case 'pri(settings.savePriceCurrency)':
