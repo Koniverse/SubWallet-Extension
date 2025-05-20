@@ -382,7 +382,7 @@ export class UniswapHandler implements SwapBaseInterface {
     const inputData = {
       destinationTokenInfo: toTokenInfo,
       originTokenInfo: fromTokenInfo,
-      sendingValue: sendingAmount,
+      sendingValue: _sendingAmount,
       sender: senderAddress,
       recipient: senderAddress, // todo: there's a case swap - bridge to another address
       destinationChain: toChainInfo,
