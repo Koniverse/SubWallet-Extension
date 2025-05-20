@@ -399,7 +399,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 weight='fill'
               />
             )}
-            name={t('settings.Screen.generalSetting.Selector.notificationInApp.title')}
+            name={t('settings.Screen.generalSetting.Item.notificationInApp')}
             onPressItem={onClickEnableNotification}
             rightItem={(
               <div className={'__trigger-right-item'}>

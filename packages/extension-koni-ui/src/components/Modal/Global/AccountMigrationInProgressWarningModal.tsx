@@ -41,13 +41,13 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               onClick={onClickActionButton}
             >
-              {t('components.Modal.accountMigrationInProgressWarning.Button.reloadView')}
+              {t('common.Modal.accountMigrationInProgressWarning.Button.reloadView')}
             </Button>
           </>
         }
         id={modalId}
         maskClosable={false}
-        title={t('components.Modal.accountMigrationInProgressWarning.title')}
+        title={t('common.Modal.accountMigrationInProgressWarning.title')}
         zIndex={1000000}
       >
         <div className='__modal-content'>
@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
 
-          {t('components.Modal.accountMigrationInProgressWarning.content')}
+          {t('common.Modal.accountMigrationInProgressWarning.content')}
         </div>
       </SwModal>
     </>

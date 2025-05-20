@@ -45,7 +45,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           let message = e.message;
 
           if (message === 'Invalid master password') {
-            message = t('settings.Screen.migrateAccount.Modal.enterPassword.Form.Error.masterPassword.invalid');
+            message = t('common.Input.password.Error.invalid');
           }
 
           onError(message);
