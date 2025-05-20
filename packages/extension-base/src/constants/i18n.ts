@@ -2,46 +2,47 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LanguageOptionType, LanguageType } from '@subwallet/extension-base/background/KoniTypes';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 
 export const languageOptions: LanguageOptionType[] = [
   {
-    text: 'English',
+    text: detectTranslate('base.constants.i18n.languageOptions.en'),
     value: 'en'
   },
   {
-    text: 'Tiếng Việt',
+    text: detectTranslate('base.constants.i18n.languageOptions.vi'),
     value: 'vi'
   },
   {
-    text: '汉语',
+    text: detectTranslate('base.constants.i18n.languageOptions.zh'),
     value: 'zh'
   },
   {
-    text: '日本語',
+    text: detectTranslate('base.constants.i18n.languageOptions.ja'),
     value: 'ja'
   },
   {
-    text: 'Русский',
+    text: detectTranslate('base.constants.i18n.languageOptions.ru'),
     value: 'ru'
   },
   {
-    text: 'Français',
+    text: detectTranslate('base.constants.i18n.languageOptions.fr'),
     value: 'fr'
   },
   {
-    text: 'Türkce',
+    text: detectTranslate('base.constants.i18n.languageOptions.tr'),
     value: 'tr'
   },
   {
-    text: 'Polski',
+    text: detectTranslate('base.constants.i18n.languageOptions.pl'),
     value: 'pl'
   },
   {
-    text: 'ภาษาไทย',
+    text: detectTranslate('base.constants.i18n.languageOptions.th'),
     value: 'th'
   },
   {
-    text: 'اردو',
+    text: detectTranslate('base.constants.i18n.languageOptions.ur'),
     value: 'ur'
   }
 ];

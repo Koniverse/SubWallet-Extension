@@ -160,13 +160,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: ThemeNames.DARK,
         leftIcon: MoonStars,
         leftIconBgColor: token.colorPrimary,
-        title: t('Dark theme')
+        title: t('settings.Screen.generalSetting.Selector.theme.Item.dark')
       },
       {
         key: ThemeNames.LIGHT,
         leftIcon: Sun,
         leftIconBgColor: token.colorPrimary,
-        title: t('Light theme'),
+        title: t('settings.Screen.generalSetting.Selector.theme.Item.light'),
         disabled: true
       }
     ];
@@ -177,7 +177,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       key: item.value,
       leftIcon: GlobeHemisphereEast,
       leftIconBgColor: token['green-6'],
-      title: item.text,
+      title: t(item.text),
       disabled: !ENABLE_LANGUAGES.includes(item.value)
     }));
   }, [token]);
@@ -193,7 +193,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: item,
         leftIcon: getCurrencySymbol(item).icon,
         leftIconBgColor: token.colorBgBorder,
-        title: `${item} - ${staticDataCurrencySymbol[item].label}`,
+        title: `${item} - ${t('settings.Screen.generalSetting.Selector.currency.Item.' + item.toLowerCase())}`,
         subTitle: staticDataCurrencySymbol[item].symbol
       }))
       : [];
@@ -399,7 +399,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 weight='fill'
               />
             )}
-            name={t('In-app notifications')}
+            name={t('settings.Screen.generalSetting.Selector.notificationInApp.title')}
             onPressItem={onClickEnableNotification}
             rightItem={(
               <div className={'__trigger-right-item'}>

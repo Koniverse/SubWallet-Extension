@@ -42,7 +42,13 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
     setTimeout(() => {
       onSubmit(values[FormFieldName.PASSWORD])
         .catch((e: Error) => {
-          onError(e.message);
+          let message = e.message;
+
+          if (message === 'Invalid master password') {
+            message = t('settings.Screen.migrateAccount.Modal.enterPassword.Form.Error.masterPassword.invalid');
+          }
+
+          onError(message);
         })
         .finally(() => {
           setLoading(false);
