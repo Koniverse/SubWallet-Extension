@@ -1,29 +1,29 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
-import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
-import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
-import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
-import { Button, Form, Icon, Input } from '@subwallet/react-ui';
+import {NotificationType} from '@subwallet/extension-base/background/KoniTypes';
+import {AccountActions, AccountProxy, AccountProxyType} from '@subwallet/extension-base/types';
+import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper} from '@subwallet/extension-koni-ui/components';
+import {FilterTabItemType, FilterTabs} from '@subwallet/extension-koni-ui/components/FilterTabs';
+import {WalletModalContext} from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
+import {useDefaultNavigate, useGetAccountProxyById, useNotification} from '@subwallet/extension-koni-ui/hooks';
+import {editAccount, forgetAccount, validateAccountName} from '@subwallet/extension-koni-ui/messaging';
+import {RootState} from '@subwallet/extension-koni-ui/stores';
+import {AccountDetailParam, ThemeProps, VoidFunction} from '@subwallet/extension-koni-ui/types';
+import {FormCallbacks, FormFieldData} from '@subwallet/extension-koni-ui/types/form';
+import {convertFieldToObject} from '@subwallet/extension-koni-ui/utils/form/form';
+import {Button, Form, Icon, Input} from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CircleNotch, Export, FloppyDiskBack, GitMerge, Trash } from 'phosphor-react';
-import { RuleObject } from 'rc-field-form/lib/interface';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {Export, GitMerge, Trash} from 'phosphor-react';
+import {RuleObject} from 'rc-field-form/lib/interface';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useSelector} from 'react-redux';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import styled from 'styled-components';
 
-import { AccountAddressList } from './AccountAddressList';
-import { DerivedAccountList } from './DerivedAccountList';
+import {AccountAddressList} from './AccountAddressList';
+import {DerivedAccountList} from './DerivedAccountList';
 
 enum FilterTabType {
   ACCOUNT_ADDRESS = 'account-address',
@@ -95,7 +95,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   const [deleting, setDeleting] = useState(false);
   // @ts-ignore
   const [deriving, setDeriving] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
@@ -211,7 +210,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
 
     if (changeMap[FormFieldName.NAME]) {
       clearTimeout(saveTimeOutRef.current);
-      setSaving(true);
 
       const isValidForm = form.getFieldsError().every((field) => !field.errors.length);
 
@@ -219,8 +217,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         saveTimeOutRef.current = setTimeout(() => {
           form.submit();
         }, 1000);
-      } else {
-        setSaving(false);
       }
     }
   }, [form]);
@@ -230,25 +226,18 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
     const name = values[FormFieldName.NAME];
 
     if (name === accountProxy.name) {
-      setSaving(false);
-
       return;
     }
 
     const accountProxyId = accountProxy.id;
 
     if (!accountProxyId) {
-      setSaving(false);
-
       return;
     }
 
     editAccount(accountProxyId, name.trim())
       .catch((error: Error) => {
         form.setFields([{ name: FormFieldName.NAME, errors: [error.message] }]);
-      })
-      .finally(() => {
-        setSaving(false);
       });
   }, [accountProxy.id, accountProxy.name, form]);
 
@@ -427,10 +416,9 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
               onBlur={form.submit}
               placeholder={t('Account name')}
               suffix={(
-                <Icon
-                  className={CN({ loading: saving })}
-                  phosphorIcon={saving ? CircleNotch : FloppyDiskBack}
-                  size='sm'
+                <AccountChainTypeLogos
+                  chainTypes={accountProxy.chainTypes}
+                  className={'__item-chain-type-logos'}
                 />
               )}
             />
@@ -524,6 +512,11 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     '.ant-sw-screen-layout-footer-content': {
       display: 'flex',
       gap: token.sizeSM
+    },
+
+    '.__item-chain-type-logos': {
+      minHeight: 20,
+      marginRight: 12
     },
 
     '.account-detail-form, .derivation-info-form': {

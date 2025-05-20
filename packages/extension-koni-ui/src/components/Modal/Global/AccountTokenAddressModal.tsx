@@ -35,6 +35,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
     return () => {
       const processFunction = () => {
         addressQrModal.open({
+          accountTokenAddresses: items,
           address: item.accountInfo.address,
           chainSlug: item.chainSlug,
           onBack: addressQrModal.close,
@@ -47,7 +48,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
 
       processFunction();
     };
-  }, [addressQrModal, onCancel]);
+  }, [addressQrModal, items, onCancel]);
 
   const onCopyAddress = useCallback((item: AccountTokenAddress) => {
     return () => {
@@ -104,7 +105,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           onClick: onCancel
         }
         : undefined}
-      title={t<string>('Select address')}
+      title={t<string>('Select address type')}
     >
       <SwList
         actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}

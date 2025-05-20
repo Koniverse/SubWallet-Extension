@@ -161,6 +161,10 @@ function Component (props: Props): React.ReactElement<Props> {
                   <div className={'__derive-account-path'}>
                     {accountProxy.suri || ''}
                   </div>
+                  <AccountChainTypeLogos
+                    chainTypes={accountProxy.chainTypes}
+                    className={'__item-chain-type-logos'}
+                  />
                 </div>
               )
               : (

@@ -10,17 +10,19 @@ import { ADDRESS_QR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet
 import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo, ModalContext, SwModal, SwQRCode, Tag } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowSquareOut, CaretLeft, CopySimple, Gear, House } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import {ArrowSquareOut, CaretLeft, CaretRight, CopySimple, Gear, House} from 'phosphor-react';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
+import {_isChainBitcoinCompatible} from "@subwallet/extension-base/services/chain-service/utils";
 
 export interface AddressQrModalProps {
   address: string;
+  accountTokenAddresses?: AccountTokenAddress[];
   chainSlug: string;
   onBack?: VoidFunction;
   onCancel?: VoidFunction;
@@ -34,18 +36,42 @@ type Props = ThemeProps & AddressQrModalProps & {
 const modalId = ADDRESS_QR_MODAL;
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
-const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accountTokenAddresses, className, isNewFormat, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
   const chainInfo = useFetchChainInfo(chainSlug);
-  const accountInfo = useGetAccountByAddress(address);
+  const accountInfo = useGetAccountByAddress(initialAddress);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const goHome = useDefaultNavigate().goHome;
 
+  const showNavigationButtons = useMemo(() => {
+    return !!chainInfo && _isChainBitcoinCompatible(chainInfo) && accountTokenAddresses && accountTokenAddresses.length > 1;
+  }, [chainInfo, accountTokenAddresses]);
+
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    if (!showNavigationButtons) return 0;
+    const index = accountTokenAddresses.findIndex(item => item.accountInfo.address === initialAddress);
+    return index !== -1 ? index : 0;
+  });
+
+  const currentAddress = showNavigationButtons ? accountTokenAddresses[currentIndex]?.accountInfo.address || initialAddress : initialAddress;
+
   const scanExplorerAddressUrl = useMemo(() => {
-    return getExplorerLink(chainInfo, address, 'account');
-  }, [address, chainInfo]);
+    return getExplorerLink(chainInfo, currentAddress, 'account');
+  }, [currentAddress, chainInfo]);
+
+  // Hàm xử lý nút Previous
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex(prev => Math.max(0, prev - 1));
+  }, []);
+
+  // Hàm xử lý nút Next
+  const handleNext = useCallback(() => {
+    if (accountTokenAddresses) {
+      setCurrentIndex(prev => Math.min(accountTokenAddresses.length - 1, prev + 1));
+    }
+  }, [accountTokenAddresses]);
 
   const onGoHome = useCallback(() => {
     goHome();
@@ -130,14 +156,35 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
       >
         <>
           <div className='__qr-code-wrapper'>
+            {showNavigationButtons && (
+              <Button
+                className='__nav-button __prev-button'
+                icon={<Icon phosphorIcon={CaretLeft} size='md' />}
+                type='ghost'
+                disabled={currentIndex === 0}
+                onClick={handlePrevious}
+                tooltip={t('Previous address')}
+              />
+            )}
             <SwQRCode
               className='__qr-code'
               color='#000'
               errorLevel='H'
               icon={''}
               size={264}
-              value={address}
+              value={currentAddress}
             />
+
+            {showNavigationButtons && (
+              <Button
+                className='__nav-button __next-button'
+                icon={<Icon phosphorIcon={CaretRight} size='md' />}
+                type='ghost'
+                disabled={currentIndex === (accountTokenAddresses?.length ?? 0) - 1}
+                onClick={handleNext}
+                tooltip={t('Next address')}
+              />
+            )}
           </div>
 
           <div className={'__address-box-wrapper'}>
@@ -150,7 +197,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
               />
 
               <div className='__address'>
-                {toShort(address || '', 7, 7)}
+                {toShort(currentAddress || '', 7, 7)}
               </div>
 
               {isNewFormat !== undefined && <div className={'__address-tag'}>
@@ -163,7 +210,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
                 </Tag>
               </div>}
 
-              <CopyToClipboard text={address}>
+              <CopyToClipboard text={currentAddress}>
                 <Button
                   className='__copy-button'
                   icon={
@@ -219,7 +266,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
       </SwModal>
       {isRelatedToTon && isTonWalletContactSelectorModalActive &&
         <TonWalletContractSelectorModal
-          address={address}
+          address={currentAddress}
           chainSlug={chainSlug}
           id={tonWalletContractSelectorModalId}
           onBack={onCloseTonWalletContactModal}
@@ -234,7 +281,9 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
   return {
     '.__qr-code-wrapper': {
       paddingTop: token.padding,
-      paddingBottom: token.padding
+      paddingBottom: token.padding,
+      display: 'flex',
+      alignItems: 'center'
     },
     '.ant-sw-sub-header-title': {
       fontSize: token.fontSizeXL,

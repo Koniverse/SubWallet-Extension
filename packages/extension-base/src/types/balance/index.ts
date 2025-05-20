@@ -40,6 +40,7 @@ export interface BalanceItem {
 
 export interface BalanceItemWithAddressType extends BalanceItem {
   addressTypeLabel?: string
+  schema?: string
 }
 
 /** Balance info of all tokens on an address */
