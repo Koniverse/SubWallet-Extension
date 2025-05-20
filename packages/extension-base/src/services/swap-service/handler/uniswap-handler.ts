@@ -368,7 +368,7 @@ export class UniswapHandler implements SwapBaseInterface {
     const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
     const tokenContract = _getContractAddressOfToken(fromTokenInfo);
 
-    const toTokenInfo = this.chainService.getAssetBySlug(params.request.pair.to);
+    const toTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.to);
     const toChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(toTokenInfo));
 
     if (_isNativeToken(fromTokenInfo)) {
@@ -384,7 +384,7 @@ export class UniswapHandler implements SwapBaseInterface {
       originTokenInfo: fromTokenInfo,
       sendingValue: sendingAmount,
       sender: senderAddress,
-      recipient: senderAddress,
+      recipient: senderAddress, // todo: there's a case swap - bridge to another address
       destinationChain: toChainInfo,
       originChain: fromChainInfo
     } as CreateXcmExtrinsicProps;
