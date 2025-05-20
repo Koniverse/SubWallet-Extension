@@ -6,7 +6,8 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { createAcrossBridgeExtrinsic, CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, GenSwapStepFuncV2, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
@@ -472,6 +473,10 @@ export class UniswapHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const sendingValue = swapXcm ? BigNumber(request.fromAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT) : request.fromAmount;
+
     const originTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
     const destinationTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.to);
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
@@ -482,7 +487,7 @@ export class UniswapHandler implements SwapBaseInterface {
       type: SwapStepType.SWAP,
       // @ts-ignore
       metadata: {
-        sendingValue: request.fromAmount.toString(),
+        sendingValue,
         expectedReceive: selectedQuote.toAmount,
         originTokenInfo,
         destinationTokenInfo,
@@ -523,7 +528,6 @@ export class UniswapHandler implements SwapBaseInterface {
     const toTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.to);
     const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
-    const isBridgeNativeToken = _isNativeToken(fromTokenInfo);
 
     if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
       throw Error('Token or chain not found');
@@ -535,15 +539,10 @@ export class UniswapHandler implements SwapBaseInterface {
 
     if (isBridgeFirst) {
       receiverAddress = _reformatAddressWithChain(request.address, toChainInfo);
-
-      if (isBridgeNativeToken) {
-        mockSendingValue = BigNumber(selectedQuote.fromAmount).multipliedBy(1.02).toFixed(0, 1);
-      } else {
-        mockSendingValue = selectedQuote.fromAmount;
-      }
+      mockSendingValue = BigNumber(selectedQuote.fromAmount).toFixed(0, 1);
     } else if (isBridgeSecond) {
       receiverAddress = _reformatAddressWithChain(request.recipient || request.address, toChainInfo);
-      mockSendingValue = BigNumber(selectedQuote.toAmount).div(1.02).toFixed(0, 1);
+      mockSendingValue = BigNumber(selectedQuote.toAmount).toFixed(0, 1);
     } else {
       return undefined;
     }
@@ -576,37 +575,26 @@ export class UniswapHandler implements SwapBaseInterface {
         feeInfo
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-      const destinationFee = BigNumber(mockSendingValue).minus(acrossQuote.metadata.outputAmount).toFixed(0, 1);
+      const acrossQuoteMetadata = acrossQuote.metadata as AcrossQuote;
+
       const estimatedBridgeFee = await estimateTxFee(tx, evmApi, feeInfo);
+      const estimatedDestinationFee = BigNumber(mockSendingValue).minus(acrossQuoteMetadata.outputAmount).toFixed(0, 1); // todo: should better handle on backend and return desFee metadata instead of minus like this
 
       let sendingValue;
       let expectedReceive;
 
       if (isBridgeFirst) {
         expectedReceive = selectedQuote.fromAmount;
-        sendingValue = BigNumber(destinationFee).multipliedBy(1.02).plus(expectedReceive).toFixed(0, 1);
-
-        // if (isBridgeNativeToken) {
-        //   sendingValue = BigNumber(expectedReceive).plus(estimatedBridgeFee).toFixed(0, 1);
-        // } else {
-        //   sendingValue = BigNumber(expectedReceive).toFixed(0, 1);
-        // }
+        sendingValue = BigNumber(estimatedDestinationFee).multipliedBy(FEE_RATE_MULTIPLIER.medium).plus(selectedQuote.fromAmount).toFixed(0, 1);
       } else if (isBridgeSecond) {
-        sendingValue = BigNumber(selectedQuote.toAmount).div(1.02).toFixed(0, 1);
-        expectedReceive = BigNumber(sendingValue).minus(destinationFee).toFixed(0, 1);
-
-        // if (isBridgeNativeToken) {
-        //   expectedReceive = BigNumber(sendingValue).minus(estimatedBridgeFee).toFixed(0, 1);
-        // } else {
-        //   expectedReceive = sendingValue;
-        // }
+        expectedReceive = selectedQuote.toAmount;
+        sendingValue = BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1);
       } else {
         return undefined;
       }
 
-      console.log('send bridge amount', sendingValue);
-      console.log('receive bridge amount', expectedReceive);
+      console.log('[i] estimatedBridgeFee', estimatedBridgeFee);
+      console.log('[i] estimatedDestinationFee', estimatedDestinationFee);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{

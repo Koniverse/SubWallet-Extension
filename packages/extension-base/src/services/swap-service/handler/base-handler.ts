@@ -219,7 +219,8 @@ export class SwapBaseHandler {
 
         if (needEditAmount) {
           bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
-        } else {
+        } else { // todo: remove
+          console.log('The code cannot run into here, if it runs into here, pls ask dev to check');
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
       }
