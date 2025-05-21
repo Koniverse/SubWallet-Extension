@@ -1,29 +1,29 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {NotificationType} from '@subwallet/extension-base/background/KoniTypes';
-import {AccountActions, AccountProxy, AccountProxyType} from '@subwallet/extension-base/types';
-import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper} from '@subwallet/extension-koni-ui/components';
-import {FilterTabItemType, FilterTabs} from '@subwallet/extension-koni-ui/components/FilterTabs';
-import {WalletModalContext} from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import {useDefaultNavigate, useGetAccountProxyById, useNotification} from '@subwallet/extension-koni-ui/hooks';
-import {editAccount, forgetAccount, validateAccountName} from '@subwallet/extension-koni-ui/messaging';
-import {RootState} from '@subwallet/extension-koni-ui/stores';
-import {AccountDetailParam, ThemeProps, VoidFunction} from '@subwallet/extension-koni-ui/types';
-import {FormCallbacks, FormFieldData} from '@subwallet/extension-koni-ui/types/form';
-import {convertFieldToObject} from '@subwallet/extension-koni-ui/utils/form/form';
-import {Button, Form, Icon, Input} from '@subwallet/react-ui';
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
+import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
+import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
+import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {Export, GitMerge, Trash} from 'phosphor-react';
-import {RuleObject} from 'rc-field-form/lib/interface';
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useSelector} from 'react-redux';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import { Export, GitMerge, Trash } from 'phosphor-react';
+import { RuleObject } from 'rc-field-form/lib/interface';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import {AccountAddressList} from './AccountAddressList';
-import {DerivedAccountList} from './DerivedAccountList';
+import { AccountAddressList } from './AccountAddressList';
+import { DerivedAccountList } from './DerivedAccountList';
 
 enum FilterTabType {
   ACCOUNT_ADDRESS = 'account-address',
