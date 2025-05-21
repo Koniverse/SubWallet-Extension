@@ -1426,8 +1426,6 @@ export default class KoniState {
       }
     }
 
-    transactionValue = transactionValue.checked_sub(CardanoWasm.Value.new(tx.body().fee()));
-
     const transactionBody = tx.body();
     const getSpecificUtxo = this.chainService.getSpecificUtxo.bind(this);
 
