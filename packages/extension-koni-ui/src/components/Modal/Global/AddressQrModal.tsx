@@ -3,6 +3,7 @@
 
 import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 
+import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
@@ -11,14 +12,14 @@ import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-koni-ui/utils';
+import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
 import { Button, Icon, Logo, ModalContext, SwModal, SwQRCode, Tag } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {ArrowSquareOut, CaretLeft, CaretRight, CopySimple, Gear, House} from 'phosphor-react';
-import React, {useCallback, useContext, useMemo, useState} from 'react';
+import { ArrowSquareOut, CaretLeft, CaretRight, CopySimple, Gear, House } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
-import {_isChainBitcoinCompatible} from "@subwallet/extension-base/services/chain-service/utils";
 
 export interface AddressQrModalProps {
   address: string;
@@ -36,7 +37,7 @@ type Props = ThemeProps & AddressQrModalProps & {
 const modalId = ADDRESS_QR_MODAL;
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 
-const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accountTokenAddresses, className, isNewFormat, onBack, onCancel }: Props) => {
+const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initialAddress, chainSlug, className, isNewFormat, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const notify = useNotification();
@@ -46,12 +47,16 @@ const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accoun
   const goHome = useDefaultNavigate().goHome;
 
   const showNavigationButtons = useMemo(() => {
-    return !!chainInfo && _isChainBitcoinCompatible(chainInfo) && accountTokenAddresses && accountTokenAddresses.length > 1;
+    return !!chainInfo && _isChainBitcoinCompatible(chainInfo) && accountTokenAddresses.length > 1;
   }, [chainInfo, accountTokenAddresses]);
 
   const [currentIndex, setCurrentIndex] = useState(() => {
-    if (!showNavigationButtons) return 0;
-    const index = accountTokenAddresses.findIndex(item => item.accountInfo.address === initialAddress);
+    if (!showNavigationButtons) {
+      return 0;
+    }
+
+    const index = accountTokenAddresses?.findIndex((item) => item.accountInfo.address === initialAddress);
+
     return index !== -1 ? index : 0;
   });
 
@@ -61,15 +66,23 @@ const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accoun
     return getExplorerLink(chainInfo, currentAddress, 'account');
   }, [currentAddress, chainInfo]);
 
-  // Hàm xử lý nút Previous
+  const bitcoinAttributes = useMemo(() => {
+    if (isBitcoinAddress(currentAddress)) {
+      const keyPairType = getKeypairTypeByAddress(currentAddress);
+
+      return getBitcoinKeypairAttributes(keyPairType);
+    }
+
+    return undefined;
+  }, [currentAddress]);
+
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => Math.max(0, prev - 1));
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
   }, []);
 
-  // Hàm xử lý nút Next
   const handleNext = useCallback(() => {
     if (accountTokenAddresses) {
-      setCurrentIndex(prev => Math.min(accountTokenAddresses.length - 1, prev + 1));
+      setCurrentIndex((prev) => Math.min(accountTokenAddresses.length - 1, prev + 1));
     }
   }, [accountTokenAddresses]);
 
@@ -158,12 +171,15 @@ const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accoun
           <div className='__qr-code-wrapper'>
             {showNavigationButtons && (
               <Button
-                className='__nav-button __prev-button'
-                icon={<Icon phosphorIcon={CaretLeft} size='md' />}
-                type='ghost'
+                className='__prev-button'
                 disabled={currentIndex === 0}
+                icon={<Icon
+                  phosphorIcon={CaretLeft}
+                  size='md'
+                />}
                 onClick={handlePrevious}
                 tooltip={t('Previous address')}
+                type='ghost'
               />
             )}
             <SwQRCode
@@ -177,17 +193,28 @@ const Component: React.FC<Props> = ({ address: initialAddress, chainSlug, accoun
 
             {showNavigationButtons && (
               <Button
-                className='__nav-button __next-button'
-                icon={<Icon phosphorIcon={CaretRight} size='md' />}
-                type='ghost'
+                className='__next-button'
                 disabled={currentIndex === (accountTokenAddresses?.length ?? 0) - 1}
+                icon={<Icon
+                  phosphorIcon={CaretRight}
+                  size='md'
+                />}
                 onClick={handleNext}
                 tooltip={t('Next address')}
+                type='ghost'
               />
             )}
           </div>
 
           <div className={'__address-box-wrapper'}>
+            {!!bitcoinAttributes && !!bitcoinAttributes.label
+              ? (
+                <div className={'__label-address-wrapper'}>
+                  <div className={'__label-address-prefix'}>{bitcoinAttributes.label} BTC</div>
+                  <span className={'__label-address-suffix'}>&nbsp;address</span>
+                </div>
+              )
+              : null}
             <div className='__address-box'>
               <Logo
                 className='__network-logo'
@@ -285,6 +312,27 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       display: 'flex',
       alignItems: 'center'
     },
+
+    '.__label-address-wrapper': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      '.__label-address-prefix': {
+        fontWeight: 700,
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextLight2
+      },
+
+      '.__label-address-suffix': {
+        fontWeight: 500,
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextTertiary
+      }
+    },
+
     '.ant-sw-sub-header-title': {
       fontSize: token.fontSizeXL,
       lineHeight: token.lineHeightHeading4,
@@ -328,7 +376,9 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       overflow: 'hidden',
       'white-space': 'nowrap',
       color: token.colorTextLight4,
-      flexShrink: 1
+      flexShrink: 1,
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM
     },
 
     '.__change-version-icon': {

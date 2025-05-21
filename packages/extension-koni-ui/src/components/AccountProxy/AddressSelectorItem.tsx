@@ -30,15 +30,11 @@ function Component (props: Props): React.ReactElement<Props> {
     if (isBitcoinAddress(address)) {
       const keyPairType = getKeypairTypeByAddress(address);
 
-      const attributes = getBitcoinKeypairAttributes(keyPairType);
-
-      return attributes;
+      return getBitcoinKeypairAttributes(keyPairType);
     }
 
     return undefined;
   }, [address]);
-
-  console.log('bitcoinAttributes', bitcoinAttributes);
 
   return (
     <div
