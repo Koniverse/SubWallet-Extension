@@ -153,6 +153,7 @@ const Component: FC<Props> = (props: Props) => {
                 }
                 prefix={item.prefix}
                 suffix={item.suffix}
+                useNumberDisplay={true}
                 value={item.value}
               />
             ))}
@@ -164,6 +165,7 @@ const Component: FC<Props> = (props: Props) => {
             label={t('Estimated total fee')}
             prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+            useNumberDisplay={true}
             value={estimatedFeeValue}
           />
         </div>

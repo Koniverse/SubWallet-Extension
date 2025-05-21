@@ -84,7 +84,9 @@ export interface WalletModalContextType {
     open: (props: TransactionStepsModalProps) => void
   },
   swapFeesModal: {
-    open: (props: SwapFeesModalProps) => void
+    open: (props: SwapFeesModalProps) => void,
+    checkActive: () => boolean,
+    update: React.Dispatch<React.SetStateAction<SwapFeesModalProps | undefined>>;
   }
 }
 
@@ -122,7 +124,11 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     open: noop
   },
   swapFeesModal: {
-    open: noop
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    open: () => {},
+    checkActive: () => false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update: () => {}
   }
 });
 
@@ -231,6 +237,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setSwapFeesModalProps(undefined);
     inactiveModal(SWAP_FEES_MODAL);
   }, [inactiveModal]);
+
+  const checkSwapFeesModalActive = useCallback(() => {
+    return checkActive(SWAP_FEES_MODAL);
+  }, [checkActive]);
   /* Process modal */
 
   const contextValue: WalletModalContextType = useMemo(() => ({
@@ -258,9 +268,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       open: openTransactionStepsModal
     },
     swapFeesModal: {
-      open: openSwapFeesModal
+      open: openSwapFeesModal,
+      checkActive: checkSwapFeesModalActive,
+      update: setSwapFeesModalProps
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, checkSwapFeesModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {

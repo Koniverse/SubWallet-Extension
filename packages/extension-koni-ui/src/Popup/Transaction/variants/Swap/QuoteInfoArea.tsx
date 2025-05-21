@@ -16,7 +16,7 @@ import { ActivityIndicator, Icon, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -240,6 +240,12 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [currentQuote, slippage]);
 
   const showQuoteEmptyBlock = (!currentQuote || handleRequestLoading || isFormInvalid);
+
+  useEffect(() => {
+    if (swapFeesModal.checkActive?.() && currentQuote && estimatedFeeValue) {
+      swapFeesModal.update({ currentQuote, estimatedFeeValue });
+    }
+  }, [currentQuote, estimatedFeeValue, swapFeesModal]);
 
   return (
     <>
