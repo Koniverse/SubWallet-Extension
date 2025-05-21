@@ -12,7 +12,7 @@ import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/ear
 import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
-import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
@@ -204,7 +204,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
           }
 
           if (event.type === 'transaction.done') {
-            const transactionData = event.data[0] as SWTransaction;
+            const transactionData = event.data[0] as SWTransactionBase;
             const notRequireReloadTypes = [
               ExtrinsicType.TRANSFER_BALANCE,
               ExtrinsicType.TRANSFER_TOKEN,
