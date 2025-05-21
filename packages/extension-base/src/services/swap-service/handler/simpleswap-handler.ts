@@ -38,6 +38,17 @@ interface SimpleSwapMetadata{
   toChainSymbol: string
 }
 
+interface BuildSimpleSwapTxParams {
+  fromSymbol: string;
+  toSymbol: string;
+  fromAmount: string;
+  fromAsset: _ChainAsset;
+  receiver: string;
+  sender: string;
+  toAsset: _ChainAsset;
+  metadata: SimpleSwapMetadata;
+}
+
 const apiUrl = 'https://api.simpleswap.io/v3';
 
 export const simpleSwapApiKey = process.env.SIMPLE_SWAP_API_KEY || '';
@@ -52,16 +63,7 @@ type BuildTxForSimpleSwapResult =
   | { data: { id: string; addressFrom: string; amountTo: string }; error?: undefined }
   | { data?: undefined; error: SwapError | TransactionError };
 
-const buildTxForSimpleSwap = async (params: {
-  fromSymbol: string;
-  toSymbol: string;
-  fromAmount: string;
-  fromAsset: _ChainAsset;
-  receiver: string;
-  sender: string;
-  toAsset: _ChainAsset;
-  metadata: SimpleSwapMetadata;
-}): Promise<BuildTxForSimpleSwapResult> => {
+const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<BuildTxForSimpleSwapResult> => {
   try {
     const { fromAmount, fromAsset, fromSymbol,
       metadata, receiver, sender, toAsset, toSymbol } = params;
