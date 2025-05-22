@@ -138,6 +138,14 @@ export interface ResultResolver {
   accounts: string[];
 }
 
+// Switch current network auth
+
+export interface RequestSwitchCurrentNetworkAuthorization {
+  url: string;
+  networkKey: string;
+  authSwitchNetworkType: AccountAuthType
+}
+
 /// Staking subscribe
 
 export enum StakingType {
