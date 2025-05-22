@@ -5,9 +5,10 @@ import { AccountMigrationInProgressWarningModal, AddressQrModal, AlertModal, Att
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
+import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-koni-ui/components/Modal/Swap/SwapFeesModal';
 import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-koni-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
-import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useExtensionDisplayModes, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -294,7 +295,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       checkActive: checkSwapFeesModalActive,
       update: setSwapFeesModalProps
     }
-  }), [checkAddressQrModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwitchNetworkAuthorizeModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, checkSwapFeesModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openSwitchNetworkAuthorizeModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
