@@ -806,5 +806,17 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
   }
 
+  override async handleChangeEarningValidator (selectedValidators: ValidatorInfo[]): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+
+    if (!selectedValidators || selectedValidators.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const validatorParamList = selectedValidators.map((validator) => validator.address);
+    const nominateTx = chainApi.api.tx.staking.nominate(validatorParamList);
+
+    return nominateTx;
+  }
   /* Other actions */
 }

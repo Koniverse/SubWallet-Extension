@@ -90,4 +90,6 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+
+export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
 /* Other */
