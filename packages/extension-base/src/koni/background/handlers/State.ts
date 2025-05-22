@@ -1571,14 +1571,7 @@ export default class KoniState {
     const migrationStatus = await SWStorage.instance.getItem('mv3_migration');
 
     if (!migrationStatus || migrationStatus !== 'done') {
-      if (isManifestV3) {
-        // Open migration tab
-        const url = `${chrome.runtime.getURL('index.html')}#/mv3-migration`;
-
-        await openPopup(url);
-
-        // migrateMV3LocalStorage will be called when user open migration tab with data from localStorage on frontend
-      } else {
+      if (!isManifestV3) {
         this.migrateMV3LocalStorage(JSON.stringify(self.localStorage)).catch(console.error);
       }
     }
