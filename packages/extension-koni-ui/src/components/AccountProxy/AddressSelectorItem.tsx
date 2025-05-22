@@ -38,7 +38,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
   return (
     <div
-      className={CN(className, {})}
+      className={CN(className)}
       onClick={onClick}
     >
       <div className='__item-left-part'>
@@ -62,7 +62,7 @@ function Component (props: Props): React.ReactElement<Props> {
             ? (
               <>
                 <div className={'__name-label-divider'}> &nbsp; - &nbsp;</div>
-                <div className={CN('__label', bitcoinAttributes.schema)}>
+                <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
                   {bitcoinAttributes.label}
                 </div>
               </>
@@ -166,13 +166,13 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
       fontSize: token.fontSizeXS,
       lineHeight: token.lineHeightXS,
       fontWeight: 700,
-      '&.orange-7': {
+      '&.-schema-orange-7': {
         color: token['orange-7']
       },
-      '&.lime-7': {
+      '&.-schema-lime-7': {
         color: token['lime-7']
       },
-      '&.cyan-7': {
+      '&.-schema-cyan-7': {
         color: token['cyan-7']
       }
     },

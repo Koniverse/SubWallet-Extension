@@ -3,7 +3,6 @@
 
 import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 
-import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
@@ -47,8 +46,8 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
   const goHome = useDefaultNavigate().goHome;
 
   const showNavigationButtons = useMemo(() => {
-    return !!chainInfo && _isChainBitcoinCompatible(chainInfo) && accountTokenAddresses.length > 1;
-  }, [chainInfo, accountTokenAddresses]);
+    return accountTokenAddresses.length > 1;
+  }, [accountTokenAddresses]);
 
   const [currentIndex, setCurrentIndex] = useState(() => {
     if (!showNavigationButtons) {

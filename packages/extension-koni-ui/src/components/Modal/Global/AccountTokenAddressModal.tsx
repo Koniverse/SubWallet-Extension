@@ -31,6 +31,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   const notify = useNotification();
   const { addressQrModal } = useContext(WalletModalContext);
 
+  // Note: This component only supports Bitcoin addresses. Please review it if you want to use it for other use cases.
   const onShowQr = useCallback((item: AccountTokenAddress) => {
     return () => {
       const processFunction = () => {

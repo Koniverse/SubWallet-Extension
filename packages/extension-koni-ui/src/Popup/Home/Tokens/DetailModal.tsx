@@ -3,12 +3,11 @@
 
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { BalanceItemWithAddressType } from '@subwallet/extension-base/types';
 import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { getBitcoinKeypairAttributes, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
