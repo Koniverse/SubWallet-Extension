@@ -19,7 +19,7 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, EvmFeeInfo, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
@@ -58,12 +58,12 @@ export default class TransactionService {
 
   private aliveProcessMap: Map<string, ProcessTransactionData> = new Map();
 
-  private readonly transactionSubject: BehaviorSubject<Record<string, SWTransaction>> = new BehaviorSubject<Record<string, SWTransaction>>({});
+  private readonly transactionSubject: BehaviorSubject<Record<string, SWTransactionBase>> = new BehaviorSubject<Record<string, SWTransactionBase>>({});
   private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
 
   private cacheProcessInfo: Record<string, Record<string, string>> = {};
 
-  private get transactions (): Record<string, SWTransaction> {
+  private get transactions (): Record<string, SWTransactionBase> {
     return this.transactionSubject.getValue();
   }
 
@@ -75,11 +75,11 @@ export default class TransactionService {
     this.chainService = state.chainService;
   }
 
-  private get allTransactions (): SWTransaction[] {
+  private get allTransactions (): SWTransactionBase[] {
     return Object.values(this.transactions);
   }
 
-  private get processingTransactions (): SWTransaction[] {
+  private get processingTransactions (): SWTransactionBase[] {
     return this.allTransactions.filter((t) => t.status === ExtrinsicStatus.QUEUED || t.status === ExtrinsicStatus.SUBMITTING);
   }
 
@@ -125,7 +125,7 @@ export default class TransactionService {
       checkSupportForAction(validationResponse, blockedActionsMap);
     }
 
-    const transaction = transactionInput.transaction;
+    const transaction = transactionInput.transaction as OptionalSWTransaction;
 
     // Check duplicated transaction
     validationResponse.errors.push(...this.checkDuplicate(transactionInput));
@@ -259,6 +259,24 @@ export default class TransactionService {
     } as SWTransaction;
   }
 
+  private fillDutchTransactionDefaultInfo (transaction: SWDutchTransactionInput): SWDutchTransaction {
+    const isInternal = !transaction.url;
+    const transactionId = getTransactionId(transaction.chainType, transaction.chain, isInternal, isWalletConnectRequest(transaction.id));
+
+    return {
+      ...transaction,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      errors: transaction.errors || [],
+      warnings: transaction.warnings || [],
+      url: transaction.url || EXTENSION_REQUEST_URL,
+      status: ExtrinsicStatus.QUEUED,
+      isInternal,
+      id: transactionId,
+      extrinsicHash: transactionId
+    } as SWDutchTransaction;
+  }
+
   public async addTransaction (inputTransaction: SWTransactionInput): Promise<TransactionEmitter> {
     const transactions = this.transactions;
     // Fill transaction default info
@@ -269,6 +287,16 @@ export default class TransactionService {
     this.transactionSubject.next({ ...transactions });
 
     return await this.sendTransaction(transaction);
+  }
+
+  public addDutchTransaction (inputTransaction: SWDutchTransactionInput): TransactionEmitter {
+    const transactions = this.transactions;
+    const transaction = this.fillDutchTransactionDefaultInfo(inputTransaction);
+
+    transactions[transaction.id] = transaction;
+    this.transactionSubject.next({ ...transactions });
+
+    return this.sendDutchTransaction(transaction);
   }
 
   public generateBeforeHandleResponseErrors (errors: TransactionError[]): SWTransactionResponse {
@@ -404,6 +432,69 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
+  public async handleDutchTransaction (transaction: SWDutchTransactionInput): Promise<SWTransactionResponse> {
+    const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
+    const validatedTransaction: SWTransactionResponse = {
+      ...transaction,
+      id: transactionId,
+      extrinsicHash: '',
+      status: undefined,
+      errors: transaction.errors || [],
+      warnings: transaction.warnings || [],
+      processId: transaction.step?.processId
+    };
+
+    const txInput: SWDutchTransaction = {
+      ...transaction,
+      isInternal: true,
+      status: ExtrinsicStatus.QUEUED,
+      id: transactionId,
+      extrinsicHash: transactionId,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime()
+    } as SWDutchTransaction;
+
+    const emitter = this.addDutchTransaction(txInput);
+
+    await new Promise<void>((resolve) => {
+      if (transaction.resolveOnDone) {
+        emitter.on('success', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+
+          resolve();
+        });
+      } else {
+        emitter.on('signed', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        });
+      }
+
+      emitter.on('error', (data: TransactionEventResponse) => {
+        if (data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+    });
+
+    // @ts-ignore
+    'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+    'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+    'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    return validatedTransaction;
+  }
+
   private async sendTransaction (transaction: SWTransaction): Promise<TransactionEmitter> {
     // Send Transaction
     const emitter = await (transaction.chainType === 'substrate'
@@ -452,11 +543,7 @@ export default class TransactionService {
       if (step) {
         const rejectError = data.errors.find((error) => {
           // TODO: REFACTOR ERROR CODE
-          if (([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType)) {
-            return true;
-          }
-
-          return false;
+          return ([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType);
         });
 
         /**
@@ -517,11 +604,7 @@ export default class TransactionService {
       if (step) {
         const rejectError = data.errors.find((error) => {
           // TODO: REFACTOR ERROR CODE
-          if (([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType)) {
-            return true;
-          }
-
-          return false;
+          return ([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType);
         });
 
         /**
@@ -543,6 +626,74 @@ export default class TransactionService {
     return emitter;
   }
 
+  private sendDutchTransaction (transaction: SWDutchTransaction) {
+    // Send Transaction
+    const emitter = this.signAndSendEvmDutchTransaction(transaction);
+
+    const { eventsHandler, step } = transaction;
+
+    emitter.on('send', (data: TransactionEventResponse) => {
+      this.onSend(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { transactionId: transaction.id, status: StepStatus.SUBMITTING, chain: transaction.chain });
+      }
+    });
+
+    emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+      this.onHasTransactionHash(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { extrinsicHash: data.extrinsicHash, status: StepStatus.PROCESSING });
+      }
+    });
+
+    emitter.on('success', (data: TransactionEventResponse) => {
+      this.handlePostProcessing(data.id);
+      this.onSuccess(data);
+
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.COMPLETE });
+      }
+    });
+
+    emitter.on('error', (data: TransactionEventResponse) => {
+      // this.handlePostProcessing(data.id); // might enable this later
+      this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
+
+      if (step) {
+        const rejectError = data.errors.find((error) => {
+          // TODO: REFACTOR ERROR CODE
+          return ([BasicTxErrorType.UNABLE_TO_SIGN, BasicTxErrorType.USER_REJECT_REQUEST] as TransactionErrorType[]).includes(error.errorType);
+        });
+
+        /**
+         * Now simple check, first step have step id = 1.
+         * Improve to fetch the process from db
+         * */
+        if (rejectError && step.stepId === 1) {
+          this.deleteProcess(step);
+        } else {
+          this.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+        }
+      }
+    });
+
+    emitter.on('timeout', (data: TransactionEventResponse) => {
+      this.onTimeOut({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.TIMEOUT)] });
+
+      if (step) {
+        this.updateProcessStepStatus(step, { status: StepStatus.TIMEOUT });
+      }
+    });
+
+    // Todo: handle any event with transaction.eventsHandler
+
+    eventsHandler?.(emitter);
+
+    return emitter;
+  }
+
   private removeTransaction (id: string): void {
     if (this.transactions[id]) {
       delete this.transactions[id];
@@ -550,7 +701,7 @@ export default class TransactionService {
     }
   }
 
-  private updateTransaction (id: string, data: Partial<Omit<SWTransaction, 'id'>>): void {
+  private updateTransaction (id: string, data: Partial<Omit<SWTransactionBase, 'id'>>): void {
     const transaction = this.transactions[id];
 
     if (transaction) {
@@ -1397,6 +1548,79 @@ export default class TransactionService {
           emitter.emit('extrinsicHash', eventData);
           emitter.emit('success', eventData);
         } else {
+          eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
+          emitter.emit('error', eventData);
+        }
+      })
+      .catch((e: Error) => {
+        this.removeTransaction(id);
+        eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, t(e.message)));
+
+        emitter.emit('error', eventData);
+      });
+
+    return emitter;
+  }
+
+  private signAndSendEvmDutchTransaction ({ address, id, isPassConfirmation, step, transaction, url }: SWDutchTransaction): TransactionEmitter {
+    const emitter = new EventEmitter<TransactionEventMap>();
+
+    const eventData: TransactionEventResponse = {
+      id,
+      errors: [],
+      warnings: [],
+      extrinsicHash: id,
+      processId: step?.processId
+    };
+
+    // todo: review this object
+    const evmSignaturePayload: EvmSignatureRequest = {
+      id: id,
+      type: 'eth_signTypedData_v4',
+      payload: transaction,
+      address: address,
+      hashPayload: '',
+      canSign: true,
+      processId: step?.processId
+    };
+
+    this.state.requestService.addConfirmation(id, url || EXTENSION_REQUEST_URL, 'submitApiRequest', evmSignaturePayload, { isPassConfirmation })
+      .then(({ isApproved, payload: signature }) => {
+        if (isApproved) {
+          emitter.emit('signed', eventData);
+          emitter.emit('send', eventData);
+
+          transaction.submitSwapOrder()
+            .then((isSendSuccess) => {
+              if (!isSendSuccess) {
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+              }
+
+              this.handleTransactionTimeout(emitter, eventData);
+
+              transaction.cronCheckTxSuccess()
+                .then((order) => {
+                  if (!order) {
+                    eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED));
+                    emitter.emit('error', eventData);
+                  } else {
+                    eventData.extrinsicHash = order.txHash;
+
+                    emitter.emit('extrinsicHash', eventData);
+                    emitter.emit('success', eventData);
+                  }
+                })
+                .catch((e: Error) => {
+                  eventData.errors.push(new TransactionError(BasicTxErrorType.SEND_TRANSACTION_FAILED, t(e.message)));
+                  emitter.emit('error', eventData);
+                });
+            })
+            .catch((e: Error) => {
+              eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, t(e.message)));
+              emitter.emit('error', eventData);
+            });
+        } else {
+          this.removeTransaction(id);
           eventData.errors.push(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
           emitter.emit('error', eventData);
         }
