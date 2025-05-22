@@ -10,6 +10,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, SwModal, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
+import { t } from 'i18next';
 import { Info } from 'phosphor-react';
 import React, { FC, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,10 +34,18 @@ interface FeeItem {
   tooltip?: string
 }
 
-const defaultTooltipMap: Record<SwapFeeType, string> = {
-  [SwapFeeType.PLATFORM_FEE]: detectTranslate('Platform fee charged to maintain the service'),
-  [SwapFeeType.NETWORK_FEE]: detectTranslate('Network fee for blockchain transactions'),
-  [SwapFeeType.WALLET_FEE]: detectTranslate('Wallet fee to process the transaction')
+const defaultTooltipMap: Record<SwapFeeType, (percentage?: number) => string> = {
+  [SwapFeeType.PLATFORM_FEE]: () => detectTranslate('Fee paid to third-party providers to facilitate the swap. It is not paid to SubWallet'),
+  [SwapFeeType.NETWORK_FEE]: () => detectTranslate('Fee paid to process your transaction on the blockchain. It is not paid to SubWallet'),
+  [SwapFeeType.WALLET_FEE]: (percentage?: number) => {
+    if (!percentage) {
+      return detectTranslate('A fee is automatically factored into this quote');
+    } else {
+      const message = detectTranslate('A fee of {{percentage}}% is automatically factored into this quote');
+
+      return t(message, { replace: { percentage: percentage } });
+    }
+  }
 };
 
 const modalId = SWAP_FEES_MODAL;
@@ -65,33 +74,38 @@ const Component: FC<Props> = (props: Props) => {
     const result: FeeItem[] = [];
 
     const feeConfigs = [
-      { type: SwapFeeType.NETWORK_FEE, label: t('Network fee'), tooltip: defaultTooltipMap[SwapFeeType.NETWORK_FEE] },
-      { type: SwapFeeType.PLATFORM_FEE, label: t('Protocol fee'), tooltip: defaultTooltipMap[SwapFeeType.PLATFORM_FEE] },
-      { type: SwapFeeType.WALLET_FEE, label: t('Wallet commission'), tooltip: defaultTooltipMap[SwapFeeType.WALLET_FEE] }
+      { type: SwapFeeType.NETWORK_FEE, label: t('Network fee'), getTooltip: () => defaultTooltipMap[SwapFeeType.NETWORK_FEE]() },
+      { type: SwapFeeType.PLATFORM_FEE, label: t('Provider fee'), getTooltip: () => defaultTooltipMap[SwapFeeType.PLATFORM_FEE]() },
+      { type: SwapFeeType.WALLET_FEE, label: t('SubWallet fee'), getTooltip: (percentage?: number) => defaultTooltipMap[SwapFeeType.WALLET_FEE](percentage) }
     ];
 
     const createFeeItem = (
       type: SwapFeeType,
       label: string,
-      tooltip: string
+      getTooltip: (percentage?: number) => string,
+      percentage?: number
     ): FeeItem => ({
       label,
       value: new BigN(0),
       prefix: currencyData.isPrefix ? currencyData.symbol : '',
       suffix: !currencyData.isPrefix ? currencyData.symbol : '',
       type,
-      tooltip
+      tooltip: getTooltip(percentage)
     });
 
-    const feeTypeMap: Record<SwapFeeType, FeeItem> = feeConfigs.reduce((map, { label, tooltip, type }) => ({
+    const feeTypeMap: Record<SwapFeeType, FeeItem> = feeConfigs.reduce((map, { getTooltip, label, type }) => ({
       ...map,
-      [type]: createFeeItem(type, label, tooltip)
+      [type]: createFeeItem(type, label, getTooltip)
     }), {} as Record<SwapFeeType, FeeItem>);
 
     currentQuote?.feeInfo.feeComponent.forEach((feeItem) => {
-      const { feeType } = feeItem;
+      const { feeType, percentage } = feeItem;
 
       feeTypeMap[feeType].value = feeTypeMap[feeType].value.plus(getConvertedBalance(feeItem));
+
+      if (feeType === SwapFeeType.WALLET_FEE && percentage !== undefined) {
+        feeTypeMap[feeType].tooltip = defaultTooltipMap[feeType](percentage);
+      }
     });
 
     Object.values(feeTypeMap).forEach((fee) => {
@@ -136,10 +150,10 @@ const Component: FC<Props> = (props: Props) => {
                 label={
                   <Tooltip
                     placement={'topRight'}
-                    title={item.tooltip || ''}
+                    title={t(item.tooltip || '')}
                   >
                     <div className={ '__label-wrapper'}>
-                      <div>{item.label}</div>
+                      <div>{t(item.label)}</div>
                       {
                         !!item.tooltip && (
                           <Icon
