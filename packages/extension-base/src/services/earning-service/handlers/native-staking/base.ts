@@ -177,5 +177,9 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 
+  async handleChangeEarningValidator (selectedValidators: ValidatorInfo[]): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
+
   /* Other actions */
 }
