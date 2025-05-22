@@ -5,11 +5,10 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _BalanceMetadata, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { BalanceItemWithAddressType } from '@subwallet/extension-base/types';
-import { Avatar } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, InfoItemBase } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -34,7 +33,9 @@ interface BalanceDisplayItem {
 const Component: React.FC<Props> = (props: Props) => {
   const { className, item } = props;
 
-  const { address, addressTypeLabel, free, locked, metadata, tokenSlug } = item;
+  const { address, addressTypeLabel, free, locked, metadata, schema: _schema, tokenSlug } = item;
+
+  const schema = _schema as InfoItemBase['valueColorSchema'];
 
   const { t } = useTranslation();
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
@@ -126,10 +127,9 @@ const Component: React.FC<Props> = (props: Props) => {
             className={'__quote-rate'}
             label={(
               <div className='account-info'>
-                <Avatar
-                  identPrefix={addressPrefix}
+                <AccountProxyAvatar
                   size={24}
-                  value={address}
+                  value={account?.proxyId}
                 />
                 <div className='account-name-address ml-xs'>
                   {
@@ -147,7 +147,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 </div>
               </div>
             )}
-            valueColorSchema={'warning'}
+            valueColorSchema={schema ? `${schema}` : 'default'}
           >
             {addressTypeLabel}
           </MetaInfo.Default>
@@ -158,10 +158,9 @@ const Component: React.FC<Props> = (props: Props) => {
             decimals={decimals}
             label={(
               <div className='account-info'>
-                <Avatar
-                  identPrefix={addressPrefix}
+                <AccountProxyAvatar
                   size={24}
-                  value={address}
+                  value={account?.proxyId}
                 />
                 <div className='account-name-address ml-xs'>
                   {

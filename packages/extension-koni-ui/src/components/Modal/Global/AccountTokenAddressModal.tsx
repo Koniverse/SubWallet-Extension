@@ -31,10 +31,12 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   const notify = useNotification();
   const { addressQrModal } = useContext(WalletModalContext);
 
+  // Note: This component only supports Bitcoin addresses. Please review it if you want to use it for other use cases.
   const onShowQr = useCallback((item: AccountTokenAddress) => {
     return () => {
       const processFunction = () => {
         addressQrModal.open({
+          accountTokenAddresses: items,
           address: item.accountInfo.address,
           chainSlug: item.chainSlug,
           onBack: addressQrModal.close,
@@ -47,7 +49,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
 
       processFunction();
     };
-  }, [addressQrModal, onCancel]);
+  }, [addressQrModal, items, onCancel]);
 
   const onCopyAddress = useCallback((item: AccountTokenAddress) => {
     return () => {
@@ -104,7 +106,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           onClick: onCancel
         }
         : undefined}
-      title={t<string>('Select address')}
+      title={t<string>('Select address type')}
     >
       <SwList
         actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}

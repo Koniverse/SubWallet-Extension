@@ -172,37 +172,37 @@ export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo
   switch (type) {
     case 'bitcoin-44':
       result.logoKey = 'bitcoin';
-      result.name = 'Bitcoin (Legacy)';
+      result.name = 'Legacy';
       result.order = 1;
       break;
 
     case 'bitcoin-84':
       result.logoKey = 'bitcoin';
-      result.name = 'Bitcoin';
+      result.name = 'Native SegWit';
       result.order = 2;
       break;
 
     case 'bitcoin-86':
       result.logoKey = 'ordinal_rune';
-      result.name = 'Ordinal, Runes';
+      result.name = 'Taproot';
       result.order = 3;
       break;
 
     case 'bittest-44':
       result.logoKey = 'bitcoinTestnet';
-      result.name = 'Bitcoin testnet';
+      result.name = 'Legacy';
       result.order = 4;
       break;
 
     case 'bittest-84':
       result.logoKey = 'bitcoinTestnet';
-      result.name = 'Bitcoin testnet';
+      result.name = 'Native SegWit';
       result.order = 5;
       break;
 
     case 'bittest-86':
       result.logoKey = 'bitcoinTestnet';
-      result.name = 'Bitcoin testnet (BIP86)';
+      result.name = 'Taproot';
       result.order = 6;
       break;
   }
@@ -292,18 +292,18 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
   };
 }
 
-export const getBitcoinLabelByKeypair = (keyPairType: KeypairType): string => {
+export const getBitcoinKeypairAttributes = (keyPairType: KeypairType): { label: string; schema: string } => {
   switch (keyPairType) {
     case 'bitcoin-44':
     case 'bittest-44':
-      return 'BIP-44';
+      return { label: 'Legacy', schema: 'orange-7' };
     case 'bitcoin-86':
     case 'bittest-86':
-      return 'BIP-86';
+      return { label: 'Taproot', schema: 'cyan-7' };
     case 'bitcoin-84':
     case 'bittest-84':
-      return 'BIP-84';
+      return { label: 'Native SegWit', schema: 'lime-7' };
     default:
-      return '';
+      return { label: '', schema: '' };
   }
 };

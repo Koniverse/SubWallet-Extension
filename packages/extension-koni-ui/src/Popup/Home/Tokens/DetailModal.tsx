@@ -3,14 +3,13 @@
 
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { BalanceItemWithAddressType } from '@subwallet/extension-base/types';
 import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
-import { getBitcoinLabelByKeypair, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinKeypairAttributes, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
 import { Form, Icon, ModalContext, Number, SwModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -161,7 +160,10 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       if (isBitcoinAddress(item.address)) {
         const keyPairType = getKeypairTypeByAddress(item.address);
 
-        resultItem.addressTypeLabel = getBitcoinLabelByKeypair(keyPairType);
+        const attributes = getBitcoinKeypairAttributes(keyPairType);
+
+        resultItem.addressTypeLabel = attributes.label;
+        resultItem.schema = attributes.schema;
       }
 
       result.push(resultItem);
