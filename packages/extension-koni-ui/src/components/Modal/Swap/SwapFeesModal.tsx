@@ -39,7 +39,7 @@ const defaultTooltipMap: Record<SwapFeeType, (percentage?: number) => string> = 
   [SwapFeeType.NETWORK_FEE]: () => detectTranslate('Fee paid to process your transaction on the blockchain. It is not paid to SubWallet'),
   [SwapFeeType.WALLET_FEE]: (percentage?: number) => {
     if (!percentage) {
-      return detectTranslate('A fee is automatically factored into this quote');
+      return detectTranslate('Fee charged by SubWallet, which is automatically factored into this quote');
     } else {
       const message = detectTranslate('A fee of {{percentage}}% is automatically factored into this quote');
 
