@@ -475,8 +475,8 @@ export class UniswapHandler implements SwapBaseInterface {
 
     const actionList = JSON.stringify(path.map((step) => step.action));
     const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
-    const sendingValue = swapXcm ? BigNumber(request.fromAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT) : request.fromAmount;
-    const expectedReceive = swapXcm ? BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT) : selectedQuote.toAmount;
+    const sendingValue = swapXcm ? BigNumber(request.fromAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1) : request.fromAmount;
+    const expectedReceive = swapXcm ? BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1) : selectedQuote.toAmount;
 
     const originTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
     const destinationTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.to);
