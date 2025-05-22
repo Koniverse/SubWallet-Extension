@@ -64,8 +64,6 @@ const Component = (): React.ReactElement => {
   }, [currentAccountProxy]);
   const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
 
-  console.log('accountProxies', accountProxies);
-
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
 

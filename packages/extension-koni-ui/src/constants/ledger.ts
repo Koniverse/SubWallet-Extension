@@ -7,7 +7,7 @@ import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
-export const SUBSTRATE_ECDSA_KEY = 'substrate_evm';
+export const SUBSTRATE_ECDSA_KEY = 'substrate_ecdsa';
 export const POLKADOT_KEY = 'polkadot';
 export const POLKADOT_SLIP_44 = 354;
 export const RECOVERY_SLUG = '_recovery';
@@ -25,6 +25,20 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isGeneric: true,
     isEthereum: false,
     slip44: 354
+  },
+  {
+    accountName: 'Polkadot ECDSA',
+    appName: 'Polkadot ECDSA',
+    networkName: 'Polkadot ECDSA',
+    genesisHash: '',
+    network: 'PokadotECDSA',
+    icon: 'substrate',
+    slug: SUBSTRATE_ECDSA_KEY,
+    isDevMode: false,
+    isGeneric: false,
+    isEthereum: false,
+    slip44: 354,
+    scheme: LEDGER_SCHEME.ECDSA
   },
   {
     accountName: 'Polkadot Migration',
@@ -252,21 +266,8 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isDevMode: false,
     isEthereum: false,
     slip44: 799
-  },
-  {
-    accountName: 'Polkadot ECDSA',
-    appName: 'Polkadot ECDSA',
-    networkName: 'Polkadot ECDSA',
-    genesisHash: '',
-    network: 'PokadotECDSA',
-    icon: 'substrate',
-    slug: SUBSTRATE_ECDSA_KEY,
-    isDevMode: false,
-    isGeneric: false,
-    isEthereum: false,
-    slip44: 354,
-    scheme: LEDGER_SCHEME.ECDSA
   }
+
   // {
   //   displayName: 'Centrifuge',
   //   genesisHash: '0xb3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82',

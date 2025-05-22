@@ -15,7 +15,8 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
 
   return useMemo(() => {
     const result: AccountChainAddress[] = [];
-    const chains: string[] = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain);
+    const isSubstrateECDSA = !!accountProxy.accounts[0]?.isSubstrateECDSA;
+    const chains: string[] = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain, isSubstrateECDSA);
 
     accountProxy.accounts.forEach((a) => {
       for (const chain of chains) {
