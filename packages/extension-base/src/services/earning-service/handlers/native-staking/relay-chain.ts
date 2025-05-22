@@ -806,8 +806,11 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
   }
 
-  override async handleChangeEarningValidator (selectedValidators: ValidatorInfo[]): Promise<TransactionData> {
+  override async handleChangeEarningValidator (data: SubmitYieldJoinData): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
+    const { selectedValidators } = data as SubmitJoinNativeStaking;
+
+    console.log('was here');
 
     if (!selectedValidators || selectedValidators.length === 0) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));

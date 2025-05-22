@@ -177,7 +177,8 @@ const NATIVE_STAKE_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.STAKING_WITHDRAW,
   // ExtrinsicType.STAKING_COMPOUNDING,
   // ExtrinsicType.STAKING_CANCEL_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_UNSTAKE
+  ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+  ExtrinsicType.CHANGE_EARNING_VALIDATOR
 ];
 
 const POOL_STAKE_ACTIONS: ExtrinsicType[] = [
@@ -236,8 +237,7 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
-  ExtrinsicType.SWAP,
-  ExtrinsicType.CROWDLOAN
+  ExtrinsicType.SWAP
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
@@ -520,8 +520,6 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
     case AccountSignMode.UNKNOWN:
       return AccountProxyType.UNKNOWN;
   }
-
-  return AccountProxyType.UNKNOWN;
 };
 
 export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPairStoreData, accountProxies: AccountProxyStoreData) => {

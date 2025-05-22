@@ -92,4 +92,5 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
 
 export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
+export const EARNING_CHANGE_VALIDATOR_MODAL = 'earning-change-validator-modal';
 /* Other */

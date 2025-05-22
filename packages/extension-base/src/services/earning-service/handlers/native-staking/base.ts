@@ -140,6 +140,8 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNativeStaking;
     const { address, amount, selectedValidators, slug } = data;
+
+    console.log('data', data);
     const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
@@ -177,7 +179,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 
-  async handleChangeEarningValidator (selectedValidators: ValidatorInfo[]): Promise<TransactionData> {
+  async handleChangeEarningValidator (_data: SubmitYieldJoinData): Promise<TransactionData> {
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 

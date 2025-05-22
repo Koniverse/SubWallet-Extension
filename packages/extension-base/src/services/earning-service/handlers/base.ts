@@ -356,7 +356,7 @@ export default abstract class BasePoolHandler {
   /** Create `transaction` to claim reward */
   public abstract handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData>;
   /** Change earning validator */
-  public abstract handleChangeEarningValidator(selectedValidators: ValidatorInfo[]): Promise<TransactionData>;
+  public abstract handleChangeEarningValidator(data: SubmitYieldJoinData): Promise<TransactionData>;
 
   /** Check handler can handle slug */
   public canHandleSlug (slug: string): boolean {

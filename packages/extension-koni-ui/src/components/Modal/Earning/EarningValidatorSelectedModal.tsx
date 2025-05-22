@@ -1,15 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
@@ -18,6 +16,8 @@ import { Book, CaretLeft } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+
+import EarningValidatorSelectorSubmit from '../../Field/Earning/EarningValidatorSelectorSubmit';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -29,8 +29,8 @@ interface Props extends ThemeProps, BasicInputWrapper {
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', modalId, nominations, onChange
-    , setForceFetchValidator, slug } = props;
+  const { chain, className = '', from, loading, modalId
+    , nominations, onChange, setForceFetchValidator, slug } = props;
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -45,8 +45,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const poolInfo = poolInfoMap[slug];
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
 
-  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, ChainRecommendValidator>>({});
-
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) {
       return poolInfo.maxPoolMembers;
@@ -56,12 +54,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [poolInfo]);
 
   const { changeValidators,
-    onApplyChangeValidators,
-    onCancelSelectValidator,
-    onInitValidators } = useSelectValidators(modalId, chain, maxCount, onChange);
+    onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
-  const [autoValidator, setAutoValidator] = useState('');
 
   const nominatorValueList = useMemo(() => {
     return nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)) || [];
@@ -78,6 +73,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
     return label !== 'dApp' ? label.toLowerCase() : label;
   }, [chain]);
+
+  const onClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
+    },
+    [activeModal]
+  );
 
   const onClickMore = useCallback((item: ValidatorDataType) => {
     return (e: SyntheticEvent) => {
@@ -118,12 +121,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     );
   }, [changeValidators, networkPrefix, nominatorValueList, onClickMore]);
 
-  useEffect(() => {
-    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
-      setDefaultPoolMap(earningPoolRecommendation);
-    }).catch(console.error);
-  }, []);
-
   return (
     <>
       <SwModal
@@ -143,7 +140,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                 weight={'fill'}
               />
             )}
-            onClick={onApplyChangeValidators}
+            onClick={onClick}
           >
             {t('Change validator')}
           </Button>
@@ -167,6 +164,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           validatorItem={viewDetailItem}
         />
       )}
+      <EarningValidatorSelectorSubmit
+        chain={poolInfo.chain}
+        disabled={false}
+        from={from}
+        items={items}
+        loading={loading}
+        modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+        nominations={nominations}
+        setForceFetchValidator={setForceFetchValidator}
+        slug={poolInfo.slug}
+      />
     </>
   );
 };

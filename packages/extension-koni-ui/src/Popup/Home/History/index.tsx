@@ -57,6 +57,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
     return IconMap.claim_reward;
   }
 
+  if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
+    return IconMap.claim_reward;
+  }
+
   if (item.type === ExtrinsicType.SWAP) {
     return IconMap.swap;
   }
@@ -288,6 +292,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake'),
     [ExtrinsicType.STAKING_BOND]: t('Stake'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Change validator'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw'),
@@ -333,6 +338,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake transaction'),
     [ExtrinsicType.STAKING_BOND]: t('Stake transaction'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake transaction'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Change validator'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward transaction'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw transaction'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw transaction'),

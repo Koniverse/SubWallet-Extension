@@ -18,7 +18,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { className, modalId, title } = props;
   const { activeModal } = useContext(ModalContext);
 
-  const handleIconClick = useCallback(
+  const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       activeModal(modalId);
@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className='__panel-title'>{title}</div>
           <div
             className='__panel-icon'
-            onClick={handleIconClick}
+            onClick={onClick}
           >
             <Icon
               phosphorIcon={PencilSimpleLine}
@@ -81,12 +81,6 @@ const NominatorCollapsiblePanel = styled(Component)<Props>(({ theme: { token } }
       justifyContent: 'center',
       alignItems: 'center',
       color: token.colorTextLight3
-    },
-
-    '.__panel-body': {
-      padding: token.padding,
-      paddingTop: token.paddingXXS,
-      paddingLeft: 24
     }
   });
 });
