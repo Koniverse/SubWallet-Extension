@@ -112,6 +112,16 @@ export function _isValidCardanoAddressFormat (validateRecipientParams: ValidateR
   return '';
 }
 
+export function _isValidEvmAddressFormat (validateRecipientParams: ValidateRecipientParams): string {
+  const { destChainInfo, toAddress } = validateRecipientParams;
+
+  if (_isChainEvmCompatible(destChainInfo) && !isEthereumAddress(toAddress)) {
+    return 'Recipient address must be a valid EVM address';
+  }
+
+  return '';
+}
+
 export function _isNotDuplicateAddress (validateRecipientParams: ValidateRecipientParams): string {
   const { fromAddress, toAddress } = validateRecipientParams;
 
@@ -127,12 +137,18 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 
   if (account?.isHardware) {
     if (!account.isGeneric) {
-      // For ledger legacy
-      const availableGen: string[] = account.availableGenesisHashes || [];
-      const destChainName = destChainInfo?.name || 'Unknown';
+      if (account.isSubstrateECDSA) {
+        if (!destChainInfo.substrateInfo || !destChainInfo.evmInfo) {
+          return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainInfo?.name || 'Unknown');
+        }
+      } else {
+        // For ledger legacy
+        const availableGen: string[] = account.availableGenesisHashes || [];
+        const destChainName = destChainInfo?.name || 'Unknown';
 
-      if (!availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
-        return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
+        if (!availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
+          return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
+        }
       }
     } else {
       // For ledger generic

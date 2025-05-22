@@ -73,6 +73,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return {
           type: 'icon',
           value: Swatches

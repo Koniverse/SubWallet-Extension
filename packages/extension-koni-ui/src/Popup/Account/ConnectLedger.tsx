@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { LedgerChainSelector, LedgerItemType } from '@subwallet/extension-koni-ui/components/Field/LedgerChainSelector';
@@ -254,7 +254,8 @@ const Component: React.FC<Props> = (props: Props) => {
           name: item.name,
           isEthereum: selectedChain.isEthereum,
           isGeneric: selectedChain.isGeneric,
-          isLedgerRecovery: selectedChain?.isRecovery
+          isLedgerRecovery: selectedChain?.isRecovery,
+          isSubstrateECDSA: selectedChain.scheme === LEDGER_SCHEME.ECDSA
         }))
       })
         .then(() => {

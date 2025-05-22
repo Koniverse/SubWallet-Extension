@@ -54,8 +54,8 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
       let result: GenericeResponseAddress;
 
       if (this.scheme === LEDGER_SCHEME.ECDSA) {
-        console.log(this.scheme, path);
         result = await this.wrapError(app.getAddressEcdsa(path, confirm));
+        result.address = hexAddPrefix(result.address);
       } else {
         result = await this.wrapError(app.getAddressEd25519(path, this.ss58_addr_type, confirm));
       }

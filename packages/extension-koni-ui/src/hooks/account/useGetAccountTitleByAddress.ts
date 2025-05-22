@@ -18,6 +18,7 @@ const useGetAccountTitleByAddress = (address?: string): string => {
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return t('Ledger account');
       case AccountSignMode.ALL_ACCOUNT:
         return t('All account');

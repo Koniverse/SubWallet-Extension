@@ -3,9 +3,11 @@
 
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
+export const SUBSTRATE_ECDSA_KEY = 'substrate_evm';
 export const POLKADOT_KEY = 'polkadot';
 export const POLKADOT_SLIP_44 = 354;
 export const RECOVERY_SLUG = '_recovery';
@@ -250,6 +252,20 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isDevMode: false,
     isEthereum: false,
     slip44: 799
+  },
+  {
+    accountName: 'Polkadot ECDSA',
+    appName: 'Polkadot ECDSA',
+    networkName: 'Polkadot ECDSA',
+    genesisHash: '',
+    network: 'PokadotECDSA',
+    icon: 'substrate',
+    slug: SUBSTRATE_ECDSA_KEY,
+    isDevMode: false,
+    isGeneric: false,
+    isEthereum: false,
+    slip44: 354,
+    scheme: LEDGER_SCHEME.ECDSA
   }
   // {
   //   displayName: 'Centrifuge',
@@ -292,8 +308,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.statemint.slug,
     slip44: 354,
     ss58_addr_type: 0,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Statemine',
@@ -303,8 +318,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'statemine',
     slug: ChainInfoMap.statemine.slug,
     slip44: 434,
-    ss58_addr_type: 2,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 2
   },
   {
     accountName: 'Kusama',
@@ -314,8 +328,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'kusama',
     slug: ChainInfoMap.kusama.slug,
     slip44: 434,
-    ss58_addr_type: 2,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 2
   },
   {
     accountName: 'Acala',
@@ -325,8 +338,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'acala',
     slug: ChainInfoMap.acala.slug,
     slip44: 787,
-    ss58_addr_type: 10,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 10
   },
   {
     accountName: 'Aleph Zero',
@@ -336,8 +348,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'aleph-node',
     slug: ChainInfoMap.aleph.slug,
     slip44: 643,
-    ss58_addr_type: 42,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 42
   },
   {
     accountName: 'Ajuna',
@@ -348,8 +359,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.ajunaPolkadot.slug,
     slip44: 354,
     ss58_addr_type: 1328,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Bifrost',
@@ -359,8 +369,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'ajuna',
     slug: ChainInfoMap.bifrost_dot.slug,
     slip44: 788,
-    ss58_addr_type: 6,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 6
   },
   {
     accountName: 'Astar',
@@ -370,8 +379,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'astar',
     slug: ChainInfoMap.astar.slug,
     slip44: 810,
-    ss58_addr_type: 5,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 5
   },
   {
     accountName: 'Karura',
@@ -381,8 +389,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'karura',
     slug: ChainInfoMap.karura.slug,
     slip44: 686,
-    ss58_addr_type: 8,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 8
   },
   {
     accountName: 'Edgeware',
@@ -392,8 +399,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'edgeware',
     slug: ChainInfoMap.edgeware.slug,
     slip44: 523,
-    ss58_addr_type: 7,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 7
   },
   {
     accountName: 'XX Network',
@@ -403,8 +409,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'xxnetwork',
     slug: ChainInfoMap.xx_network.slug,
     slip44: 1955,
-    ss58_addr_type: 55,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 55
   },
   {
     accountName: 'Polymesh',
@@ -414,8 +419,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'polymesh',
     slug: ChainInfoMap.polymesh.slug,
     slip44: 595,
-    ss58_addr_type: 12,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 12
   },
   {
     accountName: 'Polkadex',
@@ -425,8 +429,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'polkadex',
     slug: ChainInfoMap.polkadex.slug,
     slip44: 799,
-    ss58_addr_type: 88,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 88
   },
   {
     accountName: 'Centrifuge',
@@ -436,8 +439,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'centrifuge',
     slug: ChainInfoMap.centrifuge.slug,
     slip44: 747,
-    ss58_addr_type: 36,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 36
   },
   {
     accountName: 'Darwinia',
@@ -448,8 +450,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.darwinia2.slug,
     slip44: 354,
     ss58_addr_type: 18,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Hydration',
@@ -460,8 +461,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.hydradx_main.slug,
     slip44: 354,
     ss58_addr_type: 63,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Khala',
@@ -471,8 +471,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'khala',
     slug: ChainInfoMap.khala.slug,
     slip44: 434,
-    ss58_addr_type: 30,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 30
   },
   {
     accountName: 'Nodle',
@@ -482,8 +481,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     network: 'nodle',
     slug: ChainInfoMap.nodle.slug,
     slip44: 1003,
-    ss58_addr_type: 37,
-    scheme: LEDGER_SCHEME.ED25519
+    ss58_addr_type: 37
   },
   {
     accountName: 'Parallel',
@@ -494,8 +492,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.parallel.slug,
     slip44: 354,
     ss58_addr_type: 172,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Phala',
@@ -506,8 +503,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.phala.slug,
     slip44: 354,
     ss58_addr_type: 30,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
+    isHide: true
   },
   {
     accountName: 'Pendulum',
@@ -518,20 +514,7 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
     slug: ChainInfoMap.pendulum.slug,
     slip44: 354,
     ss58_addr_type: 56,
-    isHide: true,
-    scheme: LEDGER_SCHEME.ED25519
-  },
-
-  {
-    accountName: 'Mythos',
-    appName: 'mythos',
-    networkName: 'Mythos network',
-    genesisHash: ChainInfoMap.mythos.substrateInfo?.genesisHash || '0xf6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9',
-    network: 'mythos',
-    slug: ChainInfoMap.mythos.slug,
-    slip44: 60,
-    ss58_addr_type: 42,
-    scheme: LEDGER_SCHEME.ECDSA
+    isHide: true
   }
   // {
   //   accountName: 'Unique',
@@ -555,3 +538,4 @@ export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedg
   .map(({ genesisHash }) => genesisHash);
 
 export const NotNeedMigrationGens: string[] = [...PolkadotDerivationPathGens, ...StandardDerivationPathGens];
+export const SubstrateLedgerSignModeSupport: AccountSignMode[] = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];

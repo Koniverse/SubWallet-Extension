@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible } from '@subwallet/extension-koni-ui/constants';
+import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 // TODO: Use AccountSignMode from the background for consistency.
 import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 import { useCallback } from 'react';
@@ -22,6 +22,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return t('Ledger account');
       case AccountSignMode.ALL_ACCOUNT:
         return t('All account');
@@ -82,7 +83,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
           }
         }
 
-        if (mode === AccountSignMode.LEGACY_LEDGER || mode === AccountSignMode.GENERIC_LEDGER) {
+        if (SubstrateLedgerSignModeSupport.includes(mode)) {
           if (!isLedgerCapable) {
             notify({
               message: t(ledgerIncompatible),
