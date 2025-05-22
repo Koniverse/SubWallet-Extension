@@ -1954,6 +1954,7 @@ export default class KoniState {
     await this.walletConnectService.resetWallet(resetAll);
 
     await this.chainService.init();
+    this.chainOnlineService.resetFirstApplied();
     this.chainOnlineService.checkLatestData();
     this.chainService.checkLatestData();
     this.chainService.subscribeChainInfoMap().subscribe(() => {

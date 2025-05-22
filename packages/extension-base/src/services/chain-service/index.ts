@@ -1474,6 +1474,7 @@ export class ChainService {
     const availableChains = Object.values(this.dataMap.chainInfoMap)
       .filter((info) => (info.chainStatus === _ChainStatus.ACTIVE))
       .map((chainInfo) => chainInfo.slug);
+    const customChains = Object.keys(deprecatedCustomChainMap).filter((chain) => _isCustomChain(chain));
 
     let finalAssetRegistry: Record<string, _ChainAsset> = {};
 
@@ -1487,7 +1488,9 @@ export class ChainService {
 
       // Update custom assets of merged custom chains
       Object.values(storedAssetRegistry).forEach((storedAsset) => {
-        if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedCustomChainMap).includes(storedAsset.originChain)) {
+        const isFromCustomChain = customChains ? customChains.includes(storedAsset.originChain) : false;
+
+        if (_isCustomAsset(storedAsset.slug) && isFromCustomChain) {
           const newOriginChain = deprecatedCustomChainMap[storedAsset.originChain];
           const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress as string);
 
