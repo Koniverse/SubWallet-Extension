@@ -1514,5 +1514,14 @@
   "Current network is changed": "",
   "Current network is not match with input address": "",
   "Current network is not match with output address": "",
-  "Switch network": ""
+  "Switch network": "",
+  "Fee paid to third-party providers to facilitate the swap. It is not paid to SubWallet": "",
+  "Fee paid to process your transaction on the blockchain. It is not paid to SubWallet": "",
+  "Fee charged by SubWallet, which is automatically factored into this quote": "",
+  "A fee of {{percentage}}% is automatically factored into this quote": "",
+  "Provider fee": "",
+  "SubWallet fee": "",
+  "Swap fees": "",
+  "Estimated total fee": "",
+  "Transaction summary": ""
 }
