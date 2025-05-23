@@ -117,6 +117,14 @@ export function getChainflipSwap (isTestnet: boolean) {
   }
 }
 
+export function getAssetsUrl (isTestnet: boolean) {
+  if (isTestnet) {
+    return 'https://perseverance.chainflip-broker.io/assets';
+  } else {
+    return 'https://chainflip-broker.io/assets';
+  }
+}
+
 export function getBridgeStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.BRIDGE,
