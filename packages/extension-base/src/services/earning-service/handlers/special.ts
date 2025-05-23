@@ -6,7 +6,8 @@ import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/
 import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -271,31 +272,21 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const symbol = altInputTokenInfo.symbol;
           const networkName = altChainInfo.name;
 
-          const xcmOriginSubstrateApi = await this.state.getSubstrateApi(altInputTokenInfo.originChain).isReady;
-          const id = getId();
-          const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
-          const xcmRequest = {
-            sender: address,
-            originTokenInfo: altInputTokenInfo,
-            destinationTokenInfo: inputTokenInfo,
-            sendingValue: bnAmount.toString(),
-            recipient: address,
-            destinationChain: this.chainInfo,
-            originChain: altChainInfo,
-            substrateApi: xcmOriginSubstrateApi,
-            feeInfo
-          };
-
           // TODO: calculate fee for destination chain
-          let xcmFee;
+          const xcmFeeInfo = await estimateXcmFee({
+            fromChainInfo: altChainInfo,
+            fromTokenInfo: altInputTokenInfo,
+            toChainInfo: this.chainInfo,
+            recipient: address,
+            sender: address,
+            value: bnAmount.toString()
+          });
 
-          const xcmFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
-
-          if (xcmFeeByDryRun.fee) {
-            xcmFee = BigN(xcmFeeByDryRun.fee).multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
-          } else {
+          if (!xcmFeeInfo) {
             throw new Error('Error estimating XCM fee');
           }
+
+          const xcmFee = BigN(xcmFeeInfo.origin.fee).multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
 
           const fee: YieldTokenBaseInfo = {
             slug: altInputTokenSlug,
