@@ -1,10 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-koni-ui/connector';
+import { SubstrateECDSALedger } from '@subwallet/extension-koni-ui/connector/Ledger/SubstrateECDSALedger';
 import { isLedgerCapable, ledgerIncompatible, NotNeedMigrationGens } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { Ledger, SignMessageLedger, SignTransactionLedger } from '@subwallet/extension-koni-ui/types';
@@ -78,7 +79,9 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
       }
     }
   } else {
-    if (!forceMigration) {
+    if (def.scheme === LEDGER_SCHEME.ECDSA) {
+      return new SubstrateECDSALedger('webusb', def.slip44, def.scheme);
+    } else if (!forceMigration) {
       return new SubstrateLegacyLedger('webusb', def.network);
     } else {
       if (NotNeedMigrationGens.includes(def.genesisHash)) {

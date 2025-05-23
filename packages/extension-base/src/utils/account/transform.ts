@@ -89,6 +89,8 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
         if (meta.isHardware) {
           if (meta.isGeneric) {
             return AccountSignMode.GENERIC_LEDGER;
+          } else if (meta.isSubstrateECDSA) {
+            return AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
           } else {
             return AccountSignMode.LEGACY_LEDGER;
           }
@@ -380,6 +382,12 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     }
 
     return result;
+  } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
+    const result: ExtrinsicType[] = [];
+
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+
+    return result;
   }
 
   return [];
@@ -506,6 +514,7 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
   switch (accountSignMode) {
     case AccountSignMode.GENERIC_LEDGER:
     case AccountSignMode.LEGACY_LEDGER:
+    case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
       return AccountProxyType.LEDGER;
     case AccountSignMode.QR:
       return AccountProxyType.QR;
@@ -623,6 +632,7 @@ export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPai
           switch (account.signMode) {
             case AccountSignMode.GENERIC_LEDGER:
             case AccountSignMode.LEGACY_LEDGER:
+            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
               specialChain = account.specialChain;
               break;
           }

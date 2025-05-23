@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionType, ValidateRecipientParams, ValidationCondition } from '@subwallet/extension-base/core/types';
-import { _isAddress, _isNotDuplicateAddress, _isNotNull, _isSupportLedgerAccount, _isValidAddressForEcosystem, _isValidCardanoAddressFormat, _isValidSubstrateAddressFormat, _isValidTonAddressFormat } from '@subwallet/extension-base/core/utils';
+import { _isAddress, _isNotDuplicateAddress, _isNotNull, _isSupportLedgerAccount, _isValidAddressForEcosystem, _isValidCardanoAddressFormat, _isValidEvmAddressFormat, _isValidSubstrateAddressFormat, _isValidTonAddressFormat } from '@subwallet/extension-base/core/utils';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
@@ -38,6 +38,10 @@ function getConditions (validateRecipientParams: ValidateRecipientParams): Valid
 
     if (account.signMode === AccountSignMode.LEGACY_LEDGER) {
       conditions.push(ValidationCondition.IS_VALID_SUBSTRATE_ADDRESS_FORMAT);
+    }
+
+    if (account.signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+      conditions.push(ValidationCondition.IS_VALID_EVM_ADDRESS_FORMAT);
     }
   }
 
@@ -81,6 +85,12 @@ function getValidationFunctions (conditions: ValidationCondition[]): Array<(vali
 
       case ValidationCondition.IS_VALID_CARDANO_ADDRESS_FORMAT: {
         validationFunctions.push(_isValidCardanoAddressFormat);
+
+        break;
+      }
+
+      case ValidationCondition.IS_VALID_EVM_ADDRESS_FORMAT: {
+        validationFunctions.push(_isValidEvmAddressFormat);
 
         break;
       }

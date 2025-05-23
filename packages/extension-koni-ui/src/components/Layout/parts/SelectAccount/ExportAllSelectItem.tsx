@@ -1,10 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types';
+import { isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
@@ -37,7 +38,15 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
     onClick,
     showUnSelectedIcon } = props;
 
-  const { accountType, chainTypes, id: accountProxyId, name: accountName } = useMemo(() => accountProxy, [accountProxy]);
+  const { accountType, id: accountProxyId, name: accountName } = useMemo(() => accountProxy, [accountProxy]);
+
+  const chainTypes = useMemo(() => {
+    if (isSubstrateEcdsaAccountProxy(accountProxy)) {
+      return [AccountChainType.SUBSTRATE];
+    }
+
+    return accountProxy.chainTypes;
+  }, [accountProxy]);
 
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const _onSelect = useCallback(() => {

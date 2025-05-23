@@ -90,6 +90,10 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     return accounts.filter(({ address }) => !isAccountAll(address));
   }, [accounts]);
 
+  const substrateEcdsaAddresses = useMemo(() =>
+    accounts.filter((ac) => ac.isSubstrateECDSA)
+      .map(({ address }) => address), [accounts]);
+
   useEffect(() => {
     if (currentAuth) {
       if (!currentAuth.isAllowed) {
@@ -100,8 +104,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const types = currentAuth.accountAuthTypes || ['substrate'];
         const allowedMap = currentAuth.isAllowedMap;
 
-        const filterType = (address: string) => {
-          return isAddressAllowedWithAuthType(address, types);
+        const filterType = (address: string, isSubstrateECDSA?: boolean) => {
+          return isAddressAllowedWithAuthType(address, types, isSubstrateECDSA);
         };
 
         let accountToCheck = noAllAccounts;
@@ -113,15 +117,15 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const idProxiesCanConnect = new Set<string>();
         const allowedIdProxies = new Set<string>();
 
-        accountToCheck.forEach(({ address, proxyId }) => {
-          if (filterType(address) && proxyId) {
+        accountToCheck.forEach(({ address, isSubstrateECDSA, proxyId }) => {
+          if (filterType(address, isSubstrateECDSA) && proxyId) {
             idProxiesCanConnect.add(proxyId);
           }
         });
 
         Object.entries(allowedMap)
           .forEach(([address, value]) => {
-            if (filterType(address)) {
+            if (filterType(address, substrateEcdsaAddresses.includes(address))) {
               const account = accountToCheck.find(({ address: accAddress }) => accAddress === address);
 
               if (account?.proxyId && value) {
@@ -159,7 +163,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       setConnected(0);
       setConnectionState(ConnectionStatement.NOT_CONNECTED);
     }
-  }, [currentAccountProxy, currentAuth, isAllAccount, noAllAccounts]);
+  }, [currentAccountProxy, currentAuth, isAllAccount, noAllAccounts, substrateEcdsaAddresses]);
 
   const visibleText = useMemo((): string => {
     switch (connectionState) {
