@@ -67,6 +67,7 @@ export function determineUtxosForSpendAll ({ feeRate,
   if (!validateBitcoinAddress(recipient)) {
     throw new Error('Cannot calculate spend of invalid address type');
   }
+  // TODO: Prevent dust limit when transferring all
 
   const recipients = [recipient];
 
@@ -105,6 +106,15 @@ export function determineUtxosForSpend ({ amount,
   utxos }: DetermineUtxosForSpendArgs) {
   if (!validateBitcoinAddress(recipient)) {
     throw new Error('Cannot calculate spend of invalid address type');
+  }
+
+  const recipientAddressInfo = getBitcoinAddressInfo(recipient);
+  const recipientDustLimit = BTC_DUST_AMOUNT[recipientAddressInfo.type] || 546;
+
+  if (amount < recipientDustLimit) {
+    throw new Error(
+      `Transfer amount ${amount} satoshis is below dust limit (${recipientDustLimit} satoshis for ${recipientAddressInfo.type})`
+    );
   }
 
   const orderedUtxos = utxos.sort((a, b) => b.value - a.value);
@@ -156,12 +166,32 @@ export function determineUtxosForSpend ({ amount,
     throw new InsufficientFundsError();
   }
 
+  const senderAddressInfo = getBitcoinAddressInfo(sender);
+  const dustLimit = BTC_DUST_AMOUNT[senderAddressInfo.type] || 546;
+
   const outputs = [
     // outputs[0] = the desired amount going to recipient
-    { value: amount, address: recipient },
-    // outputs[1] = the remainder to be returned to a change address
-    { value: amountLeft.toNumber(), address: sender }
+    { value: amount, address: recipient }
   ];
+
+  if (amountLeft.gte(dustLimit)) {
+    // outputs[1] = the remainder to be returned to a change address
+    outputs.push({ value: amountLeft.toNumber(), address: sender });
+  } else {
+    console.warn(
+      `Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output and adding to fee.`
+    );
+    // Increase the fee to use the remaining balance
+    const newFee = sum.minus(amount).toNumber();
+
+    return {
+      filteredUtxos,
+      inputs: neededUtxos,
+      outputs,
+      size: sizeInfo.txVBytes,
+      fee: newFee
+    };
+  }
 
   return {
     filteredUtxos,
