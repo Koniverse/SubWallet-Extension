@@ -56,7 +56,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     )
     : [];
 
-  const authTypeFilter = ({ type }: SingleAddress) => {
+  const authTypeFilter = ({ json: { meta }, type }: SingleAddress) => {
     if (accountAuthTypes) {
       if (!type) {
         return false;
@@ -69,7 +69,9 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         cardano: CardanoKeypairTypes
       };
 
-      return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
+      const subCondition = (authType: AccountAuthType) => authType === 'substrate' && meta.isSubstrateECDSA;
+
+      return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type) || subCondition(authType));
     } else {
       return true;
     }

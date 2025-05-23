@@ -205,8 +205,12 @@ export const ledgerGenericAccountProblemCheck = (accountProxy: AccountProxy | nu
   }
 };
 
-export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?: AccountAuthType[]) => {
+export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?: AccountAuthType[], isSubstrateECDSA?: boolean) => {
   if (isEthereumAddress(address) && authAccountTypes?.includes('evm')) {
+    return true;
+  }
+
+  if (isEthereumAddress(address) && authAccountTypes?.includes('substrate') && isSubstrateECDSA) {
     return true;
   }
 

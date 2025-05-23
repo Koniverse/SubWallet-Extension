@@ -37,22 +37,25 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
 
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  const accounts = useSelector((state: RootState) => state.accountState.accounts);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   // const [oldConnected, setOldConnected] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
   const { token } = useTheme() as Theme;
   const _isNotConnected = isNotConnected || !authInfo;
-
+  const substrateEcdsaAddresses = useMemo(() =>
+    accounts.filter((ac) => ac.isSubstrateECDSA)
+      .map(({ address }) => address), [accounts]);
   const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
       setAllowedMap((values) => {
         const newValues = { ...values };
-        const listAddress = accountProxy.accounts.map(({ address }) => address);
+        const listAddress = accountProxy.accounts
+          .map(({ address, isSubstrateECDSA }) => ({ address, isSubstrateECDSA }))
+          .filter(({ address, isSubstrateECDSA }) => isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || [], isSubstrateECDSA));
 
-        listAddress.forEach((address) => {
-          const addressIsValid = isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []);
-
-          addressIsValid && (newValues[address] = !oldValue);
+        listAddress.forEach(({ address }) => {
+          newValues[address] = !oldValue;
         });
 
         return newValues;
@@ -92,7 +95,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       const allowedMap = authInfo.isAllowedMap;
 
       const filterType = (address: string) => {
-        return isAddressAllowedWithAuthType(address, types);
+        return isAddressAllowedWithAuthType(address, types, substrateEcdsaAddresses.includes(address));
       };
 
       const result: Record<string, boolean> = {};
@@ -109,7 +112,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       // setOldConnected(0);
       setAllowedMap({});
     }
-  }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap]);
+  }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap, substrateEcdsaAddresses]);
 
   const actionButtons = useMemo(() => {
     if (_isNotConnected) {
