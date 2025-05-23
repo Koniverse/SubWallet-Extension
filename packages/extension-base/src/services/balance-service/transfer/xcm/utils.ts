@@ -64,7 +64,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const paraSpellEndpoint = 'https://api.lightspell.xyz/v2';
+const paraSpellEndpoint = 'https://api.lightspell.xyz/v3';
 
 const paraSpellApi = {
   buildXcm: `${paraSpellEndpoint}/x-transfer`,
