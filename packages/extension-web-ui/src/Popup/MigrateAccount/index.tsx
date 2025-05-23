@@ -15,7 +15,7 @@ import { ModalContext } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { EnterPasswordModal, enterPasswordModalId } from './EnterPasswordModal';
@@ -39,6 +39,7 @@ function Component ({ className = '' }: Props) {
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { setTitle, setWebBaseClassName } = useContext(WebUIContext);
   const { goHome } = useDefaultNavigate();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [resultProxyIds, setResultProxyIds] = useState<string[]>([]);
@@ -69,9 +70,9 @@ function Component ({ className = '' }: Props) {
   const onClickDismiss = useCallback(() => {
     (async () => {
       await onInteractAction();
-      goHome();
+      isMigrationNotion ? goHome() : navigate('/settings/account-settings');
     })().catch(console.error);
-  }, [goHome, onInteractAction]);
+  }, [goHome, isMigrationNotion, navigate, onInteractAction]);
 
   const onClickMigrateNow = useCallback(() => {
     (async () => {

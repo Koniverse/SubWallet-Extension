@@ -624,6 +624,11 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       }
     },
 
+    '.link': {
+      color: token.colorLink,
+      cursor: 'pointer'
+    },
+
     'td.__percentage-col': {
       verticalAlign: 'top',
 
@@ -698,6 +703,10 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
         }
       }
     },
+
+    '.ton-solo-acc-alert-area': {
+    marginBottom: token.marginXS
+  },
 
     '.tokens-upper-block': {
       flex: 1,

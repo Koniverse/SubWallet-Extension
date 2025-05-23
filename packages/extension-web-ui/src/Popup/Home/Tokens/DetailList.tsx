@@ -759,6 +759,11 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       }
     },
 
+    '.link': {
+      color: token.colorLink,
+      cursor: 'pointer'
+    },
+
     '.__upper-block-placeholder': {
       paddingTop: 486
     },
