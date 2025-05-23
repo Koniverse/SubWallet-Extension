@@ -1311,6 +1311,20 @@ export interface BitcoinAppState {
   listenEvents?: string[]
 }
 
+export type BitcoinDAppAddress = {
+  address: string;
+  publicKey?: string;
+  tweakedPublicKey?: string;
+  derivationPath?: string;
+  isTestnet?: boolean;
+  type: 'p2tr' | 'p2wpkh' | 'p2sh' | 'ethereum' | 'unknown';
+}
+
+export type BitcoinRequestAddressesResult = {
+  addresses: BitcoinDAppAddress[];
+};
+
+
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
 export type CardanoSendTransactionRequest = CardanoTransactionConfig;
