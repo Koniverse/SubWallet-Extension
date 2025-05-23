@@ -178,19 +178,25 @@ export function determineUtxosForSpend ({ amount,
     // outputs[1] = the remainder to be returned to a change address
     outputs.push({ value: amountLeft.toNumber(), address: sender });
   } else {
-    console.warn(
-      `Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output and adding to fee.`
-    );
-    // Increase the fee to use the remaining balance
-    const newFee = sum.minus(amount).toNumber();
+    // Todo: This solution for improve later, current throw error
 
-    return {
-      filteredUtxos,
-      inputs: neededUtxos,
-      outputs,
-      size: sizeInfo.txVBytes,
-      fee: newFee
-    };
+    // console.warn(
+    //   `Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output and adding to fee.`
+    // );
+    // // Increase the fee to use the remaining balance
+    // const newFee = sum.minus(amount).toNumber();
+    //
+    // return {
+    //   filteredUtxos,
+    //   inputs: neededUtxos,
+    //   outputs,
+    //   size: sizeInfo.txVBytes,
+    //   fee: newFee
+    // };
+
+    throw new Error(
+      `The change output (${amountLeft.toString()} satoshis) is below the dust limit (${dustLimit} satoshis for ${senderAddressInfo.type})`
+    );
   }
 
   return {
