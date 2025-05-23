@@ -42,13 +42,19 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
     setTimeout(() => {
       onSubmit(values[FormFieldName.PASSWORD])
         .catch((e: Error) => {
-          onError(e.message);
+          let message = e.message;
+
+          if (message === 'Invalid master password') {
+            message = t('common.Input.password.Error.invalid');
+          }
+
+          onError(message);
         })
         .finally(() => {
           setLoading(false);
         });
     }, 500);
-  }, [onError, onSubmit]);
+  }, [onError, onSubmit, t]);
 
   useFocusById(passwordInputId);
 
@@ -84,16 +90,16 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
             loading={loading}
             onClick={form.submit}
           >
-            {t('Continue')}
+            {t('common.Button.continue')}
           </Button>
         </>
       )}
       id={enterPasswordModalId}
-      title={t('Enter password')}
+      title={t('settings.Screen.migrateAccount.Modal.enterPassword.title')}
       zIndex={9999}
     >
       <div className='__brief'>
-        {t('Enter your SubWallet password to continue')}
+        {t('settings.Screen.migrateAccount.Modal.enterPassword.description')}
       </div>
 
       <Form
@@ -105,7 +111,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           name={FormFieldName.PASSWORD}
           rules={[
             {
-              message: t('Password is required'),
+              message: t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.Error.required'),
               required: true
             }
           ]}
@@ -114,8 +120,8 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           <Input.Password
             containerClassName='__password-input'
             id={passwordInputId}
-            label={t('Password')}
-            placeholder={t('Enter password')}
+            label={t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.label')}
+            placeholder={t('settings.Screen.migrateAccount.Modal.enterPassword.Input.password.placeholder')}
             suffix={<span />}
           />
         </Form.Item>

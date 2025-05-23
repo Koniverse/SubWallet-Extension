@@ -41,13 +41,13 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               onClick={onClickActionButton}
             >
-              {t('Reload view')}
+              {t('common.Modal.accountMigrationInProgressWarning.Button.reloadView')}
             </Button>
           </>
         }
         id={modalId}
         maskClosable={false}
-        title={t('Migration in progress')}
+        title={t('common.Modal.accountMigrationInProgressWarning.title')}
         zIndex={1000000}
       >
         <div className='__modal-content'>
@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
 
-          {t('You can\'t perform any action in Expand view while account migration is in progress. Reopen SubWallet extension to complete migration, then reload to continue using Expand view')}
+          {t('common.Modal.accountMigrationInProgressWarning.content')}
         </div>
       </SwModal>
     </>
