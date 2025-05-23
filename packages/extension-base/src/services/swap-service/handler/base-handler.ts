@@ -441,7 +441,7 @@ export class SwapBaseHandler {
       const isEvmAddress = isEthereumAddress(recipient);
       const isEvmDestChain = _isChainEvmCompatible(swapToChain);
 
-      if (isEvmAddress !== isEvmDestChain) {
+      if (isEvmAddress !== isEvmDestChain) { // todo: update condition if support swap chain # EVM or Substrate
         return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
       }
     }
