@@ -231,6 +231,10 @@ export class UniswapHandler implements SwapBaseInterface {
 
   async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     /**
+     * Explain: All processes will go through one of below processes. If a step do not have, it returns undefined and
+     * the stepIndex is still counted up
+     *
+     * Processes:
      * approve - permit - swap or
      * approve - permit - swap - approve - bridge or
      * approve - bridge - approve - permit - swap
@@ -504,6 +508,10 @@ export class UniswapHandler implements SwapBaseInterface {
   async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     const { path, request, selectedQuote } = params;
     /**
+     * Explain: All processes will go through one of below processes. If a step do not have, it returns undefined and
+     * the stepIndex is still counted up
+     *
+     * Processes:
      * approve - permit - swap or
      * approve - permit - swap - approve - bridge or
      * approve - bridge - approve - permit - swap
