@@ -6,6 +6,7 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
+import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -412,6 +413,22 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const notifyNoQuote = useCallback(() => {
     notify({
       message: t('Swap pair not supported. Select another pair and try again'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
+  const notifyTooLowAmount = useCallback(() => {
+    notify({
+      message: t('Amount too low. Increase your amount and try again'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
+  const notifyTooHighAmount = useCallback(() => {
+    notify({
+      message: t('Amount too high. Lower your amount and try again'),
       type: 'error',
       duration: 5
     });
@@ -874,6 +891,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 notifyNoQuote();
               }
 
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+                notifyTooLowAmount();
+              }
+
+              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+                notifyTooHighAmount();
+              }
+
               setHandleRequestLoading(false);
             }
           });
@@ -893,7 +918,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -915,6 +940,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
           if (e.message.toLowerCase().startsWith('swap pair is not found')) {
             notifyNoQuote();
+          }
+
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+            notifyTooLowAmount();
+          }
+
+          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+            notifyTooHighAmount();
           }
         }).finally(() => {
           if (sync) {
@@ -958,7 +991,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {

@@ -146,6 +146,10 @@ const Welcome = styled(Component)<Props>(({ theme: { token } }: Props) => {
       top: 0
     },
 
+    '.-side-panel-mode & .bg-image': {
+      backgroundSize: 'cover'
+    },
+
     '.body-container': {
       padding: `${token.sizeLG * 3}px ${token.padding}px ${token.sizeXL}px`,
       textAlign: 'center',
