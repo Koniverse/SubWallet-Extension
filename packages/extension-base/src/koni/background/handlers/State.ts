@@ -11,7 +11,7 @@ import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/ba
 import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
-import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import BuyService from '@subwallet/extension-base/services/buy-service';
@@ -1312,19 +1312,16 @@ export default class KoniState {
 
     const validationSteps: ValidateStepFunction[] =
       [
-        validationAuthMiddleware,
+        validationAuthCardanoMiddleware,
         validationCardanoSignDataMiddleware
       ];
 
     const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
 
-    if (!isSameAddress(address, currentAddress)) {
-      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED);
-    }
-
     const errorsFormated = convertErrorFormat(result.errors);
     const payloadAfterValidated: CardanoSignatureRequest = {
       ...result.payloadAfterValidated as CardanoSignatureRequest,
+      currentAddress,
       errors: errorsFormated,
       id
     };
@@ -1442,8 +1439,6 @@ export default class KoniState {
       }
     }
 
-    transactionValue = transactionValue.checked_sub(CardanoWasm.Value.new(tx.body().fee()));
-
     const transactionBody = tx.body();
     const getSpecificUtxo = this.chainService.getSpecificUtxo.bind(this);
 
@@ -1460,10 +1455,8 @@ export default class KoniState {
     const pair = keyring.getPair(currentAddress);
 
     if (pair) {
-      const publicKey = CardanoWasm.Bip32PublicKey.from_bytes(pair.publicKey);
-
-      const paymentPubKey = publicKey.derive(0).derive(0).to_raw_key().hash().to_hex();
-      const stakePubKey = publicKey.derive(2).derive(0).to_raw_key().hash().to_hex();
+      const paymentPubKey = CardanoWasm.Bip32PublicKey.from_hex(pair.cardano.paymentPubKey).to_raw_key().hash().to_hex();
+      const stakePubKey = CardanoWasm.Bip32PublicKey.from_hex(pair.cardano.stakePubKey).to_raw_key().hash().to_hex();
 
       keyHashAddressMap[paymentPubKey] = 'payment';
       keyHashAddressMap[stakePubKey] = 'stake';
