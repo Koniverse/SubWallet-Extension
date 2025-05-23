@@ -9450,14 +9450,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zondax/ledger-substrate@npm:1.1.1":
-  version: 1.1.1
-  resolution: "@zondax/ledger-substrate@npm:1.1.1"
+"@zondax/ledger-substrate@npm:1.1.2":
+  version: 1.1.2
+  resolution: "@zondax/ledger-substrate@npm:1.1.2"
   dependencies:
     "@ledgerhq/hw-transport": 6.31.4
     "@zondax/ledger-js": ^1.2.0
     axios: ^1.8.4
-  checksum: 00fb7033955fb77ee7b41a78e9719b7a1c80f99945d63df935429ccadcd1eaf00fc5e90b9f3e7bac647e562b9e57b93d2d90e3edaa390ca384d33aeee362f5ec
+  checksum: 0f9e30f70c49a87496f07a4b074f6d130e21a1c937a455be4138a5e9568ec3f673c28a05bcf87ed9972804f429f0379d3ecf22464eb9dbc8937bbcc822133d55
   languageName: node
   linkType: hard
 

@@ -9,7 +9,7 @@ import { GenericeResponseAddress } from '@zondax/ledger-substrate/dist/common';
 import { LEDGER_SUCCESS_CODE } from '@polkadot/hw-ledger/constants';
 import { AccountOptions, LedgerAddress, LedgerSignature, LedgerVersion } from '@polkadot/hw-ledger/types';
 import { transports } from '@polkadot/hw-ledger-transports';
-import { hexAddPrefix, hexStripPrefix, u8aConcat, u8aToHex } from '@polkadot/util';
+import { hexAddPrefix, hexStripPrefix, u8aToHex } from '@polkadot/util';
 
 import { BaseLedger } from './BaseLedger';
 
@@ -70,20 +70,13 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
   async signTransaction (message: Uint8Array, metadata: Uint8Array, accountOffset?: number, addressOffset?: number, accountOptions?: Partial<AccountOptions>): Promise<LedgerSignature> {
     return this.withApp(async (app): Promise<LedgerSignature> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
+      const rs = this.scheme === LEDGER_SCHEME.ECDSA
+        ? await this.wrapError(app.signWithMetadataEcdsa(path, Buffer.from(message), Buffer.from(metadata)))
+        : await this.wrapError(app.signWithMetadataEd25519(path, Buffer.from(message), Buffer.from(metadata)));
 
-      if (this.scheme === LEDGER_SCHEME.ECDSA) {
-        const { r, s, v } = await this.wrapError(app.signWithMetadataEcdsa(path, Buffer.from(message), Buffer.from(metadata)));
-
-        return {
-          signature: hexAddPrefix(u8aToHex(u8aConcat(r, s, v)))
-        };
-      } else {
-        const rs = await this.wrapError((app.signWithMetadataEd25519(path, Buffer.from(message), Buffer.from(metadata))));
-
-        return {
-          signature: hexAddPrefix(u8aToHex(rs.signature))
-        };
-      }
+      return {
+        signature: hexAddPrefix(u8aToHex(rs.signature))
+      };
     });
   }
 
@@ -92,10 +85,10 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
 
       if (this.scheme === LEDGER_SCHEME.ECDSA) {
-        const { r, s, v } = await this.wrapError(app.signRawEcdsa(path, Buffer.from(message)));
+        const result = await this.wrapError(app.signRawEcdsa(path, Buffer.from(message)));
 
         return {
-          signature: hexAddPrefix(u8aToHex(u8aConcat(r, s, v)))
+          signature: hexAddPrefix(u8aToHex(result.signature))
         };
       } else {
         const rs = await this.wrapError(app.signRawEd25519(path, Buffer.from(wrapBytes(message))));
