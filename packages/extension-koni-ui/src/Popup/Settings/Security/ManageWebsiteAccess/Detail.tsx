@@ -6,6 +6,7 @@ import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/
 import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
 import { AccountProxyItem, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components/Modal/ActionModal';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { changeAuthorization, changeAuthorizationPerSite, forgetSite, toggleAuthorization } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -14,7 +15,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
 import { convertAuthorizeTypeToChainTypes, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
-import { GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
+import { ArrowsLeftRight, GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -49,6 +50,7 @@ const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?
 function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const [pendingMap, setPendingMap] = useState<Record<string, boolean>>({});
+  const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
@@ -70,6 +72,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
 
   const actions: ActionItemType[] = useMemo(() => {
     const isAllowed = authInfo.isAllowed;
+    const isEvmAuthorize = authInfo.accountAuthTypes.includes('evm');
 
     const result: ActionItemType[] = [
       {
@@ -121,10 +124,29 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           }
         }
       );
+
+      if (isEvmAuthorize) {
+        result.push({
+          key: 'switch-network',
+          icon: ArrowsLeftRight,
+          iconBackgroundColor: token['geekblue-6'],
+          title: t('Switch network'),
+          onClick: () => {
+            switchNetworkAuthorizeModal.open(
+              {
+                authUrlInfo: authInfo,
+                onComplete: (list) => {
+                  updateAuthUrls(list);
+                }
+              }
+            );
+          }
+        });
+      }
     }
 
     return result;
-  }, [authInfo.isAllowed, onCloseActionModal, origin, t, token]);
+  }, [authInfo, onCloseActionModal, origin, switchNetworkAuthorizeModal, t, token]);
 
   const renderItem = useCallback((item: AccountProxy) => {
     const isEnabled: boolean = item.accounts.some((account) => authInfo.isAllowedMap[account.address]);

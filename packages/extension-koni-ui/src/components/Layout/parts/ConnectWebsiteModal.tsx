@@ -6,14 +6,16 @@ import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountProxyItem } from '@subwallet/extension-koni-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Confirmation/ConfirmationGeneralInfo';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, NetworkItem, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { CaretRight, CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
@@ -34,15 +36,19 @@ type ConnectIcon = {
 
 function Component ({ authInfo, className = '', id, isBlocked = true, isNotConnected = false, onCancel, url }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-
+  const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const accounts = useSelector((state: RootState) => state.accountState.accounts);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   // const [oldConnected, setOldConnected] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const { token } = useTheme() as Theme;
   const _isNotConnected = isNotConnected || !authInfo;
+  const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
+  const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap.evm, chainInfoMap]);
+
   const substrateEcdsaAddresses = useMemo(() =>
     accounts.filter((ac) => ac.isSubstrateECDSA)
       .map(({ address }) => address), [accounts]);
@@ -62,6 +68,18 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       });
     };
   }, [authInfo?.accountAuthTypes]);
+
+  const openSwitchNetworkAuthorizeModal = useCallback(() => {
+    authInfo && switchNetworkAuthorizeModal.open(
+      {
+        authUrlInfo: authInfo,
+        onComplete: (list) => {
+          updateAuthUrls(list);
+        },
+        needsTabAuthCheck: true
+      }
+    );
+  }, [authInfo, switchNetworkAuthorizeModal]);
 
   const handlerSubmit = useCallback(() => {
     if (!isSubmit && authInfo?.id) {
@@ -311,6 +329,27 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       onCancel={onCancel}
       title={t('Connect website')}
     >
+      {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
+        <div className={'__switch-network-authorize-label'}>
+          {t('Switch network')}
+        </div>
+        <NetworkItem
+          name={currentEvmNetworkInfo.name}
+          networkKey={currentEvmNetworkInfo.slug}
+          networkMainLogoShape='circle'
+          networkMainLogoSize={20}
+          onPressItem={openSwitchNetworkAuthorizeModal}
+          rightItem={<div className={'__check-icon'}>
+            <Icon
+              className='__right-icon'
+              customSize={'16px'}
+              phosphorIcon={CaretRight}
+              type='phosphor'
+            />
+          </div>}
+        />
+      </div>}
+
       <ConfirmationGeneralInfo
         request={{
           id: url,
@@ -407,6 +446,56 @@ export const ConnectWebsiteModal = styled(Component)<Props>(({ theme: { token } 
 
       '.ant-btn + .ant-btn.ant-btn': {
         marginInlineStart: token.sizeSM
+      }
+    },
+
+    '.__switch-network-authorize-item': {
+      display: 'flex',
+      gap: token.sizeXS,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: token.margin,
+
+      '.__switch-network-authorize-label': {
+        fontWeight: 500,
+        fontSize: token.fontSizeHeading6,
+        lineHeight: token.lineHeightHeading6
+      },
+
+      '.ant-network-item': {
+        borderRadius: token.borderRadiusXL,
+
+        '.ant-web3-block-middle-item': {
+          width: 'fit-content'
+        },
+
+        '.ant-network-item-content': {
+          paddingLeft: token.paddingSM,
+          paddingRight: token.paddingSM,
+          paddingTop: token.paddingXS,
+          paddingBottom: token.paddingXS,
+          borderRadius: token.borderRadiusXL
+        },
+
+        '.ant-network-item-name': {
+          fontWeight: 600,
+          fontSize: token.fontSizeHeading6,
+          marginRight: token.marginXXS
+        },
+
+        '.ant-web3-block-left-item': {
+          paddingRight: token.paddingXXS,
+
+          '.ant-image': {
+            height: 20,
+            display: 'flex',
+            alignItems: 'center'
+          }
+        },
+
+        '.ant-web3-block-right-item': {
+          marginRight: 0
+        }
       }
     }
   });

@@ -23,8 +23,8 @@ import { AnyJson, Registry } from '@polkadot/types/types';
 
 export interface _DataMap {
   chainInfoMap: Record<string, _ChainInfo>,
-  chainStateMap: Record<string, _ChainState>,
   assetRegistry: Record<string, _ChainAsset>,
+  chainStateMap: Record<string, _ChainState>,
   assetRefMap: Record<string, _AssetRef>
 }
 

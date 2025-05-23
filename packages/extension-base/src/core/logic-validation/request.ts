@@ -11,6 +11,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
+import { validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { isCardanoAddress, isSubstrateAddress } from '@subwallet/keyring';
@@ -664,7 +665,7 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
 }
 
 export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
-  const { address, errors, pair: pair_ } = payload_;
+  const { address, authInfo, errors, pair: pair_, type } = payload_;
   const payload = payload_.payloadAfterValidated as DataMessageParam;
   const { promise, resolve } = createPromiseHandler<PayloadValidated>();
   let canSign = false;
@@ -685,6 +686,17 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
 
   if (!isCardanoAddress(address)) {
     handleError('Not found cardano address');
+  }
+
+  const currentCardanoNetwork = koni.requestService.getDAppChainInfo({
+    autoActive: true,
+    accessType: 'cardano',
+    defaultChain: authInfo?.currentNetworkMap[type],
+    url
+  });
+
+  if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+    handleError('Invalid address network');
   }
 
   const pair = pair_ || keyring.getPair(address);
