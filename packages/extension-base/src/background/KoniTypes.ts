@@ -1166,6 +1166,7 @@ export interface TonSignatureRequest extends TonSignRequest {
 export interface CardanoSignatureRequest extends CardanoSignRequest {
   id: string;
   errors?: ErrorValidation[];
+  currentAddress: string;
   payload: unknown
 }
 
@@ -2435,6 +2436,7 @@ export interface KoniRequestSignatures {
   'cardano(account.get.address)': [null, string[]];
   'cardano(account.get.balance)': [null, Cbor];
   'cardano(account.get.change.address)': [null, string];
+  'cardano(account.get.reward.address)': [null, string[]];
   'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[] | null];
   'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[] | null];
   'cardano(network.get.current)': [null, number];

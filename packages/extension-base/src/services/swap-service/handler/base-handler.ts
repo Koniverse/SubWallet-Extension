@@ -219,7 +219,8 @@ export class SwapBaseHandler {
 
         if (needEditAmount) {
           bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
-        } else {
+        } else { // todo: remove
+          console.log('The code cannot run into here, if it runs into here, pls ask dev to check');
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
       }
@@ -440,7 +441,7 @@ export class SwapBaseHandler {
       const isEvmAddress = isEthereumAddress(recipient);
       const isEvmDestChain = _isChainEvmCompatible(swapToChain);
 
-      if ((isEvmAddress && !isEvmDestChain) || (!isEvmAddress && isEvmDestChain)) { // todo: update this condition
+      if (isEvmAddress !== isEvmDestChain) { // todo: update condition if support swap chain # EVM or Substrate
         return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
       }
     }
