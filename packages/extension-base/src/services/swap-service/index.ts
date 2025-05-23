@@ -50,7 +50,7 @@ export class SwapService implements StoppableServiceInterface {
   private async askProvidersForQuote (_request: SwapRequestV2) {
     const availableQuotes: QuoteAskResponse[] = [];
 
-    // hotfix
+    // hotfix // todo: remove later
     const request = {
       ..._request,
       isSupportKyberVersion: true
