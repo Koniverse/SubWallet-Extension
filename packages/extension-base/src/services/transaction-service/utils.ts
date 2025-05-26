@@ -49,6 +49,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
+  if (explorerLink.includes('polimec.statescan.io')) {
+    return '#/accounts';
+  }
+
   if (explorerLink.includes('explorer.zkverify.io')) {
     return 'account';
   }
@@ -77,7 +81,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['invarch', 'tangle'].includes(chainInfo.slug)) {
+  if (['invarch', 'tangle', 'polimec'].includes(chainInfo.slug)) {
     return '#/extrinsics';
   }
 
