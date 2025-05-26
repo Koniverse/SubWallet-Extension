@@ -56,7 +56,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     )
     : [];
 
-  const authTypeFilter = ({ json: { meta }, type }: SingleAddress) => {
+  const authTypeFilter = ({ json, type }: SingleAddress) => {
     if (accountAuthTypes) {
       if (!type) {
         return false;
@@ -69,9 +69,19 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         cardano: CardanoKeypairTypes
       };
 
-      const subCondition = (authType: AccountAuthType) => authType === 'substrate' && meta.isSubstrateECDSA;
+      const subCondition = (authType: AccountAuthType) => authType === 'substrate' && json.meta.isSubstrateECDSA;
+      const isValidTypes = accountAuthTypes.some((authType) => validTypes[authType]?.includes(type) || subCondition(authType));
 
-      return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type) || subCondition(authType));
+      if (!isValidTypes) {
+        return false;
+      }
+
+      // This condition ensures that the resulting UTXOs from the user's transaction are not sent to addresses the wallet cannot manage.
+      if (type === 'cardano' && json.meta.isReadOnly) {
+        return false;
+      }
+
+      return true;
     } else {
       return true;
     }
@@ -1250,8 +1260,8 @@ export default class KoniTabs {
     }
 
     return accountList.map((address) => {
-      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
-      const addressChainFormat = reformatAddress(address, +isTestnet);
+      const isMainnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isMainnet);
 
       return convertCardanoAddressToHex(addressChainFormat);
     });
@@ -1284,10 +1294,38 @@ export default class KoniTabs {
 
     const { address, network } = await this.getCurrentInformationCardanoDapp(url);
 
-    const isTestnet = network !== 'cardano_preproduction';
-    const addressChainFormat = reformatAddress(address, +isTestnet);
+    const isMainnet = network !== 'cardano_preproduction';
+    const addressChainFormat = reformatAddress(address, +isMainnet);
 
     return convertCardanoAddressToHex(addressChainFormat);
+  }
+
+  private async cardanoGetRewardAddress (id: string, url: string): Promise<string[]> {
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
+
+    return accountList.map((address) => {
+      const pair = keyring.getPair(address);
+      const rewardAddress = pair.cardano.rewardAddress;
+      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(rewardAddress, +isTestnet);
+
+      return convertCardanoAddressToHex(addressChainFormat);
+    });
   }
 
   private async cardanoGetCurrentNetworkId (id: string, url: string): Promise<number> {
@@ -1505,6 +1543,8 @@ export default class KoniTabs {
         return await this.cardanoGetAccountBalance(id, url);
       case 'cardano(account.get.change.address)':
         return await this.cardanoGetChangeAddress(id, url);
+      case 'cardano(account.get.reward.address)':
+        return await this.cardanoGetRewardAddress(id, url);
       case 'cardano(account.get.collateral)':
         return await this.cardanoGetCollateral(id, url, request as RequestCardanoGetCollateral);
       case 'cardano(account.get.utxos)':

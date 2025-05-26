@@ -47,7 +47,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   const { token } = useTheme() as Theme;
   const _isNotConnected = isNotConnected || !authInfo;
   const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
-  const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap.evm, chainInfoMap]);
+  const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap?.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap?.evm, chainInfoMap]);
 
   const substrateEcdsaAddresses = useMemo(() =>
     accounts.filter((ac) => ac.isSubstrateECDSA)
