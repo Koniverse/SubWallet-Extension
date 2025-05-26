@@ -26,11 +26,13 @@ interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;
   nominations: NominationInfo[]
   setForceFetchValidator: (val: boolean) => void;
+  disabledButton?: boolean;
+  addresses?: string[];
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', from, loading, modalId
-    , nominations, onChange, setForceFetchValidator, slug } = props;
+  const { addresses, chain, className = '', disabledButton, from
+    , loading, modalId, nominations, onChange, setForceFetchValidator, slug } = props;
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -53,20 +55,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return undefined;
   }, [poolInfo]);
 
-  const { changeValidators,
-    onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
+  const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
 
-  const nominatorValueList = useMemo(() => {
-    return nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)) || [];
-  }, [nominations]);
-
   const resultList = useMemo(() => {
-    const nominatedValidatorAddresses = new Set(nominations.map((n) => n.validatorAddress));
+    if (addresses && addresses.length > 0) {
+      return items.filter((item) => addresses.includes(item.address.trim()));
+    }
 
-    return items.filter((item) => nominatedValidatorAddresses.has(item.address));
-  }, [items, nominations]);
+    const nominatedValidatorAddresses = nominations.map((n) => n.validatorAddress);
+
+    return items.filter((item) => nominatedValidatorAddresses.includes(item.address.trim()));
+  }, [items, nominations, addresses]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chain);
@@ -102,24 +103,21 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
-    const keyBase = key.split('___')[0];
-
-    const selected = changeValidators.includes(key);
-    const nominated = nominatorValueList.includes(key) || nominatorValueList.some((nom) => nom.split('___')[0] === keyBase);
 
     return (
       <StakingValidatorItem
         apy={item?.expectedReturn?.toString() || '0'}
         className={'pool-item'}
-        isNominated={nominated}
-        isSelected={selected}
+        isNominated={false}
+        isSelected={false}
         key={key}
         onClickMoreBtn={onClickMore(item)}
         prefixAddress = {networkPrefix}
+        showUnSelectedIcon={false}
         validatorInfo={item}
       />
     );
-  }, [changeValidators, networkPrefix, nominatorValueList, onClickMore]);
+  }, [networkPrefix, onClickMore]);
 
   return (
     <>
@@ -131,20 +129,22 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             size='md'
           />
         )}
-        footer={(
-          <Button
-            block
-            icon={(
-              <Icon
-                phosphorIcon={Book}
-                weight={'fill'}
-              />
-            )}
-            onClick={onClick}
-          >
-            {t('Change validator')}
-          </Button>
-        )}
+        footer={
+          !disabledButton && (
+            <Button
+              block
+              icon={(
+                <Icon
+                  phosphorIcon={Book}
+                  weight={'fill'}
+                />
+              )}
+              onClick={onClick}
+            >
+              {t('Change validator')}
+            </Button>
+          )
+        }
         id={modalId}
         onCancel={onCancelSelectValidator}
         title={t('Selected validators')}

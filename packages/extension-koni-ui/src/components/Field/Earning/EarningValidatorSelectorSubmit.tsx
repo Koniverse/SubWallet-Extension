@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitJoinNativeStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -17,7 +16,6 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { autoSelectValidatorOptimally } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Form, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -77,7 +75,7 @@ const filterOptions = [
 ];
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', defaultValue, from
+  const { chain, className = '', from
     , isSingleSelect: _isSingleSelect = false,
     items, modalId, nominations
     , onChange, setForceFetchValidator, slug } = props;
@@ -87,6 +85,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const [form] = Form.useForm();
   const onPreCheck = usePreCheckAction(from);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   useExcludeModal(modalId);
@@ -105,10 +104,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
-  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, ChainRecommendValidator>>({});
-
   const maxPoolMembersValue = useMemo(() => {
-    if (poolInfo.type === YieldPoolType.NATIVE_STAKING) { // todo: should also check chain group for pool
+    if (poolInfo.type === YieldPoolType.NATIVE_STAKING) {
       return poolInfo.maxPoolMembers;
     }
 
@@ -150,32 +147,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [t, hasReturn, nominations]);
 
   const { changeValidators,
-    onApplyChangeValidators,
     onCancelSelectValidator,
-    onChangeSelectedValidator,
-    onInitValidators } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
+    onChangeSelectedValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
-  const [autoValidator, setAutoValidator] = useState('');
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const fewValidators = changeValidators.length > 1;
-
-  useEffect(() => {
-    const selectedValidators = changeValidators
-      .map((key) => {
-        const [address] = key.split('___');
-
-        return items.find((item) => item.address === address);
-      })
-      .filter((item): item is ValidatorDataType => !!item)
-      .map((item) => ({
-        ...item
-      }));
-
-    form.setFieldsValue({ target: selectedValidators });
-  }, [changeValidators, form, items, chain]);
 
   const applyLabel = useMemo(() => {
     const label = getValidatorLabel(chain);
@@ -258,6 +237,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [selectedFilters]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
+    setSubmitLoading(true);
     const { target } = values;
 
     const submitData: SubmitJoinNativeStaking = {
@@ -271,14 +251,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       }
     };
 
-    console.log('submitData', submitData);
-
     changeEarningValidator(submitData)
       .then((rs) => {
         onSuccess(rs);
+        setSubmitLoading(false);
       })
       .catch((error) => {
         onError(error as Error);
+        setSubmitLoading(false);
       });
   }, [poolInfo.slug, from, onSuccess, onError]);
 
@@ -355,43 +335,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, []);
 
   useEffect(() => {
-    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
-      setDefaultPoolMap(earningPoolRecommendation);
-    }).catch(console.error);
-  }, []);
+    const selectedValidators = changeValidators
+      .map((key) => {
+        const [address] = key.split('___');
 
-  useEffect(() => {
-    const recommendValidator = defaultPoolMap[chain];
+        return items.find((item) => item.address === address);
+      })
+      .filter((item): item is ValidatorDataType => !!item)
+      .map((item) => ({
+        ...item
+      }));
 
-    if (recommendValidator) {
-      setAutoValidator((old) => {
-        if (old) {
-          return old;
-        } else {
-          const selectedValidator = autoSelectValidatorOptimally(
-            items,
-            recommendValidator.maxCount,
-            true,
-            recommendValidator.preSelectValidators
-          );
-
-          return selectedValidator.map((item) => getValidatorKey(item.address, item.identity)).join(',');
-        }
-      });
-    } else {
-      setAutoValidator('');
-    }
-  }, [items, chain, defaultPoolMap]);
-
-  useEffect(() => {
-    const _default = nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join(',') || autoValidator || '';
-    const selected = defaultValue || (isSingleSelect ? '' : _default);
-
-    onInitValidators(_default, selected);
-    onChange && onChange({ target: { value: selected } });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominations, onInitValidators, isSingleSelect, autoValidator]);
+    form.setFieldsValue({ target: selectedValidators });
+  }, [changeValidators, form, items, chain]);
 
   useEffect(() => {
     if (!isActive) {
@@ -436,7 +392,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                     weight={'fill'}
                   />
                 )}
-                onClick={onPreCheck(form.submit, ExtrinsicType.STAKING_BOND)}
+                loading={submitLoading}
+                onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
               >
                 {t(applyLabel, { number: changeValidators.length })}
               </Button>

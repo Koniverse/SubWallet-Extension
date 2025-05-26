@@ -18,11 +18,16 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   compound: YieldPositionInfo;
   poolInfo: YieldPoolInfo;
-  inputAsset: _ChainAsset;
+  inputAsset?: _ChainAsset;
+  title?: string;
+  disabledButton?: boolean
+  maxValidator?: number;
+  totalValidator?: number;
+  addresses?: string[],
+  modalId?: string
 };
 
-function Component ({ className, compound,
-  poolInfo }: Props) {
+function Component ({ addresses, className, compound, disabledButton, maxValidator, modalId, poolInfo, title, totalValidator }: Props) {
   const { t } = useTranslation();
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
   const [targetLoading, setTargetLoading] = useState(false);
@@ -72,16 +77,21 @@ function Component ({ className, compound,
     <>
       <NominatorCollapsiblePanel
         className={CN(className)}
-        modalId={EARNING_SELECTED_VALIDATOR_MODAL}
-        title={t('Nomination info')}
+        disabledButton={disabledButton}
+        maxValidator={maxValidator}
+        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
+        title={t(title || 'Selected validators')}
+        totalValidator={totalValidator}
       />
 
       <EarningValidatorSelectedModal
+        addresses={addresses}
         chain={poolInfo.chain}
         disabled={false}
+        disabledButton={disabledButton}
         from={compound.address}
         loading={targetLoading}
-        modalId={EARNING_SELECTED_VALIDATOR_MODAL}
+        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
         nominations={compound.nominations}
         setForceFetchValidator={setForceFetchValidator}
         slug={poolInfo.slug}

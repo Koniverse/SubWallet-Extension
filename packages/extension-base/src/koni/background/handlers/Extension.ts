@@ -3944,8 +3944,6 @@ export default class KoniExtension {
 
     const extrinsic = await this.#koniState.earningService.handleYieldChangeValidator(params);
 
-    console.log('extrinsic', extrinsic);
-
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain: poolHandler.chain,

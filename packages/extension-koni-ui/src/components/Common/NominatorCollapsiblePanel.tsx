@@ -4,18 +4,21 @@
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { PencilSimpleLine } from 'phosphor-react';
+import { Info, PencilSimpleLine } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
+  modalId: string;
   title: string;
   children?: React.ReactNode | React.ReactNode[];
-  modalId: string;
+  disabledButton?: boolean;
+  maxValidator?: number;
+  totalValidator?: number;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, modalId, title } = props;
+  const { className, disabledButton, maxValidator, modalId, title, totalValidator } = props;
   const { activeModal } = useContext(ModalContext);
 
   const onClick = useCallback(
@@ -25,6 +28,11 @@ const Component: React.FC<Props> = (props: Props) => {
     },
     [activeModal, modalId]
   );
+  const countText = totalValidator
+    ? maxValidator
+      ? `${totalValidator} (max ${maxValidator}) `
+      : `${totalValidator} `
+    : '';
 
   return (
     <>
@@ -39,8 +47,11 @@ const Component: React.FC<Props> = (props: Props) => {
             className='__panel-icon'
             onClick={onClick}
           >
+            <div className='__panel-count'>
+              {countText}
+            </div>
             <Icon
-              phosphorIcon={PencilSimpleLine}
+              phosphorIcon={disabledButton ? Info : PencilSimpleLine}
               size='sm'
             />
           </div>
@@ -57,20 +68,26 @@ const NominatorCollapsiblePanel = styled(Component)<Props>(({ theme: { token } }
 
     '.__panel-header': {
       display: 'flex',
+      justifyContent: 'space-between',
       alignItems: 'center',
       gap: token.sizeXS,
-      padding: token.paddingXXS,
-      paddingLeft: token.padding
+      padding: `${token.paddingXS}px ${token.padding}px`,
+      height: 46
+    },
+
+    '&.nomination-info-part .__panel-header': {
+      padding: `${token.paddingXS}px ${token.paddingSM}px`,
+      height: 46
     },
 
     '.__panel-title': {
-      'white-space': 'nowrap',
+      whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
-      flex: 1,
-      color: token.colorTextLight2
+      color: token.colorTextLight2,
+      textAlign: 'start'
     },
 
     '.__panel-icon': {
@@ -78,9 +95,13 @@ const NominatorCollapsiblePanel = styled(Component)<Props>(({ theme: { token } }
       minWidth: 40,
       height: 40,
       display: 'flex',
-      justifyContent: 'center',
+      justifyContent: 'flex-end',
       alignItems: 'center',
       color: token.colorTextLight3
+    },
+
+    '.__panel-count': {
+      marginRight: token.sizeXXS
     }
   });
 });

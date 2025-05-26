@@ -810,8 +810,6 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const chainApi = await this.substrateApi.isReady;
     const { selectedValidators } = data as SubmitJoinNativeStaking;
 
-    console.log('was here');
-
     if (!selectedValidators || selectedValidators.length === 0) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
