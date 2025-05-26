@@ -122,7 +122,10 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
       address,
       slug,
       selectedValidators,
-      netuid
+      subnetData: {
+        netuid: netuid || 0,
+        slippage: 0
+      }
     };
     const positionInfo = await this.getPoolPosition(address);
     const [, fee] = await this.createJoinExtrinsic(data, positionInfo);

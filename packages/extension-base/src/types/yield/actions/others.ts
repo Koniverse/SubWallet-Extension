@@ -3,6 +3,7 @@
 
 import { BaseRequestSign, InternalRequestSign } from '../../transaction';
 import { BasePoolInfo, UnstakingInfo, YieldPoolInfo } from '../info';
+import {ExtrinsicType} from "@subwallet/extension-base/background/KoniTypes";
 
 /**
  * @interface YieldLeaveParams
@@ -27,6 +28,8 @@ export interface YieldLeaveParams extends BaseRequestSign {
   fastLeave: boolean;
   /** Pool's info - use for create history */
   poolInfo: YieldPoolInfo;
+  /** Slippage (subnet staking) */
+  slippage?: number;
 }
 
 export type RequestYieldLeave = InternalRequestSign<YieldLeaveParams>;
@@ -95,3 +98,10 @@ export interface StakeClaimRewardParams extends BaseRequestSign {
 }
 
 export type RequestStakeClaimReward = InternalRequestSign<StakeClaimRewardParams>;
+
+export interface RequestEarningSlippage {
+  slug: string;
+  value: string;
+  netuid: number;
+  type: ExtrinsicType;
+}
