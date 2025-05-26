@@ -5,14 +5,15 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainEvmCompatible, _isPureCardanoChain, _isPureSubstrateChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
-import { decodeAddress, encodeAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
+import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isTonAddress } from '@subwallet/keyring';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
+import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from "@subwallet/keyring/types";
 
 export { canDerive } from './canDerive';
 export * from './mv3';
@@ -301,10 +302,11 @@ export function isSameAddressType (address1: string, address2: string) {
 }
 
 export function isAddressAndChainCompatible (address: string, chain: _ChainInfo) {
-  const isEvmCompatible = isEthereumAddress(address) && _isChainEvmCompatible(chain);
-  const isTonCompatible = isTonAddress(address) && _isChainTonCompatible(chain);
-  const isSubstrateCompatible = !isEthereumAddress(address) && !isTonAddress(address) && _isChainSubstrateCompatible(chain); // todo: need isSubstrateAddress util function to check exactly
-  const isCardanoCompatible = isCardanoAddress(address) && _isChainCardanoCompatible(chain);
+  const keypairType = getKeypairTypeByAddress(address);
+  const isEvmCompatible = _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType); // some chains compatible to substrate and evm, and use evm-address
+  const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
+  const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
+  const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
 
   return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible;
 }

@@ -24,8 +24,14 @@ export interface AbstractSubmitYieldJoinData {
 }
 
 export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
+  selectedPool?: {
+    mindBond: string
+  }
   selectedValidators: ValidatorInfo[];
-  netuid?: number;
+  subnetData: {
+    netuid: number,
+    slippage: number
+  }
 }
 
 export interface SubmitJoinNominationPool extends AbstractSubmitYieldJoinData {

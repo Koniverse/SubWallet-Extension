@@ -16,11 +16,23 @@ import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/cont
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { getTaoToAlphaMapping } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/dtao';
+import {
+  _checkSmartContractSupportByChain,
+  _getAssetExistentialDeposit,
+  _getAssetNetuid,
+  _getChainExistentialDeposit,
+  _getChainNativeTokenSlug,
+  _getContractAddressOfToken,
+  _getTokenOnChainAssetId,
+  _getTokenOnChainInfo,
+  _getTokenTypesSupportedByChain,
+  _getXcmAssetMultilocation,
+  _isBridgedToken,
+  _isChainEvmCompatible
+} from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
-import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
+import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { ContractPromise } from '@polkadot/api-contract';
@@ -37,6 +49,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
   let unsubBridgedToken: () => void;
   let unsubGrcToken: () => void;
   let unsubVftToken: () => void;
+  let unsubSubnetAlphaToken: () => void;
 
   const chain = chainInfo.slug;
   const baseParams: SubscribeBasePalletBalance = {
@@ -79,6 +92,10 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
       unsubBridgedToken = await subscribeForeignAssetBalance(substrateParams);
     }
 
+    if (_BALANCE_CHAIN_GROUP.bittensor.includes(chain)) {
+      unsubSubnetAlphaToken = await subscribeSubnetAlphaPallet(substrateParams);
+    }
+
     /**
      * Some substrate chain use evm account format but not have evm connection and support ERC20 contract,
      * so we need to check if the chain is compatible with EVM and support ERC20
@@ -113,6 +130,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
     unsubBridgedToken && unsubBridgedToken();
     unsubGrcToken?.();
     unsubVftToken?.();
+    unsubSubnetAlphaToken?.();
   };
 };
 
@@ -143,34 +161,21 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       }
     );
   }
-
-  let bittensorStakingBalances: BigN[] = new Array<BigN>(addresses.length).fill(new BigN(0));
-
-  if (['bittensor', 'bittensor_testnet'].includes(chainInfo.slug)) {
-    bittensorStakingBalances = await Promise.all(addresses.map(async (address) => {
-      const stakeInfo = (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toJSON() as Record<string, TaoStakeInfo> | undefined;
-      const price = await getTaoToAlphaMapping(substrateApi);
-      let TaoTotalStake = new BigN(0);
-
-      if (stakeInfo) {
-        for (const validator of Object.values(stakeInfo)) {
-          const stake = new BigN(validator.stake);
-          const netuid = validator.netuid;
-          const taoToAlphaPrice = price[netuid] ? new BigN(price[netuid]) : new BigN(1);
-
-          const taoStake = stake.multipliedBy(taoToAlphaPrice).toFixed(0).toString();
-
-          TaoTotalStake = TaoTotalStake.plus(taoStake);
-        }
-      }
-
-      return new BigN(TaoTotalStake.toString());
-    }));
-  }
-
-  const subscription = substrateApi.subscribeDataWithMulti(params, (rs) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];
+
+    let bittensorStakingBalances: BigN[] = new Array<BigN>(addresses.length).fill(new BigN(0));
+
+    if (_BALANCE_CHAIN_GROUP.bittensor.includes(chainInfo.slug)) {
+      const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
+      const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+
+      bittensorStakingBalances = values.map(([, stakes]) => {
+        return stakes.filter((i) => i.netuid === 0).reduce((previousValue, currentValue) => previousValue.plus(currentValue.stake), BigN(0));
+      });
+    }
 
     const items: BalanceItem[] = balances.map((_balance, index) => {
       const balanceInfo = _balance as unknown as FrameSystemAccountInfo;
@@ -530,5 +535,66 @@ const subscribeOrmlTokensPallet = async ({ addresses, assetMap, callback, chainI
     unsubList.forEach((unsub) => {
       unsub && unsub.unsubscribe();
     });
+  };
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chainInfo, substrateApi }: SubscribeSubstratePalletBalance): Promise<() => void> => {
+  let cancel = false;
+  const tokenMap = filterAlphaAssetsByChain(assetMap, chainInfo.slug);
+
+  const getTokenBalances = async () => {
+    if (cancel) {
+      return;
+    }
+
+    const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
+    const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+    const converted: Record<string, Record<number, BigN>> = {};
+
+    for (let i = 0; i < values.length; i++) {
+      const [, stakes] = values[i];
+      const address = addresses[i];
+
+      converted[address] = {};
+
+      stakes.forEach((stakeInfo) => {
+        const { netuid, stake } = stakeInfo;
+
+        const currentValue = converted[address][netuid] || BigN(0);
+
+        converted[address][netuid] = currentValue.plus(stake);
+      });
+    }
+
+    for (const chainAsset of Object.values(tokenMap)) {
+      const netuid = _getAssetNetuid(chainAsset);
+      const items: BalanceItem[] = Object.entries(converted).map(([address, stakeMap]): BalanceItem => {
+        const value = stakeMap[netuid] || BigN(0);
+
+        return {
+          address: address,
+          tokenSlug: chainAsset.slug,
+          state: APIItemState.READY,
+          free: value.toFixed(0),
+          locked: '0'
+        };
+      });
+
+      if (!cancel) {
+        callback(items);
+      }
+    }
+  };
+
+  getTokenBalances().catch(console.error);
+
+  const interval = setInterval(() => {
+    getTokenBalances().catch(console.error);
+  }, SUB_TOKEN_REFRESH_BALANCE_INTERVAL);
+
+  return () => {
+    cancel = true;
+    clearInterval(interval);
   };
 };

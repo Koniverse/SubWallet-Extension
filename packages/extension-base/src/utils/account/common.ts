@@ -16,7 +16,7 @@ export function isAccountAll (address?: string): boolean {
   return address === ALL_ACCOUNT_KEY;
 }
 
-export function reformatAddress (address: string, networkPrefix = 42, isEthereum = false): string {
+export function reformatAddress (address: string, networkPrefix = 42, isEthereum = false, ignoreError = true): string {
   try {
     if (!address || address === '') {
       return '';
@@ -45,6 +45,10 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
     return encodeAddress(publicKey, networkPrefix, type);
   } catch (e) {
     console.warn('Get error while reformat address', address, e);
+
+    if (!ignoreError) {
+      return '';
+    }
 
     return address;
   }

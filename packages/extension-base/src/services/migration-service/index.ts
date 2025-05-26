@@ -44,6 +44,7 @@ export default class MigrationService {
             timestamp: new Date().getTime()
           });
         }
+        console.log('key', key);
       } catch (error) {
         this.logger.error('Migration error: ', MigrationScripts[keys[i]].name, error);
       }

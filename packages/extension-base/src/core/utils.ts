@@ -66,7 +66,7 @@ export function _isValidAddressForEcosystem (validateRecipientParams: ValidateRe
       _isChainSubstrateCompatible(destChainInfo) ||
       _isChainTonCompatible(destChainInfo) ||
       _isChainCardanoCompatible(destChainInfo)) {
-      return 'Recipient address must be the same type as sender address';
+      return `Recipient address must be a valid ${destChainInfo.name} address`;
     }
 
     return 'Unknown chain type';
@@ -79,9 +79,9 @@ export function _isValidSubstrateAddressFormat (validateRecipientParams: Validat
   const { destChainInfo, toAddress } = validateRecipientParams;
 
   const addressPrefix = destChainInfo?.substrateInfo?.addressPrefix ?? 42;
-  const toAddressFormatted = reformatAddress(toAddress, addressPrefix);
+  const toAddressFormatted = reformatAddress(toAddress, addressPrefix, undefined, false);
 
-  if (toAddressFormatted !== toAddress) {
+  if (toAddressFormatted && toAddressFormatted !== toAddress) {
     return `Recipient address must be a valid ${destChainInfo.name} address`;
   }
 
