@@ -51,10 +51,10 @@ function Component ({ className, request }: Props) {
         <ConfirmationGeneralInfo request={request} />
         <div className={'account-list text-center'}>
           <Typography.Title level={4}>
-            {t('Your metadata is out of date')}
+            {t('confirmation.metadata.title')}
           </Typography.Title>
           <Typography.Paragraph className='text-tertiary'>
-            {t('Approving this update will sync your metadata for {{chainName}} chain from {{dAppUrl}}', { replace: { dAppUrl: request.url, chainName: chain } })}
+            {t('confirmation.metadata.description', { replace: { dAppUrl: request.url, chainName: chain } })}
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
             <span className='__prop-label text-tertiary text-right'>{t('Symbol')}</span> <span>{tokenSymbol}</span>
@@ -79,7 +79,7 @@ function Component ({ className, request }: Props) {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('common.Button.cancel')}
         </Button>
         <Button
           icon={(

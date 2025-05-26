@@ -58,10 +58,10 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   const getAccountListModalTriggerLabel = () => {
     if (resultAccountProxies.length === 3) {
-      return t('And 1 other');
+      return t('settings.Screen.migrateAccount.summaryView.accountListModalTriggerLabel.forOneItem');
     }
 
-    return t('And {{number}} others', { replace: { number: resultAccountProxies.length - 2 } });
+    return t('settings.Screen.migrateAccount.summaryView.accountListModalTriggerLabel.forMultiItems', { replace: { number: resultAccountProxies.length - 2 } });
   };
 
   const hasAnyAccountToMigrate = !!resultAccountProxies.length;
@@ -78,7 +78,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
       })}
       >
         <div className='__header-area'>
-          {t('Finish')}
+          {t('common.Button.finish')}
         </div>
 
         <div className='__body-area'>
@@ -93,7 +93,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
           </div>
 
           <div className='__content-title'>
-            {t('All done!')}
+            {t('settings.Screen.migrateAccount.summaryView.title')}
           </div>
 
           {
@@ -109,7 +109,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('All eligible accounts have been migrated. Review <guide>our guide</guide> to learn more about migration eligibility & process')}
+                  i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.noAccountToMigrate')}
                 />
               </div>
             )
@@ -131,7 +131,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified accounts</highlight>')}
+                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migrateToMultiAccounts')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -145,7 +145,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified account</highlight>')}
+                          i18nKey={detectTranslate('settings.Screen.migrateAccount.summaryView.migrateToOneAccount')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -196,7 +196,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
             }
             onClick={onClickFinish}
           >
-            {hasAnyAccountToMigrate ? t('Finish') : t('Back to home')}
+            {hasAnyAccountToMigrate ? t('common.Button.finish') : t('common.Button.backToHome')}
           </Button>
         </div>
       </div>

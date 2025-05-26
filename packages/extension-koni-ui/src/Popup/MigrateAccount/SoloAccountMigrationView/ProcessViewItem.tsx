@@ -38,7 +38,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   const headerContent = useMemo(() => {
-    return `${t('Accounts migrated')}: ${currentProcessOrdinal}/${totalProcessSteps}`;
+    return `${t('settings.Screen.migrateAccount.soloAccountMigrationView.title')}: ${currentProcessOrdinal}/${totalProcessSteps}`;
   }, [currentProcessOrdinal, t, totalProcessSteps]);
 
   const _onApprove = useCallback(() => {
@@ -65,10 +65,10 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.Error.exists'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.Error.invalid'));
       }
     }
 
@@ -89,11 +89,11 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
 
       <div className='__body-area'>
         <div className='__brief'>
-          {t('Enter a name for this unified account to complete the migration')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.description')}
         </div>
 
         <div className='__section-label'>
-          {t('Migrate from')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateFrom')}
         </div>
 
         <div className='__account-list'>
@@ -109,7 +109,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         </div>
 
         <div className='__section-label'>
-          {t('To')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Label.migrateTo')}
         </div>
 
         <Form
@@ -131,7 +131,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
               name={'name'}
               rules={[
                 {
-                  message: t('Account name is required'),
+                  message: t('settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.Error.required'),
                   transform: (value: string) => value.trim(),
                   required: true
                 },
@@ -144,8 +144,8 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
               <Input
                 className='__account-name-input'
                 disabled={loading}
-                label={t('Account name')}
-                placeholder={t('Enter the account name')}
+                label={t('settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.label')}
+                placeholder={t('settings.Screen.migrateAccount.soloAccountMigrationView.Input.accountName.placeholder')}
                 suffix={(
                   <AccountChainTypeLogos
                     chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES as AccountChainType[]}
@@ -171,7 +171,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
           onClick={onSkip}
           schema={'secondary'}
         >
-          {t('Skip')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Button.skip')}
         </Button>
         <Button
           block={true}
@@ -185,7 +185,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
           loading={loading}
           onClick={_onApprove}
         >
-          {t('Approve')}
+          {t('settings.Screen.migrateAccount.soloAccountMigrationView.Button.approve')}
         </Button>
       </div>
     </div>

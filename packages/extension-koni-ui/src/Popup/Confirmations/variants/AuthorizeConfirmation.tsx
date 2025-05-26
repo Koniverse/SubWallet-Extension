@@ -62,30 +62,30 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('No available Substrate account');
+          return t('confirmation.authorize.Title.noAccount.substrate');
         case 'evm':
-          return t('No available EVM account');
+          return t('confirmation.authorize.Title.noAccount.evm');
         case 'ton':
-          return t('No available TON account');
+          return t('confirmation.authorize.Title.noAccount.ton');
         case 'cardano':
-          return t('No available Cardano account');
+          return t('confirmation.authorize.Title.noAccount.cardano');
       }
     }
 
-    return t('No available account');
+    return t('confirmation.authorize.Title.noAccount.default');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t("You don't have any Substrate account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('confirmation.authorize.Description.noAccount.substrate');
         case 'evm':
-          return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('confirmation.authorize.Description.noAccount.evm');
       }
     }
 
-    return t("You don't have any account to connect. Please create one or skip this step by hitting Cancel.");
+    return t('confirmation.authorize.Description.noAccount.default');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -220,7 +220,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('Choose the account(s) you’d like to connect')
+              : t('confirmation.authorize.Title.default')
           }
         </div>
         {
@@ -256,7 +256,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('Make sure you trust this site before connecting')
+              : t('confirmation.authorize.Description.default')
           }
         </div>
       </div>
@@ -277,14 +277,14 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('common.Button.cancel')}
               </Button>
               <Button
                 disabled={isDisableConnect}
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('Connect')}
+                {t('confirmation.authorize.Button.connect')}
               </Button>
             </>
           )
@@ -304,7 +304,7 @@ function Component ({ className, request }: Props) {
                   onClick={onCancel}
                   schema={'secondary'}
                 >
-                  {t('Cancel')}
+                  {t('common.Button.cancel')}
                 </Button>
                 <Button
                   disabled={loading}
@@ -316,7 +316,7 @@ function Component ({ className, request }: Props) {
                   )}
                   onClick={onAddAccount}
                 >
-                  {t('Create one')}
+                  {t('confirmation.authorize.Button.create')}
                 </Button>
               </>
             )
@@ -339,22 +339,6 @@ const AuthorizeConfirmation = styled(Component)<Props>(({ theme: { token } }: Th
     display: 'flex',
     flexDirection: 'column',
     gap: token.sizeXS
-  },
-
-  '.all-account-selection': {
-    '.__item-middle-part': {
-      textAlign: 'start',
-      fontSize: token.fontSize
-    }
-  },
-
-  '.__account-proxy-item': {
-    '.__item-middle-part': {
-      textWrap: 'nowrap',
-      textOverflow: 'ellipsis',
-      overflow: 'hidden'
-    }
-
   }
 }));
 

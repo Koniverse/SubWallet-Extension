@@ -65,7 +65,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
     if (type === YieldPoolType.NOMINATION_POOL) {
       return t('Unclaimed rewards');
     } else {
-      return t('Rewards');
+      return t('common.Text.rewards');
     }
   }, [t, type]);
 

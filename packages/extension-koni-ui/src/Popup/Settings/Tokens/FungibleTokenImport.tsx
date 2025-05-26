@@ -135,11 +135,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   setLoading(false);
 
                   if (validationResult.isExist) {
-                    reject(new Error(t('Existed token')));
+                    reject(new Error(t('settings.Screen.importTokens.Input.contract.Error.exist')));
                   }
 
                   if (validationResult.contractError) {
-                    reject(new Error(t('Error validating this token')));
+                    reject(new Error(t('settings.Screen.importTokens.Input.contract.Error.internalError')));
                   }
 
                   if (!validationResult.isExist && !validationResult.contractError) {
@@ -154,10 +154,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 })
                 .catch(() => {
                   setLoading(false);
-                  reject(new Error(t('Error validating this token')));
+                  reject(new Error(t('settings.Screen.importTokens.Input.contract.Error.internalError')));
                 });
             } else {
-              reject(t('Invalid contract address'));
+              reject(t('settings.Screen.importTokens.Input.contract.Error.invalid'));
             }
           });
         }
@@ -277,18 +277,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       .then((result) => {
         if (result) {
           showNotification({
-            message: t('Imported token successfully')
+            message: t('settings.Screen.importTokens.SubmitResponse.success')
           });
           goBack();
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('settings.Screen.importTokens.SubmitResponse.error')
           });
         }
       })
       .catch(() => {
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('settings.Screen.importTokens.SubmitResponse.error')
         });
       })
       .finally(() => {
@@ -376,9 +376,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading,
           onClick: form.submit,
-          children: t('Import token')
+          children: t('common.Button.importToken')
         }}
-        title={t<string>('Import token')}
+        title={t<string>('settings.Screen.manageTokens.importTokens.title')}
       >
         <div className={'import_token__container'}>
           <Form
@@ -396,9 +396,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 id='import-nft-select-chain'
                 items={chains}
-                label={t<string>('Network')}
-                placeholder={t('Select network')}
-                title={t('Select network')}
+                label={t<string>('common.Text.network')}
+                placeholder={t('common.Text.selectNetwork')}
+                title={t('common.Text.selectNetwork')}
               />
             </Form.Item>
 
@@ -409,8 +409,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 disabled={!selectedChain}
                 items={tokenTypeOptions}
-                placeholder={t('Select token type')}
-                title={t('Select token type')}
+                placeholder={t('common.Text.selectTokenType')}
+                title={t('common.Text.selectTokenType')}
               />
             </Form.Item>
 
@@ -426,7 +426,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <AddressInput
                       addressPrefix={chainNetworkPrefix}
                       disabled={!selectedTokenType}
-                      label={isSelectGearToken ? t('Program ID') : t('Contract address')}
+                      label={isSelectGearToken ? t('common.Text.programID') : t('common.Text.contractAddress')}
                       showScanner={true}
                     />
                   </Form.Item>
@@ -455,9 +455,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 >
                   <Field
                     content={symbol}
-                    placeholder={t<string>('Symbol')}
+                    placeholder={t<string>('common.Text.symbol')}
                     prefix={tokenDecimalsPrefix()}
-                    tooltip={t('Symbol')}
+                    tooltip={t('common.Text.symbol')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>
@@ -468,8 +468,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 >
                   <Field
                     content={decimals === -1 ? '' : decimals}
-                    placeholder={t<string>('Decimals')}
-                    tooltip={t('Decimals')}
+                    placeholder={t<string>('common.Text.decimals')}
+                    tooltip={t('common.Text.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>
@@ -481,15 +481,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               rules={[
                 {
                   required: true,
-                  message: t('Token name is required')
+                  message: t('settings.manageTokens.Modal.importTokens.Input.tokenName.Error.required')
                 }
               ]}
               statusHelpAsTooltip={true}
             >
               <Field
                 content={tokenName}
-                placeholder={t<string>('Token name')}
-                tooltip={t('Token name')}
+                placeholder={t<string>('common.Text.tokenName')}
+                tooltip={t('common.Text.tokenName')}
                 tooltipPlacement={'topLeft'}
               />
             </Form.Item>
@@ -500,8 +500,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <Input
                 disabled={fieldDisabled}
-                placeholder={t('Price ID')}
-                tooltip={t('Price ID')}
+                placeholder={t('common.Text.priceId')}
+                tooltip={t('common.Text.priceId')}
               />
             </Form.Item>
           </Form>
