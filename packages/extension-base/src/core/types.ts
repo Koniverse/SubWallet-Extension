@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountJson } from '@subwallet/extension-base/types';
 
-export type LedgerMustCheckType = 'polkadot' | 'migration' | 'unnecessary';
+export type LedgerMustCheckType = 'polkadot' | 'migration' | 'polkadot_ecdsa' | 'unnecessary';
 
 export enum ValidationCondition {
   IS_NOT_NULL = 'IS_NOT_NULL',

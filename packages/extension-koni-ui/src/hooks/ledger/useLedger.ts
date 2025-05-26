@@ -68,7 +68,9 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
     if (def.isEthereum) {
       return new EVMLedger('webusb', def.slip44);
     } else {
-      if (originGenesisHash) {
+      if (def.scheme === LEDGER_SCHEME.ECDSA) {
+        return new SubstrateECDSALedger('webusb', def.slip44, def.scheme);
+      } else if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
 
         assert(def, 'There is no known Ledger app available for this chain');
@@ -79,9 +81,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
       }
     }
   } else {
-    if (def.scheme === LEDGER_SCHEME.ECDSA) {
-      return new SubstrateECDSALedger('webusb', def.slip44, def.scheme);
-    } else if (!forceMigration) {
+    if (!forceMigration) {
       return new SubstrateLegacyLedger('webusb', def.network);
     } else {
       if (NotNeedMigrationGens.includes(def.genesisHash)) {

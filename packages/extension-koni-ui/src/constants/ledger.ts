@@ -28,14 +28,14 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
   },
   {
     accountName: 'Polkadot ECDSA',
-    appName: 'Polkadot ECDSA',
+    appName: 'Polkadot',
     networkName: 'Polkadot ECDSA',
     genesisHash: '',
     network: 'PokadotECDSA',
     icon: 'substrate',
     slug: SUBSTRATE_ECDSA_KEY,
     isDevMode: false,
-    isGeneric: false,
+    isGeneric: true,
     isEthereum: false,
     slip44: 354,
     scheme: LEDGER_SCHEME.ECDSA
@@ -534,7 +534,7 @@ export const isLedgerCapable = !!(window as unknown as { USB?: unknown }).USB;
 export const PolkadotDerivationPathGens: string[] = [POLKADOT_KEY].map((slug) => ChainInfoMap[slug].substrateInfo?.genesisHash || '');
 export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedgerNetwork)
   .filter((network) => {
-    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
+    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY, SUBSTRATE_ECDSA_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
   })
   .map(({ genesisHash }) => genesisHash);
 

@@ -69,6 +69,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         cardano: CardanoKeypairTypes
       };
 
+      // This condition ensures that the substrate account with evm format address is can be used in Substrate dApps
       const subCondition = (authType: AccountAuthType) => authType === 'substrate' && json.meta.isSubstrateECDSA;
       const isValidTypes = accountAuthTypes.some((authType) => validTypes[authType]?.includes(type) || subCondition(authType));
 
@@ -78,6 +79,11 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
 
       // This condition ensures that the resulting UTXOs from the user's transaction are not sent to addresses the wallet cannot manage.
       if (type === 'cardano' && json.meta.isReadOnly) {
+        return false;
+      }
+
+      // If the user only wants to connect to EVM, we don't return Substrate ECDSA accounts
+      if (type === 'ethereum' && json.meta.isSubstrateECDSA && accountAuthTypes.length === 1 && accountAuthTypes[0] === 'evm') {
         return false;
       }
 

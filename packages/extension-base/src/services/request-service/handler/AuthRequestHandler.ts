@@ -97,6 +97,22 @@ export default class AuthRequestHandler {
     return addressList.reduce((addressList, v) => ({ ...addressList, [v]: value }), {});
   }
 
+  private getEcdsaAddressList (): Set<string> {
+    const addressList = Object.keys(this.keyringService.context.pairs);
+    const pairs = this.keyringService.context.pairs;
+    const ecdsaAddressList = new Set<string>();
+
+    addressList.forEach((address) => {
+      const pair = pairs[address];
+
+      if (pair && pair.json.meta.isSubstrateECDSA) {
+        ecdsaAddressList.add(address);
+      }
+    });
+
+    return ecdsaAddressList;
+  }
+
   public get numAuthRequestsV2 (): number {
     return Object.keys(this.#authRequestsV2).length;
   }
@@ -220,11 +236,11 @@ export default class AuthRequestHandler {
       if (accountAuthTypes.length !== ALL_ACCOUNT_AUTH_TYPES.length) {
         const backupAllowed = (allowedAccounts || [])
           .filter((a) => {
-            if (isEthereumAddress(a) && !accountAuthTypes.includes('evm')) {
+            if (isEthereumAddress(a) && !accountAuthTypes.includes('evm') && !this.getEcdsaAddressList().has(a)) {
               return true;
             }
 
-            if (isSubstrateAddress(a) && !accountAuthTypes.includes('substrate')) {
+            if ((isSubstrateAddress(a) || this.getEcdsaAddressList().has(a)) && !accountAuthTypes.includes('substrate')) {
               return true;
             }
 
@@ -242,6 +258,8 @@ export default class AuthRequestHandler {
         backupAllowed.forEach((acc) => {
           isAllowedMap[acc] = true;
         });
+
+        console.log(backupAllowed, isAllowedMap, '123123', allowedAccounts);
       }
 
       const defaultNetworkMap: Partial<Record<AccountAuthType, string>> = {};
@@ -388,9 +406,9 @@ export default class AuthRequestHandler {
 
       allowedListByRequestType = accountAuthTypes.reduce<string[]>((list, accountAuthType) => {
         if (accountAuthType === 'evm') {
-          list.push(...allowedListByRequestType.filter((a) => isEthereumAddress(a)));
+          list.push(...allowedListByRequestType.filter((a) => isEthereumAddress(a) && !this.getEcdsaAddressList().has(a)));
         } else if (accountAuthType === 'substrate') {
-          list.push(...allowedListByRequestType.filter((a) => isSubstrateAddress(a)));
+          list.push(...allowedListByRequestType.filter((a) => isSubstrateAddress(a) || this.getEcdsaAddressList().has(a)));
         } else if (accountAuthType === 'ton') {
           list.push(...allowedListByRequestType.filter((a) => isTonAddress(a)));
         } else if (accountAuthType === 'cardano') {

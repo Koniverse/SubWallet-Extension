@@ -79,25 +79,26 @@ const Component = function ({ className }: Props) {
         const address = request.request.payload.address;
 
         account = findAccountByAddress(accounts, address) || undefined;
-        const isEthereum = isEthereumAddress(address);
+        const isEthereum = isEthereumAddress(address) && !account?.isSubstrateECDSA;
 
         if (account?.isHardware) {
           if (account?.isGeneric) {
-            canSign = !isEthereum;
+            if (account.isSubstrateECDSA && !_isMessage) {
+              const payload = request.request.payload as SignerPayloadJSON;
+              const chainInfo = findChainInfoByGenesisHash(chainInfoMap, payload.genesisHash);
+
+              canSign = !!chainInfo && (_isChainEvmCompatible(chainInfo) && _isChainSubstrateCompatible(chainInfo));
+            } else {
+              canSign = !isEthereum;
+            }
           } else {
             if (_isMessage) {
               canSign = true;
             } else {
               const payload = request.request.payload as SignerPayloadJSON;
 
-              if (account.isSubstrateECDSA) {
-                const chainInfo = findChainInfoByGenesisHash(chainInfoMap, payload.genesisHash);
-
-                canSign = !!chainInfo && (_isChainEvmCompatible(chainInfo) && _isChainSubstrateCompatible(chainInfo));
-              } else {
-                // Valid even with evm ledger account (evm - availableGenesisHashes is empty)
-                canSign = !!account?.availableGenesisHashes?.includes(payload.genesisHash) || _isRuntimeUpdated(payload?.signedExtensions);
-              }
+              // Valid even with evm ledger account (evm - availableGenesisHashes is empty)
+              canSign = !!account?.availableGenesisHashes?.includes(payload.genesisHash) || _isRuntimeUpdated(payload?.signedExtensions);
             }
           }
         } else {

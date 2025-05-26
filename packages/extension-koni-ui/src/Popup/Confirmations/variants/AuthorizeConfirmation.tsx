@@ -10,7 +10,7 @@ import { useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -106,11 +106,11 @@ function Component ({ className, request }: Props) {
   const onConfirm = useCallback(() => {
     setLoading(true);
     const selectedAccountProxyIds = Object.keys(selectedMap).filter((key) => selectedMap[key]);
-    const selectedAccounts = accounts.filter(({ chainType, proxyId }) => {
+    const selectedAccounts = accounts.filter(({ chainType, isSubstrateECDSA, proxyId }) => {
       if (selectedAccountProxyIds.includes(proxyId || '')) {
         switch (chainType) {
           case AccountChainType.SUBSTRATE: return accountAuthTypes?.includes('substrate');
-          case AccountChainType.ETHEREUM: return accountAuthTypes?.includes('evm');
+          case AccountChainType.ETHEREUM: return isSubstrateECDSA ? accountAuthTypes?.includes('substrate') : accountAuthTypes?.includes('evm');
           case AccountChainType.TON: return accountAuthTypes?.includes('ton');
           case AccountChainType.CARDANO: return accountAuthTypes?.includes('cardano');
         }
@@ -241,7 +241,7 @@ function Component ({ className, request }: Props) {
               {visibleAccountProxies.map((item) => (
                 <AccountProxyItem
                   accountProxy={item}
-                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes)}
+                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes, isSubstrateEcdsaAccountProxy(item))}
                   className={'__account-proxy-item'}
                   isSelected={selectedMap[item.id]}
                   key={item.id}

@@ -32,11 +32,15 @@ export function getMaxBigInt (a: bigint, b: bigint): bigint {
 }
 
 export function ledgerMustCheckNetwork (account: AccountJson | null): LedgerMustCheckType {
-  if (account && account.isHardware && account.isGeneric && !isEthereumAddress(account.address)) {
-    return account.originGenesisHash ? 'migration' : 'polkadot';
-  } else {
-    return 'unnecessary';
+  if (account && account.isHardware && account.isGeneric) {
+    if (!isEthereumAddress(account.address)) {
+      return account.originGenesisHash ? 'migration' : 'polkadot';
+    } else if (account.isSubstrateECDSA) {
+      return 'polkadot_ecdsa';
+    }
   }
+
+  return 'unnecessary';
 }
 
 // --- recipient address validation --- //
@@ -137,22 +141,20 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
 
   if (account?.isHardware) {
     if (!account.isGeneric) {
-      if (account.isSubstrateECDSA) {
-        if (!destChainInfo.substrateInfo || !destChainInfo.evmInfo) {
-          return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainInfo?.name || 'Unknown');
-        }
-      } else {
-        // For ledger legacy
-        const availableGen: string[] = account.availableGenesisHashes || [];
-        const destChainName = destChainInfo?.name || 'Unknown';
+      // For ledger legacy
+      const availableGen: string[] = account.availableGenesisHashes || [];
+      const destChainName = destChainInfo?.name || 'Unknown';
 
-        if (!availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
-          return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
-        }
+      if (!availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
+        return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
       }
     } else {
       // For ledger generic
       const ledgerCheck = ledgerMustCheckNetwork(account);
+
+      if (ledgerCheck === 'polkadot_ecdsa' && (!destChainInfo.substrateInfo || !destChainInfo.evmInfo)) {
+        return 'Ledger ECDSA address is not supported for this transfer';
+      }
 
       if (ledgerCheck !== 'unnecessary' && !allowLedgerGenerics.includes(destChainInfo.slug)) {
         return `Ledger ${ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration'} address is not supported for this transfer`;

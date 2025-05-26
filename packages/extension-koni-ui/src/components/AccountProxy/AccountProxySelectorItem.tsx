@@ -1,16 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Copy, Eye, GitCommit, GitMerge, Needle, PencilSimpleLine, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
-import React, { Context, useContext, useMemo } from 'react';
+import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
 import AccountChainTypeLogos from './AccountChainTypeLogos';
@@ -43,13 +42,6 @@ function Component (props: Props): React.ReactElement<Props> {
     showDerivedPath } = props;
 
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
-  const chainTypes = useMemo(() => {
-    if (isSubstrateEcdsaAccountProxy(accountProxy)) {
-      return [AccountChainType.SUBSTRATE];
-    }
-
-    return accountProxy.chainTypes;
-  }, [accountProxy]);
 
   const { t } = useTranslation();
 
@@ -173,7 +165,7 @@ function Component (props: Props): React.ReactElement<Props> {
               )
               : (
                 <AccountChainTypeLogos
-                  chainTypes={chainTypes}
+                  chainTypes={accountProxy.chainTypes}
                   className={'__item-chain-type-logos'}
                 />
               )

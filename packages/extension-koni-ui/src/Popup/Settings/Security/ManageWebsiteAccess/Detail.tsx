@@ -184,7 +184,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
     return (
       <AccountProxyItem
         accountProxy={item}
-        chainTypes={convertAuthorizeTypeToChainTypes(authInfo.accountAuthTypes, item.chainTypes)}
+        chainTypes={convertAuthorizeTypeToChainTypes(authInfo.accountAuthTypes, item.chainTypes, isSubstrateEcdsaAccountProxy(item))}
         className={'__account-proxy-connect-item'}
         key={item.id}
         rightPartNode={(

@@ -4,11 +4,10 @@
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { Context, useContext, useMemo } from 'react';
+import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
 import AccountChainTypeLogos from './AccountChainTypeLogos';
@@ -30,13 +29,6 @@ type Props = ThemeProps & {
 function Component (props: Props): React.ReactElement<Props> {
   const { accountProxy, accountProxyName, chainTypes, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showUnselectIcon } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
-  const accountChainTypes = useMemo(() => {
-    if (isSubstrateEcdsaAccountProxy(accountProxy)) {
-      return [AccountChainType.SUBSTRATE];
-    }
-
-    return chainTypes;
-  }, [accountProxy, chainTypes]);
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
       <Icon
@@ -51,7 +43,7 @@ function Component (props: Props): React.ReactElement<Props> {
   return (
     <div
       className={CN(className, {
-        '-show-chain-type': !!accountChainTypes?.length
+        '-show-chain-type': !!chainTypes?.length
       })}
       onClick={onClick}
     >
@@ -69,8 +61,8 @@ function Component (props: Props): React.ReactElement<Props> {
         <div className={'__account-name'}>
           {accountProxyName || accountProxy.name}
         </div>
-        {!!accountChainTypes?.length && <AccountChainTypeLogos
-          chainTypes={accountChainTypes}
+        {!!chainTypes?.length && <AccountChainTypeLogos
+          chainTypes={chainTypes}
           className={'__item-chain-type-logos'}
         />}
       </div>

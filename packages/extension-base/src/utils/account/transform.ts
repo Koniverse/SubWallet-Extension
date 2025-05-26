@@ -88,9 +88,11 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
       if (meta.isExternal) {
         if (meta.isHardware) {
           if (meta.isGeneric) {
+            if (meta.isSubstrateECDSA) {
+              return AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
+            }
+
             return AccountSignMode.GENERIC_LEDGER;
-          } else if (meta.isSubstrateECDSA) {
-            return AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
           } else {
             return AccountSignMode.LEGACY_LEDGER;
           }

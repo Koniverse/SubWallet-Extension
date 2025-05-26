@@ -85,7 +85,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
 
       if (this.scheme === LEDGER_SCHEME.ECDSA) {
-        const result = await this.wrapError(app.signRawEcdsa(path, Buffer.from(message)));
+        const result = await this.wrapError(app.signRawEcdsa(path, Buffer.from(wrapBytes(message))));
 
         return {
           signature: hexAddPrefix(u8aToHex(result.signature))
