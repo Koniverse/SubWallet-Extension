@@ -56,6 +56,8 @@ export default class AuthRequestHandler {
       if (existKeyEvmNetworkConnect) {
         value.currentNetworkMap = { evm: existKeyEvmNetworkConnect };
         needUpdateAuthList = true;
+      } else if (!value.currentNetworkMap) {
+        value.currentNetworkMap = {};
       }
 
       acc[key] = { ...value };
