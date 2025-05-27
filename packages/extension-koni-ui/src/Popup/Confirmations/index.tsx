@@ -21,6 +21,8 @@ import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
 import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import BitcoinSignatureConfirmation
+  from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/BitcoinSignatureConfirmation';
 
 type Props = ThemeProps
 
@@ -114,7 +116,7 @@ const Component = function ({ className }: Props) {
       } else if (['bitcoinSignatureRequest', 'bitcoinSendTransactionRequest', 'bitcoinWatchTransactionRequest', 'bitcoinSignPsbtRequest', 'bitcoinSendTransactionRequestAfterConfirmation'].includes(confirmation.type)) {
         const request = confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest' | 'bitcoinSendTransactionRequest' | 'bitcoinWatchTransactionRequest' | 'bitcoinSendTransactionRequestAfterConfirmation'][0];
 
-        account = request.payload.account;
+        account = findAccountByAddress(accounts, request.payload.address) || undefined;
         canSign = request.payload.canSign;
         isMessage = confirmation.type === 'bitcoinSignatureRequest';
       }
@@ -197,13 +199,13 @@ const Component = function ({ className }: Props) {
           />
         );
 
-      // case 'bitcoinSignatureRequest':
-      //   return (
-      //     <BitcoinSignatureConfirmation
-      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]}
-      //       type={confirmation.type}
-      //     />
-      //   );
+      case 'bitcoinSignatureRequest':
+        return (
+          <BitcoinSignatureConfirmation
+            request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]}
+            type={confirmation.type}
+          />
+        );
       // case 'bitcoinSignPsbtRequest':
       //   return (
       //     <BitcoinSignPsbtConfirmation

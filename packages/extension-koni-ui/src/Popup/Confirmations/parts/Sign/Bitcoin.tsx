@@ -5,7 +5,7 @@ import { BitcoinSignatureRequest, BitcoinSignPsbtRequest, ConfirmationDefinition
 import { RequestSubmitTransferWithId } from '@subwallet/extension-base/types/balance/transfer';
 import { wait } from '@subwallet/extension-base/utils';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useNotification, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useNotification, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { completeConfirmationBitcoin, makeBitcoinDappTransferConfirmation, makePSBTTransferAfterConfirmation } from '@subwallet/extension-koni-ui/messaging';
 import { AccountSignMode, BitcoinSignatureSupportType, PhosphorIcon, SigData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getSignMode, removeTransactionPersist } from '@subwallet/extension-koni-ui/utils';
@@ -53,7 +53,8 @@ const handleSignature = async (type: BitcoinSignatureSupportType, id: string, si
 const Component: React.FC<Props> = (props: Props) => {
   const { canSign, className, editedPayload, extrinsicType, id, payload, type } = props;
   // const { payload: { hashPayload } } = payload;
-  const { account } = (payload.payload as BitcoinSignatureRequest);
+  const { address } = (payload.payload as BitcoinSignatureRequest);
+  const account = useGetAccountByAddress(address);
   // TODO: [Review] Error eslint
   // const chainId = (payload.payload as EvmSendTransactionRequest)?.chainId || 1;
 

@@ -15,6 +15,7 @@ import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -234,6 +235,10 @@ export default class AuthRequestHandler {
               return true;
             }
 
+            if (isBitcoinAddress(a) && !accountAuthTypes.includes('bitcoin')) {
+              return true;
+            }
+
             return false;
           });
 
@@ -393,6 +398,8 @@ export default class AuthRequestHandler {
           list.push(...allowedListByRequestType.filter((a) => isTonAddress(a)));
         } else if (accountAuthType === 'cardano') {
           list.push(...allowedListByRequestType.filter((a) => isCardanoAddress(a)));
+        } else if (accountAuthType === 'bitcoin') {
+          list.push(...allowedListByRequestType.filter((a) => isBitcoinAddress(a)));
         }
 
         return list;

@@ -25,7 +25,7 @@ import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTran
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { InjectedAccount, InjectedAccountWithMeta, MetadataDefBase } from '@subwallet/extension-inject/types';
-import { KeyringPair$Meta } from '@subwallet/keyring/types';
+import { BitcoinAddressType, KeyringPair$Meta } from '@subwallet/keyring/types';
 import { KeyringOptions } from '@subwallet/ui-keyring/options/types';
 import { KeyringAddress } from '@subwallet/ui-keyring/types';
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
@@ -1139,7 +1139,7 @@ export interface EvmSignRequest {
 }
 
 export interface BitcoinSignRequest {
-  account: AccountJson;
+  address: string;
   hashPayload: string;
   canSign: boolean;
 }
@@ -1317,13 +1317,22 @@ export type BitcoinDAppAddress = {
   tweakedPublicKey?: string;
   derivationPath?: string;
   isTestnet?: boolean;
-  type: 'p2tr' | 'p2wpkh' | 'p2sh' | 'ethereum' | 'unknown';
+  type: BitcoinAddressType;
 }
 
-export type BitcoinRequestAddressesResult = {
-  addresses: BitcoinDAppAddress[];
-};
+export type BitcoinResponseDApp<T> = {
+  result: T
+}
 
+export interface BitcoinRequestGetAddressesResult {
+  addresses: BitcoinDAppAddress[];
+}
+
+export interface BitcoinSignMessageResult {
+  signature: string;
+  message: string;
+  address: string;
+}
 
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;

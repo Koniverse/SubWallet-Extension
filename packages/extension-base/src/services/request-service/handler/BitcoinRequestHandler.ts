@@ -156,8 +156,7 @@ export default class BitcoinRequestHandler {
   }
 
   signMessageBitcoin (confirmation: ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]): SignMessageBitcoinResult {
-    const { account, payload } = confirmation.payload;
-    const address = account.address;
+    const { address, payload } = confirmation.payload;
     const pair = keyring.getPair(address);
 
     if (pair.isLocked) {
@@ -190,8 +189,7 @@ export default class BitcoinRequestHandler {
 
   private signTransactionBitcoin (request: ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequest'][0]): string {
     // Extract necessary information from the BitcoinSendTransactionRequest
-    const { account, hashPayload } = request.payload;
-    const address = account.address;
+    const { address, hashPayload } = request.payload;
     const pair = keyring.getPair(address);
 
     // Unlock the pair if it is locked
@@ -280,7 +278,7 @@ export default class BitcoinRequestHandler {
 
   private async signPsbt (request: ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]): Promise<SignPsbtBitcoinResult> {
     // Extract necessary information from the BitcoinSendTransactionRequest
-    const { account, payload } = request.payload;
+    const { address, payload } = request.payload;
     const { allowedSighash, broadcast, psbt, signAtIndex } = payload;
     const transaction = this.#transactionService.getTransaction(request.id);
     let eventData: TransactionEventResponse = {
@@ -290,13 +288,7 @@ export default class BitcoinRequestHandler {
       extrinsicHash: request.id
     };
 
-    // todo: validate type of the account
-
-    if (Object.keys(account).length === 0) {
-      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Please connect to Wallet to try this request');
-    }
-
-    const pair = keyring.getPair(account.address);
+    const pair = keyring.getPair(address);
 
     // Unlock the pair if it is locked
     if (pair.isLocked) {
