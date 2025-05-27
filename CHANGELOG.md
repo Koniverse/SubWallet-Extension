@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.39
+Build date: May 26, 2025.
+
+Bug fixed:
+- Fix bug error page when connect with dApp (#4401)
+
+
 ## 1.3.38
 Build date: May 23, 2025.
 
