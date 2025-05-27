@@ -3,10 +3,11 @@
 
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { isBitcoinAddress } from '@subwallet/keyring';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Copy, Info, QrCode } from 'phosphor-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -36,6 +37,8 @@ function Component (props: Props): React.ReactElement<Props> {
     event.stopPropagation();
     onClickInfoButton?.();
   }, [onClickInfoButton]);
+
+  const isBitcoinChain = useMemo(() => isBitcoinAddress(item.address), [item.address]);
 
   return (
     <>
@@ -84,7 +87,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 }
                 onClick={_onClickInfoButton}
                 size='xs'
-                tooltip={'This network has two address formats'}
+                tooltip={isBitcoinChain ? null : 'This network has two address formats'}
                 tooltipPlacement={'topLeft'}
                 type='ghost'
               />

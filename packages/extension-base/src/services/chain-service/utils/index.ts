@@ -339,6 +339,11 @@ export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicToke
       symbol: chainInfo.cardanoInfo.symbol,
       decimals: chainInfo.cardanoInfo.decimals
     };
+  } else if (chainInfo.bitcoinInfo) {
+    return {
+      symbol: chainInfo.bitcoinInfo.symbol,
+      decimals: chainInfo.bitcoinInfo.decimals
+    };
   }
 
   return defaultTokenInfo;

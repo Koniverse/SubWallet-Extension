@@ -1,15 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { useGetAccountChainAddresses, useGetBitcoinAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { AccountChainAddress, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
+import { isBitcoinAddress } from '@subwallet/keyring';
+import { BitcoinAddressType } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
 import { SwList } from '@subwallet/react-ui';
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -23,11 +27,29 @@ type Props = ThemeProps & {
 function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const { t } = useTranslation();
   const items: AccountChainAddress[] = useGetAccountChainAddresses(accountProxy);
+  const getBitcoinAccount = useGetBitcoinAccount();
   const notify = useNotification();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
+  const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+
+  const filteredItems = useMemo(() => {
+    if (!items) {
+      return [];
+    }
+
+    return items.filter((item) => {
+      if (isBitcoinAddress(item.address)) {
+        const addressInfo = getBitcoinAddressInfo(item.address);
+
+        return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+      }
+
+      return true;
+    });
+  }, [items]);
 
   const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
     selectAddressFormatModal.open({
@@ -45,9 +67,25 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
     });
   }, [isInModal, modalProps, selectAddressFormatModal]);
 
+  const openAccountTokenAddressModal = useCallback((accounts: AccountTokenAddress[], closeCallback?: VoidCallback) => {
+    const processFunction = () => {
+      accountTokenAddressModal.open({
+        items: accounts,
+        onBack: accountTokenAddressModal.close,
+        onCancel: () => {
+          accountTokenAddressModal.close();
+          closeCallback?.();
+        }
+      });
+    };
+
+    processFunction();
+  }, [accountTokenAddressModal]);
+
   const onShowQr = useCallback((item: AccountChainAddress) => {
     return () => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
 
       const processFunction = () => {
         addressQrModal.open({
@@ -66,6 +104,14 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
+      } else if (isBitcoinChain) {
+        const chainInfo = chainInfoMap[item.slug];
+
+        // TODO: Currently, only supports Bitcoin native token.
+        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+
+        openAccountTokenAddressModal(accountTokenAddressList);
       } else {
         onHandleTonAccountWarning(item.accountType, () => {
           onHandleLedgerGenericAccountWarning({
@@ -75,11 +121,12 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         });
       }
     };
-  }, [accountProxy, addressQrModal, checkIsPolkadotUnifiedChain, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal]);
+  }, [accountProxy, addressQrModal, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const onCopyAddress = useCallback((item: AccountChainAddress) => {
     return () => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
 
       const processFunction = () => {
         copyToClipboard(item.address || '');
@@ -90,6 +137,15 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
+      } else if (isBitcoinChain) {
+        const chainInfo = chainInfoMap[item.slug];
+
+        // TODO: Currently, only supports Bitcoin native token.
+        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+
+        openAccountTokenAddressModal(accountTokenAddressList);
       } else {
         onHandleTonAccountWarning(item.accountType, () => {
           onHandleLedgerGenericAccountWarning({
@@ -99,22 +155,36 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         });
       }
     };
-  }, [accountProxy, checkIsPolkadotUnifiedChain, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal, t]);
+  }, [accountProxy, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
 
   const onClickInfoButton = useCallback((item: AccountChainAddress) => {
     return () => {
-      openSelectAddressFormatModal(item);
+      const isBitcoinChain = isBitcoinAddress(item.address);
+
+      if (isBitcoinChain) {
+        const chainInfo = chainInfoMap[item.slug];
+
+        // TODO: Currently, only supports Bitcoin native token.
+        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+
+        openAccountTokenAddressModal(accountTokenAddressList);
+      } else {
+        openSelectAddressFormatModal(item);
+      }
     };
-  }, [openSelectAddressFormatModal]);
+  }, [chainInfoMap, getBitcoinAccount, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const renderItem = useCallback(
     (item: AccountChainAddress) => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
 
       return (
         <AccountChainAddressItem
           className={'address-item'}
-          isShowInfoButton={isPolkadotUnifiedChain}
+          isShowInfoButton={isPolkadotUnifiedChain || isBitcoinChain}
           item={item}
           key={`${item.slug}_${item.address}`}
           onClick={onShowQr(item)}
@@ -145,7 +215,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
           return prev;
         }
 
-        const targetAddress = items.find((i) => i.slug === prev.chainSlug)?.address;
+        const targetAddress = filteredItems.find((i) => i.slug === prev.chainSlug)?.address;
 
         if (!targetAddress) {
           return prev;
@@ -157,13 +227,13 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         };
       });
     }
-  }, [addressQrModal, items]);
+  }, [addressQrModal, filteredItems]);
 
   return (
     <SwList.Section
       className={className}
       enableSearchInput
-      list={items}
+      list={filteredItems}
       renderItem={renderItem}
       renderWhenEmpty={emptyList}
       searchFunction={searchFunction}
