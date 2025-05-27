@@ -138,6 +138,14 @@ export interface ResultResolver {
   accounts: string[];
 }
 
+// Switch current network auth
+
+export interface RequestSwitchCurrentNetworkAuthorization {
+  url: string;
+  networkKey: string;
+  authSwitchNetworkType: AccountAuthType
+}
+
 /// Staking subscribe
 
 export enum StakingType {
@@ -192,6 +200,7 @@ export interface PriceJson {
   exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
   price24hMap: Record<string, number>,
+  priceCoinGeckoSupported: string[],
   lastUpdatedMap: Record<string, Date>
 }
 
@@ -1157,6 +1166,7 @@ export interface TonSignatureRequest extends TonSignRequest {
 export interface CardanoSignatureRequest extends CardanoSignRequest {
   id: string;
   errors?: ErrorValidation[];
+  currentAddress: string;
   payload: unknown
 }
 
@@ -1165,6 +1175,14 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   parseData: EvmTransactionData;
   isToContract: boolean;
   errors?: ErrorValidation[]
+}
+
+export interface SubmitApiRequest extends EvmSignRequest {
+  id: string;
+  type: string;
+  payload: unknown;
+  errors?: ErrorValidation[];
+  processId?: string;
 }
 
 // Cardano Request Dapp Input
@@ -1298,7 +1316,8 @@ export interface ConfirmationDefinitions {
   evmSignatureRequest: [ConfirmationsQueueItem<EvmSignatureRequest>, ConfirmationResult<string>],
   evmSendTransactionRequest: [ConfirmationsQueueItem<EvmSendTransactionRequest>, ConfirmationResult<string>]
   evmWatchTransactionRequest: [ConfirmationsQueueItem<EvmWatchTransactionRequest>, ConfirmationResult<string>],
-  errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>]
+  errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>],
+  submitApiRequest: [ConfirmationsQueueItem<SubmitApiRequest>, ConfirmationResult<string>]
 }
 
 export interface ConfirmationDefinitionsTon {
@@ -2177,6 +2196,7 @@ export interface KoniRequestSignatures {
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
   'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
+  'pri(price.checkCoinGeckoPriceSupport)': [string, boolean];
   'pri(price.subscribeCurrentTokenPrice)': [string, ResponseSubscribeCurrentTokenPrice, CurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
@@ -2416,6 +2436,7 @@ export interface KoniRequestSignatures {
   'cardano(account.get.address)': [null, string[]];
   'cardano(account.get.balance)': [null, Cbor];
   'cardano(account.get.change.address)': [null, string];
+  'cardano(account.get.reward.address)': [null, string[]];
   'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[] | null];
   'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[] | null];
   'cardano(network.get.current)': [null, number];

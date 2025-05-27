@@ -1,29 +1,29 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CardanoSignatureRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationsQueueItem, SubmitApiRequest } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
-import { CardanoMessageDetail } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
-import { CardanoSignatureSupportType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { SubmitApiArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
+import { SubmitApiType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { BaseDetailModal, CardanoSignArea } from '../../parts';
+import { BaseDetailModal, EvmMessageDetail } from '../../parts';
 
 interface Props extends ThemeProps {
-  type: CardanoSignatureSupportType
-  request: ConfirmationsQueueItem<CardanoSignatureRequest>
+  type: SubmitApiType
+  request: ConfirmationsQueueItem<SubmitApiRequest>
 }
 
 function Component ({ className, request, type }: Props) {
   const { id, payload } = request;
   const { t } = useTranslation();
-  const { address: addressToSign, currentAddress, errors } = payload;
-  const account = useGetAccountByAddress(currentAddress);
+  const { address, errors } = payload;
+  const account = useGetAccountByAddress(address);
   const onClickDetail = useOpenDetailModal();
 
   return (
@@ -38,7 +38,7 @@ function Component ({ className, request, type }: Props) {
         </div>
         <AccountItemWithProxyAvatar
           account={account}
-          accountAddress={addressToSign}
+          accountAddress={address}
           className='account-item'
           isSelected={true}
         />
@@ -54,7 +54,7 @@ function Component ({ className, request, type }: Props) {
         </div>
         }
       </div>
-      <CardanoSignArea
+      <SubmitApiArea
         id={id}
         payload={request}
         type={type}
@@ -62,13 +62,13 @@ function Component ({ className, request, type }: Props) {
       {(!errors || errors.length === 0) && <BaseDetailModal
         title={t('Message details')}
       >
-        <CardanoMessageDetail bytes={payload.hashPayload} />
+        <EvmMessageDetail payload={request.payload} />
       </BaseDetailModal>}
     </>
   );
 }
 
-const CardanoSignatureConfirmation = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => ({
+const SubmitApiConfirmation = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => ({
   '.account-list': {
     '.__prop-label': {
       marginRight: token.marginMD,
@@ -82,4 +82,4 @@ const CardanoSignatureConfirmation = styled(Component)<Props>(({ theme: { token 
   }
 }));
 
-export default CardanoSignatureConfirmation;
+export default SubmitApiConfirmation;
