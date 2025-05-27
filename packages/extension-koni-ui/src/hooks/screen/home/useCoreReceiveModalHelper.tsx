@@ -11,6 +11,7 @@ import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHan
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
+import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -177,6 +178,13 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         item.slug,
         chainInfo
       );
+
+      accountTokenAddressList.sort((a, b) => {
+        const aDetails = getBitcoinAccountDetails(a.accountInfo.type);
+        const bDetails = getBitcoinAccountDetails(b.accountInfo.type);
+
+        return aDetails.order - bDetails.order;
+      });
 
       if (accountTokenAddressList.length > 1) {
         openAccountTokenAddressModal(accountTokenAddressList, () => {

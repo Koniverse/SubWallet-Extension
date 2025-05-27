@@ -177,7 +177,6 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                   size='md'
                 />}
                 onClick={handlePrevious}
-                tooltip={t('Previous address')}
                 type='ghost'
               />
             )}
@@ -199,7 +198,6 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                   size='md'
                 />}
                 onClick={handleNext}
-                tooltip={t('Next address')}
                 type='ghost'
               />
             )}
@@ -209,8 +207,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
             {!!bitcoinAttributes && !!bitcoinAttributes.label
               ? (
                 <div className={'__label-address-wrapper'}>
-                  <div className={'__label-address-prefix'}>{bitcoinAttributes.label} BTC</div>
-                  <span className={'__label-address-suffix'}>&nbsp;address</span>
+                  <div className={'__label-address-prefix'}>{bitcoinAttributes.label}</div>
                 </div>
               )
               : null}
@@ -322,13 +319,6 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
         fontSize: token.fontSizeSM,
         lineHeight: token.lineHeightSM,
         color: token.colorTextLight2
-      },
-
-      '.__label-address-suffix': {
-        fontWeight: 500,
-        fontSize: token.fontSizeSM,
-        lineHeight: token.lineHeightSM,
-        color: token.colorTextTertiary
       }
     },
 

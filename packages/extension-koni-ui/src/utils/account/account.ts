@@ -170,39 +170,39 @@ export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo
   };
 
   switch (type) {
-    case 'bitcoin-44':
-      result.logoKey = 'bitcoin';
-      result.name = 'Legacy';
-      result.order = 1;
-      break;
-
     case 'bitcoin-84':
       result.logoKey = 'bitcoin';
       result.name = 'Native SegWit';
-      result.order = 2;
-      break;
-
-    case 'bitcoin-86':
-      result.logoKey = 'ordinal_rune';
-      result.name = 'Taproot';
-      result.order = 3;
-      break;
-
-    case 'bittest-44':
-      result.logoKey = 'bitcoinTestnet';
-      result.name = 'Legacy';
-      result.order = 4;
+      result.order = 1;
       break;
 
     case 'bittest-84':
       result.logoKey = 'bitcoinTestnet';
       result.name = 'Native SegWit';
-      result.order = 5;
+      result.order = 2;
+      break;
+
+    case 'bitcoin-86':
+      result.logoKey = 'bitcoin';
+      result.name = 'Taproot';
+      result.order = 3;
       break;
 
     case 'bittest-86':
       result.logoKey = 'bitcoinTestnet';
       result.name = 'Taproot';
+      result.order = 4;
+      break;
+
+    case 'bitcoin-44':
+      result.logoKey = 'bitcoin';
+      result.name = 'Legacy';
+      result.order = 5;
+      break;
+
+    case 'bittest-44':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Legacy';
       result.order = 6;
       break;
   }

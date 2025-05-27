@@ -516,7 +516,8 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
 
     '.__item-chain-type-logos': {
       minHeight: 20,
-      marginRight: 12
+      marginRight: 12,
+      marginLeft: 12
     },
 
     '.account-detail-form, .derivation-info-form': {

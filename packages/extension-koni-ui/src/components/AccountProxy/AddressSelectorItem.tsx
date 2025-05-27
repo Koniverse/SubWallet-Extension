@@ -50,29 +50,46 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
 
       <div className='__item-center-part'>
-        <div className={'__item-name-wrapper'}>
-          {
-            !!name && (
-              <div className='__name'>
-                {name}
-              </div>
-            )
-          }
-          {!!bitcoinAttributes && !!bitcoinAttributes.schema
-            ? (
-              <>
-                <div className={'__name-label-divider'}> &nbsp; - &nbsp;</div>
-                <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
-                  {bitcoinAttributes.label}
+        {name
+          ? (
+            <>
+              <div className='__item-name-wrapper'>
+                <div className='__name'>
+                  {name}
                 </div>
-              </>
-            )
-            : null}
-        </div>
+                {!!bitcoinAttributes && !!bitcoinAttributes.schema
+                  ? (
+                    <>
+                      <div className='__name-label-divider'> &nbsp;-&nbsp; </div>
+                      <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
+                        {bitcoinAttributes.label}
+                      </div>
+                    </>
+                  )
+                  : null}
+              </div>
+              <div className='__address'>
+                {toShort(address, 9, 10)}
+              </div>
+            </>
+          )
+          : (
+            <div className={'__item-address-wrapper'}>
+              <div className='__address'>
+                {toShort(address, 9, 10)}
+              </div>
+              {!!bitcoinAttributes && !!bitcoinAttributes.schema
+                ? (
+                  <>
+                    <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
+                      {bitcoinAttributes.label}
+                    </div>
+                  </>
+                )
+                : null}
+            </div>
 
-        <div className='__address'>
-          {toShort(address, 9, 10)}
-        </div>
+          )}
       </div>
 
       <div className='__item-right-part'>
@@ -125,7 +142,13 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
 
     '.__item-name-wrapper': {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'baseline'
+    },
+
+    '.__item-address-wrapper': {
+      display: 'flex',
+      gap: 12,
+      alignItems: 'baseline'
     },
 
     '.__item-right-part': {
