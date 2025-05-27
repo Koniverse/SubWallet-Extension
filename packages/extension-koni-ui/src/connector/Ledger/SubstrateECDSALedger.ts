@@ -7,11 +7,9 @@ import { LedgerTypes } from '@subwallet/extension-koni-ui/types';
 import { SubstrateGenericLedger } from './SubstrateGenericLedger';
 
 export class SubstrateECDSALedger extends SubstrateGenericLedger {
-  constructor (transport: LedgerTypes, slip44: number, scheme?: LEDGER_SCHEME) {
+  constructor (transport: LedgerTypes, slip44: number) {
     super(transport, slip44);
 
-    if (scheme) {
-      this.scheme = scheme;
-    }
+    this.scheme = LEDGER_SCHEME.ECDSA;
   }
 }

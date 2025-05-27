@@ -105,7 +105,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const allowedMap = currentAuth.isAllowedMap;
 
         const filterType = (address: string, isSubstrateECDSA?: boolean) => {
-          return isAddressAllowedWithAuthType(address, types, isSubstrateECDSA);
+          return isAddressAllowedWithAuthType(address, types);
         };
 
         let accountToCheck = noAllAccounts;

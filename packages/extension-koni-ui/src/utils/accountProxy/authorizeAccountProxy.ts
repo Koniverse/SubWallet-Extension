@@ -5,17 +5,19 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 
-export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], accountAuthTypes: AccountAuthType[]): AccountProxy[] => {
+export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], accountAuthTypes: AccountAuthType[], isSubstrateConnector = false): AccountProxy[] => {
   const rs = accountProxies.filter(({ accounts, chainTypes, id }) => {
     if (isAccountAll(id)) {
       return false;
     }
 
+    const isEcdsaAccountProxy = accounts.some((account) => account.isSubstrateECDSA);
+
     return accountAuthTypes.some((type) => {
       if (type === 'substrate') {
-        return chainTypes.includes(AccountChainType.SUBSTRATE) || accounts[0]?.isSubstrateECDSA;
+        return chainTypes.includes(AccountChainType.SUBSTRATE);
       } else if (type === 'evm') {
-        return chainTypes.includes(AccountChainType.ETHEREUM) && !accounts[0]?.isSubstrateECDSA;
+        return chainTypes.includes(AccountChainType.ETHEREUM) && (isSubstrateConnector || !isEcdsaAccountProxy);
       } else if (type === 'ton') {
         return chainTypes.includes(AccountChainType.TON);
       } else if (type === 'cardano') {
@@ -33,7 +35,7 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
   return rs;
 };
 
-export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthType[] = [], accountChainTypes: AccountChainType[], isSubstrateECDSA?: boolean): AccountChainType[] => {
+export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthType[] = [], accountChainTypes: AccountChainType[]): AccountChainType[] => {
   if (!accountAuthTypes) {
     return [];
   }
@@ -43,10 +45,6 @@ export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthTy
   accountAuthTypes.forEach((type) => {
     if (type === 'substrate') {
       chainTypes.push(AccountChainType.SUBSTRATE);
-
-      if (isSubstrateECDSA) {
-        chainTypes.push(AccountChainType.ETHEREUM);
-      }
     } else if (type === 'evm') {
       chainTypes.push(AccountChainType.ETHEREUM);
     } else if (type === 'ton') {

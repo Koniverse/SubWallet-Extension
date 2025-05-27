@@ -10,7 +10,7 @@ import { useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -40,7 +40,7 @@ async function handleBlock ({ id }: AuthorizeRequest) {
 function Component ({ className, request }: Props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const { accountAuthTypes, allowedAccounts } = request.request;
+  const { accountAuthTypes, allowedAccounts, isSubstrateConnector } = request.request;
   const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
   const navigate = useNavigate();
 
@@ -48,8 +48,8 @@ function Component ({ className, request }: Props) {
   const setSelectedAccountTypes = useSetSelectedAccountTypes(true);
 
   // List all of all accounts by auth type
-  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES)),
-    [accountAuthTypes, accountProxies]);
+  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, isSubstrateConnector)),
+    [accountAuthTypes, accountProxies, isSubstrateConnector]);
 
   // Selected map with default values is map of all accounts
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});
@@ -106,11 +106,11 @@ function Component ({ className, request }: Props) {
   const onConfirm = useCallback(() => {
     setLoading(true);
     const selectedAccountProxyIds = Object.keys(selectedMap).filter((key) => selectedMap[key]);
-    const selectedAccounts = accounts.filter(({ chainType, isSubstrateECDSA, proxyId }) => {
+    const selectedAccounts = accounts.filter(({ chainType, proxyId }) => {
       if (selectedAccountProxyIds.includes(proxyId || '')) {
         switch (chainType) {
           case AccountChainType.SUBSTRATE: return accountAuthTypes?.includes('substrate');
-          case AccountChainType.ETHEREUM: return isSubstrateECDSA ? accountAuthTypes?.includes('substrate') : accountAuthTypes?.includes('evm');
+          case AccountChainType.ETHEREUM: return accountAuthTypes?.includes('evm');
           case AccountChainType.TON: return accountAuthTypes?.includes('ton');
           case AccountChainType.CARDANO: return accountAuthTypes?.includes('cardano');
         }
@@ -241,7 +241,7 @@ function Component ({ className, request }: Props) {
               {visibleAccountProxies.map((item) => (
                 <AccountProxyItem
                   accountProxy={item}
-                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes, isSubstrateEcdsaAccountProxy(item))}
+                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes)}
                   className={'__account-proxy-item'}
                   isSelected={selectedMap[item.id]}
                   key={item.id}

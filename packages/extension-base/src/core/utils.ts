@@ -32,15 +32,11 @@ export function getMaxBigInt (a: bigint, b: bigint): bigint {
 }
 
 export function ledgerMustCheckNetwork (account: AccountJson | null): LedgerMustCheckType {
-  if (account && account.isHardware && account.isGeneric) {
-    if (!isEthereumAddress(account.address)) {
-      return account.originGenesisHash ? 'migration' : 'polkadot';
-    } else if (account.isSubstrateECDSA) {
-      return 'polkadot_ecdsa';
-    }
+  if (account && account.isHardware && account.isGeneric && !isEthereumAddress(account.address)) {
+    return account.originGenesisHash ? 'migration' : 'polkadot';
+  } else {
+    return 'unnecessary';
   }
-
-  return 'unnecessary';
 }
 
 // --- recipient address validation --- //
@@ -116,16 +112,6 @@ export function _isValidCardanoAddressFormat (validateRecipientParams: ValidateR
   return '';
 }
 
-export function _isValidEvmAddressFormat (validateRecipientParams: ValidateRecipientParams): string {
-  const { destChainInfo, toAddress } = validateRecipientParams;
-
-  if (_isChainEvmCompatible(destChainInfo) && !isEthereumAddress(toAddress)) {
-    return 'Recipient address must be a valid EVM address';
-  }
-
-  return '';
-}
-
 export function _isNotDuplicateAddress (validateRecipientParams: ValidateRecipientParams): string {
   const { fromAddress, toAddress } = validateRecipientParams;
 
@@ -151,10 +137,6 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
     } else {
       // For ledger generic
       const ledgerCheck = ledgerMustCheckNetwork(account);
-
-      if (ledgerCheck === 'polkadot_ecdsa' && (!destChainInfo.substrateInfo || !destChainInfo.evmInfo)) {
-        return 'Ledger ECDSA address is not supported for this transfer';
-      }
 
       if (ledgerCheck !== 'unnecessary' && !allowLedgerGenerics.includes(destChainInfo.slug)) {
         return `Ledger ${ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration'} address is not supported for this transfer`;

@@ -44,7 +44,7 @@ interface AccountSub {
   url: string;
 }
 
-function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[]): InjectedAccount[] {
+function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[], isSubstrateConnector?: boolean): InjectedAccount[] {
   const accountSelected = authInfo
     ? (
       authInfo.isAllowed
@@ -69,9 +69,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         cardano: CardanoKeypairTypes
       };
 
-      // This condition ensures that the substrate account with evm format address is can be used in Substrate dApps
-      const subCondition = (authType: AccountAuthType) => authType === 'substrate' && json.meta.isSubstrateECDSA;
-      const isValidTypes = accountAuthTypes.some((authType) => validTypes[authType]?.includes(type) || subCondition(authType));
+      const isValidTypes = accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
 
       if (!isValidTypes) {
         return false;
@@ -82,8 +80,8 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         return false;
       }
 
-      // If the user only wants to connect to EVM, we don't return Substrate ECDSA accounts
-      if (type === 'ethereum' && json.meta.isSubstrateECDSA && accountAuthTypes.length === 1 && accountAuthTypes[0] === 'evm') {
+      // If the dApp has not connected to the Substrate type yet, we do not return Substrate ECDSA accounts.
+      if (type === 'ethereum' && json.meta.isSubstrateECDSA && !isSubstrateConnector) {
         return false;
       }
 
@@ -323,7 +321,7 @@ export default class KoniTabs {
     return authList[shortenUrl];
   }
 
-  private async accountsListV2 (url: string, { accountAuthType, anyType }: RequestAccountList): Promise<InjectedAccount[]> {
+  private async accountsListV2 (url: string, { accountAuthType, anyType, isSubstrateConnector }: RequestAccountList): Promise<InjectedAccount[]> {
     const authInfo = await this.getAuthInfo(url);
 
     const accountAuthTypes: AccountAuthType[] = [];
@@ -348,7 +346,7 @@ export default class KoniTabs {
       }
     }
 
-    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
+    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes, isSubstrateConnector);
   }
 
   // TODO: Update logic
@@ -376,7 +374,7 @@ export default class KoniTabs {
 
             const accounts = this.#koniState.keyringService.context.pairs;
 
-            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes));
+            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes, true));
           })
           .catch(console.error);
       }),

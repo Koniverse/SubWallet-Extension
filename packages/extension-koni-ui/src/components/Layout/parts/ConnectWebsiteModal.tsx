@@ -11,7 +11,7 @@ import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, NetworkItem, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight, CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
@@ -57,8 +57,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       setAllowedMap((values) => {
         const newValues = { ...values };
         const listAddress = accountProxy.accounts
-          .map(({ address, isSubstrateECDSA }) => ({ address, isSubstrateECDSA }))
-          .filter(({ address, isSubstrateECDSA }) => isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || [], isSubstrateECDSA));
+          .filter(({ address }) => isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []));
 
         listAddress.forEach(({ address }) => {
           newValues[address] = !oldValue;
@@ -113,7 +112,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       const allowedMap = authInfo.isAllowedMap;
 
       const filterType = (address: string) => {
-        return isAddressAllowedWithAuthType(address, types, substrateEcdsaAddresses.includes(address));
+        return isAddressAllowedWithAuthType(address, types);
       };
 
       const result: Record<string, boolean> = {};
@@ -269,7 +268,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       );
     }
 
-    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || []).map((proxy) => {
+    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || [], authInfo?.isSubstrateConnector).map((proxy) => {
       const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 
       return {
@@ -304,7 +303,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
               return (
                 <AccountProxyItem
                   accountProxy={ap}
-                  chainTypes={convertAuthorizeTypeToChainTypes(authInfo?.accountAuthTypes, ap.chainTypes, isSubstrateEcdsaAccountProxy(ap))}
+                  chainTypes={convertAuthorizeTypeToChainTypes(authInfo?.accountAuthTypes, ap.chainTypes)}
                   className={CN({
                     '-is-current': isCurrent
                   }, '__account-proxy-connect-item')}

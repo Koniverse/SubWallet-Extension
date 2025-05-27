@@ -69,7 +69,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
       return new EVMLedger('webusb', def.slip44);
     } else {
       if (def.scheme === LEDGER_SCHEME.ECDSA) {
-        return new SubstrateECDSALedger('webusb', def.slip44, def.scheme);
+        return new SubstrateECDSALedger('webusb', def.slip44);
       } else if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
 
