@@ -15,14 +15,14 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
   readonly icon: string = WALLET_ICON;
   readonly name: string = WALLET_NAME;
   readonly supportedExtensions: CardanoExtensionCIP[] = [...ExtensionCIPsSupported];
-  protected sendMessage: SendRequest;
+  private readonly sendMessage: SendRequest;
 
   constructor (sendMessage: SendRequest) {
     this.icon = WALLET_ICON;
     this.sendMessage = sendMessage;
   }
 
-  public async enable () {
+  public enable = async () => {
     const isEnabled = await this.sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes: ['cardano'] });
 
     if (!isEnabled) {
@@ -31,12 +31,12 @@ export default class SubWalletCardanoProvider implements CardanoProvider {
 
     const CIP30 = new CIP30Api(this.sendMessage);
 
-    return Object.freeze(CIP30);
-  }
+    return Object.freeze(CIP30.apis);
+  };
 
-  async isEnable (): Promise<boolean> {
+  public isEnable = async (): Promise<boolean> => {
     const accountList = await this.sendMessage('pub(accounts.list)', { accountAuthType: 'cardano' });
 
     return accountList.length > 0;
-  }
+  };
 }

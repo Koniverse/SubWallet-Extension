@@ -237,7 +237,7 @@ const Wrapper: React.FC<Props> = (props: Props) => {
       return true;
     }
 
-    return new BigN(value).gte(1);
+    return new BigN(value).gte(1) || new BigN(value).lte(-1);
   }, [hide, value]);
 
   if (isDefaultComponentUsed) {
