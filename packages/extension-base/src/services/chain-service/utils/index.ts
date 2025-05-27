@@ -348,6 +348,14 @@ export function _getChainNativeTokenSlug (chainInfo: _ChainInfo) {
   return `${chainInfo.slug}-${_AssetType.NATIVE}-${_getChainNativeTokenBasicInfo(chainInfo).symbol}`;
 }
 
+export function _getChainSubstrateTokenSymbol (chainInfo: _ChainInfo) {
+  if (chainInfo.substrateInfo) {
+    return chainInfo.substrateInfo.symbol || '';
+  } else {
+    return '';
+  }
+}
+
 export function _isLocalToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.LOCAL;
 }
