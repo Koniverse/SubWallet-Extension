@@ -10,7 +10,16 @@ import { BehaviorSubject } from 'rxjs';
 import { DEFAULT_SERVICE_INFO } from './constants';
 
 const convertSupportType = (support: OnrampAccountSupportType): AccountChainType => {
-  return support === 'ETHEREUM' ? AccountChainType.ETHEREUM : AccountChainType.SUBSTRATE;
+  switch (support) {
+    case 'ETHEREUM':
+      return AccountChainType.ETHEREUM;
+    case 'SUBSTRATE':
+      return AccountChainType.SUBSTRATE;
+    case 'CARDANO':
+      return AccountChainType.CARDANO;
+    case 'TON':
+      return AccountChainType.TON;
+  }
 };
 
 export default class BuyService {
