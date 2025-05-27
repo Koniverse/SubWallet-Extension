@@ -86,6 +86,8 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   const { recipient, sender, slippageTolerance } = params;
   let routeSummary = params.routeSummary;
 
+  console.log('routeSummary1', routeSummary);
+
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
     return {
       error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR)
@@ -134,6 +136,8 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     ignoreCappedSlippage: true,
     enableGasEstimation: true
   };
+
+  console.log('routeSummary2', routeSummary);
 
   try {
     const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
