@@ -3,12 +3,13 @@
 
 import { Layout } from '@subwallet/extension-koni-ui/components';
 import { CUSTOMIZE_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes, useSelector, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
+import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ButtonProps, Icon, ModalContext } from '@subwallet/react-ui';
+import { ButtonProps, Dropdown, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { BellSimpleRinging, FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
+import { ArrowsOut, BellSimpleRinging, FadersHorizontal, MagnifyingGlass, PuzzlePiece, SidebarSimple } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,23 +17,24 @@ import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   children?: React.ReactNode;
-  showFilterIcon?: boolean;
-  showSearchIcon?: boolean;
+  showFaderIcon?: boolean;
+  showSearchToken?: boolean;
+  showSidebarIcon?: boolean;
   showNotificationIcon?: boolean;
-  onClickFilterIcon?: () => void;
-  onClickSearchIcon?: () => void;
+  onClickSearchToken?: () => void;
   showTabBar?: boolean;
   isDisableHeader?: boolean;
-
 }
 
-const Component = ({ children, className, isDisableHeader, onClickFilterIcon, onClickSearchIcon, showFilterIcon, showNotificationIcon, showSearchIcon, showTabBar }: Props) => {
+const Component = ({ children, className, isDisableHeader, onClickSearchToken, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, showTabBar }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
+  const { closeSidePanel, isSidePanelSupported, openSidePanel } = useSidePanelUtils();
+  const { isExpanseMode, isPopupMode, isSidePanelMode } = useExtensionDisplayModes();
 
   const unreadNotificationCount = useMemo(() => {
     if (!currentAccountProxy || !unreadNotificationCountMap) {
@@ -50,36 +52,80 @@ const Component = ({ children, className, isDisableHeader, onClickFilterIcon, on
     navigate('/settings/notification');
   }, [navigate]);
 
+  const faderMenu = useMemo(() => {
+    return [
+      {
+        key: '1',
+        label: t('Network display'),
+        icon: (
+          <Icon phosphorIcon={FadersHorizontal} />
+        ),
+        onClick: onOpenCustomizeModal
+      },
+      {
+        key: '2',
+        label: t('Search token'),
+        icon: (
+          <Icon phosphorIcon={MagnifyingGlass} />
+        ),
+        onClick: onClickSearchToken
+      }
+    ];
+  }, [onClickSearchToken, onOpenCustomizeModal, t]);
+
+  const sidebarMenu = useMemo(() => {
+    const expandViewItem = {
+      key: '1',
+      label: t('Expand view'),
+      icon: (
+        <Icon phosphorIcon={ArrowsOut} />
+      ),
+      onClick: () => {
+        windowOpen({ allowedPath: '/' }).catch(console.error);
+        isSidePanelMode && closeSidePanel();
+      }
+    };
+
+    const openInSidebarItem = {
+      key: '2',
+      label: t('Open in sidebar'),
+      icon: (
+        <Icon phosphorIcon={SidebarSimple} />
+      ),
+      disabled: !isSidePanelSupported,
+      onClick: () => {
+        isPopupMode && window.close();
+        openSidePanel();
+      }
+    };
+
+    const openInPopupItem = {
+      key: '3',
+      label: t('Open in popup'),
+      icon: (
+        <Icon
+          phosphorIcon={PuzzlePiece}
+          weight={'fill'}
+        />
+      ),
+      onClick: () => {
+        isSidePanelMode && closeSidePanel();
+      }
+    };
+
+    if (isPopupMode) {
+      return [expandViewItem, openInSidebarItem];
+    }
+
+    if (isSidePanelMode) {
+      return [expandViewItem, openInPopupItem];
+    }
+
+    return [];
+  }, [closeSidePanel, isPopupMode, isSidePanelMode, isSidePanelSupported, openSidePanel, t]);
+
   const headerIcons = useMemo<ButtonProps[]>(() => {
     const icons: ButtonProps[] = [];
-
-    if (showFilterIcon) {
-      icons.push({
-        icon: (
-          <Icon
-            phosphorIcon={FadersHorizontal}
-            size='md'
-          />
-        ),
-        onClick: onClickFilterIcon || onOpenCustomizeModal,
-        tooltip: t('Customize your asset display'),
-        tooltipPlacement: 'bottomRight'
-      });
-    }
-
-    if (showSearchIcon) {
-      icons.push({
-        icon: (
-          <Icon
-            phosphorIcon={MagnifyingGlass}
-            size='md'
-          />
-        ),
-        onClick: onClickSearchIcon,
-        tooltip: t('Search a token'),
-        tooltipPlacement: 'bottomRight'
-      });
-    }
 
     if (showNotificationIcon) {
       icons.push({
@@ -99,8 +145,81 @@ const Component = ({ children, className, isDisableHeader, onClickFilterIcon, on
       });
     }
 
+    if (showFaderIcon) {
+      if (showSearchToken) {
+        icons.push({
+          icon: (
+            <>
+              <Icon
+                phosphorIcon={FadersHorizontal}
+                size='md'
+              />
+              <Dropdown
+                arrow={false}
+                menu={{ items: faderMenu }}
+                overlayClassName={'sw-dropdown-menu'}
+                placement='bottomRight'
+                trigger={['click']}
+              >
+                <i className={'sw-dropdown-trigger'}></i>
+              </Dropdown>
+            </>
+          )
+        });
+      } else {
+        icons.push({
+          icon: (
+            <Icon
+              phosphorIcon={FadersHorizontal}
+              size='md'
+            />
+          ),
+          onClick: onOpenCustomizeModal,
+          tooltip: t('Customize your asset display'),
+          tooltipPlacement: 'bottomRight'
+        });
+      }
+    }
+
+    if (showSidebarIcon) {
+      if (isExpanseMode) {
+        icons.push({
+          icon: (
+            <Icon
+              phosphorIcon={SidebarSimple}
+              size='md'
+            />
+          ),
+          disabled: !isSidePanelSupported,
+          onClick: openSidePanel,
+          tooltip: t('Open in sidebar'),
+          tooltipPlacement: 'bottomRight'
+        });
+      } else {
+        icons.push({
+          icon: (
+            <>
+              <Icon
+                phosphorIcon={SidebarSimple}
+                size='md'
+              />
+              <Dropdown
+                arrow={false}
+                menu={{ items: sidebarMenu }}
+                overlayClassName={'sw-dropdown-menu'}
+                placement='bottomRight'
+                trigger={['click']}
+              >
+                <i className={'sw-dropdown-trigger'}></i>
+              </Dropdown>
+            </>
+          )
+        });
+      }
+    }
+
     return icons;
-  }, [onClickFilterIcon, onClickSearchIcon, onOpenCustomizeModal, onOpenNotification, showFilterIcon, showNotificationIcon, showSearchIcon, t, unreadNotificationCount, notiEnable]);
+  }, [faderMenu, isExpanseMode, isSidePanelSupported, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
 
   const onClickListIcon = useCallback(() => {
     navigate('/settings/list');

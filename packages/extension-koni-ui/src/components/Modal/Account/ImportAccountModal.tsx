@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useClickOutSide, useGoBackSelectAccount, useIsPopup, useSetSessionLatest, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -37,7 +37,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { checkActive, inactiveModal } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
-  const isPopup = useIsPopup();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
   const onBack = useGoBackSelectAccount(modalId);
 
   const onCancel = useCallback(() => {
@@ -56,13 +57,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [inactiveModal, setStateSelectAccount, navigate]);
 
   const onClickJson = useCallback(() => {
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({ allowedPath: '/accounts/restore-json' }).catch(console.error);
+
+      isSidePanelMode && closeSidePanel();
     } else {
       inactiveModal(modalId);
       navigate('/accounts/restore-json');
     }
-  }, [inactiveModal, isPopup, navigate]);
+  }, [closeSidePanel, inactiveModal, isExpanseMode, isSidePanelMode, navigate]);
 
   const onClickSeed = useCallback(() => {
     inactiveModal(modalId);

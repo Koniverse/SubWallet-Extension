@@ -3,7 +3,7 @@
 
 import type { WindowOpenParams } from '@subwallet/extension-base/background/types';
 
-import { CronReloadRequest, Notification, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { CronReloadRequest, CurrentTokenPrice, Notification, PriceChartTimeframe, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging/base';
 
@@ -42,6 +42,18 @@ export async function cancelSubscription (request: string): Promise<boolean> {
 
 export async function subscribeTransactionHistory (chain: string, address: string, callback: (items: TransactionHistoryItem[]) => void): Promise<ResponseSubscribeHistory> {
   return sendMessage('pri(transaction.history.subscribe)', { address, chain }, callback);
+}
+
+export async function getHistoryTokenPrice (priceId: string, timeframe: PriceChartTimeframe) {
+  return sendMessage('pri(price.getHistory)', { priceId, timeframe });
+}
+
+export async function canShowChart (priceId: string): Promise<boolean> {
+  return sendMessage('pri(price.checkCoinGeckoPriceSupport)', priceId);
+}
+
+export async function subscribeCurrentTokenPrice (priceId: string, callback: (item: CurrentTokenPrice) => void): Promise<ResponseSubscribeCurrentTokenPrice> {
+  return sendMessage('pri(price.subscribeCurrentTokenPrice)', priceId, callback);
 }
 
 export * from './accounts';

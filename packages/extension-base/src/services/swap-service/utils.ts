@@ -52,7 +52,7 @@ export const FEE_RATE_MULTIPLIER: Record<string, number> = {
   high: 2
 };
 
-export function getSupportSwapChain (): string[] {
+export function getSupportedSwapChains (): string[] {
   return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
 }
 
@@ -301,6 +301,22 @@ export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
   });
 
   return swapChains;
+}
+
+export function processStepsToPathActions (steps: CommonStepDetail[]): DynamicSwapType[] {
+  const path: DynamicSwapType[] = [];
+
+  for (const step of steps) {
+    if (step.type === CommonStepType.XCM) {
+      path.push(DynamicSwapType.BRIDGE);
+    }
+
+    if (step.type === SwapStepType.SWAP) {
+      path.push(DynamicSwapType.SWAP);
+    }
+  }
+
+  return path;
 }
 
 export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.04; // add 2%

@@ -16,6 +16,7 @@ export const TELEGRAM_URL = 'https://t.me/subwallet';
 export const TWITTER_URL = 'https://twitter.com/subwalletapp';
 export const DISCORD_URL = 'https://discord.com/invite/vPCN4vdB8v';
 export const SUPPORT_MAIL = 'mailto:support@subwallet.app';
+export const CONTACT_SUPPORT_URL = 'https://support.subwallet.app';
 export const EXTENSION_URL = 'https://subwallet.app/download.html';
 export const CONTACT_US = 'https://t.me/subwallet';
 export const ALL_KEY = 'all';
