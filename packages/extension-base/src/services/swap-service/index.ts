@@ -26,8 +26,9 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
+import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
-import { UniswapHandler } from './handler/uniswap-handler';
+import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
 
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
@@ -46,12 +47,23 @@ export class SwapService implements StoppableServiceInterface {
     this.chainService = state.chainService;
   }
 
-  private async askProvidersForQuote (request: SwapRequestV2) {
+  private async askProvidersForQuote (_request: SwapRequestV2) {
     const availableQuotes: QuoteAskResponse[] = [];
+
+    // hotfix // todo: remove later
+    const request = {
+      ..._request,
+      isSupportKyberVersion: true
+    };
+
     const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
 
     if (Array.isArray(quotes)) {
       quotes.forEach((quoteData) => {
+        if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
+          return;
+        }
+
         if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
           return;
         }
@@ -131,6 +143,14 @@ export class SwapService implements StoppableServiceInterface {
     console.group('Swap Logger');
     console.log('path', path);
     console.log('swapQuoteResponse', swapQuoteResponse);
+
+    if (swapQuoteResponse.optimalQuote && swapQuoteResponse.optimalQuote.metadata) {
+      const routing = (swapQuoteResponse.optimalQuote.metadata as UniswapMetadata).routing;
+
+      if (routing) {
+        console.log('Uniswap routing', routing);
+      }
+    }
 
     let optimalProcess;
 
@@ -289,7 +309,14 @@ export class SwapService implements StoppableServiceInterface {
     const availablePath = await subwalletApiSdk.swapApi?.findAvailablePath(request);
 
     if (!availablePath) {
-      throw Error('No available path');
+      return {
+        path: [],
+        swapQuoteResponse: {
+          quotes: [],
+          aliveUntil: Date.now() + SWAP_QUOTE_TIMEOUT_MAP.error,
+          error: new SwapError(SwapErrorType.ERROR_FETCHING_QUOTE)
+        }
+      };
     }
 
     const { path } = availablePath;
@@ -417,6 +444,9 @@ export class SwapService implements StoppableServiceInterface {
           break;
         case SwapProviderId.UNISWAP:
           this.handlers[providerId] = new UniswapHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
+        case SwapProviderId.KYBER:
+          this.handlers[providerId] = new KyberHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
           break;
         default:
           throw new Error('Unsupported provider');
