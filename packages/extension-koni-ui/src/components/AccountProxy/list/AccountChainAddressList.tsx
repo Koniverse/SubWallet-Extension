@@ -32,7 +32,7 @@ interface BitcoinAccountsByNetwork {
 function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const { t } = useTranslation();
   const items: AccountChainAddress[] = useGetAccountChainAddresses(accountProxy);
-  const getBitcoinAccount = useGetBitcoinAccounts();
+  const getBitcoinAccounts = useGetBitcoinAccounts();
   const notify = useNotification();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
@@ -106,9 +106,9 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
 
-      return getBitcoinAccount(slug, nativeTokenSlug, chainInfo, bitcoinAccounts);
+      return getBitcoinAccounts(slug, nativeTokenSlug, chainInfo, bitcoinAccounts);
     },
-    [chainInfoMap, getBitcoinAccount]
+    [chainInfoMap, getBitcoinAccounts]
   );
 
   const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
@@ -186,7 +186,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }, processFunction);
       });
     };
-  }, [accountProxy, addressQrModal, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
+  }, [accountProxy, addressQrModal, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const onCopyAddress = useCallback((item: AccountChainAddress) => {
     return () => {
@@ -225,7 +225,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }, processFunction);
       });
     };
-  }, [accountProxy, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
+  }, [accountProxy, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
 
   const onClickInfoButton = useCallback((item: AccountChainAddress) => {
     return () => {
@@ -244,17 +244,25 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       openSelectAddressFormatModal(item);
     };
-  }, [chainInfoMap, getBitcoinAccount, openAccountTokenAddressModal, openSelectAddressFormatModal]);
+  }, [bitcoinAccountList, getBitcoinTokenAddresses, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const renderItem = useCallback(
     (item: AccountChainAddress) => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
       const isBitcoinChain = isBitcoinAddress(item.address);
-      const tooltip = isPolkadotUnifiedChain ? 'This network has two address formats' : '';
+      let tooltip = '';
+
+      if (isPolkadotUnifiedChain) {
+        tooltip = 'This network has two address formats';
+      } else if (isBitcoinChain) {
+        tooltip = 'This network has three address types';
+      }
+
       let isShowBitcoinInfoButton = false;
 
       if (isBitcoinChain) {
         const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
         isShowBitcoinInfoButton = accountTokenAddressList.length > 1;
       }
 
@@ -272,7 +280,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         />
       );
     },
-    [checkIsPolkadotUnifiedChain, onClickInfoButton, onCopyAddress, onShowQr]
+    [bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, onClickInfoButton, onCopyAddress, onShowQr]
   );
 
   const emptyList = useCallback(() => {

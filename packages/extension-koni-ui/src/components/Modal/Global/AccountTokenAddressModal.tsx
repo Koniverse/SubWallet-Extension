@@ -25,6 +25,7 @@ type Props = ThemeProps & AccountTokenAddressModalProps & {
 };
 
 const modalId = ADDRESS_GROUP_MODAL;
+const LEARN_MORE_DOCS_URL = 'https://docs.subwallet.app/main/extension-user-guide/receive-and-transfer-assets/receive-tokens-and-nfts#select-your-preferred-bitcoin-address';
 
 const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Props) => {
   const { t } = useTranslation();
@@ -108,14 +109,24 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
         : undefined}
       title={t<string>('Select address type')}
     >
-      <SwList
-        actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
-        className={'address-group-list'}
-        list={items}
-        renderItem={renderItem}
-        renderWhenEmpty={renderEmpty}
-      />
-      <div></div>
+      <div>
+        <div className={'sub-title'}>
+          {t('SubWallet supports three Bitcoin address types for receiving and transferring assets. Make sure you choose the correct address type to avoid risks of fund loss. ')}
+          <a
+            href={LEARN_MORE_DOCS_URL}
+            rel='noreferrer'
+            style={{ textDecoration: 'underline' }}
+            target={'_blank'}
+          >Learn more</a>
+        </div>
+        <SwList
+          actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
+          className={'address-group-list'}
+          list={items}
+          renderItem={renderItem}
+          renderWhenEmpty={renderEmpty}
+        />
+      </div>
     </SwModal>
   );
 };
@@ -129,6 +140,15 @@ const AccountTokenAddressModal = styled(Component)<Props>(({ theme: { token } }:
 
     '.item-wrapper + .item-wrapper': {
       marginTop: 8
+    },
+
+    '.sub-title': {
+      paddingBottom: token.padding,
+      fontSize: token.fontSizeSM,
+      fontWeight: token.bodyFontWeight,
+      lineHeight: token.lineHeightSM,
+      textAlign: 'center',
+      color: token.colorTextTertiary
     },
 
     '.ant-sw-list-search-input': {
