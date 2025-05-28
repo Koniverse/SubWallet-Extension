@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { AccountBitcoinInfoType, AccountTokenAddress } from '@subwallet/extension-koni-ui/types';
+import { AccountInfoType, AccountTokenAddress } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes } from '@subwallet/keyring/types';
 import { useCallback } from 'react';
 
 const transformBitcoinAccounts = (
-  accounts: AccountBitcoinInfoType[] = [],
+  accounts: AccountInfoType[] = [],
   chainSlug: string,
   tokenSlug: string,
   chainInfo: _ChainInfo
@@ -27,8 +27,8 @@ const transformBitcoinAccounts = (
     }));
 };
 
-const useGetBitcoinAccount = () => {
-  return useCallback((chainSlug: string, tokenSlug: string, chainInfo: _ChainInfo, accountProxy: AccountBitcoinInfoType[]): AccountTokenAddress[] => {
+const useGetBitcoinAccounts = () => {
+  return useCallback((chainSlug: string, tokenSlug: string, chainInfo: _ChainInfo, accountProxy: AccountInfoType[]): AccountTokenAddress[] => {
     const accountTokenAddressList = transformBitcoinAccounts(
       accountProxy || [],
       chainSlug,
@@ -47,4 +47,4 @@ const useGetBitcoinAccount = () => {
   }, []);
 };
 
-export default useGetBitcoinAccount;
+export default useGetBitcoinAccounts;

@@ -36,13 +36,13 @@ export type AccountChainAddress = {
   logoKey?: string
 }
 
-export type AccountBitcoinInfoType = {
+export type AccountInfoType = {
   address: string;
   type: KeypairType;
 }
 
 export type AccountTokenAddress = {
-  accountInfo: AccountBitcoinInfoType;
+  accountInfo: AccountInfoType;
   tokenSlug: string;
   chainSlug: string;
 }

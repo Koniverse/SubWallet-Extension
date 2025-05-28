@@ -6,8 +6,8 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetAccountChainAddresses, useGetBitcoinAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { AccountBitcoinInfoType, AccountChainAddress, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { useGetAccountChainAddresses, useGetBitcoinAccounts, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { AccountChainAddress, AccountInfoType, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { isBitcoinAddress } from '@subwallet/keyring';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
@@ -24,10 +24,15 @@ type Props = ThemeProps & {
   }
 };
 
+interface BitcoinAccountsByNetwork {
+  mainnet: AccountInfoType[];
+  testnet: AccountInfoType[];
+}
+
 function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const { t } = useTranslation();
   const items: AccountChainAddress[] = useGetAccountChainAddresses(accountProxy);
-  const getBitcoinAccount = useGetBitcoinAccount();
+  const getBitcoinAccount = useGetBitcoinAccounts();
   const notify = useNotification();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
@@ -35,7 +40,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const bitcoinAccountList: AccountBitcoinInfoType[] = useMemo(() => {
+  const bitcoinAccountList: AccountInfoType[] = useMemo(() => {
     if (!items) {
       return [];
     }
@@ -48,6 +53,27 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       }));
   }, [items]);
 
+  const soloBitcoinAccount = useMemo((): BitcoinAccountsByNetwork => {
+    if (!bitcoinAccountList || bitcoinAccountList.length === 0) {
+      return { mainnet: [], testnet: [] };
+    }
+
+    const mainnet: AccountInfoType[] = [];
+    const testnet: AccountInfoType[] = [];
+
+    bitcoinAccountList.forEach((account) => {
+      const bitcoinAddressInfo = getBitcoinAddressInfo(account.address);
+
+      if (bitcoinAddressInfo.network === 'mainnet') {
+        mainnet.push(account);
+      } else {
+        testnet.push(account);
+      }
+    });
+
+    return { mainnet, testnet };
+  }, [bitcoinAccountList]);
+
   const filteredItems = useMemo(() => {
     if (!items) {
       return [];
@@ -57,12 +83,33 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       if (isBitcoinAddress(item.address)) {
         const addressInfo = getBitcoinAddressInfo(item.address);
 
-        return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+        if (addressInfo.network === 'mainnet' && soloBitcoinAccount.mainnet.length > 1) {
+          return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+        } else if (addressInfo.network === 'testnet' && soloBitcoinAccount.testnet.length > 1) {
+          return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+        }
+
+        return true;
       }
 
       return true;
     });
-  }, [items]);
+  }, [items, soloBitcoinAccount.mainnet.length, soloBitcoinAccount.testnet.length]);
+
+  const getBitcoinTokenAddresses = useCallback(
+    (slug: string, bitcoinAccounts: AccountInfoType[]): AccountTokenAddress[] => {
+      const chainInfo = chainInfoMap[slug];
+
+      if (!chainInfo) {
+        return [];
+      }
+
+      const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+
+      return getBitcoinAccount(slug, nativeTokenSlug, chainInfo, bitcoinAccounts);
+    },
+    [chainInfoMap, getBitcoinAccount]
+  );
 
   const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
     selectAddressFormatModal.open({
@@ -117,22 +164,27 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
-      } else if (isBitcoinChain) {
-        const chainInfo = chainInfoMap[item.slug];
 
-        // TODO: Currently, only supports Bitcoin native token.
-        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
-
-        openAccountTokenAddressModal(accountTokenAddressList);
-      } else {
-        onHandleTonAccountWarning(item.accountType, () => {
-          onHandleLedgerGenericAccountWarning({
-            accountProxy: accountProxy,
-            chainSlug: item.slug
-          }, processFunction);
-        });
+        return;
       }
+
+      if (isBitcoinChain) {
+        // TODO: Currently, only supports Bitcoin native token.
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
+
+          return;
+        }
+      }
+
+      onHandleTonAccountWarning(item.accountType, () => {
+        onHandleLedgerGenericAccountWarning({
+          accountProxy: accountProxy,
+          chainSlug: item.slug
+        }, processFunction);
+      });
     };
   }, [accountProxy, addressQrModal, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
@@ -150,23 +202,28 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
-      } else if (isBitcoinChain) {
-        const chainInfo = chainInfoMap[item.slug];
 
-        // TODO: Currently, only supports Bitcoin native token.
-        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
-
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
-
-        openAccountTokenAddressModal(accountTokenAddressList);
-      } else {
-        onHandleTonAccountWarning(item.accountType, () => {
-          onHandleLedgerGenericAccountWarning({
-            accountProxy: accountProxy,
-            chainSlug: item.slug
-          }, processFunction);
-        });
+        return;
       }
+
+      if (isBitcoinChain) {
+        // TODO: Currently, only supports Bitcoin native token.
+
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
+
+          return;
+        }
+      }
+
+      onHandleTonAccountWarning(item.accountType, () => {
+        onHandleLedgerGenericAccountWarning({
+          accountProxy: accountProxy,
+          chainSlug: item.slug
+        }, processFunction);
+      });
     };
   }, [accountProxy, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccount, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
 
@@ -175,17 +232,17 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       const isBitcoinChain = isBitcoinAddress(item.address);
 
       if (isBitcoinChain) {
-        const chainInfo = chainInfoMap[item.slug];
-
         // TODO: Currently, only supports Bitcoin native token.
-        const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
 
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
 
-        openAccountTokenAddressModal(accountTokenAddressList);
-      } else {
-        openSelectAddressFormatModal(item);
+          return;
+        }
       }
+
+      openSelectAddressFormatModal(item);
     };
   }, [chainInfoMap, getBitcoinAccount, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
@@ -194,12 +251,18 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
       const isBitcoinChain = isBitcoinAddress(item.address);
       const tooltip = isPolkadotUnifiedChain ? 'This network has two address formats' : '';
+      let isShowBitcoinInfoButton = false;
+
+      if (isBitcoinChain) {
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+        isShowBitcoinInfoButton = accountTokenAddressList.length > 1;
+      }
 
       return (
         <AccountChainAddressItem
           className={'address-item'}
           infoButtonTooltip={tooltip}
-          isShowInfoButton={isPolkadotUnifiedChain || isBitcoinChain}
+          isShowInfoButton={isPolkadotUnifiedChain || isShowBitcoinInfoButton}
           item={item}
           key={`${item.slug}_${item.address}`}
           onClick={onShowQr(item)}
