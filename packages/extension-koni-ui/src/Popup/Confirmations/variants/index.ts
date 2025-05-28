@@ -12,8 +12,8 @@ export { default as SignConfirmation } from './SignConfirmation';
 export { default as TransactionConfirmation } from './Transaction';
 export { default as NotSupportWCConfirmation } from './NotSupportWCConfirmation';
 export { default as CardanoSignTransactionConfirmation } from './CardanoSignTransactionConfirmation';
-// export { default as BitcoinSignatureConfirmation } from './BitcoinSignatureConfirmation';
-// export { default as BitcoinSignPsbtConfirmation } from './BitcoinSignPsbtConfirmation';
+export { default as BitcoinSignatureConfirmation } from './BitcoinSignatureConfirmation';
+export { default as BitcoinSignPsbtConfirmation } from './BitcoinSignPsbtConfirmation';
 // export { default as BitcoinSendTransactionRequestConfirmation } from './BitcoinSendTransactionRequestConfirmation';
 
 export * from './Error';

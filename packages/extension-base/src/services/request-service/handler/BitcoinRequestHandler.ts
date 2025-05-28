@@ -3,7 +3,7 @@
 
 import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BitcoinProviderErrorType, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin, SignMessageBitcoinResult, SignPsbtBitcoinResult } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinProviderErrorType, BitcoinSignMessageResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin, SignPsbtBitcoinResult } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -75,9 +75,7 @@ export default class BitcoinRequestHandler {
     const payloadJson = JSON.stringify(payload);
     const isInternal = isInternalRequest(url);
 
-    if (['bitcoinSignatureRequest', 'bitcoinSendTransactionRequest', 'bitcoinSendTransactionRequestAfterConfirmation'].includes(type)) {
-      console.log('bitcoinSendTransactionRequest.type', type);
-      console.log('bitcoinSendTransactionRequest.payload', payload);
+    if (['bitcoinSignatureRequest', 'bitcoinSendTransactionRequest', 'bitcoinSendTransactionRequestAfterConfirmation', 'bitcoinSignPsbtRequest'].includes(type)) {
       const isAlwaysRequired = await this.#requestService.settingService.isAlwaysRequired;
 
       if (isAlwaysRequired) {
@@ -100,6 +98,8 @@ export default class BitcoinRequestHandler {
       payloadJson,
       ...options
     } as ConfirmationDefinitionsBitcoin[CT][0];
+
+    console.log(confirmationType, '123123123');
 
     const promise = new Promise<ConfirmationDefinitionsBitcoin[CT][1]>((resolve, reject) => {
       this.confirmationsPromiseMap[id] = {
@@ -155,7 +155,7 @@ export default class BitcoinRequestHandler {
     this.confirmationsQueueSubjectBitcoin.next(confirmations);
   }
 
-  signMessageBitcoin (confirmation: ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]): SignMessageBitcoinResult {
+  signMessageBitcoin (confirmation: ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]): BitcoinSignMessageResult {
     const { address, payload } = confirmation.payload;
     const pair = keyring.getPair(address);
 
@@ -279,7 +279,7 @@ export default class BitcoinRequestHandler {
   private async signPsbt (request: ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]): Promise<SignPsbtBitcoinResult> {
     // Extract necessary information from the BitcoinSendTransactionRequest
     const { address, payload } = request.payload;
-    const { allowedSighash, broadcast, psbt, signAtIndex } = payload;
+    const { allowedSighash, autoFinalized = true, broadcast, psbt, signAtIndex } = payload;
     const transaction = this.#transactionService.getTransaction(request.id);
     let eventData: TransactionEventResponse = {
       id: request.id,
@@ -314,8 +314,10 @@ export default class BitcoinRequestHandler {
     }
 
     if (!broadcast) {
-      for (const index of signAtIndexGenerate) {
-        psptSignedTransaction.finalizeInput(index);
+      if (autoFinalized) {
+        for (const index of signAtIndexGenerate) {
+          psptSignedTransaction.finalizeInput(index);
+        }
       }
 
       return {
@@ -343,6 +345,10 @@ export default class BitcoinRequestHandler {
     const chainInfo = this.#chainService.getChainInfoByKey(chain);
 
     try {
+      if (!autoFinalized) {
+        throw new Error('Unable to send transaction without autoFinalized');
+      }
+
       psptSignedTransaction.finalizeAllInputs();
     } catch (e) {
       emitterTransaction.emit('error', { ...eventData, errors: [new TransactionError(BasicTxErrorType.INVALID_PARAMS, (e as Error).message)] });
@@ -411,9 +417,6 @@ export default class BitcoinRequestHandler {
       if (isApproved) {
         try {
           // Fill signature for some special type
-          console.log('request.type', type);
-          console.log('request.confirmation', confirmation);
-          console.log('request.result', result);
           await this.decorateResultBitcoin(type, confirmation, result);
           const error = validator && validator(result);
 

@@ -6,7 +6,7 @@ import { AuthRequestV2, ResultResolver } from '@subwallet/extension-base/backgro
 import { AccountAuthType, AuthorizeRequest, RequestAuthorizeTab, Resolver } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES } from '@subwallet/extension-base/constants';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
@@ -176,6 +176,18 @@ export default class AuthRequestHandler {
       const cardanoChains = Object.values(chainInfoMaps).filter(_isChainCardanoCompatible);
 
       chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.cardano) || cardanoChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
+
+      if (options.autoActive) {
+        if (!needEnableChains.includes(chainInfo?.slug)) {
+          needEnableChains.push(chainInfo?.slug);
+        }
+      }
+    }
+
+    if (options.accessType === 'bitcoin') {
+      const bitcoinChains = Object.values(chainInfoMaps).filter(_isChainBitcoinCompatible);
+
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.bitcoin) || bitcoinChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
 
       if (options.autoActive) {
         if (!needEnableChains.includes(chainInfo?.slug)) {

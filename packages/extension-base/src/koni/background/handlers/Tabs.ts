@@ -10,7 +10,7 @@ import { CardanoProviderError } from '@subwallet/extension-base/background/error
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinResponseDApp, BitcoinSignMessageResult, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinAppState, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -31,6 +31,7 @@ import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, Substra
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
+import { t } from 'i18next';
 import { Subscription } from 'rxjs';
 import Web3 from 'web3';
 import { HttpProvider, RequestArguments, WebsocketProvider } from 'web3-core';
@@ -1435,23 +1436,56 @@ export default class KoniTabs {
       ].includes(request?.method)) || type === 'evm(events.subscribe)';
   }
 
-  async bitcoinGetAddresses (url: string): Promise<BitcoinResponseDApp<BitcoinRequestGetAddressesResult>> {
+  private async getBitcoinState (url?: string, defaultChain?: string): Promise<BitcoinAppState> {
+    let autoActiveChain = false;
+
+    if (url) {
+      const authInfo = await this.getAuthInfo(url);
+
+      if (authInfo?.isAllowed) {
+        autoActiveChain = true;
+      }
+    }
+
+    const currentBitcoinNetwork = this.#koniState.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'bitcoin',
+      defaultChain: defaultChain === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet',
+      url
+    });
+
+    if (currentBitcoinNetwork) {
+      const { slug } = currentBitcoinNetwork;
+      const bitcoinApi = this.#koniState.getBitcoinApi(slug);
+      const bitcoinApiStrategy = bitcoinApi?.api;
+
+      return {
+        networkKey: slug,
+        strategy: bitcoinApiStrategy,
+        listenEvents: []
+      };
+    } else {
+      return {};
+    }
+  }
+
+  async bitcoinGetAddresses (url: string): Promise<BitcoinRequestGetAddressesResult> {
     try {
       const isCompleted = await this.#koniState.authorizeUrlV2(url, {
         origin: url,
         accountAuthTypes: ['bitcoin']
       });
 
-      const result: BitcoinRequestGetAddressesResult = { addresses: [] };
+      const result: BitcoinRequestGetAddressesResult = [];
 
       if (!isCompleted) {
-        return { result };
+        return result;
       }
 
       const authInfo = await this.getAuthInfo(url);
 
       if (!authInfo || !authInfo.isAllowedMap || !authInfo.isAllowed) {
-        return { result };
+        return result;
       }
 
       const addressesAllowed = await this.getCurrentAccount(url, 'bitcoin');
@@ -1492,11 +1526,7 @@ export default class KoniTabs {
         addressResults.push(item);
       });
 
-      return {
-        result: {
-          addresses: addressResults
-        }
-      };
+      return addressResults;
     } catch (e) {
       throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
     }
@@ -1513,31 +1543,31 @@ export default class KoniTabs {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
     }
   }
-  //
-  // private async bitcoinSignPspt (id: string, url: string, { method, params }: RequestArguments) {
-  //   const allowedAccounts = (await this.getBitcoinCurrentAccount(url));
-  //   const psbtParams = params as BitcoinSignPsbtRawRequest;
-  //
-  //   if (!(psbtParams.network === 'mainnet' || psbtParams.network === 'testnet')) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network to try this request is must be mainnet or testnet'));
-  //   }
-  //
-  //   const bitcoinState = await this.getBitcoinState(url, psbtParams.network);
-  //
-  //   const networkKey = bitcoinState.networkKey;
-  //
-  //   if (!networkKey) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
-  //   }
-  //
-  //   const signResult = await this.#koniState.bitcoinSignPspt(id, url, networkKey, method, psbtParams, allowedAccounts);
-  //
-  //   if (signResult) {
-  //     return signResult;
-  //   } else {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
-  //   }
-  // }
+
+  private async bitcoinSignPspt (id: string, url: string, { method, params }: RequestArguments) {
+    const allowedAccounts = (await this.getCurrentAccount(url, 'bitcoin'));
+    const psbtParams = params as BitcoinSignPsbtRawRequest;
+
+    if (!(psbtParams.network === 'mainnet' || psbtParams.network === 'testnet')) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network to try this request is must be mainnet or testnet'));
+    }
+
+    const bitcoinState = await this.getBitcoinState(url, psbtParams.network);
+
+    const networkKey = bitcoinState.networkKey;
+
+    if (!networkKey) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
+    }
+
+    const signResult = await this.#koniState.bitcoinSignPspt(id, url, networkKey, method, psbtParams, allowedAccounts);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
   //
   // private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments) {
   //   const transactionParams = params as BitcoinSendTransactionParams;
@@ -1605,9 +1635,9 @@ export default class KoniTabs {
 
         case 'signMessage':
           return await this.bitcoinSign(id, url, request);
-          //
-          // case 'signPsbt':
-          //   return await this.bitcoinSignPspt(id, url, request);
+
+        case 'signPsbt':
+          return await this.bitcoinSignPspt(id, url, request);
           //
           // case 'sendTransfer':
           //   return await this.bitcoinSendTransfer(id, url, request);

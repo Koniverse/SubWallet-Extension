@@ -67,7 +67,7 @@ import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { getKeypairTypeByAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
@@ -649,7 +649,8 @@ export default class KoniExtension {
       evm: EthereumKeypairTypes,
       substrate: SubstrateKeypairTypes,
       ton: TonKeypairTypes,
-      cardano: CardanoKeypairTypes
+      cardano: CardanoKeypairTypes,
+      bitcoin: BitcoinKeypairTypes
     };
 
     return !!accountAuthTypes && accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
@@ -1478,6 +1479,8 @@ export default class KoniExtension {
           transferAll: !!transferAll,
           value: txVal,
           network: network });
+
+        console.log(transaction.toHex(), '213123');
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 

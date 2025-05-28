@@ -1182,8 +1182,9 @@ export interface BitcoinSignPsbtRawRequest {
   allowedSighash?: SignatureHash[];
   signAtIndex?: number | number[];
   broadcast?: boolean;
+  autoFinalized?: boolean;
   network: string;
-  account: string;
+  address: string;
 }
 
 export interface TonSignRequest {
@@ -1320,13 +1321,7 @@ export type BitcoinDAppAddress = {
   type: BitcoinAddressType;
 }
 
-export type BitcoinResponseDApp<T> = {
-  result: T
-}
-
-export interface BitcoinRequestGetAddressesResult {
-  addresses: BitcoinDAppAddress[];
-}
+export type BitcoinRequestGetAddressesResult = BitcoinDAppAddress[];
 
 export interface BitcoinSignMessageResult {
   signature: string;
@@ -1361,12 +1356,6 @@ export interface BitcoinTransactionConfig{
   value?: number | string | BN;
   networkKey?: string;
   tokenSlug?: string;
-}
-
-export interface SignMessageBitcoinResult {
-  signature: string;
-  message: string;
-  address: string;
 }
 
 export interface SignPsbtBitcoinResult {
@@ -1440,7 +1429,7 @@ export interface ConfirmationDefinitionsCardano {
 }
 
 export interface ConfirmationDefinitionsBitcoin {
-  bitcoinSignatureRequest: [ConfirmationsQueueItem<BitcoinSignatureRequest>, ConfirmationResult<SignMessageBitcoinResult>],
+  bitcoinSignatureRequest: [ConfirmationsQueueItem<BitcoinSignatureRequest>, ConfirmationResult<BitcoinSignMessageResult>],
   bitcoinSendTransactionRequest: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
   bitcoinSendTransactionRequestAfterConfirmation: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
   bitcoinWatchTransactionRequest: [ConfirmationsQueueItem<BitcoinWatchTransactionRequest>, ConfirmationResult<string>],
