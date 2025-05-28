@@ -7,7 +7,7 @@ import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountChainAddresses, useGetBitcoinAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { AccountChainAddress, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountBitcoinInfoType, AccountChainAddress, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { isBitcoinAddress } from '@subwallet/keyring';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
@@ -34,6 +34,19 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+
+  const bitcoinAccountList: AccountBitcoinInfoType[] = useMemo(() => {
+    if (!items) {
+      return [];
+    }
+
+    return items
+      .filter((item) => isBitcoinAddress(item.address))
+      .map((item) => ({
+        address: item.address,
+        type: item.accountType
+      }));
+  }, [items]);
 
   const filteredItems = useMemo(() => {
     if (!items) {
@@ -109,7 +122,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
         // TODO: Currently, only supports Bitcoin native token.
         const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
 
         openAccountTokenAddressModal(accountTokenAddressList);
       } else {
@@ -143,7 +156,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         // TODO: Currently, only supports Bitcoin native token.
         const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
 
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
 
         openAccountTokenAddressModal(accountTokenAddressList);
       } else {
@@ -167,7 +180,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         // TODO: Currently, only supports Bitcoin native token.
         const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
 
-        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo);
+        const accountTokenAddressList = getBitcoinAccount(item.slug, nativeTokenSlug, chainInfo, bitcoinAccountList);
 
         openAccountTokenAddressModal(accountTokenAddressList);
       } else {
@@ -180,10 +193,12 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
     (item: AccountChainAddress) => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
       const isBitcoinChain = isBitcoinAddress(item.address);
+      const tooltip = isPolkadotUnifiedChain ? 'This network has two address formats' : '';
 
       return (
         <AccountChainAddressItem
           className={'address-item'}
+          infoButtonTooltip={tooltip}
           isShowInfoButton={isPolkadotUnifiedChain || isBitcoinChain}
           item={item}
           key={`${item.slug}_${item.address}`}

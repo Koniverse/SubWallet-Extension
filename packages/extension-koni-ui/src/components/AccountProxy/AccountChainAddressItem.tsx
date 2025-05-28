@@ -3,11 +3,10 @@
 
 import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { isBitcoinAddress } from '@subwallet/keyring';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Copy, Info, QrCode } from 'phosphor-react';
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -17,10 +16,12 @@ type Props = ThemeProps & {
   onClickQrButton?: VoidFunction;
   onClickInfoButton?: VoidFunction;
   isShowInfoButton?: boolean;
+  infoButtonTooltip?: string;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isShowInfoButton,
+  const { className, infoButtonTooltip,
+    isShowInfoButton,
     item,
     onClick, onClickCopyButton, onClickInfoButton, onClickQrButton } = props;
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
@@ -37,8 +38,6 @@ function Component (props: Props): React.ReactElement<Props> {
     event.stopPropagation();
     onClickInfoButton?.();
   }, [onClickInfoButton]);
-
-  const isBitcoinChain = useMemo(() => isBitcoinAddress(item.address), [item.address]);
 
   return (
     <>
@@ -87,7 +86,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 }
                 onClick={_onClickInfoButton}
                 size='xs'
-                tooltip={isBitcoinChain ? null : 'This network has two address formats'}
+                tooltip={infoButtonTooltip}
                 tooltipPlacement={'topLeft'}
                 type='ghost'
               />

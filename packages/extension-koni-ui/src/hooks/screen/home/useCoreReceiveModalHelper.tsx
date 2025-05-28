@@ -150,7 +150,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
 
     if (isBitcoinChain) {
-      const accountTokenAddressList = getBitcoinAccount(chainSlug, item.slug, chainInfo);
+      const accountTokenAddressList = getBitcoinAccount(chainSlug, item.slug, chainInfo, currentAccountProxy.accounts);
 
       if (accountTokenAddressList.length > 1) {
         openAccountTokenAddressModal(accountTokenAddressList, () => {

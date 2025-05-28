@@ -148,7 +148,10 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
     '.__item-address-wrapper': {
       display: 'flex',
       gap: 12,
-      alignItems: 'baseline'
+      alignItems: 'baseline',
+      '.__address': {
+        fontSize: token.fontSize
+      }
     },
 
     '.__item-right-part': {

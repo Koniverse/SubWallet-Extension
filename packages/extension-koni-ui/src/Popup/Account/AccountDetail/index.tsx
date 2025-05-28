@@ -418,7 +418,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
               suffix={(
                 <AccountChainTypeLogos
                   chainTypes={accountProxy.chainTypes}
-                  className={'__item-chain-type-logos'}
+                  className={'__account-item-chain-type-logos'}
                 />
               )}
             />
@@ -514,7 +514,7 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       gap: token.sizeSM
     },
 
-    '.__item-chain-type-logos': {
+    '.__account-item-chain-type-logos': {
       minHeight: 20,
       marginRight: 12,
       marginLeft: 12
