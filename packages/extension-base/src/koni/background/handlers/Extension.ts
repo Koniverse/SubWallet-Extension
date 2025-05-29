@@ -39,7 +39,7 @@ import { _isAcrossChainBridge, AcrossQuote, getAcrossQuote } from '@subwallet/ex
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { DryRunInfo } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
@@ -1687,12 +1687,18 @@ export default class KoniExtension {
       };
 
       extrinsic = await funcCreateExtrinsic(params);
-      let dryRunInfo: DryRunInfo;
 
       if (isSubstrateXcm) {
-        dryRunInfo = await dryRunXcmExtrinsicV2(params);
+        const xcmFeeInfo = await estimateXcmFee({
+          fromChainInfo: params.originChain,
+          fromTokenInfo: params.originTokenInfo,
+          toChainInfo: params.destinationChain,
+          recipient: params.recipient,
+          sender: params.sender,
+          value: params.sendingValue
+        });
 
-        xcmFeeDryRun = dryRunInfo.fee;
+        xcmFeeDryRun = xcmFeeInfo?.origin.fee || '0';
       }
 
       if (isAcrossBridgeTransfer) {
@@ -1767,8 +1773,12 @@ export default class KoniExtension {
         warning.length && inputTransaction.warnings.push(...warning);
         error.length && inputTransaction.errors.push(...error);
 
-        if (isSubstrateXcm && !dryRunInfo.success) {
-          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
+        if (isSubstrateXcm) {
+          const isDryRunSuccess = await dryRunXcmExtrinsicV2(params);
+
+          if (!isDryRunSuccess) {
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
+          }
         }
       };
 
