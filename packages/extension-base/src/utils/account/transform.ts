@@ -387,7 +387,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
   } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
     const result: ExtrinsicType[] = [];
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     return result;
   }
