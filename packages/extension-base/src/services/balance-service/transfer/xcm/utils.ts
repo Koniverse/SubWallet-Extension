@@ -211,7 +211,14 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to dry run XCM');
+    const error = await response.json() as ParaSpellError;
+
+    return {
+      origin: {
+        success: false,
+        failureReason: error.message
+      }
+    } as DryRunResult;
   }
 
   return await response.json() as DryRunResult;

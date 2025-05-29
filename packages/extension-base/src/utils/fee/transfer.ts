@@ -413,8 +413,6 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
           value: params.sendingValue
         });
 
-        console.log('--PARASPELL XCM FEE--', xcmFeeInfo); // todo: remove after test
-
         estimatedFee = xcmFeeInfo?.origin.fee || '0';
       } else {
         try {
