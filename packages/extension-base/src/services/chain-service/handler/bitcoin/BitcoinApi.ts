@@ -99,7 +99,6 @@ export class BitcoinApi implements _BitcoinApi {
   }
 
   async disconnect () {
-    this.api.stop();
     this.onDisconnect();
 
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
