@@ -90,7 +90,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
 
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
     return {
-      error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR)
+      error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Invalid Route Summary')
     };
   }
 
@@ -115,6 +115,12 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
       }
     });
 
+    if (!res.ok) {
+      const errorText = await res.text();
+
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, `Fetch Kyber routes failed: ${errorText}`) };
+    }
+
     const routeData = (await res.json()) as KyberApiResponse<KyberRouteData>;
 
     if (!routeData.data?.routeSummary) {
@@ -125,7 +131,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   } catch (error) {
     console.error('Error:', error);
 
-    return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
+    return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Unable to build Kyber swap transaction') };
   }
 
   const body = {

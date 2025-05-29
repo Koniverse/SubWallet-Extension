@@ -99,7 +99,9 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
     );
 
     if (!response.ok) {
-      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
+      const errorText = await response.text();
+
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, `Unable to create simpleswap transaction: ${errorText}`) };
     }
 
     const depositAddressResponse = await response.json() as ExchangeSimpleSwapData;
