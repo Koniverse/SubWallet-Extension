@@ -4,6 +4,7 @@
 import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -11,7 +12,6 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -22,7 +22,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
 const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
 
-export const CHAINFLIP_BROKER_API = process.env.CHAINFLIP_BROKER_API || '';
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.CHAINFLIP}`;
 
 interface DepositAddressResponse {
   id: number;
@@ -45,7 +45,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private readonly isTestnet: boolean;
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
-  private baseUrl: string;
+  // private baseUrl: string;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
@@ -57,7 +57,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     });
     this.isTestnet = isTestnet;
     this.providerSlug = isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET;
-    this.baseUrl = getChainflipSwap(isTestnet);
+    // this.baseUrl = getChainflipSwap(isTestnet);
   }
 
   get chainService () {
@@ -125,7 +125,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       sourceAsset: fromAssetId
     };
 
-    const url = `${this.baseUrl}&${new URLSearchParams(depositParams).toString()}`;
+    const url = `${proxyApi}&${new URLSearchParams(depositParams).toString()}`;
     const response = await fetch(url, {
       method: 'GET'
     });

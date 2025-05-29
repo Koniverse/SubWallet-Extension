@@ -140,12 +140,8 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
     return undefined;
   }
 
-  const response = await fetch(`${API_URL}/check_approval`, {
+  const response = await fetch(`${proxyApi}/check_approval`, {
     method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
     body: JSON.stringify({
       walletAddress: address,
       amount: BigNumber(amount).multipliedBy(2).toFixed(0),
