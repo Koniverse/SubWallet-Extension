@@ -166,6 +166,7 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
 export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo {
   const result: BitcoinAccountInfo = {
     name: 'Unknown',
+    network: 'Unknown',
     order: 99
   };
 
@@ -173,36 +174,42 @@ export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo
     case 'bitcoin-84':
       result.logoKey = 'bitcoin';
       result.name = 'Native SegWit';
+      result.network = 'Bitcoin';
       result.order = 1;
       break;
 
     case 'bittest-84':
       result.logoKey = 'bitcoinTestnet';
       result.name = 'Native SegWit';
+      result.network = 'Bitcoin Testnet';
       result.order = 2;
       break;
 
     case 'bitcoin-86':
       result.logoKey = 'bitcoin';
       result.name = 'Taproot';
+      result.network = 'Bitcoin';
       result.order = 3;
       break;
 
     case 'bittest-86':
       result.logoKey = 'bitcoinTestnet';
       result.name = 'Taproot';
+      result.network = 'Bitcoin Testnet';
       result.order = 4;
       break;
 
     case 'bitcoin-44':
       result.logoKey = 'bitcoin';
       result.name = 'Legacy';
+      result.network = 'Bitcoin';
       result.order = 5;
       break;
 
     case 'bittest-44':
       result.logoKey = 'bitcoinTestnet';
       result.name = 'Legacy';
+      result.network = 'Bitcoin Testnet';
       result.order = 6;
       break;
   }

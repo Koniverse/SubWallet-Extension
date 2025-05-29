@@ -49,6 +49,7 @@ export type AccountTokenAddress = {
 
 export interface BitcoinAccountInfo {
   name: string;
+  network: string;
   logoKey?: string;
   order: number;
 }

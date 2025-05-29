@@ -347,13 +347,17 @@ const AccountProxySelectorItem = styled(Component)<Props>(({ theme }) => {
 
     '.__item-derived-path': {
       display: 'flex',
-      gap: token.sizeXS - 2,
+      gap: 4,
       alignItems: 'center',
 
       '.__derive-account-path': {
         fontSize: token.fontSizeSM,
         color: token.colorTextLight4,
-        lineHeight: token.lineHeightSM
+        lineHeight: token.lineHeightSM,
+        maxWidth: 103,
+        overflow: 'hidden',
+        'white-space': 'nowrap',
+        textOverflow: 'ellipsis'
       }
     },
 

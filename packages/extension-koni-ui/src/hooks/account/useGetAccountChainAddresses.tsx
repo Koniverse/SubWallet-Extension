@@ -26,7 +26,7 @@ const createChainAddressItem = (
     const bitcoinInfo = getBitcoinAccountDetails(accountType);
 
     return {
-      name: bitcoinInfo.name,
+      name: bitcoinInfo.network,
       logoKey: bitcoinInfo.logoKey,
       slug: chainInfo.slug,
       address,

@@ -131,7 +131,7 @@ const AccountChainAddressItem = styled(Component)<Props>(({ theme: { token } }: 
       'white-space': 'nowrap',
       gap: token.sizeXXS,
       flex: 1,
-      alignItems: 'flex-end'
+      alignItems: 'baseline'
     },
 
     '.__item-chain-name': {

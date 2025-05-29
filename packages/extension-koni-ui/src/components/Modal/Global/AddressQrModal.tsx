@@ -306,7 +306,18 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       paddingTop: token.padding,
       paddingBottom: token.padding,
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      justifyContent: 'center',
+      '.__prev-button': {
+        marginLeft: -20
+      },
+      '.__next-button': {
+        marginRight: -20
+      },
+      '.__qr-code ': {
+        marginLeft: 0,
+        marginRight: 0
+      }
     },
 
     '.__label-address-wrapper': {
