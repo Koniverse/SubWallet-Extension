@@ -37,7 +37,7 @@ function Component ({ className, request, type }: Props) {
   }, [assetRegistry, tokenSlug]);
   const renderAccountTransactionDetail = useCallback((accountsPsbt: PsbtTransactionArg[]) => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div className={'transaction-detail-container'}>
         {
           accountsPsbt.map(({ address, amount }) => {
             const account = findAccountByAddress(accounts, address);

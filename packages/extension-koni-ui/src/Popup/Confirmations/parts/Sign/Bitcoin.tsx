@@ -116,10 +116,10 @@ const Component: React.FC<Props> = (props: Props) => {
       if (type === 'bitcoinSendTransactionRequestAfterConfirmation' && editedPayload) {
         await makeBitcoinDappTransferConfirmation(editedPayload);
       } else if (type === 'bitcoinSignPsbtRequest') {
-        const { payload: { account, broadcast, network, psbt, to, tokenSlug, txInput, txOutput, value } } = payload.payload as BitcoinSignPsbtRequest;
+        const { payload: { address, broadcast, network, psbt, to, tokenSlug, txInput, txOutput, value } } = payload.payload as BitcoinSignPsbtRequest;
 
         if (broadcast) {
-          await makePSBTTransferAfterConfirmation({ id, chain: network, txOutput, txInput, tokenSlug, psbt, from: account, to, value });
+          await makePSBTTransferAfterConfirmation({ id, chain: network, txOutput, txInput, tokenSlug, psbt, from: address, to, value });
         } else {
           await wait(1000);
         }

@@ -99,8 +99,6 @@ export default class BitcoinRequestHandler {
       ...options
     } as ConfirmationDefinitionsBitcoin[CT][0];
 
-    console.log(confirmationType, '123123123');
-
     const promise = new Promise<ConfirmationDefinitionsBitcoin[CT][1]>((resolve, reject) => {
       this.confirmationsPromiseMap[id] = {
         validator: validator,
