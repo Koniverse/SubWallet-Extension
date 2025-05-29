@@ -4,6 +4,6 @@
 import { NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { fetchStaticData } from '@subwallet/extension-base/utils';
 
-export const fetchLastestRemindNotificationTime = async () => {
+export const fetchLatestRemindNotificationTime = async () => {
   return await fetchStaticData<Record<NotificationActionType, number>>('config/remind-notification-time');
 };

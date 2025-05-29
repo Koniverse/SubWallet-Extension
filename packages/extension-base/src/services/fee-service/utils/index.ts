@@ -18,6 +18,7 @@ const INFURA_API_KEY_SECRET = process.env.INFURA_API_KEY_SECRET || '';
 const INFURA_AUTH = 'Basic ' + Buffer.from(INFURA_API_KEY + ':' + INFURA_API_KEY_SECRET).toString('base64');
 
 export const FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE = 105; // percentage
+const EIP1559_MIN_PRIORITY_FEE = '1';
 
 export const parseInfuraFee = (info: InfuraFeeInfo, threshold: InfuraThresholdInfo): EvmFeeInfo => {
   const base = new BigN(info.estimatedBaseFee).multipliedBy(BN_WEI);
@@ -212,15 +213,19 @@ export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, u
     const averagePriorityFee = history.reward.reduce((previous, rewards) => previous.plus(rewards[1]), BN_ZERO).dividedBy(numBlock).decimalPlaces(0);
     const fastPriorityFee = history.reward.reduce((previous, rewards) => previous.plus(rewards[2]), BN_ZERO).dividedBy(numBlock).decimalPlaces(0);
 
+    if (slowPriorityFee.eq(0) && averagePriorityFee.eq(0) && fastPriorityFee.eq(0)) {
+      throw new Error('Fee rates are currently same for all levels');
+    }
+
     return {
       type: 'evm',
       gasPrice: undefined,
       baseGasFee: baseGasFee.toString(),
       busyNetwork,
       options: {
-        slow: getEIP1559GasFee(baseGasFee, slowPriorityFee, 10, blockTime),
-        average: getEIP1559GasFee(baseGasFee, averagePriorityFee, 5, blockTime),
-        fast: getEIP1559GasFee(baseGasFee, fastPriorityFee, 3, blockTime),
+        slow: enforceMinOneTip(getEIP1559GasFee(baseGasFee, slowPriorityFee, 10, blockTime)),
+        average: enforceMinOneTip(getEIP1559GasFee(baseGasFee, averagePriorityFee, 5, blockTime)),
+        fast: enforceMinOneTip(getEIP1559GasFee(baseGasFee, fastPriorityFee, 3, blockTime)),
         default: busyNetwork ? 'average' : 'slow'
       }
     };
@@ -236,6 +241,16 @@ export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, u
       options: undefined
     };
   }
+};
+
+export const enforceMinOneTip = (feeOptionDetail: EvmEIP1559FeeOption): EvmEIP1559FeeOption => {
+  if (feeOptionDetail.maxPriorityFeePerGas === '0') {
+    feeOptionDetail.maxPriorityFeePerGas = EIP1559_MIN_PRIORITY_FEE;
+
+    return feeOptionDetail;
+  }
+
+  return feeOptionDetail;
 };
 
 export const calculateToAmountByReservePool = async (api: ApiPromise, fromToken: _ChainAsset, toToken: _ChainAsset, fromAmount: string): Promise<string> => {
