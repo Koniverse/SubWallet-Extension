@@ -612,7 +612,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const { amount } = data;
 
-    if (new BN(amount).lt(new BN(DEFAULT_DTAO_MINBOND))) {
+    if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
     }
 
