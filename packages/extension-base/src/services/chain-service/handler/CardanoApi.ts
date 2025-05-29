@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, TransactionUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
@@ -10,10 +11,12 @@ import { BehaviorSubject } from 'rxjs';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
 
-export const API_KEY = {
-  mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
-  testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
-};
+// export const API_KEY = {
+//   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
+//   testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
+// };
+
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.CARDANO}`;
 
 export class CardanoApi implements _CardanoApi {
   chainSlug: string;
@@ -27,7 +30,6 @@ export class CardanoApi implements _CardanoApi {
   isApiReadyOnce = false;
   isReadyHandler: PromiseHandler<_CardanoApi>;
   isTestnet: boolean; // todo: add api with interface BlockFrostAPI to remove isTestnet check
-  private projectId: string;
 
   providerName: string;
 
@@ -35,7 +37,6 @@ export class CardanoApi implements _CardanoApi {
     this.chainSlug = chainSlug;
     this.apiUrl = apiUrl;
     this.isTestnet = isTestnet ?? true;
-    this.projectId = isTestnet ? API_KEY.testnet : API_KEY.mainnet;
     this.providerName = providerName || 'unknown';
     // this.api = this.createProvider(isTestnet);
     this.isReadyHandler = createPromiseHandler<_CardanoApi>();
@@ -137,17 +138,17 @@ export class CardanoApi implements _CardanoApi {
 
   async getBalanceMap (address: string): Promise<CardanoBalanceItem[]> {
     try {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}`;
+      const url = `${proxyApi}/addresses/${address}?isTestnet=${this.isTestnet.toString()}`;
+
       const response = await fetch(
         url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
+          method: 'GET'
         }
       );
 
       const addressBalance = await response.json() as CardanoAddressBalance;
+
+      console.log('addressBalance', addressBalance);
 
       return addressBalance.amount;
     } catch (e) {
@@ -159,15 +160,13 @@ export class CardanoApi implements _CardanoApi {
 
   async getUtxos (address: string, page: number, limit: number): Promise<CardanoUtxosItem[]> {
     try {
-      let url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}/utxos`;
+      let url = `${proxyApi}/addresses/${address}/utxos?isTestnet=${this.isTestnet.toString()}`;
 
-      url += `?page=${page}&count=${limit}`;
+      url += `&page=${page}&count=${limit}`;
+
       const response = await fetch(
         url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
+          method: 'GET'
         }
       );
 
@@ -183,13 +182,11 @@ export class CardanoApi implements _CardanoApi {
 
   async getSpecificUtxo (txHash: string): Promise<TransactionUtxosItem> {
     try {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/txs/${txHash}/utxos`;
+      const url = `${proxyApi}/txs/${txHash}/utxos?isTestnet=${this.isTestnet.toString()}`;
+
       const response = await fetch(
         url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
+          method: 'GET'
         }
       );
 
@@ -205,12 +202,11 @@ export class CardanoApi implements _CardanoApi {
 
   async sendCardanoTxReturnHash (tx: string): Promise<string> {
     try {
-      const url = this.isTestnet ? 'https://cardano-preprod.blockfrost.io/api/v0/tx/submit' : 'https://cardano-mainnet.blockfrost.io/api/v0/tx/submit';
+      const url = `${proxyApi}/tx/submit?isTestnet=${this.isTestnet.toString()}`;
       const response = await fetch(
         url, {
           method: 'POST',
           headers: {
-            Project_id: this.projectId,
             'Content-Type': 'application/cbor'
           },
           body: cborToBytes(tx)
@@ -237,13 +233,10 @@ export class CardanoApi implements _CardanoApi {
     const cronTime = 30000;
 
     return retryCardanoTxStatus(async () => {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}` : `https://cardano-mainnet.blockfrost.io/api/v0/txs/${txHash}`;
+      const url = `${proxyApi}/txs/${txHash}?isTestnet=${this.isTestnet.toString()}`;
       const response = await fetch(
         url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
+          method: 'GET'
         }
       );
 

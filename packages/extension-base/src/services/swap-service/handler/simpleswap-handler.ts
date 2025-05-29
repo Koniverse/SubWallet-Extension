@@ -5,6 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { _getAssetDecimals, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
@@ -28,9 +29,7 @@ interface ExchangeSimpleSwapData{
   amount_to: string;
 }
 
-const apiUrl = 'https://api.simpleswap.io';
-
-export const simpleSwapApiKey = process.env.SIMPLE_SWAP_API_KEY || '';
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.SIMPLESWAP}`;
 
 const toBNString = (input: string | number | BigNumber, decimal: number): string => {
   const raw = new BigNumber(input);
@@ -54,7 +53,7 @@ const createSwapRequest = async (params: {fromSymbol: string; toSymbol: string; 
   };
 
   const response = await fetch(
-    `${apiUrl}/create_exchange?api_key=${simpleSwapApiKey}`,
+    `${proxyApi}/exchanges}`,
     {
       method: 'POST',
       headers: {
