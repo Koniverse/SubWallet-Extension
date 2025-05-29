@@ -142,6 +142,9 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
 
   const response = await fetch(`${proxyApi}/check_approval`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
       walletAddress: address,
       amount: BigNumber(amount).multipliedBy(2).toFixed(0),
@@ -814,6 +817,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
       postTransactionResponse = await fetch(`${proxyApi}/swap`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(body)
       });
       const transactionResponse = await postTransactionResponse.json() as SwapResponse;
@@ -826,6 +832,9 @@ export class UniswapHandler implements SwapBaseInterface {
         try {
           const res = await fetch(`${proxyApi}/order`, {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
               signature: signature,
               quote: dutchQuote
@@ -876,7 +885,10 @@ export class UniswapHandler implements SwapBaseInterface {
         return retryGetUniswapTx(async () => {
           try {
             const response = await fetch(`${proxyApi}/orders?orderId=${orderId}&swapper=${swapper}`, {
-              method: 'GET'
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
             });
 
             if (response.ok) {
