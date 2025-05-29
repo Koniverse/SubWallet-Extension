@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainInfoMap } from '@subwallet/chain-list';
-import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
+export const SUBSTRATE_ECDSA_KEY = 'substrate_ecdsa';
 export const POLKADOT_KEY = 'polkadot';
 export const POLKADOT_SLIP_44 = 354;
 export const RECOVERY_SLUG = '_recovery';
@@ -23,6 +25,20 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isGeneric: true,
     isEthereum: false,
     slip44: 354
+  },
+  {
+    accountName: 'Polkadot ECDSA',
+    appName: 'Polkadot',
+    networkName: 'Polkadot ECDSA',
+    genesisHash: '',
+    network: 'PokadotECDSA',
+    icon: 'substrate',
+    slug: SUBSTRATE_ECDSA_KEY,
+    isDevMode: false,
+    isGeneric: true,
+    isEthereum: false,
+    slip44: 354,
+    scheme: LEDGER_SCHEME.ECDSA
   },
   {
     accountName: 'Polkadot Migration',
@@ -251,6 +267,7 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isEthereum: false,
     slip44: 799
   }
+
   // {
   //   displayName: 'Centrifuge',
   //   genesisHash: '0xb3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82',
@@ -517,8 +534,9 @@ export const isLedgerCapable = !!(window as unknown as { USB?: unknown }).USB;
 export const PolkadotDerivationPathGens: string[] = [POLKADOT_KEY].map((slug) => ChainInfoMap[slug].substrateInfo?.genesisHash || '');
 export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedgerNetwork)
   .filter((network) => {
-    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
+    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY, SUBSTRATE_ECDSA_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
   })
   .map(({ genesisHash }) => genesisHash);
 
 export const NotNeedMigrationGens: string[] = [...PolkadotDerivationPathGens, ...StandardDerivationPathGens];
+export const SubstrateLedgerSignModeSupport: AccountSignMode[] = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];

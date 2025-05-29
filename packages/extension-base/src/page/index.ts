@@ -59,7 +59,7 @@ export function sendMessage<TMessageType extends MessageTypes> (message: TMessag
 export async function enable (origin: string, opt?: AuthRequestOption): Promise<Injected> {
   const accountAuthTypes: AccountAuthType[] = opt?.accountAuthType === 'both' ? ['substrate', 'evm'] : [opt?.accountAuthType || 'substrate'];
 
-  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes });
+  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes, isSubstrateConnector: true });
 
   return new Injected(sendMessage);
 }

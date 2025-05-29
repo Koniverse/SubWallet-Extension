@@ -61,6 +61,8 @@ export interface AccountLedgerData {
   availableGenesisHashes?: string[];
   /** Is Ledger recovery chain */
   isLedgerRecovery?: boolean;
+  /** Is Ledger substrate ECDSA scheme signature */
+  isSubstrateECDSA?: boolean;
 }
 
 /**
@@ -113,6 +115,7 @@ export enum AccountSignMode {
   QR = 'qr',
   LEGACY_LEDGER = 'legacy-ledger',
   GENERIC_LEDGER = 'generic-ledger',
+  ECDSA_SUBSTRATE_LEDGER = 'ecdsa-substrate-ledger',
   READ_ONLY = 'readonly',
   ALL_ACCOUNT = 'all',
   INJECTED = 'injected',

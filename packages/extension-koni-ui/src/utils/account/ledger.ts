@@ -5,6 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { LedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountProxy } from '@subwallet/extension-base/types';
 import { PredefinedLedgerNetwork, RECOVERY_SLUG } from '@subwallet/extension-koni-ui/constants/ledger';
 
 interface ChainItem extends _ChainState {
@@ -27,3 +28,13 @@ export const getSupportedLedger = (networkInfoMap: Record<string, _ChainInfo>, n
 };
 
 export const convertNetworkSlug = (network: LedgerNetwork) => network.slug.concat(network.isRecovery ? RECOVERY_SLUG : '');
+
+export const isSubstrateEcdsaAccountProxy = (accountProxy: AccountProxy) => {
+  return accountProxy.accounts.some((account) => account.isSubstrateECDSA);
+};
+
+export const isHasOnlySubstrateEcdsaAccountProxy = (accountProxies: AccountProxy[]) => {
+  return accountProxies.every((accountProxy) => {
+    return accountProxy.accounts.length === 1 && accountProxy.accounts[0].isSubstrateECDSA;
+  });
+};
