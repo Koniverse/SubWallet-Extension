@@ -28,7 +28,7 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   updatedAt: number;
   estimateFee?: FeeData,
   xcmFeeDryRun?: string;
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
+  transaction: any;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
   isPassConfirmation?: boolean;
@@ -38,7 +38,7 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
 }
 
 export interface SWTransaction extends SWTransactionBase {
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
 }
 
 export interface SWPermitTransaction extends SWTransactionBase {
