@@ -3,7 +3,13 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import {
+  BitcoinKeypairTypes,
+  CardanoKeypairTypes,
+  EthereumKeypairTypes,
+  SubstrateKeypairTypes,
+  TonKeypairTypes
+} from '@subwallet/keyring/types';
 
 export const isAddressValidWithAuthType = (address: string, accountAuthTypes?: AccountAuthType[]): boolean => {
   const keypairType = getKeypairTypeByAddress(address);
@@ -12,7 +18,8 @@ export const isAddressValidWithAuthType = (address: string, accountAuthTypes?: A
     evm: EthereumKeypairTypes,
     substrate: SubstrateKeypairTypes,
     ton: TonKeypairTypes,
-    cardano: CardanoKeypairTypes
+    cardano: CardanoKeypairTypes,
+    bitcoin: BitcoinKeypairTypes
   };
 
   return !!accountAuthTypes?.some((authType) => validTypes[authType]?.includes(keypairType));
