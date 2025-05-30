@@ -5,7 +5,8 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWTransaction, SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
+import { Psbt } from 'bitcoinjs-lib';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 
@@ -34,6 +35,11 @@ export const isCardanoTransaction = (tx: SWTransactionBase['transaction']): tx i
   const cardanoTransactionConfig = tx as CardanoTransactionConfig;
 
   return cardanoTransactionConfig.cardanoPayload !== null && cardanoTransactionConfig.cardanoPayload !== undefined;
+};
+
+// TODO: [Review] this function
+export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is Psbt => {
+  return 'data' in tx && Array.isArray((tx as Psbt).data.inputs);
 };
 
 const typeName = (type: SWTransactionBase['extrinsicType']) => {

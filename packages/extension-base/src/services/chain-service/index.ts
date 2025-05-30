@@ -2058,7 +2058,8 @@ export class ChainService {
       this.substrateChainHandler.sleep(),
       this.evmChainHandler.sleep(),
       this.tonChainHandler.sleep(),
-      this.cardanoChainHandler.sleep()
+      this.cardanoChainHandler.sleep(),
+      this.bitcoinChainHandler.sleep()
     ]);
 
     this.stopCheckLatestChainData();
@@ -2069,7 +2070,8 @@ export class ChainService {
       this.substrateChainHandler.wakeUp(),
       this.evmChainHandler.wakeUp(),
       this.tonChainHandler.wakeUp(),
-      this.cardanoChainHandler.wakeUp()
+      this.cardanoChainHandler.wakeUp(),
+      this.bitcoinChainHandler.wakeUp()
     ]);
 
     this.checkLatestData();
