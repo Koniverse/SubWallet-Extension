@@ -1,0 +1,67 @@
+name: Koni Dev
+on:
+  pull_request:
+    branches:
+      - koni/dev/issue-4415
+  push:
+    branches:
+      - koni/dev/issue-4415
+
+jobs:
+  master:
+    if: "! startsWith(github.event.head_commit.message, '[CI Skip]')"
+    runs-on: ubuntu-22.04
+    name: Build Development Preview
+    environment: 'extension'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      - name: Set Params
+        id: setup_params
+        run: |
+          time_tag="$(date +'%Y-%m-%d_%H-%M')"
+          ref_with_prefix="${{ github.ref }}"
+          ref_without_prefix="${ref_with_prefix#refs/heads/}"
+
+          echo "time_tag=$time_tag" >> $GITHUB_OUTPUT
+          if [[ -n "${{ github.event.pull_request }}" ]]; then
+            echo "ref=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=$ref_without_prefix" >> $GITHUB_OUTPUT
+          fi
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+      - name: Load .env variables
+        id: dotenv
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          # Ensure .env file exists
+          if [ -f ./.env.pull-request.development ]; then
+            echo "Loading .env variables..."
+            # Read each line, export as an environment variable
+            while IFS='=' read -r key value; do
+              if [[ ! "$key" =~ ^# && -n "$key" ]]; then # Ignore comments and empty lines
+                echo "${key}=${value}" >> $GITHUB_ENV
+                echo "Loaded variable: ${key}"
+              fi
+            done < ./.env.pull-request.development
+          else
+            echo ".env file not found. Skipping environment variable loading."
+          fi
+      - name: Use loaded environment variables
+        env:
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+          CURRENT_BRANCH: ${{ github.event.pull_request.head.ref || github.ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          echo "The BRANCH_NAME is: $BRANCH_NAME"
+          echo "The SUBWALLET_API is: $SUBWALLET_API"
+
+      - name: Another step using the variables
+        run: |
+          echo "Still using API Key: SUBWALLET_API"
