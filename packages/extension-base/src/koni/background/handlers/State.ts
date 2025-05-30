@@ -1622,6 +1622,8 @@ export default class KoniState {
     let to = '';
     const tokenInfo = this.getNativeTokenInfo(result.networkKey);
     let value = new BigN(0);
+    const freeBalance = await this.balanceService.getTransferableBalance(address, result.networkKey, tokenInfo.slug);
+    let inputAmount = new BigN(0);
     const psbtInputData = psbtGenerate.data.inputs.reduce((inputs, { nonWitnessUtxo, witnessUtxo }, inputIndex) => {
       let inputData: PsbtTransactionArg | null = null;
 
@@ -1640,10 +1642,20 @@ export default class KoniState {
         };
       }
 
-      inputData && inputs.push(inputData);
+      if (inputData) {
+        inputs.push(inputData);
+
+        if (isSameAddress(address, inputData.address || '')) {
+          inputAmount = inputAmount.plus(new BigN(inputData.amount || '0'));
+        }
+      }
 
       return inputs;
     }, [] as PsbtTransactionArg[]);
+
+    if (new BigN(freeBalance.value).lt(inputAmount)) {
+      payloadAfterValidated.errors = [{ message: t('Insufficient balance'), name: t('Unable to sign transaction') }];
+    }
 
     const psbtOutputData = psbtGenerate.txOutputs.map((output) => {
       let address = '';

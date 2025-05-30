@@ -1,15 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  BitcoinTransactionConfig,
-  ChainType,
-  ExtrinsicDataTypeMap,
-  ExtrinsicStatus,
-  ExtrinsicType,
-  FeeData,
-  ValidateTransactionResponse
-} from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinTransactionConfig, ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';

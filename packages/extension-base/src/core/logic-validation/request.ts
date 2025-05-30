@@ -1034,7 +1034,7 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
     };
   });
 
-  if (new BigN(freeBalance.value).lt(totalValue)) {
+  if (new BigN(freeBalance.value).lte(totalValue)) {
     handleError(t('Insufficient balance'));
   }
 

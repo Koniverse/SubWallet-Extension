@@ -35,7 +35,7 @@ const convertToBigN = (num: BitcoinSendTransactionRequest['value']): string | nu
 };
 
 function Component ({ className, request, type }: Props) {
-  const { id, payload: { address, networkKey, to, tokenSlug, value } } = request;
+  const { id, payload: { address, errors, networkKey, to, tokenSlug, value } } = request;
   const { t } = useTranslation();
   const account = useGetAccountByAddress(address);
   const transferAmountValue = useMemo(() => value?.toString() as string, [value]);
@@ -104,7 +104,6 @@ function Component ({ className, request, type }: Props) {
           chain: chainValue,
           token: assetValue,
           destChain: chainValue,
-          feeOption: 'slow',
           // feeOption: transactionFeeInfo?.feeOption,
           // feeCustom: transactionFeeInfo?.feeCustom,
           value: transferAmountValue || '0',
@@ -122,6 +121,8 @@ function Component ({ className, request, type }: Props) {
             setTransferInfo(undefined);
           })
           .finally(() => {
+            clearTimeout(timeout);
+            id && cancelSubscription(id).catch(console.error);
             setIsFetchingInfo(false);
           });
       }, 100);
@@ -214,7 +215,7 @@ function Component ({ className, request, type }: Props) {
         </MetaInfo>
       </div>
       <BitcoinSignArea
-        canSign={!isFetchingInfo && !isErrorTransaction}
+        canSign={!isFetchingInfo && !isErrorTransaction && !errors?.length}
         editedPayload={transactionInfo}
         id={id}
         payload={request}
@@ -242,7 +243,7 @@ const BitcoinSendTransactionRequestConfirmation = styled(Component)<Props>(({ th
   },
 
   '.__fee-editor.__fee-editor.__fee-editor': {
-    marginTop: 4,
+    marginTop: 4
   },
 
   '.__fee-editor-value-wrapper': {

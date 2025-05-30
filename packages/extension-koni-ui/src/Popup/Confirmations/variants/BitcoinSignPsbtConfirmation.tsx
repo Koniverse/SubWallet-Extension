@@ -26,7 +26,7 @@ interface Props extends ThemeProps {
 function Component ({ className, request, type }: Props) {
   const { id, payload } = request;
   const { t } = useTranslation();
-  const { address } = payload;
+  const { address, errors } = payload;
   const { tokenSlug, txInput, txOutput } = request.payload.payload;
   const account = useGetAccountByAddress(address);
   const accounts = useSelector((state: RootState) => state.accountState.accounts);
@@ -80,7 +80,7 @@ function Component ({ className, request, type }: Props) {
           className='account-item'
           isSelected={true}
         />
-        <div>
+        {!errors?.length && <div>
           <Button
             icon={<ViewDetailIcon />}
             onClick={onClickDetail}
@@ -89,7 +89,7 @@ function Component ({ className, request, type }: Props) {
           >
             {t('View details')}
           </Button>
-        </div>
+        </div>}
       </div>
       <BitcoinSignArea
         id={id}
