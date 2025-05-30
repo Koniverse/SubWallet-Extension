@@ -40,6 +40,23 @@ jobs:
       with:
         node-version: '18'
         cache: 'yarn'
+    - name: Load .env variables
+      id: dotenv
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        # Ensure .env file exists
+        if [ -f ./.env.pull-request.development ]; then
+          echo "Loading .env variables..."
+          # Read each line, export as an environment variable
+          while IFS='=' read -r key value; do
+            if [[ ! "$key" =~ ^# && -n "$key" ]]; then # Ignore comments and empty lines
+              echo "${key}=${value}" >> $GITHUB_ENV
+              echo "Loaded variable: ${key}"
+            fi
+          done < ./.env.pull-request.development
+        else
+          echo ".env file not found. Skipping environment variable loading."
+        fi
     - name: Build Dev
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
