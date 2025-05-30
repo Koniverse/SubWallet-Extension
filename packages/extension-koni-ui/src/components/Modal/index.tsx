@@ -14,7 +14,7 @@ export { default as ResetWalletModal } from './ResetWalletModal';
 export { default as TonWalletContractSelectorModal } from './TonWalletContractSelectorModal';
 export { default as TransactionProcessDetailModal } from './TransactionProcessDetailModal';
 export { default as TransactionStepsModal } from './TransactionStepsModal';
-
+export { default as SwitchNetworkAuthorizeModal } from './SwitchNetworkAuthorizeModal';
 export { SortingModal } from './SortingModal';
 
 export * from './Global';

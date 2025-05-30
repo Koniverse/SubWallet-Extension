@@ -56,6 +56,8 @@ export default class AuthRequestHandler {
       if (existKeyEvmNetworkConnect) {
         value.currentNetworkMap = { evm: existKeyEvmNetworkConnect };
         needUpdateAuthList = true;
+      } else if (!value.currentNetworkMap) {
+        value.currentNetworkMap = {};
       }
 
       acc[key] = { ...value };
@@ -282,7 +284,7 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentNetworkMap: existed ? existed.currentNetworkMap : defaultNetworkMap
+          currentNetworkMap: existed ? { ...defaultNetworkMap, ...existed.currentNetworkMap } : defaultNetworkMap
         };
 
         this.setAuthorize(authorizeList, () => {
