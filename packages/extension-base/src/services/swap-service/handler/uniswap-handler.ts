@@ -3,6 +3,7 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { createAcrossBridgeExtrinsic, CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
@@ -22,10 +23,7 @@ import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
 
-const API_URL = 'https://trade-api.gateway.uniswap.org/v1';
-const headers = {
-  'x-api-key': process.env.UNISWAP_API_KEY || ''
-};
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.UNISWAP}`;
 
 export type PermitData = {
   domain: Record<string, unknown>;
@@ -142,10 +140,9 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
     return undefined;
   }
 
-  const response = await fetch(`${API_URL}/check_approval`, {
+  const response = await fetch(`${proxyApi}/check_approval`, {
     method: 'POST',
     headers: {
-      ...headers,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
@@ -818,10 +815,9 @@ export class UniswapHandler implements SwapBaseInterface {
         body.permitData = permitData;
       }
 
-      postTransactionResponse = await fetch(`${API_URL}/swap`, {
+      postTransactionResponse = await fetch(`${proxyApi}/swap`, {
         method: 'POST',
         headers: {
-          ...headers,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -834,10 +830,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
       const submitSwapOrder = async () => {
         try {
-          const res = await fetch(`${API_URL}/order`, {
+          const res = await fetch(`${proxyApi}/order`, {
             method: 'POST',
             headers: {
-              ...headers,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -889,10 +884,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
         return retryGetUniswapTx(async () => {
           try {
-            const response = await fetch(`${API_URL}/orders?orderId=${orderId}&swapper=${swapper}`, {
+            const response = await fetch(`${proxyApi}/orders?orderId=${orderId}&swapper=${swapper}`, {
               method: 'GET',
               headers: {
-                ...headers,
                 'Content-Type': 'application/json'
               }
             });

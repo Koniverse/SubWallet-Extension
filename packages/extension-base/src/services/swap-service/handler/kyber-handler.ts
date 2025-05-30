@@ -4,6 +4,7 @@
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
@@ -76,9 +77,7 @@ export interface KyberSwapQuoteMetadata {
   priceImpact?: string;
 }
 
-export const KYBER_CLIENT_ID = process.env.KYBER_CLIENT_ID || '';
-
-const kyberUrl = 'https://aggregator-api.kyberswap.com';
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.KYBER}`;
 
 type BuildTxForSwapResult = { data?: TransactionConfig; error?: SwapError | TransactionError };
 
@@ -103,14 +102,13 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     gasInclude: 'true'
   });
 
-  const url = `${kyberUrl}/${chain}/api/v1/routes?${queryParams.toString()}`;
+  const url = `${proxyApi}/${chain}/api/v1/routes?${queryParams.toString()}`;
 
   try {
     const res = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': KYBER_CLIENT_ID,
         accept: 'application/json'
       }
     });
@@ -146,11 +144,11 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   console.log('routeSummary2', routeSummary);
 
   try {
-    const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
+    console.log('proxyapi', proxyApi);
+    const res = await fetch(`${proxyApi}/${chain}/api/v1/route/build`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': KYBER_CLIENT_ID,
         accept: 'application/json'
       },
       body: JSON.stringify(body)

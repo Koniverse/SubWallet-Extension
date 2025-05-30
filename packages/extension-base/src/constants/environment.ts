@@ -7,3 +7,15 @@ const branchName = process.env.BRANCH_NAME || 'subwallet-dev';
 export const isProductionMode = PRODUCTION_BRANCHES.indexOf(branchName) > -1;
 export const BACKEND_API_URL = process.env.SUBWALLET_API || (isProductionMode ? 'https://sw-services.subwallet.app/api' : 'https://be-dev.subwallet.app/api');
 export const BACKEND_PRICE_HISTORY_URL = process.env.SUBWALLET_PRICE_HISTORY_API || (isProductionMode ? 'https://price-history.subwallet.app/api' : 'https://price-history-dev.subwallet.app/api');
+
+export const BACKEND_PROXY_API_URL = process.env.SUBWALLET_PROXY_API || (isProductionMode ? 'https://external-services.subwallet.app/' : 'https://external-services-dev.subwallet.app/');
+
+export enum ProxyServiceRoute {
+  BITTENSOR = 'bittensor',
+  CHAINFLIP = 'chainflip',
+  KYBER = 'kyber',
+  SIMPLESWAP = 'simpleswap',
+  UNISWAP = 'uniswap',
+  CARDANO = 'cardano',
+  PARASPELL = 'paraspell',
+}

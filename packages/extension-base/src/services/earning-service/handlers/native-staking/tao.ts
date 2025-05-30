@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
+import { BACKEND_PROXY_API_URL, BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
@@ -61,27 +61,7 @@ interface Validator {
   apr: string;
 }
 
-export const BITTENSOR_API_KEY_1 = process.env.BITTENSOR_API_KEY_1 || '';
-export const BITTENSOR_API_KEY_2 = process.env.BITTENSOR_API_KEY_2 || '';
-export const BITTENSOR_API_KEY_3 = process.env.BITTENSOR_API_KEY_3 || '';
-export const BITTENSOR_API_KEY_4 = process.env.BITTENSOR_API_KEY_4 || '';
-export const BITTENSOR_API_KEY_5 = process.env.BITTENSOR_API_KEY_5 || '';
-export const BITTENSOR_API_KEY_6 = process.env.BITTENSOR_API_KEY_6 || '';
-export const BITTENSOR_API_KEY_7 = process.env.BITTENSOR_API_KEY_7 || '';
-export const BITTENSOR_API_KEY_8 = process.env.BITTENSOR_API_KEY_8 || '';
-export const BITTENSOR_API_KEY_9 = process.env.BITTENSOR_API_KEY_9 || '';
-export const BITTENSOR_API_KEY_10 = process.env.BITTENSOR_API_KEY_10 || '';
-
-function random (...keys: string[]) {
-  const validKeys = keys.filter((key) => key);
-  const randomIndex = Math.floor(Math.random() * validKeys.length);
-
-  return validKeys[randomIndex];
-}
-
-export const bittensorApiKey = (): string => {
-  return random(BITTENSOR_API_KEY_1, BITTENSOR_API_KEY_2, BITTENSOR_API_KEY_3, BITTENSOR_API_KEY_4, BITTENSOR_API_KEY_5, BITTENSOR_API_KEY_6, BITTENSOR_API_KEY_7, BITTENSOR_API_KEY_8, BITTENSOR_API_KEY_9, BITTENSOR_API_KEY_10);
-};
+const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.BITTENSOR}`;
 
 /* Fetch data */
 export class BittensorCache {
@@ -116,14 +96,11 @@ export class BittensorCache {
   }
 
   private async fetchData (): Promise<ValidatorResponse> {
-    const apiKey = bittensorApiKey();
-
     try {
-      const resp = await fetch('https://api.taostats.io/api/validator/latest/v1?limit=50', {
+      const resp = await fetch(`${proxyApi}/validator/latest/v1?limit=50`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${apiKey}`
+          'Content-Type': 'application/json'
         }
       });
 
