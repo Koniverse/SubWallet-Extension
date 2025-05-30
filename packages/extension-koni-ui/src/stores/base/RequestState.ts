@@ -26,6 +26,7 @@ const initialState: RequestState = {
   evmSendTransactionRequest: {},
   evmWatchTransactionRequest: {},
   errorConnectNetwork: {},
+  submitApiRequest: {},
 
   tonSignatureRequest: {},
   tonSendTransactionRequest: {},
@@ -55,6 +56,7 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'evmSendTransactionRequest',
   'evmWatchTransactionRequest',
   'errorConnectNetwork',
+  'submitApiRequest',
   'tonSignatureRequest',
   'tonSendTransactionRequest',
   'tonWatchTransactionRequest',

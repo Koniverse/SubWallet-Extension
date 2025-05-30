@@ -43,7 +43,8 @@ export enum SwapProviderId {
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP',
-  UNISWAP = 'UNISWAP'
+  UNISWAP = 'UNISWAP',
+  KYBER = 'KYBER'
 }
 
 export interface SwapRequest {
@@ -65,6 +66,7 @@ interface SwapRequestV2 {
   feeToken?: string;
   preferredProvider?: SwapProviderId; // allow user to designate a provider
   isCrossChain?: boolean;
+  evmBridgeSwapVersion?: boolean; // hotfix todo: remove later
 }
 
 export interface HydrationRateRequest {
@@ -194,8 +196,14 @@ export class SwapApi {
     }
   }
 
-  async findAvailablePath (availablePathRequest: SwapRequestV2) {
+  async findAvailablePath (_availablePathRequest: SwapRequestV2) {
     const url = `${this.baseUrl}/swap/find-available-path`;
+
+    // hotfix todo: remove later
+    const availablePathRequest = {
+      ..._availablePathRequest,
+      evmBridgeSwapVersion: true
+    };
 
     try {
       const rawResponse = await fetch(url, {
