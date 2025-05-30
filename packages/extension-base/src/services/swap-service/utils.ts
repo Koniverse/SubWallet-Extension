@@ -14,6 +14,7 @@ export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
 
 export const SIMPLE_SWAP_EXPLORER = 'https://simpleswap.io';
 
+// Deprecated
 export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string> = {
   'bittensor-NATIVE-TAO': 'tao',
   [COMMON_ASSETS.ETH]: 'eth',
@@ -25,9 +26,11 @@ export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string>
 export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in milliseconds
   default: 90000,
   [SwapProviderId.CHAIN_FLIP_TESTNET]: 30000,
-  [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000
+  [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000,
+  error: 10000
 };
 
+// deprecated
 export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
   [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],

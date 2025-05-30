@@ -3,7 +3,7 @@
 
 import type { KeypairType } from '@subwallet/keyring/types';
 
-import { AccountActions, AccountJson, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 
 export interface WordItem {
   index: number;
@@ -36,14 +36,20 @@ export type AccountChainAddress = {
   logoKey?: string
 }
 
+export type AccountInfoType = {
+  address: string;
+  type: KeypairType;
+}
+
 export type AccountTokenAddress = {
-  accountInfo: AccountJson;
+  accountInfo: AccountInfoType;
   tokenSlug: string;
   chainSlug: string;
 }
 
 export interface BitcoinAccountInfo {
   name: string;
+  network: string;
   logoKey?: string;
   order: number;
 }

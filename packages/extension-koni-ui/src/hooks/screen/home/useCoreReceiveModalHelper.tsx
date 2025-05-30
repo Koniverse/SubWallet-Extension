@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { AccountActions, AccountChainType, AccountJson, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useGetBitcoinAccounts, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
-import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
+import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,28 +19,6 @@ import { useSelector } from 'react-redux';
 type HookType = {
   onOpenReceive: VoidFunction;
   receiveModalProps: ReceiveModalProps;
-};
-
-const transformBitcoinAccounts = (
-  accounts: AccountJson[] = [],
-  chainSlug: string,
-  tokenSlug: string,
-  chainInfo: _ChainInfo
-): AccountTokenAddress[] => {
-  const isBitcoinTestnet = chainInfo.isTestnet;
-  const keypairTypes = isBitcoinTestnet ? BitcoinTestnetKeypairTypes : BitcoinMainnetKeypairTypes;
-
-  return accounts
-    .filter(
-      (acc) =>
-        acc.chainType === AccountChainType.BITCOIN &&
-        keypairTypes.includes(acc.type)
-    )
-    .map((item) => ({
-      accountInfo: item,
-      tokenSlug,
-      chainSlug
-    }));
 };
 
 const tokenSelectorModalId = RECEIVE_MODAL_TOKEN_SELECTOR;
@@ -63,6 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const getBitcoinAccount = useGetBitcoinAccounts();
 
   // chain related to tokenGroupSlug, if it is token slug
   const specificChain = useMemo(() => {
@@ -171,12 +150,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
 
     if (isBitcoinChain) {
-      const accountTokenAddressList = transformBitcoinAccounts(
-        currentAccountProxy?.accounts || [],
-        chainSlug,
-        item.slug,
-        chainInfo
-      );
+      const accountTokenAddressList = getBitcoinAccount(chainSlug, item.slug, chainInfo, currentAccountProxy.accounts);
 
       if (accountTokenAddressList.length > 1) {
         openAccountTokenAddressModal(accountTokenAddressList, () => {
@@ -224,7 +198,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, openAccountTokenAddressModal, inactiveModal, getReformatAddress, openAddressFormatModal, openAddressQrModal]);
+  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, getBitcoinAccount, openAccountTokenAddressModal, inactiveModal, openAddressQrModal, getReformatAddress, openAddressFormatModal]);
 
   /* token Selector --- */
 

@@ -15,6 +15,7 @@ export { default as useAlert } from './useAlert';
 export { default as useSetSessionLatest } from './useSetSessionLatest';
 export { default as useDebouncedValue } from './useDebouncedValue';
 export { default as useIsPolkadotUnifiedChain } from './useIsPolkadotUnifiedChain';
+export { default as useGetBitcoinAccounts } from './useGetBitcoinAccounts';
 export { default as useReformatAddress } from './useReformatAddress';
 
 export * from './useSelector';

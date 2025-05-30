@@ -78,7 +78,8 @@ export enum SwapProviderId {
   ROCOCO_ASSET_HUB = 'ROCOCO_ASSET_HUB',
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP',
-  UNISWAP = 'UNISWAP'
+  UNISWAP = 'UNISWAP',
+  KYBER = 'KYBER'
 }
 
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
@@ -91,7 +92,8 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   // SwapProviderId.ROCOCO_ASSET_HUB,
   // SwapProviderId.WESTEND_ASSET_HUB,
   SwapProviderId.SIMPLE_SWAP,
-  SwapProviderId.UNISWAP
+  SwapProviderId.UNISWAP,
+  SwapProviderId.KYBER
 ];
 
 export interface SwapProvider {
@@ -184,6 +186,7 @@ export interface SwapRequestV2 {
   feeToken?: string;
   preferredProvider?: SwapProviderId; // allow user to designate a provider
   isCrossChain?: boolean;
+  isSupportKyberVersion?: boolean;
 }
 
 export interface SwapRequestResult {
@@ -216,6 +219,7 @@ export interface SwapSubmitStepData {
   extrinsicType: ExtrinsicType;
   chainType: ChainType;
   isPermit?: boolean;
+  isDutch?: boolean;
 }
 
 export enum DynamicSwapType {
