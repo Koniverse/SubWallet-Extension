@@ -72,6 +72,7 @@
   "devDependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.19.3",
+    "@dedot/chaintypes": "^0.108.0",
     "@polkadot/dev": "^0.65.23",
     "@types/jest": "^29.5.0",
     "axios": "^1.6.2",
@@ -91,6 +92,7 @@
     "@ledgerhq/hw-transport": "6.30.3",
     "@mangata-finance/type-definitions": "2.1.2",
     "@polkadot/api": "^15.7.2",
+    "dedot": "^0.12.0",
     "@polkadot/api-augment": "^15.7.2",
     "@polkadot/api-base": "^15.7.2",
     "@polkadot/api-contract": "^15.7.2",
