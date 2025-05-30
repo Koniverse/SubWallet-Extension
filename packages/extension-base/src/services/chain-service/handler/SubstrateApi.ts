@@ -13,9 +13,10 @@ import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/ha
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
+import { DedotClient, WsProvider as DedotWsProvider } from 'dedot';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, WsProvider as PapiWsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
 import { typesBundle as _typesBundle } from '@polkadot/apps-config/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
@@ -42,6 +43,7 @@ if (typesBundle.spec) {
 export class SubstrateApi implements _SubstrateApi {
   chainSlug: string;
   api: ApiPromise;
+  client: DedotClient;
   providerName?: string;
   provider: ProviderInterface;
   apiUrl: string;
@@ -95,7 +97,7 @@ export class SubstrateApi implements _SubstrateApi {
     } else {
       this.useLightClient = true;
 
-      return new WsProvider(apiUrl, API_AUTO_CONNECT_MS, {}, API_CONNECT_TIMEOUT);
+      return new PapiWsProvider(apiUrl, API_AUTO_CONNECT_MS, {}, API_CONNECT_TIMEOUT);
     }
   }
 
@@ -160,6 +162,22 @@ export class SubstrateApi implements _SubstrateApi {
     return api;
   }
 
+  private createClient (apiUrl: string) {
+    const provider = new DedotWsProvider(apiUrl);
+    // todo: re-check metadata, typesBundle, registry,
+
+    this.updateConnectionStatus(_ChainConnectionStatus.CONNECTING);
+
+    const client = new DedotClient(provider);
+
+    client.on('ready', () => console.log(`On ready ${apiUrl} dedot`));
+    client.on('connected', () => console.log(`On successfully ${apiUrl} dedot`));
+    client.on('disconnected', () => console.log(`On disconnect ${apiUrl} dedot`));
+    client.on('error', () => console.log(`On error ${apiUrl} dedot`));
+
+    return client;
+  }
+
   constructor (chainSlug: string, apiUrl: string, { externalApiPromise, metadata, providerName }: _ApiOptions = {}) {
     this.chainSlug = chainSlug;
     this.apiUrl = apiUrl;
@@ -168,6 +186,7 @@ export class SubstrateApi implements _SubstrateApi {
     this.metadata = metadata;
     this.provider = this.createProvider(apiUrl);
     this.api = this.createApi(this.provider, externalApiPromise);
+    this.client = this.createClient(apiUrl);
 
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
   }
@@ -189,10 +208,16 @@ export class SubstrateApi implements _SubstrateApi {
     this.api.off('disconnected', this.onDisconnect.bind(this));
     this.api.off('error', this.onError.bind(this));
 
+    this.client.off('ready', () => console.log(`Off ready ${apiUrl} dedot`));
+    this.client.off('connected', () => console.log(`Off connected ${apiUrl} dedot`));
+    this.client.off('disconnected', () => console.log(`Off disconnected ${apiUrl} dedot`));
+    this.client.off('error', () => console.log(`Off error ${apiUrl} dedot`));
+
     // Create new provider and api
     this.apiUrl = apiUrl;
     this.provider = this.createProvider(apiUrl);
     this.api = this.createApi(this.provider);
+    this.client = this.createClient(apiUrl);
   }
 
   connect (_callbackUpdateMetadata?: (substrateApi: _SubstrateApi) => void): void {
@@ -201,6 +226,8 @@ export class SubstrateApi implements _SubstrateApi {
       _callbackUpdateMetadata?.(this);
     } else {
       this.updateConnectionStatus(_ChainConnectionStatus.CONNECTING);
+
+      this.client.connect().catch(console.error);
 
       this.api.connect()
         .then(() => {
@@ -214,7 +241,10 @@ export class SubstrateApi implements _SubstrateApi {
 
   async disconnect () {
     try {
-      await this.api.disconnect();
+      await Promise.all([
+        this.api.disconnect(),
+        this.client.disconnect()
+      ]);
     } catch (e) {
       console.error(e);
     }

@@ -12,6 +12,7 @@ import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chai
 import { TonWalletContract } from '@subwallet/keyring/types';
 import { Cell } from '@ton/core';
 import { Address, Contract, OpenedContract } from '@ton/ton';
+import { DedotClient } from 'dedot';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import Web3 from 'web3';
 
@@ -96,6 +97,7 @@ export interface _SubstrateApiState {
 
 export interface _SubstrateApi extends _SubstrateApiState, _ChainBaseApi, _SubstrateApiAdapter {
   api: ApiPromise;
+  client: DedotClient
   isReady: Promise<_SubstrateApi>;
   connect: (_callbackUpdateMetadata?: (substrateApi: _SubstrateApi) => void) => void;
 
