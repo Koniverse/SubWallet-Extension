@@ -1150,6 +1150,7 @@ export interface BitcoinSignRequest {
   address: string;
   hashPayload: string;
   canSign: boolean;
+  errors?: ErrorValidation[];
 }
 
 export interface BitcoinRecipientTransactionParams{

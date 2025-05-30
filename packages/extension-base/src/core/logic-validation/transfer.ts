@@ -23,6 +23,7 @@ import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
+import { TransactionConfig } from 'web3-core';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -386,7 +387,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
 
         estimateFee.value = (feeCombine.feeRate * sizeInfo.txVBytes).toString();
       } else {
-        const _transaction = transaction;
+        const _transaction = transaction as TransactionConfig;
         const gasLimit = _transaction.gas || await evmApi.api.eth.estimateGas(_transaction);
 
         const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);

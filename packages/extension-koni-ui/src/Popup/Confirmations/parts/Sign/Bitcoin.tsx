@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BitcoinSignatureRequest, BitcoinSignPsbtRequest, ConfirmationDefinitionsBitcoin, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinSignPsbtRequest, ConfirmationDefinitionsBitcoin, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSubmitTransferWithId } from '@subwallet/extension-base/types/balance/transfer';
 import { wait } from '@subwallet/extension-base/utils';
+import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress, useNotification, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { completeConfirmationBitcoin, makeBitcoinDappTransferConfirmation, makePSBTTransferAfterConfirmation } from '@subwallet/extension-koni-ui/messaging';
@@ -53,7 +54,7 @@ const handleSignature = async (type: BitcoinSignatureSupportType, id: string, si
 const Component: React.FC<Props> = (props: Props) => {
   const { canSign, className, editedPayload, extrinsicType, id, payload, type } = props;
   // const { payload: { hashPayload } } = payload;
-  const { address } = (payload.payload as BitcoinSignatureRequest);
+  const { address, errors } = payload.payload;
   const account = useGetAccountByAddress(address);
   // TODO: [Review] Error eslint
   // const chainId = (payload.payload as EvmSendTransactionRequest)?.chainId || 1;
@@ -67,6 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const checkUnlock = useUnlockChecker();
   const signMode = useMemo(() => getSignMode(account), [account]);
+  const isErrorTransaction = useMemo(() => errors && errors.length > 0, [errors]);
   // TODO: [Review] type generic_ledger or legacy_ledger
   // const isLedger = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER, [signMode]);
   // const isMessage = isBitcoinMessage(payload);
@@ -270,20 +272,40 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={CN(className, 'confirmation-footer')}>
-      <Button
-        disabled={loading}
-        icon={(
-          <Icon
-            phosphorIcon={XCircle}
-            weight='fill'
+      {
+        isErrorTransaction && errors && (
+          <AlertBox
+            className={CN(className, 'alert-box')}
+            description={errors[0].message}
+            title={errors[0].name}
+            type={'error'}
           />
-        )}
-        onClick={onCancel}
-        schema={'secondary'}
-      >
-        {t('Cancel')}
-      </Button>
-      <Button
+        )
+      }
+      {
+        isErrorTransaction
+          ? <Button
+            disabled={loading}
+            onClick={onCancel}
+            schema={'primary'}
+          >
+            {t('I understand')}
+          </Button>
+          : <Button
+            disabled={loading}
+            icon={(
+              <Icon
+                phosphorIcon={XCircle}
+                weight='fill'
+              />
+            )}
+            onClick={onCancel}
+            schema={'secondary'}
+          >
+            {t('Cancel')}
+          </Button>
+      }
+      {!isErrorTransaction && <Button
         disabled={!(canSign === undefined ? payload.payload.canSign : canSign && payload.payload.canSign)}
         icon={(
           <Icon
@@ -295,7 +317,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onClick={onConfirm}
       >
         {t('Approve')}
-      </Button>
+      </Button> }
       {/* { */}
       {/*   signMode === AccountSignMode.QR && ( */}
       {/*     <DisplayPayloadModal> */}
@@ -307,7 +329,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {/*     </DisplayPayloadModal> */}
       {/*   ) */}
       {/* } */}
-      {signMode === AccountSignMode.QR && <ScanSignature onSignature={onApproveSignature} />}
+      {!isErrorTransaction && signMode === AccountSignMode.QR && <ScanSignature onSignature={onApproveSignature} />}
     </div>
   );
 };

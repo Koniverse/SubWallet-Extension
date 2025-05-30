@@ -43,7 +43,7 @@ import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEnabled, _isChainEvmCompatible, _isChainBitcoinCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainBitcoinCompatible, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
@@ -62,7 +62,7 @@ import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/e
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
-import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, getAccountSignMode, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -77,6 +77,7 @@ import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/sessio
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
+import { Psbt } from 'bitcoinjs-lib';
 import { t } from 'i18next';
 import { combineLatest, Subject } from 'rxjs';
 import { TransactionConfig } from 'web3-core';
@@ -754,7 +755,8 @@ export default class KoniExtension {
       substrate: 'substrateInfo',
       evm: 'evmInfo',
       cardano: 'cardanoInfo',
-      ton: 'tonInfo'
+      ton: 'tonInfo',
+      bitcoin: 'bitcoinInfo'
     };
 
     const typeInfoKey = typeInfoMap[authSwitchNetworkType];
@@ -1868,7 +1870,7 @@ export default class KoniExtension {
     const tokenBaseAmount: AmountData = { value: '0', symbol: transferTokenInfo.symbol, decimals: transferTokenInfo.decimals || 0 };
     const transferAmount: AmountData = { ...tokenBaseAmount };
 
-    let transaction: ValidateTransactionResponseInput['transaction'];
+    let transaction: Psbt | undefined;
 
     // Get native token amount
     const freeBalance = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug });

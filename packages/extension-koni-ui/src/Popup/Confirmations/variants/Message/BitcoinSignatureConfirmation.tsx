@@ -12,7 +12,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { BaseDetailModal } from '../parts';
+import { BaseDetailModal } from '../../parts';
 
 interface Props extends ThemeProps {
   type: BitcoinSignatureSupportType
@@ -22,7 +22,7 @@ interface Props extends ThemeProps {
 function Component ({ className, request, type }: Props) {
   const { id, payload } = request;
   const { t } = useTranslation();
-  const { address } = payload;
+  const { address, errors } = payload;
   const account = useGetAccountByAddress(address);
   const onClickDetail = useOpenDetailModal();
 
@@ -42,7 +42,7 @@ function Component ({ className, request, type }: Props) {
           className='account-item'
           isSelected={true}
         />
-        <div>
+        {(!errors || errors.length === 0) && <div>
           <Button
             icon={<ViewDetailIcon />}
             onClick={onClickDetail}
@@ -52,19 +52,20 @@ function Component ({ className, request, type }: Props) {
             {t('View details')}
           </Button>
         </div>
+        }
       </div>
       <BitcoinSignArea
         id={id}
         payload={request}
         type={type}
       />
-      <BaseDetailModal
+      {(!errors || errors.length === 0) && <BaseDetailModal
         title={t('Message details')}
       >
         <MetaInfo.Data>
           {request.payload.payload as string}
         </MetaInfo.Data>
-      </BaseDetailModal>
+      </BaseDetailModal>}
     </>
   );
 }
