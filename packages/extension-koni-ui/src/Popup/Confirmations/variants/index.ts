@@ -8,13 +8,13 @@ export { default as ConnectWalletConnectConfirmation } from './ConnectWalletConn
 export { default as EvmTransactionConfirmation } from './EvmTransactionConfirmation';
 export { default as MetadataConfirmation } from './MetadataConfirmation';
 export { default as NotSupportConfirmation } from './NotSupportConfirmation';
-export { default as SignConfirmation } from './SignConfirmation';
+export { default as SignConfirmation } from './Message/SignConfirmation';
 export { default as TransactionConfirmation } from './Transaction';
 export { default as NotSupportWCConfirmation } from './NotSupportWCConfirmation';
 export { default as CardanoSignTransactionConfirmation } from './CardanoSignTransactionConfirmation';
-// export { default as BitcoinSignatureConfirmation } from './BitcoinSignatureConfirmation';
-// export { default as BitcoinSignPsbtConfirmation } from './BitcoinSignPsbtConfirmation';
-// export { default as BitcoinSendTransactionRequestConfirmation } from './BitcoinSendTransactionRequestConfirmation';
+export { default as BitcoinSignatureConfirmation } from './Message/BitcoinSignatureConfirmation';
+export { default as BitcoinSignPsbtConfirmation } from './BitcoinSignPsbtConfirmation';
+export { default as BitcoinSendTransactionRequestConfirmation } from './BitcoinSendTransactionRequestConfirmation';
 
 export * from './Error';
 export * from './Message';

@@ -40,11 +40,11 @@ const defaultErrorMap: Record<BitcoinProviderErrorType, { message: string, code?
 export class BitcoinProviderError extends SWError {
   override errorType: BitcoinProviderErrorType;
 
-  constructor (errorType: BitcoinProviderErrorType, errMessage?: string, data?: unknown) {
+  constructor (errorType: BitcoinProviderErrorType, errMessage?: string, data?: unknown, name?: string) {
     const { code, message } = defaultErrorMap[errorType];
     const finalMessage = errMessage || t(message || '') || errorType;
 
-    super(errorType, finalMessage, code, data);
+    super(errorType, finalMessage, code, data, name);
     this.errorType = errorType;
   }
 }
