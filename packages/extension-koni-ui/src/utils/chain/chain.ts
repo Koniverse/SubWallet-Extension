@@ -5,6 +5,7 @@ import { _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
+import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 
 export const findChainInfoByGenesisHash = (chainMap: Record<string, _ChainInfo>, genesisHash?: string): _ChainInfo | null => {
   if (!genesisHash) {
@@ -62,7 +63,7 @@ export const isChainCompatibleWithAccountChainTypes = (chainInfo: _ChainInfo, ch
   return chainTypes.some((chainType) => isChainInfoAccordantAccountChainType(chainInfo, chainType));
 };
 
-export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>, chainTypes: AccountChainType[], specialChain?: string): string[] => {
+export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>, chainTypes: AccountChainType[], accountTypes: KeypairType[] = [], specialChain?: string): string[] => {
   const chainInfoMap = Object.fromEntries(Object.entries(_chainInfoMap).filter(([, chainInfo]) => chainInfo.chainStatus === _ChainStatus.ACTIVE));
 
   if (specialChain) {
@@ -70,9 +71,25 @@ export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>
   } else {
     const result: string[] = [];
 
+    const bitcoinAccountTypes = accountTypes.filter((type) => BitcoinMainnetKeypairTypes.includes(type) || BitcoinTestnetKeypairTypes.includes(type));
+    const isOnlyBitcoinMainnet = bitcoinAccountTypes.every((type) => BitcoinMainnetKeypairTypes.includes(type));
+    const isOnlyBitcoinTestnet = bitcoinAccountTypes.every((type) => BitcoinTestnetKeypairTypes.includes(type));
+
     for (const chainInfo of Object.values(chainInfoMap)) {
       if (isChainCompatibleWithAccountChainTypes(chainInfo, chainTypes)) {
-        result.push(chainInfo.slug);
+        const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
+
+        if (isBitcoinChain) {
+          if (isOnlyBitcoinMainnet && chainInfo.bitcoinInfo?.bitcoinNetwork === 'mainnet') {
+            result.push(chainInfo.slug);
+          } else if (isOnlyBitcoinTestnet && chainInfo.bitcoinInfo?.bitcoinNetwork === 'testnet') {
+            result.push(chainInfo.slug);
+          } else if (!isOnlyBitcoinMainnet && !isOnlyBitcoinTestnet) {
+            result.push(chainInfo.slug);
+          }
+        } else {
+          result.push(chainInfo.slug);
+        }
       }
     }
 
@@ -81,7 +98,7 @@ export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>
 };
 
 // Note : The function filters the chain slug list by account All, where all accounts case may include only Ledger accounts.
-export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProxies: AccountProxy[], _chainInfoMap: Record<string, _ChainInfo>): string[] => {
+export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProxies: AccountProxy[], _chainInfoMap: Record<string, _ChainInfo>, accountTypes: KeypairType[] = []): string[] => {
   const specialChainRecord: Record<AccountChainType, string[]> = {} as Record<AccountChainType, string[]>;
   const { chainTypes, specialChain } = accountAllProxy;
   const chainInfoMap = Object.fromEntries(Object.entries(_chainInfoMap).filter(([, chainInfo]) => chainInfo.chainStatus === _ChainStatus.ACTIVE));
@@ -111,7 +128,22 @@ export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProx
       });
 
       if (isAllowed) {
-        result.push(chainInfo.slug);
+        const bitcoinAccountTypes = accountTypes.filter((type) => BitcoinMainnetKeypairTypes.includes(type) || BitcoinTestnetKeypairTypes.includes(type));
+        const isOnlyBitcoinMainnet = bitcoinAccountTypes.every((type) => BitcoinMainnetKeypairTypes.includes(type));
+        const isOnlyBitcoinTestnet = bitcoinAccountTypes.every((type) => BitcoinTestnetKeypairTypes.includes(type));
+        const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
+
+        if (isBitcoinChain) {
+          if (isOnlyBitcoinMainnet && chainInfo.bitcoinInfo?.bitcoinNetwork === 'mainnet') {
+            result.push(chainInfo.slug);
+          } else if (isOnlyBitcoinTestnet && chainInfo.bitcoinInfo?.bitcoinNetwork === 'testnet') {
+            result.push(chainInfo.slug);
+          } else if (!isOnlyBitcoinMainnet && !isOnlyBitcoinTestnet) {
+            result.push(chainInfo.slug);
+          }
+        } else {
+          result.push(chainInfo.slug);
+        }
       }
     });
   } else {
