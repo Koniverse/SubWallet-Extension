@@ -21,6 +21,8 @@ import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
 import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import BitcoinSendTransactionRequestConfirmation
+  from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/BitcoinSendTransactionRequestConfirmation';
 
 type Props = ThemeProps
 
@@ -211,13 +213,13 @@ const Component = function ({ className }: Props) {
             type={confirmation.type}
           />
         );
-      // case 'bitcoinSendTransactionRequestAfterConfirmation':
-      //   return (
-      //     <BitcoinSendTransactionRequestConfirmation
-      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]}
-      //       type={confirmation.type}
-      //     />
-      //   );
+      case 'bitcoinSendTransactionRequestAfterConfirmation':
+        return (
+          <BitcoinSendTransactionRequestConfirmation
+            request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]}
+            type={confirmation.type}
+          />
+        );
       case 'authorizeRequest':
         return (
           <AuthorizeConfirmation request={confirmation.item as AuthorizeRequest} />

@@ -10,7 +10,7 @@ import { CardanoProviderError } from '@subwallet/extension-base/background/error
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinAppState, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinAppState, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -1023,8 +1023,8 @@ export default class KoniTabs {
     });
   }
 
-  public async canUseAccount (address: string, url: string) {
-    const allowedAccounts = await this.getCurrentAccount(url, 'evm');
+  public async canUseAccount (address: string, url: string, type: AccountAuthType) {
+    const allowedAccounts = await this.getCurrentAccount(url, type);
 
     return !!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()));
   }
@@ -1568,62 +1568,62 @@ export default class KoniTabs {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
     }
   }
-  //
-  // private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments) {
-  //   const transactionParams = params as BitcoinSendTransactionParams;
-  //   const canUseAccount = !!transactionParams.account && await this.canUseAccount(transactionParams.account, url, 'bitcoin');
-  //   const bitcoinState = await this.getBitcoinState(url, transactionParams.network);
-  //   const networkKey = bitcoinState.networkKey;
-  //
-  //   if (!canUseAccount) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('You have rescinded allowance for this account in wallet'));
-  //   }
-  //
-  //   if (!networkKey) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
-  //   }
-  //
-  //   const senderAccountType = getKeypairTypeByAddress(transactionParams.account);
-  //
-  //   if ((networkKey === 'bitcoin' && senderAccountType !== 'bitcoin-84') || (networkKey === 'bitcoinTestnet' && senderAccountType !== 'bittest-84')) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('The account or the network is incorrect'));
-  //   }
-  //
-  //   if (!networkKey) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
-  //   }
-  //
-  //   if (!transactionParams.recipients?.length) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Please provide the recipient and the amount'));
-  //   }
-  //
-  //   if (transactionParams.recipients?.length > 1) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("We don't support multiple recipients yet. Please provide only one for now."));
-  //   }
-  //
-  //   if (transactionParams.recipients.filter(({ address, amount }) => !address || !amount).length > 0) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS);
-  //   }
-  //
-  //   if (transactionParams.account === transactionParams.recipients[0].address) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("The recipient address cannot be the same as the sender's address"));
-  //   }
-  //
-  //   const recipientAccountType = getKeypairTypeByAddress(transactionParams.recipients[0].address);
-  //
-  //   if (senderAccountType !== recipientAccountType) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("The type of the recipient's address must match the type of the sender's address"));
-  //   }
-  //
-  //   const allowedAccounts = await this.getBitcoinCurrentAccount(url);
-  //   const transactionHash = await this.#koniState.bitcoinSendTransaction(id, url, networkKey, allowedAccounts, transactionParams);
-  //
-  //   if (!transactionHash) {
-  //     throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
-  //   }
-  //
-  //   return transactionHash;
-  // }
+
+  private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments) {
+    const transactionParams = params as BitcoinSendTransactionParams;
+    const canUseAccount = !!transactionParams.account && await this.canUseAccount(transactionParams.account, url, 'bitcoin');
+    const bitcoinState = await this.getBitcoinState(url, transactionParams.network);
+    const networkKey = bitcoinState.networkKey;
+
+    if (!canUseAccount) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('You have rescinded allowance for this account in wallet'));
+    }
+
+    if (!networkKey) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
+    }
+
+    const senderAccountType = getKeypairTypeByAddress(transactionParams.account);
+
+    if ((networkKey === 'bitcoin' && senderAccountType !== 'bitcoin-84') || (networkKey === 'bitcoinTestnet' && senderAccountType !== 'bittest-84')) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('The account or the network is incorrect'));
+    }
+
+    if (!networkKey) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Network unavailable. Please switch network or manually add network to wallet'));
+    }
+
+    if (!transactionParams.recipients?.length) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Please provide the recipient and the amount'));
+    }
+
+    if (transactionParams.recipients?.length > 1) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("We don't support multiple recipients yet. Please provide only one for now."));
+    }
+
+    if (transactionParams.recipients.filter(({ address, amount }) => !address || !amount).length > 0) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS);
+    }
+
+    if (transactionParams.account === transactionParams.recipients[0].address) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("The recipient address cannot be the same as the sender's address"));
+    }
+
+    const recipientAccountType = getKeypairTypeByAddress(transactionParams.recipients[0].address);
+
+    if (senderAccountType !== recipientAccountType) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t("The type of the recipient's address must match the type of the sender's address"));
+    }
+
+    const allowedAccounts = await this.getCurrentAccount(url, 'bitcoin');
+    const transactionHash = await this.#koniState.bitcoinSendTransaction(id, url, networkKey, allowedAccounts, transactionParams);
+
+    if (!transactionHash) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+    }
+
+    return transactionHash;
+  }
 
   private async handleBitcoinRequest (id: string, url: string, request: RequestArguments, port: chrome.runtime.Port): Promise<unknown> {
     const { method } = request;
@@ -1638,9 +1638,9 @@ export default class KoniTabs {
 
         case 'signPsbt':
           return await this.bitcoinSignPspt(id, url, request);
-          //
-          // case 'sendTransfer':
-          //   return await this.bitcoinSendTransfer(id, url, request);
+
+        case 'sendTransfer':
+          return await this.bitcoinSendTransfer(id, url, request);
 
         default:
           return this.performWeb3Method(id, url, request);

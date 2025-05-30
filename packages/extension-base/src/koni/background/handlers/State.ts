@@ -9,7 +9,7 @@ import { EvmProviderError } from '@subwallet/extension-base/background/errors/Ev
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSignatureRequest, BitcoinSignMessageResult, BitcoinSignPsbtPayload, BitcoinSignPsbtRawRequest, BitcoinSignPsbtRequest, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SignPsbtBitcoinResult, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageResult, BitcoinSignPsbtPayload, BitcoinSignPsbtRawRequest, BitcoinSignPsbtRequest, BitcoinTransactionConfig, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SignPsbtBitcoinResult, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
@@ -1552,8 +1552,6 @@ export default class KoniState {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Invalid bitcoin address'));
     }
 
-    console.log(allowedAccounts);
-
     // Check sign abiblity
     if (!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()))) {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('You have rescinded allowance for this account in wallet'));
@@ -1716,6 +1714,93 @@ export default class KoniState {
     };
 
     return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignPsbtRequest', signPayload, {
+      requiredPassword: false
+    })
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
+  public async bitcoinSendTransaction (id: string, url: string, networkKey: string, allowedAccounts: string[], transactionParams: BitcoinSendTransactionParams): Promise<string | undefined> {
+    const autoFormatNumber = (val: string | number): string => {
+      if (typeof val === 'string' && val.startsWith('0x')) {
+        return new BigN(val.replace('0x', ''), 16).toString();
+      } else if (typeof val === 'number') {
+        return val.toString();
+      }
+
+      return val;
+    };
+
+    if (transactionParams.recipients.length !== 1) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Receiving address must be a single account'));
+    }
+
+    if (transactionParams.account === transactionParams.recipients[0].address) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Receiving address must be different from sending address'));
+    }
+
+    const tokenInfo = this.getNativeTokenInfo(networkKey);
+    let totalValue = new BigN('0');
+    const to = transactionParams.recipients.map((value) => {
+      const amount = autoFormatNumber(value.amount);
+
+      totalValue = totalValue.plus(amount);
+
+      return {
+        ...value,
+        amount
+      };
+    });
+    const transaction: BitcoinTransactionConfig = {
+      id,
+      from: transactionParams.account,
+      to,
+      value: totalValue.toString(),
+      tokenSlug: tokenInfo.slug,
+      networkKey
+    };
+
+    // Address is validated in before step
+    const fromAddress = allowedAccounts.find((account) => (account.toLowerCase() === (transaction.from as string).toLowerCase()));
+
+    if (!fromAddress) {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('You have rescinded allowance for this account in wallet'));
+    }
+
+    const pair = keyring.getPair(fromAddress);
+
+    if (!pair) {
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Unable to find account'));
+    }
+
+    if (networkKey === 'bitcoin') {
+      if (!BitcoinMainnetKeypairTypes.includes(pair.type)) {
+        throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Your address is not on the mainnet network'));
+      }
+    } else if (networkKey === 'bitcoinTestnet') {
+      if (!BitcoinTestnetKeypairTypes.includes(pair.type)) {
+        throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Your address is not on the testnet network'));
+      }
+    }
+
+    const requestPayload: BitcoinSendTransactionRequest = {
+      ...transaction,
+      hashPayload: JSON.stringify(transaction),
+      canSign: true,
+      address: fromAddress
+    };
+
+    // Custom handle this instead of general handler transaction
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSendTransactionRequestAfterConfirmation', requestPayload, {
       requiredPassword: false
     })
       .then(({ isApproved, payload }) => {

@@ -6,7 +6,7 @@ import { RequestOptimalTransferProcess } from '@subwallet/extension-base/service
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { BitcoinTransactionData, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { CommonOptimalTransferPath, RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
-import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 
 import { sendMessage } from '../base';
 
@@ -48,6 +48,10 @@ export async function getOptimalTransferProcess (request: RequestOptimalTransfer
 
 export async function getTokensCanPayFee (request: RequestGetTokensCanPayFee): Promise<TokenPayFeeInfo> { // can set a default fee to ED of native token
   return sendMessage('pri(customFee.getTokensCanPayFee)', request);
+}
+
+export async function subscribeTransferWhenConfirmation (request: RequestSubscribeTransfer, callback: (data: ResponseSubscribeTransferConfirmation) => void): Promise<ResponseSubscribeTransferConfirmation> {
+  return sendMessage('pri(transfer.confirmation.subscribe)', request, callback);
 }
 
 export async function getAmountForPair (request: RequestGetAmountForPair): Promise<string> {
