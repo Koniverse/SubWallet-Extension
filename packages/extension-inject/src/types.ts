@@ -169,14 +169,12 @@ export interface CardanoProvider {
 
 export interface BitcoinProvider {
   isSubWallet: boolean;
-  getURL: () => string;
-  authenticationRequest: (payload: string) => Promise<any>;
-  signatureRequest: (payload: string) => Promise<any>;
-  structuredDataSignatureRequest: (payload: string) => Promise<any>;
-  transactionRequest: (payload: string) => Promise<any>;
-  psbtRequest: (payload: string) => Promise<any>;
-  profileUpdateRequest: (payload: string) => Promise<any>;
-  request: (method: string, params?: any[]) => Promise<Record<string, any>>;
+  requestAccounts: () => Promise<any[]>;
+  getAccounts: () => Promise<any[]>;
+  signPsbt (params: any): Promise<any>;
+  signMessage (params: any): Promise<any>;
+  sendTransfer (params: any): Promise<any>;
+  request: <T>(method: string, params?: any) => Promise<T>;
   getProductInfo: () => {
     name: string;
     version: string;

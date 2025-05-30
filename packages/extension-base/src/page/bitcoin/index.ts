@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
+import { BitcoinDAppAddress, BitcoinSendTransactionParams, BitcoinSendTransactionResult, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtResult } from '@subwallet/extension-base/background/KoniTypes';
 import { SendRequest } from '@subwallet/extension-base/page/types';
 import { BitcoinProvider } from '@subwallet/extension-inject/types';
 
@@ -18,47 +19,33 @@ export default class SubWalletBitcoinProvider {
     this.sendMessage = sendMessage;
   }
 
-  private getURL (): string {
-    // Implement this method
-    throw new Error('Method not implemented.');
+  private async requestAccounts (): Promise<BitcoinDAppAddress[]> {
+    return await this.request<BitcoinDAppAddress[]>('getAccounts');
   }
 
-  private authenticationRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
+  private async getAccounts (): Promise<BitcoinDAppAddress[]> {
+    return await this.request<BitcoinDAppAddress[]>('getAccounts');
   }
 
-  private signatureRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
+  private async signMessage (params: BitcoinSignMessageParams): Promise<BitcoinSignMessageResult> {
+    return await this.request<BitcoinSignMessageResult>('signMessage', params);
   }
 
-  private structuredDataSignatureRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
+  private async signPsbt (params: BitcoinSignPsbtParams): Promise<BitcoinSignPsbtResult> {
+    return await this.request<BitcoinSignPsbtResult>('signPsbt', params);
   }
 
-  private transactionRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
+  private async sendTransfer (params: BitcoinSendTransactionParams): Promise<BitcoinSendTransactionResult> {
+    return await this.request<BitcoinSendTransactionResult>('sendTransfer', params);
   }
 
-  private psbtRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
-  }
-
-  private profileUpdateRequest (payload: string): Promise<any> {
-    // Implement this method
-    throw new Error('Method not implemented.');
-  }
-
-  private request (method: string, params?: any[] | undefined): Promise<Record<string, any>> {
+  private request<T> (method: string, params?: any): Promise<T> {
     // Implement this method
     return new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       this.sendMessage('bitcoin(request)', { method, params })
         .then((result) => {
-          resolve(result as Record<string, any>);
+          resolve(result as T);
         })
         .catch((e: BitcoinProviderError) => {
           reject(e);
@@ -76,14 +63,12 @@ export default class SubWalletBitcoinProvider {
   get apis (): BitcoinProvider {
     return {
       isSubWallet: this.isSubWallet,
-      getURL: () => this.getURL(),
-      authenticationRequest: (payload: string) => this.authenticationRequest(payload),
-      signatureRequest: (payload: string) => this.signatureRequest(payload),
-      structuredDataSignatureRequest: (payload: string) => this.structuredDataSignatureRequest(payload),
-      transactionRequest: (payload: string) => this.transactionRequest(payload),
-      psbtRequest: (payload: string) => this.psbtRequest(payload),
-      profileUpdateRequest: (payload: string) => this.profileUpdateRequest(payload),
-      request: (method: string, params?: any[]) => this.request(method, params),
+      request: <T>(method: string, params?: any) => this.request<T>(method, params),
+      getAccounts: () => this.getAccounts(),
+      signMessage: (params: BitcoinSignMessageParams) => this.signMessage(params),
+      signPsbt: (params: BitcoinSignPsbtParams) => this.signPsbt(params),
+      sendTransfer: (params: BitcoinSendTransactionParams) => this.sendTransfer(params),
+      requestAccounts: () => this.requestAccounts(),
       getProductInfo: () => this.getProductInfo()
     };
   }

@@ -6,7 +6,7 @@ import { BitcoinProviderError } from '@subwallet/extension-base/background/error
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtPayload, BitcoinSignPsbtRawRequest, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
@@ -886,8 +886,8 @@ export async function validationBitcoinSignMessageMiddleware (koni: KoniState, u
 
 export async function validationBitcoinSignPsbtMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
   const { errors, networkKey, pair: pair_ } = payload_;
-  const psbtParams = payload_.payloadAfterValidated as BitcoinSignPsbtRawRequest;
-  const { address, allowedSighash, autoFinalized, broadcast, psbt, signAtIndex } = payload_.payloadAfterValidated as BitcoinSignPsbtRawRequest;
+  const psbtParams = payload_.payloadAfterValidated as BitcoinSignPsbtParams;
+  const { address, allowedSighash, autoFinalized, broadcast, psbt, signAtIndex } = payload_.payloadAfterValidated as BitcoinSignPsbtParams;
   const { promise, resolve } = createPromiseHandler<PayloadValidated>();
 
   const handleError = (message_: string) => {

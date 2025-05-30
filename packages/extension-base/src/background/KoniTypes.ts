@@ -10,7 +10,6 @@ import { RequestOptimalTransferProcess } from '@subwallet/extension-base/service
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
@@ -1164,12 +1163,16 @@ export interface BitcoinSendTransactionParams {
   recipients: BitcoinRecipientTransactionParams[]
 }
 
+export interface BitcoinSendTransactionResult {
+  txid: string;
+}
+
 export interface PsbtTransactionArg {
   address?: string;
   amount?: string;
 }
 
-export interface BitcoinSignPsbtPayload extends Omit<BitcoinSignPsbtRawRequest, 'psbt'>{
+export interface BitcoinSignPsbtPayload extends Omit<BitcoinSignPsbtParams, 'psbt'>{
   txInput: PsbtTransactionArg[];
   txOutput: PsbtTransactionArg[];
   to: string;
@@ -1186,7 +1189,7 @@ enum SignatureHash {
   ANYONECANPAY = 128
 }
 
-export interface BitcoinSignPsbtRawRequest {
+export interface BitcoinSignPsbtParams {
   psbt: string;
   allowedSighash?: SignatureHash[];
   signAtIndex?: number | number[];
@@ -1323,13 +1326,6 @@ export interface BitcoinSignatureRequest extends BitcoinSignRequest {
   payloadJson: any;
 }
 
-export interface BitcoinAppState {
-  networkKey?: string,
-  isConnected?: boolean,
-  strategy?: BitcoinApiStrategy,
-  listenEvents?: string[]
-}
-
 export type BitcoinDAppAddress = {
   address: string;
   publicKey?: string;
@@ -1340,6 +1336,11 @@ export type BitcoinDAppAddress = {
 }
 
 export type BitcoinRequestGetAddressesResult = BitcoinDAppAddress[];
+
+export interface BitcoinSignMessageParams {
+  message: string;
+  address: string;
+}
 
 export interface BitcoinSignMessageResult {
   signature: string;
@@ -1376,7 +1377,7 @@ export interface BitcoinTransactionConfig{
   tokenSlug?: string;
 }
 
-export interface SignPsbtBitcoinResult {
+export interface BitcoinSignPsbtResult {
   psbt: string;
   txid?: string
 }
@@ -1452,7 +1453,7 @@ export interface ConfirmationDefinitionsBitcoin {
   bitcoinSendTransactionRequest: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
   bitcoinSendTransactionRequestAfterConfirmation: [ConfirmationsQueueItem<BitcoinSendTransactionRequest>, ConfirmationResult<string>],
   bitcoinWatchTransactionRequest: [ConfirmationsQueueItem<BitcoinWatchTransactionRequest>, ConfirmationResult<string>],
-  bitcoinSignPsbtRequest: [ConfirmationsQueueItem<BitcoinSignPsbtRequest>, ConfirmationResult<SignPsbtBitcoinResult>],
+  bitcoinSignPsbtRequest: [ConfirmationsQueueItem<BitcoinSignPsbtRequest>, ConfirmationResult<BitcoinSignPsbtResult>],
 }
 
 export type ConfirmationType = keyof ConfirmationDefinitions;

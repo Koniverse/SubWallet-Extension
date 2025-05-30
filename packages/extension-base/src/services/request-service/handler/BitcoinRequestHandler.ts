@@ -3,7 +3,7 @@
 
 import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BitcoinProviderErrorType, BitcoinSignMessageResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin, SignPsbtBitcoinResult } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinProviderErrorType, BitcoinSignMessageResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin, BitcoinSignPsbtResult } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -274,7 +274,7 @@ export default class BitcoinRequestHandler {
     return promise;
   }
 
-  private async signPsbt (request: ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]): Promise<SignPsbtBitcoinResult> {
+  private async signPsbt (request: ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]): Promise<BitcoinSignPsbtResult> {
     // Extract necessary information from the BitcoinSendTransactionRequest
     const { address, payload } = request.payload;
     const { allowedSighash, autoFinalized = true, broadcast, psbt, signAtIndex } = payload;
@@ -356,7 +356,7 @@ export default class BitcoinRequestHandler {
     const hexTransaction = psptSignedTransaction.extractTransaction().toHex();
 
     this.#transactionService.emitterEventTransaction(emitterTransaction, eventData, chainInfo.slug, hexTransaction);
-    const { promise, reject, resolve } = createPromiseHandler<SignPsbtBitcoinResult>();
+    const { promise, reject, resolve } = createPromiseHandler<BitcoinSignPsbtResult>();
 
     emitterTransaction.on('extrinsicHash', (data) => {
       if (!data.extrinsicHash || !psptSignedTransaction) {

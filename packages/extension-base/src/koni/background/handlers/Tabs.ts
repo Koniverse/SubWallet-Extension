@@ -10,7 +10,7 @@ import { CardanoProviderError } from '@subwallet/extension-base/background/error
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSendTransactionResult, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtResult, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -1538,9 +1538,7 @@ export default class KoniTabs {
   }
 
   private async bitcoinSign (id: string, url: string, { method, params }: RequestArguments): Promise<BitcoinSignMessageResult> {
-    const allowedAccounts = (await this.getCurrentAccount(url, 'bitcoin'));
-
-    const signResult = await this.#koniState.bitcoinSign(id, url, method, params as Record<string, string>, allowedAccounts);
+    const signResult = await this.#koniState.bitcoinSign(id, url, method, params as BitcoinSignMessageParams);
 
     if (signResult) {
       return signResult;
@@ -1549,8 +1547,8 @@ export default class KoniTabs {
     }
   }
 
-  private async bitcoinSignPspt (id: string, url: string, { method, params }: RequestArguments) {
-    const psbtParams = params as BitcoinSignPsbtRawRequest;
+  private async bitcoinSignPspt (id: string, url: string, { method, params }: RequestArguments): Promise<BitcoinSignPsbtResult> {
+    const psbtParams = params as BitcoinSignPsbtParams;
 
     const signResult = await this.#koniState.bitcoinSignPspt(id, url, psbtParams);
 
@@ -1561,7 +1559,7 @@ export default class KoniTabs {
     }
   }
 
-  private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments) {
+  private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments): Promise<BitcoinSendTransactionResult> {
     const transactionParams = params as BitcoinSendTransactionParams;
     const transactionHash = await this.#koniState.bitcoinSendTransaction(id, url, transactionParams);
 
@@ -1569,7 +1567,9 @@ export default class KoniTabs {
       throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
     }
 
-    return transactionHash;
+    return {
+      txid: transactionHash
+    };
   }
 
   private async handleBitcoinRequest (id: string, url: string, request: RequestArguments, port: chrome.runtime.Port): Promise<unknown> {
