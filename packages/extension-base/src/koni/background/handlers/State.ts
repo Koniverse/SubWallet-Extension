@@ -9,7 +9,7 @@ import { EvmProviderError } from '@subwallet/extension-base/background/errors/Ev
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, BitcoinSignPsbtRequest, BitcoinTransactionConfig, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SignPsbtBitcoinResult, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageResult, BitcoinSignPsbtRawRequest, BitcoinSignPsbtRequest, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SignPsbtBitcoinResult, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
@@ -1704,52 +1704,19 @@ export default class KoniState {
       networkKey: transactionParams.network === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet'
     };
 
-    const autoFormatNumber = (val: string | number): string => {
-      if (typeof val === 'string' && val.startsWith('0x')) {
-        return new BigN(val.replace('0x', ''), 16).toString();
-      } else if (typeof val === 'number') {
-        return val.toString();
-      }
-
-      return val;
-    };
-
     const validationSteps: ValidateStepFunction[] =
       [
         validationAuthMiddleware,
         validationBitcoinConnectMiddleware,
         validationBitcoinSendTransactionMiddleware
       ];
-
     const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
-
     const errorsFormated = convertErrorFormat(result.errors);
-
-    const tokenInfo = this.getNativeTokenInfo(result.networkKey);
-    let totalValue = new BigN('0');
-    const to = transactionParams.recipients.map((value) => {
-      const amount = autoFormatNumber(value.amount);
-
-      totalValue = totalValue.plus(amount);
-
-      return {
-        ...value,
-        amount
-      };
-    });
-    const transaction: BitcoinTransactionConfig = {
-      id,
-      from: transactionParams.account,
-      to,
-      value: totalValue.toString(),
-      tokenSlug: tokenInfo.slug,
-      networkKey: result.networkKey
-    };
-
     const requestPayload: BitcoinSendTransactionRequest = {
       ...result.payloadAfterValidated as BitcoinSendTransactionRequest,
-      ...transaction,
-      hashPayload: JSON.stringify(transaction),
+      hashPayload: JSON.stringify(result.payloadAfterValidated),
+      from: transactionParams.account,
+      id,
       errors: errorsFormated
     };
 

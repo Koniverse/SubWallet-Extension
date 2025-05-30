@@ -21,9 +21,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
-import BitcoinSendTransactionRequestConfirmation
-  from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/BitcoinSendTransactionRequestConfirmation';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSendTransactionRequestConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
 
 type Props = ThemeProps
 
