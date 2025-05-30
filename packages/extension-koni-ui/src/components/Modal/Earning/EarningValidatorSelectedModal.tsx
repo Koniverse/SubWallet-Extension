@@ -8,12 +8,12 @@ import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/Empt
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { Book, CaretLeft } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
+import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -58,6 +58,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
+
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    chain && checkChain(chain);
+  }, [chain, checkChain]);
 
   const resultList = useMemo(() => {
     if (addresses && addresses.length > 0) {
