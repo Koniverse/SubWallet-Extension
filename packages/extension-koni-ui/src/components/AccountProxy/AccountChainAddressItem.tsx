@@ -16,10 +16,12 @@ type Props = ThemeProps & {
   onClickQrButton?: VoidFunction;
   onClickInfoButton?: VoidFunction;
   isShowInfoButton?: boolean;
+  infoButtonTooltip?: string;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isShowInfoButton,
+  const { className, infoButtonTooltip,
+    isShowInfoButton,
     item,
     onClick, onClickCopyButton, onClickInfoButton, onClickQrButton } = props;
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
@@ -84,7 +86,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 }
                 onClick={_onClickInfoButton}
                 size='xs'
-                tooltip={'This network has two address formats'}
+                tooltip={infoButtonTooltip}
                 tooltipPlacement={'topLeft'}
                 type='ghost'
               />
@@ -129,7 +131,7 @@ const AccountChainAddressItem = styled(Component)<Props>(({ theme: { token } }: 
       'white-space': 'nowrap',
       gap: token.sizeXXS,
       flex: 1,
-      alignItems: 'flex-end'
+      alignItems: 'baseline'
     },
 
     '.__item-chain-name': {

@@ -22,8 +22,8 @@ interface Props extends ThemeProps {
 function Component ({ className, request, type }: Props) {
   const { id, payload } = request;
   const { t } = useTranslation();
-  const { address, errors } = payload;
-  const account = useGetAccountByAddress(address);
+  const { address: addressToSign, currentAddress, errors } = payload;
+  const account = useGetAccountByAddress(currentAddress);
   const onClickDetail = useOpenDetailModal();
 
   return (
@@ -38,7 +38,7 @@ function Component ({ className, request, type }: Props) {
         </div>
         <AccountItemWithProxyAvatar
           account={account}
-          accountAddress={address}
+          accountAddress={addressToSign}
           className='account-item'
           isSelected={true}
         />

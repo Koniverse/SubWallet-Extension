@@ -37,11 +37,6 @@ export interface BalanceItem {
   // substrate fields
   metadata?: _BalanceMetadata;
 }
-
-export interface BalanceItemWithAddressType extends BalanceItem {
-  addressTypeLabel?: string
-}
-
 /** Balance info of all tokens on an address */
 export type BalanceInfo = Record<string, BalanceItem>; // Key is tokenSlug
 /** Balance info of all addresses */
