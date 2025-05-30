@@ -690,5 +690,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
   }
 
+  public override handleChangeEarningValidator (data: SubmitYieldJoinData): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
   /* Other actions */
 }

@@ -656,6 +656,11 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const { amount, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData) {
+      throw new Error(BasicTxErrorType.INVALID_PARAMS);
+    }
+
     const { netuid, slippage } = subnetData;
 
     const chainApi = await this.substrateApi.isReady;

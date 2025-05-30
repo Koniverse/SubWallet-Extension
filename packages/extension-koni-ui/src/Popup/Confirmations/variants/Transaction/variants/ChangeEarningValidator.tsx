@@ -7,7 +7,7 @@ import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo'
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { NominationInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/NominationInfoPart';
+import { SelectedValidatorInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/SelectedValidatorInfoPart';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,7 +67,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <MetaInfo
             className={'nomination-wrapper'}
           >
-            <NominationInfoPart
+            <SelectedValidatorInfoPart
               addresses={newValidatorAddresses}
               className='nomination-info-part'
               compound={compound}
@@ -80,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
 
             {deselectedCount > 0 && (
-              <NominationInfoPart
+              <SelectedValidatorInfoPart
                 addresses={deselectedAddresses}
                 className='nomination-info-part'
                 compound={compound}
@@ -93,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
             )}
 
             {newlySelectedCount > 0 && (
-              <NominationInfoPart
+              <SelectedValidatorInfoPart
                 addresses={newlySelectedAddresses}
                 className='nomination-info-part'
                 compound={compound}

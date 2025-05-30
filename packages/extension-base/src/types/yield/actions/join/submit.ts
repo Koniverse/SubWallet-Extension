@@ -28,7 +28,7 @@ export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
     mindBond: string
   }
   selectedValidators: ValidatorInfo[];
-  subnetData: {
+  subnetData?: {
     netuid: number,
     slippage: number
   }

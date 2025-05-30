@@ -2,64 +2,33 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
-import NominatorCollapsiblePanel from '@subwallet/extension-koni-ui/components/Common/NominatorCollapsiblePanel';
-import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
-import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useFetchChainState, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
-import { store } from '@subwallet/extension-koni-ui/stores';
+import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { useGetChainPrefixBySlug, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { toShort } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
   compound: YieldPositionInfo;
   poolInfo: YieldPoolInfo;
-  inputAsset?: _ChainAsset;
-  title?: string;
-  disabledButton?: boolean
-  maxValidator?: number;
-  totalValidator?: number;
-  addresses?: string[],
-  modalId?: string
+  inputAsset: _ChainAsset;
 };
 
-function Component ({ addresses, className, compound, disabledButton, maxValidator, modalId, poolInfo, title, totalValidator }: Props) {
+function Component ({ className, compound,
+  inputAsset,
+  poolInfo }: Props) {
   const { t } = useTranslation();
-  const [forceFetchValidator, setForceFetchValidator] = useState(false);
-  const [targetLoading, setTargetLoading] = useState(false);
-  const chainState = useFetchChainState(poolInfo?.chain || '');
-  const slug = poolInfo.slug;
-
-  useEffect(() => {
-    let unmount = false;
-
-    if ((!!poolInfo.chain && !!compound.address && chainState?.active) || forceFetchValidator) {
-      setTargetLoading(true);
-      fetchPoolTarget({ slug })
-        .then((result) => {
-          if (!unmount) {
-            store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
-          }
-        })
-        .catch(console.error)
-        .finally(() => {
-          if (!unmount) {
-            setTargetLoading(false);
-            setForceFetchValidator(false);
-          }
-        });
-    }
-
-    return () => {
-      unmount = true;
-    };
-  }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound.address]);
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
+
+  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain), [poolInfo.chain]);
+
+  const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
   const haveNomination = useMemo(() => {
     return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);
   }, [poolInfo.type]);
@@ -73,30 +42,46 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
     return null;
   }
 
-  return (
-    <>
-      <NominatorCollapsiblePanel
-        className={CN(className)}
-        disabledButton={disabledButton}
-        maxValidator={maxValidator}
-        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
-        title={t(title || 'Selected validators')}
-        totalValidator={totalValidator}
-      />
+  const symbol = (compound as SubnetYieldPositionInfo).subnetData?.subnetSymbol || inputAsset?.symbol || '';
 
-      <EarningValidatorSelectedModal
-        addresses={addresses}
-        chain={poolInfo.chain}
-        disabled={false}
-        disabledButton={disabledButton}
-        from={compound.address}
-        loading={targetLoading}
-        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
-        nominations={compound.nominations}
-        setForceFetchValidator={setForceFetchValidator}
-        slug={poolInfo.slug}
-      />
-    </>
+  return (
+    <CollapsiblePanel
+      className={CN(className)}
+      title={t('Nomination info')}
+    >
+      <MetaInfo
+        labelColorScheme='gray'
+        labelFontWeight='regular'
+        spaceSize='ms'
+      >
+        {compound.nominations.map((item) => {
+          return (
+            <MetaInfo.Number
+              className={CN('__nomination-item', {
+                '-hide-number': isRelayChain
+              })}
+              decimals={inputAsset?.decimals || 0}
+              key={item.validatorAddress}
+              label={(
+                <>
+                  <Avatar
+                    identPrefix={networkPrefix}
+                    size={24}
+                    value={item.validatorAddress}
+                  />
+                  <div className={'__nomination-name'}>
+                    {item.validatorIdentity || toShort(item.validatorAddress)}
+                  </div>
+                </>
+              )}
+              suffix={symbol}
+              value={item.activeStake}
+              valueColorSchema='even-odd'
+            />
+          );
+        })}
+      </MetaInfo>
+    </CollapsiblePanel>
   );
 }
 

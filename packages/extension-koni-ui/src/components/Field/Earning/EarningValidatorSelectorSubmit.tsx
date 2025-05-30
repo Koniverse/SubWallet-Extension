@@ -80,7 +80,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     items, modalId, nominations
     , onChange, setForceFetchValidator, slug } = props;
   const { t } = useTranslation();
-  const { activeModal, checkActive } = useContext(ModalContext);
+  const { activeModal, checkActive, inactiveAll } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const [form] = Form.useForm();
@@ -244,23 +244,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       slug: poolInfo.slug,
       address: from,
       amount: '0',
-      selectedValidators: target,
-      subnetData: {
-        netuid: 0,
-        slippage: 0
-      }
+      selectedValidators: target
     };
 
-    changeEarningValidator(submitData)
-      .then((rs) => {
-        onSuccess(rs);
-        setSubmitLoading(false);
-      })
-      .catch((error) => {
-        onError(error as Error);
-        setSubmitLoading(false);
-      });
-  }, [poolInfo.slug, from, onSuccess, onError]);
+    setTimeout(() => {
+      changeEarningValidator(submitData)
+        .then(onSuccess)
+        .catch(onError)
+        .finally(() => {
+          setSubmitLoading(false);
+          inactiveAll();
+        });
+    }, 300);
+  }, [poolInfo.slug, from, onSuccess, onError, inactiveAll]);
 
   const onResetSort = useCallback(() => {
     setSortSelection(SortKey.DEFAULT);

@@ -13,7 +13,7 @@ import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/type
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { Book, CaretLeft } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -150,7 +150,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         title={t('Selected validators')}
       >
         <SwList.Section
-
           list={resultList}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}

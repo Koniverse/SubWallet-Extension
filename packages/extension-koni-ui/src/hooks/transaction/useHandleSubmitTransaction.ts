@@ -21,6 +21,8 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
   const onSuccess = useCallback((rs: SWTransactionResponse) => {
     const { errors, estimateFee, id, warnings } = rs;
 
+    console.log('onDoneId2', id);
+
     if (errors.length || warnings.length) {
       if (![t('Rejected by user'), 'Rejected by user'].includes(errors[0]?.message)) {
         if (errors[0]?.message?.startsWith('Unable to fetch staking data.')) {
@@ -69,6 +71,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
         warnings[0] && setIgnoreWarnings?.(true);
       }
     } else if (id) {
+      console.log('was here');
       onDone(id);
     }
   }, [t, handleDataForInsufficientAlert, openRecheckChainConnectionModal, notify, openAlert, closeAlert, setIgnoreWarnings, onDone]);

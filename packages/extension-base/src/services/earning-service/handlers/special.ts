@@ -644,5 +644,8 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 
+  handleChangeEarningValidator (data: SubmitYieldJoinData): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
   /* Other actions */
 }
