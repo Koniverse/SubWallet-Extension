@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -658,4 +658,21 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   /* Leave pool action */
+
+  /* Change validator */
+  override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+    const { amount, fromValidator, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData || fromValidator) {
+      throw new Error(BasicTxErrorType.INVALID_PARAMS);
+    }
+
+    const selectedValidatorInfo = targetValidators[0];
+    const destValidator = selectedValidatorInfo.address;
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(fromValidator, destValidator, 0, 0, amount);
+
+    return extrinsic;
+  }
 }
