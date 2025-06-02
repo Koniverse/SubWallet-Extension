@@ -3,7 +3,7 @@
 
 import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BitcoinProviderErrorType, BitcoinSignMessageResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin, BitcoinSignPsbtResult } from '@subwallet/extension-base/background/KoniTypes';
+import { BitcoinProviderErrorType, BitcoinSignMessageResult, BitcoinSignPsbtResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
