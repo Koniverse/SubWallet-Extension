@@ -14,6 +14,7 @@ export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
 
 export const SIMPLE_SWAP_EXPLORER = 'https://simpleswap.io';
 
+// Deprecated
 export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string> = {
   'bittensor-NATIVE-TAO': 'tao',
   [COMMON_ASSETS.ETH]: 'eth',

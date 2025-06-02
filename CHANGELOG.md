@@ -1,5 +1,56 @@
 # CHANGELOG
 
+## 1.3.40
+Build date: May 30, 2025.
+
+Features & Update:
+- Update chain-list stable v0.2.105 (#4273),
+- Update SimpleSwap API
+- Update Paraspell's fee calculation API (#4314),
+
+Bug fixed:
+- Fixed bug Wrong Price Impact When Swapping on PAH (#4241)
+
+
+## 1.3.39
+Build date: May 26, 2025.
+
+Bug fixed:
+- Fix bug error page when connect with dApp (#4401)
+
+
+## 1.3.38
+Build date: May 23, 2025.
+
+Features & Update:
+- Support Bridge-Swap process for cross-chain swap on EVM (#4321)
+- Update UI to clearly display fees (#4347)
+
+Bug fixed:
+- Fixed bug related to feedback from Cardano Foundation (#4352)
+
+
+## 1.3.37
+Build date: May 23, 2025.
+
+Features & Update:
+- Update fee for UniSwap (#4385)
+- Update Wallet Connector Libraries (#4353)
+- Turn off the update manifest v3 popup (#4023)
+
+Bug fixed:
+- Fixed bug when connects to Remix (#4330)
+
+
+## 1.3.36
+Build date: May 16, 2025.
+
+Features & Update:
+- Support KyberSwap Aggregator (#4144)
+- Support UniswapX Dutch Swap (#4293)
+- Review Uniswap fee (#4088)
+
+
 ## 1.3.35
 Build date: May 09, 2025.
 
