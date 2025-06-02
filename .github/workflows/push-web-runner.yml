@@ -46,7 +46,6 @@ jobs:
         SIMPLE_SWAP_API_KEY: ${{ secrets.SIMPLE_SWAP_API_KEY }}
         UNISWAP_API_KEY:  ${{ secrets.UNISWAP_API_KEY }}
         KYBER_CLIENT_ID: ${{ secrets.KYBER_CLIENT_ID }}
-        SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
         BLOCKFROST_API_KEY_MAIN: ${{ secrets.BLOCKFROST_API_KEY_MAIN }}
         BLOCKFROST_API_KEY_PREP: ${{ secrets.BLOCKFROST_API_KEY_PREP }}
         MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
