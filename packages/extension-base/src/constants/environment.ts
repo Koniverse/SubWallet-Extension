@@ -19,3 +19,9 @@ export enum ProxyServiceRoute {
   CARDANO = 'cardano',
   PARASPELL = 'paraspell',
 }
+
+export function formatProxyApiUrl (baseUrl: string, isTestnet: boolean): string {
+  const network = isTestnet ? 'testnet' : 'mainnet';
+
+  return `${baseUrl}/${network}`;
+}

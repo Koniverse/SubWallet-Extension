@@ -4,7 +4,7 @@
 import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
+import { BACKEND_PROXY_API_URL, formatProxyApiUrl, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -125,7 +125,9 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       sourceAsset: fromAssetId
     };
 
-    const url = `${proxyApi}&${new URLSearchParams(depositParams).toString()}`;
+    const formattedProxyApi = formatProxyApiUrl(proxyApi, this.isTestnet);
+
+    const url = `${formattedProxyApi}&${new URLSearchParams(depositParams).toString()}`;
     const response = await fetch(url, {
       method: 'GET'
     });
