@@ -47,9 +47,6 @@ jobs:
         GH_RELEASE_GITHUB_API_TOKEN: ${{ secrets.GH_PAT }}
         TRANSAK_API_KEY: ${{ secrets.TRANSAK_API_KEY }}
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
-        SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
-        SUBWALLET_PROXY_API: ${{ secrets.SUBWALLET_PROXY_API }}
-        MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
         MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         GH_RELEASE_FILES: master-build.zip,master-src.zip
         COMMIT_MESSAGE: ${{ github.event.head_commit.message }}

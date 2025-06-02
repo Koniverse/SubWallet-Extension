@@ -8,7 +8,7 @@ export const isProductionMode = PRODUCTION_BRANCHES.indexOf(branchName) > -1;
 export const BACKEND_API_URL = process.env.SUBWALLET_API || (isProductionMode ? 'https://sw-services.subwallet.app/api' : 'https://be-dev.subwallet.app/api');
 export const BACKEND_PRICE_HISTORY_URL = process.env.SUBWALLET_PRICE_HISTORY_API || (isProductionMode ? 'https://price-history.subwallet.app/api' : 'https://price-history-dev.subwallet.app/api');
 
-export const BACKEND_PROXY_API_URL = process.env.SUBWALLET_PROXY_API || (isProductionMode ? 'https://external-services.subwallet.app/' : 'https://external-services-dev.subwallet.app/');
+export const SW_EXTERNAL_SERVICES_API = process.env.SW_EXTERNAL_SERVICES_API || (isProductionMode ? 'https://external-services.subwallet.app/' : 'https://external-services-dev.subwallet.app/');
 
 export enum ProxyServiceRoute {
   BITTENSOR = 'bittensor',
@@ -20,7 +20,7 @@ export enum ProxyServiceRoute {
   PARASPELL = 'paraspell',
 }
 
-export function formatProxyApiUrl (baseUrl: string, isTestnet: boolean): string {
+export function formatExternalServiceApi (baseUrl: string, isTestnet: boolean): string {
   const network = isTestnet ? 'testnet' : 'mainnet';
 
   return `${baseUrl}/${network}`;

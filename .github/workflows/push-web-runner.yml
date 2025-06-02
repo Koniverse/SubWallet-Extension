@@ -32,9 +32,6 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         TRANSAK_API_KEY: ${{ secrets.TRANSAK_API_KEY }}
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
-        SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
-        SUBWALLET_PROXY_API: ${{ secrets.SUBWALLET_PROXY_API }}
-        MELD_API_KEY: ${{ secrets.MELD_API_KEY }}
         MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         BRANCH_NAME: master
       run: |

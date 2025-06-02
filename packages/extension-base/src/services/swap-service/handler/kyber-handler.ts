@@ -4,7 +4,7 @@
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_PROXY_API_URL, ProxyServiceRoute } from '@subwallet/extension-base/constants';
+import { ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
@@ -77,7 +77,7 @@ export interface KyberSwapQuoteMetadata {
   priceImpact?: string;
 }
 
-const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.KYBER}`;
+const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.KYBER}`;
 
 type BuildTxForSwapResult = { data?: TransactionConfig; error?: SwapError | TransactionError };
 
@@ -102,7 +102,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     gasInclude: 'true'
   });
 
-  const url = `${proxyApi}/${chain}/api/v1/routes?${queryParams.toString()}`;
+  const url = `${externalServiceApi}/${chain}/api/v1/routes?${queryParams.toString()}`;
 
   try {
     const res = await fetch(url, {
@@ -144,8 +144,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   console.log('routeSummary2', routeSummary);
 
   try {
-    console.log('proxyapi', proxyApi);
-    const res = await fetch(`${proxyApi}/${chain}/api/v1/route/build`, {
+    const res = await fetch(`${externalServiceApi}/${chain}/api/v1/route/build`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

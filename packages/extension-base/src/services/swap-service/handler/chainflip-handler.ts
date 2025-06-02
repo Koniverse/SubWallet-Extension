@@ -4,7 +4,7 @@
 import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_PROXY_API_URL, formatProxyApiUrl, ProxyServiceRoute } from '@subwallet/extension-base/constants';
+import { formatExternalServiceApi, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -22,7 +22,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
 const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
 
-const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.CHAINFLIP}`;
+const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.CHAINFLIP}`;
 
 interface DepositAddressResponse {
   id: number;
@@ -125,9 +125,9 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       sourceAsset: fromAssetId
     };
 
-    const formattedProxyApi = formatProxyApiUrl(proxyApi, this.isTestnet);
+    const formattedExternalServiceApi = formatExternalServiceApi(externalServiceApi, this.isTestnet);
 
-    const url = `${formattedProxyApi}&${new URLSearchParams(depositParams).toString()}`;
+    const url = `${formattedExternalServiceApi}/swap?${new URLSearchParams(depositParams).toString()}`;
     const response = await fetch(url, {
       method: 'GET'
     });

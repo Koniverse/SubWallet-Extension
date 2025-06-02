@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_PROXY_API_URL, BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO, ProxyServiceRoute } from '@subwallet/extension-base/constants';
+import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
@@ -61,7 +61,7 @@ interface Validator {
   apr: string;
 }
 
-const proxyApi = `${BACKEND_PROXY_API_URL}${ProxyServiceRoute.BITTENSOR}`;
+const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.BITTENSOR}`;
 
 /* Fetch data */
 export class BittensorCache {
@@ -97,7 +97,7 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const resp = await fetch(`${proxyApi}/validator/latest/v1?limit=50`, {
+      const resp = await fetch(`${externalServiceApi}/validator/latest/v1?limit=50`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
