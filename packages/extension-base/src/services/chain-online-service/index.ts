@@ -3,6 +3,7 @@
 
 import { AssetLogoMap, ChainLogoMap } from '@subwallet/chain-list';
 import { _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import { LATEST_CHAIN_PATCH_FETCHING_INTERVAL, md5HashChainAsset, md5HashChainInfo } from '@subwallet/extension-base/services/chain-online-service/constants';
 import { ChainService, filterAssetInfoMap } from '@subwallet/extension-base/services/chain-service';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
@@ -132,6 +133,7 @@ export class ChainOnlineService {
       let assetRegistry: Record<string, _ChainAsset> = structuredClone(this.chainService.getAssetRegistry());
       const currentChainStateMap: Record<string, _ChainState> = structuredClone(this.chainService.getChainStateMap());
       const currentChainStatusMap: Record<string, _ChainApiStatus> = structuredClone(this.chainService.getChainStatusMap());
+      const assetSetting: Record<string, AssetSetting> = structuredClone(await this.chainService.getAssetSettings());
       let addedChain: string[] = [];
       const deprecatedChains: string[] = [];
       const deprecatedChainMap: Record<string, string> = {};
@@ -157,6 +159,11 @@ export class ChainOnlineService {
                 if (duplicatedDefaultSlug.length > 0) {
                   deprecatedChainMap[storedSlug] = duplicatedDefaultSlug;
                   deprecatedChains.push(storedSlug);
+                  const storedChainState = currentChainStateMap[storedSlug];
+                  const storedChainStatus = currentChainStatusMap[storedSlug];
+
+                  currentChainStateMap[duplicatedDefaultSlug] = storedChainState;
+                  currentChainStatusMap[duplicatedDefaultSlug] = storedChainStatus;
                 }
               }
             }
@@ -169,18 +176,20 @@ export class ChainOnlineService {
           addedChain = newChainKey.filter((chain) => !currentChainStateKey.includes(chain));
 
           addedChain.forEach((key) => {
-            currentChainStateMap[key] = {
-              active: false,
-              currentProvider: randomizeProvider(chainInfoMap[key].providers).providerKey,
-              manualTurnOff: false,
-              slug: key
-            };
+            if (!currentChainStateMap[key] && !currentChainStatusMap[key]) {
+              currentChainStateMap[key] = {
+                active: false,
+                currentProvider: randomizeProvider(chainInfoMap[key].providers).providerKey,
+                manualTurnOff: false,
+                slug: key
+              };
 
-            currentChainStatusMap[key] = {
-              slug: key,
-              connectionStatus: _ChainConnectionStatus.DISCONNECTED,
-              lastUpdated: Date.now()
-            };
+              currentChainStatusMap[key] = {
+                slug: key,
+                connectionStatus: _ChainConnectionStatus.DISCONNECTED,
+                lastUpdated: Date.now()
+              };
+            }
           });
         }
 
@@ -190,7 +199,7 @@ export class ChainOnlineService {
             .filter((info) => (info.chainStatus === _ChainStatus.ACTIVE))
             .map((chainInfo) => chainInfo.slug);
 
-          let finalAssetRegistry: Record<string, _ChainAsset> = {};
+          let finalAssetRegistry: Record<string, _ChainAsset>;
 
           if (storedAssetRegistry.length === 0) {
             finalAssetRegistry = oldAssetRegistry;
@@ -223,6 +232,19 @@ export class ChainOnlineService {
                 // case merge custom asset with default asset
                 if (_isEqualSmartContractAsset(storedAssetInfo, defaultChainAsset)) {
                   duplicated = true;
+                  const migratedAssetSetting: Record<string, AssetSetting> = {};
+
+                  if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
+                    const isVisible = assetSetting[storedAssetInfo.slug].visible;
+
+                    migratedAssetSetting[defaultChainAsset.slug] = { visible: isVisible };
+                  }
+
+                  this.chainService.setAssetSettings({
+                    ...assetSetting,
+                    ...migratedAssetSetting
+                  });
+
                   break;
                 }
 
