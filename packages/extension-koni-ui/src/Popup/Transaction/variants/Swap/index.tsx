@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, isAccountAll, isChainInfoAccordantAccountChainType, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, isAccountAll, isChainInfoCompatibleWithAccountInfo, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -373,7 +373,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return false;
     }
 
-    return !isChainInfoAccordantAccountChainType(chainInfoMap[destChainValue], fromAccountJson.chainType);
+    return !isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson.chainType, fromAccountJson.type);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
 
   const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
@@ -764,7 +764,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => isChainInfoAccordantAccountChainType(destChainInfo, a.chainType));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => isChainInfoCompatibleWithAccountInfo(destChainInfo, a.chainType, a.type));
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;

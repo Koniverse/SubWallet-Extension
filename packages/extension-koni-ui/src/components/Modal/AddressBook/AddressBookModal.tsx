@@ -6,7 +6,7 @@ import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwa
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBitcoinAccountDetails, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinAccountDetails, isAccountAll, isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
 import { Badge, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (isChainInfoAccordantAccountChainType(chainInfo, getAccountChainTypeForAddress(acc.address))) {
+      if (isChainInfoCompatibleWithAccountInfo(chainInfo, getAccountChainTypeForAddress(acc.address), getKeypairTypeByAddress(acc.address))) {
         result.push({
           displayName: acc.name,
           formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),

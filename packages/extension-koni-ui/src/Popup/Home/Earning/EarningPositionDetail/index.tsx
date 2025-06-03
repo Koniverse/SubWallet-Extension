@@ -13,7 +13,7 @@ import { EarningInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning
 import { RewardInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart';
 import { WithdrawInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/WithdrawInfoPart';
 import { EarningEntryParam, EarningEntryView, EarningPositionDetailParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getTransactionFromAccountProxyValue, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll, isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-koni-ui/utils';
 import { Button, ButtonProps, Icon, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -52,11 +52,11 @@ function Component ({ compound,
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, type: accountType }) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+        return isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
       }
 
       return false;

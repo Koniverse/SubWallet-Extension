@@ -19,7 +19,7 @@ import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
-import { isChainInfoAccordantAccountChainType } from '../chain';
+import { isChainInfoCompatibleWithAccountInfo } from '../chain';
 import { getLogoByNetworkKey } from '../common';
 
 export function getAccountType (address: string): AccountType {
@@ -224,7 +224,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return undefined;
   }
 
-  if (!isChainInfoAccordantAccountChainType(chainInfo, accountJson.chainType)) {
+  if (!isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson.chainType, accountJson.type)) {
     return undefined;
   }
 

@@ -14,7 +14,7 @@ import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extensio
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBannerButtonIcon, getEarningTimeText, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
+import { getBannerButtonIcon, getEarningTimeText, isAccountAll, isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
@@ -63,11 +63,11 @@ const Component: React.FC<Props> = (props: Props) => {
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, type: accountType }) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+        return isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
       }
 
       return false;
