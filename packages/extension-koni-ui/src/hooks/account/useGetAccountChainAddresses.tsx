@@ -6,9 +6,9 @@ import type { KeypairType } from '@subwallet/keyring/types';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG } from '@subwallet/extension-base/services/chain-service/constants';
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { useCoreReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateGetChainSlugsByAccountProxy, useCoreReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress } from '@subwallet/extension-koni-ui/types';
-import { getBitcoinAccountDetails, getChainsByAccountType } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 // todo:
@@ -45,10 +45,11 @@ const createChainAddressItem = (
 const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAddress[] => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const getReformatAddress = useCoreReformatAddress();
+  const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
 
   return useMemo(() => {
     const result: AccountChainAddress[] = [];
-    const chains: string[] = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, undefined, accountProxy.specialChain);
+    const chains: string[] = getChainSlugsByAccountProxy(accountProxy);
 
     accountProxy.accounts.forEach((a) => {
       for (const chain of chains) {
@@ -68,7 +69,7 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
     });
 
     return result;
-  }, [accountProxy, chainInfoMap, getReformatAddress]);
+  }, [accountProxy, chainInfoMap, getChainSlugsByAccountProxy, getReformatAddress]);
 };
 
 export default useGetAccountChainAddresses;

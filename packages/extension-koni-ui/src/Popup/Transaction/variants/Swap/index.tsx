@@ -1,14 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
@@ -20,7 +20,7 @@ import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/compone
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useCoreReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateIsChainInfoCompatibleWithAccountProxy, useCoreReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, isAccountAll, isChainInfoAccordantAccountChainType, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -203,6 +203,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
+  const isChainInfoCompatibleWithAccountProxy = useCoreCreateIsChainInfoCompatibleWithAccountProxy();
 
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
@@ -278,11 +279,17 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
 
-  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
-    const allowChainSlugs = isAccountAll(targetAccountProxy.id)
-      ? getChainsByAccountAll(targetAccountProxy, accountProxies, chainInfoMap)
-      : undefined;
+  const isTokenCompatibleWithTargetAccountProxy = useCallback((
+    tokenSlug: string,
+    chainInfoMap: Record<string, _ChainInfo>
+  ): boolean => {
+    const chainSlug = _getOriginChainOfAsset(tokenSlug);
+    const chainInfo = chainInfoMap[chainSlug];
 
+    return !!chainInfo && isChainInfoCompatibleWithAccountProxy(chainInfo, targetAccountProxy);
+  }, [isChainInfoCompatibleWithAccountProxy, targetAccountProxy]);
+
+  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     return tokenSelectorItems.filter((item) => {
       const slug = item.slug;
       const assetInfo = assetRegistryMap[slug];
@@ -291,11 +298,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         return false;
       }
 
-      if (allowChainSlugs && !allowChainSlugs.includes(assetInfo.originChain)) {
-        return false;
-      }
-
-      if (!isTokenCompatibleWithAccountChainTypes(slug, targetAccountProxy.chainTypes, chainInfoMap)) {
+      if (!isTokenCompatibleWithTargetAccountProxy(slug, chainInfoMap)) {
         return false;
       }
 
@@ -305,7 +308,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
       return defaultSlug === slug || _getMultiChainAsset(assetInfo) === defaultSlug;
     });
-  }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, targetAccountProxy, tokenSelectorItems]);
+  }, [assetRegistryMap, chainInfoMap, defaultSlug, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
 
   const toTokenItems = useMemo(() => {
     return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
@@ -322,8 +325,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
-    return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap);
-  }, [chainInfoMap, targetAccountProxy.chainTypes, toTokenSlugValue]);
+    return isTokenCompatibleWithTargetAccountProxy(toTokenSlugValue || '', chainInfoMap);
+  }, [chainInfoMap, isTokenCompatibleWithTargetAccountProxy, toTokenSlugValue]);
 
   // Unable to use useEffect due to infinity loop caused by conflict setCurrentSlippage and currentQuote
   const slippage = useMemo(() => {
