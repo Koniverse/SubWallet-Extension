@@ -1,9 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { BTC_DUST_AMOUNT } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
-import { DetermineUtxosForSpendArgs, InsufficientFundsError, UtxoResponseItem } from '@subwallet/extension-base/types';
+import { DetermineUtxosForSpendArgs, InsufficientFundsError, TransferTxErrorType, UtxoResponseItem } from '@subwallet/extension-base/types';
+import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
 import BigN from 'bignumber.js';
@@ -33,22 +35,22 @@ export function filterUneconomicalUtxos ({ feeRate,
   return filteredAndSortUtxos.reduce((utxos, utxo, currentIndex) => {
     const utxosWithout = utxos.filter((u) => u.txid !== utxo.txid);
 
-    const { fee: feeWithout, spendableAmount: spendableAmountWithout } = getSpendableAmount({
+    const { spendableAmount: spendableAmountWithout } = getSpendableAmount({
       utxos: utxosWithout,
       feeRate,
       recipients,
       sender
     });
 
-    const { fee, spendableAmount } = getSpendableAmount({
+    const { spendableAmount } = getSpendableAmount({
       utxos,
       feeRate,
       recipients,
       sender
     });
 
-    console.log(utxosWithout, feeWithout, spendableAmountWithout.toString());
-    console.log(utxos, fee, spendableAmount.toString());
+    // console.log(utxosWithout, feeWithout, spendableAmountWithout.toString());
+    // console.log(utxos, fee, spendableAmount.toString());
 
     if (spendableAmount.lte(0)) {
       return utxosWithout;
@@ -112,9 +114,9 @@ export function determineUtxosForSpend ({ amount,
   const recipientDustLimit = BTC_DUST_AMOUNT[recipientAddressInfo.type] || 546;
 
   if (amount < recipientDustLimit) {
-    throw new Error(
-      `Transfer amount ${amount} satoshis is below dust limit (${recipientDustLimit} satoshis for ${recipientAddressInfo.type})`
-    );
+    const atLeastStr = formatNumber(recipientDustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
+
+    throw new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, `You must transfer at least ${atLeastStr} BTC`);
   }
 
   const orderedUtxos = utxos.sort((a, b) => b.value - a.value);
@@ -194,9 +196,9 @@ export function determineUtxosForSpend ({ amount,
     //   fee: newFee
     // };
 
-    throw new Error(
-      `The change output (${amountLeft.toString()} satoshis) is below the dust limit (${dustLimit} satoshis for ${senderAddressInfo.type})`
-    );
+    const atLeastStr = formatNumber(dustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
+
+    throw new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, `You must transfer at least ${atLeastStr} BTC`);
   }
 
   return {

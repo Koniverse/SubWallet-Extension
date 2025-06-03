@@ -104,7 +104,9 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
 
     return [tx, transferAmount.toString()];
   } catch (e) {
-    // const error = e as Error;
+    if (e instanceof TransactionError) {
+      throw e;
+    }
 
     throw new Error(`You don’t have enough BTC (${convertChainToSymbol(chain)}) for the transaction. Lower your BTC amount and try again`);
   }
