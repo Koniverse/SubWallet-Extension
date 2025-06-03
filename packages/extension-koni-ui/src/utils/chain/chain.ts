@@ -62,7 +62,41 @@ export const isChainInfoAccordantAccountChainType = (chainInfo: _ChainInfo, chai
   return false;
 };
 
-export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, AccountType: KeypairType): boolean => {
+export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
+  if (accountChainType === AccountChainType.SUBSTRATE) {
+    return _isPureSubstrateChain(chainInfo);
+  }
+
+  if (accountChainType === AccountChainType.ETHEREUM) {
+    return _isChainEvmCompatible(chainInfo);
+  }
+
+  if (accountChainType === AccountChainType.TON) {
+    return _isChainTonCompatible(chainInfo);
+  }
+
+  if (accountChainType === AccountChainType.BITCOIN) {
+    if (!_isChainBitcoinCompatible(chainInfo)) {
+      return false;
+    }
+
+    const network = chainInfo.bitcoinInfo?.bitcoinNetwork;
+
+    if (BitcoinMainnetKeypairTypes.includes(accountType)) {
+      return network === 'mainnet';
+    }
+
+    if (BitcoinTestnetKeypairTypes.includes(accountType)) {
+      return network === 'testnet';
+    }
+
+    return false;
+  }
+
+  if (accountChainType === AccountChainType.CARDANO) {
+    return _isChainCardanoCompatible(chainInfo);
+  }
+
   return false;
 };
 
