@@ -288,6 +288,8 @@ export class ChainOnlineService {
 
           this.chainService.subscribeChainStatusMap().next(currentChainStatusMap);
 
+          this.chainService.setAssetSettings(assetSetting);
+
           await this.dbService.removeFromChainStore(deprecatedChains);
           await this.dbService.removeFromAssetStore(deprecatedAssets);
 
