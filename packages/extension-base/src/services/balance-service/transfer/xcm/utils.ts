@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 
@@ -64,15 +65,13 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const paraSpellEndpoint = 'https://api.lightspell.xyz/v3';
+const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.PARASPELL}`;
 
 const paraSpellApi = {
-  buildXcm: `${paraSpellEndpoint}/x-transfer`,
-  dryRunXcm: `${paraSpellEndpoint}/dry-run`,
-  feeXcm: `${paraSpellEndpoint}/xcm-fee`
+  buildXcm: `${externalServiceApi}/x-transfer`,
+  dryRunXcm: `${externalServiceApi}/dry-run`,
+  feeXcm: `${externalServiceApi}/xcm-fee`
 };
-
-const paraSpellKey = process.env.PARASPELL_API_KEY || '';
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
   try {
@@ -165,8 +164,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-API-KEY': paraSpellKey
+      Accept: 'application/json'
     }
   });
 
@@ -205,8 +203,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-API-KEY': paraSpellKey
+      Accept: 'application/json'
     }
   });
 
@@ -249,8 +246,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-API-KEY': paraSpellKey
+      Accept: 'application/json'
     }
   });
 
