@@ -24,7 +24,7 @@ const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
 
 export const CHAINFLIP_BROKER_API = {
   main: process.env.CHAINFLIP_BROKER_API || '',
-  test: process.env.CHAINFLIP_BROKER_TESTNET_API || ''
+  test: process.env.CHAINFLIP_BROKER_TESTNET_API || '' // testnet use separate api key
 };
 
 interface DepositAddressResponse {
