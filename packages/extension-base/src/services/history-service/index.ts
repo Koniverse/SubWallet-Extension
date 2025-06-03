@@ -5,8 +5,9 @@ import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionHistoryItem, XCMT
 import { CRON_RECOVER_HISTORY_INTERVAL } from '@subwallet/extension-base/constants';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { parseBitcoinTransferData } from '@subwallet/extension-base/services/history-service/bitcoin-history';
 import { historyRecover, HistoryRecoverStatus } from '@subwallet/extension-base/services/history-service/helpers/recoverHistoryStatus';
 import { getExtrinsicParserKey } from '@subwallet/extension-base/services/history-service/helpers/subscan-extrinsic-parser-helper';
 import { parseSubscanExtrinsicData, parseSubscanTransferData } from '@subwallet/extension-base/services/history-service/subscan-history';
@@ -179,16 +180,37 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     });
   }
 
+  private async fetchBitcoinTransactionHistory (chain: string, addresses: string[]) {
+    const chainInfo = this.chainService.getChainInfoByKey(chain);
+    const chainState = this.chainService.getChainStateByKey(chain);
+
+    if (!chainState.active) {
+      return;
+    }
+
+    const bitcoinApi = this.chainService.getBitcoinApi(chain);
+
+    for (const address of addresses) {
+      const transferItems = await bitcoinApi.api.getAddressTransaction(address);
+
+      const parsedItems = Object.values(transferItems).map((i) => {
+        return parseBitcoinTransferData(address, i, chainInfo);
+      });
+
+      await this.addHistoryItems(parsedItems);
+    }
+  }
+
   subscribeHistories (chain: string, proxyId: string, cb: (items: TransactionHistoryItem[]) => void) {
     const addresses = this.keyringService.context.getDecodedAddresses(proxyId, false);
+    const chainInfo = this.chainService.getChainInfoByKey(chain);
     const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
     const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
+    const bitcoinAddresses = getAddressesByChainType(addresses, [ChainType.BITCOIN], chainInfo);
 
     const subscription = this.historySubject.subscribe((items) => {
       cb(items.filter(filterHistoryItemByAddressAndChain(chain, addresses)));
     });
-
-    const chainInfo = this.chainService.getChainInfoByKey(chain);
 
     if (_isChainSubstrateCompatible(chainInfo)) {
       if (_isChainEvmCompatible(chainInfo)) {
@@ -196,6 +218,10 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       } else {
         this.fetchSubscanTransactionHistory(chain, substrateAddresses);
       }
+    } else if (_isChainBitcoinCompatible(chainInfo)) {
+      this.fetchBitcoinTransactionHistory(chain, bitcoinAddresses).catch((e) => {
+        console.log('fetchBitcoinTransactionHistory Error', e);
+      });
     }
 
     return {
