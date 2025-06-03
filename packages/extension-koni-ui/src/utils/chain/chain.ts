@@ -59,6 +59,10 @@ export const isChainInfoAccordantAccountChainType = (chainInfo: _ChainInfo, chai
   return false;
 };
 
+export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, AccountType: KeypairType): boolean => {
+  return false;
+};
+
 export const isChainCompatibleWithAccountChainTypes = (chainInfo: _ChainInfo, chainTypes: AccountChainType[]): boolean => {
   return chainTypes.some((chainType) => isChainInfoAccordantAccountChainType(chainInfo, chainType));
 };
