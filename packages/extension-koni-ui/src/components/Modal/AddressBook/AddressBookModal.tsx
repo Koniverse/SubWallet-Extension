@@ -4,7 +4,7 @@
 import { AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
-import { useChainInfo, useFilterModal, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useChainInfo, useCoreReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
@@ -58,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const chainInfo = useChainInfo(chainSlug);
 
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreReformatAddress();
 
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 

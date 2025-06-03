@@ -6,7 +6,7 @@ import type { KeypairType } from '@subwallet/keyring/types';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _BITCOIN_CHAIN_SLUG, _BITCOIN_TESTNET_CHAIN_SLUG } from '@subwallet/extension-base/services/chain-service/constants';
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails, getChainsByAccountType } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
@@ -44,7 +44,7 @@ const createChainAddressItem = (
 
 const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAddress[] => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreReformatAddress();
 
   return useMemo(() => {
     const result: AccountChainAddress[] = [];

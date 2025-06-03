@@ -6,10 +6,10 @@ import { AccountJson } from '@subwallet/extension-base/types';
 import { getReformatedAddressRelatedToChain } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
-const useReformatAddress = () => {
+const useCoreReformatAddress = () => {
   return useCallback((accountJson: AccountJson, chainInfo: _ChainInfo): string | undefined => {
     return getReformatedAddressRelatedToChain(accountJson, chainInfo);
   }, []);
 };
 
-export default useReformatAddress;
+export default useCoreReformatAddress;

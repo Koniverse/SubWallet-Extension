@@ -8,7 +8,7 @@ import { EarningRewardHistoryItem, YieldPoolType, YieldPositionInfo } from '@sub
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { ASTAR_PORTAL_URL, BN_ZERO, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
-import { useReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, openInNewTab } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, Icon, Number } from '@subwallet/react-ui';
@@ -43,7 +43,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
 
   const total = useYieldRewardTotal(slug);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreReformatAddress();
 
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);

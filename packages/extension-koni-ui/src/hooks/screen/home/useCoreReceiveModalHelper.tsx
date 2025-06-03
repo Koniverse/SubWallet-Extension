@@ -7,7 +7,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetBitcoinAccounts, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReformatAddress, useGetBitcoinAccounts, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -39,7 +39,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const getBitcoinAccount = useGetBitcoinAccounts();
 
