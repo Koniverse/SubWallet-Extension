@@ -35,6 +35,9 @@ export const findChainInfoByChainId = (chainMap: Record<string, _ChainInfo>, cha
   return null;
 };
 
+/**
+ * @deprecated Use `isChainInfoCompatibleWithAccountInfo` instead.
+ */
 export const isChainInfoAccordantAccountChainType = (chainInfo: _ChainInfo, chainType: AccountChainType): boolean => {
   if (chainType === AccountChainType.SUBSTRATE) {
     return _isPureSubstrateChain(chainInfo);
@@ -63,10 +66,16 @@ export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acco
   return false;
 };
 
+/**
+ * @deprecated Use hook `useCoreCreateIsChainInfoCompatibleWithAccountProxy` instead.
+ */
 export const isChainCompatibleWithAccountChainTypes = (chainInfo: _ChainInfo, chainTypes: AccountChainType[]): boolean => {
   return chainTypes.some((chainType) => isChainInfoAccordantAccountChainType(chainInfo, chainType));
 };
 
+/**
+ * @deprecated Use hook `useCoreCreateGetChainSlugsByAccountProxy` instead.
+ */
 export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>, chainTypes: AccountChainType[], accountTypes: KeypairType[] = [], specialChain?: string): string[] => {
   const chainInfoMap = Object.fromEntries(Object.entries(_chainInfoMap).filter(([, chainInfo]) => chainInfo.chainStatus === _ChainStatus.ACTIVE));
 
@@ -101,6 +110,9 @@ export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>
   }
 };
 
+/**
+ * @deprecated Use hook `useCoreCreateGetChainSlugsByAccountProxy` instead.
+ */
 // Note : The function filters the chain slug list by account All, where all accounts case may include only Ledger accounts.
 export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProxies: AccountProxy[], _chainInfoMap: Record<string, _ChainInfo>, accountTypes: KeypairType[] = []): string[] => {
   const specialChainRecord: Record<AccountChainType, string[]> = {} as Record<AccountChainType, string[]>;
