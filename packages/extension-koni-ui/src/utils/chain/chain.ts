@@ -67,7 +67,7 @@ export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acco
 };
 
 /**
- * @deprecated Use hook `useCoreCreateIsChainInfoCompatibleWithAccountProxy` instead.
+ * @deprecated
  */
 export const isChainCompatibleWithAccountChainTypes = (chainInfo: _ChainInfo, chainTypes: AccountChainType[]): boolean => {
   return chainTypes.some((chainType) => isChainInfoAccordantAccountChainType(chainInfo, chainType));

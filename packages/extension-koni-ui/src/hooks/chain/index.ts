@@ -14,5 +14,4 @@ export { default as useChainInfoData } from './useChainInfoData';
 export { default as useChainConnection } from './useChainConnection';
 
 export { default as useCoreCreateGetChainSlugsByAccountProxy } from './useCoreCreateGetChainSlugsByAccountProxy';
-export { default as useCoreCreateIsChainInfoCompatibleWithAccountProxy } from './useCoreCreateIsChainInfoCompatibleWithAccountProxy';
 export { default as useGetChainSlugsByCurrentAccountProxy } from './useGetChainSlugsByCurrentAccountProxy';
