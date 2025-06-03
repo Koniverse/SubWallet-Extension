@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _BITCOIN_CHAIN_SLUG, _BITCOIN_NAME, _BITCOIN_TESTNET_NAME } from '@subwallet/extension-base/services/chain-service/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BitcoinFeeInfo, BitcoinFeeRate, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
