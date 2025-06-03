@@ -1519,6 +1519,11 @@ export default class KoniExtension {
           transferAll: !!transferAll,
           value: txVal,
           network: network });
+
+        // TODO: This is a hotfix until transferMax for Bitcoin is supported.
+        if (transferAll) {
+          inputData.value = transferAmount.value;
+        }
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 
