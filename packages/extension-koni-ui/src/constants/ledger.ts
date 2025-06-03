@@ -27,11 +27,11 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     slip44: 354
   },
   {
-    accountName: 'Polkadot ECDSA',
+    accountName: 'Polkadot Eth',
     appName: 'Polkadot',
-    networkName: 'Polkadot ECDSA',
+    networkName: 'Polkadot Eth',
     genesisHash: '',
-    network: 'PokadotECDSA',
+    network: 'PokadotEth',
     icon: 'substrate',
     slug: SUBSTRATE_ECDSA_KEY,
     isDevMode: false,
