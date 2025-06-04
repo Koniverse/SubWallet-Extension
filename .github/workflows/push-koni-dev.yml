@@ -6,7 +6,6 @@ on:
       - upgrade-ui
       - subwallet-dev
       - koni/dev/issue-4200-v2
-      - koni/dev/issue-4094-v2
       - koni/dev/issue-4297
   push:
     branches:
