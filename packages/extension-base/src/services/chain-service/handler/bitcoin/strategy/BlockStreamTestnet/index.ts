@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -180,7 +180,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
+      const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
 
       if (!response.ok) {
         throw new SWError('BlockStreamTestnetRequestStrategy.getRecommendedFeeRate', `Failed to fetch fee estimates: ${response.statusText}`);
@@ -192,11 +192,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         hourFee: 60 * 60000
       };
 
-      const estimates = await response.json() as BlockStreamFeeEstimates;
-
-      const low = 6;
-      const average = 4;
-      const fast = 2;
+      const estimates = await response.json() as RecommendedFeeEstimates;
 
       const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
 
@@ -204,9 +200,9 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(estimates[low] || 10), time: convertTimeMilisec.hourFee },
-          average: { feeRate: convertFee(estimates[average] || 12), time: convertTimeMilisec.halfHourFee },
-          fast: { feeRate: convertFee(estimates[fast] || 15), time: convertTimeMilisec.fastestFee },
+          slow: { feeRate: convertFee(estimates.hourFee || 1), time: convertTimeMilisec.hourFee },
+          average: { feeRate: convertFee(estimates.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
+          fast: { feeRate: convertFee(estimates.fastestFee || 1), time: convertTimeMilisec.fastestFee },
           default: 'slow'
         }
       };

@@ -1993,7 +1993,6 @@ export default class TransactionService {
               throw new Error('Bad signature');
             }
 
-            console.log('Transaction Signed:', payload);
             // Emit signed event
             emitter.emit('signed', eventData);
             // Add start info
