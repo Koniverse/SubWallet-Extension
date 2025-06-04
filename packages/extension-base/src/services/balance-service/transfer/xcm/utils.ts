@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { fetchFromProxyService, ProxyServiceRoute } from '@subwallet/extension-base/constants/environment';
+import { fetchFromProxyService } from '@subwallet/extension-base/constants/environment';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';

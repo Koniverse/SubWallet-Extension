@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchFromProxyService, ProxyServiceRoute } from '@subwallet/extension-base/constants';
+import { fetchFromProxyService } from '@subwallet/extension-base/constants';
 import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, TransactionUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -147,8 +148,6 @@ export class CardanoApi implements _CardanoApi {
 
       const addressBalance = await response.json() as CardanoAddressBalance;
 
-      console.log('addressBalance', addressBalance);
-
       return addressBalance.amount;
     } catch (e) {
       console.error('Error on getting account balance', e);
@@ -161,7 +160,7 @@ export class CardanoApi implements _CardanoApi {
     try {
       let path = `/addresses/${address}/utxos`;
 
-      path += `&page=${page}&count=${limit}`;
+      path += `?page=${page}&count=${limit}`;
 
       const response = await this.fetchCardano(path, {
         method: 'GET'
@@ -197,7 +196,7 @@ export class CardanoApi implements _CardanoApi {
 
   async sendCardanoTxReturnHash (tx: string): Promise<string> {
     try {
-      const path = '\'/tx/submit';
+      const path = '/tx/submit';
       const response = await this.fetchCardano(path, {
         method: 'POST',
         headers: { 'Content-Type': 'application/cbor' },

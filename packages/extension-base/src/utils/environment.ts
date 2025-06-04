@@ -85,3 +85,15 @@ export const targetIsMobile = TARGET_ENV === 'mobile';
 export const MODULE_SUPPORT: EnvironmentSupport = {
   MANTA_ZK: false
 };
+
+export function formatExternalServiceApi (url: string, isTestnet?: boolean): string {
+  if (isTestnet === true) {
+    return `${url}/testnet`;
+  }
+
+  if (isTestnet === false) {
+    return `${url}/mainnet`;
+  }
+
+  return url;
+}
