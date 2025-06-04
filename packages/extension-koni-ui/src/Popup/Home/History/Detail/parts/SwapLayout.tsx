@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetName, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
@@ -27,6 +27,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { currencyData, priceMap } = useSelector((state) => state.price);
   const swapInfo = data.additionalInfo as SwapTxData | undefined;
   const { accounts } = useSelector((state) => state.accountState);
+  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
 
   const estimatedFeeValue = useMemo(() => {
     let totalBalance = BN_ZERO;
@@ -55,6 +56,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const assetTo = assetRegistryMap[swapInfo.quote.pair.to];
   const recipientAddress = data.to || swapInfo.recipient || data.from;
   const account = findAccountByAddress(accounts, recipientAddress);
+  const destChainSlug = _getAssetOriginChain(assetTo);
+  const originChainSlug = _getAssetOriginChain(assetFrom);
 
   return (
     <MetaInfo className={CN(className)}>
@@ -66,12 +69,12 @@ const Component: React.FC<Props> = (props: Props) => {
       />
       <MetaInfo.Transfer
         destinationChain={{
-          slug: _getAssetOriginChain(assetTo),
-          name: _getAssetName(assetTo)
+          slug: destChainSlug,
+          name: _getChainName(chainInfoMap[destChainSlug])
         }}
         originChain={{
-          slug: _getAssetOriginChain(assetFrom),
-          name: _getAssetName(assetFrom)
+          slug: originChainSlug,
+          name: _getChainName(chainInfoMap[originChainSlug])
         }}
         recipientAddress={recipientAddress}
         recipientName={account?.name}
