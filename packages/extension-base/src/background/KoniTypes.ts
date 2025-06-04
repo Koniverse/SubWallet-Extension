@@ -734,7 +734,7 @@ export type TransactionAdditionalInfo = {
 //       ? Pick<SubmitBifrostLiquidStaking, 'rewardTokenSlug' | 'estimatedAmountReceived'>
 //       : undefined;
 export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType.TRANSFER_BALANCE> {
-  origin?: 'app' | 'migration' | 'subsquid' | 'subscan', // 'app' or history source
+  origin?: 'app' | 'migration' | 'subsquid' | 'subscan' | 'blockstream', // 'app' or history source
   callhash?: string,
   signature?: string,
   chain: string,

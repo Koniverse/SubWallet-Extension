@@ -72,6 +72,10 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
       }
 
       const rsRaw = await response.json() as BlockstreamAddressResponse;
+      const chainBalance = rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum;
+      const pendingLocked = rsRaw.mempool_stats.spent_txo_sum; // Only consider spent UTXOs in mempool
+      const availableBalance = Math.max(0, chainBalance - pendingLocked); // Ensure balance is non-negative
+
       const rs: BitcoinAddressSummaryInfo = {
         address: rsRaw.address,
         chain_stats: {
@@ -88,7 +92,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
           spent_txo_sum: rsRaw.mempool_stats.spent_txo_sum,
           tx_count: rsRaw.mempool_stats.tx_count
         },
-        balance: rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum,
+        balance: availableBalance,
         total_inscription: 0,
         balance_rune: '0',
         balance_inscription: '0'
@@ -194,8 +198,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
       const average = 4;
       const fast = 2;
 
-      console.log('getRecommendedFeeRate: estimates', estimates);
-
       const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
 
       return {
@@ -215,8 +217,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     return this.addRequest<UtxoResponseItem[]>(async (): Promise<UtxoResponseItem[]> => {
       const response = await getRequest(this.getUrl(`address/${address}/utxo`), undefined, {});
       const rs = await response.json() as BlockStreamUtxo[];
-
-      console.log('getUtxos: rs', rs);
 
       if (!response.ok) {
         const errorText = await response.text();

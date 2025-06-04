@@ -70,7 +70,7 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
 function getDisplayData (item: TransactionHistoryItem, nameMap: Record<string, string>, titleMap: Record<string, string>): TransactionHistoryDisplayData {
   let displayData: TransactionHistoryDisplayData;
-  const time = customFormatDate(item.time, '#hhhh#:#mm#');
+  const time = customFormatDate(item.time ? item.time : item.blockTime || 0, '#hhhh#:#mm#');
 
   const displayStatus = item.status === ExtrinsicStatus.FAIL ? 'fail' : '';
 
@@ -384,7 +384,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [currentItemDisplayCount, setCurrentItemDisplayCount] = useState<number>(DEFAULT_ITEMS_COUNT);
 
   const getHistoryItems = useCallback((count: number) => {
-    return Object.values(historyMap).filter(filterFunction).sort((a, b) => (b.time - a.time)).slice(0, count);
+    return Object.values(historyMap).filter(filterFunction).sort((a, b) => {
+      if (a.time !== 0 && b.time !== 0) {
+        return b.time - a.time;
+      }
+
+      const blockTimeA = a.blockTime ?? 0;
+      const blockTimeB = b.blockTime ?? 0;
+
+      return blockTimeB - blockTimeA;
+    })
+      .slice(0, count);
   }, [filterFunction, historyMap]);
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
@@ -483,7 +493,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   );
 
   const groupBy = useCallback((item: TransactionHistoryItem) => {
-    return formatHistoryDate(item.time, language, 'list');
+    return formatHistoryDate(item.time ? item.time : item.blockTime || 0, language, 'list');
   }, [language]);
 
   const groupSeparator = useCallback((group: TransactionHistoryItem[], idx: number, groupLabel: string) => {

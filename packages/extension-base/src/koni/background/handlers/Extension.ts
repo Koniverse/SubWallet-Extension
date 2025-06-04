@@ -1523,6 +1523,11 @@ export default class KoniExtension {
           value: txVal,
           network: network });
 
+        // TODO: This is a hotfix until transferMax for Bitcoin is supported.
+        if (transferAll) {
+          inputData.value = transferAmount.value;
+        }
+
         console.log('PSPT transaction', transaction.toHex());
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);

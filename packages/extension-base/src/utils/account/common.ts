@@ -79,8 +79,9 @@ interface AddressesByChainType {
   [ChainType.CARDANO]: string[]
 }
 
-export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[]): string[] {
-  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses);
+// TODO: Recheck the usage of this function for Bitcoin; it is currently applied to history.
+export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[], chainInfo?: _ChainInfo): string[] {
+  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses, chainInfo);
 
   return chainTypes.map((chainType) => {
     return addressByChainTypeMap[chainType];
