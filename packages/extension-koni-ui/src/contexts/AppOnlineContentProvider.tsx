@@ -66,6 +66,8 @@ const getPositionByRouteName = (currentRoute?: string) => {
       return 'mission_pool';
     case '/home/history':
       return 'history';
+    case '/home/gov':
+      return 'openGov';
     case '/':
     default:
       return 'token';
