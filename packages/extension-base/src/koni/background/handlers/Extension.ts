@@ -1522,6 +1522,8 @@ export default class KoniExtension {
           transferAll: !!transferAll,
           value: txVal,
           network: network });
+
+        console.log('PSPT transaction', transaction.toHex());
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 

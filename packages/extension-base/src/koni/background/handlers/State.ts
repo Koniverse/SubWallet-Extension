@@ -1571,10 +1571,7 @@ export default class KoniState {
       id
     };
 
-    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignatureRequest', payloadAfterValidated, {
-      requiredPassword: false,
-      address
-    })
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignatureRequest', payloadAfterValidated, {})
       .then(({ isApproved, payload }) => {
         if (isApproved) {
           if (payload) {
@@ -1622,7 +1619,7 @@ export default class KoniState {
     let to = '';
     const tokenInfo = this.getNativeTokenInfo(result.networkKey);
     let value = new BigN(0);
-    const freeBalance = await this.balanceService.getTransferableBalance(address, result.networkKey, tokenInfo.slug);
+    const totalBalance = await this.balanceService.getTotalBalance(address, result.networkKey, tokenInfo.slug);
     let inputAmount = new BigN(0);
     const psbtInputData = psbtGenerate.data.inputs.reduce((inputs, { nonWitnessUtxo, witnessUtxo }, inputIndex) => {
       let inputData: PsbtTransactionArg | null = null;
@@ -1653,7 +1650,7 @@ export default class KoniState {
       return inputs;
     }, [] as PsbtTransactionArg[]);
 
-    if (new BigN(freeBalance.value).lt(inputAmount)) {
+    if (new BigN(totalBalance.value).lt(inputAmount)) {
       payloadAfterValidated.errors = [{ message: t('Insufficient balance'), name: t('Unable to sign transaction') }];
     }
 
@@ -1691,9 +1688,7 @@ export default class KoniState {
       txOutput: psbtOutputData
     };
 
-    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignPsbtRequest', payloadAfterValidated, {
-      requiredPassword: false
-    })
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignPsbtRequest', payloadAfterValidated, {})
       .then(({ isApproved, payload }) => {
         if (isApproved) {
           if (payload) {
@@ -1733,9 +1728,7 @@ export default class KoniState {
     };
 
     // Custom handle this instead of general handler transaction
-    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSendTransactionRequestAfterConfirmation', requestPayload, {
-      requiredPassword: false
-    })
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSendTransactionRequestAfterConfirmation', requestPayload, {})
       .then(({ isApproved, payload }) => {
         if (isApproved) {
           if (payload) {

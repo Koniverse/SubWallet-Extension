@@ -26,7 +26,6 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { getDerivePath, getKeypairTypeByAddress } from '@subwallet/keyring';
 import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
@@ -1033,12 +1032,6 @@ export default class KoniTabs {
     });
   }
 
-  public async canUseAccount (address: string, url: string, type: AccountAuthType) {
-    const allowedAccounts = await this.getCurrentAccount(url, type);
-
-    return !!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()));
-  }
-
   private async evmSign (id: string, url: string, { method, params }: RequestArguments) {
     const signResult = await this.#koniState.evmSign(id, url, method, params);
 
@@ -1471,7 +1464,7 @@ export default class KoniTabs {
     return (type === 'bitcoin(request)' &&
       [
         'getAddresses'
-      ].includes(request?.method)) || type === 'evm(events.subscribe)';
+      ].includes(request?.method));
   }
 
   async bitcoinGetAddresses (url: string): Promise<BitcoinRequestGetAddressesResult> {
@@ -1498,15 +1491,9 @@ export default class KoniTabs {
       const addressResults: BitcoinDAppAddress[] = [];
 
       addressesAllowed.forEach((address) => {
-        const keypairType = getKeypairTypeByAddress(address);
-
-        if (!BitcoinKeypairTypes.includes(keypairType)) {
-          return;
-        }
-
         const pair = keyring.getPair(address);
 
-        if (pair.meta.isReadOnly) {
+        if (pair.meta.noPublicKey) {
           return;
         }
 
@@ -1518,10 +1505,7 @@ export default class KoniTabs {
           isTestnet: addressInfo.network === 'testnet'
         };
 
-        const deriFunc = getDerivePath(keypairType);
-        const index = parseInt((pair.meta.suri as string)?.split('//')[1]) || 0;
-
-        item.derivationPath = deriFunc(index);
+        item.derivationPath = pair.meta.derivationPath as string;
         item.publicKey = hexStripPrefix(u8aToHex(pair.publicKey));
 
         if (pair.publicKey.length !== 32) {
@@ -1590,7 +1574,7 @@ export default class KoniTabs {
           return await this.bitcoinSendTransfer(id, url, request);
 
         default:
-          return this.performWeb3Method(id, url, request);
+          throw new Error(`Method ${method} is not supported by SubWalletBitcoin provider`);
       }
     } catch (e) {
       // @ts-ignore
