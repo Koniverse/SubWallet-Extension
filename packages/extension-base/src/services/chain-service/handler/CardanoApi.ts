@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchFromProxyService } from '@subwallet/extension-base/constants';
 import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, TransactionUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
+import { createPromiseHandler, fetchFromProxyService, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';

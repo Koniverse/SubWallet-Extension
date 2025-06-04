@@ -10,7 +10,3 @@ export enum ProxyServiceRoute {
   CARDANO = '/cardano',
   PARASPELL = '/paraspell',
 }
-
-export enum HEADERS {
-  PLATFORM = 'Platform'
-}
