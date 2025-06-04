@@ -13,15 +13,15 @@ function getChainSlugsByAccountProxySingle (accountProxySingle: AccountProxy, ch
     return accountProxySingle.specialChain in chainInfoMap ? [accountProxySingle.specialChain] : [];
   }
 
-  const result: string[] = [];
+  const slugSet = new Set<string>();
 
   for (const chainInfo of Object.values(chainInfoMap)) {
     if (accountProxySingle.accounts.some((account) => isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type))) {
-      result.push(chainInfo.slug);
+      slugSet.add(chainInfo.slug);
     }
   }
 
-  return result;
+  return [...slugSet];
 }
 
 function getChainSlugsByAccountProxyAll (accountProxyAll: AccountProxy, accountProxies: AccountProxy[], chainInfoMap: Record<string, _ChainInfo>): string[] {
