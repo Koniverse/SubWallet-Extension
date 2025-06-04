@@ -4,13 +4,13 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO, HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import { formatNumber, reformatAddress, TARGET_ENV } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
@@ -100,7 +100,8 @@ export class BittensorCache {
       const resp = await fetch(`${externalServiceApi}/validator/latest/v1?limit=50`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          [HEADERS.PLATFORM]: TARGET_ENV
         }
       });
 

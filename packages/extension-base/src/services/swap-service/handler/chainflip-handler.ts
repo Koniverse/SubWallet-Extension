@@ -4,7 +4,7 @@
 import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { formatExternalServiceApi, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { formatExternalServiceApi, HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -131,7 +131,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Platform: `${TARGET_ENV}`
+        [HEADERS.PLATFORM]: TARGET_ENV
       }
     });
 

@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
+import { HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { TARGET_ENV } from '@subwallet/extension-base/utils';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -164,7 +165,8 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json'
+      Accept: 'application/json',
+      [HEADERS.PLATFORM]: TARGET_ENV
     }
   });
 
@@ -203,7 +205,8 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json'
+      Accept: 'application/json',
+      [HEADERS.PLATFORM]: TARGET_ENV
     }
   });
 
@@ -246,7 +249,8 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     body: JSON.stringify(bodyData),
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json'
+      Accept: 'application/json',
+      [HEADERS.PLATFORM]: TARGET_ENV
     }
   });
 

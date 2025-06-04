@@ -5,11 +5,11 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { _getAssetDecimals, _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, formatNumber } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, formatNumber, TARGET_ENV } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN, { BigNumber } from 'bignumber.js';
 
@@ -90,7 +90,8 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
         method: 'POST',
         headers: {
           accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          [HEADERS.PLATFORM]: TARGET_ENV
         },
         body: JSON.stringify(requestBody)
       }

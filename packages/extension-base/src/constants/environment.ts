@@ -20,6 +20,10 @@ export enum ProxyServiceRoute {
   PARASPELL = 'paraspell',
 }
 
+export enum HEADERS {
+  PLATFORM = 'Platform'
+}
+
 export function formatExternalServiceApi (baseUrl: string, isTestnet: boolean): string {
   const network = isTestnet ? 'testnet' : 'mainnet';
 
