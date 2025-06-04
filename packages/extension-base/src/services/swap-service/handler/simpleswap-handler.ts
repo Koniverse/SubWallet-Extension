@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { getPlatformHeaders, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { fetchFromProxyService, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { _getAssetDecimals, _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
@@ -50,8 +50,6 @@ interface BuildSimpleSwapTxParams {
   metadata: SimpleSwapMetadata;
 }
 
-const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.SIMPLESWAP}`;
-
 const toBNString = (input: string | number | BigNumber, decimal: number): string => {
   const raw = new BigNumber(input);
 
@@ -84,11 +82,11 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
       userRefundExtraId: ''
     };
 
-    const response = await fetch(
-      `${externalServiceApi}/exchanges`,
+    const response = await fetchFromProxyService(ProxyServiceRoute.SIMPLESWAP,
+      '/exchanges',
       {
         method: 'POST',
-        headers: getPlatformHeaders({ 'Content-Type': 'application/json', accept: 'application/json' }),
+        headers: { 'Content-Type': 'application/json', accept: 'application/json' },
         body: JSON.stringify(requestBody)
       }
     );

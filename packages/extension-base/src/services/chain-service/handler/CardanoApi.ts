@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { formatExternalServiceApi, getPlatformHeaders, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { fetchFromProxyService, ProxyServiceRoute } from '@subwallet/extension-base/constants';
 import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, TransactionUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
@@ -15,8 +15,6 @@ import { hexAddPrefix, isHex } from '@polkadot/util';
 //   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
 //   testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
 // };
-
-const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.CARDANO}`;
 
 export class CardanoApi implements _CardanoApi {
   chainSlug: string;
@@ -32,7 +30,6 @@ export class CardanoApi implements _CardanoApi {
   isTestnet: boolean; // todo: add api with interface BlockFrostAPI to remove isTestnet check
 
   providerName: string;
-  formattedExternalServiceApi: string;
 
   constructor (chainSlug: string, apiUrl: string, { isTestnet, providerName }: _ApiOptions) {
     this.chainSlug = chainSlug;
@@ -41,7 +38,6 @@ export class CardanoApi implements _CardanoApi {
     this.providerName = providerName || 'unknown';
     // this.api = this.createProvider(isTestnet);
     this.isReadyHandler = createPromiseHandler<_CardanoApi>();
-    this.formattedExternalServiceApi = formatExternalServiceApi(externalServiceApi, this.isTestnet);
     this.connect();
   }
 
@@ -51,6 +47,10 @@ export class CardanoApi implements _CardanoApi {
 
   get connectionStatus (): _ChainConnectionStatus {
     return this.connectionStatusSubject.getValue();
+  }
+
+  private fetchCardano (path: string, options: RequestInit) {
+    return fetchFromProxyService(ProxyServiceRoute.CARDANO, path, options, this.isTestnet);
   }
 
   private updateConnectionStatus (status: _ChainConnectionStatus): void {
@@ -139,14 +139,11 @@ export class CardanoApi implements _CardanoApi {
 
   async getBalanceMap (address: string): Promise<CardanoBalanceItem[]> {
     try {
-      const url = `${this.formattedExternalServiceApi}/addresses/${address}}`;
+      const path = `/addresses/${address}`;
 
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: getPlatformHeaders()
-        }
-      );
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const addressBalance = await response.json() as CardanoAddressBalance;
 
@@ -162,16 +159,13 @@ export class CardanoApi implements _CardanoApi {
 
   async getUtxos (address: string, page: number, limit: number): Promise<CardanoUtxosItem[]> {
     try {
-      let url = `${this.formattedExternalServiceApi}/addresses/${address}/utxos}`;
+      let path = `/addresses/${address}/utxos`;
 
-      url += `&page=${page}&count=${limit}`;
+      path += `&page=${page}&count=${limit}`;
 
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: getPlatformHeaders()
-        }
-      );
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const utxos = await response.json() as CardanoUtxosItem[];
 
@@ -185,14 +179,11 @@ export class CardanoApi implements _CardanoApi {
 
   async getSpecificUtxo (txHash: string): Promise<TransactionUtxosItem> {
     try {
-      const url = `${this.formattedExternalServiceApi}/txs/${txHash}/utxos}`;
+      const path = `/txs/${txHash}/utxos`;
 
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: getPlatformHeaders()
-        }
-      );
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const utxo = await response.json() as TransactionUtxosItem;
 
@@ -206,16 +197,12 @@ export class CardanoApi implements _CardanoApi {
 
   async sendCardanoTxReturnHash (tx: string): Promise<string> {
     try {
-      const url = `${this.formattedExternalServiceApi}/tx/submit}`;
-      const response = await fetch(
-        url, {
-          method: 'POST',
-
-          headers: getPlatformHeaders({ 'Content-Type': 'application/cbor' }),
-          body: cborToBytes(tx)
-        }
-      );
-
+      const path = '\'/tx/submit';
+      const response = await this.fetchCardano(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/cbor' },
+        body: cborToBytes(tx)
+      });
       const hash = (await response.text()).replace(/^"|"$/g, '');
 
       if (isHex(hexAddPrefix(hash))) {
@@ -236,13 +223,10 @@ export class CardanoApi implements _CardanoApi {
     const cronTime = 30000;
 
     return retryCardanoTxStatus(async () => {
-      const url = `${this.formattedExternalServiceApi}/txs/${txHash}}`;
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: getPlatformHeaders()
-        }
-      );
+      const path = `/txs/${txHash}`;
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const txInfo = await response.json() as { hash: string, block: string, index: number };
 

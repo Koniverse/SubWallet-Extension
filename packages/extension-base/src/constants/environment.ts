@@ -22,19 +22,34 @@ export enum ProxyServiceRoute {
   PARASPELL = 'paraspell',
 }
 
-export function formatExternalServiceApi (baseUrl: string, isTestnet: boolean): string {
-  const network = isTestnet ? 'testnet' : 'mainnet';
+export function formatExternalServiceApi (url: string, isTestnet?: boolean): string {
+  if (isTestnet === true) {
+    return `${url}/testnet`;
+  }
 
-  return `${baseUrl}/${network}`;
+  if (isTestnet === false) {
+    return `${url}/mainnet`;
+  }
+
+  return url;
 }
 
 export enum HEADERS {
   PLATFORM = 'Platform'
 }
 
-export function getPlatformHeaders (headers: Record<string, string> = {}): Record<string, string> {
-  return {
+export async function fetchFromProxyService (service: ProxyServiceRoute, path: string, options: RequestInit, isTestnet?: boolean) {
+  const baseUrl = formatExternalServiceApi(`${SW_EXTERNAL_SERVICES_API}${service}`, isTestnet);
+  const url = `${baseUrl}${path}`;
+  const headers = {
     [HEADERS.PLATFORM]: TARGET_ENV,
-    ...headers
+    ...(options.headers || {})
   };
+
+  console.log('hmm', [url, options, headers]);
+
+  return fetch(url, {
+    ...options,
+    headers
+  });
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { getPlatformHeaders, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
+import { fetchFromProxyService, ProxyServiceRoute } from '@subwallet/extension-base/constants/environment';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 
@@ -65,12 +65,10 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const externalServiceApi = `${SW_EXTERNAL_SERVICES_API}${ProxyServiceRoute.PARASPELL}`;
-
 const paraSpellApi = {
-  buildXcm: `${externalServiceApi}/x-transfer`,
-  dryRunXcm: `${externalServiceApi}/dry-run`,
-  feeXcm: `${externalServiceApi}/xcm-fee`
+  buildXcm: '/x-transfer',
+  dryRunXcm: '/dry-run',
+  feeXcm: '/xcm-fee'
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
@@ -159,13 +157,18 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
   };
 
-  const response = await fetch(paraSpellApi.buildXcm, {
-    method: 'POST',
-    body: JSON.stringify(bodyData),
-    headers: getPlatformHeaders(
-      { 'Content-Type': 'application/json',
-        Accept: 'application/json' })
-  });
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.buildXcm,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
@@ -197,13 +200,18 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
   };
 
-  const response = await fetch(paraSpellApi.dryRunXcm, {
-    method: 'POST',
-    body: JSON.stringify(bodyData),
-    headers: getPlatformHeaders(
-      { 'Content-Type': 'application/json',
-        Accept: 'application/json' })
-  });
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.dryRunXcm,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
@@ -239,13 +247,18 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     currency: createParaSpellCurrency(psAssetType, psAssetValue, value)
   };
 
-  const response = await fetch(paraSpellApi.feeXcm, {
-    method: 'POST',
-    body: JSON.stringify(bodyData),
-    headers: getPlatformHeaders(
-      { 'Content-Type': 'application/json',
-        Accept: 'application/json' })
-  });
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.feeXcm,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
 
   if (!response.ok) {
     console.error('Failed to request estimate fee');
