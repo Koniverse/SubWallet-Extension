@@ -7,8 +7,8 @@ on:
       - subwallet-dev
       - koni/dev/issue-4200-v2
       - koni/dev/issue-4094-v2
-      - koni/dev/issue-4245
       - koni/dev/issue-4297
+      - koni/dev/issue-4245
   push:
     branches:
       - koni-dev
