@@ -70,7 +70,7 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
 function getDisplayData (item: TransactionHistoryItem, nameMap: Record<string, string>, titleMap: Record<string, string>): TransactionHistoryDisplayData {
   let displayData: TransactionHistoryDisplayData;
-  const time = customFormatDate(item.time ? item.time : item.blockTime || 0, '#hhhh#:#mm#');
+  const time = customFormatDate(item.blockTime ? item.blockTime : item.time || 0, '#hhhh#:#mm#');
 
   const displayStatus = item.status === ExtrinsicStatus.FAIL ? 'fail' : '';
 
@@ -385,14 +385,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const getHistoryItems = useCallback((count: number) => {
     return Object.values(historyMap).filter(filterFunction).sort((a, b) => {
-      if (a.time !== 0 && b.time !== 0) {
-        return b.time - a.time;
-      }
-
       const blockTimeA = a.blockTime ?? 0;
       const blockTimeB = b.blockTime ?? 0;
 
-      return blockTimeB - blockTimeA;
+      if (blockTimeA !== 0 && blockTimeB !== 0) {
+        return blockTimeB - blockTimeA;
+      }
+
+      return b.time - a.time;
     })
       .slice(0, count);
   }, [filterFunction, historyMap]);
