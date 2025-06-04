@@ -13,7 +13,6 @@ on:
       - koni-dev
       - upgrade-ui
       - subwallet-dev
-      - koni/dev/issue-4245
 jobs:
   master:
     if: "! startsWith(github.event.head_commit.message, '[CI Skip]')"
