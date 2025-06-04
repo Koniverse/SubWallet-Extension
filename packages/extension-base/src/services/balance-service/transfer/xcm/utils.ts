@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
+import { getPlatformHeaders, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants/environment';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
-import { TARGET_ENV } from '@subwallet/extension-base/utils';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -163,11 +162,9 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const response = await fetch(paraSpellApi.buildXcm, {
     method: 'POST',
     body: JSON.stringify(bodyData),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      [HEADERS.PLATFORM]: TARGET_ENV
-    }
+    headers: getPlatformHeaders(
+      { 'Content-Type': 'application/json',
+        Accept: 'application/json' })
   });
 
   if (!response.ok) {
@@ -203,11 +200,9 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const response = await fetch(paraSpellApi.dryRunXcm, {
     method: 'POST',
     body: JSON.stringify(bodyData),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      [HEADERS.PLATFORM]: TARGET_ENV
-    }
+    headers: getPlatformHeaders(
+      { 'Content-Type': 'application/json',
+        Accept: 'application/json' })
   });
 
   if (!response.ok) {
@@ -247,11 +242,9 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const response = await fetch(paraSpellApi.feeXcm, {
     method: 'POST',
     body: JSON.stringify(bodyData),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      [HEADERS.PLATFORM]: TARGET_ENV
-    }
+    headers: getPlatformHeaders(
+      { 'Content-Type': 'application/json',
+        Accept: 'application/json' })
   });
 
   if (!response.ok) {

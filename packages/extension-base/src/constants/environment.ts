@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { TARGET_ENV } from '../utils';
+
 const PRODUCTION_BRANCHES = ['master', 'webapp', 'webapp-dev'];
 const branchName = process.env.BRANCH_NAME || 'subwallet-dev';
 
@@ -20,12 +22,19 @@ export enum ProxyServiceRoute {
   PARASPELL = 'paraspell',
 }
 
-export enum HEADERS {
-  PLATFORM = 'Platform'
-}
-
 export function formatExternalServiceApi (baseUrl: string, isTestnet: boolean): string {
   const network = isTestnet ? 'testnet' : 'mainnet';
 
   return `${baseUrl}/${network}`;
+}
+
+export enum HEADERS {
+  PLATFORM = 'Platform'
+}
+
+export function getPlatformHeaders (headers: Record<string, string> = {}): Record<string, string> {
+  return {
+    [HEADERS.PLATFORM]: TARGET_ENV,
+    ...headers
+  };
 }

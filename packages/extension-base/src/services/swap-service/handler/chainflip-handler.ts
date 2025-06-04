@@ -4,7 +4,7 @@
 import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { formatExternalServiceApi, HEADERS, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
+import { formatExternalServiceApi, getPlatformHeaders, ProxyServiceRoute, SW_EXTERNAL_SERVICES_API } from '@subwallet/extension-base/constants';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
@@ -13,7 +13,7 @@ import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatibl
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, TARGET_ENV } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 
@@ -130,9 +130,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const url = `${formattedExternalServiceApi}/swap?${new URLSearchParams(depositParams).toString()}`;
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        [HEADERS.PLATFORM]: TARGET_ENV
-      }
+      headers: getPlatformHeaders()
     });
 
     const data = await response.json() as DepositAddressResponse;
