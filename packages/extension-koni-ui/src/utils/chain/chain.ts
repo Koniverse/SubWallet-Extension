@@ -36,7 +36,7 @@ export const findChainInfoByChainId = (chainMap: Record<string, _ChainInfo>, cha
 };
 
 /**
- * @deprecated Use `isChainInfoCompatibleWithAccountInfo` instead.
+ * @deprecated Use `_isChainInfoCompatibleWithAccountInfo` instead.
  */
 export const isChainInfoAccordantAccountChainType = (chainInfo: _ChainInfo, chainType: AccountChainType): boolean => {
   if (chainType === AccountChainType.SUBSTRATE) {
@@ -56,44 +56,6 @@ export const isChainInfoAccordantAccountChainType = (chainInfo: _ChainInfo, chai
   }
 
   if (chainType === AccountChainType.CARDANO) {
-    return _isChainCardanoCompatible(chainInfo);
-  }
-
-  return false;
-};
-
-export const isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
-  if (accountChainType === AccountChainType.SUBSTRATE) {
-    return _isPureSubstrateChain(chainInfo);
-  }
-
-  if (accountChainType === AccountChainType.ETHEREUM) {
-    return _isChainEvmCompatible(chainInfo);
-  }
-
-  if (accountChainType === AccountChainType.TON) {
-    return _isChainTonCompatible(chainInfo);
-  }
-
-  if (accountChainType === AccountChainType.BITCOIN) {
-    if (!_isChainBitcoinCompatible(chainInfo)) {
-      return false;
-    }
-
-    const network = chainInfo.bitcoinInfo?.bitcoinNetwork;
-
-    if (BitcoinMainnetKeypairTypes.includes(accountType)) {
-      return network === 'mainnet';
-    }
-
-    if (BitcoinTestnetKeypairTypes.includes(accountType)) {
-      return network === 'testnet';
-    }
-
-    return false;
-  }
-
-  if (accountChainType === AccountChainType.CARDANO) {
     return _isChainCardanoCompatible(chainInfo);
   }
 

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
 function getChainSlugsByAccountProxySingle (accountProxySingle: AccountProxy, chainInfoMap: Record<string, _ChainInfo>): string[] {
@@ -16,7 +16,7 @@ function getChainSlugsByAccountProxySingle (accountProxySingle: AccountProxy, ch
   const slugSet = new Set<string>();
 
   for (const chainInfo of Object.values(chainInfoMap)) {
-    if (accountProxySingle.accounts.some((account) => isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type))) {
+    if (accountProxySingle.accounts.some((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type))) {
       slugSet.add(chainInfo.slug);
     }
   }

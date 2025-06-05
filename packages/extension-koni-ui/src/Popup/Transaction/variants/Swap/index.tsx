@@ -8,7 +8,7 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, isAccountAll, isChainInfoCompatibleWithAccountInfo, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -373,7 +373,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return false;
     }
 
-    return !isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson.chainType, fromAccountJson.type);
+    return !_isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson.chainType, fromAccountJson.type);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
 
   const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
@@ -764,7 +764,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => isChainInfoCompatibleWithAccountInfo(destChainInfo, a.chainType, a.type));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, a.chainType, a.type));
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;

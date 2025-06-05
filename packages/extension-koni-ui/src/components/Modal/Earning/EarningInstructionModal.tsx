@@ -4,6 +4,7 @@
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
@@ -14,7 +15,7 @@ import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extensio
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBannerButtonIcon, getEarningTimeText, isAccountAll, isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-koni-ui/utils';
+import { getBannerButtonIcon, getEarningTimeText, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
@@ -67,7 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
       }
 
       return false;
