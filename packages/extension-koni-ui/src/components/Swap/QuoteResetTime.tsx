@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
+import { Timer } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -42,15 +44,28 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [quoteAliveUntilValue, setQuoteCountdownTime]);
 
   return (
-    <div className={CN(className, '__quote-reset-time')}>
-      Quote reset in: <span className={CN({ '__quote-reset-change-color': quoteCountdownTime <= 10 })}>&nbsp;{quoteCountdownTime}s</span>
-    </div>
+    <span className={CN(className, {
+      '__quote-reset-change-color': quoteCountdownTime <= 10
+    })}
+    >
+      <Icon
+        className={'__reset-time-icon'}
+        phosphorIcon={Timer}
+        weight={'fill'}
+      />
+
+      <span className='__reset-time-text'>
+        {quoteCountdownTime}s
+      </span>
+    </span>
   );
 };
 
 const QuoteResetTime = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.__quote-reset-change-color': {
+    color: token.colorWarning,
+
+    '&.__quote-reset-change-color': {
       color: token.colorError
     }
   };

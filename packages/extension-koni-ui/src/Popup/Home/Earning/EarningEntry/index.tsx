@@ -25,11 +25,15 @@ function Component () {
   const earningPositions = useGroupYieldPosition();
 
   useEffect(() => {
-    if (currentAccountProxyRef.current !== currentAccountProxy?.id) {
-      currentAccountProxyRef.current = currentAccountProxy?.id;
+    const timer = setTimeout(() => {
+      if (currentAccountProxyRef.current !== currentAccountProxy?.id) {
+        currentAccountProxyRef.current = currentAccountProxy?.id;
 
-      setEntryView(EarningEntryView.POSITIONS);
-    }
+        setEntryView(EarningEntryView.POSITIONS);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [currentAccountProxy?.id]);
 
   if (loading) {

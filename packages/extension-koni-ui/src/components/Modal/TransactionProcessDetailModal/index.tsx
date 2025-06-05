@@ -115,10 +115,6 @@ const Component: FC<Props> = (props: Props) => {
 
 const TransactionProcessDetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    '.ant-sw-modal-content.ant-sw-modal-content': {
-      paddingBottom: 0
-    },
-
     '.ant-sw-modal-body.ant-sw-modal-body': {
       paddingBottom: 0
     },
@@ -128,11 +124,11 @@ const TransactionProcessDetailModal = styled(Component)<Props>(({ theme: { token
     },
 
     '.__current-process-step-block': {
-      marginBottom: token.marginSM
+      marginBottom: token.margin
     },
 
     '.__transaction-info-block': {
-      marginBottom: token.marginSM
+      marginBottom: token.margin
     }
   });
 });

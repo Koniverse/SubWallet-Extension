@@ -1,5 +1,64 @@
 # CHANGELOG
 
+## 1.3.30
+Build date: Apr 14, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain Round 2 (#4114):
+  - Improve swap feature (#4069)
+  - Improve Select provider in Swap feature (#3933)
+  - Optimize swap pair selection (#3902)
+  - Update New UI for Swap quote (#4204)
+  - Recheck swap quote with asset hub (#4113)
+- Support custom slippage for TAO subnet staking (#4145)
+- Add APY information for TAO and dTao staking (#4217)
+
+
+Bug fixed:
+- Fixed enforcing the minimum miner tip 1 wei (#2393)
+- Fixed UX for swap cross-chain Round 2 (#4114)
+  - Error when swap on hydration (#3993)
+  - Fixed bug Cannot read properties of undefined (reading 'destinationTokenInfo') when open the old Notification details (#4195)
+  - Fixed bug Error page when perform sign permit from Uniswap (#4248)
+
+
+## 1.3.29
+Build date: Apr 08, 2025.
+
+Features & Update:
+- Support auto detect balance for EVM (#2836)
+- Sort token by balance (#2339)
+- Update for Meld on-ramp (#4198)
+- Add validate sufficient token for XCM transfer (#3895)
+
+Bug fixed:
+- Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
+
+
+## 1.3.28
+Build date: Apr 02, 2025.
+
+Features & Update:
+- Show value of derivative token relative to the origin tokens (#4081)
+- Add dTAO token (#4151)
+- Display dTAO balance like another token (#4150)
+
+Bug fixed:
+- Fixed bug related to subnet staking feature (#4140)
+- Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
+
+## 1.3.27
+Build date: Mar 29, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain round 1 (#4090)
+- Update chainlist stable version 0.2.102 (#4058)
+- Update API key for blockfrost on Cardano (#4164)
+
+Bug fixed:
+- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
+
+
 ## 1.3.26
 Build date: Mar 27, 2025.
 

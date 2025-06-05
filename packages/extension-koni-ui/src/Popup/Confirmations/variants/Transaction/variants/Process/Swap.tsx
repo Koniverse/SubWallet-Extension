@@ -1,14 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { ProcessTransactionData } from '@subwallet/extension-base/types';
+import { getSwapChainsFromPath, getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
+import { ProcessTransactionData, ProcessType } from '@subwallet/extension-base/types';
 import { SwapBaseTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { SwapRoute, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
+import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { Number } from '@subwallet/react-ui';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetSwapProcessSteps, useGetTransactionProcessSteps, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -55,24 +54,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return totalBalance;
   }, [assetRegistryMap, data.quote.feeInfo.feeComponent, priceMap]);
 
-  const renderRateConfirmInfo = () => {
-    return (
-      <div className={'__quote-rate-wrapper'}>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(fromAssetInfo)}
-          value={1}
-        />
-        <span>&nbsp;~&nbsp;</span>
-        <Number
-          decimal={0}
-          suffix={_getAssetSymbol(toAssetInfo)}
-          value={data.quote.rate}
-        />
-      </div>
-    );
-  };
-
   // const isSwapXCM = useMemo(() => {
   //   return data.process.steps.some((item) => item.type === CommonStepType.XCM);
   // }, [data.process.steps]);
@@ -83,10 +64,23 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [data.quote.estimatedArrivalTime]);
 
   const getTransactionProcessSteps = useGetTransactionProcessSteps();
+  const getSwapProcessSteps = useGetSwapProcessSteps();
 
   const stepItems = useMemo(() => {
-    return getTransactionProcessSteps(process.steps, process.combineInfo, false);
-  }, [getTransactionProcessSteps, process.combineInfo, process.steps]);
+    if (process.type === ProcessType.SWAP) {
+      return getSwapProcessSteps(data.process, data.quote);
+    }
+
+    return getTransactionProcessSteps(process.steps, data, false);
+  }, [process.type, process.steps, getTransactionProcessSteps, data, getSwapProcessSteps]);
+
+  const processChains = useMemo(() => {
+    return getSwapChainsFromPath(data.process.path);
+  }, [data.process.path]);
+
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(data.process.steps);
+  }, [data.process.steps]);
 
   useEffect(() => {
     let timer: NodeJS.Timer;
@@ -108,13 +102,17 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <SwapTransactionBlock
-        quote={data.quote}
+        fromAmount={data.quote.fromAmount}
+        fromAssetSlug={originSwapPair?.from}
+        toAmount={data.quote.toAmount}
+        toAssetSlug={originSwapPair?.to}
       />
       <MetaInfo
         className={'__swap-confirmation-wrapper'}
         hasBackgroundWrapper={false}
         labelColorScheme={'gray'}
         labelFontWeight={'regular'}
+        spaceSize={'sm'}
       >
         <MetaInfo.Account
           address={recipientAddress}
@@ -128,7 +126,12 @@ const Component: React.FC<Props> = (props: Props) => {
           label={t('Quote rate')}
           valueColorSchema={'gray'}
         >
-          {renderRateConfirmInfo()}
+          <QuoteRateDisplay
+            className={'__quote-estimate-swap-value'}
+            fromAssetInfo={fromAssetInfo}
+            rateValue={data.quote.rate}
+            toAssetInfo={toAssetInfo}
+          />
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
@@ -138,15 +141,10 @@ const Component: React.FC<Props> = (props: Props) => {
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}
         />
-        <MetaInfo.Default
-          className={'-d-column'}
-          label={t('Swap route')}
-        >
-        </MetaInfo.Default>
-        <SwapRoute swapRoute={data.quote.route} />
 
         <MetaInfo.TransactionProcess
           items={stepItems}
+          processChains={processChains}
           type={process.type}
         />
 
@@ -164,16 +162,17 @@ const Component: React.FC<Props> = (props: Props) => {
         {/*     type='warning' */}
         {/*   /> */}
         {/* )} */}
-        {showQuoteExpired &&
-          (
-            <AlertBox
-              className={'__swap-quote-expired'}
-              description={t('Swap quote expired. Cancel to get a new quote.')}
-              title={t('Pay attention!')}
-              type='warning'
-            />)
-        }
       </MetaInfo>
+
+      {showQuoteExpired &&
+        (
+          <AlertBox
+            className={'__swap-quote-expired'}
+            description={t('Swap quote expired. Cancel to get a new quote.')}
+            title={t('Pay attention!')}
+            type='warning'
+          />)
+      }
     </div>
   );
 };

@@ -7,32 +7,17 @@ import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/backgro
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import {
-  BaseYieldPositionInfo,
-  BasicTxErrorType,
-  EarningStatus,
-  NativeYieldPoolInfo,
-  OptimalYieldPath,
-  StakeCancelWithdrawalParams,
-  SubmitJoinNativeStaking,
-  TransactionData,
-  UnstakingInfo,
-  ValidatorInfo,
-  YieldPoolInfo,
-  YieldPoolMethodInfo,
-  YieldPositionInfo,
-  YieldTokenBaseInfo
-} from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import {DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo} from './dtao';
-import {_getAssetDecimals, _getAssetSymbol} from "@subwallet/extension-base/services/chain-service/utils";
-import {t} from "i18next";
+import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -261,6 +246,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         const validators = _topValidator.data;
         let highestApr = validators[0];
+
+        for (let i = 1; i < validators.length; i++) {
+          if (parseFloat(validators[i].apr) > parseFloat(highestApr.apr)) {
+            highestApr = validators[i];
+          }
+        }
 
         for (let i = 1; i < validators.length; i++) {
           if (parseFloat(validators[i].apr) > parseFloat(highestApr.apr)) {
