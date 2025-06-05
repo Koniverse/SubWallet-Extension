@@ -179,6 +179,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 0);
   }
 
+  // TODO: Handle fallback for this route as it is not stable.
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
