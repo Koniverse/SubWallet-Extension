@@ -72,43 +72,10 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
       }
 
       const rsRaw = await response.json() as BlockstreamAddressResponse;
-
-      // Fetch unconfirmed transactions from mempool
-      const mempoolResponse = await getRequest(this.getUrl(`address/${address}/txs/mempool`), undefined, this.headers);
-
-      if (!mempoolResponse.ok) {
-        const errorText = await mempoolResponse.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.getAddressSummaryInfo', `Failed to fetch mempool transactions: ${mempoolResponse.status} - ${errorText}`);
-      }
-
-      const mempoolTxs = await mempoolResponse.json() as BitcoinTx[];
-
-      // Calculate total value of UTXOs used in unconfirmed transactions (inputs)
-      let unconfirmedLocked = new BigN(0);
-      // Calculate total value of change outputs returning to the address
-      let unconfirmedChange = new BigN(0);
-
-      for (const tx of mempoolTxs) {
-        // Process inputs
-        for (const vin of tx.vin) {
-          if (vin.prevout && vin.prevout.scriptpubkey_address === address) {
-            unconfirmedLocked = unconfirmedLocked.plus(vin.prevout.value);
-          }
-        }
-
-        // Process outputs
-        for (const vout of tx.vout) {
-          if (vout.scriptpubkey_address === address) {
-            unconfirmedChange = unconfirmedChange.plus(vout.value);
-          }
-        }
-      }
-
       const chainBalance = rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum;
-      const unconfirmedLockedValue = parseInt(unconfirmedLocked.toString(), 10);
-      const unconfirmedChangeValue = parseInt(unconfirmedChange.toString(), 10);
-      const availableBalance = Math.max(0, chainBalance - unconfirmedLockedValue + unconfirmedChangeValue); // Ensure balance is non-negative
+      const pendingLocked = rsRaw.mempool_stats.spent_txo_sum; // Only consider spent UTXOs in mempool
+      const mempoolReceived = rsRaw.mempool_stats.funded_txo_sum; // Funds received in mempool (e.g., change)
+      const availableBalance = Math.max(0, chainBalance - pendingLocked + mempoolReceived); // Ensure balance is non-negative
 
       const rs: BitcoinAddressSummaryInfo = {
         address: rsRaw.address,
