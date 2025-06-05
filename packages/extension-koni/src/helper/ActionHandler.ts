@@ -98,6 +98,7 @@ export class ActionHandler {
         if (needActive) {
           this.isActive = true;
           startHeartbeat();
+
           if (!needFullActive) {
             this.mainHandler && await this.mainHandler.state.wakeup(false);
           }
