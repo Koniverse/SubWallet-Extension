@@ -21,6 +21,9 @@ export class EventService extends EventEmitter<EventRegistry> {
   public readonly waitCryptoReady: Promise<boolean>;
   public readonly waitDatabaseReady: Promise<boolean>;
 
+  public readonly waitAppStart: Promise<boolean>;
+  public readonly waitAppStartFull: Promise<boolean>;
+
   public readonly waitKeyringReady: Promise<boolean>;
   public readonly waitAccountReady: Promise<boolean>;
   public readonly waitInjectReady: Promise<boolean>;
@@ -43,6 +46,9 @@ export class EventService extends EventEmitter<EventRegistry> {
     this.waitDatabaseReady = this.generateWaitPromise('database.ready');
     this.waitKeyringReady = this.generateWaitPromise('keyring.ready');
     this.waitAccountReady = this.generateWaitPromise('account.ready');
+    this.waitAppStart = this.generateWaitPromise('general.start');
+    this.waitAppStartFull = this.generateWaitPromise('general.start_full');
+
     // TODO: Need to merge logic on web-runner file
     this.waitInjectReady = TARGET_ENV === 'webapp' ? this.generateWaitPromise('inject.ready') : Promise.resolve(true);
 
