@@ -7,8 +7,8 @@ import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwa
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBitcoinAccountDetails, isAccountAll } from '@subwallet/extension-koni-ui/utils';
-import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
+import { isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { Badge, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
@@ -138,23 +138,7 @@ const Component: React.FC<Props> = (props: Props) => {
     // todo: may need better solution for this sorting below
 
     return result
-      .sort((a: AnalyzeAddress, b: AnalyzeAddress) => {
-        const _isABitcoin = isBitcoinAddress(a.address);
-        const _isBBitcoin = isBitcoinAddress(b.address);
-        const _isSameProxyId = a.proxyId === b.proxyId;
-
-        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
-          const aKeyPairType = getKeypairTypeByAddress(a.address);
-          const bKeyPairType = getKeypairTypeByAddress(b.address);
-
-          const aDetails = getBitcoinAccountDetails(aKeyPairType);
-          const bDetails = getBitcoinAccountDetails(bKeyPairType);
-
-          return aDetails.order - bDetails.order;
-        }
-
-        return ((a?.displayName || '').toLowerCase() > (b?.displayName || '').toLowerCase()) ? 1 : -1;
-      })
+      .sort(sortFuncAnalyzeAddress)
       .sort((a, b) => getGroupPriority(b) - getGroupPriority(a));
   }, [accountProxies, chainInfo, chainSlug, contacts, getReformatAddress, recent, selectedFilters]);
 
