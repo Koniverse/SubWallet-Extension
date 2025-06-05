@@ -600,6 +600,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     let id: string;
     let isSubscribed = true;
 
+    if (!selectedChain) {
+      setLoading(false);
+
+      return;
+    }
+
     setLoading(true);
 
     setCurrentItemDisplayCount(DEFAULT_ITEMS_COUNT);
