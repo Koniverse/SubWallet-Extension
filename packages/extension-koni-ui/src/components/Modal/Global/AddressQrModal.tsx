@@ -144,6 +144,40 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
             : undefined
         }
         destroyOnClose={true}
+        footer={isNewFormat === undefined || isNewFormat
+          ? (
+            <Button
+              block
+              className={'__view-on-explorer'}
+              disabled={!scanExplorerAddressUrl}
+              icon={
+                <Icon
+                  customSize={'28px'}
+                  phosphorIcon={ArrowSquareOut}
+                  size='sm'
+                  weight={'fill'}
+                />
+              }
+              onClick={handleClickViewOnExplorer}
+            >{t('View on explorer')}</Button>
+          )
+          : (
+            <Button
+              block
+              className={'__go-home-button'}
+              disabled={!scanExplorerAddressUrl}
+              icon={
+                <Icon
+                  customSize={'28px'}
+                  phosphorIcon={House}
+                  size='sm'
+                  weight={'fill'}
+                />
+              }
+              onClick={onGoHome}
+              schema={'secondary'}
+            >{t('Back to home')}</Button>
+          )}
         id={modalId}
         onCancel={onBack || onCancel}
         rightIconProps={onBack
@@ -185,7 +219,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               color='#000'
               errorLevel='H'
               icon={''}
-              size={264}
+              size={232}
               value={currentAddress}
             />
 
@@ -250,41 +284,6 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               </CopyToClipboard>
             </div>
           </div>
-
-          {isNewFormat === undefined || isNewFormat
-            ? (
-              <Button
-                block
-                className={'__view-on-explorer'}
-                disabled={!scanExplorerAddressUrl}
-                icon={
-                  <Icon
-                    customSize={'28px'}
-                    phosphorIcon={ArrowSquareOut}
-                    size='sm'
-                    weight={'fill'}
-                  />
-                }
-                onClick={handleClickViewOnExplorer}
-              >{t('View on explorer')}</Button>
-            )
-            : (
-              <Button
-                block
-                className={'__go-home-button'}
-                disabled={!scanExplorerAddressUrl}
-                icon={
-                  <Icon
-                    customSize={'28px'}
-                    phosphorIcon={House}
-                    size='sm'
-                    weight={'fill'}
-                  />
-                }
-                onClick={onGoHome}
-                schema={'secondary'}
-              >{t('Back to home')}</Button>
-            )}
         </>
       </SwModal>
       {isRelatedToTon && isTonWalletContactSelectorModalActive &&
@@ -302,6 +301,14 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
 
 const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '.ant-sw-modal-footer': {
+      borderTop: 0
+    },
+
+    '.ant-sw-modal-body': {
+      paddingBottom: 0
+    },
+
     '.__qr-code-wrapper': {
       paddingTop: token.padding,
       paddingBottom: token.padding,
@@ -324,6 +331,7 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      marginBottom: 2,
 
       '.__label-address-prefix': {
         fontWeight: 700,
@@ -356,7 +364,7 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
     },
 
     '.__address-box-wrapper': {
-      marginBottom: token.margin
+
     },
 
     '.__address-box': {
@@ -366,7 +374,7 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       justifyContent: 'center',
       paddingLeft: token.paddingSM,
       paddingRight: token.paddingXXS,
-      minHeight: 48
+      minHeight: 52
     },
 
     '.__address': {
