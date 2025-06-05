@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import '@polkadot/types-augment';
+
 import { BlockStreamTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockstreamTestnet';
 import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
