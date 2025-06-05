@@ -245,7 +245,8 @@ export const _TRANSFER_CHAIN_GROUP = {
   avail: ['kate', 'goldberg_testnet'],
   pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
   centrifuge: ['centrifuge'],
-  disable_transfer: ['crab', 'pangolin']
+  disable_transfer: ['crab', 'pangolin'],
+  truth: ['truth_network']
 };
 
 export const _BALANCE_PARSING_CHAIN_GROUP = {
