@@ -7,7 +7,7 @@ import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import { LATEST_CHAIN_PATCH_FETCHING_INTERVAL, md5HashChainAsset, md5HashChainInfo } from '@subwallet/extension-base/services/chain-online-service/constants';
 import { ChainService, filterAssetInfoMap } from '@subwallet/extension-base/services/chain-service';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _isCustomAsset, _isCustomChain, _isEqualSmartContractAsset, fetchPatchData, PatchInfo, randomizeProvider } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isCustomAsset, _isCustomChain, _isEqualSmartContractAsset, _isNativeToken, fetchPatchData, PatchInfo, randomizeProvider } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
@@ -96,17 +96,17 @@ export class ChainOnlineService {
     let duplicatedSlug = '';
 
     if (genesisHash) {
-      Object.values(latestChainInfoMap).forEach((chainInfo) => {
+      for (const chainInfo of Object.values(latestChainInfoMap)) {
         if (chainInfo.substrateInfo && chainInfo.substrateInfo.genesisHash === genesisHash) {
           duplicatedSlug = chainInfo.slug;
         }
-      });
+      }
     } else if (evmChainId) {
-      Object.values(latestChainInfoMap).forEach((chainInfo) => {
+      for (const chainInfo of Object.values(latestChainInfoMap)) {
         if (chainInfo.evmInfo && chainInfo.evmInfo.evmChainId === evmChainId) {
           duplicatedSlug = chainInfo.slug;
         }
-      });
+      }
     }
 
     return duplicatedSlug;
@@ -226,65 +226,57 @@ export class ChainOnlineService {
             const parsedStoredAssetRegistry: Record<string, _ChainAsset> = {};
 
             // Update custom assets of merged custom chains
-            Object.values(storedAssetRegistry).forEach((storedAsset) => {
-              if (Object.keys(deprecatedChainMap).includes(storedAsset.originChain)) {
-                if (_isCustomAsset(storedAsset.slug) && storedAsset.metadata?.contractAddress) {
-                  const newOriginChain = deprecatedChainMap[storedAsset.originChain];
-                  const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
+            for (const storedAsset of Object.values(storedAssetRegistry)) {
+              if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedChainMap).includes(storedAsset.originChain) && storedAsset.metadata?.contractAddress) {
+                const newOriginChain = deprecatedChainMap[storedAsset.originChain];
+                const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
 
-                  deprecatedAssets.push(storedAsset.slug);
-                  parsedStoredAssetRegistry[newSlug] = {
-                    ...storedAsset,
-                    originChain: newOriginChain,
-                    slug: newSlug
-                  };
-                } else {
-                  parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;
-                }
+                deprecatedAssets.push(storedAsset.slug);
+                parsedStoredAssetRegistry[newSlug] = {
+                  ...storedAsset,
+                  originChain: newOriginChain,
+                  slug: newSlug
+                };
+              } else {
+                parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;
               }
-            });
+            }
 
             for (const storedAssetInfo of Object.values(parsedStoredAssetRegistry)) {
               let duplicated = false;
               let deprecated = false;
+              let defaultSlugForMigration: string | undefined;
 
               for (const defaultChainAsset of Object.values(latestAssetInfo)) {
                 // case merge custom asset with default asset
                 if (_isEqualSmartContractAsset(storedAssetInfo, defaultChainAsset)) {
                   duplicated = true;
-
-                  if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
-                    const isVisible = assetSetting[storedAssetInfo.slug].visible;
-
-                    migratedAssetSetting[defaultChainAsset.slug] = { visible: isVisible };
-                    delete assetSetting[storedAssetInfo.slug];
-                  }
-
-                  delete mergedAssetRegistry[storedAssetInfo.slug];
-
+                  defaultSlugForMigration = defaultChainAsset.slug;
                   break;
                 }
 
                 if (availableChains.indexOf(storedAssetInfo.originChain) === -1) {
                   deprecated = true;
-
-                  if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
-                    const isVisible = assetSetting[storedAssetInfo.slug].visible;
-
-                    migratedAssetSetting[defaultChainAsset.slug] = { visible: isVisible };
-                    delete assetSetting[storedAssetInfo.slug];
-                  }
-
-                  delete mergedAssetRegistry[storedAssetInfo.slug];
-
+                  defaultSlugForMigration = defaultChainAsset.slug;
                   break;
                 }
               }
 
-              if (!duplicated && !deprecated) {
-                mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
-              } else {
+              if (duplicated || deprecated) {
+                if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
+                  const isVisible = assetSetting[storedAssetInfo.slug].visible;
+
+                  if (defaultSlugForMigration) {
+                    migratedAssetSetting[defaultSlugForMigration] = { visible: isVisible };
+                    delete assetSetting[storedAssetInfo.slug];
+                  }
+                }
+
+                delete mergedAssetRegistry[storedAssetInfo.slug];
+
                 deprecatedAssets.push(storedAssetInfo.slug);
+              } else {
+                mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
               }
             }
 
