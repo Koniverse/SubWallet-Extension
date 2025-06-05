@@ -182,32 +182,49 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
   // TODO: Handle fallback for this route as it is not stable.
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getRecommendedFeeRate', `Failed to fetch fee estimates: ${response.statusText}`);
-      }
-
       const convertTimeMilisec = {
         fastestFee: 10 * 60000,
         halfHourFee: 30 * 60000,
         hourFee: 60 * 60000
       };
 
-      const estimates = await response.json() as RecommendedFeeEstimates;
-
-      const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
-
-      return {
+      const defaultFeeInfo: BitcoinFeeInfo = {
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(estimates.hourFee || 1), time: convertTimeMilisec.hourFee },
-          average: { feeRate: convertFee(estimates.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
-          fast: { feeRate: convertFee(estimates.fastestFee || 1), time: convertTimeMilisec.fastestFee },
+          slow: { feeRate: 1, time: convertTimeMilisec.hourFee },
+          average: { feeRate: 1, time: convertTimeMilisec.halfHourFee },
+          fast: { feeRate: 1, time: convertTimeMilisec.fastestFee },
           default: 'slow'
         }
       };
+
+      try {
+        const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
+
+        if (!response.ok) {
+          console.warn(`Failed to fetch fee estimates: ${response.statusText}`);
+
+          return defaultFeeInfo;
+        }
+
+        const estimates = await response.json() as RecommendedFeeEstimates;
+
+        const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
+
+        return {
+          type: 'bitcoin',
+          busyNetwork: false,
+          options: {
+            slow: { feeRate: convertFee(estimates.hourFee || 1), time: convertTimeMilisec.hourFee },
+            average: { feeRate: convertFee(estimates.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
+            fast: { feeRate: convertFee(estimates.fastestFee || 1), time: convertTimeMilisec.fastestFee },
+            default: 'slow'
+          }
+        };
+      } catch {
+        return defaultFeeInfo;
+      }
     }, 0);
   }
 
