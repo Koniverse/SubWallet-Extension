@@ -68,10 +68,12 @@ interface ParaSpellError {
   statusCode: number
 }
 
+const version = '/v3';
+
 const paraSpellApi = {
-  buildXcm: '/x-transfer',
-  dryRunXcm: '/dry-run',
-  feeXcm: '/xcm-fee'
+  buildXcm: `${version}/x-transfer`,
+  dryRunXcm: `${version}/dry-run`,
+  feeXcm: `${version}/xcm-fee`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
