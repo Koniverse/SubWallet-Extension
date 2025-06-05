@@ -127,8 +127,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <GlobalSearchTokenModal
         id={GlobalSearchTokenModalId}
         onCancel={onCloseGlobalSearchToken}
-        sortedTokenSlugs={tokenGroupStructure.sortedTokenSlugs}
         tokenBalanceMap={accountBalance.tokenBalanceMap}
+        tokenSlugs={tokenGroupStructure.tokenSlugs}
       />
     </>
   );

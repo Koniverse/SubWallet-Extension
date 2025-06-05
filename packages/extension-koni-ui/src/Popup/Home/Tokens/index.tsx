@@ -44,7 +44,7 @@ const Component = (): React.ReactElement => {
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { accountBalance: { tokenGroupBalanceMap,
-    totalBalanceInfo }, tokenGroupStructure: { sortedTokenGroups } } = useContext(HomeContext);
+    totalBalanceInfo }, tokenGroupStructure: { tokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
@@ -277,7 +277,7 @@ const Component = (): React.ReactElement => {
   const tokenGroupBalanceItems = useMemo((): TokenBalanceItemType[] => {
     const result: TokenBalanceItemType[] = [];
 
-    sortedTokenGroups.forEach((tokenGroupSlug) => {
+    tokenGroups.forEach((tokenGroupSlug) => {
       if (debouncedTokenGroupBalanceMap[tokenGroupSlug]) {
         result.push(debouncedTokenGroupBalanceMap[tokenGroupSlug]);
       }
@@ -286,7 +286,7 @@ const Component = (): React.ReactElement => {
     sortTokensByStandard(result, priorityTokens, true);
 
     return result;
-  }, [sortedTokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
+  }, [tokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
