@@ -14,7 +14,7 @@ import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { addLazy, createPromiseHandler, fetchStaticData, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
+import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
@@ -25,10 +25,6 @@ const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
 
   return fetchData.data;
-};
-
-const fetchAhMapChain = async () => {
-  return await fetchStaticData<Record<string, string>>('asset-hub-staking-map');
 };
 
 export default class EarningService implements StoppableServiceInterface, PersistDataServiceInterface {
@@ -72,7 +68,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
 
     const minAmountPercent: Record<string, number> = {};
-    const ahMapChain = await fetchAhMapChain();
+    const ahMapChain = await this.state.chainService.fetchAhMapChain();
 
     for (const chain of chains) {
       const handlers: BasePoolHandler[] = [];
