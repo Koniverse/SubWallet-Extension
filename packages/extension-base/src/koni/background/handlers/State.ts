@@ -144,6 +144,7 @@ export default class KoniState {
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
   private waitSleeping: Promise<void> | null = null;
   private waitStarting: Promise<void> | null = null;
+  private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
     // Init subwallet api sdk
@@ -186,7 +187,9 @@ export default class KoniState {
 
     // Init state
     if (targetIsWeb) {
-      this.init().catch(console.error);
+      this.init().then(() => {
+        this.wakeup(true).catch(console.error);
+      }).catch(console.error);
     }
   }
 
@@ -306,7 +309,7 @@ export default class KoniState {
     await this.swapService.init();
     await this.inappNotificationService.init();
 
-    this.onReady();
+    // this.onReady();
     this.onAccountAdd();
     this.onAccountRemove();
 
@@ -345,12 +348,6 @@ export default class KoniState {
     this.dbService.subscribeMantaPayConfig(_DEFAULT_MANTA_ZK_CHAIN, (data) => {
       this.mantaPayConfigSubject.next(data);
     });
-  }
-
-  public onReady () {
-    // Todo: Need optimize in the future to, only run important services onetime to save resources
-    // Todo: If optimize must check activity of web-runner of mobile
-    this._start().catch(console.error);
   }
 
   public updateKeyringState (isReady = true, callback?: () => void): void {
@@ -1751,6 +1748,7 @@ export default class KoniState {
   public async sleep () {
     // Wait starting finish before sleep to avoid conflict
     this.generalStatus === ServiceStatus.STARTING && this.waitStarting && await this.waitStarting;
+    this.generalStatus === ServiceStatus.STARTING_FULL && this.waitStartingFull && await this.waitStartingFull;
     this.eventService.emit('general.sleep', true);
 
     // Avoid sleep multiple times
@@ -1811,7 +1809,7 @@ export default class KoniState {
     }
 
     // Start services
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start', true);
 
     // Complete starting
     starting.resolve();
@@ -1819,8 +1817,35 @@ export default class KoniState {
     this.generalStatus = ServiceStatus.STARTED;
   }
 
-  public async wakeup () {
+  private async _startFull () {
+    // Continue wait existed starting process
+    if (this.generalStatus === ServiceStatus.STARTING) {
+      await this.waitStarting;
+    }
+
+    // Always start full from start state
+    if (this.generalStatus !== ServiceStatus.STARTED) {
+      return;
+    }
+
+    this.generalStatus = ServiceStatus.STARTING_FULL;
+    const startingFull = createPromiseHandler<void>();
+
+    this.waitStartingFull = startingFull.promise;
+
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start_full', true);
+
+    this.waitStartingFull = null;
+    this.generalStatus = ServiceStatus.STARTED_FULL;
+  }
+
+  public async wakeup (fullWakeup = false) {
     await this._start();
+
+    if (fullWakeup) {
+      await this._startFull();
+    }
   }
 
   public cancelSubscription (id: string): boolean {
