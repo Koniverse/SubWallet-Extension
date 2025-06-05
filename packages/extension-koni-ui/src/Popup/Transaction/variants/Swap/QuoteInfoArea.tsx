@@ -16,7 +16,7 @@ import { ActivityIndicator, Icon, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, Info, ListBullets, PencilSimpleLine, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -44,7 +44,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
 
-  const { transactionStepsModal } = useContext(WalletModalContext);
+  const { swapFeesModal, transactionStepsModal } = useContext(WalletModalContext);
 
   const getSwapProcessSteps = useGetSwapProcessSteps();
 
@@ -61,6 +61,17 @@ const Component: React.FC<Props> = (props: Props) => {
       variant: 'standard'
     });
   }, [currentOptimalSwapPath, currentQuote, getSwapProcessSteps, transactionStepsModal]);
+
+  const openSwapFeeModal = useCallback(() => {
+    if (!currentQuote) {
+      return;
+    }
+
+    swapFeesModal.open({
+      currentQuote,
+      estimatedFeeValue
+    });
+  }, [currentQuote, estimatedFeeValue, swapFeesModal]);
 
   const renderRateInfo = () => {
     if (!currentQuote) {
@@ -230,6 +241,12 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const showQuoteEmptyBlock = (!currentQuote || handleRequestLoading || isFormInvalid);
 
+  useEffect(() => {
+    if (swapFeesModal.checkActive?.() && currentQuote && estimatedFeeValue) {
+      swapFeesModal.update({ currentQuote, estimatedFeeValue });
+    }
+  }, [currentQuote, estimatedFeeValue, swapFeesModal]);
+
   return (
     <>
       <div className={className}>
@@ -285,12 +302,23 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__meta-info-number-row'}
                 label={t('Estimated fee')}
               >
-                <NumberDisplay
-                  decimal={0}
-                  prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
-                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                  value={estimatedFeeValue}
-                />
+                <div
+                  className={'__swap-fees-modal-trigger'}
+                  onClick={openSwapFeeModal}
+                >
+                  <NumberDisplay
+                    decimal={0}
+                    prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                    suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                    value={estimatedFeeValue}
+                  />
+                  <Icon
+                    className={'__caret-icon'}
+                    customSize={'16px'}
+                    phosphorIcon={CaretRight}
+                    size='sm'
+                  />
+                </div>
               </MetaInfo.Default>
 
               <MetaInfo.Default
@@ -370,7 +398,7 @@ export const QuoteInfoArea = styled(Component)<Props>(({ theme: { token } }: Pro
       paddingRight: 6
     },
 
-    '.__swap-process-modal-trigger': {
+    '.__swap-process-modal-trigger, .__swap-fees-modal-trigger': {
       display: 'flex',
       cursor: 'pointer',
       alignItems: 'center',

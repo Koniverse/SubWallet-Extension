@@ -1520,6 +1520,11 @@ export class ChainService {
             deprecated = true;
             break;
           }
+
+          if (defaultChainAsset.slug === storedAssetInfo.slug) {
+            duplicated = true;
+            break;
+          }
         }
 
         if (!duplicated && !deprecated) {

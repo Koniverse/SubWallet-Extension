@@ -10,8 +10,9 @@ import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate
 import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -167,13 +168,16 @@ export class SwapBaseHandler {
       };
 
       // TODO: calculate fee for destination chain
-      const bridgeFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
+      const xcmFeeInfo = await estimateXcmFee({
+        fromChainInfo: xcmRequest.originChain,
+        fromTokenInfo: xcmRequest.originTokenInfo,
+        toChainInfo: xcmRequest.destinationChain,
+        recipient: xcmRequest.recipient,
+        sender: xcmRequest.sender,
+        value: xcmRequest.sendingValue
+      });
 
-      if (!bridgeFeeByDryRun.fee) {
-        return undefined;
-      }
-
-      const estimatedBridgeFee = BigN(bridgeFeeByDryRun.fee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
+      const estimatedBridgeFee = BigN(xcmFeeInfo?.origin.fee || '0').multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -219,7 +223,8 @@ export class SwapBaseHandler {
 
         if (needEditAmount) {
           bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
-        } else {
+        } else { // todo: remove
+          console.log('The code cannot run into here, if it runs into here, pls ask dev to check');
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
       }
@@ -440,7 +445,7 @@ export class SwapBaseHandler {
       const isEvmAddress = isEthereumAddress(recipient);
       const isEvmDestChain = _isChainEvmCompatible(swapToChain);
 
-      if ((isEvmAddress && !isEvmDestChain) || (!isEvmAddress && isEvmDestChain)) { // todo: update this condition
+      if (isEvmAddress !== isEvmDestChain) { // todo: update condition if support swap chain # EVM or Substrate
         return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
       }
     }
