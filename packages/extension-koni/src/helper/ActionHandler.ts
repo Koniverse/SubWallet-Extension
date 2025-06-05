@@ -21,10 +21,10 @@ export class ActionHandler {
   private connectionMap: Record<string, string> = {};
   private firstTrigger = false;
   private waitFirstTrigger = createPromiseHandler<void>();
-  private waitActiveHandler = createPromiseHandler<boolean>();
   public waitFirstActiveMessage = this.waitFirstTrigger.promise;
 
   private isActive = false;
+  private isFullActive = false;
   private sleepTimeout?: NodeJS.Timeout;
 
   get isContentConnecting (): boolean {
@@ -68,15 +68,15 @@ export class ActionHandler {
   }
 
   private async _onPortMessage (port: chrome.runtime.Port, data: TransportRequestMessage<keyof RequestSignatures>, portId: string) {
-    // console.debug(data.message, data.id, portId);
     // message and disconnect handlers
     if (!this.mainHandler) {
       this.mainHandler = await this.waitMainHandler.promise;
     }
 
-    const requireActive = data.message !== 'pub(phishing.redirectIfDenied)';
+    const validMessage = data?.message;
+    const requireActive = validMessage && validMessage !== 'pub(phishing.redirectIfDenied)';
 
-    if (!this.connectionMap[portId] && data?.message && requireActive) {
+    if (!this.connectionMap[portId] && requireActive) {
       this.connectionMap[portId] = port.name;
 
       if (!this.firstTrigger) {
@@ -84,17 +84,29 @@ export class ActionHandler {
         this.waitFirstTrigger.resolve();
       }
 
-      if (this.sleepTimeout) {
-        console.debug('Clearing sleep timeout');
-        clearTimeout(this.sleepTimeout);
-        this.sleepTimeout = undefined;
-      }
+      if (requireActive) {
+        const requireFullActive = validMessage.startsWith('pri(') || validMessage.startsWith('mobile(');
+        const needActive = !this.isActive;
+        const needFullActive = !this.isFullActive && requireFullActive;
 
-      if (!this.isActive) {
-        this.isActive = true;
-        startHeartbeat();
-        this.mainHandler && await this.mainHandler.state.wakeup();
-        this.waitActiveHandler.resolve(true);
+        if (this.sleepTimeout) {
+          console.debug('Clearing sleep timeout');
+          clearTimeout(this.sleepTimeout);
+          this.sleepTimeout = undefined;
+        }
+
+        if (needActive) {
+          this.isActive = true;
+          startHeartbeat();
+          if (!needFullActive) {
+            this.mainHandler && await this.mainHandler.state.wakeup(false);
+          }
+        }
+
+        if (needFullActive) {
+          this.isFullActive = true;
+          this.mainHandler && await this.mainHandler.state.wakeup(true);
+        }
       }
     }
 
@@ -113,7 +125,6 @@ export class ActionHandler {
         this.sleepTimeout && clearTimeout(this.sleepTimeout);
         this.sleepTimeout = setTimeout(() => {
           // Reset active status
-          this.waitActiveHandler = createPromiseHandler<boolean>();
           this.mainHandler && this.mainHandler.state.sleep().catch(console.error);
         }, SLEEP_TIMEOUT);
       }
