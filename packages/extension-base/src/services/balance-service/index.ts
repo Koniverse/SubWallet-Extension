@@ -442,6 +442,46 @@ export class BalanceService implements StoppableServiceInterface {
     };
   }
 
+  async runSubscribeBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
+    // Check if address and chain are valid
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+
+    if (!chainInfoMap[chain]) {
+      console.warn(`Chain ${chain} is not supported`);
+
+      return;
+    }
+
+    // Get necessary data
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const evmApiMap = this.state.chainService.getEvmApiMap();
+    const substrateApiMap = this.state.chainService.getSubstrateApiMap();
+    const tonApiMap = this.state.chainService.getTonApiMap();
+    const cardanoApiMap = this.state.chainService.getCardanoApiMap();
+    const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
+
+    return new Promise<void>((resolve) => {
+      const unsub = subscribeBalance(
+        [address],
+        [chain],
+        [asset],
+        assetMap,
+        chainInfoMap,
+        substrateApiMap,
+        evmApiMap,
+        tonApiMap,
+        cardanoApiMap,
+        bitcoinApiMap,
+        (result) => {
+          this.setBalanceItem(result);
+          unsub();
+          resolve();
+        },
+        extrinsicType || ExtrinsicType.TRANSFER_BALANCE
+      );
+    });
+  }
+
   /** Unsubscribe balance subscription */
   runUnsubscribeBalances () {
     this._unsubscribeBalance && this._unsubscribeBalance();

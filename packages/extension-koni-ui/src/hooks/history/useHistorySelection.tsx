@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { useChainInfoWithState, useGetChainSlugsByAccount, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useChainInfoWithState, useCoreCreateReformatAddress, useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ChainItemType } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,8 +12,8 @@ export default function useHistorySelection () {
   const { address: propAddress, chain: propChain } = useParams<{address: string, chain: string}>();
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const chainInfoList = useChainInfoWithState();
-  const allowedChains = useGetChainSlugsByAccount();
-  const getReformatAddress = useReformatAddress();
+  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
+  const getReformatAddress = useCoreCreateReformatAddress();
   const { accountProxies, currentAccountProxy } = useSelector((root) => root.accountState);
 
   const [selectedAddress, setSelectedAddress] = useState<string>(propAddress || '');
