@@ -827,6 +827,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     if (fromValue && assetValue) {
       subscribeMaxTransfer({
         address: fromValue,
+        to: toValue,
         chain: assetRegistry[assetValue].originChain,
         token: assetValue,
         value: transferAmountValue,
@@ -851,7 +852,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');

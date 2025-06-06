@@ -69,7 +69,9 @@ export function determineUtxosForSpendAll ({ feeRate,
   if (!validateBitcoinAddress(recipient)) {
     throw new Error('Cannot calculate spend of invalid address type');
   }
-  // TODO: Prevent dust limit when transferring all
+
+  const recipientAddressInfo = getBitcoinAddressInfo(recipient);
+  const recipientDustLimit = BTC_DUST_AMOUNT[recipientAddressInfo.type] || 546;
 
   const recipients = [recipient];
 
@@ -85,6 +87,15 @@ export function determineUtxosForSpendAll ({ feeRate,
 
   if (amount <= 0) {
     throw new InsufficientFundsError();
+  }
+
+  if (amount < recipientDustLimit) {
+    const atLeastStr = formatNumber(recipientDustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
+
+    throw new TransactionError(
+      TransferTxErrorType.NOT_ENOUGH_VALUE,
+      `You must transfer at least ${atLeastStr} BTC`
+    );
   }
 
   // Fee has already been deducted from the amount with send all

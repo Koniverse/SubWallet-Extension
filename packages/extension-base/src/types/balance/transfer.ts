@@ -9,6 +9,7 @@ import { FeeChainType, FeeDetail, TransactionFee } from '../fee';
 
 export interface RequestSubscribeTransfer extends TransactionFee {
   address: string;
+  to?: string;
   chain: string;
   value: string;
   token: string;
