@@ -1127,8 +1127,23 @@ export default class TransactionService {
       const balanceService = this.state.balanceService;
       const inputData = parseTransactionData<ExtrinsicType.TRANSFER_BALANCE>(transaction.data);
 
-      balanceService.runSubscribeBalanceForAddress(transaction.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
-        .catch((error) => console.error('Failed to run balance subscription:', error));
+      try {
+        const sender = keyring.getPair(inputData.from);
+
+        balanceService.runSubscribeBalanceForAddress(sender.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+          .catch((error) => console.error('Failed to run balance subscription:', error));
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
+        const recipient = keyring.getPair(inputData.to);
+
+        balanceService.runSubscribeBalanceForAddress(recipient.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+          .catch((error) => console.error('Failed to run balance subscription:', error));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
