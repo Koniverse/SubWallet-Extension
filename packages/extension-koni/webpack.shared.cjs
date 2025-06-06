@@ -63,6 +63,7 @@ const _additionalEnv = {
   UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
   KYBER_CLIENT_ID: JSON.stringify(process.env.KYBER_CLIENT_ID),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SUBWALLET_PROXY_API: JSON.stringify(process.env.SUBWALLET_PROXY_API),
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),

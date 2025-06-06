@@ -5,15 +5,16 @@ import { CardanoAddressBalance, CardanoBalanceItem, CardanoUtxosItem, Transactio
 import { cborToBytes, retryCardanoTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
-import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { createPromiseHandler, fetchFromProxyService, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
 
-export const API_KEY = {
-  mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
-  testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
-};
+// export const API_KEY = {
+//   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
+//   testnet: process.env.BLOCKFROST_API_KEY_PREP || ''
+// };
 
 export class CardanoApi implements _CardanoApi {
   chainSlug: string;
@@ -27,7 +28,6 @@ export class CardanoApi implements _CardanoApi {
   isApiReadyOnce = false;
   isReadyHandler: PromiseHandler<_CardanoApi>;
   isTestnet: boolean; // todo: add api with interface BlockFrostAPI to remove isTestnet check
-  private projectId: string;
 
   providerName: string;
 
@@ -35,11 +35,9 @@ export class CardanoApi implements _CardanoApi {
     this.chainSlug = chainSlug;
     this.apiUrl = apiUrl;
     this.isTestnet = isTestnet ?? true;
-    this.projectId = isTestnet ? API_KEY.testnet : API_KEY.mainnet;
     this.providerName = providerName || 'unknown';
     // this.api = this.createProvider(isTestnet);
     this.isReadyHandler = createPromiseHandler<_CardanoApi>();
-
     this.connect();
   }
 
@@ -49,6 +47,10 @@ export class CardanoApi implements _CardanoApi {
 
   get connectionStatus (): _ChainConnectionStatus {
     return this.connectionStatusSubject.getValue();
+  }
+
+  private fetchCardano (path: string, options: RequestInit) {
+    return fetchFromProxyService(ProxyServiceRoute.CARDANO, path, options, this.isTestnet);
   }
 
   private updateConnectionStatus (status: _ChainConnectionStatus): void {
@@ -137,15 +139,11 @@ export class CardanoApi implements _CardanoApi {
 
   async getBalanceMap (address: string): Promise<CardanoBalanceItem[]> {
     try {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}`;
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
-        }
-      );
+      const path = `/addresses/${address}`;
+
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const addressBalance = await response.json() as CardanoAddressBalance;
 
@@ -159,17 +157,13 @@ export class CardanoApi implements _CardanoApi {
 
   async getUtxos (address: string, page: number, limit: number): Promise<CardanoUtxosItem[]> {
     try {
-      let url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${address}/utxos`;
+      let path = `/addresses/${address}/utxos`;
 
-      url += `?page=${page}&count=${limit}`;
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
-        }
-      );
+      path += `?page=${page}&count=${limit}`;
+
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const utxos = await response.json() as CardanoUtxosItem[];
 
@@ -183,15 +177,11 @@ export class CardanoApi implements _CardanoApi {
 
   async getSpecificUtxo (txHash: string): Promise<TransactionUtxosItem> {
     try {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}/utxos` : `https://cardano-mainnet.blockfrost.io/api/v0/txs/${txHash}/utxos`;
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
-        }
-      );
+      const path = `/txs/${txHash}/utxos`;
+
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const utxo = await response.json() as TransactionUtxosItem;
 
@@ -205,18 +195,12 @@ export class CardanoApi implements _CardanoApi {
 
   async sendCardanoTxReturnHash (tx: string): Promise<string> {
     try {
-      const url = this.isTestnet ? 'https://cardano-preprod.blockfrost.io/api/v0/tx/submit' : 'https://cardano-mainnet.blockfrost.io/api/v0/tx/submit';
-      const response = await fetch(
-        url, {
-          method: 'POST',
-          headers: {
-            Project_id: this.projectId,
-            'Content-Type': 'application/cbor'
-          },
-          body: cborToBytes(tx)
-        }
-      );
-
+      const path = '/tx/submit';
+      const response = await this.fetchCardano(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/cbor' },
+        body: cborToBytes(tx)
+      });
       const hash = (await response.text()).replace(/^"|"$/g, '');
 
       if (isHex(hexAddPrefix(hash))) {
@@ -237,15 +221,10 @@ export class CardanoApi implements _CardanoApi {
     const cronTime = 30000;
 
     return retryCardanoTxStatus(async () => {
-      const url = this.isTestnet ? `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}` : `https://cardano-mainnet.blockfrost.io/api/v0/txs/${txHash}`;
-      const response = await fetch(
-        url, {
-          method: 'GET',
-          headers: {
-            Project_id: this.projectId
-          }
-        }
-      );
+      const path = `/txs/${txHash}`;
+      const response = await this.fetchCardano(path, {
+        method: 'GET'
+      });
 
       const txInfo = await response.json() as { hash: string, block: string, index: number };
 

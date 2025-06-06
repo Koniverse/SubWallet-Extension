@@ -10,7 +10,8 @@ import { AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, GenSwapStepFuncV2, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { _reformatAddressWithChain, fetchFromProxyService } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
@@ -21,11 +22,6 @@ import { _getAssetOriginChain, _getChainNativeTokenSlug, _getContractAddressOfTo
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
-
-const API_URL = 'https://trade-api.gateway.uniswap.org/v1';
-const headers = {
-  'x-api-key': process.env.UNISWAP_API_KEY || ''
-};
 
 export type PermitData = {
   domain: Record<string, unknown>;
@@ -142,12 +138,9 @@ async function fetchCheckApproval (request: CheckApprovalRequest): Promise<Check
     return undefined;
   }
 
-  const response = await fetch(`${API_URL}/check_approval`, {
+  const response = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/check_approval', {
     method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       walletAddress: address,
       amount: BigNumber(amount).multipliedBy(2).toFixed(0),
@@ -818,10 +811,9 @@ export class UniswapHandler implements SwapBaseInterface {
         body.permitData = permitData;
       }
 
-      postTransactionResponse = await fetch(`${API_URL}/swap`, {
+      postTransactionResponse = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/swap', {
         method: 'POST',
         headers: {
-          ...headers,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -834,10 +826,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
       const submitSwapOrder = async () => {
         try {
-          const res = await fetch(`${API_URL}/order`, {
+          const res = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/order', {
             method: 'POST',
             headers: {
-              ...headers,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -889,10 +880,9 @@ export class UniswapHandler implements SwapBaseInterface {
 
         return retryGetUniswapTx(async () => {
           try {
-            const response = await fetch(`${API_URL}/orders?orderId=${orderId}&swapper=${swapper}`, {
+            const response = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, `/orders?orderId=${orderId}&swapper=${swapper}`, {
               method: 'GET',
               headers: {
-                ...headers,
                 'Content-Type': 'application/json'
               }
             });
