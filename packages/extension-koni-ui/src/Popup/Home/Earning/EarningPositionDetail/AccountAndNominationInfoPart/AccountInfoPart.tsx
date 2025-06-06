@@ -7,15 +7,18 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { EARNING_NOMINATION_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
+import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
+import { useFetchChainState, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
+import { store } from '@subwallet/extension-koni-ui/stores';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretLeft, CaretRight } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
 
@@ -63,6 +66,39 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { accounts } = useSelector((state) => state.accountState);
   const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
+
+  // Validator Handler
+  const [forceFetchValidator, setForceFetchValidator] = useState(false);
+  const [targetLoading, setTargetLoading] = useState(false);
+  const chainState = useFetchChainState(poolInfo?.chain || '');
+  const slug = poolInfo.slug;
+
+  useEffect(() => {
+    let unmount = false;
+
+    if ((!!poolInfo.chain && !!compound.address && chainState?.active) || forceFetchValidator) {
+      setTargetLoading(true);
+      fetchPoolTarget({ slug })
+        .then((result) => {
+          if (!unmount) {
+            store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
+          }
+        })
+        .catch(console.error)
+        .finally(() => {
+          if (!unmount) {
+            setTargetLoading(false);
+            setForceFetchValidator(false);
+          }
+        });
+    }
+
+    return () => {
+      unmount = true;
+    };
+  }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound.address]);
+  // Validator Handler
+
   const sliderSettings: Settings = useMemo(() => {
     return {
       dots: false,
@@ -95,8 +131,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
 
   const haveNomination = useMemo(() => {
-    return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
+    return [YieldPoolType.NOMINATION_POOL].includes(poolInfo.type);
   }, [poolInfo.type]);
+
+  const haveValidator = useMemo(() => {
+    return [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);
+  }, [poolInfo.type]);
+
   const noNomination = useMemo(
     () => !haveNomination || isAllAccount || !compound.nominations.length,
     [compound.nominations.length, haveNomination, isAllAccount]
@@ -108,6 +149,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return list.find((item) => isSameAddress(item.address, selectedAddress));
   }, [list, selectedAddress]);
 
+  console.log('compound', [compound.nominations, selectedItem]);
   const renderAccount = useCallback(
     (item: YieldPositionInfo) => {
       const account = findAccountByAddress(accounts, item.address);
@@ -136,6 +178,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return () => {
       setSelectedAddress(item.address);
       activeModal(EARNING_NOMINATION_MODAL);
+    };
+  }, [activeModal]);
+
+  const createOpenValidator = useCallback((item: YieldPositionInfo) => {
+    return () => {
+      setSelectedAddress(item.address);
+      activeModal(EARNING_SELECTED_VALIDATOR_MODAL);
     };
   }, [activeModal]);
 
@@ -216,7 +265,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               valueColorSchema='even-odd'
             />
           ))}
-          {isAllAccount && haveNomination && (
+          {isAllAccount && (haveNomination || haveValidator) && (
             <>
               <div className='__separator'></div>
 
@@ -225,17 +274,21 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   block={true}
                   className={'__nomination-button'}
                   disabled={disableButton}
-                  onClick={createOpenNomination(item)}
-                  size={'xs'}
-                  type={'ghost'}
+                  onClick={
+                    haveValidator
+                      ? createOpenValidator(item)
+                      : createOpenNomination(item)
+                  }
+                  size='xs'
+                  type='ghost'
                 >
-                  <div className={'__nomination-button-label'}>
-                    {t('Nomination info')}
+                  <div className='__nomination-button-label'>
+                    {t(haveValidator ? 'Selected validator' : 'Nomination info')}
                   </div>
 
                   <Icon
                     phosphorIcon={ArrowSquareOut}
-                    size={'sm'}
+                    size='sm'
                   />
                 </Button>
               </div>
@@ -244,7 +297,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, t]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, createOpenValidator, createOpenNomination]);
 
   return (
     <>
@@ -279,6 +332,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
+      {selectedItem && (
+        <EarningValidatorSelectedModal
+          chain={poolInfo.chain}
+          disabled={false}
+          from={selectedAddress}
+          loading={targetLoading}
+          modalId={EARNING_SELECTED_VALIDATOR_MODAL}
+          nominations={selectedItem?.nominations}
+          setForceFetchValidator={setForceFetchValidator}
+          slug={poolInfo.slug}
+        />)}
     </>
   );
 }
