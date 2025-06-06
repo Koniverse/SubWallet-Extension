@@ -101,20 +101,28 @@ function getChainflipNetwork (isTestnet: boolean) {
 export function getChainflipBroker (isTestnet: boolean) { // noted: currently not use testnet broker
   if (isTestnet) {
     return {
-      url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+      url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API.test}`
     };
   } else {
     return {
-      url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+      url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API.main}`
     };
   }
 }
 
 export function getChainflipSwap (isTestnet: boolean) {
   if (isTestnet) {
-    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API.test}`;
   } else {
-    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API.main}`;
+  }
+}
+
+export function getAssetsUrl (isTestnet: boolean) {
+  if (isTestnet) {
+    return 'https://perseverance.chainflip-broker.io/assets';
+  } else {
+    return 'https://chainflip-broker.io/assets';
   }
 }
 
