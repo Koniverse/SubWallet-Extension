@@ -12,7 +12,7 @@ import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
 
 // const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
 // const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
-const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
+// const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
 
 export class BitcoinApi implements _BitcoinApi {
   chainSlug: string;
@@ -37,7 +37,7 @@ export class BitcoinApi implements _BitcoinApi {
     const isTestnet = apiUrl.includes('testnet');
 
     if (isTestnet) {
-      this.api = new BlockStreamTestnetRequestStrategy(MEMPOOL_TESTNET_V4_API_URL);
+      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
     } else {
       this.api = new SubWalletMainnetRequestStrategy(apiUrl);
     }
@@ -80,7 +80,7 @@ export class BitcoinApi implements _BitcoinApi {
     const isTestnet = apiUrl.includes('testnet');
 
     if (isTestnet) {
-      this.api = new BlockStreamTestnetRequestStrategy(MEMPOOL_TESTNET_V4_API_URL);
+      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
     } else {
       this.api = new SubWalletMainnetRequestStrategy(apiUrl);
     }

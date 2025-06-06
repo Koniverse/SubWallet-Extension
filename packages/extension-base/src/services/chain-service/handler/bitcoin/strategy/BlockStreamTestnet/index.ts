@@ -166,6 +166,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 1);
   }
 
+  // TODO: NOTE: Currently not in use. Recheck the response if you want to use it.
   async getFeeRate (): Promise<BitcoinFeeInfo> {
     const blockTime = await this.computeBlockTime();
 
@@ -198,7 +199,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 0);
   }
 
-  // TODO: Handle fallback for this route as it is not stable.
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const convertTimeMilisec = {
