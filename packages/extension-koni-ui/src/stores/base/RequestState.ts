@@ -71,6 +71,8 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'cardanoSignTransactionRequest',
   'tonWatchTransactionRequest',
   'bitcoinSignatureRequest',
+  'bitcoinSignPsbtRequest',
+  'bitcoinSendTransactionRequestAfterConfirmation',
   'bitcoinSendTransactionRequest',
   'bitcoinWatchTransactionRequest',
   'connectWCRequest',
