@@ -16,6 +16,7 @@ export { default as TransactionProcessDetailModal } from './TransactionProcessDe
 export { default as TransactionStepsModal } from './TransactionStepsModal';
 export { default as SwitchNetworkAuthorizeModal } from './SwitchNetworkAuthorizeModal';
 export { SortingModal } from './SortingModal';
+export { DAppConfigurationModal } from './DAppConfigurationModal';
 
 export * from './Global';
 export * from './Account';

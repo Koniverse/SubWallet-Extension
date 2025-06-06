@@ -4,17 +4,18 @@
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
-import { AccountProxyItem } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyItem, DAppConfigurationModal } from '@subwallet/extension-koni-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Confirmation/ConfirmationGeneralInfo';
+import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, NetworkItem, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, NetworkItem, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CaretRight, CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
+import { CaretRight, CheckCircle, GearSix, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,9 +35,12 @@ type ConnectIcon = {
   linkIconBg?: string;
 };
 
+const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
+
 function Component ({ authInfo, className = '', id, isBlocked = true, isNotConnected = false, onCancel, url }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
+  const { activeModal } = useContext(ModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
@@ -64,6 +68,10 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       });
     };
   }, [authInfo?.accountAuthTypes]);
+
+  const onOpenDAppConfigurationModal = useCallback(() => {
+    activeModal(dAppConfigurationModalId);
+  }, [activeModal]);
 
   const openSwitchNetworkAuthorizeModal = useCallback(() => {
     authInfo && switchNetworkAuthorizeModal.open(
@@ -318,43 +326,67 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   };
 
   return (
-    <SwModal
-      className={className}
-      footer={actionButtons}
-      id={id}
-      onCancel={onCancel}
-      title={t('Connect website')}
-    >
-      {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
-        <div className={'__switch-network-authorize-label'}>
-          {t('Switch network')}
-        </div>
-        <NetworkItem
-          name={currentEvmNetworkInfo.name}
-          networkKey={currentEvmNetworkInfo.slug}
-          networkMainLogoShape='circle'
-          networkMainLogoSize={20}
-          onPressItem={openSwitchNetworkAuthorizeModal}
-          rightItem={<div className={'__check-icon'}>
-            <Icon
-              className='__right-icon'
-              customSize={'16px'}
-              phosphorIcon={CaretRight}
-              type='phosphor'
-            />
-          </div>}
-        />
-      </div>}
+    <>
+      <SwModal
+        className={className}
+        footer={actionButtons}
+        id={id}
+        onCancel={onCancel}
+        rightIconProps={
+          authInfo
+            ? {
+              icon: (
+                <Icon
+                  phosphorIcon={GearSix}
+                  size='md'
+                  type='phosphor'
+                  weight='bold'
+                />
+              ),
+              onClick: onOpenDAppConfigurationModal
+            }
+            : undefined
+        }
+        title={t('Connect website')}
+      >
+        {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
+          <div className={'__switch-network-authorize-label'}>
+            {t('Switch network')}
+          </div>
+          <NetworkItem
+            name={currentEvmNetworkInfo.name}
+            networkKey={currentEvmNetworkInfo.slug}
+            networkMainLogoShape='circle'
+            networkMainLogoSize={20}
+            onPressItem={openSwitchNetworkAuthorizeModal}
+            rightItem={<div className={'__check-icon'}>
+              <Icon
+                className='__right-icon'
+                customSize={'16px'}
+                phosphorIcon={CaretRight}
+                type='phosphor'
+              />
+            </div>}
+          />
+        </div>}
 
-      <ConfirmationGeneralInfo
-        request={{
-          id: url,
-          url: url
-        }}
-        {...connectIconProps}
-      />
-      {renderContent()}
-    </SwModal>
+        <ConfirmationGeneralInfo
+          request={{
+            id: url,
+            url: url
+          }}
+          {...connectIconProps}
+        />
+        {renderContent()}
+      </SwModal>
+      {
+        !!authInfo && (
+          <DAppConfigurationModal
+            authInfo={authInfo}
+          />
+        )
+      }
+    </>
   );
 }
 
