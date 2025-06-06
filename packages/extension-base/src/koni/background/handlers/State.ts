@@ -1847,6 +1847,7 @@ export default class KoniState {
 
     this.waitStartingFull = null;
     this.generalStatus = ServiceStatus.STARTED_FULL;
+    startingFull.resolve();
   }
 
   public async wakeup (fullWakeup = false) {
