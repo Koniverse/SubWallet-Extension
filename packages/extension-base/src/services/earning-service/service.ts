@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL, CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _isChainEnabled, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
 import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
@@ -14,7 +14,7 @@ import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { addLazy, createPromiseHandler, getAddressesByChainType, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
+import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject } from 'rxjs';
 
@@ -497,16 +497,12 @@ export default class EarningService implements StoppableServiceInterface, Persis
     let cancel = false;
 
     await this.eventService.waitChainReady;
-
-    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
-    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
     for (const handler of Object.values(this.handlers)) {
       if (activeChains.includes(handler.chain)) {
-        const chainInfo = handler.chainInfo;
-        const useAddresses = _isChainEvmCompatible(chainInfo) ? evmAddresses : substrateAddresses;
+        const [useAddresses] = filterAddressByChainInfo(addresses, handler.chainInfo);
 
         handler.subscribePoolPosition(useAddresses, callback)
           .then((unsub) => {
@@ -683,16 +679,12 @@ export default class EarningService implements StoppableServiceInterface, Persis
     let cancel = false;
 
     await this.eventService.waitChainReady;
-
-    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
-    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
     for (const handler of Object.values(this.handlers)) {
       if (activeChains.includes(handler.chain)) {
-        const chainInfo = handler.chainInfo;
-        const useAddresses = _isChainEvmCompatible(chainInfo) ? evmAddresses : substrateAddresses;
+        const [useAddresses] = filterAddressByChainInfo(addresses, handler.chainInfo);
 
         handler.getPoolReward(useAddresses, callback)
           .then((unsub) => {
@@ -757,16 +749,12 @@ export default class EarningService implements StoppableServiceInterface, Persis
     let cancel = false;
 
     await this.eventService.waitChainReady;
-
-    const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
-    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const activeChains = this.state.activeChainSlugs;
     const unsubList: Array<VoidFunction> = [];
 
     for (const handler of Object.values(this.handlers)) {
       if (activeChains.includes(handler.chain)) {
-        const chainInfo = handler.chainInfo;
-        const useAddresses = _isChainEvmCompatible(chainInfo) ? evmAddresses : substrateAddresses;
+        const [useAddresses] = filterAddressByChainInfo(addresses, handler.chainInfo);
 
         handler.getPoolRewardHistory(useAddresses, callback)
           .then((unsub) => {
