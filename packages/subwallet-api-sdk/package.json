@@ -21,6 +21,6 @@
   "main": "index.js",
   "dependencies": {
     "@polkadot/util": "^13.2.3",
-    "@subwallet/chain-list": "0.2.105"
+    "@subwallet/chain-list": "0.2.106-beta.0"
   }
 }

@@ -117,6 +117,15 @@ export function convertSwapRate (rate: string, fromAsset: _ChainAsset, toAsset: 
 //   }
 // }
 
+// export function getAssetsUrl (isTestnet: boolean) {
+//   if (isTestnet) {
+//     return 'https://perseverance.chainflip-broker.io/assets';
+//   } else {
+//     return 'https://chainflip-broker.io/assets';
+//   }
+// }
+
+
 export function getBridgeStep (from: string, to: string): DynamicSwapAction {
   return {
     action: DynamicSwapType.BRIDGE,

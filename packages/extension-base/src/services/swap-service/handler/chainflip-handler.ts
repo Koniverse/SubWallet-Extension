@@ -34,6 +34,16 @@ interface DepositAddressResponse {
   channelOpeningFeeNative: string;
 }
 
+interface ChainFlipAsset {
+  id: string,
+  direction: string,
+  ticker: string,
+  network: string,
+  decimals: number,
+  minimalAmount: number,
+  minimalAmountNative: string,
+}
+
 interface ChainFlipMetadata {
   srcChain: string;
   destChain: string;
@@ -44,6 +54,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
   // private baseUrl: string;
+  // private assetsUrl: string;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
@@ -56,6 +67,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     this.isTestnet = isTestnet;
     this.providerSlug = isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET;
     // this.baseUrl = getChainflipSwap(isTestnet);
+    // this.assetsUrl = getAssetsUrl(isTestnet);
   }
 
   get chainService () {
@@ -112,15 +124,30 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       throw new Error('Metadata for Chainflip not found');
     }
 
+    const assetsResponse = await fetchFromProxyService(ProxyServiceRoute.CHAINFLIP,
+      '/assets',
+      {
+        method: 'GET'
+      },
+      this.isTestnet);
+    console.log('assetResponse', assetsResponse);
+    const _allAssets = await assetsResponse.json() as { assets: ChainFlipAsset[] };
+    const allAssets = _allAssets.assets;
+
+    const sourceAsset = allAssets.find((asset) => asset.network === processMetadata.srcChain && asset.ticker === fromAssetId);
+    const destinationAsset = allAssets.find((asset) => asset.network === processMetadata.destChain && asset.ticker === toAssetId);
+
+    if (!sourceAsset || !destinationAsset) {
+      throw new Error('Error get Chainflip data');
+    }
+
     const depositParams = {
-      sourceChain: processMetadata.srcChain,
       destinationAddress: receiver,
-      destinationAsset: toAssetId,
-      destinationChain: processMetadata.destChain,
+      destinationAsset: destinationAsset.id,
+      sourceAsset: sourceAsset.id,
       minimumPrice: minReceive, // minimum accepted price for swaps through the channel
       refundAddress: address, // address to which assets are refunded
-      retryDurationInBlocks: '100', // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
-      sourceAsset: fromAssetId
+      retryDurationInBlocks: '100' // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
     };
 
     const path = `/swap?${new URLSearchParams(depositParams).toString()}`;
