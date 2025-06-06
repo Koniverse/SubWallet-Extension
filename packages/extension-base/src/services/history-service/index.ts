@@ -334,6 +334,9 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       switch (recoverResult.status) {
         case HistoryRecoverStatus.API_INACTIVE:
           break;
+        case HistoryRecoverStatus.TX_PENDING:
+          delete this.#needRecoveryHistories[currentExtrinsicHash];
+          break;
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
@@ -380,7 +383,13 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
 
     histories
       .filter((history) => {
-        return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
+        if ([ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status)) {
+          return true;
+        } else if (history.status === ExtrinsicStatus.SUCCESS && history.chainType === 'bitcoin') {
+          return !history.blockTime;
+        }
+
+        return false;
       })
       .filter((history) => {
         if (history.type === ExtrinsicType.TRANSFER_XCM) {
