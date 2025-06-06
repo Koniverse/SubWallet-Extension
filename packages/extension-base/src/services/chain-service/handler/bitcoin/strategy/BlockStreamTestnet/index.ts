@@ -149,6 +149,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 1);
   }
 
+  // TODO: NOTE: Currently not in use. Recheck the response if you want to use it.
   getFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
@@ -179,7 +180,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 0);
   }
 
-  // TODO: Handle fallback for this route as it is not stable.
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const convertTimeMilisec = {
