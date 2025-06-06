@@ -390,7 +390,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return (
         <div
           className={'list-item-group-label'}
-          key={item.id}
+          key={`group__${item.id}`}
         >
           {(item as ListItemGroupLabel).groupLabel}
         </div>
@@ -398,17 +398,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
 
     return (
-      <>
-        <AccountRestoreJsonItem
-          accountProxy={item as AccountProxyExtra_}
-          className='account-selection'
-          disabled={submitting}
-          isSelected={selected}
-          key={item.id}
-          onClick={onSelect(item as AccountProxyExtra_)}
-          showUnSelectedIcon ={true}
-        />
-      </>
+      <AccountRestoreJsonItem
+        accountProxy={item as AccountProxyExtra_}
+        className='account-selection'
+        disabled={submitting}
+        isSelected={selected}
+        key={`account-${item.id}`}
+        onClick={onSelect(item as AccountProxyExtra_)}
+        showUnSelectedIcon ={true}
+      />
 
     );
   }, [accountProxiesSelected, onSelect, submitting]);

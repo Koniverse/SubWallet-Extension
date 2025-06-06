@@ -58,17 +58,17 @@ export const getAccountChainTypeFromKeypairType = (type: KeypairType): AccountCh
     : AccountChainType.SUBSTRATE;
 };
 
-export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType => {
+export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType[] => {
   if (type === AccountChainType.ETHEREUM) {
-    return 'ethereum';
+    return ['ethereum'];
   } else if (type === AccountChainType.TON) {
-    return 'ton';
+    return ['ton'];
   } else if (type === AccountChainType.BITCOIN) {
-    return 'bitcoin-84';
+    return ['bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
   } else if (type === AccountChainType.CARDANO) {
-    return 'cardano';
+    return ['cardano'];
   } else {
-    return 'sr25519';
+    return ['sr25519'];
   }
 };
 
@@ -274,6 +274,10 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [
           ...BASE_TRANSFER_ACTIONS
         ];
+      case AccountChainType.BITCOIN:
+        return [
+          ...BASE_TRANSFER_ACTIONS
+        ];
     }
   } else if (signMode === AccountSignMode.QR) {
     switch (networkType) {
@@ -310,6 +314,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [];
       case AccountChainType.CARDANO:
         return [];
+      case AccountChainType.BITCOIN:
+        return [];
     }
   } else if (signMode === AccountSignMode.GENERIC_LEDGER) {
     switch (networkType) {
@@ -340,6 +346,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...BASE_TRANSFER_ACTIONS
         ];
       case AccountChainType.CARDANO:
+        return [];
+      case AccountChainType.BITCOIN:
         return [];
     }
   } else if (signMode === AccountSignMode.LEGACY_LEDGER) { // Only for Substrate

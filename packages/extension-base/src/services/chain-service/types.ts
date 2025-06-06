@@ -8,6 +8,7 @@ import type { ApiInterfaceRx } from '@polkadot/api/types';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _CrowdloanFund } from '@subwallet/chain-list/types';
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { AccountState, TxByMsgResponse } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/types';
+import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { TonWalletContract } from '@subwallet/keyring/types';
 import { Cell } from '@ton/core';
@@ -239,3 +240,26 @@ export const _NFT_CONTRACT_STANDARDS = [
 ];
 
 export const _SMART_CONTRACT_STANDARDS = [..._FUNGIBLE_CONTRACT_STANDARDS, ..._NFT_CONTRACT_STANDARDS];
+
+export interface BitcoinApiProxy {
+  setBaseUrl: (baseUrl: string) => void,
+  getRequest: (urlPath: string, params?: Record<string, string>, headers?: Record<string, string>) => Promise<Response>,
+  postRequest: (urlPath: string, body?: BodyInit, headers?: Record<string, string>) => Promise<Response>
+}
+
+export interface _BitcoinApi extends _ChainBaseApi {
+  isReady: Promise<_BitcoinApi>;
+  api: BitcoinApiStrategy;
+}
+
+export interface OBResponse<T> {
+  status_code: number,
+  message: string,
+  result: T,
+}
+
+export interface OBRuneResponse<T> {
+  status_code: number,
+  message: string,
+  result: T,
+}

@@ -7,6 +7,8 @@ import GeneralEmptyList from '@subwallet/extension-koni-ui/components/EmptyList/
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
+import { isBitcoinAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft } from 'phosphor-react';
@@ -30,6 +32,10 @@ interface Props extends ThemeProps {
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
+
+function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
+  return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
+}
 
 function Component ({ className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
@@ -155,7 +161,22 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
       result.push(...unknownAccounts);
     }
 
-    return result;
+    return result.sort((a: ListItem, b: ListItem) => {
+      if (isAccountAddressItem(a) && isAccountAddressItem(b)) {
+        const _isABitcoin = isBitcoinAddress(a.address);
+        const _isBBitcoin = isBitcoinAddress(b.address);
+        const _isSameProxyId = a.accountProxyId === b.accountProxyId;
+
+        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
+          const aDetails = getBitcoinAccountDetails(a.accountType);
+          const bDetails = getBitcoinAccountDetails(b.accountType);
+
+          return aDetails.order - bDetails.order;
+        }
+      }
+
+      return 0;
+    });
   }, [items, searchFunction, searchValue, t]);
 
   const handleSearch = useCallback((value: string) => {

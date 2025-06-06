@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-koni-ui/utils';
+import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import AccountProxyAvatar from './AccountProxyAvatar';
@@ -25,6 +26,16 @@ function Component (props: Props): React.ReactElement<Props> {
     avatarValue,
     className, isSelected, name, onClick, showUnselectIcon } = props;
 
+  const bitcoinAttributes = useMemo(() => {
+    if (isBitcoinAddress(address)) {
+      const keyPairType = getKeypairTypeByAddress(address);
+
+      return getBitcoinKeypairAttributes(keyPairType);
+    }
+
+    return undefined;
+  }, [address]);
+
   return (
     <div
       className={CN(className)}
@@ -39,17 +50,46 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
 
       <div className='__item-center-part'>
-        {
-          !!name && (
-            <div className='__name'>
-              {name}
-            </div>
+        {name
+          ? (
+            <>
+              <div className='__item-name-wrapper'>
+                <div className='__name'>
+                  {name}
+                </div>
+                {!!bitcoinAttributes && !!bitcoinAttributes.schema
+                  ? (
+                    <>
+                      <div className='__name-label-divider'> &nbsp;-&nbsp; </div>
+                      <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
+                        {bitcoinAttributes.label}
+                      </div>
+                    </>
+                  )
+                  : null}
+              </div>
+              <div className='__address'>
+                {toShort(address, 9, 10)}
+              </div>
+            </>
           )
-        }
+          : (
+            <div className={'__item-address-wrapper'}>
+              <div className='__address'>
+                {toShort(address, 9, 10)}
+              </div>
+              {!!bitcoinAttributes && !!bitcoinAttributes.schema
+                ? (
+                  <>
+                    <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
+                      {bitcoinAttributes.label}
+                    </div>
+                  </>
+                )
+                : null}
+            </div>
 
-        <div className='__address'>
-          {name ? `(${toShort(address, 4, 5)})` : toShort(address, 9, 10)}
-        </div>
+          )}
       </div>
 
       <div className='__item-right-part'>
@@ -87,17 +127,31 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
     minHeight: 52,
 
     '.__avatar': {
-      marginRight: token.marginSM
+      marginRight: token.marginXS
     },
 
     '.__item-center-part': {
       display: 'flex',
+      flexDirection: 'column',
       overflowX: 'hidden',
       'white-space': 'nowrap',
-      gap: token.sizeXXS,
       flex: 1,
       fontSize: token.fontSize,
       lineHeight: token.lineHeight
+    },
+
+    '.__item-name-wrapper': {
+      display: 'flex',
+      alignItems: 'baseline'
+    },
+
+    '.__item-address-wrapper': {
+      display: 'flex',
+      gap: 12,
+      alignItems: 'baseline',
+      '.__address': {
+        fontSize: token.fontSize
+      }
     },
 
     '.__item-right-part': {
@@ -119,16 +173,40 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
     '.__name': {
       color: token.colorTextLight1,
       overflow: 'hidden',
-      textOverflow: 'ellipsis'
+      textOverflow: 'ellipsis',
+      fontWeight: token.fontWeightStrong
     },
 
     '.__address': {
-      color: token.colorTextLight4
+      color: token.colorTextLight4,
+      fontSize: token.fontSizeSM,
+      fontWeight: token.bodyFontWeight,
+      lineHeight: token.lineHeightSM
     },
 
     '&:hover': {
       background: token.colorBgInput
+    },
+
+    '.__label, .__name-label-divider': {
+      fontSize: token.fontSizeXS,
+      lineHeight: token.lineHeightXS,
+      fontWeight: 700,
+      '&.-schema-orange-7': {
+        color: token['orange-7']
+      },
+      '&.-schema-lime-7': {
+        color: token['lime-7']
+      },
+      '&.-schema-cyan-7': {
+        color: token['cyan-7']
+      }
+    },
+
+    '.__name-label-divider': {
+      color: token.colorTextTertiary
     }
+
   };
 });
 
