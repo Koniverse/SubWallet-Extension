@@ -130,7 +130,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
         method: 'GET'
       },
       this.isTestnet);
-    console.log('assetResponse', assetsResponse);
+
     const _allAssets = await assetsResponse.json() as { assets: ChainFlipAsset[] };
     const allAssets = _allAssets.assets;
 
