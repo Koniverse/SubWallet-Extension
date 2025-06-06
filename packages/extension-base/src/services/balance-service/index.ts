@@ -42,6 +42,9 @@ export class BalanceService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   private isReload = false;
+  get isStarted (): boolean {
+    return this.status === ServiceStatus.STARTED;
+  }
 
   private readonly detectAccountBalanceStore = new DetectAccountBalanceStore();
   private readonly balanceDetectSubject: BehaviorSubject<DetectBalanceCache> = new BehaviorSubject<DetectBalanceCache>({});
@@ -166,7 +169,7 @@ export class BalanceService implements StoppableServiceInterface {
 
     if (needReload) {
       addLazy('reloadBalanceByEvents', () => {
-        if (!this.isReload && this.status === ServiceStatus.STARTED) {
+        if (!this.isReload && this.isStarted) {
           this.runSubscribeBalances().catch(console.error);
         }
       }, lazyTime, undefined, true);

@@ -21,6 +21,7 @@ export class EventService extends EventEmitter<EventRegistry> {
   public readonly waitCryptoReady: Promise<boolean>;
   public readonly waitDatabaseReady: Promise<boolean>;
 
+  public readonly waitAppInitialized: Promise<boolean>;
   public readonly waitAppStart: Promise<boolean>;
   public readonly waitAppStartFull: Promise<boolean>;
 
@@ -46,6 +47,7 @@ export class EventService extends EventEmitter<EventRegistry> {
     this.waitDatabaseReady = this.generateWaitPromise('database.ready');
     this.waitKeyringReady = this.generateWaitPromise('keyring.ready');
     this.waitAccountReady = this.generateWaitPromise('account.ready');
+    this.waitAppInitialized = this.generateWaitPromise('general.init');
     this.waitAppStart = this.generateWaitPromise('general.start');
     this.waitAppStartFull = this.generateWaitPromise('general.start_full');
 

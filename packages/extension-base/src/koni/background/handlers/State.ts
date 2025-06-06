@@ -322,6 +322,9 @@ export default class KoniState {
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
     });
+
+    // Mark app is ready
+    this.eventService.emit('general.init', true);
   }
 
   public async initMantaPay (password: string) {
@@ -1746,6 +1749,9 @@ export default class KoniState {
   }
 
   public async sleep () {
+    // Wait for app initialized before sleep
+    await this.eventService.waitAppInitialized;
+
     // Wait starting finish before sleep to avoid conflict
     this.generalStatus === ServiceStatus.STARTING && this.waitStarting && await this.waitStarting;
     this.generalStatus === ServiceStatus.STARTING_FULL && this.waitStartingFull && await this.waitStartingFull;
@@ -1781,6 +1787,9 @@ export default class KoniState {
   }
 
   private async _start () {
+    // Wait for app initialized before start
+    await this.eventService.waitAppInitialized;
+
     // Wait sleep finish before start to avoid conflict
     this.generalStatus === ServiceStatus.STOPPING && this.waitSleeping && await this.waitSleeping;
 
