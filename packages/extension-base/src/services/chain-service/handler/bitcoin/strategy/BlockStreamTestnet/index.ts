@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -74,7 +74,8 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
       const rsRaw = await response.json() as BlockstreamAddressResponse;
       const chainBalance = rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum;
       const pendingLocked = rsRaw.mempool_stats.spent_txo_sum; // Only consider spent UTXOs in mempool
-      const availableBalance = Math.max(0, chainBalance - pendingLocked); // Ensure balance is non-negative
+      const mempoolReceived = rsRaw.mempool_stats.funded_txo_sum; // Funds received in mempool (e.g., change)
+      const availableBalance = Math.max(0, chainBalance - pendingLocked + mempoolReceived); // Ensure balance is non-negative
 
       const rs: BitcoinAddressSummaryInfo = {
         address: rsRaw.address,
@@ -178,38 +179,52 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 0);
   }
 
+  // TODO: Handle fallback for this route as it is not stable.
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getRecommendedFeeRate', `Failed to fetch fee estimates: ${response.statusText}`);
-      }
-
       const convertTimeMilisec = {
         fastestFee: 10 * 60000,
         halfHourFee: 30 * 60000,
         hourFee: 60 * 60000
       };
 
-      const estimates = await response.json() as BlockStreamFeeEstimates;
-
-      const low = 6;
-      const average = 4;
-      const fast = 2;
-
-      const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
-
-      return {
+      const defaultFeeInfo: BitcoinFeeInfo = {
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(estimates[low] || 10), time: convertTimeMilisec.hourFee },
-          average: { feeRate: convertFee(estimates[average] || 12), time: convertTimeMilisec.halfHourFee },
-          fast: { feeRate: convertFee(estimates[fast] || 15), time: convertTimeMilisec.fastestFee },
+          slow: { feeRate: 1, time: convertTimeMilisec.hourFee },
+          average: { feeRate: 1, time: convertTimeMilisec.halfHourFee },
+          fast: { feeRate: 1, time: convertTimeMilisec.fastestFee },
           default: 'slow'
         }
       };
+
+      try {
+        const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
+
+        if (!response.ok) {
+          console.warn(`Failed to fetch fee estimates: ${response.statusText}`);
+
+          return defaultFeeInfo;
+        }
+
+        const estimates = await response.json() as RecommendedFeeEstimates;
+
+        const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
+
+        return {
+          type: 'bitcoin',
+          busyNetwork: false,
+          options: {
+            slow: { feeRate: convertFee(estimates.hourFee || 1), time: convertTimeMilisec.hourFee },
+            average: { feeRate: convertFee(estimates.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
+            fast: { feeRate: convertFee(estimates.fastestFee || 1), time: convertTimeMilisec.fastestFee },
+            default: 'slow'
+          }
+        };
+      } catch {
+        return defaultFeeInfo;
+      }
     }, 0);
   }
 

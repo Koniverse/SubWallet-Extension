@@ -69,7 +69,7 @@ export class BalanceService implements StoppableServiceInterface {
     this.status = ServiceStatus.INITIALIZED;
 
     // Start service
-    await this.start();
+    // await this.start(); // Commented out to avoid auto start when app not fully initialized
 
     // Handle events
     this.state.eventService.onLazy(this.handleEvents.bind(this));
@@ -166,7 +166,7 @@ export class BalanceService implements StoppableServiceInterface {
 
     if (needReload) {
       addLazy('reloadBalanceByEvents', () => {
-        if (!this.isReload) {
+        if (!this.isReload && this.status === ServiceStatus.STARTED) {
           this.runSubscribeBalances().catch(console.error);
         }
       }, lazyTime, undefined, true);
@@ -439,6 +439,55 @@ export class BalanceService implements StoppableServiceInterface {
       cancel = true;
       unsub && unsub();
       unsub2 && unsub2();
+    };
+  }
+
+  async runSubscribeBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
+    await Promise.all([this.state.eventService.waitKeyringReady, this.state.eventService.waitChainReady]);
+
+    // Check if address and chain are valid
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+
+    if (!chainInfoMap[chain]) {
+      console.warn(`Chain ${chain} is not supported`);
+
+      return;
+    }
+
+    // Get necessary data
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const evmApiMap = this.state.chainService.getEvmApiMap();
+    const substrateApiMap = this.state.chainService.getSubstrateApiMap();
+    const tonApiMap = this.state.chainService.getTonApiMap();
+    const cardanoApiMap = this.state.chainService.getCardanoApiMap();
+    const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
+
+    // Subscribe balance
+    let cancel = false;
+    const unsub = subscribeBalance(
+      [address],
+      [chain],
+      [asset],
+      assetMap,
+      chainInfoMap,
+      substrateApiMap,
+      evmApiMap,
+      tonApiMap,
+      cardanoApiMap,
+      bitcoinApiMap,
+      (result) => {
+        !cancel && this.setBalanceItem(result);
+
+        cancel = true;
+        unsub && unsub();
+        this._unsubscribeBalance = undefined; // Clear unsubscribe function
+      },
+      extrinsicType || ExtrinsicType.TRANSFER_BALANCE
+    );
+
+    this._unsubscribeBalance = () => {
+      cancel = true;
+      unsub && unsub();
     };
   }
 

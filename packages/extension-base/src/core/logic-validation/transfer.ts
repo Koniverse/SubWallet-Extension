@@ -384,7 +384,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
           sender: address
         });
 
-        estimateFee.value = (feeCombine.feeRate * sizeInfo.txVBytes).toString();
+        estimateFee.value = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
       } else {
         const _transaction = transaction;
         const gasLimit = _transaction.gas || await evmApi.api.eth.estimateGas(_transaction);
