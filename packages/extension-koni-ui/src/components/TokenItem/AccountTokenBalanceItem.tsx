@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BalanceMetadata, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
+import { _isChainBitcoinCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { BalanceItem } from '@subwallet/extension-base/types';
-import { Avatar } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, InfoItemBase } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -20,14 +20,22 @@ import styled from 'styled-components';
 import { MetaInfo } from '../MetaInfo';
 
 interface Props extends ThemeProps {
-  item: BalanceItem;
+  item: BalanceItemWithAddressType;
+}
+
+interface BalanceDisplayItem {
+  label: string;
+  value: string;
+  key: string;
 }
 
 // todo: logic in this file may not be correct in some case, need to recheck
 const Component: React.FC<Props> = (props: Props) => {
   const { className, item } = props;
 
-  const { address, free, locked, tokenSlug } = item;
+  const { address, addressTypeLabel, free, locked, metadata, schema: _schema, tokenSlug } = item;
+
+  const schema = _schema as InfoItemBase['valueColorSchema'];
 
   const { t } = useTranslation();
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
@@ -72,58 +80,110 @@ const Component: React.FC<Props> = (props: Props) => {
   const symbol = tokenInfo?.symbol || '';
   const link = (chainInfo !== undefined) && getExplorerLink(chainInfo, reformatedAddress, 'account');
 
+  const isBitcoinMetadata = (meta: _BalanceMetadata | undefined): meta is BitcoinBalanceMetadata => {
+    return !!meta && typeof meta === 'object' && 'runeBalance' in meta && 'inscriptionBalance' in meta;
+  };
+
+  const renderBalanceItem = useCallback(
+    ({ key, label, value }: BalanceDisplayItem) => (
+      <MetaInfo.Number
+        className='balance-info'
+        decimals={decimals}
+        key={key}
+        label={label}
+        suffix={symbol}
+        value={value}
+        valueColorSchema='gray'
+      />
+    ),
+    [decimals, symbol]
+  );
+  const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
+  const balanceItems = useMemo<BalanceDisplayItem[]>(() => {
+    if (isBitcoinChain && isBitcoinMetadata(metadata)) {
+      return [
+        { key: 'btc_transferable', label: t('BTC Transferable'), value: free },
+        { key: 'btc_rune', label: t('BTC Rune (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.runeBalance) : '0' },
+        { key: 'btc_inscription', label: t('BTC Inscription (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.inscriptionBalance) : '0' },
+        { key: 'btc_total', label: t('Total'), value: total }
+      ];
+    }
+
+    return [
+      { key: 'transferable', label: t('Transferable'), value: free },
+      { key: 'locked', label: t('Locked'), value: locked }
+    ];
+  }, [free, isBitcoinChain, locked, metadata, t, total]);
+
   return (
     <MetaInfo
       className={CN(className, 'account-token-detail', { '__show-button': !!link })}
       hasBackgroundWrapper={true}
       spaceSize='xxs'
     >
-      <MetaInfo.Number
-        className='account-info'
-        decimals={decimals}
-        label={(
-          <div className='account-info'>
-            <Avatar
-              identPrefix={addressPrefix}
-              size={24}
-              value={address}
-            />
-            <div className='account-name-address ml-xs'>
-              {
-                name
-                  ? (
-                    <>
-                      <span className='account-name'>{name}</span>
-                      <span className='account-address'>&nbsp;({toShort(reformatedAddress, 4, 4)})</span>
-                    </>
-                  )
-                  : (
-                    <span className='account-name'>({toShort(reformatedAddress)})</span>
-                  )
-              }
-            </div>
-          </div>
+      {isBitcoinChain
+        ? (
+          <MetaInfo.Default
+            className={'__quote-rate'}
+            label={(
+              <div className='account-info'>
+                <AccountProxyAvatar
+                  size={24}
+                  value={account?.proxyId}
+                />
+                <div className='account-name-address ml-xs'>
+                  {
+                    name
+                      ? (
+                        <>
+                          <span className='account-name'>{name}</span>
+                          <span className='account-address'>&nbsp;({toShort(reformatedAddress, 4, 4)})</span>
+                        </>
+                      )
+                      : (
+                        <span className='account-name'>({toShort(reformatedAddress)})</span>
+                      )
+                  }
+                </div>
+              </div>
+            )}
+            valueColorSchema={schema ? `${schema}` : 'default'}
+          >
+            {addressTypeLabel}
+          </MetaInfo.Default>
+        )
+        : (
+          <MetaInfo.Number
+            className='account-info'
+            decimals={decimals}
+            label={(
+              <div className='account-info'>
+                <AccountProxyAvatar
+                  size={24}
+                  value={account?.proxyId}
+                />
+                <div className='account-name-address ml-xs'>
+                  {
+                    name
+                      ? (
+                        <>
+                          <span className='account-name'>{name}</span>
+                          <span className='account-address'>&nbsp;({toShort(reformatedAddress, 4, 4)})</span>
+                        </>
+                      )
+                      : (
+                        <span className='account-name'>({toShort(reformatedAddress)})</span>
+                      )
+                  }
+                </div>
+              </div>
+            )}
+            suffix={symbol}
+            value={total}
+            valueColorSchema='light'
+          />
         )}
-        suffix={symbol}
-        value={total}
-        valueColorSchema='light'
-      />
-      <MetaInfo.Number
-        className='balance-info'
-        decimals={decimals}
-        label={t('Transferable')}
-        suffix={symbol}
-        value={free}
-        valueColorSchema='gray'
-      />
-      <MetaInfo.Number
-        className='balance-info'
-        decimals={decimals}
-        label={t('Locked')}
-        suffix={symbol}
-        value={locked}
-        valueColorSchema='gray'
-      />
+      {balanceItems.map(renderBalanceItem)}
       {!!link && (
         <Button
           block

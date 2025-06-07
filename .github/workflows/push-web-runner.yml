@@ -53,6 +53,7 @@ jobs:
         MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         PARASPELL_API_KEY: ${{ secrets.PARASPELL_API_KEY }}
         BRANCH_NAME: master
+        BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
         yarn install --immutable | grep -v 'YN0013'
         yarn ${{ matrix.step }}

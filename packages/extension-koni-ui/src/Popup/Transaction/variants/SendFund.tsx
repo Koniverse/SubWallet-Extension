@@ -70,7 +70,8 @@ function getTokenItems (
   let allowedChains: string[];
 
   if (!isAccountAll(accountProxy.id)) {
-    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain);
+    // TODO: Review logic getChainsByAccountType after handle transfer for bitcoin
+    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, undefined, accountProxy.specialChain);
   } else {
     allowedChains = getChainsByAccountAll(accountProxy, accountProxies, chainInfoMap);
   }

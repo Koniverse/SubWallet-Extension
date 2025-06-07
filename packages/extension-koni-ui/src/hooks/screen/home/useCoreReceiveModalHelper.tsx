@@ -1,18 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { KeypairType } from '@subwallet/keyring/types';
-
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetOriginChain, _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useGetBitcoinAccounts, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
+import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -36,12 +35,13 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [selectedChain, setSelectedChain] = useState<string | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
-  const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
+  const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const chainSupported = useGetChainSlugsByAccount();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const getBitcoinAccount = useGetBitcoinAccounts();
 
   // chain related to tokenGroupSlug, if it is token slug
   const specificChain = useMemo(() => {
@@ -90,6 +90,21 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     processFunction();
   }, [selectAddressFormatModal]);
 
+  const openAccountTokenAddressModal = useCallback((accounts: AccountTokenAddress[], closeCallback?: VoidCallback) => {
+    const processFunction = () => {
+      accountTokenAddressModal.open({
+        items: accounts,
+        onBack: accountTokenAddressModal.close,
+        onCancel: () => {
+          accountTokenAddressModal.close();
+          closeCallback?.();
+        }
+      });
+    };
+
+    processFunction();
+  }, [accountTokenAddressModal]);
+
   /* --- token Selector */
 
   const tokenSelectorItems = useMemo<_ChainAsset[]>(() => {
@@ -132,7 +147,26 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    // current account is not All, just do show QR logic
+    const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
+
+    if (isBitcoinChain) {
+      const accountTokenAddressList = getBitcoinAccount(chainSlug, item.slug, chainInfo, currentAccountProxy.accounts);
+
+      if (accountTokenAddressList.length > 1) {
+        openAccountTokenAddressModal(accountTokenAddressList, () => {
+          inactiveModal(tokenSelectorModalId);
+          setSelectedAccountAddressItem(undefined);
+        });
+      } else {
+        openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+          inactiveModal(tokenSelectorModalId);
+          setSelectedAccountAddressItem(undefined);
+        });
+      }
+
+      return;
+    }
+
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
 
     for (const accountJson of currentAccountProxy.accounts) {
@@ -164,7 +198,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [activeModal, chainInfoMap, checkIsPolkadotUnifiedChain, currentAccountProxy, inactiveModal, isAllAccount, openAddressFormatModal, openAddressQrModal, getReformatAddress]);
+  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, getBitcoinAccount, openAccountTokenAddressModal, inactiveModal, openAddressQrModal, getReformatAddress, openAddressFormatModal]);
 
   /* token Selector --- */
 

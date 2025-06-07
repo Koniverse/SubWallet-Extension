@@ -58,17 +58,17 @@ export const getAccountChainTypeFromKeypairType = (type: KeypairType): AccountCh
     : AccountChainType.SUBSTRATE;
 };
 
-export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType => {
+export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType[] => {
   if (type === AccountChainType.ETHEREUM) {
-    return 'ethereum';
+    return ['ethereum'];
   } else if (type === AccountChainType.TON) {
-    return 'ton';
+    return ['ton'];
   } else if (type === AccountChainType.BITCOIN) {
-    return 'bitcoin-84';
+    return ['bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
   } else if (type === AccountChainType.CARDANO) {
-    return 'cardano';
+    return ['cardano'];
   } else {
-    return 'sr25519';
+    return ['sr25519'];
   }
 };
 
