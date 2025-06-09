@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BlockStreamTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStreamTestnet';
+import { BlockStreamTestnetRequestStrategy, MempoolTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStreamTestnet';
 import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
@@ -33,20 +33,26 @@ export class BitcoinApi implements _BitcoinApi {
     this.apiUrl = apiUrl;
     this.providerName = providerName || 'unknown';
     this.isReadyHandler = createPromiseHandler<_BitcoinApi>();
-
-    const isTestnet = apiUrl.includes('testnet');
-
-    if (isTestnet) {
-      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
-    } else {
-      this.api = new SubWalletMainnetRequestStrategy(apiUrl);
-    }
+    this.api = this.createApiStrategy(apiUrl);
 
     this.connect();
   }
 
   get isApiConnected (): boolean {
     return this.isApiConnectedSubject.getValue();
+  }
+
+  private createApiStrategy (apiUrl: string): BitcoinApiStrategy {
+    const isTestnet = apiUrl.includes('testnet');
+    const isBlockstreamUrl = apiUrl.includes('blockstream');
+
+    if (isTestnet) {
+      return isBlockstreamUrl
+        ? new BlockStreamTestnetRequestStrategy(apiUrl)
+        : new MempoolTestnetRequestStrategy(apiUrl);
+    }
+
+    return new SubWalletMainnetRequestStrategy(apiUrl);
   }
 
   get connectionStatus (): _ChainConnectionStatus {
@@ -77,13 +83,7 @@ export class BitcoinApi implements _BitcoinApi {
     await this.disconnect();
     this.apiUrl = apiUrl;
 
-    const isTestnet = apiUrl.includes('testnet');
-
-    if (isTestnet) {
-      this.api = new BlockStreamTestnetRequestStrategy(apiUrl);
-    } else {
-      this.api = new SubWalletMainnetRequestStrategy(apiUrl);
-    }
+    this.api = this.createApiStrategy(apiUrl);
 
     this.connect();
   }
