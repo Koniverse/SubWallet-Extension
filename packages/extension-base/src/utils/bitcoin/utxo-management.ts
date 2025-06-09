@@ -207,9 +207,11 @@ export function determineUtxosForSpend ({ amount,
     //   fee: newFee
     // };
 
-    const atLeastStr = formatNumber(dustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
+    // const atLeastStr = formatNumber(dustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
+    // throw new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, `You must transfer at least ${atLeastStr} BTC`);
 
-    throw new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, `You must transfer at least ${atLeastStr} BTC`);
+    // Do nothing with the remaining balance (amountLeft < dustLimit)
+    console.warn(`Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output.`);
   }
 
   return {
