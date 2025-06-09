@@ -53,6 +53,8 @@ const _additionalEnv = {
   NFT_MINTING_HOST: JSON.stringify(process.env.NFT_MINTING_HOST),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API)
 };
 
 // Overwrite babel babel config from polkadot dev

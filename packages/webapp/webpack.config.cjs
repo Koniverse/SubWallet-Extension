@@ -57,7 +57,11 @@ const _additionalEnv = {
   TRANSAK_TEST_MODE: JSON.stringify(false),
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
-  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET)
+  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
+  CHAINFLIP_BROKER_TESTNET_API: JSON.stringify(process.env.CHAINFLIP_BROKER_TESTNET_API),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API)
 };
 
 const createConfig = (entry, alias = {}, useSplitChunk = false) => {

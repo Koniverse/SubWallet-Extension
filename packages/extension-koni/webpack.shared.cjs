@@ -47,8 +47,10 @@ const _additionalEnv = {
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
-  MELD_TEST_MODE: JSON.stringify(false),
+  MELD_TEST_MODE: JSON.stringify(false)
 };
 
 const additionalEnvDict = {
