@@ -14,7 +14,7 @@ import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } 
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
 import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
+import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
@@ -236,14 +236,6 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
   } else if (accountJson.chainType === AccountChainType.CARDANO && chainInfo.cardanoInfo) {
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
   } else if (accountJson.chainType === AccountChainType.BITCOIN && chainInfo.bitcoinInfo) {
-    const isTestnet = chainInfo.isTestnet;
-    const isBitcoinTestnet = BitcoinTestnetKeypairTypes.includes(accountJson.type);
-
-    // Both must be testnet or both must be mainnet
-    if (isTestnet !== isBitcoinTestnet) {
-      return undefined;
-    }
-
     return accountJson.address;
   }
 
