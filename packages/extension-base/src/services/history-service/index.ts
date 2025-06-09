@@ -189,16 +189,21 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     }
 
     const bitcoinApi = this.chainService.getBitcoinApi(chain);
+    const allParsedItems: TransactionHistoryItem[] = [];
 
     for (const address of addresses) {
       const transferItems = await bitcoinApi.api.getAddressTransaction(address);
 
-      const parsedItems = Object.values(transferItems).map((i) => {
-        return parseBitcoinTransferData(address, i, chainInfo);
+      const parsedItems = transferItems.map((item, index) => {
+        const parsedItem = parseBitcoinTransferData(address, item, chainInfo);
+
+        return { ...parsedItem, apiTxIndex: index };
       });
 
-      await this.addHistoryItems(parsedItems);
+      allParsedItems.push(...parsedItems);
     }
+
+    await this.addHistoryItems(allParsedItems);
   }
 
   subscribeHistories (chain: string, proxyId: string, cb: (items: TransactionHistoryItem[]) => void) {
