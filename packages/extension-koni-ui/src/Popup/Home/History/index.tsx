@@ -539,6 +539,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       {
         (isAllAccount || accountAddressItems.length > 1) && (
           <AccountAddressSelector
+            autoSelectFirstItem={true}
             className={'__history-address-selector'}
             items={accountAddressItems}
             onChange={onSelectAccount}
