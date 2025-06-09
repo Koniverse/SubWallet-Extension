@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubmitJoinNativeStaking } from '@subwallet/extension-base/types';
+import { SubmitChangeValidatorStaking } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -23,7 +23,7 @@ const isSingular = (count: number, singular: string, plural: string) => {
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
-  const data = transaction.data as SubmitJoinNativeStaking;
+  const data = transaction.data as SubmitChangeValidatorStaking;
   const slug = data.slug;
 
   const { compound } = useYieldPositionDetail(slug, data.address);

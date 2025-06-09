@@ -17,7 +17,8 @@ import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContex
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import EarningValidatorSelectorSubmit from '../../Field/Earning/EarningValidatorSelectorSubmit';
+import ChangeBittensorValidator from '../../Field/Earning/ChangeBittensorValidator';
+import ChangeValidator from '../../Field/Earning/ChangeValidator';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -33,19 +34,20 @@ interface Props extends ThemeProps, BasicInputWrapper {
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { addresses, chain, className = '', disabledButton, from
     , loading, modalId, nominations, onChange, setForceFetchValidator, slug } = props;
+
+  const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
+
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
+
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-
-  useExcludeModal(modalId);
-
-  const items = useGetPoolTargetList(slug) as ValidatorDataType[];
-  const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
-
   const { poolInfoMap } = useSelector((state) => state.earning);
-
   const poolInfo = poolInfoMap[slug];
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
+  const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
+
+  const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
+  const items = useGetPoolTargetList(slug) as ValidatorDataType[];
 
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) {
@@ -54,16 +56,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
     return undefined;
   }, [poolInfo]);
-
-  const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
-
-  const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
-
-  const checkChain = useChainChecker();
-
-  useEffect(() => {
-    chain && checkChain(chain);
-  }, [chain, checkChain]);
 
   const resultList = useMemo(() => {
     if (addresses && addresses.length > 0) {
@@ -80,6 +72,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
     return label !== 'dApp' ? label.toLowerCase() : label;
   }, [chain]);
+
+  const isBittensorChain = useMemo(() => {
+    return poolInfo.chain === 'bittensor' || poolInfo.chain === 'bittensor_testnet';
+  }, [poolInfo.chain]);
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -125,6 +121,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     );
   }, [networkPrefix, onClickMore]);
 
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    chain && checkChain(chain);
+  }, [chain, checkChain]);
+
+  useExcludeModal(modalId);
+
   return (
     <>
       <SwModal
@@ -169,17 +173,33 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           validatorItem={viewDetailItem}
         />
       )}
-      <EarningValidatorSelectorSubmit
-        chain={poolInfo.chain}
-        disabled={false}
-        from={from}
-        items={items}
-        loading={loading}
-        modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-        nominations={nominations}
-        setForceFetchValidator={setForceFetchValidator}
-        slug={poolInfo.slug}
-      />
+      {isBittensorChain
+        ? (
+          <ChangeBittensorValidator
+            chain={poolInfo.chain}
+            disabled={false}
+            from={from}
+            items={items}
+            loading={loading}
+            modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+            nominations={nominations}
+            setForceFetchValidator={setForceFetchValidator}
+            slug={poolInfo.slug}
+          />
+        )
+        : (
+          <ChangeValidator
+            chain={poolInfo.chain}
+            disabled={false}
+            from={from}
+            items={items}
+            loading={loading}
+            modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+            nominations={nominations}
+            setForceFetchValidator={setForceFetchValidator}
+            slug={poolInfo.slug}
+          />
+        )}
     </>
   );
 };

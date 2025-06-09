@@ -566,7 +566,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
-          expectedReturn: apyCalculate.apy,
+          apy: apyCalculate.apy,
           blocked: false,
           isVerified: false,
           chain: this.chain,
@@ -664,12 +664,16 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const chainApi = await this.substrateApi.isReady;
     const { amount, fromValidator, selectedValidators: targetValidators, subnetData } = data;
 
-    if (!subnetData || fromValidator) {
-      throw new Error(BasicTxErrorType.INVALID_PARAMS);
+    if (!subnetData || !fromValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
     const selectedValidatorInfo = targetValidators[0];
     const destValidator = selectedValidatorInfo.address;
+
+    if (fromValidator === destValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
+    }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(fromValidator, destValidator, 0, 0, amount);
 
