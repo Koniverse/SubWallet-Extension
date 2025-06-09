@@ -13,7 +13,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { convertAuthorizeTypeToChainTypes } from '@subwallet/extension-koni-ui/utils';
+import { convertAuthorizeTypeToChainTypes, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
 import { ArrowsLeftRight, GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -32,14 +32,14 @@ type WrapperProps = ThemeProps;
 const ActionModalId = 'actionModalId';
 // const FilterModalId = 'filterModalId';
 
-const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?: AccountAuthType[]): boolean => {
+const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?: AccountAuthType[], isECDSA?: boolean): boolean => {
   if (!accountAuthTypes) {
     return false;
   }
 
   switch (chainType) {
     case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
-    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm');
+    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') || !!isECDSA;
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
   }
@@ -55,7 +55,11 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
   const accountProxyItems = useMemo(() => {
-    return accountProxies.filter((ap) => ap.id !== 'ALL' && ap.chainTypes.some((chainType) => checkAccountAddressValid(chainType, accountAuthTypes)));
+    return accountProxies.filter((ap) => {
+      const isECDSA = isSubstrateEcdsaAccountProxy(ap);
+
+      return ap.id !== 'ALL' && ap.chainTypes.some((chainType) => checkAccountAddressValid(chainType, accountAuthTypes, isECDSA));
+    });
   }, [accountAuthTypes, accountProxies]);
 
   const onOpenActionModal = useCallback(() => {
@@ -157,7 +161,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
       const newAllowedMap = { ...authInfo.isAllowedMap };
 
       item.accounts.forEach((account) => {
-        if (checkAccountAddressValid(account.chainType, authInfo.accountAuthTypes)) {
+        if (checkAccountAddressValid(account.chainType, authInfo.accountAuthTypes, account.isSubstrateECDSA)) {
           newAllowedMap[account.address] = !isEnabled;
         }
       });
