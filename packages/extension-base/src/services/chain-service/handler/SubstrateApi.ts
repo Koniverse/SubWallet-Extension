@@ -164,7 +164,10 @@ export class SubstrateApi implements _SubstrateApi {
 
   private createClient (apiUrl: string) {
     // todo: re-check metadata, typesBundle, registry,
-    const provider = new DedotWsProvider(apiUrl);
+    const provider = new DedotWsProvider({
+      endpoint: apiUrl,
+      maxRetryAttempts: 0
+    });
     const client = new DedotClient(provider);
 
     client.on('connected', () => console.log(`Dedot: On successfully ${apiUrl}`));
@@ -172,9 +175,21 @@ export class SubstrateApi implements _SubstrateApi {
     client.on('disconnected', () => console.log(`Dedot: On disconnect ${apiUrl}`));
     client.on('error', () => console.log(`Dedot: On error ${apiUrl}`));
 
-    client.connect().then(() => console.log('Dedot: Init connect or update url')).catch(console.error);
+    client.connect()
+      .then(() => console.log(`Dedot: Init connect or update url ${apiUrl}`))
+      .catch(() => {
+        console.log(`Dedot: Disconnected from ${apiUrl}`);
+        this.stopListenClientEvent(client);
+      });
 
     return client;
+  }
+
+  private stopListenClientEvent (client: DedotClient) {
+    client.off('connected');
+    client.off('ready');
+    client.off('disconnected');
+    client.off('error');
   }
 
   constructor (chainSlug: string, apiUrl: string, { externalApiPromise, metadata, providerName }: _ApiOptions = {}) {
@@ -227,9 +242,12 @@ export class SubstrateApi implements _SubstrateApi {
     } else {
       this.updateConnectionStatus(_ChainConnectionStatus.CONNECTING);
 
-      this.client.connect().then(() => {
-        console.log(`Dedot: Reconnect with status: ${this.client.status}`);
-      }).catch(console.error);
+      this.client.connect()
+        .then(() => console.log(`Dedot: Reconnect url: ${this.apiUrl}`))
+        .catch(() => {
+          console.log(`Dedot: Disconnected from ${this.apiUrl}`);
+          this.stopListenClientEvent(this.client);
+        });
 
       this.api.connect()
         .then(() => {
