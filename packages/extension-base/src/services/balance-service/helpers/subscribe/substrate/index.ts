@@ -608,8 +608,7 @@ const gdotSlug = 'hydradx_main-LOCAL-GDOT';
 
 async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
-    const _balanceInfo = await substrateApi.api.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address);
-    const balanceInfo = _balanceInfo.toPrimitive() as OrmlTokensAccountData;
+    const balanceInfo = await substrateApi.client.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address) as OrmlTokensAccountData;
 
     const transferableBalance = _getTokensPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
     const totalLockedFromTransfer = _getTokensPalletLocked(balanceInfo);
