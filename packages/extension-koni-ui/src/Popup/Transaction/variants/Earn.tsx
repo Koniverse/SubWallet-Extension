@@ -938,15 +938,31 @@ const Component = () => {
         return ExtrinsicType.MINT_STDOT;
       }
 
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.MINT_VMANTA;
+        }
+
+        return ExtrinsicType.MINT_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.MINT_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.MINT_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.MINT_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_BOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
