@@ -8,13 +8,14 @@ import { GearApi } from '@gear-js/api';
 import { rpc as oakRpc, types as oakTypes } from '@oak-foundation/types';
 import { MetadataItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _API_OPTIONS_CHAIN_GROUP, API_AUTO_CONNECT_MS, API_CONNECT_TIMEOUT } from '@subwallet/extension-base/services/chain-service/constants';
-import { getSubstrateConnectProvider } from '@subwallet/extension-base/services/chain-service/handler/light-client';
+import { getSubstrateConnectProvider, paraChainSpecs, relayChainSpecs } from '@subwallet/extension-base/services/chain-service/handler/light-client';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
-import { DedotClient, WsProvider as DedotWsProvider } from 'dedot';
+import { DedotClient, SmoldotProvider, WsProvider as DedotWsProvider } from 'dedot';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import * as smoldot from 'smoldot';
 
 import { ApiPromise, WsProvider as PapiWsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
@@ -39,6 +40,8 @@ if (typesBundle.spec) {
   typesBundle.spec.avail = _availSpec;
   typesBundle.spec['data-avail'] = _goldbergSpec;
 }
+
+type DedotProvider = DedotWsProvider | SmoldotProvider;
 
 export class SubstrateApi implements _SubstrateApi {
   chainSlug: string;
@@ -95,9 +98,32 @@ export class SubstrateApi implements _SubstrateApi {
 
       return getSubstrateConnectProvider(apiUrl.replace('light://substrate-connect/', ''));
     } else {
-      this.useLightClient = true;
+      this.useLightClient = true; // todo: ?
 
       return new PapiWsProvider(apiUrl, API_AUTO_CONNECT_MS, {}, API_CONNECT_TIMEOUT);
+    }
+  }
+
+  private createDeDotProvider (apiUrl: string): DedotProvider {
+    if (apiUrl.startsWith('light://')) {
+      const client = smoldot.start();
+      const specLink = apiUrl.replace('light://substrate-connect/', '');
+      const [relayName, paraName] = specLink.split('/');
+
+      if (!paraName) {
+        const relayChain = client.addChain({ chainSpec: relayChainSpecs[relayName] });
+
+        return new SmoldotProvider(relayChain);
+      }
+
+      const paraChain = client.addChain({ chainSpec: paraChainSpecs[specLink] });
+
+      return new SmoldotProvider(paraChain);
+    } else {
+      return new DedotWsProvider({
+        endpoint: apiUrl,
+        maxRetryAttempts: 0
+      });
     }
   }
 
@@ -164,10 +190,7 @@ export class SubstrateApi implements _SubstrateApi {
 
   private createClient (apiUrl: string) {
     // todo: re-check metadata, typesBundle, registry,
-    const provider = new DedotWsProvider({
-      endpoint: apiUrl,
-      maxRetryAttempts: 0
-    });
+    const provider = this.createDeDotProvider(apiUrl);
     const client = new DedotClient(provider);
 
     client.on('connected', () => console.log(`Dedot: On successfully ${apiUrl}`));
@@ -230,8 +253,8 @@ export class SubstrateApi implements _SubstrateApi {
 
     // Create new provider and api
     this.apiUrl = apiUrl;
-    this.provider = this.createProvider(apiUrl);
     this.client = this.createClient(apiUrl);
+    this.provider = this.createProvider(apiUrl);
     this.api = this.createApi(this.provider);
   }
 

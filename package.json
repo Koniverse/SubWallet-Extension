@@ -92,6 +92,7 @@
     "@ledgerhq/hw-transport": "6.30.3",
     "@mangata-finance/type-definitions": "2.1.2",
     "@polkadot/api": "^15.7.2",
+    "smoldot": "^2.0.36",
     "dedot": "^0.13.0",
     "@polkadot/api-augment": "^15.7.2",
     "@polkadot/api-base": "^15.7.2",
