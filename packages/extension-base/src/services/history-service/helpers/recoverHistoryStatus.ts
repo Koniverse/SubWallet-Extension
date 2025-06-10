@@ -221,6 +221,8 @@ const bitcoinRecover = async (history: TransactionHistoryItem, chainService: Cha
     status: HistoryRecoverStatus.UNKNOWN
   };
 
+  // TODO: 1. Consider rebroadcasting transaction if stuck in mempool
+
   try {
     const bitcoinApi = chainService.getBitcoinApi(chain);
 
@@ -234,16 +236,26 @@ const bitcoinRecover = async (history: TransactionHistoryItem, chainService: Cha
               resolve(undefined);
             }, 60000);
           });
-          const transactionDetail = await Promise.race([api.getTransactionDetail(extrinsicHash), timeout]);
+          const txStatus = await Promise.race([api.getTransactionStatus(extrinsicHash), timeout]);
 
-          if (transactionDetail) {
-            result.blockHash = transactionDetail.status.block_hash || undefined;
-            result.blockNumber = transactionDetail.status.block_height || undefined;
-            result.blockTime = transactionDetail.status.block_time ? (transactionDetail.status.block_time * 1000) : undefined;
-
-            return { ...result, status: transactionDetail ? HistoryRecoverStatus.SUCCESS : HistoryRecoverStatus.TX_PENDING };
-          } else {
+          if (!txStatus) {
             return { ...result, status: HistoryRecoverStatus.API_INACTIVE };
+          }
+
+          if (txStatus.confirmed) {
+            const transactionDetail = await Promise.race([api.getTransactionDetail(extrinsicHash), timeout]);
+
+            if (transactionDetail) {
+              result.blockHash = transactionDetail.status.block_hash || undefined;
+              result.blockNumber = transactionDetail.status.block_height || undefined;
+              result.blockTime = transactionDetail.status.block_time ? (transactionDetail.status.block_time * 1000) : undefined;
+
+              return { ...result, status: HistoryRecoverStatus.SUCCESS };
+            }
+
+            return { ...result, status: HistoryRecoverStatus.API_INACTIVE };
+          } else {
+            return { ...result, status: HistoryRecoverStatus.TX_PENDING };
           }
         } catch (e) {
           // Fail when cannot find transaction

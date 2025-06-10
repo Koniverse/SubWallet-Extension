@@ -40,6 +40,7 @@ import { combineEthFee, combineSubstrateFee } from './combine';
 
 export interface CalculateMaxTransferable extends TransactionFee {
   address: string;
+  to?: string;
   value: string;
   srcToken: _ChainAsset;
   destToken?: _ChainAsset;
@@ -105,7 +106,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, tonApi, value } = request;
+  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, value } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
@@ -180,7 +181,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       [transaction] = await createBitcoinTransaction({
         chain: srcChain.slug,
         from: address,
-        to: address,
+        to: to || address,
         value,
         feeInfo: fee,
         transferAll: false,
