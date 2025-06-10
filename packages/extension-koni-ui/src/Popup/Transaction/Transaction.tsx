@@ -248,18 +248,30 @@ function Component ({ className }: Props) {
   //  - fromAccountProxy should not be strictly tied to currentAccountProxy.
   //  - Ensure direct link access to transaction screens works reliably and cleanly without stale form data.
   useEffect(() => {
-    if (currentAccountProxy) {
-      if (currentAccountProxy.id !== storage.fromAccountProxy) {
-        setStorage({
-          ...defaultTransactionStorageValue
-        });
-        setDefaultData({
-          ...defaultTransactionStorageValue
-        });
-        setForceRerenderKey(`${Date.now()}_ForceRerenderKey`);
+    const doFunction = () => {
+      if (![SWAP_TRANSACTION, TRANSFER_TRANSACTION, EARN_TRANSACTION].includes(storageKey)) {
+        return;
       }
-    }
-  }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy]);
+
+      if (!currentAccountProxy) {
+        return;
+      }
+
+      if (getTransactionFromAccountProxyValue(currentAccountProxy) === storage.fromAccountProxy) {
+        return;
+      }
+
+      setStorage({
+        ...defaultTransactionStorageValue
+      });
+      setDefaultData({
+        ...defaultTransactionStorageValue
+      });
+      setForceRerenderKey(`${Date.now()}_ForceRerenderKey`);
+    };
+
+    doFunction();
+  }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy, storageKey]);
 
   return (
     <>
