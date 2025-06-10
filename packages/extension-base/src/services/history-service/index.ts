@@ -180,6 +180,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     });
   }
 
+  // Only 1 address is passed in
   private async fetchBitcoinTransactionHistory (chain: string, addresses: string[]) {
     const chainInfo = this.chainService.getChainInfoByKey(chain);
     const chainState = this.chainService.getChainStateByKey(chain);
@@ -192,15 +193,12 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     const allParsedItems: TransactionHistoryItem[] = [];
 
     for (const address of addresses) {
-      const existingItems = await this.dbService.getHistories({ address, chain });
-      const maxIndex = existingItems.length > 0 ? Math.max(...existingItems.map((item) => item.apiTxIndex || -1)) : -1;
-
       const transferItems = await bitcoinApi.api.getAddressTransaction(address);
 
       const parsedItems = transferItems.map((item, index) => {
         const parsedItem = parseBitcoinTransferData(address, item, chainInfo);
 
-        return { ...parsedItem, apiTxIndex: maxIndex + index + 1 };
+        return { ...parsedItem, apiTxIndex: index };
       });
 
       allParsedItems.push(...parsedItems);
@@ -269,7 +267,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         (item_) => item_.extrinsicHash === item.extrinsicHash && item.chain === item_.chain && item.address === item_.address);
 
       if (needUpdateItem) {
-        updateRecords.push({ ...needUpdateItem, status: item.status });
+        updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex });
 
         return;
       }
