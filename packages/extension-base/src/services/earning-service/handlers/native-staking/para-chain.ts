@@ -559,6 +559,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     const apiPromise = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
     const selectedCollatorInfo = selectedValidators[0];
+    const { address, nominatorCount } = selectedCollatorInfo;
 
     // eslint-disable-next-line @typescript-eslint/require-await
     const compoundResult = async (extrinsic: SubmittableExtrinsic<'promise'>): Promise<[TransactionData, YieldTokenBaseInfo]> => {
@@ -571,7 +572,11 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     };
 
     if (!positionInfo) {
-      const extrinsic = apiPromise.api.tx.parachainStaking.delegate(selectedCollatorInfo.address, binaryAmount, new BN(selectedCollatorInfo.nominatorCount), 0);
+      const isSupported = !!apiPromise.api?.tx.parachainStaking.delegate;
+
+      const extrinsic = isSupported
+        ? apiPromise.api.tx.parachainStaking.delegate(address, binaryAmount, new BN(nominatorCount), 0)
+        : apiPromise.api.tx.parachainStaking.delegateWithAutoCompound(address, binaryAmount, 0, new BN(nominatorCount), 0, 0);
 
       return compoundResult(extrinsic);
     }
@@ -580,11 +585,15 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     const parsedSelectedCollatorAddress = reformatAddress(selectedCollatorInfo.address, 0);
 
     if (!bondedValidators.includes(parsedSelectedCollatorAddress)) {
-      const extrinsic = apiPromise.api.tx.parachainStaking.delegate(selectedCollatorInfo.address, binaryAmount, new BN(selectedCollatorInfo.nominatorCount), nominationCount);
+      const isSupported = !!apiPromise.api?.tx.parachainStaking.delegate;
+
+      const extrinsic = isSupported
+        ? apiPromise.api.tx.parachainStaking.delegate(address, binaryAmount, new BN(nominatorCount), nominationCount)
+        : apiPromise.api.tx.parachainStaking.delegateWithAutoCompound(address, binaryAmount, 0, new BN(nominatorCount), 0, nominationCount);
 
       return compoundResult(extrinsic);
     } else {
-      const extrinsic = apiPromise.api.tx.parachainStaking.delegatorBondMore(selectedCollatorInfo.address, binaryAmount);
+      const extrinsic = apiPromise.api.tx.parachainStaking.delegatorBondMore(address, binaryAmount);
 
       return compoundResult(extrinsic);
     }
