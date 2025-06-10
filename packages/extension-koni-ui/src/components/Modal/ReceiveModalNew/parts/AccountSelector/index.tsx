@@ -2,18 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
-import { AddressSelectorItem, CloseIcon } from '@subwallet/extension-koni-ui/components';
+import { CloseIcon } from '@subwallet/extension-koni-ui/components';
 import GeneralEmptyList from '@subwallet/extension-koni-ui/components/EmptyList/GeneralEmptyList';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
-import { isBitcoinAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
+
+import { AccountSelectorItem } from './AccountSelectorItem';
+
+// NOTE:
+// This component is specifically designed for ReceiveModal.
+// Although it shares similarities with the general AccountSelector (Selector/AccountSelector.tsx),
+// it is separated to avoid impacting other use cases and to prevent
+// mixing ReceiveModal-specific logic into the shared component,
+// which would complicate maintenance.
 
 type ListItemGroupLabel = {
   id: string;
@@ -29,16 +36,11 @@ interface Props extends ThemeProps {
   onCancel?: VoidFunction;
   onBack?: VoidFunction;
   selectedValue?: string;
-  autoSelectFirstItem?: boolean;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
-function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
-  return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
-}
-
-function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function Component ({ className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -72,7 +74,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     }
 
     return (
-      <AddressSelectorItem
+      <AccountSelectorItem
         address={(item as AccountAddressItemType).address}
         avatarValue={(item as AccountAddressItemType).accountProxyId}
         className={'account-selector-item'}
@@ -162,22 +164,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       result.push(...unknownAccounts);
     }
 
-    return result.sort((a: ListItem, b: ListItem) => {
-      if (isAccountAddressItem(a) && isAccountAddressItem(b)) {
-        const _isABitcoin = isBitcoinAddress(a.address);
-        const _isBBitcoin = isBitcoinAddress(b.address);
-        const _isSameProxyId = a.accountProxyId === b.accountProxyId;
-
-        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
-          const aDetails = getBitcoinAccountDetails(a.accountType);
-          const bDetails = getBitcoinAccountDetails(b.accountType);
-
-          return aDetails.order - bDetails.order;
-        }
-      }
-
-      return 0;
-    });
+    return result;
   }, [items, searchFunction, searchValue, t]);
 
   const handleSearch = useCallback((value: string) => {
@@ -191,34 +178,6 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       }, 100);
     }
   }, [isActive]);
-
-  useEffect(() => {
-    const doFunction = () => {
-      if (!listItems.length) {
-        return;
-      }
-
-      const firstItem = listItems.find((i) => isAccountAddressItem(i)) as AccountAddressItemType | undefined;
-
-      if (!firstItem) {
-        return;
-      }
-
-      if (!selectedValue) {
-        onSelectItem?.(firstItem);
-
-        return;
-      }
-
-      if (!listItems.some((i) => isAccountAddressItem(i) && i.address === selectedValue)) {
-        onSelectItem?.(firstItem);
-      }
-    };
-
-    if (autoSelectFirstItem) {
-      doFunction();
-    }
-  }, [autoSelectFirstItem, listItems, onSelectItem, selectedValue]);
 
   return (
     <SwModal
@@ -261,7 +220,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
   );
 }
 
-const AccountSelectorModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const AccountSelectorModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-content': {
       height: '100vh'
