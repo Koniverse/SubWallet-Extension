@@ -57,6 +57,7 @@ export class SubstrateApi implements _SubstrateApi {
   isApiReadyOnce = false;
   apiError?: string;
   private handleApiReady: PromiseHandler<_SubstrateApi>;
+  private handleClientReady: PromiseHandler<_SubstrateApi>;
   public readonly isApiConnectedSubject = new BehaviorSubject(false);
   public readonly connectionStatusSubject = new BehaviorSubject(_ChainConnectionStatus.DISCONNECTED);
   get isApiConnected (): boolean {
@@ -191,11 +192,17 @@ export class SubstrateApi implements _SubstrateApi {
   private createClient (apiUrl: string) {
     // todo: re-check metadata, typesBundle, registry,
     const provider = this.createDeDotProvider(apiUrl);
-    const client = new DedotClient(provider);
+    const client = new DedotClient({ provider });
 
     client.on('connected', () => console.log(`Dedot: On successfully ${apiUrl}`));
-    client.on('ready', () => console.log(`Dedot: On ready ${apiUrl}`));
-    client.on('disconnected', () => console.log(`Dedot: On disconnect ${apiUrl}`));
+    client.on('ready', () => {
+      this.handleClientReady.resolve(this);
+      console.log(`Dedot: On ready ${apiUrl}`);
+    });
+    client.on('disconnected', () => {
+      this.handleClientReady = createPromiseHandler<_SubstrateApi>();
+      console.log(`Dedot: On disconnect ${apiUrl}`);
+    });
     client.on('error', () => console.log(`Dedot: On error ${apiUrl}`));
 
     client.connect()
@@ -226,10 +233,15 @@ export class SubstrateApi implements _SubstrateApi {
     this.api = this.createApi(this.provider, externalApiPromise);
 
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
+    this.handleClientReady = createPromiseHandler<_SubstrateApi>();
   }
 
   get isReady (): Promise<_SubstrateApi> {
     return this.handleApiReady.promise;
+  }
+
+  get isClientReady (): Promise<_SubstrateApi> {
+    return this.handleClientReady.promise;
   }
 
   async updateApiUrl (apiUrl: string) {
@@ -299,6 +311,7 @@ export class SubstrateApi implements _SubstrateApi {
     await this.disconnect();
     this.connect();
     await this.handleApiReady.promise;
+    await this.handleClientReady.promise;
   }
 
   destroy () {

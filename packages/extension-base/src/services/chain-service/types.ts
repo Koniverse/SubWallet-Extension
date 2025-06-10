@@ -99,6 +99,7 @@ export interface _SubstrateApi extends _SubstrateApiState, _ChainBaseApi, _Subst
   api: ApiPromise;
   client: DedotClient
   isReady: Promise<_SubstrateApi>;
+  isClientReady: Promise<_SubstrateApi>;
   connect: (_callbackUpdateMetadata?: (substrateApi: _SubstrateApi) => void) => void;
 
   specName: string;
