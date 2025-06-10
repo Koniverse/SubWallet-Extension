@@ -38,6 +38,7 @@ function Component ({ className }: Props) {
 
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
+  const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
 
   const transactionType = useMemo((): ExtrinsicType => {
     const pathName = location.pathname;
@@ -150,7 +151,7 @@ function Component ({ className }: Props) {
     };
   }, [currentAccountProxy, storageKey]);
 
-  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, defaultTransactionStorageValue);
+  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, { ...defaultTransactionStorageValue });
 
   // TODO: Review needPersistData — may be outdated and misaligned with current logic
   //  Temporarily set needPersistData to false to avoid unintended side effects
@@ -163,7 +164,7 @@ function Component ({ className }: Props) {
 
   const needPersistData = false;
 
-  const [defaultData] = useState(storage);
+  const [defaultData, setDefaultData] = useState(storage);
   const { chain, from } = storage;
 
   const homePath = useMemo((): string => {
@@ -239,6 +240,27 @@ function Component ({ className }: Props) {
     chain !== '' && chainChecker(chain);
   }, [chain, chainChecker]);
 
+  // TODO (Hotfix):
+  //  Temporary workaround for handling cases where a user opens a transaction screen via direct link.
+  //  This fixes the issue where form values are incorrectly restored from a previously cached transaction.
+  //  Expected direction:
+  //  - Allow external logic to override form values cleanly.
+  //  - fromAccountProxy should not be strictly tied to currentAccountProxy.
+  //  - Ensure direct link access to transaction screens works reliably and cleanly without stale form data.
+  useEffect(() => {
+    if (currentAccountProxy) {
+      if (currentAccountProxy.id !== storage.fromAccountProxy) {
+        setStorage({
+          ...defaultTransactionStorageValue
+        });
+        setDefaultData({
+          ...defaultTransactionStorageValue
+        });
+        setForceRerenderKey(`${Date.now()}_ForceRerenderKey`);
+      }
+    }
+  }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy]);
+
   return (
     <>
       <Layout.Home
@@ -263,7 +285,10 @@ function Component ({ className }: Props) {
         }}
         >
           <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
-            <div className={CN(className, 'transaction-wrapper')}>
+            <div
+              className={CN(className, 'transaction-wrapper')}
+              key={forceRerenderKey}
+            >
               <SwSubHeader
                 background={'transparent'}
                 center
