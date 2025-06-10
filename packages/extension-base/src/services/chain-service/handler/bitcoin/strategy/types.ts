@@ -7,6 +7,7 @@ import EventEmitter from 'eventemitter3';
 
 export interface BitcoinApiStrategy extends Omit<ApiRequestStrategy, 'addRequest'> {
   getBlockTime (): Promise<number>;
+  computeBlockTime (): Promise<number>;
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo>;
   getRunes (address: string): Promise<RunesInfoByAddress[]>;
   // getRuneTxsUtxos (address: string): Promise<RuneTxs[]>; // noted: all rune utxos come in account

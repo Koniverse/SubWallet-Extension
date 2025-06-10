@@ -24,14 +24,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
     this.baseUrl = url;
     this.isTestnet = url.includes('testnet');
-
-    this.getBlockTime()
-      .then((rs) => {
-        this.timePerBlock = rs;
-      })
-      .catch(() => {
-        this.timePerBlock = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000;
-      });
   }
 
   private headers = {
@@ -61,6 +53,31 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
       return time / length;
     }, 0);
+  }
+
+  async computeBlockTime (): Promise<number> {
+    let blockTime = this.timePerBlock;
+
+    if (blockTime > 0) {
+      return blockTime;
+    }
+
+    try {
+      blockTime = await this.getBlockTime();
+
+      this.timePerBlock = blockTime;
+    } catch (e) {
+      console.error('Failed to compute block time', e);
+
+      blockTime = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000; // Default to 10 minutes if failed
+    }
+
+    // Cache block time in 60 seconds
+    setTimeout(() => {
+      this.timePerBlock = 0;
+    }, 60000);
+
+    return blockTime;
   }
 
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo> {
@@ -150,8 +167,10 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
   }
 
   // TODO: NOTE: Currently not in use. Recheck the response if you want to use it.
-  getFeeRate (): Promise<BitcoinFeeInfo> {
-    return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
+  async getFeeRate (): Promise<BitcoinFeeInfo> {
+    const blockTime = await this.computeBlockTime();
+
+    return await this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
       const estimates = await response.json() as BlockStreamFeeEstimates;
 
@@ -171,9 +190,9 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(estimates[low] || 10), time: this.timePerBlock * low },
-          average: { feeRate: convertFee(estimates[average || 12]), time: this.timePerBlock * average },
-          fast: { feeRate: convertFee(estimates[fast] || 15), time: this.timePerBlock * fast },
+          slow: { feeRate: convertFee(estimates[low] || 10), time: blockTime * low },
+          average: { feeRate: convertFee(estimates[average || 12]), time: blockTime * average },
+          fast: { feeRate: convertFee(estimates[fast] || 15), time: blockTime * fast },
           default: 'slow'
         }
       };
