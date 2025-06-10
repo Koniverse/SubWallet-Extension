@@ -398,8 +398,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           return -1;
         } else if (PROCESSING_STATUSES.includes(b.status) && !PROCESSING_STATUSES.includes(a.status)) {
           return 1;
-        } else {
+        } else if (b.displayTime !== a.displayTime) {
           return b.displayTime - a.displayTime;
+        } else {
+          return (a.apiTxIndex ?? 0) - (b.apiTxIndex ?? 0);
         }
       })
       .slice(0, count);
