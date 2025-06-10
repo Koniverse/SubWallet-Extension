@@ -401,7 +401,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         } else if (b.displayTime !== a.displayTime) {
           return b.displayTime - a.displayTime;
         } else {
-          return a.txIndex - b.txIndex;
+          return (a.apiTxIndex ?? 0) - (b.apiTxIndex ?? 0);
         }
       })
       .slice(0, count);
