@@ -283,7 +283,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   type='ghost'
                 >
                   <div className='__nomination-button-label'>
-                    {t(haveValidator ? 'Selected validator' : 'Nomination info')}
+                    {t(haveValidator ? 'Your validators' : 'Nomination info')}
                   </div>
 
                   <Icon

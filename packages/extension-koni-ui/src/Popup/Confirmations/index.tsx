@@ -283,7 +283,7 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
           return t('Cancel unstake confirm');
         case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
-          return t('Change validator');
+          return t('Change validator confirm');
         case ExtrinsicType.MINT_VDOT:
           return t('Mint vDOT confirm');
         case ExtrinsicType.MINT_VMANTA:

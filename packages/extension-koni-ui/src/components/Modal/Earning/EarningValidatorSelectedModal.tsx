@@ -17,8 +17,7 @@ import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContex
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import ChangeBittensorValidator from '../../Field/Earning/ChangeBittensorValidator';
-import ChangeValidator from '../../Field/Earning/ChangeValidator';
+import { ChangeBittensorValidator, ChangeValidator } from '../../Earning';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;

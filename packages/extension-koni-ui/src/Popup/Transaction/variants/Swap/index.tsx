@@ -427,6 +427,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     });
   }, [notify, t]);
 
+  // HMM
   const notifyTooHighAmount = useCallback(() => {
     notify({
       message: t('Amount too high. Lower your amount and try again'),

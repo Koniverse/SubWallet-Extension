@@ -8,7 +8,7 @@ import { NominationInfo, SubmitChangeValidatorStaking, YieldPoolType } from '@su
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
-import { useGetChainAssetInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
@@ -19,10 +19,10 @@ import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContex
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { AccountItemWithName } from '../../Account';
-import AmountInput from '../AmountInput';
-import NominationSelector from '../NominationSelector';
-import EarningValidatorSelector from './EarningValidatorSelector';
+import { AccountItemWithName } from '../Account';
+import AmountInput from '../Field/AmountInput';
+import EarningValidatorSelector from '../Field/Earning/EarningValidatorSelector';
+import NominationSelector from '../Field/NominationSelector';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -52,6 +52,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const { t } = useTranslation();
+  const notify = useNotification();
   const { inactiveAll } = useContext(ModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -86,6 +87,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [poolInfo]);
 
   const bondedAsset = useGetChainAssetInfo(bondedSlug || poolInfo.metadata.inputAsset);
+  const symbol = poolInfo.metadata.subnetData?.subnetSymbol || bondedAsset?.symbol;
+
   const decimals = useMemo(() => bondedAsset?.decimals || 0, [bondedAsset]);
   const { compound: positionInfo } = useYieldPositionDetail(slug, from);
 
@@ -222,10 +225,26 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     [amountChange, form, defaultData.value]
   );
 
+  const notifyTooHighAmount = useCallback(() => {
+    notify({
+      message: t(`Amount too high. Lower your amount to no more than ${formatBalance(bondedValue, decimals)} ${symbol || ''} and try again`),
+      type: 'error',
+      duration: 5
+    });
+  }, [bondedValue, decimals, notify, symbol, t]);
+
   const onClickSubmit = useCallback(
     (values: ChangeValidatorParams) => {
-      setSubmitLoading(true);
       const { fromTarget, value } = values;
+
+      if (isShowAmountChange && ((new BigN(value)).gt(bondedValue))) {
+        notifyTooHighAmount();
+
+        return;
+      }
+
+      setSubmitLoading(true);
+
       const submitData: SubmitChangeValidatorStaking = {
         slug: poolInfo.slug,
         address: from,
@@ -252,7 +271,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           });
       }, 300);
     },
-    [poolInfo.slug, from, isShowAmountChange, bondedValue, poolTargets, netuid, onSuccess, onError, inactiveAll]
+    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, netuid, notifyTooHighAmount, onError, onSuccess, inactiveAll]
   );
 
   const onPreCheck = usePreCheckAction(from);
@@ -306,7 +325,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             <span>
                   &nbsp;{formatBalance(bondedValue, decimals)}&nbsp;
             </span>
-            <span>{ poolInfo.metadata.subnetData?.subnetSymbol || bondedAsset?.symbol }</span>
+            <span>{ symbol }</span>
           </div>
         </Form.Item>
 
@@ -315,7 +334,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             chain={chain}
             defaultValue={persistValidator}
             disabled={!from}
-            label={t('Select validator')}
+            label={t('From')}
             networkPrefix={networkPrefix}
             nominators={nominations}
             poolInfo={poolInfo}
