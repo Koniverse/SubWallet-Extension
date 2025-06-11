@@ -80,7 +80,7 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
         disabledButton={disabledButton}
         maxValidator={maxValidator}
         modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
-        title={t(title || 'Selected validators')}
+        title={t(title || 'Your validators')}
         totalValidator={totalValidator}
       />
 

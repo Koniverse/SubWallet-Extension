@@ -151,13 +151,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               )}
               onClick={onClick}
             >
-              {t('Change validator')}
+              {t('Change validators')}
             </Button>
           )
         }
         id={modalId}
         onCancel={onCancelSelectValidator}
-        title={t('Selected validators')}
+        title={t('Your validators')}
       >
         <SwList.Section
           list={resultList}

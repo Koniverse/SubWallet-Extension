@@ -9,7 +9,7 @@ import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-u
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import { SelectedValidatorInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/SelectedValidatorInfoPart';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -17,9 +17,7 @@ import { BaseTransactionConfirmationProps } from './Base';
 
 type Props = BaseTransactionConfirmationProps;
 
-const isSingular = (count: number, singular: string, plural: string) => {
-  return count === 1 ? singular : plural;
-};
+const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-10)}`;
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
@@ -43,6 +41,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const deselectedAddresses = oldValidatorAddresses.filter((addr) => !newValidatorAddresses.includes(addr));
   const newlySelectedAddresses = newValidatorAddresses.filter((addr) => !oldValidatorAddresses.includes(addr));
 
+  const isBittensorChain = useMemo(() => {
+    return transaction.chain === 'bittensor' || transaction.chain === 'bittensor_testnet';
+  }, [transaction.chain]);
+
   return (
     <div>
       <div className={CN(className)}>
@@ -52,57 +54,91 @@ const Component: React.FC<Props> = (props: Props) => {
         />
 
         <MetaInfo
-          className={'meta-info'}
-          hasBackgroundWrapper
+          className={'nomination-wrapper'}
         >
-          <MetaInfo.Number
-            decimals={decimals}
-            label={t('Estimated fee')}
-            suffix={symbol}
-            value={transaction.estimateFee?.value || 0}
-          />
+          <MetaInfo
+            className={'meta-info'}
+            hasBackgroundWrapper
+          >
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('Estimated fee')}
+              suffix={symbol}
+              value={transaction.estimateFee?.value || 0}
+            />
+          </MetaInfo>
+          {(compound && !isBittensorChain) && (<SelectedValidatorInfoPart
+            addresses={newValidatorAddresses}
+            className='nomination-info-part'
+            compound={compound}
+            disabledButton={true}
+            maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
+            modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
+            poolInfo={poolInfo}
+            title={'Total validators selected'}
+            totalValidator={totalSelectedCount}
+          />)}
         </MetaInfo>
 
         {compound && (
           <MetaInfo
             className={'nomination-wrapper'}
           >
-            <SelectedValidatorInfoPart
-              addresses={newValidatorAddresses}
-              className='nomination-info-part'
-              compound={compound}
-              disabledButton={true}
-              maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
-              modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
-              poolInfo={poolInfo}
-              title={isSingular(deselectedCount, 'Total validator selected', 'Total validators selected')}
-              totalValidator={totalSelectedCount}
-            />
-
-            {deselectedCount > 0 && (
-              <SelectedValidatorInfoPart
-                addresses={deselectedAddresses}
-                className='nomination-info-part'
-                compound={compound}
-                disabledButton={true}
-                modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-deselected`}
-                poolInfo={poolInfo}
-                title={isSingular(deselectedCount, 'Validator deselected', 'Validators deselected')}
-                totalValidator={deselectedCount}
-              />
+            {(deselectedCount > 0 || data.fromValidator) && (
+              data.fromValidator
+                ? (
+                  <MetaInfo.Default
+                    className='__validator-address deselected'
+                    label='Deselected validator'
+                  >
+                    {truncateAddress(data.fromValidator)}
+                  </MetaInfo.Default>
+                )
+                : deselectedCount === 1
+                  ? (
+                    <MetaInfo.Default
+                      className='__validator-address deselected'
+                      label='Deselected validator'
+                    >
+                      {truncateAddress(deselectedAddresses[0])}
+                    </MetaInfo.Default>
+                  )
+                  : (
+                    <SelectedValidatorInfoPart
+                      addresses={deselectedAddresses}
+                      className='nomination-info-part'
+                      compound={compound}
+                      disabledButton={true}
+                      modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-deselected`}
+                      poolInfo={poolInfo}
+                      title={'Validators deselected'}
+                      totalValidator={deselectedCount}
+                    />
+                  )
             )}
 
             {newlySelectedCount > 0 && (
-              <SelectedValidatorInfoPart
-                addresses={newlySelectedAddresses}
-                className='nomination-info-part'
-                compound={compound}
-                disabledButton={true}
-                modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-newly`}
-                poolInfo={poolInfo}
-                title={isSingular(newlySelectedCount, 'Validator newly selected', 'Validators newly selected')}
-                totalValidator={newlySelectedCount}
-              />
+              newlySelectedCount === 1
+                ? (
+                  <MetaInfo.Default
+                    className='__validator-address newly-selected'
+                    label='Newly selected validator'
+                  >
+                    {truncateAddress(newlySelectedAddresses[0])}
+                  </MetaInfo.Default>
+                )
+                : (
+                  <SelectedValidatorInfoPart
+                    addresses={newlySelectedAddresses}
+                    className='nomination-info-part'
+                    compound={compound}
+                    disabledButton={true}
+                    modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-newly`}
+                    poolInfo={poolInfo}
+                    title={'Validators newly selected'}
+                    totalValidator={newlySelectedCount}
+                  />
+                )
             )}
           </MetaInfo>
         )}
@@ -121,6 +157,19 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
     },
     '.form-space-sm .ant-form-item': {
       marginBottom: '0px'
+    },
+
+    '.__validator-address': {
+      paddingLeft: '12px',
+      paddingRight: '12px'
+    },
+
+    '.__validator-address.deselected': {
+      paddingTop: '12px'
+    },
+
+    '.__validator-address.newly-selected': {
+      paddingBottom: '12px'
     }
   };
 });

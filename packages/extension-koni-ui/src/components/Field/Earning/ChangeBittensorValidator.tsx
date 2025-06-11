@@ -12,9 +12,9 @@ import { useGetChainAssetInfo, useHandleSubmitTransaction, usePreCheckAction, us
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon, InputRef, Logo, ModalContext, Switch, SwModal, useExcludeModal } from '@subwallet/react-ui';
+import { Button, Form, Icon, InputRef, Logo, ModalContext, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
-import { CaretLeft, CheckCircle } from 'phosphor-react';
+import { CaretLeft, CheckCircle, Info } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -348,7 +348,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         </MetaInfo>
 
         <div className='__amount-part'>
-          <div className='__item-left-part'>{t('Change Amount')}</div>
+          <Tooltip
+            placement={'topRight'}
+            title={t('Amount you want to move from the selected validator to the new validator')}
+          >
+            <div className='__item-left-part'>{t('Change staking amount')}
+              <Icon
+                className='__validator-info'
+                iconColor='white'
+                phosphorIcon={Info}
+                size='sm'
+                weight='fill'
+              />
+            </div>
+          </Tooltip>
           <div className='__item-right-part'>
             <Switch onClick={showAmountChangeInput} />
           </div>
@@ -436,6 +449,13 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
 
     '.minimum-stake__label': {
       color: token['gray-4']
+    },
+
+    '.__item-left-part': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      cursor: 'pointer'
     }
   };
 });
