@@ -28,7 +28,6 @@ import { BitcoinAddressType, KeyringPair$Meta } from '@subwallet/keyring/types';
 import { KeyringOptions } from '@subwallet/ui-keyring/options/types';
 import { KeyringAddress } from '@subwallet/ui-keyring/types';
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
-import { Psbt } from 'bitcoinjs-lib';
 import BN from 'bn.js';
 import { DexieExportJsonStructure } from 'dexie-export-import';
 import Web3 from 'web3';
@@ -1178,7 +1177,7 @@ export interface BitcoinSignPsbtPayload extends Omit<BitcoinSignPsbtParams, 'psb
   txOutput: PsbtTransactionArg[];
   to: string;
   value: string;
-  psbt: Psbt;
+  psbt: string;
   tokenSlug: string;
 }
 

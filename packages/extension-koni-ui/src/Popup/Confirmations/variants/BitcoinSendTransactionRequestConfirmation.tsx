@@ -242,10 +242,6 @@ const BitcoinSendTransactionRequestConfirmation = styled(Component)<Props>(({ th
     justifyContent: 'center'
   },
 
-  '.__fee-editor.__fee-editor.__fee-editor': {
-    marginTop: 4
-  },
-
   '.__fee-editor-value-wrapper': {
     display: 'flex',
     alignItems: 'center'

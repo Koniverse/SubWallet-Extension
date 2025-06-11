@@ -1610,7 +1610,7 @@ export default class KoniState {
       ...result.payloadAfterValidated as BitcoinSignPsbtRequest,
       errors: errorsFormated
     };
-    const network_ = network === 'mainnet' ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+    const network_ = network === 'mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
     const psbtGenerate = bitcoin.Psbt.fromHex(psbt, {
       network: network_
     });
@@ -1680,7 +1680,7 @@ export default class KoniState {
 
     payloadAfterValidated.payload = {
       ...payloadAfterValidated.payload,
-      psbt: psbtGenerate,
+      psbt,
       tokenSlug: tokenInfo.slug,
       value: value.toString(),
       to,
