@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.3.41
+Build date: Jun 11, 2025.
+
+Features & Update:
+- Support Asset Hub Testnet swap for Chainflip (#4265)
+- Exposed API Key in SubWallet Chrome Extension
+- Moving BlockFrost interaction Logic to the Backend (#4368)
+- Update UI Connect dApp screen (#4377)
+
+Bug fixed:
+- Fixed bug show Moonbeam local token balance (#4413)
+- Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416)
+- Fixed bug Error page when use marketing campaign (#4403)
+- Fixed bug navigating actions in Earning feature (#4441)
+
+
 ## 1.3.40
 Build date: May 30, 2025.
 
