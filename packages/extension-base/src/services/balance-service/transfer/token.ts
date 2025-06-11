@@ -125,6 +125,100 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
   return [transfer, transferAmount || value];
 };
 
+export const createSubstrateExtrinsicV2 = async ({ from, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
+  const client = substrateApi.client;
+
+  const isDisableTransfer = tokenInfo.metadata?.isDisableTransfer as boolean;
+
+  if (isDisableTransfer) {
+    return [null, value];
+  }
+
+  // @ts-ignore
+  let transfer: SubmittableExtrinsic<'promise'> | null = null;
+  const isTxCurrenciesSupported = !!client && !!client && !!client.tx.currencies;
+  const isTxBalancesSupported = !!client && !!client.tx && !!client.tx.balances;
+  const isTxTokensSupported = !!client && !!client.tx && !!client.tx.tokens;
+  const isTxAssetsSupported = !!client && !!client.tx && !!client.tx.assets;
+  let transferAmount; // for PSP-22 tokens, might be deprecated in the future
+
+  if (_isBridgedToken(tokenInfo) && client.tx.foreignAssets) {
+    const onChainInfo = _getTokenOnChainInfo(tokenInfo) || _getXcmAssetMultilocation(tokenInfo);
+
+    if (transferAll) {
+      transfer = client.tx.foreignAssets.transfer(onChainInfo, to, value);
+    } else {
+      transfer = client.tx.foreignAssets.transferKeepAlive(onChainInfo, to, value);
+    }
+  } else if (_isTokenWasmSmartContract(tokenInfo) && client.query.contracts) {
+    const contractPromise = getPSP22ContractPromise(client, _getContractAddressOfToken(tokenInfo));
+    // @ts-ignore
+    const gasLimit = await getWasmContractGasLimit(client, from, 'psp22::transfer', contractPromise, {}, [from, value, {}]);
+
+    // @ts-ignore
+    transfer = contractPromise.tx['psp22::transfer']({ gasLimit }, to, value, {});
+    transferAmount = value;
+  } else if (_isTokenGearSmartContract(tokenInfo) && (client instanceof GearApi)) {
+    const contractPromise = tokenInfo.assetType === _AssetType.GRC20
+      ? getGRC20ContractPromise(client, _getContractAddressOfToken(tokenInfo))
+      : getVFTContractPromise(client, _getContractAddressOfToken(tokenInfo));
+    const transaction = await contractPromise
+      .service
+      .transfer(u8aToHex(decodeAddress(to)), value) // Create transfer transaction
+      .withAccount(from) // Set sender account
+      .calculateGas(); // Add account arg to extrinsic
+
+    transfer = transaction.extrinsic;
+    transferAmount = value;
+  } else if (_TRANSFER_CHAIN_GROUP.acala.includes(networkKey)) {
+    if (!_isNativeToken(tokenInfo)) {
+      if (isTxCurrenciesSupported) {
+        transfer = client.tx.currencies.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
+      }
+    } else {
+      if (transferAll) {
+        transfer = client.tx.balances.transferAll(to, false);
+      } else if (value) {
+        transfer = client.tx.balances.transferKeepAlive(to, new BN(value));
+      }
+    }
+  } else if (_TRANSFER_CHAIN_GROUP.kintsugi.includes(networkKey) && isTxTokensSupported) {
+    if (transferAll) {
+      transfer = client.tx.tokens.transferAll(to, _getTokenOnChainInfo(tokenInfo) || _getTokenOnChainAssetId(tokenInfo), false);
+    } else if (value) {
+      transfer = client.tx.tokens.transfer(to, _getTokenOnChainInfo(tokenInfo) || _getTokenOnChainAssetId(tokenInfo), new BN(value));
+    }
+  } else if (_TRANSFER_CHAIN_GROUP.pendulum.includes(networkKey) && isTxTokensSupported && !_isNativeToken(tokenInfo)) {
+    if (transferAll) {
+      transfer = client.tx.tokens.transferAll(to, _getTokenOnChainInfo(tokenInfo) || _getTokenOnChainAssetId(tokenInfo), false);
+    } else if (value) {
+      transfer = client.tx.tokens.transfer(to, _getTokenOnChainInfo(tokenInfo) || _getTokenOnChainAssetId(tokenInfo), new BN(value));
+    }
+  } else if (_TRANSFER_CHAIN_GROUP.bitcountry.includes(networkKey) && !_isNativeToken(tokenInfo)) {
+    transfer = client.tx.currencies.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
+  } else if (_TRANSFER_CHAIN_GROUP.statemine.includes(networkKey) && !_isNativeToken(tokenInfo)) {
+    transfer = client.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+  } else if (_TRANSFER_CHAIN_GROUP.sora_substrate.includes(networkKey) && isTxAssetsSupported) {
+    transfer = client.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+  } else if (isTxBalancesSupported && _isNativeToken(tokenInfo)) {
+    if (_TRANSFER_CHAIN_GROUP.disable_transfer.includes(networkKey)) {
+      return [null, transferAmount || value];
+    }
+
+    if (transferAll) {
+      transfer = client.tx.balances.transferAll(to, false);
+    } else if (value) {
+      if (client.tx.balances.transferKeepAlive) {
+        transfer = client.tx.balances.transferKeepAlive(to, new BN(value));
+      } else {
+        transfer = client.tx.balances.transfer(to, new BN(value));
+      }
+    }
+  }
+
+  return [transfer, transferAmount || value];
+};
+
 export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInfo, tokenInfo: _ChainAsset, api: _SubstrateApi | _EvmApi | _TonApi): Promise<BigN> => {
   try {
     let estimatedFee;
@@ -162,7 +256,7 @@ export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInf
     } else {
       const substrateApi = api as _SubstrateApi;
       const chainApi = await substrateApi.isReady;
-      const [mockTx] = await createSubstrateExtrinsic({
+      const [mockTx] = await createSubstrateExtrinsicV2({
         from: address,
         networkKey: chainInfo.slug,
         substrateApi: chainApi,
