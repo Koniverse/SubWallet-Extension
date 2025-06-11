@@ -33,6 +33,7 @@ jobs:
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
         NFT_MINTING_HOST: ${{ secrets.NFT_MINTING_HOST }}
         CHAINFLIP_BROKER_API: ${{ secrets.CHAINFLIP_BROKER_API }}
+        CHAINFLIP_BROKER_TESTNET_API: ${{ secrets.CHAINFLIP_BROKER_TESTNET_API }}
         BITTENSOR_API_KEY_1: ${{ secrets.BITTENSOR_API_KEY_1 }}
         BITTENSOR_API_KEY_2: ${{ secrets.BITTENSOR_API_KEY_2 }}
         BITTENSOR_API_KEY_3: ${{ secrets.BITTENSOR_API_KEY_3 }}
@@ -45,7 +46,7 @@ jobs:
         BITTENSOR_API_KEY_10: ${{ secrets.BITTENSOR_API_KEY_10 }}
         SIMPLE_SWAP_API_KEY: ${{ secrets.SIMPLE_SWAP_API_KEY }}
         UNISWAP_API_KEY:  ${{ secrets.UNISWAP_API_KEY }}
-        SUBWALLET_API: ${{ secrets.SUBWALLET_API }}
+        KYBER_CLIENT_ID: ${{ secrets.KYBER_CLIENT_ID }}
         BLOCKFROST_API_KEY_MAIN: ${{ secrets.BLOCKFROST_API_KEY_MAIN }}
         BLOCKFROST_API_KEY_PREP: ${{ secrets.BLOCKFROST_API_KEY_PREP }}
         PARASPELL_API_KEY: ${{ secrets.PARASPELL_API_KEY }}

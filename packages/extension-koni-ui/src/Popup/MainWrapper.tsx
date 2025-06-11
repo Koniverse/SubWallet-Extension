@@ -4,7 +4,7 @@
 import { StepStatus } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, BackgroundExpandView } from '@subwallet/extension-koni-ui/components';
-import { useIsPopup } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useCallback, useMemo } from 'react';
@@ -20,7 +20,7 @@ type Props = ThemeProps & {
 const Component: React.FC<Props> = (props: Props) => {
   const { children, className } = props;
   const aliveProcessMap = useSelector((state: RootState) => state.requestState.aliveProcess);
-  const isPopup = useIsPopup();
+  const { isExpanseMode } = useExtensionDisplayModes();
   const navigate = useNavigate();
 
   const processIds = useMemo(() => {
@@ -49,7 +49,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={className}>
       {
-        !!lastProcessId && !isPopup && (
+        !!lastProcessId && isExpanseMode && (
           <div className={'transaction-process-warning-container'}>
             <AlertBox
               className={'transaction-process-warning-item'}
@@ -112,9 +112,5 @@ export const MainWrapper = styled(Component)<ThemeProps>(({ theme: { token } }: 
       textDecoration: 'underline',
       cursor: 'pointer'
     }
-  },
-
-  '.web-layout-container': {
-    height: '100%'
   }
 }));

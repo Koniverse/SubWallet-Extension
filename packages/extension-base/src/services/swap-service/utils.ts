@@ -14,6 +14,7 @@ export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
 
 export const SIMPLE_SWAP_EXPLORER = 'https://simpleswap.io';
 
+// Deprecated
 export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string> = {
   'bittensor-NATIVE-TAO': 'tao',
   [COMMON_ASSETS.ETH]: 'eth',
@@ -25,9 +26,11 @@ export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string>
 export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in milliseconds
   default: 90000,
   [SwapProviderId.CHAIN_FLIP_TESTNET]: 30000,
-  [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000
+  [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000,
+  error: 10000
 };
 
+// deprecated
 export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
   [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
   [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
@@ -49,7 +52,7 @@ export const FEE_RATE_MULTIPLIER: Record<string, number> = {
   high: 2
 };
 
-export function getSupportSwapChain (): string[] {
+export function getSupportedSwapChains (): string[] {
   return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
 }
 
@@ -98,20 +101,28 @@ function getChainflipNetwork (isTestnet: boolean) {
 export function getChainflipBroker (isTestnet: boolean) { // noted: currently not use testnet broker
   if (isTestnet) {
     return {
-      url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+      url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API.test}`
     };
   } else {
     return {
-      url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+      url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API.main}`
     };
   }
 }
 
 export function getChainflipSwap (isTestnet: boolean) {
   if (isTestnet) {
-    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API.test}`;
   } else {
-    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API.main}`;
+  }
+}
+
+export function getAssetsUrl (isTestnet: boolean) {
+  if (isTestnet) {
+    return 'https://perseverance.chainflip-broker.io/assets';
+  } else {
+    return 'https://chainflip-broker.io/assets';
   }
 }
 
@@ -298,6 +309,22 @@ export function getSwapChainsFromPath (path: DynamicSwapAction[]): string[] {
   });
 
   return swapChains;
+}
+
+export function processStepsToPathActions (steps: CommonStepDetail[]): DynamicSwapType[] {
+  const path: DynamicSwapType[] = [];
+
+  for (const step of steps) {
+    if (step.type === CommonStepType.XCM) {
+      path.push(DynamicSwapType.BRIDGE);
+    }
+
+    if (step.type === SwapStepType.SWAP) {
+      path.push(DynamicSwapType.SWAP);
+    }
+  }
+
+  return path;
 }
 
 export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.04; // add 2%

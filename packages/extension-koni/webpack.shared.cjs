@@ -48,6 +48,7 @@ const _additionalEnv = {
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
   CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
+  CHAINFLIP_BROKER_TESTNET_API: JSON.stringify(process.env.CHAINFLIP_BROKER_TESTNET_API),
   BITTENSOR_API_KEY_1: JSON.stringify(process.env.BITTENSOR_API_KEY_1),
   BITTENSOR_API_KEY_2: JSON.stringify(process.env.BITTENSOR_API_KEY_2),
   BITTENSOR_API_KEY_3: JSON.stringify(process.env.BITTENSOR_API_KEY_3),
@@ -60,6 +61,7 @@ const _additionalEnv = {
   BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
   SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
   UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
+  KYBER_CLIENT_ID: JSON.stringify(process.env.KYBER_CLIENT_ID),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
   BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
   BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
@@ -162,6 +164,11 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: 'public/index.html',
+        chunks: ['extension']
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'side-panel.html',
+        template: 'public/side-panel.html',
         chunks: ['extension']
       }),
       new HtmlWebpackPlugin({

@@ -9,7 +9,7 @@ import { CURRENT_PAGE, TRANSACTION_STORAGES } from '@subwallet/extension-koni-ui
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-koni-ui/constants/router';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { usePredefinedModal, WalletModalContextProvider } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetCurrentPage, useIsPopup, useSubscribeLanguage } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes, useGetCurrentPage, useSubscribeLanguage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useUILock from '@subwallet/extension-koni-ui/hooks/common/useUILock';
 import { subscribeNotifications } from '@subwallet/extension-koni-ui/messaging';
@@ -37,7 +37,6 @@ const migrateAccountNotionUrl = '/migrate-account?is-notion=true';
 const forcedAccountMigrationUrl = '/migrate-account?is-forced-migration=true';
 const loginUrl = '/keyring/login';
 const phishingUrl = '/phishing-page-detected';
-const mv3MigrationUrl = '/mv3-migration';
 // const remindExportAccountUrl = '/remind-export-account';
 const createPasswordUrl = '/keyring/create-password';
 const migratePasswordUrl = '/keyring/migrate-password';
@@ -96,7 +95,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
   const needUnlock = isUILocked || (isLocked && unlockType === WalletUnlockType.ALWAYS_REQUIRED);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const navigate = useNavigate();
-  const isPopup = useIsPopup();
+  const { isPopupMode } = useExtensionDisplayModes();
 
   const needMasterPasswordMigration = useMemo(
     () => !!accounts
@@ -107,16 +106,16 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
   );
 
   const activePriorityPath = useMemo(() => {
-    if (isPopup && !isAcknowledgedUnifiedAccountMigration) {
+    if (isPopupMode && !isAcknowledgedUnifiedAccountMigration) {
       return migrateAccountNotionUrl;
     }
 
-    if (isPopup && isUnifiedAccountMigrationInProgress) {
+    if (isPopupMode && isUnifiedAccountMigrationInProgress) {
       return forcedAccountMigrationUrl;
     }
 
     return undefined;
-  }, [isAcknowledgedUnifiedAccountMigration, isPopup, isUnifiedAccountMigrationInProgress]);
+  }, [isAcknowledgedUnifiedAccountMigration, isPopupMode, isUnifiedAccountMigrationInProgress]);
 
   const redirectPath = useMemo<string | null>(() => {
     const pathName = location.pathname;
@@ -127,7 +126,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
       return null;
     }
 
-    const requireLogin = pathName !== mv3MigrationUrl && !pathName.startsWith(phishingUrl);
+    const requireLogin = !pathName.startsWith(phishingUrl);
 
     if (!requireLogin) {
       // Do nothing

@@ -1,19 +1,19 @@
-    3002	AnhMTV                        	Release version 1.3.30
-    2650	Nam Phạm                      	[Issue 4114] chore: update chainlist
-    2547	S2kael                        	[Issue-4114] Synchronize step metadata for processes
+    3050	AnhMTV                        	Release version 1.3.40
+    2668	Nam Phạm                      	disable block explorer for truth network
+    2554	S2kael                        	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     737	bluezdot                      	[Issue-3293] fix: fix enforcing the minimum miner tip
+     847	bluezdot                      	[Issue-4314] fix: fix dry-run
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     256	Frenkie Nguyen                	[Issue-4081] Update the URL to detect the environment
-     217	lw                            	[Issue-4114] fix: Fix error in transaction submission screen
-     217	tunghp2002                    	
+     297	Frenkie Nguyen                	[Issue-4347] chores: eslint after merge subwallet-dev
+     268	tunghp2002                    	[Issue-38-Backend] Handle error message
+     240	lw                            	refactor: Adjust conditional rendering logic in NumberDisplay
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
+     178	PDTnhah                       	[Issue-4273] Update transfer chain group
      170	lw-cdm                        	
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     156	PDTnhah                       	[Issue-2836] Fix: correct spelling
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	
@@ -21,19 +21,20 @@
       77	bluedot                       	[Issue-3888] build: upgrade version polkadot api
       63	Roman                         	fix ui issues
       53	Dominhquangdev                	update Bridge code
+      36	Thiendekaco                   	[Issue-4401] fix(dapp): Error page when connect with dApps
       28	S2kael                        	[Issue-3658] Hide estimate fee field on Send Fund screen with cardano chain
+      28	Thiendekaco                   	[Issue-4100] fix: resolve PR feedback
       10	Trang Trịnh                   	api get karura and acala nfts
       10	tunghp2002                    	
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
-       7	Thiendekaco                   	[Issue-2339] feat: remove default token when in specific account mode
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
+       5	thiendekaco                   	[Issue-4100] fix: throw success target error code to Dapp #
        4	Amaury Martiny                	PostMessageProvider with on('connected' | 'disconnected') (#279)
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
-       4	thiendekaco                   	[Issue-4086] fix: throw success target error code to Dapp #2
        3	Antoine Estienne              	Add eth test for extension signature (#909)
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
