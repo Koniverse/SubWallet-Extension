@@ -1,17 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { MissionCategoryType } from '@subwallet/extension-web-ui/Popup/MissionPool/predefined';
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
+import { MissionCategoryType, tagMap } from '@subwallet/extension-web-ui/Popup/MissionPool/predefined';
 import { Theme } from '@subwallet/extension-web-ui/themes';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { MissionInfo } from '@subwallet/extension-web-ui/types/missionPool';
-import { customFormatDate, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { convertHexColorToRGBA, customFormatDate, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, Image, Tag } from '@subwallet/react-ui';
 import capitalize from '@subwallet/react-ui/es/_util/capitalize';
-import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import CN from 'classnames';
-import { Coin, DiceSix, GlobeHemisphereWest, MagicWand, PlusCircle, SelectionBackground, TwitterLogo, User } from 'phosphor-react';
-import { IconWeight } from 'phosphor-react/src/lib';
+import { GlobeHemisphereWest, MagicWand, PlusCircle } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
@@ -21,21 +20,6 @@ type Props = ThemeProps & {
   onClick: (data: MissionInfo) => void,
   compactMode?: boolean;
 };
-
-enum TagType {
-  FCFS='fcfs',
-  POINTS='points',
-  LUCKY_DRAW='lucky_draw',
-  MANUAL_SELECTION='manual_selection'
-}
-
-type TagInfo = {
-  theme: string,
-  name: string,
-  slug: string,
-  icon: SwIconProps['phosphorIcon'],
-  iconWeight?: IconWeight
-}
 
 function Component (props: Props): React.ReactElement<Props> {
   const { className, compactMode, data, onClick } = props;
@@ -72,64 +56,74 @@ function Component (props: Props): React.ReactElement<Props> {
     onClick(data);
   }, [data, onClick]);
 
-  const tagMap = useMemo<Record<string, TagInfo>>(() => {
-    return {
-      [TagType.FCFS]: {
-        theme: 'yellow',
-        name: t('FCFS'),
-        slug: TagType.FCFS,
-        icon: User
-      },
-      [TagType.POINTS]: {
-        theme: 'success',
-        name: t('Points'),
-        slug: TagType.POINTS,
-        icon: Coin,
-        iconWeight: 'fill'
-      },
-      [TagType.LUCKY_DRAW]: {
-        theme: 'gold',
-        name: t('Lucky draw'),
-        slug: TagType.LUCKY_DRAW,
-        icon: DiceSix,
-        iconWeight: 'fill'
-      },
-      [TagType.MANUAL_SELECTION]: {
-        theme: 'blue',
-        name: t('Manual selection'),
-        slug: TagType.MANUAL_SELECTION,
-        icon: SelectionBackground
-      }
-    };
-  }, [t]);
-
   const tagNode = useMemo(() => {
     if (!data.tags || !data.tags.length) {
       return null;
     }
 
     const tagSlug = data.tags[0];
-
+    const tagCategory = data?.categories?.[0];
     const theme = tagMap[tagSlug]?.theme || 'gray';
     const name = tagMap[tagSlug]?.name || t(capitalize(tagSlug.replace('_', ' ')));
     const iconWeight = tagMap[tagSlug]?.iconWeight;
     const icon = tagMap[tagSlug]?.icon || MagicWand;
+    let missionTheme, missionName, missionIconWeight, missionIcon;
+    const missionStatus = data?.status;
+
+    if (missionStatus) {
+      missionTheme = tagMap[missionStatus]?.theme || 'gray';
+      missionName = tagMap[missionStatus]?.name;
+      missionIconWeight = tagMap[missionStatus]?.iconWeight;
+      missionIcon = tagMap[missionStatus]?.icon;
+    }
 
     return (
-      <Tag
-        className='__item-tag'
-        color={theme}
-      >
-        <Icon
-          className={'__item-tag-icon'}
-          customSize={'12px'}
-          phosphorIcon={icon}
-          weight={iconWeight}
-        />
-        {name}
-      </Tag>
+      <>
+        <Tag
+          className='__item-tag'
+          color={theme}
+        >
+          <Icon
+            className={'__item-tag-icon'}
+            customSize={'12px'}
+            phosphorIcon={icon}
+            weight={iconWeight}
+          />
+          {t(`${name}`)}
+        </Tag>
+        {
+          !!missionStatus && !!missionName && (
+            <Tag
+              className='__item-tag'
+              color={missionTheme}
+            >
+              <Icon
+                className={'__item-tag-icon'}
+                customSize={'12px'}
+                phosphorIcon={missionIcon}
+                weight={missionIconWeight}
+              />
+              {t(`${missionName}`)}
+            </Tag>
+          )
+        }
+        {
+          tagCategory && (
+            <Tag
+              className='__item-tag'
+              color={tagCategory.color}
+            >
+              <Icon
+                className={'__item-tag-icon'}
+                customSize={'12px'}
+              />
+              {tagCategory.name}
+            </Tag>
+          )
+        }
+      </>
     );
-  }, [data.tags, t, tagMap]);
+  }, [data.tags, data?.categories, data?.status, t]);
 
   if (compactMode) {
     return (
@@ -155,19 +149,18 @@ function Component (props: Props): React.ReactElement<Props> {
               <div className='__compact-item-name'>
                 {data.name || ''}
               </div>
-              <div className={'__compact-item-value-row'}>
-                <div className='__compact-item-label'>{t('Rewards')}:</div>
-                <div className='__compact-item-value'>
-                  {data.reward}
-                </div>
+            </div>
+            <div className='__compact-item-date-time'>{timeline}</div>
+            <div className={'__compact-item-value-row'}>
+              <div className='__compact-item-label'>{t('Rewards')}:&nbsp;</div>
+              <div className='__compact-item-value'>
+                {data.reward}
               </div>
             </div>
-            <div className={'__compact-item-content-part-2'}>
+            <div className={'__separator'}></div>
+            <div className={'__compact-item-content-part-3'}>
               <div className={'__compact-item-tags'}>
                 {tagNode}
-              </div>
-              <div className={'__compact-item-value-row'}>
-                <div className='__compact-item-date-time'>{timeline}</div>
               </div>
             </div>
           </div>
@@ -233,10 +226,11 @@ function Component (props: Props): React.ReactElement<Props> {
           <Button
             className={'__item-icon-button'}
             icon={(
-              <Icon
-                phosphorIcon={TwitterLogo}
-                size={'sm'}
-                weight={'fill'}
+              <Image
+                height={18}
+                shape={'square'}
+                src={DefaultLogosMap.xtwitter_transparent}
+                width={20}
               />
             )}
             onClick={onClickTwitterIcon}
@@ -271,6 +265,7 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
     borderRadius: token.borderRadiusLG,
     position: 'relative',
     cursor: 'pointer',
+    overflow: 'hidden',
 
     '.ant-number .ant-typography': {
       fontSize: 'inherit !important',
@@ -286,10 +281,19 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
       position: 'absolute',
       top: 0,
       left: 0,
-      filter: 'blur(7.5px)',
+      filter: 'blur(8px)',
       right: 0
     },
-
+    '.__item-icon-button .ant-image': {
+      alignItems: 'end',
+      display: 'flex'
+    },
+    '.__separator': {
+      height: 2,
+      backgroundColor: 'rgba(33, 33, 33, 0.80)',
+      marginTop: token.marginXS,
+      marginBottom: token.marginXS
+    },
     '.__item-inner': {
       display: 'flex',
       flexDirection: 'column',
@@ -360,6 +364,8 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.__item-tags': {
+      display: 'flex',
+      gap: token.sizeXS,
       minHeight: 22,
       marginBottom: token.margin
     },
@@ -388,9 +394,14 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
         width: 20
       }
     },
+    '.ant-tag-has-color': {
+      backgroundColor: convertHexColorToRGBA(token['gray-6'], 0.1)
+    },
 
     '&.-compact-mode': {
       padding: token.sizeSM,
+      paddingTop: token.paddingXS,
+      paddingBottom: token.paddingXS,
 
       '.__compact-item-background': {
         height: '100%',
@@ -424,8 +435,26 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
         gap: token.size
       },
 
-      '.__compact-item-content-part-2': {
-        overflow: 'hidden'
+      '.__compact-item-value-row': {
+        display: 'flex',
+        color: token.colorTextTertiary,
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        fontWeight: token.fontWeightStrong
+      },
+
+      '.__compact-item-value-row .__compact-item-value': {
+        color: token.colorSuccess,
+        fontWeight: token.headingFontWeight,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      },
+      '.__compact-item-date-time, .__compact-item-value-row': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextTertiary,
+        fontWeight: token.bodyFontWeight
       },
 
       '.__compact-item-name': {
@@ -441,27 +470,13 @@ const MissionItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
       },
 
       '.__compact-item-tags': {
-        minHeight: 22
-      },
-
-      '.__compact-item-value-row': {
+        minHeight: 22,
         display: 'flex',
-        fontSize: token.fontSizeSM,
-        lineHeight: token.lineHeightSM,
-        fontWeight: token.bodyFontWeight,
-        gap: token.sizeXXS,
-        overflow: 'hidden'
+        gap: token.sizeXXS
       },
 
       '.__compact-item-label': {
         color: token.colorTextLight4
-      },
-
-      '.__compact-item-date-time': {
-        color: token.colorTextLight4,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
       },
 
       '.__compact-item-value': {

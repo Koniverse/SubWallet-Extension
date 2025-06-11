@@ -3,13 +3,12 @@
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainInfo, _CrowdloanFund, _FundStatus } from '@subwallet/chain-list/types';
-import { APIItemState, CrowdloanItem, CrowdloanParaState } from '@subwallet/extension-base/background/KoniTypes';
+import { APIItemState, ChainType, CrowdloanItem, CrowdloanParaState } from '@subwallet/extension-base/background/KoniTypes';
 import { ACALA_REFRESH_CROWDLOAN_INTERVAL } from '@subwallet/extension-base/constants';
 import registry from '@subwallet/extension-base/koni/api/dotsama/typeRegistry';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { categoryAddresses, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchJson, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
-import axios from 'axios';
 
 import { DeriveOwnContributions } from '@polkadot/api-derive/types';
 import { BN } from '@polkadot/util';
@@ -86,7 +85,7 @@ export const subscribeAcalaContributeInterval = (polkadotAddresses: string[], fu
 
   const getContributeInfo = () => {
     Promise.all(polkadotAddresses.map((polkadotAddress) => {
-      return axios.get(`${acalaContributionApi}${polkadotAddress}`);
+      return fetchJson(`${acalaContributionApi}${polkadotAddress}`);
     })).then((resList) => {
       let contribute = new BN(0);
 
@@ -179,7 +178,7 @@ export async function subscribeCrowdloan (addresses: string[], substrateApiMap: 
     const now = Date.now();
     const polkadotAPI = await substrateApiMap[COMMON_CHAIN_SLUGS.POLKADOT].isReady;
     const kusamaAPI = await substrateApiMap[COMMON_CHAIN_SLUGS.KUSAMA].isReady;
-    const substrateAddresses = categoryAddresses(addresses)[0];
+    const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const hexAddresses = substrateAddresses.map((address) => {
       return registry.createType('AccountId', address).toHex();
     });

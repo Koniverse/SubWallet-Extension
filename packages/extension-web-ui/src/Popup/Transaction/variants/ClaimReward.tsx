@@ -3,15 +3,14 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-web-ui/components';
-import { getInputValuesFromString } from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
-import { useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-web-ui/messaging';
 import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
@@ -19,7 +18,7 @@ import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -83,6 +82,7 @@ const filterAccount = (
 
 const Component = () => {
   const navigate = useNavigate();
+  const { isWebUI } = useContext(ScreenContext);
 
   const { defaultData, persistData } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
@@ -92,7 +92,6 @@ const Component = () => {
 
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
-  const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
 
   const fromValue = useWatchTransaction('from', form, defaultData);
@@ -109,27 +108,14 @@ const Component = () => {
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
-  const existentialDeposit = useMemo(() => {
-    const assetInfo = Object.values(assetRegistry).find((v) => v.originChain === chainValue);
-
-    if (assetInfo) {
-      return assetInfo.minAmount || '0';
-    }
-
-    return '0';
-  }, [assetRegistry, chainValue]);
-
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
       return {
-        existentialDeposit: getInputValuesFromString(existentialDeposit, estimateFee.decimals),
-        availableBalance: getInputValuesFromString(nativeTokenBalance.value, estimateFee.decimals),
-        maintainBalance: getInputValuesFromString(poolInfo.metadata.maintainBalance || '0', estimateFee.decimals),
+        chainName: chainInfoMap[chainValue]?.name || '',
         symbol: estimateFee.symbol
       };
     },
-    [existentialDeposit, nativeTokenBalance.value, poolInfo.metadata.maintainBalance]
+    [chainInfoMap, chainValue]
   );
 
   const { onError, onSuccess } = useHandleSubmitTransaction(undefined, handleDataForInsufficientAlert);
@@ -250,25 +236,29 @@ const Component = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Bond reward after claim')}</span>
+              <span className={'__option-label'}>{t('Stake reward after claim')}</span>
             </Checkbox>
           </Form.Item>
         </Form>
       </TransactionContent>
       <TransactionFooter>
-        <Button
-          disabled={loading}
-          icon={(
-            <Icon
-              phosphorIcon={XCircle}
-              weight='fill'
-            />
-          )}
-          onClick={goHome}
-          schema={'secondary'}
-        >
-          {t('Cancel')}
-        </Button>
+        {
+          !isWebUI && (
+            <Button
+              disabled={loading}
+              icon={(
+                <Icon
+                  phosphorIcon={XCircle}
+                  weight='fill'
+                />
+              )}
+              onClick={goHome}
+              schema={'secondary'}
+            >
+              {t('Cancel')}
+            </Button>
+          )
+        }
 
         <Button
           disabled={isDisable || !isBalanceReady}

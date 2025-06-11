@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-inject authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { KeypairType } from '@subwallet/keyring/types';
 import type { Signer as InjectedSigner } from '@polkadot/api/types';
 import type { ProviderInterface } from '@polkadot/rpc-provider/types';
 import type { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
-import type { KeypairType } from '@polkadot/util-crypto/types';
 
 // eslint-disable-next-line no-undef
 type This = typeof globalThis;
@@ -31,6 +31,12 @@ export interface InjectedAccountWithMeta {
 export interface InjectedAccounts {
   get: (anyType?: boolean) => Promise<InjectedAccount[]>;
   subscribe: (cb: (accounts: InjectedAccount[]) => void | Promise<void>) => Unsubcall;
+}
+
+export type AuthAccountSubstrateType = 'substrate' | 'both' | 'evm';
+
+export interface AuthRequestOption {
+  accountAuthType: AuthAccountSubstrateType
 }
 
 export interface InjectedExtensionInfo {
@@ -106,7 +112,7 @@ export interface EvmProvider {
 }
 
 export interface InjectedWindowProvider {
-  enable: (origin: string) => Promise<Injected>;
+  enable: (origin: string, opt?: AuthRequestOption) => Promise<Injected>;
   version: string;
 }
 
@@ -114,6 +120,7 @@ export interface InjectedWindow extends This {
   injectedWeb3: Record<string, InjectedWindowProvider>;
   ethereum: EvmProvider;
   SubWallet: EvmProvider;
+  cardano: Record<string, CardanoProvider>
 }
 
 export type InjectedExtension = InjectedExtensionInfo & Injected;
@@ -144,4 +151,17 @@ export interface EIP6963AnnounceProviderEvent extends CustomEvent {
 
 export interface EIP6963RequestProviderEvent extends Event {
   type: 'eip6963:requestProvider';
+}
+
+export interface CardanoExtensionCIP {
+  cip: number
+}
+
+export interface CardanoProvider {
+  apiVersion: string;
+  name: string;
+  icon: string;
+  enable: () => Promise<unknown>;
+  supportedExtensions: CardanoExtensionCIP[];
+  isEnable: () => Promise<boolean>;
 }

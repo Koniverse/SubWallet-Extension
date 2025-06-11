@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
@@ -13,7 +14,7 @@ import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extensio
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBannerButtonIcon } from '@subwallet/extension-koni-ui/utils';
+import { getBannerButtonIcon, getEarningTimeText, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
@@ -51,11 +52,29 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
-  const { currentAccount } = useSelector((state) => state.accountState);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
   const [loading, setLoading] = useState(false);
   const [isScrollEnd, setIsScrollEnd] = useState(false);
   const [isDisableEarnButton, setDisableEarnButton] = useState(true);
   const poolInfo = useMemo(() => poolInfoMap[slug], [poolInfoMap, slug]);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const targetAddress = useMemo(() => {
+    if (currentAccountProxy && isAccountAll(currentAccountProxy?.id)) {
+      return ALL_ACCOUNT_KEY;
+    }
+
+    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+      if (chainInfoMap[poolInfo.chain]) {
+        const chainInfo = chainInfoMap[poolInfo.chain];
+
+        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+      }
+
+      return false;
+    });
+
+    return accountAddress?.address;
+  }, [chainInfoMap, currentAccountProxy, poolInfo.chain]);
   const title = useMemo(() => {
     if (!poolInfo) {
       return '';
@@ -69,6 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const getOrigin = () => {
       switch (type) {
+        case YieldPoolType.SUBNET_STAKING:
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
@@ -138,6 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const { type } = poolInfo;
 
     switch (type) {
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NOMINATION_POOL:
       case YieldPoolType.NATIVE_STAKING:
       case YieldPoolType.LIQUID_STAKING:
@@ -170,18 +191,6 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }, []);
 
-  const convertTime = useCallback((_number?: number): string => {
-    if (_number !== undefined) {
-      const isDay = _number > 24;
-      const time = isDay ? Math.floor(_number / 24) : _number;
-      const unit = isDay ? (time === 1 ? 'day' : 'days') : time === 1 ? 'hour' : 'hours';
-
-      return [time, unit].join(' ');
-    } else {
-      return 'unknown time';
-    }
-  }, []);
-
   const unBondedTime = useMemo((): string => {
     let time: number | undefined;
 
@@ -189,8 +198,8 @@ const Component: React.FC<Props> = (props: Props) => {
       time = poolInfo.statistic.unstakingPeriod;
     }
 
-    return convertTime(time);
-  }, [poolInfo.statistic, convertTime]);
+    return getEarningTimeText(time);
+  }, [poolInfo.statistic]);
 
   const data: BoxProps[] = useMemo(() => {
     if (!poolInfo) {
@@ -234,6 +243,8 @@ const Component: React.FC<Props> = (props: Props) => {
         }
       }
 
+      case YieldPoolType.SUBNET_STAKING: // fallthrough
+
       case YieldPoolType.NATIVE_STAKING: {
         const _label = getValidatorLabel(poolInfo.chain);
         const maxCandidatePerFarmer = poolInfo.statistic?.maxCandidatePerFarmer || 0;
@@ -268,6 +279,25 @@ const Component: React.FC<Props> = (props: Props) => {
             });
           }
 
+          if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
+            return EARNING_DATA_RAW.BITTENOSR_STAKING.map((item) => {
+              const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+              replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+              replaceEarningValue(_item, '{validatorType}', label);
+              replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+              replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+              replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+              if (paidOut !== undefined) {
+                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+              }
+
+              return _item;
+            });
+          }
+
           return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) => {
             const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
@@ -278,8 +308,8 @@ const Component: React.FC<Props> = (props: Props) => {
             replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
 
             if (paidOut !== undefined) {
-              replaceEarningValue(_item, '{paidOut}', paidOut.toString());
-              replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : 'hour');
+              replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+              replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
             }
 
             return _item;
@@ -423,7 +453,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     earlyValidateJoin({
       slug: slug,
-      address: currentAccount?.address || ''
+      address: targetAddress || ''
     })
       .then((rs) => {
         if (isValid()) {
@@ -451,7 +481,7 @@ const Component: React.FC<Props> = (props: Props) => {
           setLoading(false);
         }
       });
-  }, [closeAlert, currentAccount?.address, onStakeMore, openAlert, setVisible, slug, t]);
+  }, [closeAlert, targetAddress, onStakeMore, openAlert, setVisible, slug, t]);
 
   const onScrollContent = useCallback(() => {
     scrollRef?.current?.scroll({ top: scrollRef?.current?.scrollHeight, left: 0 });

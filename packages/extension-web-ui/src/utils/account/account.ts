@@ -3,20 +3,21 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
-import { AbstractAddressJson, AccountAuthType, AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/types';
 import { isAccountAll, uniqueStringArray } from '@subwallet/extension-base/utils';
-import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-web-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-web-ui/types';
 import { getLogoByNetworkKey } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-web-ui/utils/types';
+import { KeypairType } from '@subwallet/keyring/types';
 
 import { decodeAddress, encodeAddress, isAddress, isEthereumAddress } from '@polkadot/util-crypto';
-import { KeypairType } from '@polkadot/util-crypto/types';
 
 export function getAccountType (address: string): AccountType {
   return isAccountAll(address) ? 'ALL' : isEthereumAddress(address) ? 'ETHEREUM' : 'SUBSTRATE';
@@ -69,7 +70,11 @@ export const getSignMode = (account: AccountJson | null | undefined): AccountSig
 
       if (account.isExternal) {
         if (account.isHardware) {
-          return AccountSignMode.LEDGER;
+          if (account.isGeneric) {
+            return AccountSignMode.GENERIC_LEDGER;
+          } else {
+            return AccountSignMode.LEGACY_LEDGER;
+          }
         } else if (account.isReadOnly) {
           return AccountSignMode.READ_ONLY;
         } else {
@@ -162,8 +167,8 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
       result.push(EVM_ACCOUNT_TYPE);
     } else if (authType === 'substrate') {
       result.push(SUBSTRATE_ACCOUNT_TYPE);
-    } else if (authType === 'both') {
-      result.push(SUBSTRATE_ACCOUNT_TYPE, EVM_ACCOUNT_TYPE);
+    } else if (authType === 'ton') {
+      result.push(TON_ACCOUNT_TYPE);
     }
   }
 

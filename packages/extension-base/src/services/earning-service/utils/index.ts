@@ -6,7 +6,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { LendingYieldPoolInfo, LiquidYieldPoolInfo, NativeYieldPoolInfo, NominationYieldPoolInfo, YieldAssetExpectedEarning, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 
-import { hexToString, isHex } from '@polkadot/util';
+import { BN, hexToString, isHex } from '@polkadot/util';
 
 export function calculateReward (apr: number, amount = 0, compoundingPeriod = YieldCompoundingPeriod.YEARLY, isApy = false): YieldAssetExpectedEarning {
   if (!apr) {
@@ -65,10 +65,9 @@ export async function parseIdentity (substrateApi: _SubstrateApi, address: strin
 
   if (substrateApi.api.query.identity) {
     let identity;
-
     const _parent = await substrateApi.api.query.identity.superOf(address);
 
-    const parentInfo = _parent.toHuman() as unknown as PalletIdentitySuper;
+    const parentInfo = _parent?.toHuman() as unknown as PalletIdentitySuper;
 
     if (parentInfo) {
       const [parentAddress, { Raw: data }] = parentInfo;
@@ -82,15 +81,26 @@ export async function parseIdentity (substrateApi: _SubstrateApi, address: strin
       }
     }
 
+    let identityInfo;
+
     const _identity = await substrateApi.api.query.identity.identityOf(address);
-    const identityInfo = _identity.toHuman() as unknown as PalletIdentityRegistration;
+    const identityOfMetadata = substrateApi.api.query.identity.identityOf.creator.meta;
+    const identityOfReturnType = substrateApi.api.registry.lookup.getName(identityOfMetadata.type.asMap.value);
+
+    if (identityOfReturnType === 'PalletIdentityRegistration') {
+      identityInfo = _identity.toHuman() as unknown as PalletIdentityRegistration;
+    } else {
+      const _identityInfo = _identity?.toHuman() as unknown as [PalletIdentityRegistration, any];
+
+      identityInfo = _identityInfo ? _identityInfo[0] : undefined;
+    }
 
     if (identityInfo) {
       const displayName = identityInfo.info?.display?.Raw;
       const web = identityInfo.info?.web?.Raw;
       const riot = identityInfo.info?.riot?.Raw;
       const twitter = identityInfo.info?.twitter?.Raw;
-      const isReasonable = identityInfo.judgements.length > 0;
+      const isReasonable = identityInfo.judgements?.length > 0;
 
       if (displayName) {
         identity = isHex(displayName) ? hexToString(displayName) : displayName;
@@ -116,6 +126,10 @@ export function isActionFromValidator (stakingType: YieldPoolType, chain: string
     return true;
   } else if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
     return true;
+  } else if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+    return true;
+  } else if (_STAKING_CHAIN_GROUP.mythos.includes(chain)) {
+    return true;
   }
 
   return false;
@@ -136,3 +150,9 @@ export const isLiquidPool = (pool: YieldPoolInfo): pool is LiquidYieldPoolInfo =
 export const isLendingPool = (pool: YieldPoolInfo): pool is LendingYieldPoolInfo => {
   return pool.type === YieldPoolType.LENDING;
 };
+
+export function applyDecimal (bnNumber: BN, decimals: number) {
+  const bnDecimals = new BN((10 ** decimals).toString());
+
+  return bnNumber.div(bnDecimals);
+}

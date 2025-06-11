@@ -3,28 +3,41 @@
 
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _FundStatus, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { AuthUrls, Resolver } from '@subwallet/extension-base/background/handlers/State';
-import { AccountAuthType, AccountJson, AddressJson, AuthorizeRequest, ConfirmationRequestBase, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeCancel, RequestAuthorizeReject, RequestAuthorizeSubscribe, RequestAuthorizeTab, RequestCurrentAccountAddress, ResponseAuthorizeList, ResponseJsonGetAccountInfo, SeedLengths } from '@subwallet/extension-base/background/types';
+import { Resolver } from '@subwallet/extension-base/background/handlers/State';
+import { AccountAuthType, AuthorizeRequest, ConfirmationRequestBase, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeCancel, RequestAuthorizeReject, RequestAuthorizeSubscribe, RequestAuthorizeTab, RequestCurrentAccountAddress, ResponseAuthorizeList } from '@subwallet/extension-base/background/types';
+import { AppConfig, BrowserConfig, OSConfig } from '@subwallet/extension-base/constants';
+import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
+import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
+import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
+import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
+import { _NotificationInfo, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { CrowdloanContributionsResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestGetYieldPoolTargets, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseEarlyValidateYield, ResponseGetYieldPoolTargets, SubmitYieldStepData, TokenApproveData, UnlockDotTransactionNft, UnstakingStatus, ValidateYieldProcessParams, YieldPoolInfo, YieldPositionInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningSlippage, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
+import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { InjectedAccount, InjectedAccountWithMeta, MetadataDefBase } from '@subwallet/extension-inject/types';
-import { KeyringPair$Json, KeyringPair$Meta } from '@subwallet/keyring/types';
+import { KeyringPair$Meta } from '@subwallet/keyring/types';
 import { KeyringOptions } from '@subwallet/ui-keyring/options/types';
-import { KeyringAddress, KeyringPairs$Json } from '@subwallet/ui-keyring/types';
+import { KeyringAddress } from '@subwallet/ui-keyring/types';
 import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/session';
 import { DexieExportJsonStructure } from 'dexie-export-import';
 import Web3 from 'web3';
 import { RequestArguments, TransactionConfig } from 'web3-core';
 import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers';
 
+import { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
 import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
-import { KeypairType } from '@polkadot/util-crypto/types';
 
+import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -70,7 +83,7 @@ export interface AuthRequestV2 extends Resolver<ResultResolver> {
   idStr: string;
   request: RequestAuthorizeTab;
   url: string;
-  accountAuthType: AccountAuthType;
+  accountAuthTypes: AccountAuthType[];
 }
 
 /// Manage Auth
@@ -125,9 +138,12 @@ export interface ResultResolver {
   accounts: string[];
 }
 
-export interface RejectResolver {
-  error: Error;
-  accounts: string[];
+// Switch current network auth
+
+export interface RequestSwitchCurrentNetworkAuthorization {
+  url: string;
+  networkKey: string;
+  authSwitchNetworkType: AccountAuthType
 }
 
 /// Staking subscribe
@@ -149,18 +165,6 @@ export interface StakingRewardItem {
   totalReward?: string,
   totalSlash?: string,
   unclaimedReward?: string
-}
-
-export interface UnlockingStakeInfo {
-  chain: string,
-  address: string,
-  type: StakingType,
-
-  nextWithdrawal: number,
-  redeemable: number,
-  nextWithdrawalAmount: number,
-  nextWithdrawalAction?: string,
-  validatorAddress?: string // validator to unstake from
 }
 
 export interface StakingItem {
@@ -190,10 +194,40 @@ export interface StakingRewardJson {
 }
 
 export interface PriceJson {
+  currency: CurrencyType;
   ready?: boolean,
-  currency: string,
+  currencyData: CurrencyJson,
+  exchangeRateMap: Record<string, ExchangeRateJSON>,
   priceMap: Record<string, number>,
-  price24hMap: Record<string, number>
+  price24hMap: Record<string, number>,
+  priceCoinGeckoSupported: string[],
+  lastUpdatedMap: Record<string, Date>
+}
+
+export interface HistoryTokenPriceJSON {
+  history: PriceChartPoint[];
+}
+
+export interface ResponseSubscribeCurrentTokenPrice {
+  id: string;
+  price: CurrentTokenPrice;
+}
+
+export interface CurrentTokenPrice {
+  value: number;
+  value24h: number;
+  time: number;
+}
+
+export interface ExchangeRateJSON {
+  exchange: number;
+  label: string;
+}
+
+export interface CurrencyJson {
+  label: string;
+  isPrefix: boolean;
+  symbol: string;
 }
 
 export enum APIItemState {
@@ -215,7 +249,7 @@ export enum CrowdloanParaState {
   FAILED = 'failed'
 }
 
-export interface NftItem {
+export interface NftItem extends NftItemExtraInfo {
   // must-have
   id: string;
   chain: string;
@@ -229,9 +263,18 @@ export interface NftItem {
   rarity?: string;
   description?: string;
   properties?: Record<any, any> | null;
+}
+
+interface NftItemExtraInfo {
   type?: _AssetType.ERC721 | _AssetType.PSP34 | RMRK_VER; // for sending
   rmrk_ver?: RMRK_VER;
   onChainOption?: any; // for sending PSP-34 tokens, should be done better
+  assetHubType?: AssetHubNftType // for sending assetHub nft. There're 2 types nft
+}
+
+export enum AssetHubNftType {
+  NFTS = 'nfts',
+  UNIQUES = 'uniques'
 }
 
 export interface NftCollection {
@@ -258,8 +301,23 @@ export interface NftCollectionJson {
 
 export interface MetadataItem {
   genesisHash: string;
+  specName: string;
   specVersion: string;
   hexValue: HexString;
+  types: Record<string, Record<string, string> | string>;
+  userExtensions?: ExtDef;
+  hexV15?: HexString;
+  tokenInfo?: {
+    ss58Format: number;
+    tokenDecimals: number;
+    tokenSymbol: string;
+  };
+}
+
+export interface MetadataV15Item {
+  genesisHash: string;
+  specVersion: string;
+  hexV15?: HexString;
 }
 
 export interface CrowdloanItem {
@@ -347,11 +405,6 @@ export interface DonateInfo {
   link: string;
 }
 
-export interface DropdownTransformOptionType {
-  label: string;
-  value: string;
-}
-
 export interface NetWorkMetadataDef extends MetadataDefBase {
   networkKey: string;
   groups: NetWorkGroup[];
@@ -362,32 +415,8 @@ export interface NetWorkMetadataDef extends MetadataDefBase {
   apiStatus: NETWORK_STATUS;
 }
 
-export type CurrentNetworkInfo = {
-  networkKey: string;
-  networkPrefix: number;
-  icon: string;
-  genesisHash: string;
-  isEthereum: boolean;
-  isReady?: boolean; // check if current network info is lifted from initial state
-}
-
-// all Accounts and the address of the current Account
-export interface AccountsWithCurrentAddress {
-  accounts: AccountJson[];
-  currentAddress?: string;
-  currentGenesisHash?: string | null;
-  isShowBalance?: boolean; // Deprecated and move to setting
-  allAccountLogo?: string; // Deprecated and move to setting
-}
-
 export interface OptionInputAddress {
   options: KeyringOptions;
-}
-
-export interface CurrentAccountInfo {
-  address: string;
-  currentGenesisHash: string | null;
-  allGenesisHash?: string;
 }
 
 export type LanguageType = 'en'
@@ -400,6 +429,23 @@ export type LanguageType = 'en'
 | 'vi'
 | 'ja'
 | 'ru';
+
+export type CurrencyType = 'USD'
+| 'BRL'
+| 'CNY'
+| 'EUR'
+| 'GBP'
+| 'HKD'
+| 'JPY'
+| 'RUB'
+| 'VND'
+
+export type PriceChartTimeframe = '1D' | '1W' | '1M' | '3M' | 'YTD' | '1Y' | 'ALL';
+
+export interface PriceChartPoint {
+  time: number;
+  value: number;
+}
 
 export type LanguageOptionType = {
   text: string;
@@ -415,6 +461,7 @@ export enum WalletUnlockType {
 
 export interface UiSettings {
   language: LanguageType,
+  currency: string,
   browserConfirmationType: BrowserConfirmationType;
   isShowZeroBalance: boolean;
   isShowBalance: boolean;
@@ -424,8 +471,13 @@ export interface UiSettings {
   timeAutoLock: number;
   unlockType: WalletUnlockType;
   enableChainPatrol: boolean;
+  notificationSetup: NotificationSetup;
+  isAcknowledgedUnifiedAccountMigration: boolean;
+  isUnifiedAccountMigrationInProgress: boolean;
+  isUnifiedAccountMigrationDone: boolean;
   // On-ramp service account reference
   walletReference: string;
+  allowOneSign: boolean;
 }
 
 export type RequestSettingsType = UiSettings;
@@ -442,9 +494,19 @@ export type RequestChangeShowZeroBalance = { show: boolean };
 
 export type RequestChangeLanguage = { language: LanguageType };
 
+export type RequestChangePriceCurrency = { currency: CurrencyType }
+
+export type RequestGetHistoryTokenPriceData = { priceId: string, timeframe: PriceChartTimeframe };
+
 export type RequestChangeShowBalance = { enable: boolean };
 
 export type DetectBalanceCache = Record<string, number>;
+
+export type RequestSaveAppConfig = { appConfig: AppConfig };
+
+export type RequestSaveBrowserConfig = { browserConfig: BrowserConfig };
+
+export type RequestSaveOSConfig = { osConfig: OSConfig };
 
 export interface RandomTestRequest {
   start: number;
@@ -458,7 +520,10 @@ export enum TransactionDirection {
 
 export enum ChainType {
   EVM = 'evm',
-  SUBSTRATE = 'substrate'
+  SUBSTRATE = 'substrate',
+  BITCOIN = 'bitcoin',
+  TON = 'ton',
+  CARDANO = 'cardano'
 }
 
 export enum ExtrinsicType {
@@ -469,15 +534,16 @@ export enum ExtrinsicType {
   SEND_NFT = 'send_nft',
   CROWDLOAN = 'crowdloan',
 
-  STAKING_JOIN_POOL = 'staking.join_pool',
-  STAKING_LEAVE_POOL = 'staking.leave_pool',
-  STAKING_POOL_WITHDRAW = 'staking.pool_withdraw',
+  STAKING_JOIN_POOL = 'staking.join_pool', // todo: merge to JOIN_YIELD_POOL
+  STAKING_LEAVE_POOL = 'staking.leave_pool', // todo: deprecated, STAKING_LEAVE_POOL + STAKING_UNBOND
+  STAKING_POOL_WITHDRAW = 'staking.pool_withdraw', // todo: deprecated, STAKING_POOL_WITHDRAW + STAKING_WITHDRAW
+
   STAKING_BOND = 'staking.bond',
-  STAKING_UNBOND = 'staking.unbond',
+  STAKING_UNBOND = 'staking.unbond', // todo: STAKING_LEAVE_POOL + STAKING_UNBOND
   STAKING_CLAIM_REWARD = 'staking.claim_reward',
-  STAKING_WITHDRAW = 'staking.withdraw',
-  STAKING_COMPOUNDING = 'staking.compounding',
-  STAKING_CANCEL_COMPOUNDING = 'staking.cancel_compounding',
+  STAKING_WITHDRAW = 'staking.withdraw', // todo: STAKING_POOL_WITHDRAW + STAKING_WITHDRAW
+  STAKING_COMPOUNDING = 'staking.compounding', // deprecated
+  STAKING_CANCEL_COMPOUNDING = 'staking.cancel_compounding', // deprecated
   STAKING_CANCEL_UNSTAKE = 'staking.cancel_unstake',
 
   JOIN_YIELD_POOL = 'earn.join_pool', // TODO: review this
@@ -502,7 +568,13 @@ export enum ExtrinsicType {
   UNSTAKE_STDOT = 'earn.unstake_stdot',
   UNSTAKE_VMANTA = 'earn.unstake_vmanta',
 
-  TOKEN_APPROVE = 'evm.token_approve',
+  TOKEN_SPENDING_APPROVAL = 'token.spending_approval',
+
+  SWAP = 'swap',
+
+  CLAIM_BRIDGE = 'claim.claim_bridge',
+
+  // SET_FEE_TOKEN = 'set_fee-token',
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -553,10 +625,13 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.REDEEM_STDOT]: RequestYieldLeave,
   [ExtrinsicType.REDEEM_VMANTA]: RequestYieldLeave,
 
-  [ExtrinsicType.TOKEN_APPROVE]: TokenApproveData,
+  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: TokenSpendingApprovalParams,
+
+  [ExtrinsicType.CLAIM_BRIDGE]: RequestClaimBridge
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
+  [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }
 
@@ -597,8 +672,14 @@ export interface BasicTokenInfo {
   symbol: string;
 }
 
+export interface SufficientMetadata {
+  isSufficient: boolean,
+  minBalance: number
+}
+
 export interface AmountData extends BasicTokenInfo {
   value: string;
+  metadata?: unknown;
 }
 
 export interface FeeData extends AmountData {
@@ -678,12 +759,8 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   additionalInfo?: any,
   startBlock?: number,
   nonce?: number,
-}
-
-export interface SWError extends Error {
-  code?: number;
-  errorType: string;
-  data?: unknown;
+  addressPrefix?: number,
+  processId?: string;
 }
 
 export interface SWWarning {
@@ -691,58 +768,6 @@ export interface SWWarning {
   code?: number;
   message: string;
   data?: unknown;
-}
-
-export enum BasicTxErrorType {
-  NOT_ENOUGH_BALANCE = 'NOT_ENOUGH_BALANCE',
-  CHAIN_DISCONNECTED = 'CHAIN_DISCONNECTED',
-  INVALID_PARAMS = 'INVALID_PARAMS',
-  DUPLICATE_TRANSACTION = 'DUPLICATE_TRANSACTION',
-  UNABLE_TO_SIGN = 'UNABLE_TO_SIGN',
-  USER_REJECT_REQUEST = 'USER_REJECT_REQUEST',
-  UNABLE_TO_SEND = 'UNABLE_TO_SEND',
-  SEND_TRANSACTION_FAILED = 'SEND_TRANSACTION_FAILED',
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  UNSUPPORTED = 'UNSUPPORTED',
-  TIMEOUT = 'TIMEOUT',
-  NOT_ENOUGH_EXISTENTIAL_DEPOSIT = 'NOT_ENOUGH_EXISTENTIAL_DEPOSIT',
-}
-
-export enum StakingTxErrorType {
-  NOT_ENOUGH_MIN_STAKE = 'NOT_ENOUGH_MIN_STAKE',
-  EXCEED_MAX_NOMINATIONS = 'EXCEED_MAX_NOMINATIONS',
-  EXIST_UNSTAKING_REQUEST = 'EXIST_UNSTAKING_REQUEST',
-  INVALID_ACTIVE_STAKE = 'INVALID_ACTIVE_STAKE',
-  EXCEED_MAX_UNSTAKING = 'EXCEED_MAX_UNSTAKING',
-  INACTIVE_NOMINATION_POOL = 'INACTIVE_NOMINATION_POOL',
-  CAN_NOT_GET_METADATA = 'CAN_NOT_GET_METADATA',
-  NOT_ENOUGH_MIN_UNSTAKE = 'NOT_ENOUGH_MIN_UNSTAKE'
-}
-
-export enum TransferTxErrorType {
-  NOT_ENOUGH_VALUE = 'NOT_ENOUGH_VALUE',
-  NOT_ENOUGH_FEE = 'NOT_ENOUGH_FEE',
-  INVALID_TOKEN = 'INVALID_TOKEN',
-  TRANSFER_ERROR = 'TRANSFER_ERROR',
-  RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT = 'RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT',
-}
-
-export type TransactionErrorType = BasicTxErrorType | TransferTxErrorType | StakingTxErrorType | YieldValidationStatus
-
-export enum BasicTxWarningCode {
-  NOT_ENOUGH_EXISTENTIAL_DEPOSIT = 'notEnoughExistentialDeposit'
-}
-
-export type BasicTxError = {
-  errorType: TxErrorCode,
-  data?: object,
-  message: string
-}
-
-export type BasicTxWarning = {
-  warningType: TransactionWarningType,
-  data?: object,
-  message: string
 }
 
 export interface TransactionResponse {
@@ -760,16 +785,12 @@ export interface NftTransactionResponse extends SWTransactionResponse {
 
 export type HandleBasicTx = (data: TransactionResponse) => void;
 
-export type TxErrorCode = TransferTxErrorType | TransactionErrorType
-
 export enum BalanceErrorType {
   NETWORK_ERROR = 'NETWORK_ERROR',
   TOKEN_ERROR = 'TOKEN_ERROR',
   TIMEOUT = 'TIMEOUT',
   GET_BALANCE_ERROR = 'GET_BALANCE_ERROR',
 }
-
-export type TransactionWarningType = BasicTxWarningCode
 
 export enum ProviderErrorType {
   CHAIN_DISCONNECTED = 'CHAIN_DISCONNECTED',
@@ -791,126 +812,7 @@ export interface ResponseAccountExportPrivateKey {
   publicKey: string;
 }
 
-// Get account info with private key
-
-export interface RequestCheckPublicAndSecretKey {
-  secretKey: string;
-  publicKey: string;
-}
-
-export interface ResponseCheckPublicAndSecretKey {
-  address: string;
-  isValid: boolean;
-  isEthereum: boolean;
-}
-
-// Create seed phase
-
-export interface RequestSeedCreateV2 {
-  length?: SeedLengths;
-  seed?: string;
-  types?: Array<KeypairType>;
-}
-
-export interface ResponseSeedCreateV2 {
-  seed: string,
-  addressMap: Record<KeypairType, string>
-}
-
-// Get account info with suri
-
-export interface RequestSeedValidateV2 {
-  suri: string;
-  types?: Array<KeypairType>;
-}
-
-export type ResponseSeedValidateV2 = ResponseSeedCreateV2
-
-// Create account with suri
-
-export interface RequestAccountCreateSuriV2 {
-  name: string;
-  genesisHash?: string | null;
-  password?: string;
-  suri: string;
-  types?: Array<KeypairType>;
-  isAllowed: boolean;
-}
-
-export type ResponseAccountCreateSuriV2 = Record<KeypairType, string>
-
-// Create derive account
-
-export interface RequestDeriveCreateV2 {
-  name: string;
-  genesisHash?: string | null;
-  suri: string;
-  parentAddress: string;
-  isAllowed: boolean;
-}
-
-export interface CreateDeriveAccountInfo {
-  name: string;
-  suri: string;
-}
-
-export interface RequestDeriveCreateV3 {
-  address: string;
-}
-
-export interface RequestDeriveCreateMultiple {
-  parentAddress: string;
-  isAllowed: boolean;
-  items: CreateDeriveAccountInfo[];
-}
-
-export interface DeriveAccountInfo {
-  address: string;
-  suri: string;
-}
-
-export interface RequestDeriveValidateV2 {
-  suri: string;
-  parentAddress: string;
-}
-
-export type ResponseDeriveValidateV2 = DeriveAccountInfo;
-
-export interface RequestGetDeriveAccounts {
-  page: number;
-  limit: number;
-  parentAddress: string;
-}
-
-export interface ResponseGetDeriveAccounts {
-  result: DeriveAccountInfo[];
-}
-
-// Restore account with json file (single account)
-
-export interface RequestJsonRestoreV2 {
-  file: KeyringPair$Json;
-  password: string;
-  address: string;
-  isAllowed: boolean;
-  withMasterPassword: boolean;
-}
-
-// Restore account with json file (multi account)
-
-export interface RequestBatchRestoreV2 {
-  file: KeyringPairs$Json;
-  password: string;
-  accountsInfo: ResponseJsonGetAccountInfo[];
-  isAllowed: boolean;
-}
-
-// Restore account with privateKey
-
-export interface ResponsePrivateKeyValidateV2 {
-  addressMap: Record<KeypairType, string>,
-  autoAddPrefix: boolean
-}
+// Export batch accounts
 
 // External account
 
@@ -931,31 +833,27 @@ export interface RequestAccountCreateExternalV2 {
   address: string;
   genesisHash?: string | null;
   name: string;
-  isEthereum: boolean;
   isAllowed: boolean;
   isReadOnly: boolean;
 }
 
 // Attach Ledger account
 
-export interface RequestAccountCreateHardwareV2 {
-  accountIndex: number;
-  address: string;
-  addressOffset: number;
-  genesisHash: string;
-  hardwareType: string;
-  name: string;
-  isAllowed?: boolean;
-}
-
 export interface CreateHardwareAccountItem {
   accountIndex: number;
   address: string;
   addressOffset: number;
   genesisHash: string;
+  originGenesisHash: string;
   hardwareType: string;
   name: string;
   isEthereum: boolean;
+  isGeneric: boolean;
+  isLedgerRecovery?: boolean;
+}
+
+export interface RequestAccountCreateHardwareV2 extends CreateHardwareAccountItem {
+  isAllowed?: boolean;
 }
 
 export interface RequestAccountCreateHardwareMultiple {
@@ -1025,14 +923,6 @@ export interface ExternalRequestPromise {
   createdAt: number
 }
 
-// Prepare to create
-
-export interface PrepareExternalRequest {
-  id: string;
-  setState: (promise: ExternalRequestPromise) => void;
-  updateState: (promise: Partial<ExternalRequestPromise>) => void;
-}
-
 // Reject
 
 export interface RequestRejectExternalRequest {
@@ -1079,31 +969,12 @@ export enum ThemeNames {
   SUBSPACE = 'subspace'
 }
 
-export enum NETWORK_ERROR {
-  INVALID_INFO_TYPE = 'invalidInfoType',
-  INJECT_SCRIPT_DETECTED = 'injectScriptDetected',
-  EXISTED_NETWORK = 'existedNetwork',
-  EXISTED_PROVIDER = 'existedProvider',
-  INVALID_PROVIDER = 'invalidProvider',
-  NONE = 'none',
-  CONNECTION_FAILURE = 'connectionFailure',
-  PROVIDER_NOT_SAME_NETWORK = 'providerNotSameNetwork'
-}
-
 export enum NETWORK_STATUS {
   CONNECTED = 'connected',
   CONNECTING = 'connecting',
   DISCONNECTED = 'disconnected',
   PENDING = 'pending'
 }
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type BaseRequestSign = {
-  ignoreWarnings?: boolean;
-};
-
-// Internal request: request from extension, not dApp.
-export type InternalRequestSign<T extends BaseRequestSign> = Omit<T, 'password'>;
 
 export type TxResultType = {
   change: string;
@@ -1124,14 +995,6 @@ export interface NftTransactionRequest {
 
 export interface EvmNftTransaction extends ValidateTransactionResponse {
   tx: Record<string, any> | null;
-}
-
-export interface EvmNftSubmitTransaction extends BaseRequestSign {
-  senderAddress: string,
-  recipientAddress: string,
-  networkKey: string,
-  estimateGas: string,
-  rawTransaction: Record<string, any>
 }
 
 export interface ValidateNetworkResponse {
@@ -1162,15 +1025,11 @@ export interface ApiMap {
   evm: Record<string, _EvmApi>;
 }
 
-export interface SupportTransferResponse {
-  supportTransfer: boolean;
-  supportTransferAll: boolean;
-}
-
 export interface RequestFreeBalance {
   address: string,
   networkKey: string,
-  token?: string
+  token?: string,
+  extrinsicType?: ExtrinsicType
 }
 
 export interface RequestMaxTransferable {
@@ -1179,20 +1038,6 @@ export interface RequestMaxTransferable {
   token?: string,
   isXcmTransfer?: boolean,
   destChain: string
-}
-
-export interface RequestTransferCheckReferenceCount {
-  address: string,
-  networkKey: string
-}
-
-export interface RequestTransferCheckSupporting {
-  networkKey: string,
-  tokenSlug: string
-}
-
-export interface RequestTransferExistentialDeposit {
-  tokenSlug: string;
 }
 
 export interface RequestSaveRecentAccount {
@@ -1214,7 +1059,6 @@ export interface SubstrateNftSubmitTransaction extends BaseRequestSign {
 }
 
 export type RequestSubstrateNftSubmitTransaction = InternalRequestSign<SubstrateNftSubmitTransaction>;
-export type RequestEvmNftSubmitTransaction = InternalRequestSign<EvmNftSubmitTransaction>;
 
 export interface RequestAccountMeta {
   address: string | Uint8Array;
@@ -1265,6 +1109,7 @@ export enum EvmProviderErrorType {
   UNSUPPORTED_METHOD = 'UNSUPPORTED_METHOD',
   DISCONNECTED = 'DISCONNECTED',
   CHAIN_DISCONNECTED = 'CHAIN_DISCONNECTED',
+  NETWORK_NOT_SUPPORTED= 'NETWORK_NOT_SUPPORTED',
   INVALID_PARAMS = 'INVALID_PARAMS',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
@@ -1278,37 +1123,148 @@ export interface EvmSendTransactionParams {
   maxFeePerGas?: string | number;
   gasPrice?: string | number;
   data?: string;
-}
-
-export interface SwitchNetworkRequest {
-  networkKey: string;
-  address?: string;
+  gas?: string | number;
 }
 
 export interface EvmSignRequest {
+  address: string;
+  hashPayload: string;
+  canSign: boolean;
+}
+
+export interface TonSignRequest {
   account: AccountJson;
   hashPayload: string;
   canSign: boolean;
+}
+
+export interface CardanoSignRequest {
+  address: string;
+  hashPayload: string;
+  canSign: boolean;
+}
+
+export interface ErrorValidation {
+  message: string;
+  name: string;
 }
 
 export interface EvmSignatureRequest extends EvmSignRequest {
   id: string;
   type: string;
   payload: unknown;
+  errors?: ErrorValidation[];
+  processId?: string;
+}
+
+export interface TonSignatureRequest extends TonSignRequest {
+  id: string;
+  type: string;
+  payload: unknown;
+}
+
+export interface CardanoSignatureRequest extends CardanoSignRequest {
+  id: string;
+  errors?: ErrorValidation[];
+  currentAddress: string;
+  payload: unknown
 }
 
 export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignRequest {
   estimateGas: string;
   parseData: EvmTransactionData;
   isToContract: boolean;
+  errors?: ErrorValidation[]
 }
 
+export interface SubmitApiRequest extends EvmSignRequest {
+  id: string;
+  type: string;
+  payload: unknown;
+  errors?: ErrorValidation[];
+  processId?: string;
+}
+
+// Cardano Request Dapp Input
+export enum CardanoProviderErrorType {
+  INVALID_REQUEST = 'INVALID_REQUEST',
+  REFUSED_REQUEST = 'REFUSED_REQUEST',
+  ACCOUNT_CHANGED = 'ACCOUNT_CHANGED',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  PROOF_GENERATION_FAILED = 'PROOF_GENERATION_FAILED',
+  ADDRESS_SIGN_NOT_PK = 'ADDRESS_SIGN_NOT_PK',
+  SIGN_DATA_DECLINED = 'SIGN_DATA_DECLINED',
+  SUBMIT_TRANSACTION_REFUSED = 'SUBMIT_TRANSACTION_REFUSED',
+  SUBMIT_TRANSACTION_FAILURE = 'SUBMIT_TRANSACTION_FAILURE',
+  SIGN_TRANSACTION_DECLINED = 'SIGN_TRANSACTION_DECLINED',
+}
+
+export type Cbor = string;
+export type CardanoPaginate = {
+  page: number,
+  limit: number,
+};
+
+export interface RequestCardanoGetUtxos {
+  amount?: Cbor;
+  paginate?: CardanoPaginate;
+}
+
+export interface RequestCardanoGetCollateral {
+  amount: Cbor;
+}
+
+export interface RequestCardanoSignData {
+  address: string;
+  payload: string;
+}
+
+export interface ResponseCardanoSignData {
+  signature: Cbor,
+  key: Cbor,
+}
+
+export interface RequestCardanoSignTransaction {
+  tx: Cbor;
+  partialSign: boolean
+}
+
+export interface AddressCardanoTransactionBalance {
+  values: CardanoBalanceItem[],
+  isOwner?: boolean,
+  isRecipient?: boolean
+}
+
+export type CardanoKeyType = 'stake' | 'payment';
+export interface CardanoTransactionDappConfig {
+  txInputs: Record<string, AddressCardanoTransactionBalance>,
+  txOutputs: Record<string, AddressCardanoTransactionBalance>,
+  networkKey: string,
+  from: string,
+  addressRequireKeyTypes: CardanoKeyType[],
+  value: CardanoBalanceItem[],
+  estimateCardanoFee: string,
+  cardanoPayload: string,
+  errors?: ErrorValidation[],
+  id: string,
+}
+
+export type ResponseCardanoSignTransaction = Cbor;
+
+// TODO: add account info + dataToSign
+export type TonSendTransactionRequest = TonTransactionConfig;
+export type CardanoSendTransactionRequest = CardanoTransactionConfig;
+export type CardanoSignTransactionRequest = CardanoTransactionDappConfig;
+
 export type EvmWatchTransactionRequest = EvmSendTransactionRequest;
+export type TonWatchTransactionRequest = TonSendTransactionRequest;
+export type CardanoWatchTransactionRequest = CardanoSendTransactionRequest;
 
 export interface ConfirmationsQueueItemOptions {
   requiredPassword?: boolean;
   address?: string;
   networkKey?: string;
+  isPassConfirmation?: boolean;
 }
 
 export interface ConfirmationsQueueItem<T> extends ConfirmationsQueueItemOptions, ConfirmationRequestBase {
@@ -1319,17 +1275,6 @@ export interface ConfirmationsQueueItem<T> extends ConfirmationsQueueItemOptions
 export interface ConfirmationResult<T> extends ConfirmationRequestBase {
   isApproved: boolean;
   payload?: T;
-}
-
-export interface EvmRequestExternal {
-  hashPayload: string;
-  canSign: boolean;
-}
-
-export interface EvmSendTransactionRequestExternal extends EvmSendTransactionRequest, EvmRequestExternal {
-}
-
-export interface EvmSignatureRequestExternal extends EvmSignatureRequest, EvmRequestExternal {
 }
 
 export interface AddNetworkRequestExternal { // currently only support adding pure Evm network
@@ -1345,13 +1290,7 @@ export interface AddNetworkRequestExternal { // currently only support adding pu
   };
 }
 
-export interface AddNetworkExternalRequest { // currently only support adding pure Evm network
-  chainId: string;
-  rpcUrl: string;
-  chainName: string;
-  blockExplorerUrl: string;
-  requestId: string;
-}
+export type AddNetworkToRequestConnect = AddNetworkRequestExternal;
 
 export interface AddTokenRequestExternal {
   slug?: string;
@@ -1365,32 +1304,62 @@ export interface AddTokenRequestExternal {
   contractError: boolean;
 }
 
+export interface ErrorNetworkConnection {
+  networkKey: string,
+  address: string,
+  errors: ErrorValidation[]
+}
+
 export interface ConfirmationDefinitions {
   addNetworkRequest: [ConfirmationsQueueItem<_NetworkUpsertParams>, ConfirmationResult<null>],
   addTokenRequest: [ConfirmationsQueueItem<AddTokenRequestExternal>, ConfirmationResult<boolean>],
-  switchNetworkRequest: [ConfirmationsQueueItem<SwitchNetworkRequest>, ConfirmationResult<boolean>],
   evmSignatureRequest: [ConfirmationsQueueItem<EvmSignatureRequest>, ConfirmationResult<string>],
   evmSendTransactionRequest: [ConfirmationsQueueItem<EvmSendTransactionRequest>, ConfirmationResult<string>]
-  evmWatchTransactionRequest: [ConfirmationsQueueItem<EvmWatchTransactionRequest>, ConfirmationResult<string>]
+  evmWatchTransactionRequest: [ConfirmationsQueueItem<EvmWatchTransactionRequest>, ConfirmationResult<string>],
+  errorConnectNetwork: [ConfirmationsQueueItem<ErrorNetworkConnection>, ConfirmationResult<null>],
+  submitApiRequest: [ConfirmationsQueueItem<SubmitApiRequest>, ConfirmationResult<string>]
+}
+
+export interface ConfirmationDefinitionsTon {
+  tonSignatureRequest: [ConfirmationsQueueItem<TonSignatureRequest>, ConfirmationResult<string>],
+  tonSendTransactionRequest: [ConfirmationsQueueItem<TonSendTransactionRequest>, ConfirmationResult<string>],
+  tonWatchTransactionRequest: [ConfirmationsQueueItem<TonWatchTransactionRequest>, ConfirmationResult<string>]
+}
+
+export interface ConfirmationDefinitionsCardano {
+  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<ResponseCardanoSignData>],
+  cardanoSendTransactionRequest: [ConfirmationsQueueItem<CardanoSendTransactionRequest>, ConfirmationResult<string>],
+  cardanoSignTransactionRequest: [ConfirmationsQueueItem<CardanoSignTransactionRequest>, ConfirmationResult<string>],
+  cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
 }
 
 export type ConfirmationType = keyof ConfirmationDefinitions;
+export type ConfirmationTypeTon = keyof ConfirmationDefinitionsTon;
+export type ConfirmationTypeCardano = keyof ConfirmationDefinitionsCardano;
 
 export type ConfirmationsQueue = {
   [CT in ConfirmationType]: Record<string, ConfirmationDefinitions[CT][0]>;
 }
+export type ConfirmationsQueueTon = {
+  [CT in ConfirmationTypeTon]: Record<string, ConfirmationDefinitionsTon[CT][0]>;
+}
+export type ConfirmationsQueueCardano = {
+  [CT in ConfirmationTypeCardano]: Record<string, ConfirmationDefinitionsCardano[CT][0]>;
+}
 
 export type RequestConfirmationsSubscribe = null;
+export type RequestConfirmationsSubscribeTon = null;
+export type RequestConfirmationsSubscribeCardano = null;
 
 // Design to use only one confirmation
 export type RequestConfirmationComplete = {
   [CT in ConfirmationType]?: ConfirmationDefinitions[CT][1];
 }
-
-export interface BasicTxInfo {
-  fee: string,
-  balanceError: boolean,
-  rawFee?: number
+export type RequestConfirmationCompleteTon = {
+  [CT in ConfirmationTypeTon]?: ConfirmationDefinitionsTon[CT][1];
+}
+export type RequestConfirmationCompleteCardano = {
+  [CT in ConfirmationTypeCardano]?: ConfirmationDefinitionsCardano[CT][1];
 }
 
 export interface BondingOptionParams {
@@ -1438,22 +1407,36 @@ export interface ResponseParseEvmContractInput {
 /// Ledger
 
 export interface LedgerNetwork {
-  genesisHash: string; // GenesisHash for substrate app
-  networkName: string; // Display in selector
-  accountName: string; // Name for account(Ledger X Account)
-  appName: string; // Name in Ledger
-  network: string; // network is predefined in ledger lib
-  slug: string; // slug in chain list
-  icon: 'substrate' | 'ethereum'; // Deprecated
-  isDevMode: boolean; // Dev mode on Ledger
-  isEthereum: boolean; // Use for evm account
+  /** GenesisHash for substrate app */
+  genesisHash: string;
+  /** Display in selector */
+  networkName: string;
+  /** Name for account(Ledger X Account) */
+  accountName: string;
+  /** Name in Ledger */
+  appName: string;
+  /** Network is predefined in ledger lib */
+  network: string;
+  /** slug in chain list */
+  slug: string;
+  /** Deprecated */
+  icon: 'substrate' | 'ethereum';
+  /** Dev mode on Ledger */
+  isDevMode: boolean;
+  /** Is use generic Ledger app */
+  isGeneric: boolean;
+  /** Use for evm account */
+  isEthereum: boolean;
+  /** Hide networks that are supported by the dot migration app */
+  isHide?: boolean;
+  /** Recovery app */
+  isRecovery?: boolean;
+  /** Slip44 in the derivation path */
+  slip44: number;
 }
 
-/// On-ramp
-
-export interface TransakNetwork {
-  networks: string[];
-  tokens?: string[];
+export interface MigrationLedgerNetwork extends Omit<LedgerNetwork, 'isGeneric' | 'isEthereum' | 'isDevMode' | 'icon' > {
+  ss58_addr_type: number
 }
 
 /// Qr Sign
@@ -1541,37 +1524,18 @@ export interface ResponseQrSignEvm {
   signature: string;
 }
 
-/// Transfer
-
-export interface RequestCheckTransfer extends BaseRequestSign {
-  networkKey: string,
-  from: string,
-  to: string,
-  value?: string,
-  transferAll?: boolean
-  tokenSlug: string
+export interface RequestChangeFeeToken {
+  currentFeeToken?: string;
+  selectedFeeToken: string;
 }
+
+/// Transfer
 
 export interface ValidateTransactionResponse {
   errors: TransactionError[],
   warnings: TransactionWarning[],
   transferNativeAmount?: string
 }
-
-export type RequestTransfer = InternalRequestSign<RequestCheckTransfer>;
-
-export interface RequestCheckCrossChainTransfer extends BaseRequestSign {
-  originNetworkKey: string,
-  destinationNetworkKey: string,
-  from: string,
-  to: string,
-  transferAll?: boolean,
-  value: string,
-  tokenSlug: string,
-  showExtraWarning?: boolean
-}
-
-export type RequestCrossChainTransfer = InternalRequestSign<RequestCheckCrossChainTransfer>;
 
 /// Stake
 
@@ -1603,6 +1567,7 @@ export interface NominationInfo {
   hasUnstaking?: boolean;
   validatorMinStake?: string;
   status: EarningStatus;
+  originActiveStake?: string
 }
 
 export interface UnstakingInfo {
@@ -1655,7 +1620,15 @@ export interface BondingSubmitParams extends BaseRequestSign {
   amount: string,
   address: string,
   selectedValidators: ValidatorInfo[],
-  lockPeriod?: number // in month
+  lockPeriod?: number // in month,
+  poolInfo?: {
+    metadata: SubnetYieldPositionInfo,
+    type: YieldPoolType,
+    chain: string
+  },
+  poolPosition?: {
+    chain: string,
+  }
 }
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
@@ -1675,6 +1648,9 @@ export interface UnbondingSubmitParams extends BaseRequestSign {
   exchangeRate?: number;
   inputTokenInfo?: _ChainAsset;
   isFastUnbond: boolean;
+  poolInfo?: {
+    metadata: SubnetYieldPositionInfo,
+  },
 }
 
 export type RequestUnbondingSubmit = InternalRequestSign<UnbondingSubmitParams>;
@@ -1701,41 +1677,6 @@ export interface StakePoolingUnbondingParams extends BaseRequestSign {
 
 export type RequestStakePoolingUnbonding = InternalRequestSign<StakePoolingUnbondingParams>;
 
-export interface DelegationItem {
-  owner: string,
-  amount: string, // raw amount string
-  identity?: string,
-  minBond: string,
-  hasScheduledRequest: boolean
-  icon?: string;
-}
-
-export interface StakeDelegationRequest {
-  address: string,
-  networkKey: string
-}
-
-export interface CheckExistingTuringCompoundParams {
-  address: string;
-  collatorAddress: string;
-  networkKey: string;
-}
-
-export interface ExistingTuringCompoundTask {
-  exist: boolean;
-  taskId: string;
-  accountMinimum: number;
-  frequency: number;
-}
-
-export interface TuringStakeCompoundResp {
-  txInfo: BasicTxInfo,
-  optimalFrequency: string,
-  initTime: number,
-  compoundFee: string,
-  rawCompoundFee?: number
-}
-
 export interface TuringStakeCompoundParams extends BaseRequestSign {
   address: string,
   collatorAddress: string,
@@ -1753,57 +1694,6 @@ export interface TuringCancelStakeCompoundParams extends BaseRequestSign {
 }
 
 export type RequestTuringCancelStakeCompound = InternalRequestSign<TuringCancelStakeCompoundParams>;
-
-/// Create QR
-
-// Transfer
-
-export type RequestTransferExternal = InternalRequestSign<RequestCheckTransfer>;
-
-// XCM
-
-export type RequestCrossChainTransferExternal = InternalRequestSign<RequestCheckCrossChainTransfer>;
-
-// NFT
-
-export type RequestNftTransferExternalSubstrate = InternalRequestSign<SubstrateNftSubmitTransaction>;
-
-export type RequestNftTransferExternalEvm = InternalRequestSign<EvmNftSubmitTransaction>;
-
-export enum ChainEditStandard {
-  EVM = 'EVM',
-  SUBSTRATE = 'SUBSTRATE',
-  UNKNOWN = 'UNKNOWN',
-  MIXED = 'MIXED' // takes root in a standard (Substrate, Evm,...) but also compatible with other standards
-}
-
-// ChainService
-// for custom network
-export type ChainEditInfo = { // only support pure substrate or Evm network
-  slug: string;
-  currentProvider: string;
-  providers: Record<string, string>;
-  name: string;
-  chainType: ChainEditStandard;
-  blockExplorer?: string;
-  crowdloanUrl?: string;
-  priceId?: string;
-  symbol: string;
-}
-
-export interface ChainSpecInfo {
-  // Substrate
-  addressPrefix: number,
-  genesisHash: string,
-  paraId: number | null,
-
-  // Evm
-  evmChainId: number | null // null means not Evm
-
-  // Common
-  existentialDeposit: string,
-  decimals: number
-}
 
 /// Keyring state
 
@@ -1995,6 +1885,22 @@ export interface RequestAddPspToken {
   };
 }
 
+// Popular tokens
+
+export interface TokenPriorityDetails {
+  tokenGroup: Record<string, number>;
+  token: Record<string, number>
+}
+
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect
@@ -2076,6 +1982,8 @@ export interface RequestFindRawMetadata {
 export interface ResponseFindRawMetadata {
   rawMetadata: string;
   specVersion: number;
+  types: Record<string, Record<string, string> | string>;
+  userExtensions?: ExtDef;
 }
 
 export interface ResolveDomainRequest {
@@ -2106,6 +2014,10 @@ export interface CampaignButton {
   name: string;
   type: CampaignAction;
   metadata: Record<string, any> | null;
+}
+
+export interface ShowCampaignPopupRequest {
+  value: boolean;
 }
 
 export enum CampaignDataType {
@@ -2166,7 +2078,61 @@ export interface ResponseSubscribeHistory {
   items: TransactionHistoryItem[]
 }
 
+export interface ResponseNftImport {
+  success: boolean;
+  error: string;
+}
+
 /* Campaign */
+
+/* Migrate Unified Account */
+export interface RequestSaveMigrationAcknowledgedStatus {
+  isAcknowledgedUnifiedAccountMigration: boolean;
+}
+
+export interface RequestSaveUnifiedAccountMigrationInProgress {
+  isUnifiedAccountMigrationInProgress: boolean;
+}
+
+export interface RequestMigrateUnifiedAndFetchEligibleSoloAccounts {
+  password: string
+}
+
+export interface ResponseMigrateUnifiedAndFetchEligibleSoloAccounts {
+  migratedUnifiedAccountIds: string[],
+  soloAccounts: Record<string, SoloAccountToBeMigrated[]>
+  sessionId: string; // to keep linking to password in state
+}
+
+export interface SoloAccountToBeMigrated {
+  upcomingProxyId: string,
+  proxyId: string,
+  address: string,
+  name: string,
+  chainType: AccountChainType
+}
+
+export interface RequestMigrateSoloAccount {
+  soloAccounts: SoloAccountToBeMigrated[];
+  accountName: string;
+  sessionId: string;
+}
+
+export interface ResponseMigrateSoloAccount {
+  migratedUnifiedAccountId: string
+}
+
+export interface RequestPingSession {
+  sessionId: string;
+}
+
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
+}
+
+/* Core types */
+export type _Address = string;
+export type _BalanceMetadata = unknown;
 
 // Use stringify to communicate, pure boolean value will error with case 'false' value
 export interface KoniRequestSignatures {
@@ -2181,7 +2147,7 @@ export interface KoniRequestSignatures {
   'pri(bonding.subscribeNominatorMetadata)': [null, NominatorMetadata[], NominatorMetadata[]];
   'pri(bonding.getBondingOptions)': [BondingOptionParams, ValidatorInfo[]];
   'pri(bonding.getNominationPoolOptions)': [string, NominationPoolInfo[]];
-  'pri(bonding.nominationPool.submitBonding)': [RequestStakePoolingBonding, SWTransactionResponse];
+  'pri(bonding.nominationPool.submitBonding)': [RequestYieldStepSubmit, SWTransactionResponse];
   'pri(bonding.nominationPool.submitUnbonding)': [RequestStakePoolingUnbonding, SWTransactionResponse];
 
   // Chains, assets functions
@@ -2194,12 +2160,13 @@ export interface KoniRequestSignatures {
   'pri(chainService.upsertChain)': [_NetworkUpsertParams, boolean];
   'pri(chainService.enableChains)': [EnableMultiChainParams, boolean];
   'pri(chainService.enableChain)': [EnableChainParams, boolean];
+  'pri(chainService.enableChainWithPriorityAssets)': [EnableChainParams, boolean];
   'pri(chainService.reconnectChain)': [string, boolean];
   'pri(chainService.disableChains)': [string[], boolean];
   'pri(chainService.disableChain)': [string, boolean];
   'pri(chainService.removeChain)': [string, boolean];
   'pri(chainService.deleteCustomAsset)': [string, boolean];
-  'pri(chainService.upsertCustomAsset)': [Record<string, any>, boolean];
+  'pri(chainService.upsertCustomAsset)': [Record<string, any>, ResponseNftImport];
   'pri(chainService.validateCustomAsset)': [_ValidateCustomAssetRequest, _ValidateCustomAssetResponse];
   'pri(chainService.resetDefaultChains)': [null, boolean];
   'pri(chainService.getSupportedContractTypes)': [null, string[]];
@@ -2228,6 +2195,9 @@ export interface KoniRequestSignatures {
   // Price, balance, crowdloan functions
   'pri(price.getPrice)': [RequestPrice, PriceJson];
   'pri(price.getSubscription)': [RequestSubscribePrice, PriceJson, PriceJson];
+  'pri(price.getHistory)': [RequestGetHistoryTokenPriceData, HistoryTokenPriceJSON];
+  'pri(price.checkCoinGeckoPriceSupport)': [string, boolean];
+  'pri(price.subscribeCurrentTokenPrice)': [string, ResponseSubscribeCurrentTokenPrice, CurrentTokenPrice];
   'pri(balance.getBalance)': [RequestBalance, BalanceJson];
   'pri(balance.getSubscription)': [RequestSubscribeBalance, BalanceJson, BalanceJson];
   'pri(crowdloan.getCrowdloan)': [RequestCrowdloan, CrowdloanJson];
@@ -2262,12 +2232,14 @@ export interface KoniRequestSignatures {
   /* Account management */
 
   // Validate
-  'pri(seed.validateV2)': [RequestSeedValidateV2, ResponseSeedValidateV2];
-  'pri(privateKey.validateV2)': [RequestSeedValidateV2, ResponsePrivateKeyValidateV2];
-  'pri(accounts.checkPublicAndSecretKey)': [RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey];
+  'pri(accounts.validate.seed)': [RequestMnemonicValidateV2, ResponseMnemonicValidateV2];
+  'pri(accounts.validate.name)': [RequestAccountNameValidate, ResponseAccountNameValidate];
+  'pri(accounts.validate.privateKey)': [RequestPrivateKeyValidateV2, ResponsePrivateKeyValidateV2];
+  'pri(accounts.validate.substrate.publicAndPrivateKey)': [RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey];
+  'pri(accounts.validate.bounceable)': [RequestBounceableValidate, boolean];
 
   // Create account
-  'pri(seed.createV2)': [RequestSeedCreateV2, ResponseSeedCreateV2];
+  'pri(seed.createV2)': [RequestMnemonicCreateV2, ResponseMnemonicCreateV2];
   'pri(accounts.create.suriV2)': [RequestAccountCreateSuriV2, ResponseAccountCreateSuriV2];
   'pri(accounts.create.externalV2)': [RequestAccountCreateExternalV2, AccountExternalError[]];
   'pri(accounts.create.hardwareV2)': [RequestAccountCreateHardwareV2, boolean];
@@ -2278,34 +2250,55 @@ export interface KoniRequestSignatures {
   'pri(accounts.inject.add)': [RequestAddInjectedAccounts, boolean];
   'pri(accounts.inject.remove)': [RequestRemoveInjectedAccounts, boolean];
 
-  // Derive
-  'pri(derivation.createV2)': [RequestDeriveCreateV2, boolean]; // Substrate
-
   // Restore by json
-  'pri(json.restoreV2)': [RequestJsonRestoreV2, void];
-  'pri(json.batchRestoreV2)': [RequestBatchRestoreV2, void];
+  'pri(accounts.json.info)': [RequestJsonGetAccountInfo, ResponseJsonGetAccountInfo];
+  'pri(accounts.json.restoreV2)': [RequestJsonRestoreV2, string[]];
+  'pri(accounts.json.batchInfo)': [RequestBatchJsonGetAccountInfo, ResponseBatchJsonGetAccountInfo];
+  'pri(accounts.json.batchRestoreV2)': [RequestBatchRestoreV2, string[]];
 
   // Export account
-  'pri(accounts.exportPrivateKey)': [RequestAccountExportPrivateKey, ResponseAccountExportPrivateKey];
+  'pri(accounts.export.json.batch)': [RequestAccountBatchExportV2, ResponseAccountBatchExportV2];
+  'pri(accounts.export.privateKey)': [RequestAccountExportPrivateKey, ResponseAccountExportPrivateKey];
+  'pri(accounts.export.mnemonic)': [RequestExportAccountProxyMnemonic, ResponseExportAccountProxyMnemonic];
 
   // Current account
-  'pri(accounts.subscribeWithCurrentAddress)': [RequestAccountSubscribe, AccountsWithCurrentAddress, AccountsWithCurrentAddress];
-  'pri(accounts.updateCurrentAddress)': [string, boolean]; // old
-  'pri(currentAccount.saveAddress)': [RequestCurrentAccountAddress, CurrentAccountInfo];
-  'pri(accounts.get.meta)': [RequestAccountMeta, ResponseAccountMeta];
+  'pri(accounts.subscribeWithCurrentProxy)': [RequestAccountSubscribe, AccountsWithCurrentAddress, AccountsWithCurrentAddress];
+  'pri(accounts.saveCurrentProxy)': [RequestCurrentAccountAddress, CurrentAccountInfo];
+
+  // Edit account
+  'pri(accounts.edit)': [RequestAccountProxyEdit, boolean];
+  'pri(accounts.forget)': [RequestAccountProxyForget, boolean];
+  'pri(accounts.ton.version.change)': [RequestChangeTonWalletContractVersion, string];
+  'pri(accounts.ton.version.map)': [RequestGetAllTonWalletContractVersion, ResponseGetAllTonWalletContractVersion];
+
+  // Derive
+  'pri(accounts.derive.validateV2)': [RequestDeriveValidateV2, ResponseDeriveValidateV2];
+  'pri(accounts.derive.suggestion)': [RequestGetDeriveSuggestion, ResponseGetDeriveSuggestion];
+  'pri(accounts.derive.getList)': [RequestGetDeriveAccounts, ResponseGetDeriveAccounts];
+  'pri(accounts.derive.create.multiple)': [RequestDeriveCreateMultiple, boolean];
+  'pri(accounts.derive.createV3)': [RequestDeriveCreateV3, boolean];
+
+  // Keyring state
+  'pri(keyring.subscribe)': [null, KeyringState, KeyringState];
+  'pri(keyring.change)': [RequestChangeMasterPassword, ResponseChangeMasterPassword];
+  'pri(keyring.migrate)': [RequestMigratePassword, ResponseMigratePassword];
+  'pri(keyring.unlock)': [RequestUnlockKeyring, ResponseUnlockKeyring];
+  'pri(keyring.lock)': [null, void];
+  'pri(keyring.export.mnemonic)': [RequestKeyringExportMnemonic, ResponseKeyringExportMnemonic];
+  'pri(keyring.reset)': [RequestResetWallet, ResponseResetWallet];
 
   // Address book
-  'pri(accounts.saveRecent)': [RequestSaveRecentAccount, KeyringAddress];
-  'pri(accounts.subscribeAddresses)': [null, AddressBookInfo, AddressBookInfo];
-  'pri(accounts.editContact)': [RequestEditContactAccount, boolean];
-  'pri(accounts.deleteContact)': [RequestDeleteContactAccount, boolean];
+  'pri(addressBook.saveRecent)': [RequestSaveRecentAccount, KeyringAddress];
+  'pri(addressBook.subscribe)': [null, AddressBookInfo, AddressBookInfo];
+  'pri(addressBook.edit)': [RequestEditContactAccount, boolean];
+  'pri(addressBook.delete)': [RequestDeleteContactAccount, boolean];
 
   // Domain name
   'pri(accounts.resolveDomainToAddress)': [ResolveDomainRequest, string | undefined];
   'pri(accounts.resolveAddressToDomain)': [ResolveAddressToDomainRequest, string | undefined];
 
   // For input UI
-  'pri(accounts.subscribeAccountsInputAddress)': [RequestAccountSubscribe, string, OptionInputAddress];
+  'pri(accounts.subscribeAccountsInputAddress)': [RequestInputAccountSubscribe, ResponseInputAccountSubscribe, ResponseInputAccountSubscribe];
 
   /* Account management */
 
@@ -2320,11 +2313,22 @@ export interface KoniRequestSignatures {
   'pri(settings.saveAutoLockTime)': [RequestChangeTimeAutoLock, boolean];
   'pri(settings.saveUnlockType)': [RequestUnlockType, boolean];
   'pri(settings.saveEnableChainPatrol)': [RequestChangeEnableChainPatrol, boolean];
+  'pri(settings.saveNotificationSetup)': [NotificationSetup, boolean];
+  'pri(settings.saveUnifiedAccountMigrationInProgress)': [RequestSaveUnifiedAccountMigrationInProgress, boolean];
+  'pri(settings.pingUnifiedAccountMigrationDone)': [null, boolean];
+  'pri(settings.saveMigrationAcknowledgedStatus)': [RequestSaveMigrationAcknowledgedStatus, boolean];
   'pri(settings.saveLanguage)': [RequestChangeLanguage, boolean];
+  'pri(settings.savePriceCurrency)': [RequestChangePriceCurrency, boolean];
   'pri(settings.saveShowZeroBalance)': [RequestChangeShowZeroBalance, boolean];
   'pri(settings.saveShowBalance)': [RequestChangeShowBalance, boolean];
+  'pri(settings.update.allowOneSign)': [RequestChangeAllowOneSign, boolean];
   'pri(settings.logo.assets.subscribe)': [null, Record<string, string>, Record<string, string>];
   'pri(settings.logo.chains.subscribe)': [null, Record<string, string>, Record<string, string>];
+
+  // Environment Config
+  'pri(settings.saveAppConfig)': [RequestSaveAppConfig, boolean];
+  'pri(settings.saveBrowserConfig)': [RequestSaveBrowserConfig, boolean];
+  'pri(settings.saveOSConfig)': [RequestSaveOSConfig, boolean];
 
   /* Earning */
 
@@ -2370,6 +2374,7 @@ export interface KoniRequestSignatures {
   'pri(yield.withdraw.submit)': [RequestYieldWithdrawal, SWTransactionResponse];
   'pri(yield.cancelWithdrawal.submit)': [RequestStakeCancelWithdrawal, SWTransactionResponse];
   'pri(yield.claimReward.submit)': [RequestStakeClaimReward, SWTransactionResponse];
+  'pri(yield.getEarningSlippage)': [RequestEarningSlippage, EarningSlippageResult];
 
   /* Other */
 
@@ -2380,25 +2385,31 @@ export interface KoniRequestSignatures {
   // Subscription
   'pri(transaction.history.getSubscription)': [null, TransactionHistoryItem[], TransactionHistoryItem[]];
   'pri(transaction.history.subscribe)': [RequestSubscribeHistory, ResponseSubscribeHistory, TransactionHistoryItem[]];
-  // 'pri(transaction.history.add)': [RequestTransactionHistoryAdd, boolean, TransactionHistoryItem[]];
-  'pri(transfer.checkReferenceCount)': [RequestTransferCheckReferenceCount, boolean];
-  'pri(transfer.checkSupporting)': [RequestTransferCheckSupporting, SupportTransferResponse];
-  'pri(transfer.getExistentialDeposit)': [RequestTransferExistentialDeposit, string];
   'pri(transfer.getMaxTransferable)': [RequestMaxTransferable, AmountData];
+  'pri(transfer.subscribe)': [RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransfer];
   'pri(subscription.cancel)': [string, boolean];
   'pri(freeBalance.get)': [RequestFreeBalance, AmountData];
   'pri(freeBalance.subscribe)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
 
   // Transfer
   'pri(accounts.checkTransfer)': [RequestCheckTransfer, ValidateTransactionResponse];
-  'pri(accounts.transfer)': [RequestTransfer, SWTransactionResponse];
+  'pri(accounts.transfer)': [RequestSubmitTransfer, SWTransactionResponse];
+  'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalTransferPath];
+  'pri(accounts.approveSpending)': [TokenSpendingApprovalParams, SWTransactionResponse];
 
   'pri(accounts.checkCrossChainTransfer)': [RequestCheckCrossChainTransfer, ValidateTransactionResponse];
   'pri(accounts.crossChainTransfer)': [RequestCrossChainTransfer, SWTransactionResponse];
 
+  'pri(customFee.getTokensCanPayFee)': [RequestGetTokensCanPayFee, TokenPayFeeInfo];
+  'pri(customFee.getAmountForPair)': [RequestGetAmountForPair, string];
+
   // Confirmation Queues
   'pri(confirmations.subscribe)': [RequestConfirmationsSubscribe, ConfirmationsQueue, ConfirmationsQueue];
+  'pri(confirmationsTon.subscribe)': [RequestConfirmationsSubscribeTon, ConfirmationsQueueTon, ConfirmationsQueueTon];
+  'pri(confirmationsCardano.subscribe)': [RequestConfirmationsSubscribeCardano, ConfirmationsQueueCardano, ConfirmationsQueueCardano];
   'pri(confirmations.complete)': [RequestConfirmationComplete, boolean];
+  'pri(confirmationsTon.complete)': [RequestConfirmationCompleteTon, boolean];
+  'pri(confirmationsCardano.complete)': [RequestConfirmationCompleteCardano, boolean];
 
   'pub(utils.getRandom)': [RandomTestRequest, number];
   'pub(accounts.listV2)': [RequestAccountList, InjectedAccount[]];
@@ -2421,29 +2432,26 @@ export interface KoniRequestSignatures {
   'evm(request)': [RequestArguments, unknown];
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
 
+  // Cardano
+  'cardano(account.get.address)': [null, string[]];
+  'cardano(account.get.balance)': [null, Cbor];
+  'cardano(account.get.change.address)': [null, string];
+  'cardano(account.get.reward.address)': [null, string[]];
+  'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[] | null];
+  'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[] | null];
+  'cardano(network.get.current)': [null, number];
+  'cardano(data.sign)': [RequestCardanoSignData, ResponseCardanoSignData];
+  'cardano(transaction.sign)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
+  'cardano(transaction.submit)': [Cbor, string];
+
   // Evm Transaction
   'pri(evm.transaction.parse.input)': [RequestParseEvmContractInput, ResponseParseEvmContractInput];
 
   // Authorize
   'pri(authorize.subscribe)': [null, AuthUrls, AuthUrls];
 
-  // Keyring state
-  'pri(keyring.subscribe)': [null, KeyringState, KeyringState];
-  'pri(keyring.change)': [RequestChangeMasterPassword, ResponseChangeMasterPassword];
-  'pri(keyring.migrate)': [RequestMigratePassword, ResponseMigratePassword];
-  'pri(keyring.unlock)': [RequestUnlockKeyring, ResponseUnlockKeyring];
-  'pri(keyring.lock)': [null, void];
-  'pri(keyring.export.mnemonic)': [RequestKeyringExportMnemonic, ResponseKeyringExportMnemonic];
-  'pri(keyring.reset)': [RequestResetWallet, ResponseResetWallet];
-
   // Signing
   'pri(signing.approve.passwordV2)': [RequestSigningApprovePasswordV2, boolean];
-
-  // Derive
-  'pri(derivation.validateV2)': [RequestDeriveValidateV2, ResponseDeriveValidateV2];
-  'pri(derivation.getList)': [RequestGetDeriveAccounts, ResponseGetDeriveAccounts];
-  'pri(derivation.create.multiple)': [RequestDeriveCreateMultiple, boolean];
-  'pri(derivation.createV3)': [RequestDeriveCreateV3, boolean];
 
   // Transaction
   // Get Transaction
@@ -2489,6 +2497,8 @@ export interface KoniRequestSignatures {
 
   /// Metadata
   'pri(metadata.find)': [RequestFindRawMetadata, ResponseFindRawMetadata];
+  'pri(metadata.hash)': [RequestMetadataHash, ResponseMetadataHash];
+  'pri(metadata.transaction.shorten)': [RequestShortenMetadata, ResponseShortenMetadata];
 
   /* Campaign */
 
@@ -2499,6 +2509,14 @@ export interface KoniRequestSignatures {
 
   /* Campaign */
   'pri(campaign.banner.subscribe)': [null, CampaignBanner[], CampaignBanner[]];
+  'pri(campaign.popup.subscribeVisibility)': [null, ShowCampaignPopupRequest, ShowCampaignPopupRequest];
+  'pri(campaign.popup.toggle)': [ShowCampaignPopupRequest, null];
+  'pri(campaign.popup.getData)': [null, AppPopupData[]];
+  'pri(campaign.banner.getData)': [null, AppBannerData[]];
+  'pri(campaign.confirmation.getData)': [null, AppConfirmationData[]];
+  'pri(campaign.popups.subscribe)': [null, AppPopupData[], AppPopupData[]];
+  'pri(campaign.banners.subscribe)': [null, AppBannerData[], AppBannerData[]];
+  'pri(campaign.confirmations.subscribe)': [null, AppConfirmationData[], AppConfirmationData[]];
   'pri(campaign.banner.complete)': [RequestCampaignBannerComplete, boolean];
   /* Campaign */
 
@@ -2511,7 +2529,55 @@ export interface KoniRequestSignatures {
   'pri(database.export)': [null, string];
   'pri(database.import)': [string, boolean];
   'pri(database.exportJson)': [null, DexieExportJsonStructure];
+  'pri(database.migrateLocalStorage)': [string, boolean];
+  'pri(database.setLocalStorage)': [StorageDataInterface, boolean];
+  'pri(database.getLocalStorage)': [string, string | null];
   /* Database Service */
+
+  /* Swap */
+  'pri(swapService.subscribePairs)': [null, SwapPair[], SwapPair[]];
+  'pri(swapService.handleSwapRequest)': [SwapRequest, SwapRequestResult];
+  'pri(swapService.handleSwapRequestV2)': [SwapRequestV2, SwapRequestResult];
+  'pri(swapService.handleSwapStep)': [SwapSubmitParams, SWTransactionResponse];
+  'pri(swapService.getLatestQuote)': [SwapRequest, SwapQuoteResponse];
+  'pri(swapService.validateSwapProcess)': [ValidateSwapProcessParams, TransactionError[]];
+  /* Swap */
+
+  /* Notification Service */
+  'pri(inappNotification.subscribeUnreadNotificationCountMap)': [null, Record<string, number>, Record<string, number>];
+  'pri(inappNotification.markAllReadNotification)': [string, null];
+  'pri(inappNotification.switchReadNotificationStatus)': [RequestSwitchStatusParams, null];
+  'pri(inappNotification.fetch)': [GetNotificationParams, _NotificationInfo[]];
+  'pri(inappNotification.get)': [string, _NotificationInfo];
+  'pri(inappNotification.isClaimedPolygonBridge)': [RequestIsClaimedPolygonBridge, boolean]
+  /* Notification Service */
+
+  /* Avail Bridge */
+  'pri(availBridge.submitClaimAvailBridgeOnAvail)': [RequestClaimBridge, SWTransactionResponse]
+  /* Avail Bridge */
+
+  /* Polygon Bridge */
+  'pri(polygonBridge.submitClaimPolygonBridge)': [RequestClaimBridge, SWTransactionResponse]
+  /* Polygon Bridge */
+
+  /* Ledger */
+  'pri(ledger.generic.allow)': [null, string[], string[]];
+  /* Ledger */
+
+  /* Popular tokens */
+  'pri(tokens.subscribePriority)': [null, TokenPriorityDetails, TokenPriorityDetails];
+  /* Popular tokens */
+
+  /* Process multi steps */
+  'pri(process.transaction.submit)': [RequestSubmitProcessTransaction, SWTransactionResponse];
+  'pri(process.subscribe.id)': [RequestSubscribeProcessById, ResponseSubscribeProcessById, ResponseSubscribeProcessById];
+  'pri(process.subscribe.alive)': [null, ResponseSubscribeProcessAlive, ResponseSubscribeProcessAlive];
+  /* Process multi steps */
+
+  /* Migrate Unified Account */
+  'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
+  'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
+  'pri(migrate.pingSession)': [RequestPingSession, boolean];
 }
 
 export interface ApplicationMetadataType {

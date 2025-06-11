@@ -10,7 +10,7 @@ import React, { ChangeEventHandler, ClipboardEventHandler, ForwardedRef, forward
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { BasicInputWrapper } from './Base';
+import { BasicInputEvent, BasicInputWrapper } from './Base';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   decimals: number;
@@ -18,13 +18,15 @@ interface Props extends ThemeProps, BasicInputWrapper {
   onSetMax?: (value: boolean) => void;
   showMaxButton?: boolean;
   forceUpdateMaxValue?: object;
+  defaultInvalidOutputValue?: string;
+  onChange?: (event: BasicInputEvent<string>, isUserInput?: boolean) => void
 }
 
 const isValidInput = (input: string) => {
   return !(isNaN(parseFloat(input)) || !input.match(/^-?\d*(\.\d+)?$/));
 };
 
-export const getInputValuesFromString: (input: string, power: number) => string = (input: string, power: number) => {
+export const getInputValuesFromString = (input: string, power: number): string => {
   const intValue = input.split('.')[0];
   let valueBigN = new BigN(isValidInput(intValue) ? intValue : '0');
 
@@ -33,9 +35,9 @@ export const getInputValuesFromString: (input: string, power: number) => string 
   return valueBigN.toFixed();
 };
 
-export const getOutputValuesFromString: (input: string, power: number) => string = (input: string, power: number) => {
+export const getOutputValuesFromString = (input: string, power: number, defaultInvalidOutputValue = ''): string => {
   if (!isValidInput(input)) {
-    return '';
+    return defaultInvalidOutputValue;
   }
 
   let valueBigN = new BigN(input);
@@ -68,7 +70,7 @@ const isControlKey = (keycode: number) => {
 };
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { className, decimals, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, showMaxButton, statusHelp, tooltip, value } = props;
+  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, showMaxButton, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
 
@@ -126,11 +128,11 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     setInputValue(value);
     setFirstTime(false);
 
-    const transformVal = getOutputValuesFromString(value, decimals);
+    const transformVal = getOutputValuesFromString(value, decimals, defaultInvalidOutputValue);
 
-    onChange && onChange({ target: { value: transformVal } });
+    onChange && onChange({ target: { value: transformVal } }, true);
     onSetMax?.(false);
-  }, [decimals, getMaxLengthText, onChange, onSetMax]);
+  }, [decimals, defaultInvalidOutputValue, getMaxLengthText, onChange, onSetMax]);
 
   const onKeyDown = useCallback(
     (event: React.KeyboardEvent<Element>): void => {
@@ -147,7 +149,11 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         const newValue = `${value.substring(0, i || 0)}${event.key}${value.substring(j || 0)}`;
 
         if (!isUseControl) {
-          if (!(/^(0|[1-9]\d*)(\.\d*)?$/).test(newValue)) {
+          const dotIndex: number = newValue.indexOf('.');
+
+          if (dotIndex !== -1 && (i === 0 && event.key === '0')) {
+            event.preventDefault();
+          } else if (!(/^(0|[1-9]\d*)(\.\d*)?$/).test(newValue) && !(i === 0 && event.key === '0')) {
             event.preventDefault();
           }
         }
@@ -182,7 +188,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     let amount = true;
 
     if (inputValue && !firstTime) {
-      const transformVal = getOutputValuesFromString(inputValue || '0', decimals);
+      const transformVal = getOutputValuesFromString(inputValue || '0', decimals, defaultInvalidOutputValue);
 
       setTimeout(() => {
         if (amount) {
@@ -208,6 +214,24 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [decimals, forceUpdateMaxValue, maxValue]);
+
+  useEffect(() => {
+    if (inputValue && inputValue.length > (getMaxLengthText(inputValue) || 0)) {
+      let valueStr = inputValue.toString();
+      const decimalPointIndex = valueStr.indexOf('.');
+
+      if (decimalPointIndex !== -1) {
+        valueStr = valueStr.slice(0, decimalPointIndex + decimals + 1);
+        valueStr = valueStr.replace(/0+$/, '');
+
+        if (valueStr.endsWith('.')) {
+          valueStr = valueStr.slice(0, -1);
+        }
+      }
+
+      setInputValue(valueStr);
+    }
+  }, [decimals, getMaxLengthText, inputValue, value]);
 
   return (
     <Input

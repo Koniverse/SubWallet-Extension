@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestStakePoolingBonding } from '@subwallet/extension-base/background/KoniTypes';
+import { RequestYieldStepSubmit, SubmitJoinNominationPool } from '@subwallet/extension-base/types';
+import { AlertBox } from '@subwallet/extension-web-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-web-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-web-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-web-ui/hooks/common/useGetNativeTokenBasicInfo';
@@ -16,7 +17,8 @@ type Props = BaseTransactionConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
-  const data = transaction.data as RequestStakePoolingBonding;
+  const requestData = transaction.data as RequestYieldStepSubmit;
+  const data = requestData.data as SubmitJoinNominationPool;
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
@@ -31,11 +33,11 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {/* <MetaInfo.Account */}
-        {/*   address={'5DnokDpMdNEH8cApsZoWQnjsggADXQmGWUb6q8ZhHeEwvncL'} */}
-        {/*   label={t('Validator')} */}
-        {/*   networkPrefix={42} */}
-        {/* /> */}
+        <MetaInfo.Account
+          address={data.selectedPool.address}
+          label={t('Pool')}
+          networkPrefix={42}
+        />
 
         {/* <MetaInfo.AccountGroup */}
         {/*  accounts={data.address} */}
@@ -57,12 +59,25 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+
+      <AlertBox
+        className={'description'}
+        description={t('Once staked, your funds will be locked and become non-transferable. ' +
+          'To unlock your funds, you need to unstake manually, wait for the unstaking period to' +
+          ' end and then withdraw manually.')}
+        title={t('Your staked funds will be locked')}
+        type='warning'
+      />
     </div>
   );
 };
 
 const StakeTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '.description': {
+      marginTop: token.marginSM
+    }
+  };
 });
 
 export default StakeTransactionConfirmation;

@@ -1,10 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AuthRequestV2, ConfirmationDefinitions, ConfirmationsQueue, ConfirmationsQueueItemOptions, ConfirmationType, RequestConfirmationComplete } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountAuthType, AccountJson, AuthorizeRequest, MetadataRequest, RequestAuthorizeTab, RequestSign, ResponseSigning, SigningRequest } from '@subwallet/extension-base/background/types';
+import { AuthRequestV2, ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationsQueueTon, ConfirmationType, ConfirmationTypeCardano, ConfirmationTypeTon, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountAuthType, AuthorizeRequest, MetadataRequest, RequestAuthorizeTab, RequestSign, ResponseSigning, SigningRequest } from '@subwallet/extension-base/background/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
+import CardanoRequestHandler from '@subwallet/extension-base/services/request-service/handler/CardanoRequestHandler';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -12,6 +13,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 
+import TonRequestHandler from './handler/TonRequestHandler';
 import { AuthRequestHandler, ConnectWCRequestHandler, EvmRequestHandler, MetadataRequestHandler, NotSupportWCRequestHandler, PopupHandler, SubstrateRequestHandler } from './handler';
 import { AuthUrls, MetaRequest } from './types';
 
@@ -25,6 +27,8 @@ export default class RequestService {
   readonly #authRequestHandler: AuthRequestHandler;
   readonly #substrateRequestHandler: SubstrateRequestHandler;
   readonly #evmRequestHandler: EvmRequestHandler;
+  readonly #tonRequestHandler: TonRequestHandler;
+  readonly #cardanoRequestHandler: CardanoRequestHandler;
   readonly #connectWCRequestHandler: ConnectWCRequestHandler;
   readonly #notSupportWCRequestHandler: NotSupportWCRequestHandler;
 
@@ -38,6 +42,8 @@ export default class RequestService {
     this.#authRequestHandler = new AuthRequestHandler(this, this.#chainService, this.keyringService);
     this.#substrateRequestHandler = new SubstrateRequestHandler(this);
     this.#evmRequestHandler = new EvmRequestHandler(this);
+    this.#tonRequestHandler = new TonRequestHandler(this);
+    this.#cardanoRequestHandler = new CardanoRequestHandler(this);
     this.#connectWCRequestHandler = new ConnectWCRequestHandler(this);
     this.#notSupportWCRequestHandler = new NotSupportWCRequestHandler(this);
 
@@ -46,7 +52,7 @@ export default class RequestService {
   }
 
   public get numAllRequests () {
-    return this.allSubstrateRequests.length + this.numEvmRequests;
+    return this.allSubstrateRequests.length + this.numEvmRequests + this.numTonRequests + this.numCardanoRequests;
   }
 
   public updateIconV2 (shouldClose?: boolean): void {
@@ -54,7 +60,7 @@ export default class RequestService {
   }
 
   getAddressList (value = false): Record<string, boolean> {
-    const addressList = Object.keys(this.keyringService.accounts);
+    const addressList = Object.keys(this.keyringService.context.pairs);
 
     return addressList.reduce((addressList, v) => ({ ...addressList, [v]: value }), {});
   }
@@ -92,8 +98,8 @@ export default class RequestService {
     return this.#metadataRequestHandler.numMetaRequests;
   }
 
-  public injectMetadata (url: string, request: MetadataDef): Promise<boolean> {
-    return this.#metadataRequestHandler.injectMetadata(url, request);
+  public injectMetadata (request: MetadataDef): boolean {
+    return this.#metadataRequestHandler.injectMetadata(request);
   }
 
   public getMetaRequest (id: string): MetaRequest {
@@ -158,8 +164,8 @@ export default class RequestService {
     return this.#substrateRequestHandler.allSubstrateRequests;
   }
 
-  public sign (url: string, request: RequestSign, account: AccountJson, id?: string): Promise<ResponseSigning> {
-    return this.#substrateRequestHandler.sign(url, request, account, id);
+  public sign (url: string, request: RequestSign, id?: string): Promise<ResponseSigning> {
+    return this.#substrateRequestHandler.sign(url, request, id);
   }
 
   public get numSubstrateRequests (): number {
@@ -171,16 +177,32 @@ export default class RequestService {
     return this.#evmRequestHandler.numEvmRequests;
   }
 
+  public get numTonRequests (): number {
+    return this.#tonRequestHandler.numTonRequests;
+  }
+
+  public get numCardanoRequests (): number {
+    return this.#cardanoRequestHandler.numCardanoRequests;
+  }
+
   public get confirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {
     return this.#evmRequestHandler.getConfirmationsQueueSubject();
+  }
+
+  public get confirmationsQueueSubjectTon (): BehaviorSubject<ConfirmationsQueueTon> {
+    return this.#tonRequestHandler.getConfirmationsQueueSubjectTon();
+  }
+
+  public get confirmationsQueueSubjectCardano (): BehaviorSubject<ConfirmationsQueueCardano> {
+    return this.#cardanoRequestHandler.getConfirmationsQueueSubjectCardano();
   }
 
   public getSignRequest (id: string) {
     return this.#substrateRequestHandler.getSignRequest(id);
   }
 
-  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON): Promise<ResponseSigning> {
-    return this.#substrateRequestHandler.signTransaction(id, address, url, payload);
+  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void): Promise<ResponseSigning> {
+    return this.#substrateRequestHandler.signTransaction(id, address, url, payload, onSign);
   }
 
   public addConfirmation<CT extends ConfirmationType> (
@@ -194,8 +216,38 @@ export default class RequestService {
     return this.#evmRequestHandler.addConfirmation(id, url, type, payload, options, validator);
   }
 
+  public addConfirmationTon<CT extends ConfirmationTypeTon> (
+    id: string,
+    url: string,
+    type: CT,
+    payload: ConfirmationDefinitionsTon[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {},
+    validator?: (input: ConfirmationDefinitionsTon[CT][1]) => Error | undefined
+  ): Promise<ConfirmationDefinitionsTon[CT][1]> {
+    return this.#tonRequestHandler.addConfirmationTon(id, url, type, payload, options, validator);
+  }
+
+  public addConfirmationCardano<CT extends ConfirmationTypeCardano> (
+    id: string,
+    url: string,
+    type: CT,
+    payload: ConfirmationDefinitionsCardano[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {},
+    validator?: (input: ConfirmationDefinitionsCardano[CT][1]) => Error | undefined
+  ): Promise<ConfirmationDefinitionsCardano[CT][1]> {
+    return this.#cardanoRequestHandler.addConfirmationCardano(id, url, type, payload, options, validator);
+  }
+
   public async completeConfirmation (request: RequestConfirmationComplete): Promise<boolean> {
     return await this.#evmRequestHandler.completeConfirmation(request);
+  }
+
+  public async completeConfirmationTon (request: RequestConfirmationCompleteTon): Promise<boolean> {
+    return await this.#tonRequestHandler.completeConfirmationTon(request);
+  }
+
+  public async completeConfirmationCardano (request: RequestConfirmationCompleteCardano) {
+    return await this.#cardanoRequestHandler.completeConfirmationCardano(request);
   }
 
   public updateConfirmation<CT extends ConfirmationType> (
@@ -252,13 +304,15 @@ export default class RequestService {
 
   // General methods
   public get numRequests (): number {
-    return this.numMetaRequests + this.numAuthRequests + this.numSubstrateRequests + this.numEvmRequests + this.numConnectWCRequests + this.numNotSupportWCRequests;
+    return this.numMetaRequests + this.numAuthRequests + this.numSubstrateRequests + this.numEvmRequests + this.numConnectWCRequests + this.numNotSupportWCRequests + this.numTonRequests + this.numCardanoRequests;
   }
 
   public resetWallet (): void {
     this.#authRequestHandler.resetWallet();
     this.#substrateRequestHandler.resetWallet();
     this.#evmRequestHandler.resetWallet();
+    this.#tonRequestHandler.resetWallet();
+    this.#cardanoRequestHandler.resetWallet();
     this.#metadataRequestHandler.resetWallet();
     this.#connectWCRequestHandler.resetWallet();
     this.#notSupportWCRequestHandler.resetWallet();

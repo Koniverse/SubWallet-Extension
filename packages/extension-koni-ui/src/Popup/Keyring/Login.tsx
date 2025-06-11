@@ -68,7 +68,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setLoading(false);
         });
     }, 500);
-  }, [onError, unlock, t]);
+  }, [onError, t, unlock]);
 
   const onReset = useCallback(() => {
     activeModal(RESET_WALLET_MODAL);
@@ -157,6 +157,10 @@ const Login = styled(Component)<Props>(({ theme }: Props) => {
       width: '100%',
       left: 0,
       top: 0
+    },
+
+    '.-side-panel-mode & .bg-image': {
+      backgroundSize: 'cover'
     },
 
     '.body-container': {

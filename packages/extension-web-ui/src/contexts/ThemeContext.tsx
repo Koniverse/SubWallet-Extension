@@ -93,6 +93,30 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         width: '100%'
       }
     },
+    '.__currency-value-detail-tooltip': {
+      paddingBottom: 0,
+
+      '.ant-tooltip-inner': {
+        padding: `${token.paddingXXS}px ${token.paddingXXS + 2}px`,
+        fontSize: token.fontSizeSM,
+        minHeight: 'auto',
+        minWidth: 'auto'
+      },
+
+      '.ant-tooltip-arrow': {
+        transform: 'translateX(-50%) translateY(100%) rotate(180deg) scaleX(0.5)'
+      }
+    },
+    '.__tooltip-overlay-remind': {
+      '.ant-tooltip-inner': {
+        fontSize: token.fontSizeXS,
+        lineHeight: token.lineHeightXS,
+        fontWeight: 700,
+        padding: `2px ${token.paddingXS}px`,
+        minHeight: 'auto',
+        marginRight: token.marginSM
+      }
+    },
     '.text-secondary': {
       color: token.colorTextSecondary
     },
@@ -263,6 +287,18 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         '.ant-sw-list-section .ant-sw-list-wrapper': {
           flexBasis: 'auto'
         }
+      }
+    },
+    '.ant-btn-ghost.-ghost-type-3': {
+      color: token.colorWhite,
+      '&:hover': {
+        color: token.colorSuccess
+      },
+      '&:active': {
+        color: token['cyan-2']
+      },
+      '&:disabled': {
+        color: token.colorTextLight6
       }
     }
   });

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { ButtonSchema } from '@subwallet/react-ui/es/button/button';
 import { Icon as _PhosphorIcon, IconProps } from 'phosphor-react';
 import React from 'react';
@@ -22,12 +22,17 @@ export type AlertDialogButtonProps = {
 }
 
 export type AlertDialogProps = {
-  title: string,
-  type?: NotificationType,
-  closable?: boolean,
-  content: React.ReactNode,
-  cancelButton?: AlertDialogButtonProps,
-  okButton: AlertDialogButtonProps,
+  title: string;
+  subtitle?: React.ReactNode;
+  type?: NotificationType;
+  closable?: boolean;
+  content: React.ReactNode;
+  cancelButton?: AlertDialogButtonProps;
+  okButton: AlertDialogButtonProps;
+  onCancel?: VoidFunction;
+  okLoading?: boolean;
+  cancelDisabled?: boolean;
+  maskClosable?: boolean;
 };
 
 export type AccountType = 'ALL' | 'ETHEREUM' | 'SUBSTRATE';
@@ -114,19 +119,27 @@ export interface SigData {
   signature: `0x${string}`;
 }
 
+export interface SubstrateSigData extends SigData {
+  signedTransaction?: `0x${string}`;
+}
+
 export * from './account';
 export * from './balance';
 export * from './buy';
 export * from './chain';
 export * from './confirmation';
 export * from './crowdloan';
+export * from './earning';
 export * from './form';
 export * from './history';
 export * from './hook';
 export * from './ledger';
+export * from './localStorage';
+export * from './metadata';
+export * from './missionPool';
 export * from './navigation';
+export * from './scanner';
 export * from './staking';
 export * from './transaction';
 export * from './walletConnect';
-export * from './earning';
-export * from './missionPool';
+export * from './component';

@@ -1,17 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
+import { BaseModal, InfoItemBase, MetaInfo } from '@subwallet/extension-web-ui/components';
 import NetworkGroup from '@subwallet/extension-web-ui/components/MetaInfo/parts/NetworkGroup';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
-import { missionCategoryMap, MissionCategoryType } from '@subwallet/extension-web-ui/Popup/MissionPool/predefined';
+import { missionCategoryMap, MissionCategoryType, tagMap } from '@subwallet/extension-web-ui/Popup/MissionPool/predefined';
 import { Theme } from '@subwallet/extension-web-ui/themes';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { MissionInfo } from '@subwallet/extension-web-ui/types/missionPool';
 import { capitalize, customFormatDate, openInNewTab } from '@subwallet/extension-web-ui/utils';
-import { Button, ButtonProps, Icon, Image, ModalContext } from '@subwallet/react-ui';
-import { GlobeHemisphereWest, PlusCircle, TwitterLogo } from 'phosphor-react';
+import { Button, ButtonProps, Icon, Image, ModalContext, Tag } from '@subwallet/react-ui';
+import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useMemo } from 'react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import styled, { ThemeContext } from 'styled-components';
 
 type Props = ThemeProps & {
@@ -57,6 +60,13 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
     inactiveModal(modalId);
   }, [inactiveModal]);
 
+  const modalCloseButton = <Icon
+    customSize={'24px'}
+    phosphorIcon={CaretLeft}
+    type='phosphor'
+    weight={'light'}
+  />;
+
   const status = useMemo(() => {
     if (
       data?.status && missionCategoryMap[data?.status]
@@ -71,12 +81,25 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
     return '';
   }, [data?.status, t]);
 
+  const valueColorSchema = useMemo<InfoItemBase['valueColorSchema']>(() => {
+    const missionStatus = data?.status;
+
+    if (missionStatus != null && tagMap[missionStatus]?.theme) {
+      const statusColorSchema = tagMap[missionStatus]?.theme as InfoItemBase['valueColorSchema'];
+
+      return statusColorSchema;
+    } else {
+      return 'default';
+    }
+  }, [data?.status]);
+
   return (
     <BaseModal
       className={`${className}`}
+      closeIcon={modalCloseButton}
       id={modalId}
       onCancel={onCancel}
-      title={t('Mission details')}
+      title={data?.name || t('Mission details')}
     >
       {
         data && (
@@ -128,23 +151,45 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
               }
               <MetaInfo.Default
                 label={t('Status')}
-                valueColorSchema={data.status === MissionCategoryType.ARCHIVED ? 'warning' : 'success'}
+                valueColorSchema={valueColorSchema}
               >
                 {status}
               </MetaInfo.Default>
+
+              {data?.categories && data.categories.length > 0 && (
+                <MetaInfo.Default
+                  className='__category-pool'
+                  label={t('Categories')}
+                >
+                  {data.categories.map((category, index) => (
+                    <Tag
+                      className='__item-tag'
+                      color={category.color}
+                      key={index}
+                    >
+                      <Icon
+                        className='__item-tag-icon'
+                        customSize='12px'
+                      />
+                      {category.name}
+                    </Tag>
+                  ))}
+                </MetaInfo.Default>
+              )}
+
               <MetaInfo.Default
                 className={'-vertical'}
                 label={t('Description')}
                 valueColorSchema={'gray'}
               >
-                {data.description}
+                <Markdown remarkPlugins={[remarkGfm]}>{data.description}</Markdown>
               </MetaInfo.Default>
-              <MetaInfo.Default
+              {!!data.total_supply && <MetaInfo.Default
                 label={t('Total token supply')}
                 valueColorSchema={'gray'}
               >
                 {data.total_supply}
-              </MetaInfo.Default>
+              </MetaInfo.Default>}
               <MetaInfo.Default
                 label={t('Total rewards')}
                 valueColorSchema={'gray'}
@@ -185,10 +230,11 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
                 <Button
                   className={'__modal-icon-button'}
                   icon={(
-                    <Icon
-                      phosphorIcon={TwitterLogo}
-                      size={'sm'}
-                      weight={'fill'}
+                    <Image
+                      height={18}
+                      shape={'square'}
+                      src={DefaultLogosMap.xtwitter_transparent}
+                      width={20}
                     />
                   )}
                   onClick={onClickTwitterIcon}
@@ -222,19 +268,40 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
 
 export const MissionDetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
+    '&.-mobile': {
+      '.ant-sw-modal-content': {
+        minHeight: '100%'
+      },
+      '.ant-sw-modal-header': {
+        borderBottom: 0
+      },
+      '.__modal-separator': {
+        marginBottom: token.margin,
+        marginLeft: 0,
+        marginRight: 0
+      }
+    },
+
     '.__modal-background': {
       height: 70,
       backgroundPosition: 'center',
       backgroundSize: 'cover',
       filter: 'blur(7.5px)'
     },
+    '.__category-pool .__item-tag:last-child': {
+      marginRight: 0
+    },
 
     '.__modal-separator': {
       height: 2,
-      marginBottom: token.marginLG,
       marginLeft: -token.margin,
       marginRight: -token.margin,
+      marginBottom: token.marginLG,
       backgroundColor: 'rgba(33, 33, 33, 0.80)'
+    },
+    '.__modal-icon-button .ant-image': {
+      alignItems: 'end',
+      display: 'flex'
     },
 
     '.__modal-logo': {
@@ -281,6 +348,7 @@ export const MissionDetailModal = styled(Component)<Props>(({ theme: { token } }
       '.__row.-vertical': {
         flexDirection: 'column',
         gap: token.sizeXS,
+        marginBottom: -14,
 
         '.__value-col': {
           textAlign: 'left'
@@ -289,7 +357,7 @@ export const MissionDetailModal = styled(Component)<Props>(({ theme: { token } }
     },
 
     '.__modal-footer': {
-      marginTop: token.paddingLG,
+      paddingTop: token.paddingMD,
       paddingBottom: token.padding,
       paddingLeft: token.padding,
       paddingRight: token.padding,

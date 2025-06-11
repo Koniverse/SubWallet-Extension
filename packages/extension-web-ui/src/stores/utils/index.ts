@@ -3,13 +3,14 @@
 
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { AuthUrls } from '@subwallet/extension-base/background/handlers/State';
-import { AccountsWithCurrentAddress, AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, StakingJson, StakingRewardJson, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson, AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
+import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, StakingJson, StakingRewardJson, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { addLazy, canDerive, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
+import { AccountJson, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SwapPair } from '@subwallet/extension-base/types/swap';
+import { addLazy, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-web-ui/messaging';
 import { store } from '@subwallet/extension-web-ui/stores';
 import { DAppCategory, DAppInfo } from '@subwallet/extension-web-ui/types/dapp';
@@ -26,13 +27,13 @@ export const updateAccountData = (data: AccountsWithCurrentAddress) => {
   const accounts = data.accounts;
 
   accounts.forEach((accountJson) => {
-    if (accountJson.address === data.currentAddress) {
+    if (accountJson.address === data.currentAccountProxy) {
       currentAccountJson = accountJson;
     }
   });
 
   const hierarchy = buildHierarchy(accounts);
-  const master = hierarchy.find(({ isExternal, type }) => !isExternal && canDerive(type));
+  const master = hierarchy.find(({ isExternal, type }) => !isExternal);
 
   updateCurrentAccountState(currentAccountJson);
   updateAccountsContext({
@@ -52,7 +53,7 @@ export const updateAccountsContext = (data: AccountsContext) => {
   }, 300, 2400);
 };
 
-export const subscribeAccountsData = lazySubscribeMessage('pri(accounts.subscribeWithCurrentAddress)', {}, updateAccountData, updateAccountData);
+export const subscribeAccountsData = lazySubscribeMessage('pri(accounts.subscribeWithCurrentProxy)', {}, updateAccountData, updateAccountData);
 
 export const updateKeyringState = (data: KeyringState) => {
   addLazy('updateKeyringState', () => {
@@ -66,7 +67,7 @@ export const updateAddressBook = (data: AddressBookInfo) => {
   store.dispatch({ type: 'accountState/updateAddressBook', payload: data });
 };
 
-export const subscribeAddressBook = lazySubscribeMessage('pri(accounts.subscribeAddresses)', null, updateAddressBook, updateAddressBook);
+export const subscribeAddressBook = lazySubscribeMessage('pri(addressBook.subscribe)', null, updateAddressBook, updateAddressBook);
 
 function convertConfirmationToMap (data: ConfirmationRequestBase[]) {
   return data.reduce((prev, request) => {
@@ -146,7 +147,7 @@ export const subscribeAssetLogoMaps = lazySubscribeMessage('pri(settings.logo.as
 //   store.dispatch({ type: 'accountState/updateCurrentAccount', payload: data });
 // };
 //
-// export const subscribeAppSettings = lazySubscribeMessage('pri(accounts.subscribeWithCurrentAddress)', {}, updateCurrentAccountState, updateCurrentAccountState);
+// export const subscribeAppSettings = lazySubscribeMessage('pri(accounts.subscribeWithCurrentProxy)', {}, updateCurrentAccountState, updateCurrentAccountState);
 //
 export const updateAuthUrls = (data: AuthUrls) => {
   store.dispatch({ type: 'settings/updateAuthUrls', payload: data });
@@ -158,7 +159,7 @@ export const subscribeAuthUrls = lazySubscribeMessage('pri(authorize.subscribe)'
 //   store.dispatch({ type: 'accountState/updateCurrentAccount', payload: data });
 // };
 //
-// export const subscribeMediaAllowance = lazySubscribeMessage('pri(accounts.subscribeWithCurrentAddress)', {}, updateCurrentAccountState, updateCurrentAccountState);
+// export const subscribeMediaAllowance = lazySubscribeMessage('pri(accounts.subscribeWithCurrentProxy)', {}, updateCurrentAccountState, updateCurrentAccountState);
 
 export const updateChainInfoMap = (data: Record<string, _ChainInfo>) => {
   store.dispatch({ type: 'chainStore/updateChainInfoMap', payload: data });
@@ -385,7 +386,7 @@ export const getMissionPoolData = (() => {
     start: () => {
       fetchStaticData<MissionInfo[]>('airdrop-campaigns')
         .then((data) => {
-          handler.resolve?.(data);
+          handler.resolve?.(data || []);
         })
         .catch(handler.reject);
     }
@@ -425,7 +426,13 @@ export const subscribeBuyServices = lazySubscribeMessage('pri(buyService.service
 /* Earning */
 
 export const updateYieldPoolInfo = (data: YieldPoolInfo[]) => {
-  store.dispatch({ type: 'earning/updateYieldPoolInfo', payload: data });
+  addLazy(
+    'updateYieldPoolInfo',
+    () => {
+      store.dispatch({ type: 'earning/updateYieldPoolInfo', payload: data });
+    },
+    900
+  );
 };
 
 export const subscribeYieldPoolInfo = lazySubscribeMessage(
@@ -436,7 +443,13 @@ export const subscribeYieldPoolInfo = lazySubscribeMessage(
 );
 
 export const updateYieldPositionInfo = (data: YieldPositionInfo[]) => {
-  store.dispatch({ type: 'earning/updateYieldPositionInfo', payload: data });
+  addLazy(
+    'updateYieldPositionInfo',
+    () => {
+      store.dispatch({ type: 'earning/updateYieldPositionInfo', payload: data });
+    },
+    900
+  );
 };
 
 export const subscribeYieldPositionInfo = lazySubscribeMessage(
@@ -447,7 +460,13 @@ export const subscribeYieldPositionInfo = lazySubscribeMessage(
 );
 
 export const updateYieldReward = (data: EarningRewardJson) => {
-  store.dispatch({ type: 'earning/updateYieldReward', payload: Object.values(data.data) });
+  addLazy(
+    'updateYieldReward',
+    () => {
+      store.dispatch({ type: 'earning/updateYieldReward', payload: Object.values(data.data) });
+    },
+    900
+  );
 };
 
 export const subscribeYieldReward = lazySubscribeMessage(
@@ -488,3 +507,11 @@ export const subscribeYieldMinAmountPercent = lazySubscribeMessage(
 );
 
 /* Earning */
+
+/* Swap */
+export const updateSwapPairs = (data: SwapPair[]) => {
+  store.dispatch({ type: 'swap/updateSwapPairs', payload: data });
+};
+
+export const subscribeSwapPairs = lazySubscribeMessage('pri(swapService.subscribePairs)', null, updateSwapPairs, updateSwapPairs);
+/* Swap */

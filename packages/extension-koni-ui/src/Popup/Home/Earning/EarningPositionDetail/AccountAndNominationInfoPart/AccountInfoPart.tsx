@@ -8,7 +8,7 @@ import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { EARNING_NOMINATION_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
-import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
@@ -62,7 +62,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { accounts } = useSelector((state) => state.accountState);
-
+  const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
   const sliderSettings: Settings = useMemo(() => {
     return {
       dots: false,
@@ -85,6 +85,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       return undefined;
     }
   }, [assetRegistry, compound]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
   const earningTagType: EarningTagType = useMemo(() => {
     return createEarningTypeTags(compound.chain)[compound.type];
@@ -92,6 +93,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
+
   const haveNomination = useMemo(() => {
     return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
   }, [poolInfo.type]);
@@ -113,6 +115,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       return (
         <>
           <Avatar
+            identPrefix={networkPrefix}
             size={24}
             value={item.address}
           />
@@ -122,7 +125,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </>
       );
     },
-    [accounts]
+    [accounts, networkPrefix]
   );
 
   const onCloseNominationModal = useCallback(() => {
@@ -140,6 +143,34 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return list.map((item) => {
       const disableButton = !item.nominations.length;
 
+      const metaInfoNumber = (labelKey: string, value: string | number | BigN, asset = inputAsset) => ({ label: t(labelKey), value, decimals: asset?.decimals || 0, suffix: asset?.symbol });
+
+      const metaInfoItems = isSubnetStaking
+        ? [
+          metaInfoNumber('Total stake', new BigN(item.totalStake)),
+          {
+            label: t('Derivative token balance'),
+            value: item.subnetData?.originalTotalStake || '',
+            decimals: inputAsset?.decimals || 0,
+            suffix: item.subnetData?.subnetSymbol
+          }
+        ]
+        : !isSpecial
+          ? [
+            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            metaInfoNumber('Active stake', item.activeStake),
+            metaInfoNumber('Unstaked', item.unstakeBalance)
+          ]
+          : [
+            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            {
+              label: t('Derivative token balance'),
+              value: item.activeStake,
+              decimals: deriveAsset?.decimals || 0,
+              suffix: deriveAsset?.symbol
+            }
+          ];
+
       return (
         <MetaInfo
           className={CN('__account-info-item', {
@@ -156,7 +187,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             ? (
               <MetaInfo.Account
                 address={item.address}
+                chainSlug={poolInfo.chain}
                 label={t('Account')}
+                networkPrefix={networkPrefix}
               />
             )
             : (
@@ -176,50 +209,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             {earningTagType.label}
           </MetaInfo.Default>
 
-          {!isSpecial
-            ? (
-              <>
-                <MetaInfo.Number
-                  decimals={inputAsset?.decimals || 0}
-                  label={t('Total stake')}
-                  suffix={inputAsset?.symbol}
-                  value={new BigN(item.totalStake)}
-                  valueColorSchema='even-odd'
-                />
-                <MetaInfo.Number
-                  decimals={inputAsset?.decimals || 0}
-                  label={t('Active staked')}
-                  suffix={inputAsset?.symbol}
-                  value={item.activeStake}
-                  valueColorSchema='even-odd'
-                />
-                <MetaInfo.Number
-                  decimals={inputAsset?.decimals || 0}
-                  label={t('Unstaked')}
-                  suffix={inputAsset?.symbol}
-                  value={item.unstakeBalance}
-                  valueColorSchema='even-odd'
-                />
-              </>
-            )
-            : (
-              <>
-                <MetaInfo.Number
-                  decimals={inputAsset?.decimals || 0}
-                  label={t('Total stake')}
-                  suffix={inputAsset?.symbol}
-                  value={new BigN(item.totalStake)}
-                  valueColorSchema='even-odd'
-                />
-                <MetaInfo.Number
-                  decimals={deriveAsset?.decimals || 0}
-                  label={t('Derivative token balance')}
-                  suffix={deriveAsset?.symbol}
-                  value={item.activeStake}
-                  valueColorSchema='even-odd'
-                />
-              </>
-            )}
+          {metaInfoItems.map((item) => (
+            <MetaInfo.Number
+              key={item.label}
+              {...item}
+              valueColorSchema='even-odd'
+            />
+          ))}
           {isAllAccount && haveNomination && (
             <>
               <div className='__separator'></div>
@@ -248,7 +244,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset?.decimals, inputAsset?.symbol, isAllAccount, isSpecial, list, renderAccount, t]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, t]);
 
   return (
     <>
@@ -261,7 +257,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         title={t('Account info')}
       >
 
-        {isAllAccount
+        {isAllAccount && list.length > 1
           ? (
             <div className={'__slider-container'}>
               <Slider
@@ -305,7 +301,7 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
   '&.-horizontal-mode.-has-one-item': {
     '.__account-info-item.-box-mode': {
-      minWidth: 300
+      flex: 1
     }
   },
 

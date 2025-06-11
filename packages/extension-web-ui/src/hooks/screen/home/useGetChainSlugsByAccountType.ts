@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountType } from '@subwallet/extension-web-ui/types';
 import { isAccountAll } from '@subwallet/extension-web-ui/utils';
@@ -57,10 +57,10 @@ export function useGetChainSlugsByAccountType (address?: string): string[] {
       } else {
         accountType = 'SUBSTRATE';
       }
-    } else {
-      if (currentAccount?.type === 'ethereum') {
+    } else if (currentAccount?.type) {
+      if (currentAccount.type === 'ethereum') {
         accountType = 'ETHEREUM';
-      } else if (currentAccount?.type === 'sr25519') {
+      } else if (['ed25519', 'sr25519', 'ecdsa'].includes(currentAccount.type)) {
         accountType = 'SUBSTRATE';
       }
     }
@@ -76,9 +76,7 @@ export function useGetChainSlugsByAccountType (address?: string): string[] {
     }
 
     if (account?.isHardware) {
-      const isEthereum = isEthereumAddress(account.address || '');
-
-      if (isEthereum) {
+      if (account?.isGeneric) {
         return undefined;
       } else {
         const availableGen: string[] = account.availableGenesisHashes || [];

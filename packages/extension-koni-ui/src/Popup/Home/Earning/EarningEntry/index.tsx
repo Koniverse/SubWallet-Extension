@@ -17,20 +17,24 @@ type Props = ThemeProps;
 function Component () {
   useSetCurrentPage('/home/earning');
   const locationState = useLocation().state as EarningEntryParam;
-  const { currentAccount } = useSelector((state) => state.accountState);
-  const currentAccountRef = useRef(currentAccount?.address);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
+  const currentAccountProxyRef = useRef(currentAccountProxy?.id);
   const [entryView, setEntryView] = useState<EarningEntryView>(locationState?.view || EarningEntryView.POSITIONS);
   const [loading, setLoading] = useState<boolean>(false);
 
   const earningPositions = useGroupYieldPosition();
 
   useEffect(() => {
-    if (currentAccountRef.current !== currentAccount?.address) {
-      currentAccountRef.current = currentAccount?.address;
+    const timer = setTimeout(() => {
+      if (currentAccountProxyRef.current !== currentAccountProxy?.id) {
+        currentAccountProxyRef.current = currentAccountProxy?.id;
 
-      setEntryView(EarningEntryView.POSITIONS);
-    }
-  }, [currentAccount?.address]);
+        setEntryView(EarningEntryView.POSITIONS);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [currentAccountProxy?.id]);
 
   if (loading) {
     return (<LoadingScreen />);

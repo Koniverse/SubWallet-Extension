@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { BaseRequestSign, InternalRequestSign } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
+import { BaseRequestSign, InternalRequestSign } from '../../transaction';
 import { BasePoolInfo, UnstakingInfo, YieldPoolInfo } from '../info';
 
 /**
@@ -28,6 +29,8 @@ export interface YieldLeaveParams extends BaseRequestSign {
   fastLeave: boolean;
   /** Pool's info - use for create history */
   poolInfo: YieldPoolInfo;
+  /** Slippage (subnet staking) */
+  slippage?: number;
 }
 
 export type RequestYieldLeave = InternalRequestSign<YieldLeaveParams>;
@@ -96,3 +99,10 @@ export interface StakeClaimRewardParams extends BaseRequestSign {
 }
 
 export type RequestStakeClaimReward = InternalRequestSign<StakeClaimRewardParams>;
+
+export interface RequestEarningSlippage {
+  slug: string;
+  value: string;
+  netuid: number;
+  type: ExtrinsicType;
+}

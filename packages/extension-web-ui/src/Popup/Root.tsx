@@ -43,10 +43,11 @@ const createPasswordUrl = '/keyring/create-password';
 const migratePasswordUrl = '/keyring/migrate-password';
 const securityUrl = '/settings/security';
 const createDoneUrl = '/create-done';
+const settingImportNetwork = '/settings/chains/import';
 
 // Campaign
-const earningDemoUrl = '/earning-demo';
-const earningHomeUrl = '/home/earning/';
+const earningOptionsPreviewUrl = '/earning-preview';
+const earningPoolsPreviewUrl = '/earning-preview/pools';
 const checkCrowdloanUrl = '/crowdloan-unlock-campaign/check-contributions';
 const crowdloanResultUrl = '/crowdloan-unlock-campaign/contributions-result';
 
@@ -54,7 +55,8 @@ const baseAccountPath = '/accounts';
 const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
 
 const allowImportAccountUrls = allowImportAccountPaths.map((path) => `${baseAccountPath}/${path}`);
-const allowPreventWelcomeUrls = [...allowImportAccountUrls, welcomeUrl, createPasswordUrl, securityUrl, earningDemoUrl, checkCrowdloanUrl, crowdloanResultUrl];
+const allowPreventWelcomeUrls = [...allowImportAccountUrls, welcomeUrl, createPasswordUrl, securityUrl,
+  earningOptionsPreviewUrl, earningPoolsPreviewUrl, checkCrowdloanUrl, crowdloanResultUrl];
 
 export const MainWrapper = styled('div')<ThemeProps>(({ theme: { token } }: ThemeProps) => ({
   display: 'flex',
@@ -79,7 +81,7 @@ function removeLoadingPlaceholder (animation: boolean): void {
 
       // Callback after 1 second
       setTimeout(() => {
-      // Remove element
+        // Remove element
         element.parentNode?.removeChild(element);
       }, 150);
     } else {
@@ -91,6 +93,10 @@ function removeLoadingPlaceholder (animation: boolean): void {
 interface RedirectProps {
   redirect: string|null;
   modal: string|null;
+}
+
+interface RootLocationState {
+  useOpenModal?: string
 }
 
 function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactElement {
@@ -116,7 +122,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
 
   const needMigrate = useMemo(
     () => !!accounts
-      .filter((acc) => acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected)
+      .filter((acc) => acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected && !acc.pendingMigrate)
       .filter((acc) => !acc.isMasterPassword)
       .length
     , [accounts]
@@ -168,6 +174,9 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
 
   const redirectTarget = useMemo(() => {
     const pathName = location.pathname;
+
+    const redirectHandlePage = pathName.startsWith('/redirect-handler');
+
     const redirectObj: RedirectProps = { redirect: null, modal: null };
 
     if (pathName === '/wc') {
@@ -191,22 +200,27 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
       redirectObj.redirect = DEFAULT_ROUTER_PATH;
     } else if (!hasMasterPassword) {
       if (isNoAccount) {
-        if (!allowPreventWelcomeUrls.includes(pathName)) {
+        if (!allowPreventWelcomeUrls.includes(pathName) && !redirectHandlePage) {
           redirectObj.redirect = welcomeUrl;
         }
       } else if (pathName !== createDoneUrl) {
         redirectObj.redirect = createPasswordUrl;
       }
     } else if (isNoAccount) {
-      if (!allowPreventWelcomeUrls.includes(pathName)) {
+      if (!allowPreventWelcomeUrls.includes(pathName) && !redirectHandlePage) {
         redirectObj.redirect = welcomeUrl;
       }
-    } else if (pathName === earningDemoUrl && !isNoAccount) {
-      redirectObj.redirect = earningHomeUrl;
+    } else if (hasConfirmations && pathName === settingImportNetwork) {
+      redirectObj.modal = `close:${CONFIRMATION_MODAL}`;
     } else if (hasConfirmations) {
       redirectObj.modal = `open:${CONFIRMATION_MODAL}`;
     } else if (pathName === DEFAULT_ROUTER_PATH) {
       redirectObj.redirect = tokenUrl;
+      const state = location.state as RootLocationState;
+
+      if (state?.useOpenModal) {
+        redirectObj.modal = `open:${state.useOpenModal}`;
+      }
     } else if (pathName === loginUrl && !needUnlock) {
       redirectObj.redirect = DEFAULT_ROUTER_PATH;
     } else if (pathName === welcomeUrl && !isNoAccount) {
@@ -236,7 +250,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
     redirectObj.redirect = redirectObj.redirect !== pathName ? redirectObj.redirect : null;
 
     return redirectObj;
-  }, [location.pathname, dataLoaded, needMigrate, hasMasterPassword, needUnlock, isNoAccount, hasConfirmations, hasInternalConfirmations]);
+  }, [location.state, location.pathname, dataLoaded, needMigrate, hasMasterPassword, needUnlock, isNoAccount, hasConfirmations, hasInternalConfirmations]);
 
   // Active or inactive confirmation modal
   useEffect(() => {

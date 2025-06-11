@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { EarningEntryView } from '@subwallet/extension-web-ui/types/earning';
 
 export type CreateDoneParam = {
@@ -49,7 +49,9 @@ export type CrowdloanContributionsResultParam = {
 // earning
 
 export type EarningEntryParam = {
-  view: EarningEntryView
+  view: EarningEntryView;
+  redirectFromPreview?: boolean;
+  chainName?: string;
 };
 
 export type EarningPoolsParam = {

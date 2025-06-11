@@ -43,7 +43,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui'
+  'extension-koni-ui',
+  'subwallet-api-sdk'
 ];
 
 const polkadotDevOptions = require('@polkadot/dev/config/babel-config-webpack.cjs');
@@ -51,7 +52,9 @@ const polkadotDevOptions = require('@polkadot/dev/config/babel-config-webpack.cj
 const _additionalEnv = {
   NFT_MINTING_HOST: JSON.stringify(process.env.NFT_MINTING_HOST),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
-  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET)
+  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API)
 };
 
 // Overwrite babel babel config from polkadot dev
@@ -65,6 +68,7 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
       static: {
         directory: path.join(__dirname, 'build')
       },
+      allowedHosts: 'all',
       hot: false,
       liveReload: false,
       webSocketServer: false,
@@ -142,7 +146,11 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: 'public/index.html'
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({
@@ -154,7 +162,7 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
       }),
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        crypto: require.resolve('crypto-browserify'),
+        crypto: false,
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         os: require.resolve('os-browserify/browser'),

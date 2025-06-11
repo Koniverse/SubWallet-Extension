@@ -3,14 +3,12 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { RequestYieldLeave, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, RequestYieldLeave, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, NominationSelector } from '@subwallet/extension-web-ui/components';
-import { getInputValuesFromString } from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { BN_ZERO, UNSTAKE_ALERT_DATA } from '@subwallet/extension-web-ui/constants';
-import { useGetBalance, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
+import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { yieldSubmitLeavePool } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-web-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, noop, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
@@ -51,12 +49,11 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
 
-  const { defaultData, persistData } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
 
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { poolInfoMap } = useSelector((state) => state.earning);
   const poolInfo = poolInfoMap[slug];
   const poolType = poolInfo.type;
@@ -101,17 +98,6 @@ const Component: React.FC = () => {
       return undefined;
     }
   }, [currentValidator, positionInfo]);
-
-  const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
-  const existentialDeposit = useMemo(() => {
-    const assetInfo = Object.values(assetRegistry).find((v) => v.originChain === chainValue);
-
-    if (assetInfo) {
-      return assetInfo.minAmount || '0';
-    }
-
-    return '0';
-  }, [assetRegistry, chainValue]);
 
   // @ts-ignore
   const showFastLeave = useMemo(() => {
@@ -179,13 +165,11 @@ const Component: React.FC = () => {
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
       return {
-        existentialDeposit: getInputValuesFromString(existentialDeposit, estimateFee.decimals),
-        availableBalance: getInputValuesFromString(nativeTokenBalance.value, estimateFee.decimals),
-        maintainBalance: getInputValuesFromString(poolInfo.metadata.maintainBalance || '0', estimateFee.decimals),
+        chainName: chainInfoMap[chainValue]?.name || '',
         symbol: estimateFee.symbol
       };
     },
-    [existentialDeposit, nativeTokenBalance.value, poolInfo.metadata.maintainBalance]
+    [chainInfoMap, chainValue]
   );
 
   const [loading, setLoading] = useState(false);
@@ -291,6 +275,12 @@ const Component: React.FC = () => {
     return [];
   }, [fromValue, positionInfo?.nominations]);
 
+  const handleValidatorLabel = useMemo(() => {
+    const label = getValidatorLabel(chainValue);
+
+    return label !== 'dApp' ? label.toLowerCase() : label;
+  }, [chainValue]);
+
   useEffect(() => {
     if (poolInfo.metadata.availableMethod.defaultUnstake && poolInfo.metadata.availableMethod.fastUnstake) {
       //
@@ -313,6 +303,36 @@ const Component: React.FC = () => {
     }
   }, [accountList, form, fromValue]);
 
+  useEffect(() => {
+    if (poolType === YieldPoolType.LENDING) {
+      setCustomScreenTitle(t('Withdraw'));
+    }
+
+    return () => {
+      setCustomScreenTitle(undefined);
+    };
+  }, [poolType, setCustomScreenTitle, t]);
+
+  const exType = useMemo(() => {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING) {
+      return ExtrinsicType.STAKING_UNBOND;
+    }
+
+    if (poolType === YieldPoolType.LIQUID_STAKING) {
+      if (chainValue === 'moonbeam') {
+        return ExtrinsicType.UNSTAKE_STDOT;
+      }
+
+      return ExtrinsicType.UNSTAKE_LDOT;
+    }
+
+    if (poolType === YieldPoolType.LENDING) {
+      return ExtrinsicType.UNSTAKE_LDOT;
+    }
+
+    return ExtrinsicType.STAKING_UNBOND;
+  }, [poolType, chainValue]);
+
   return (
     <>
       <TransactionContent>
@@ -333,7 +353,7 @@ const Component: React.FC = () => {
               disabled={!isAllAccount}
               doFilter={false}
               externalAccounts={accountList}
-              label={t('Unstake from account')}
+              label={poolInfo.type === YieldPoolType.LENDING ? t('Withdraw from account') : t('Unstake from account')}
             />
           </Form.Item>
           <FreeBalance
@@ -352,7 +372,7 @@ const Component: React.FC = () => {
               chain={chainValue}
               defaultValue={persistValidator}
               disabled={!fromValue}
-              label={t(`Select ${getValidatorLabel(chainValue)}`)}
+              label={t(`Select ${handleValidatorLabel}`)}
               nominators={nominators}
             />
           </Form.Item>
@@ -388,53 +408,53 @@ const Component: React.FC = () => {
             </Checkbox>
           </Form.Item>
 
-          {!fastLeaveValue || !showFastLeave
-            ? (
-              poolInfo.type !== YieldPoolType.LENDING
-                ? (
-                  <>
-                    {!!UNSTAKE_ALERT_DATA.length && (
-                      <div className={'__instruction-items-container'}>
-                        {UNSTAKE_ALERT_DATA.map((_props, index) => {
-                          return (
-                            <InstructionItem
-                              className={'__instruction-item'}
-                              description={(
-                                <div dangerouslySetInnerHTML={{ __html: (_props.description)?.replace('{unBondedTime}', unBondedTime) }}></div>
-                              )}
-                              iconInstruction={
-                                <BackgroundIcon
-                                  backgroundColor={getAlphaColor(_props.iconColor, 0.1)}
-                                  iconColor={_props.iconColor}
-                                  phosphorIcon={getBannerButtonIcon(_props.icon)}
-                                  size='lg'
-                                  weight='fill'
-                                />
-                              }
-                              key={`${_props.icon}-${index}`}
-                              title={_props.title}
-                            />
-                          );
-                        })}
-                      </div>
-                    )}
-                  </>
-                )
-                : (
-                  <AlertBox
-                    description={t('You can withdraw your supplied funds immediately')}
-                    title={t('Withdraw')}
-                    type={'info'}
-                  />
-                )
-            )
-            : (
-              <AlertBox
-                description={t('With fast unstake, you will receive your funds immediately with a higher fee')}
-                title={t('Fast unstake')}
-                type={'info'}
-              />
-            )}
+          <div className={'__instruction-items-container'}>
+            {!fastLeaveValue || !showFastLeave
+              ? (
+                poolInfo.type !== YieldPoolType.LENDING
+                  ? (
+                    <>
+                      {!!UNSTAKE_ALERT_DATA.length && UNSTAKE_ALERT_DATA.map((_props, index) => {
+                        return (
+                          <InstructionItem
+                            className={'__instruction-item'}
+                            description={(
+                              <div
+                                dangerouslySetInnerHTML={{ __html: (_props.description)?.replace('{unBondedTime}', unBondedTime) }}
+                              ></div>
+                            )}
+                            iconInstruction={
+                              <BackgroundIcon
+                                backgroundColor={getAlphaColor(_props.iconColor, 0.1)}
+                                iconColor={_props.iconColor}
+                                phosphorIcon={getBannerButtonIcon(_props.icon)}
+                                size='lg'
+                                weight='fill'
+                              />
+                            }
+                            key={`${_props.icon}-${index}`}
+                            title={_props.title}
+                          />
+                        );
+                      })}
+                    </>
+                  )
+                  : (
+                    <AlertBox
+                      description={t('You can withdraw your supplied funds immediately')}
+                      title={t('Withdraw')}
+                      type={'info'}
+                    />
+                  )
+              )
+              : (
+                <AlertBox
+                  description={t('With fast unstake, you will receive your funds immediately with a higher fee')}
+                  title={t('Fast unstake')}
+                  type={'info'}
+                />
+              )}
+          </div>
 
         </Form>
       </TransactionContent>
@@ -449,9 +469,9 @@ const Component: React.FC = () => {
             />
           )}
           loading={loading}
-          onClick={onPreCheck(form.submit, poolInfo.type === YieldPoolType.NOMINATION_POOL ? ExtrinsicType.STAKING_LEAVE_POOL : ExtrinsicType.STAKING_UNBOND)}
+          onClick={onPreCheck(form.submit, exType)}
         >
-          {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unbond')}
+          {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
         </Button>
       </TransactionFooter>
     </>
@@ -493,6 +513,15 @@ const Unbond = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
 
     '.__instruction-items-container, .__instruction-item + .__instruction-item': {
       marginTop: token.marginSM
+    },
+
+    '.ant-checkbox-wrapper': {
+      display: 'flex',
+      alignItems: 'center',
+
+      '.ant-checkbox': {
+        top: 0
+      }
     }
   };
 });

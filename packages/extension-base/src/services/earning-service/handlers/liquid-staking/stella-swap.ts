@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BasicTxErrorType, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { getERC20Contract } from '@subwallet/extension-base/koni/api/tokens/evm/web3';
+import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { getERC20Contract, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
-import { BaseYieldStepDetail, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenApproveData, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import fetch from 'cross-fetch';
+import { ApproveStepMetadata, BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
 
@@ -24,22 +24,19 @@ export const getStellaswapLiquidStakingContract = (networkKey: string, assetAddr
   return new evmApi.api.eth.Contract(ST_LIQUID_TOKEN_ABI, assetAddress, options);
 };
 
-const APR_STATS_URL = 'https://apr-api.stellaswap.com/api/v1/stdot';
+const APR_STATS_URL = 'https://stdot-apr.stellaswap.com/';
 
 const SUBWALLET_REFERRAL = '0x7e6815f45E624768548d085231f2d453f16FD7DD';
+const TOP_HOLDER = '0x4300e09284e3bB4d9044DdAB31EfAF5f3301DABa';
 
 interface StellaswapApr {
-  code: number,
-  result: number,
-  isSuccess: boolean
+  stDOTAPR: number,
 }
 
 interface StellaswapUnbonding {
   unbonded: string,
   waiting: string
 }
-
-const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
 export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {
   public slug: string;
@@ -96,20 +93,19 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     const tvlCall = stakingContract.methods.fundRaisedBalance();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
     const exchangeRateCall = stakingContract.methods.getPooledTokenByShares(sampleTokenShare);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const [aprObject, tvl, equivalentTokenShare] = await Promise.all([
-      aprPromise,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      tvlCall.call(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      exchangeRateCall.call()
-    ]);
-
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+    const equivalentTokenShare = (await exchangeRateCall.call());
     const rate = equivalentTokenShare as number;
     const exchangeRate = rate / (10 ** _getAssetDecimals(derivativeTokenInfo));
 
     this.updateExchangeRate(rate);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const [aprObject, tvl] = await Promise.all([
+      aprPromise,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      tvlCall.call()
+    ]);
 
     return {
       ...this.baseInfo,
@@ -122,7 +118,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
         assetEarning: [
           {
             slug: this.rewardAssets[0],
-            apr: (aprObject as StellaswapApr).result,
+            apr: (aprObject as StellaswapApr).stDOTAPR,
             exchangeRate: exchangeRate
           }
         ],
@@ -134,7 +130,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
           defaultUnstake: '0',
           fastUnstake: '0'
         },
-        totalApr: (aprObject as StellaswapApr).result,
+        totalApr: (aprObject as StellaswapApr).stDOTAPR,
         tvl: (tvl as number).toString()
       }
     };
@@ -252,9 +248,16 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     ]);
 
     if (!allowance || parseInt(allowance) <= 0) {
+      const metadata: ApproveStepMetadata = {
+        tokenApprove: inputTokenSlug,
+        contractAddress: _getContractAddressOfToken(inputTokenInfo),
+        spenderAddress: _getContractAddressOfToken(derivativeTokenInfo)
+      };
+
       const step: BaseYieldStepDetail = {
         name: 'Authorize token approval',
-        type: YieldStepType.TOKEN_APPROVAL
+        type: YieldStepType.TOKEN_APPROVAL,
+        metadata: metadata as unknown as Record<string, unknown>
       };
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -285,11 +288,17 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
 
       let estimatedDepositGas = 0;
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        estimatedDepositGas = (await depositCall.estimateGas({ from: params.address })) as number;
-      } catch (e) {
-        console.error(e);
+      const addressToTests: string[] = [params.address, TOP_HOLDER];
+
+      for (const address of addressToTests) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+          estimatedDepositGas = (await depositCall.estimateGas({ from: address })) as number;
+
+          break;
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       const gasPrice = await evmApi.api.eth.getGasPrice();
@@ -317,34 +326,18 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);
     const derivativeTokenContractAddress = _getContractAddressOfToken(derivativeTokenInfo);
     const evmApi = this.evmApi;
-    const inputTokenContract = getERC20Contract(_getContractAddressOfToken(inputTokenInfo), evmApi);
+    const transactionObject = await getERC20SpendingApprovalTx(derivativeTokenContractAddress, address, _getContractAddressOfToken(inputTokenInfo), evmApi);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-    const approveCall = inputTokenContract.methods.approve(derivativeTokenContractAddress, MAX_INT); // TODO: need test
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-    const approveEncodedCall = approveCall.encodeABI() as string;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    const gasLimit = await approveCall.estimateGas({ from: address }) as number;
-    const priority = await calculateGasFeeParams(evmApi, this.chain);
-
-    const transactionObject = {
-      from: address,
-      to: _getContractAddressOfToken(inputTokenInfo),
-      data: approveEncodedCall,
-      gas: gasLimit,
-      gasPrice: priority.gasPrice,
-      maxFeePerGas: priority.maxFeePerGas?.toString(),
-      maxPriorityFeePerGas: priority.maxPriorityFeePerGas?.toString()
-    } as TransactionConfig;
-
-    const _data: TokenApproveData = {
-      inputTokenSlug: inputTokenSlug,
-      spenderTokenSlug: this.derivativeAssets[0]
+    const _data: TokenSpendingApprovalParams = {
+      contractAddress: inputTokenSlug,
+      spenderAddress: this.derivativeAssets[0],
+      owner: address,
+      chain: this.chain
     };
 
     return Promise.resolve({
       txChain: this.chain,
-      extrinsicType: ExtrinsicType.TOKEN_APPROVE,
+      extrinsicType: ExtrinsicType.TOKEN_SPENDING_APPROVAL,
       extrinsic: transactionObject,
       txData: _data,
       transferNativeAmount: '0',
@@ -367,15 +360,14 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     const gasLimit = await depositCall.estimateGas({ from: address }) as number;
     const priority = await calculateGasFeeParams(evmApi, this.chain);
+    const feeCombine = combineEthFee(priority);
 
     const transactionObject = {
       from: address,
       to: _getContractAddressOfToken(derivativeTokenInfo),
       data: depositEncodedCall,
       gas: gasLimit,
-      gasPrice: priority.gasPrice,
-      maxFeePerGas: priority.maxFeePerGas?.toString(),
-      maxPriorityFeePerGas: priority.maxPriorityFeePerGas?.toString()
+      ...feeCombine
     } as TransactionConfig;
 
     return {
@@ -411,15 +403,14 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     const gasLimit = await redeemCall.estimateGas({ from: address }) as number;
     const priority = await calculateGasFeeParams(evmApi, this.chain);
+    const feeCombine = combineEthFee(priority);
 
     const transaction: TransactionConfig = {
       from: address,
       to: _getContractAddressOfToken(derivativeTokenInfo),
       data: redeemEncodedCall,
       gas: gasLimit,
-      gasPrice: priority.gasPrice,
-      maxFeePerGas: priority.maxFeePerGas?.toString(),
-      maxPriorityFeePerGas: priority.maxPriorityFeePerGas?.toString()
+      ...feeCombine
     };
 
     return [ExtrinsicType.UNSTAKE_STDOT, transaction];
@@ -444,15 +435,14 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     const gasLimit = await withdrawCall.estimateGas({ from: address }) as number;
     const priority = await calculateGasFeeParams(evmApi, this.chain);
+    const feeCombine = combineEthFee(priority);
 
     return {
       from: address,
       to: _getContractAddressOfToken(derivativeTokenInfo),
       data: withdrawEncodedCall,
       gas: gasLimit,
-      gasPrice: priority.gasPrice,
-      maxFeePerGas: priority.maxFeePerGas?.toString(),
-      maxPriorityFeePerGas: priority.maxPriorityFeePerGas?.toString()
+      ...feeCombine
     }; // TODO: check tx history parsing
   }
 

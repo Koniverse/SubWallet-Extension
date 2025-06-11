@@ -26,10 +26,11 @@ export default class EvmRequestHandler {
   private readonly confirmationsQueueSubject = new BehaviorSubject<ConfirmationsQueue>({
     addNetworkRequest: {},
     addTokenRequest: {},
-    switchNetworkRequest: {},
     evmSignatureRequest: {},
     evmSendTransactionRequest: {},
-    evmWatchTransactionRequest: {}
+    evmWatchTransactionRequest: {},
+    errorConnectNetwork: {},
+    submitApiRequest: {}
   });
 
   private readonly confirmationsPromiseMap: Record<string, { resolver: Resolver<any>, validator?: (rs: any) => Error | undefined }> = {};
@@ -106,6 +107,10 @@ export default class EvmRequestHandler {
       this.#requestService.popupOpen();
     }
 
+    if (options.isPassConfirmation) {
+      await this.completeConfirmation({ [type]: { id, url, isApproved: true, payload: '' } });
+    }
+
     this.#requestService.updateIconV2();
 
     return promise;
@@ -145,8 +150,7 @@ export default class EvmRequestHandler {
   }
 
   private async signMessage (confirmation: ConfirmationDefinitions['evmSignatureRequest'][0]): Promise<string> {
-    const { account, payload, type } = confirmation.payload;
-    const address = account.address;
+    const { address, payload, type } = confirmation.payload;
     const pair = keyring.getPair(address);
 
     if (pair.isLocked) {
@@ -160,7 +164,7 @@ export default class EvmRequestHandler {
       case 'eth_signTypedData_v1':
       case 'eth_signTypedData_v3':
       case 'eth_signTypedData_v4':
-        return await pair.evmSigner.signMessage(payload, type);
+        return await pair.evm.signMessage(payload, type);
       default:
         throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Unsupported action'));
     }
@@ -230,7 +234,7 @@ export default class EvmRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    return pair.evmSigner.signTransaction(tx);
+    return pair.evm.signTransaction(tx);
   }
 
   private async decorateResult<T extends ConfirmationType> (t: T, request: ConfirmationDefinitions[T][0], result: ConfirmationDefinitions[T][1]) {
@@ -239,6 +243,8 @@ export default class EvmRequestHandler {
         result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
       } else if (t === 'evmSendTransactionRequest') {
         result.payload = await this.signTransaction(request as ConfirmationDefinitions['evmSendTransactionRequest'][0]);
+      } else if (t === 'submitApiRequest') {
+        return;
       }
 
       if (t === 'evmSignatureRequest' || t === 'evmSendTransactionRequest') {

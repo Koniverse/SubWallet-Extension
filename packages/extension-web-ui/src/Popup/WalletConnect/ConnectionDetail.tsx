@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/background/types';
+import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/types';
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { AccountItemWithName, EmptyList, GeneralEmptyList, Layout, MetaInfo, PageWrapper, WCNetworkAvatarGroup } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -199,7 +199,7 @@ const Component: React.FC<ComponentProps> = (props) => {
         </MetaInfo.Default>
       </MetaInfo>
       <div className='total-account'>
-        {t('{{number}} account connected', { replace: { number: accountItems.length } })}
+        {t('{{number}} {{account}} connected', { replace: { number: accountItems.length, account: accountItems.length > 1 ? 'accounts' : 'account' } })}
       </div>
       <SwList.Section
         className='account-list'

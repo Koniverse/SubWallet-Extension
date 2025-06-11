@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountAuthType, AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORT_NAMESPACES } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { isSameAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { WalletConnectChainInfo } from '@subwallet/extension-web-ui/types';
 import { chainsToWalletConnectChainInfos, isAccountAll, reformatAddress } from '@subwallet/extension-web-ui/utils';
@@ -114,6 +115,7 @@ const useSelectWalletConnectAccount = (params: ProposalTypes.Struct) => {
   , [chainInfoMap, params.requiredNamespaces]
   );
 
+  const isExitedAnotherUnsupportedNamespace = useMemo(() => params.requiredNamespaces && Object.keys(params.requiredNamespaces).some((namespace) => !isSupportWalletConnectNamespace(namespace)), [params.requiredNamespaces]);
   const supportOneChain = useMemo(() => supportedChains.length === 1, [supportedChains]);
   const supportOneNamespace = useMemo(() => Object.keys(namespaces).length === 1, [namespaces]);
   const noNetwork = useMemo((): boolean => {
@@ -239,6 +241,7 @@ const useSelectWalletConnectAccount = (params: ProposalTypes.Struct) => {
     onApplyAccounts,
     onCancelSelectAccounts,
     onSelectAccount,
+    isExitedAnotherUnsupportedNamespace,
     supportOneChain,
     supportOneNamespace,
     supportedChains

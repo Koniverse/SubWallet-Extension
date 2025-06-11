@@ -4,6 +4,7 @@
 import Search from '@subwallet/extension-web-ui/components/Search';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { FadersHorizontal, Question } from 'phosphor-react';
@@ -11,43 +12,51 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps{
-  onClickFilter: VoidFunction;
+  onClickFilter?: VoidFunction;
   onSearch: (value: string) => void;
   inputPlaceholder: string;
   searchValue: string;
-  showReload?: boolean; // todo: later
+  extraActionNode?: React.ReactNode; // todo: later
 }
 
-function Component ({ className, inputPlaceholder, onClickFilter, onSearch, searchValue }: Props): React.ReactElement<Props> {
+function Component ({ className, extraActionNode, inputPlaceholder, onClickFilter, onSearch, searchValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
 
   const onClickHelp = useCallback(() => {
-    // todo: open earning doc
+    openInNewTab('https://docs.subwallet.app/main/web-dashboard-user-guide/earning/faqs')();
   }, []);
 
   return (
     <div className={CN(className)}>
       <Search
-        actionBtnIcon={(
-          <Icon
-            phosphorIcon={FadersHorizontal}
-            size='sm'
-          />
-        )}
+        actionBtnIcon={onClickFilter
+          ? (
+            <Icon
+              phosphorIcon={FadersHorizontal}
+              size='sm'
+            />
+          )
+          : undefined}
         extraButton={
-          <Button
-            icon={(
-              <Icon
-                customSize={'28px'}
-                phosphorIcon={Question}
-              />
-            )}
-            onClick={onClickHelp}
-            size='xs'
-            type='ghost'
-          >
-            {t('Help')}
-          </Button>
+          (
+            <>
+              <Button
+                icon={(
+                  <Icon
+                    customSize={'28px'}
+                    phosphorIcon={Question}
+                  />
+                )}
+                onClick={onClickHelp}
+                size='xs'
+                type='ghost'
+              >
+                {t('Help')}
+              </Button>
+
+              {extraActionNode}
+            </>
+          )
         }
         onClickActionBtn={onClickFilter}
         onSearch={onSearch}

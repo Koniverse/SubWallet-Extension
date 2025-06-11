@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useClickOutSide, useGoBackSelectAccount, useIsPopup, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -33,39 +33,44 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
-
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { setStateSelectAccount } = useSetSessionLatest();
+  const { checkActive, inactiveModal } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
-  const isPopup = useIsPopup();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
   const onBack = useGoBackSelectAccount(modalId);
 
   const onCancel = useCallback(() => {
+    setStateSelectAccount(true);
     inactiveModal(modalId);
-  }, [inactiveModal]);
+  }, [inactiveModal, setStateSelectAccount]);
 
   useClickOutSide(isActive, renderModalSelector(className), onCancel);
 
   const onClickItem = useCallback((path: string) => {
     return () => {
       inactiveModal(modalId);
+      setStateSelectAccount(true);
       navigate(path);
     };
-  }, [navigate, inactiveModal]);
+  }, [inactiveModal, setStateSelectAccount, navigate]);
 
   const onClickJson = useCallback(() => {
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({ allowedPath: '/accounts/restore-json' }).catch(console.error);
+
+      isSidePanelMode && closeSidePanel();
     } else {
       inactiveModal(modalId);
       navigate('/accounts/restore-json');
     }
-  }, [inactiveModal, isPopup, navigate]);
+  }, [closeSidePanel, inactiveModal, isExpanseMode, isSidePanelMode, navigate]);
 
   const onClickSeed = useCallback(() => {
     inactiveModal(modalId);
-    activeModal(IMPORT_SEED_MODAL);
-  }, [activeModal, inactiveModal]);
+    navigate('/accounts/import-seed-phrase');
+  }, [inactiveModal, navigate]);
 
   const items = useMemo((): ImportAccountItem[] => [
     {
@@ -79,14 +84,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       backgroundColor: token['orange-7'],
       icon: FileJs,
       key: 'restore-json',
-      label: t('Import from Polkadot.{js}'),
+      label: t('Import from JSON file'),
       onClick: onClickJson
     },
     {
       backgroundColor: token['gray-3'],
       icon: Wallet,
       key: 'import-private-key',
-      label: t('Import by MetaMask private key'),
+      label: t('Import from private key'),
       onClick: onClickItem('/accounts/import-private-key')
     },
     {

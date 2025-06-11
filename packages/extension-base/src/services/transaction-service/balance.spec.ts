@@ -3,11 +3,12 @@
 
 import { ChainAssetMap, ChainInfoMap } from '@subwallet/chain-list';
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
-import { createTransferExtrinsic } from '@subwallet/extension-base/koni/api/dotsama/transfer';
-import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/koni/api/tokens/evm/transfer';
+import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
+import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
 import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-service/handler/SubstrateChainHandler';
 import { _getContractAddressOfToken, _isLocalToken, _isTokenEvmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import BigN from 'bignumber.js';
 import fs from 'fs';
 import { TransactionConfig } from 'web3-core';
@@ -49,7 +50,7 @@ describe('test token transfer', () => {
 
       for (const asset of assets) {
         try {
-          const [extrinsic] = await createTransferExtrinsic({
+          const [extrinsic] = await createSubstrateExtrinsic({
             from: '5DnokDpMdNEH8cApsZoWQnjsggADXQmGWUb6q8ZhHeEwvncL',
             networkKey: networkKey,
             to: '5EhSb8uHkbPRF869wynQ4gh5V7B62YgkEQvMdk6tzHD9bK7b',
@@ -102,11 +103,29 @@ describe('test token transfer', () => {
       for (const asset of assets) {
         try {
           let transaction: TransactionConfig;
+          const feeInfo = await calculateGasFeeParams(_api, chain.slug);
 
           if (_isTokenEvmSmartContract(asset) || _isLocalToken(asset)) {
-            [transaction] = await getERC20TransactionObject(_getContractAddressOfToken(asset), chain, '0x29d6d6d84c9662486198667b5a9fbda3e698b23f', '0x5e10e440FEce4dB0b16a6159A4536efb74d32E9b', '0', false, _api);
+            [transaction] = await getERC20TransactionObject({
+              assetAddress: _getContractAddressOfToken(asset),
+              chain: chain.slug,
+              evmApi: _api,
+              feeInfo,
+              value: '0',
+              from: '0x29d6d6d84c9662486198667b5a9fbda3e698b23f',
+              to: '0x5e10e440FEce4dB0b16a6159A4536efb74d32E9b',
+              transferAll: false
+            });
           } else {
-            [transaction] = await getEVMTransactionObject(chain, '0x29d6d6d84c9662486198667b5a9fbda3e698b23f', '0x5e10e440FEce4dB0b16a6159A4536efb74d32E9b', '0', false, _api);
+            [transaction] = await getEVMTransactionObject({
+              chain: chain.slug,
+              evmApi: _api,
+              feeInfo,
+              from: '0x29d6d6d84c9662486198667b5a9fbda3e698b23f',
+              to: '0x5e10e440FEce4dB0b16a6159A4536efb74d32E9b',
+              value: '0',
+              transferAll: false
+            });
           }
 
           if (transaction) {

@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { subscribeCrowdloan } from '@subwallet/extension-base/koni/api/dotsama/crowdloan';
-import { nftHandler } from '@subwallet/extension-base/koni/background/handlers';
+import { NftHandler } from '@subwallet/extension-base/koni/api/nft';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { COMMON_RELOAD_EVENTS, EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
@@ -15,6 +15,8 @@ import { Logger } from '@polkadot/util/types';
 import KoniState from './handlers/State';
 
 type SubscriptionName = 'balance' | 'crowdloan' | 'yieldPoolStats' | 'yieldPosition';
+
+const nftHandler = new NftHandler();
 
 export class KoniSubscription {
   private eventHandler?: (events: EventItem<EventType>[], eventTypes: EventType[]) => void;
@@ -64,7 +66,7 @@ export class KoniSubscription {
 
   async start () {
     await Promise.all([this.state.eventService.waitCryptoReady, this.state.eventService.waitKeyringReady, this.state.eventService.waitAssetReady]);
-    const currentAddress = this.state.keyringService.currentAccount?.address;
+    const currentAddress = this.state.keyringService.context.currentAccount?.proxyId;
 
     if (currentAddress) {
       this.subscribeCrowdloans(currentAddress, this.state.getSubstrateApiMap());
@@ -78,7 +80,7 @@ export class KoniSubscription {
         return;
       }
 
-      const address = serviceInfo.currentAccountInfo?.address;
+      const address = serviceInfo.currentAccountInfo?.proxyId;
 
       if (!address) {
         return;
@@ -102,7 +104,7 @@ export class KoniSubscription {
   }
 
   subscribeCrowdloans (address: string, substrateApiMap: Record<string, _SubstrateApi>, onlyRunOnFirstTime?: boolean) {
-    const addresses = this.state.getDecodedAddresses(address);
+    const addresses = this.state.keyringService.context.getDecodedAddresses(address);
 
     if (!addresses.length) {
       return;
@@ -130,7 +132,7 @@ export class KoniSubscription {
   }
 
   subscribeNft (address: string, substrateApiMap: Record<string, _SubstrateApi>, evmApiMap: Record<string, _EvmApi>, smartContractNfts: _ChainAsset[], chainInfoMap: Record<string, _ChainInfo>) {
-    const addresses = this.state.getDecodedAddresses(address);
+    const addresses = this.state.keyringService.context.getDecodedAddresses(address);
 
     if (!addresses.length) {
       return;
@@ -153,7 +155,7 @@ export class KoniSubscription {
   }
 
   async reloadCrowdloan () {
-    const currentAddress = this.state.keyringService.currentAccount?.address;
+    const currentAddress = this.state.keyringService.context.currentAccount?.proxyId;
 
     this.subscribeCrowdloans(currentAddress, this.state.getSubstrateApiMap());
 

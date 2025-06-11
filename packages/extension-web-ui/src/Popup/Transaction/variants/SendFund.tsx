@@ -2,31 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { AssetSetting, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
-import { _getAssetDecimals, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isMantaZkAsset, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { AssetSetting, ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _getXcmUnstableWarning, _isMythosFromHydrationToMythos, _isXcmTransferUnstable } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { _getAssetDecimals, _getContractAddressOfToken, _getOriginChainOfAsset, _getTokenMinAmount, _isAssetFungibleToken, _isChainEvmCompatible, _isMantaZkAsset, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { AccountJson } from '@subwallet/extension-base/types';
+import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
-import { HiddenInput } from '@subwallet/extension-web-ui/components';
+import { AlertBox, AlertModal, HiddenInput } from '@subwallet/extension-web-ui/components';
 import { AccountSelector } from '@subwallet/extension-web-ui/components/Field/AccountSelector';
 import { AddressInput } from '@subwallet/extension-web-ui/components/Field/AddressInput';
 import AmountInput from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { ChainSelector } from '@subwallet/extension-web-ui/components/Field/ChainSelector';
 import { TokenItemType, TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useGetChainPrefixBySlug, useHandleSubmitTransaction, useInitValidateTransaction, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
+import { useAlert, useFetchChainAssetInfo, useGetChainPrefixBySlug, useInitValidateTransaction, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
 import { useIsMantaPayEnabled } from '@subwallet/extension-web-ui/hooks/account/useIsMantaPayEnabled';
-import { getMaxTransfer, makeCrossChainTransfer, makeTransfer } from '@subwallet/extension-web-ui/messaging';
+import useHandleSubmitMultiTransaction from '@subwallet/extension-web-ui/hooks/transaction/useHandleSubmitMultiTransaction';
+import { approveSpending, getMaxTransfer, getOptimalTransferProcess, makeCrossChainTransfer, makeTransfer } from '@subwallet/extension-web-ui/messaging';
+import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-web-ui/reducer';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
-import { findAccountByAddress, formatBalance, noop, transactionDefaultFilterAccount } from '@subwallet/extension-web-ui/utils';
+import { findAccountByAddress, formatBalance, noop, reformatAddress, transactionDefaultFilterAccount } from '@subwallet/extension-web-ui/utils';
 import { findNetworkJsonByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIsFirstRender } from 'usehooks-ts';
@@ -35,6 +40,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { isAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
 import { FreeBalance, TransactionContent, TransactionFooter } from '../parts';
+import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 
 type Props = ThemeProps & {
   modalContent?: boolean;
@@ -68,6 +74,7 @@ function getTokenItems (
   const isLedger = !!account.isHardware;
   const validGen: string[] = account.availableGenesisHashes || [];
   const validLedgerNetwork = validGen.map((genesisHash) => findNetworkJsonByGenesisHash(chainInfoMap, genesisHash)?.slug);
+  const isGenericLedger = !!account.isGeneric;
   const isAccountEthereum = isEthereumAddress(address);
   const isSetTokenSlug = !!tokenGroupSlug && !!assetRegistry[tokenGroupSlug];
   const isSetMultiChainAssetSlug = !!tokenGroupSlug && !!multiChainAssetMap[tokenGroupSlug];
@@ -78,7 +85,7 @@ function getTokenItems (
     }
 
     const chainAsset = assetRegistry[tokenGroupSlug];
-    const isValidLedger = isLedger ? (isAccountEthereum || validLedgerNetwork.includes(chainAsset?.originChain)) : true;
+    const isValidLedger = isLedger ? (isGenericLedger || validLedgerNetwork.includes(chainAsset?.originChain)) : true;
 
     if (isSetTokenSlug) {
       if (isAssetTypeValid(chainAsset, chainInfoMap, isAccountEthereum) && isValidLedger) {
@@ -101,7 +108,7 @@ function getTokenItems (
   const items: TokenItemType[] = [];
 
   Object.values(assetRegistry).forEach((chainAsset) => {
-    const isValidLedger = isLedger ? (isAccountEthereum || validLedgerNetwork.includes(chainAsset?.originChain)) : true;
+    const isValidLedger = isLedger ? (isGenericLedger || validLedgerNetwork.includes(chainAsset?.originChain)) : true;
     const isTokenFungible = _isAssetFungibleToken(chainAsset);
 
     if (!(isTokenFungible && isAssetTypeValid(chainAsset, chainInfoMap, isAccountEthereum) && isValidLedger)) {
@@ -213,6 +220,7 @@ const filterAccountFunc = (
 
 const hiddenFields: Array<keyof TransferParams> = ['chain'];
 const validateFields: Array<keyof TransferParams> = ['value', 'to'];
+const alertModalId = 'confirmation-alert-modal';
 
 const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/send-fund');
@@ -238,6 +246,9 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
   const chain = useWatchTransaction('chain', form, defaultData);
   const asset = useWatchTransaction('asset', form, defaultData);
 
+  const assetInfo = useFetchChainAssetInfo(asset);
+  const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
+
   const { chainInfoMap, chainStatusMap } = useSelector((root) => root.chainStore);
   const { assetRegistry, assetSettingMap, multiChainAssetMap, xcmRefMap } = useSelector((root) => root.assetRegistry);
   const { accounts, isAllAccount } = useSelector((state: RootState) => state.accountState);
@@ -245,19 +256,32 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
   const checkAction = usePreCheckAction(from, true, detectTranslate('The account you are using is {{accountTitle}}, you cannot send assets with it'));
   const isZKModeEnabled = useIsMantaPayEnabled(from);
 
+  const hideMaxButton = useMemo(() => {
+    const chainInfo = chainInfoMap[chain];
+
+    if (_isPolygonChainBridge(chain, destChain)) {
+      return true;
+    }
+
+    return !!chainInfo && !!assetInfo && _isChainEvmCompatible(chainInfo) && destChain === chain && _isNativeToken(assetInfo);
+  }, [chainInfoMap, chain, destChain, assetInfo]);
+
   const [loading, setLoading] = useState(false);
   const [isTransferAll, setIsTransferAll] = useState(false);
   const [, update] = useState({});
+  const [isFetchingMaxValue, setIsFetchingMaxValue] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [forceUpdateMaxValue, setForceUpdateMaxValue] = useState<object|undefined>(undefined);
   const chainStatus = useMemo(() => chainStatusMap[chain]?.connectionStatus, [chain, chainStatusMap]);
+
+  const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
 
   const handleTransferAll = useCallback((value: boolean) => {
     setForceUpdateMaxValue({});
     setIsTransferAll(value);
   }, []);
 
-  const { onError, onSuccess } = useHandleSubmitTransaction(handleTransferAll);
+  const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState, handleTransferAll);
 
   const destChainItems = useMemo<ChainItemType[]>(() => {
     return getTokenAvailableDestinations(asset, xcmRefMap, chainInfoMap);
@@ -321,9 +345,17 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
       return Promise.resolve();
     }
 
-    const isOnChain = chain === destChain;
+    if (!isEthereumAddress(_recipientAddress)) {
+      const destChainInfo = chainInfoMap[destChain];
+      const addressPrefix = destChainInfo?.substrateInfo?.addressPrefix ?? 42;
+      const _addressOnChain = reformatAddress(_recipientAddress, addressPrefix);
 
-    const account = findAccountByAddress(accounts, _recipientAddress);
+      if (_addressOnChain !== _recipientAddress) {
+        return Promise.reject(t('Recipient should be a valid {{networkName}} address', { replace: { networkName: destChainInfo.name } }));
+      }
+    }
+
+    const isOnChain = chain === destChain;
 
     if (isOnChain) {
       if (isSameAddress(from, _recipientAddress)) {
@@ -351,11 +383,13 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
       }
     }
 
+    const account = findAccountByAddress(accounts, _recipientAddress);
+
     if (account?.isHardware) {
       const destChainInfo = chainInfoMap[destChain];
       const availableGen: string[] = account.availableGenesisHashes || [];
 
-      if (!isEthereumAddress(account.address) && !availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
+      if (!account.isGeneric && !availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
         const destChainName = destChainInfo?.name || 'Unknown';
 
         return Promise.reject(t('Wrong network. Your Ledger account is not supported by {{network}}. Please choose another receiving account and try again.', { replace: { network: destChainName } }));
@@ -436,13 +470,11 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
   );
 
   // Submit transaction
-  const onSubmit: FormCallbacks<TransferParams>['onFinish'] = useCallback((values: TransferParams) => {
+  const isShowWarningOnSubmit = useCallback((values: TransferParams) => {
     setLoading(true);
-    const { asset, chain, destChain, from, to, value } = values;
+    const { asset, chain, destChain, from: _from } = values;
 
-    let sendPromise: Promise<SWTransactionResponse>;
-
-    const account = findAccountByAddress(accounts, from);
+    const account = findAccountByAddress(accounts, _from);
 
     if (!account) {
       setLoading(false);
@@ -451,7 +483,7 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
         type: 'error'
       });
 
-      return;
+      return true;
     }
 
     const isLedger = !!account.isHardware;
@@ -468,11 +500,35 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
               type: 'warning'
             });
 
-            return;
+            return true;
           }
         }
       }
+    } else {
+      if (isLedger) {
+        setLoading(false);
+        notification({
+          message: t('This feature is not available for Ledger account'),
+          type: 'warning'
+        });
 
+        return true;
+      }
+    }
+
+    return false;
+  }, [accounts, assetRegistry, notification, t]);
+
+  const handleBasicSubmit = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
+    const { asset, chain, destChain, from: _from, to, value } = values;
+
+    let sendPromise: Promise<SWTransactionResponse>;
+
+    const chainInfo = chainInfoMap[chain];
+    const addressPrefix = chainInfo?.substrateInfo?.addressPrefix ?? 42;
+    const from = reformatAddress(_from, addressPrefix);
+
+    if (chain === destChain) {
       // Transfer token or send fund
       sendPromise = makeTransfer({
         from,
@@ -483,16 +539,6 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
         transferAll: isTransferAll
       });
     } else {
-      if (isLedger) {
-        setLoading(false);
-        notification({
-          message: t('This feature is not available for Ledger account'),
-          type: 'warning'
-        });
-
-        return;
-      }
-
       // Make cross chain transfer
       sendPromise = makeCrossChainTransfer({
         destinationNetworkKey: destChain,
@@ -505,17 +551,80 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
       });
     }
 
+    return sendPromise;
+  }, [chainInfoMap, isTransferAll]);
+
+  // todo: must refactor later, temporary solution to support SnowBridge
+  const handleSnowBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
+    const tokenInfo = assetRegistry[values.asset];
+
+    return approveSpending({
+      amount: values.value,
+      contractAddress: _getContractAddressOfToken(tokenInfo),
+      spenderAddress: getSnowBridgeGatewayContract(values.chain),
+      chain: values.chain,
+      owner: values.from
+    });
+  }, [assetRegistry]);
+
+  // Submit transaction
+  const doSubmit: FormCallbacks<TransferParams>['onFinish'] = useCallback((values: TransferParams) => {
+    if (isShowWarningOnSubmit(values)) {
+      return;
+    }
+
+    const submitData = async (step: number): Promise<boolean> => {
+      dispatchProcessState({
+        type: CommonActionType.STEP_SUBMIT,
+        payload: null
+      });
+
+      const isFirstStep = step === 0;
+      const isLastStep = step === processState.steps.length - 1;
+      const needRollback = step === 1;
+
+      try {
+        if (isFirstStep) {
+          // todo: validate process
+          dispatchProcessState({
+            type: CommonActionType.STEP_COMPLETE,
+            payload: true
+          });
+          dispatchProcessState({
+            type: CommonActionType.STEP_SUBMIT,
+            payload: null
+          });
+
+          return await submitData(step + 1);
+        } else {
+          const stepType = processState.steps[step].type;
+          const submitPromise: Promise<SWTransactionResponse> | undefined = stepType === CommonStepType.TOKEN_APPROVAL ? handleSnowBridgeSpendingApproval(values) : handleBasicSubmit(values);
+
+          const rs = await submitPromise;
+          const success = onSuccess(isLastStep, needRollback)(rs);
+
+          if (success) {
+            return await submitData(step + 1);
+          } else {
+            return false;
+          }
+        }
+      } catch (e) {
+        onError(e as Error);
+
+        return false;
+      }
+    };
+
     setTimeout(() => {
       // Handle transfer action
-      sendPromise
-        .then(onSuccess)
+      submitData(processState.currentStep)
         .catch(onError)
         .finally(() => {
           setLoading(false);
-        })
-      ;
+        });
     }, 300);
-  }, [accounts, assetRegistry, notification, t, isTransferAll, onSuccess, onError]);
+  }, [handleBasicSubmit, handleSnowBridgeSpendingApproval, isShowWarningOnSubmit, onError, onSuccess, processState.currentStep, processState.steps]);
 
   const onFilterAccountFunc = useMemo(() => filterAccountFunc(chainInfoMap, assetRegistry, multiChainAssetMap, sendFundSlug), [assetRegistry, chainInfoMap, multiChainAssetMap, sendFundSlug]);
 
@@ -526,6 +635,64 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
       setIsTransferAll(value);
     }
   }, [maxTransfer]);
+
+  const onSubmit: FormCallbacks<TransferParams>['onFinish'] = useCallback((values: TransferParams) => {
+    if (chain !== destChain) {
+      const originChainInfo = chainInfoMap[chain];
+      const destChainInfo = chainInfoMap[destChain];
+      const assetSlug = values.asset;
+      const isMythosFromHydrationToMythos = _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug);
+
+      if (_isXcmTransferUnstable(originChainInfo, destChainInfo, assetSlug)) {
+        openAlert({
+          type: NotificationType.WARNING,
+          content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
+          title: isMythosFromHydrationToMythos ? t('High fee alert!') : t('Pay attention!'),
+          okButton: {
+            text: t('Continue'),
+            onClick: () => {
+              closeAlert();
+              doSubmit(values);
+            }
+          },
+          cancelButton: {
+            text: t('Cancel'),
+            onClick: closeAlert
+          }
+        });
+
+        return;
+      }
+    }
+
+    if (_isNativeToken(assetInfo)) {
+      const minAmount = _getTokenMinAmount(assetInfo);
+      const bnMinAmount = new BN(minAmount);
+
+      if (bnMinAmount.gt(BN_ZERO) && isTransferAll && chain === destChain) {
+        openAlert({
+          type: NotificationType.WARNING,
+          content: t('Transferring all will remove all assets on this network. Are you sure?'),
+          title: t('Pay attention!'),
+          okButton: {
+            text: t('Transfer'),
+            onClick: () => {
+              closeAlert();
+              doSubmit(values);
+            }
+          },
+          cancelButton: {
+            text: t('Cancel'),
+            onClick: closeAlert
+          }
+        });
+
+        return;
+      }
+    }
+
+    doSubmit(values);
+  }, [assetInfo, chain, chainInfoMap, closeAlert, destChain, doSubmit, isTransferAll, openAlert, t]);
 
   // TODO: Need to review
   // Auto fill logic
@@ -575,6 +742,8 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
   useEffect(() => {
     let cancel = false;
 
+    setIsFetchingMaxValue(false);
+
     if (from && asset) {
       getMaxTransfer({
         address: from,
@@ -584,10 +753,16 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
         destChain
       })
         .then((balance) => {
-          !cancel && setMaxTransfer(balance.value);
+          if (!cancel) {
+            setMaxTransfer(balance.value);
+            setIsFetchingMaxValue(true);
+          }
         })
         .catch(() => {
-          !cancel && setMaxTransfer('0');
+          if (!cancel) {
+            setMaxTransfer('0');
+            setIsFetchingMaxValue(true);
+          }
         })
         .finally(() => {
           if (!cancel) {
@@ -615,6 +790,28 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
       setIsTransferAll(true);
     }
   }, [maxTransfer, transferAmount]);
+
+  useEffect(() => {
+    getOptimalTransferProcess({
+      amount: transferAmount,
+      address: from,
+      originChain: chain,
+      tokenSlug: asset,
+      destChain
+    })
+      .then((result) => {
+        dispatchProcessState({
+          payload: {
+            steps: result.steps,
+            feeStructure: result.totalFee
+          },
+          type: CommonActionType.STEP_CREATE
+        });
+      })
+      .catch((e) => {
+        console.log('error', e);
+      });
+  }, [asset, chain, destChain, from, transferAmount]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -690,7 +887,8 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
             <AddressInput
               addressPrefix={destChainNetworkPrefix}
               allowDomain={true}
-              chain={chain}
+              chain={destChain}
+              fitNetwork={true}
               label={t('Send to')}
               networkGenesisHash={destChainGenesisHash}
               placeholder={t('Account address')}
@@ -715,7 +913,7 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
               forceUpdateMaxValue={forceUpdateMaxValue}
               maxValue={maxTransfer}
               onSetMax={onSetMaxTransferable}
-              showMaxButton={true}
+              showMaxButton={!hideMaxButton}
               tooltip={isWebUI ? t('Amount') : undefined}
             />
           </Form.Item>
@@ -725,9 +923,29 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
           address={from}
           chain={chain}
           className='balance'
+          extrinsicType={extrinsicType}
           onBalanceReady={setIsBalanceReady}
           tokenSlug={asset}
         />
+        {
+          !!alertProps && (
+            <AlertModal
+              modalId={alertModalId}
+              {...alertProps}
+            />
+          )
+        }
+        {
+          chain !== destChain && (
+            <div className={'__warning_message_cross_chain'}>
+              <AlertBox
+                description={t('Cross-chain transfer to an exchange (CEX) will result in loss of funds. Make sure the receiving address is not an exchange address.')}
+                title={t('Pay attention!')}
+                type={'warning'}
+              />
+            </div>
+          )
+        }
       </TransactionContent>
       <TransactionFooter
         className={CN(`${className} -transaction-footer`, {
@@ -735,7 +953,7 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
         })}
       >
         <Button
-          disabled={!isBalanceReady}
+          disabled={!isBalanceReady || (isTransferAll ? !isFetchingMaxValue : false)}
           icon={(
             <Icon
               phosphorIcon={PaperPlaneTilt}

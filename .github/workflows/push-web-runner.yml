@@ -16,6 +16,7 @@ jobs:
         step: ['web-runner:build-zip']
     name: ${{ matrix.step }}
     runs-on: ubuntu-22.04
+    environment: 'mobile'
     steps:
     - uses: actions/checkout@v3
       with:
@@ -31,6 +32,7 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         TRANSAK_API_KEY: ${{ secrets.TRANSAK_API_KEY }}
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
+        MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         BRANCH_NAME: master
       run: |
         yarn install --immutable | grep -v 'YN0013'

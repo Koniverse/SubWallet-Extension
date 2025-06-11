@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { APIItemState, BasicTxErrorType, ChainType, ExtrinsicType, NominationInfo, StakingTxErrorType, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { APIItemState, ChainType, ExtrinsicType, NominationInfo, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { calculateChainStakedReturnV2, calculateInflation, getAvgValidatorEraReward, getExistUnstakeErrorMessage, getMinStakeErrorMessage, getSupportedDaysByHistoryDepth, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
+import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseYieldPositionInfo, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletNominationPoolsPoolMember, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingNominations, RequestStakePoolingBonding, StakeCancelWithdrawalParams, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, RequestYieldStepSubmit, SpStakingExposurePage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -109,18 +110,23 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const maxSupportedEras = substrateApi.api.consts.staking.historyDepth.toString();
       const erasPerDay = 24 / _STAKING_ERA_LENGTH_MAP[chainInfo.slug]; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
 
-      const supportedDays = getSupportedDaysByHistoryDepth(erasPerDay, parseInt(maxSupportedEras));
+      const supportedDays = getSupportedDaysByHistoryDepth(erasPerDay, parseInt(maxSupportedEras), parseInt(currentEra) / erasPerDay);
+
       const startEra = parseInt(currentEra) - supportedDays * erasPerDay;
 
-      const [_EraStakeInfo, _totalIssuance, _auctionCounter, _minPoolJoin, ..._eraReward] = await Promise.all([
+      const [_maxPoolMember, _EraStakeInfo, _totalIssuance, _auctionCounter, _minPoolJoin, ..._eraReward] = await Promise.all([
+        substrateApi.api.query.nominationPools?.maxPoolMembersPerPool(),
         substrateApi.api.query.staking.erasTotalStake.multi([parseInt(currentEra), parseInt(currentEra) - 1]),
         substrateApi.api.query.balances.totalIssuance(),
         substrateApi.api.query.auctions?.auctionCounter(),
-        substrateApi.api.query?.nominationPools?.minJoinBond(),
+        substrateApi.api.query.nominationPools?.minJoinBond(),
         substrateApi.api.query.staking.erasValidatorReward.multi([...Array(supportedDays).keys()].map((i) => i + startEra))
       ]);
 
+      const maxPoolMembers = _maxPoolMember ? parseInt(_maxPoolMember.toString()) : undefined;
+
       const [_totalEraStake, _lastTotalStaked] = _EraStakeInfo;
+
       const validatorEraReward = getAvgValidatorEraReward(supportedDays, _eraReward[0]);
       const lastTotalStaked = _lastTotalStaked.toString();
       const rawTotalEraStake = _totalEraStake.toString();
@@ -132,7 +138,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
       const inflation = calculateInflation(bnTotalEraStake, bnTotalIssuance, numAuctions, chainInfo.slug);
       const minPoolJoin = _minPoolJoin?.toString() || undefined;
-      const expectedReturn = calculateChainStakedReturnV2(chainInfo, rawTotalIssuance, erasPerDay, lastTotalStaked, validatorEraReward, true);
+      const expectedReturn = await calculateChainStakedReturnV2(chainInfo, rawTotalIssuance, erasPerDay, lastTotalStaked, validatorEraReward, new BigN(inflation), true);
       const eraTime = _STAKING_ERA_LENGTH_MAP[this.chain] || _STAKING_ERA_LENGTH_MAP.default; // in hours
       const unlockingPeriod = parseInt(unlockingEras) * eraTime; // in hours
 
@@ -166,7 +172,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
           totalApy: expectedReturn, // TODO recheck
           unstakingPeriod: unlockingPeriod,
           inflation: inflation
-        }
+        },
+        maxPoolMembers: maxPoolMembers || undefined
       };
 
       callback(data);
@@ -182,7 +189,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
   /* Subscribe pool position */
 
-  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, _deriveSessionProgress: DeriveSessionProgress): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, _deriveSessionProgress: DeriveSessionProgress, address: string): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chainInfo = this.chainInfo;
     const unlimitedNominatorRewarded = substrateApi.api.consts.staking.maxExposurePageSize !== undefined;
     const _maxNominatorRewardedPerValidator = (substrateApi.api.consts.staking.maxNominatorRewardedPerValidator || 0).toString();
@@ -206,10 +213,20 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const validatorList = nominations.targets;
 
       await Promise.all(validatorList.map(async (validatorAddress) => {
-        const _eraStaker = await substrateApi.api.query.staking.erasStakers(currentEra, validatorAddress);
-        const eraStaker = _eraStaker.toPrimitive() as unknown as PalletStakingExposure;
+        let eraStakerOtherList: PalletStakingExposureItem[] = [];
 
-        const sortedNominators = eraStaker.others
+        if (substrateApi.api.query.staking.erasStakersPaged) { // todo: review all relaychains later
+          const _eraStaker = await substrateApi.api.query.staking.erasStakersPaged.entries(currentEra, validatorAddress);
+
+          eraStakerOtherList = _eraStaker.flatMap((paged) => (paged[1].toPrimitive() as unknown as SpStakingExposurePage).others);
+        } else {
+          const _eraStaker = await substrateApi.api.query.staking.erasStakers(currentEra, validatorAddress);
+          const eraStaker = _eraStaker.toPrimitive() as unknown as PalletStakingExposure;
+
+          eraStakerOtherList = eraStaker.others;
+        }
+
+        const sortedNominators: PalletStakingExposureItem[] = eraStakerOtherList
           .sort((a, b) => {
             return new BigN(b.value).minus(a.value).toNumber();
           })
@@ -267,6 +284,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
       stakingStatus = EarningStatus.NOT_EARNING;
     }
 
+    await this.createWithdrawNotifications(unstakings, this.nativeToken, address);
+
     return {
       status: stakingStatus,
       balanceToken: this.nativeToken.slug,
@@ -288,7 +307,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
     const unsub = await substrateApi.api.query?.nominationPools?.poolMembers.multi(useAddresses, async (ledgers: Codec[]) => {
       if (cancel) {
-        unsub();
+        unsub?.();
 
         return;
       }
@@ -306,7 +325,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
           const owner = reformatAddress(useAddresses[i], 42);
 
           if (poolMemberInfo) {
-            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, _deriveSessionProgress);
+            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, _deriveSessionProgress, owner);
 
             resultCallback({
               ...defaultInfo,
@@ -335,7 +354,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
     return () => {
       cancel = true;
-      unsub();
+      unsub?.();
     };
   }
 
@@ -355,13 +374,19 @@ export default class NominationPoolHandler extends BasePoolHandler {
           const _unclaimedReward = await substrateApi.api.call?.nominationPoolsApi?.pendingRewards(address);
 
           if (_unclaimedReward) {
-            callBack({
+            const earningRewardItem = {
               ...this.baseInfo,
               address: address,
               type: this.type,
               unclaimedReward: _unclaimedReward.toString(),
               state: APIItemState.READY
-            });
+            };
+
+            if (_unclaimedReward.toString() !== '0') {
+              await this.createClaimNotification(earningRewardItem, this.nativeToken);
+            }
+
+            callBack(earningRewardItem);
           }
         }
       }
@@ -394,11 +419,12 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const poolsPalletId = substrateApi.api.consts.nominationPools.palletId.toString();
       const poolStashAccount = parsePoolStashAddress(substrateApi.api, 0, poolId, poolsPalletId);
 
-      const [_nominations, _bondedPool, _metadata, _minimumActiveStake] = await Promise.all([
+      const [_nominations, _bondedPool, _metadata, _minimumActiveStake, _maxPoolMembers] = await Promise.all([
         substrateApi.api.query.staking.nominators(poolStashAccount),
         substrateApi.api.query.nominationPools.bondedPools(poolId),
         substrateApi.api.query.nominationPools.metadata(poolId),
-        substrateApi.api.query.staking.minimumActiveStake()
+        substrateApi.api.query.staking.minimumActiveStake(),
+        substrateApi.api.query.nominationPools?.maxPoolMembersPerPool()
       ]);
 
       const minimumActiveStake = _minimumActiveStake.toPrimitive() as number;
@@ -413,6 +439,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const isPoolNominating = !!nominations && nominations.targets.length > 0;
       const isPoolEarningReward = bondedPool.points > minimumActiveStake;
 
+      const maxPoolMembers = _maxPoolMembers ? parseInt(_maxPoolMembers.toString()) : undefined;
+
       nominationPools.push({
         id: poolId,
         address: poolAddress,
@@ -421,7 +449,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
         roles: bondedPool.roles,
         memberCounter: bondedPool.memberCounter,
         state: bondedPool.state,
-        isProfitable: isPoolOpen && isPoolNominating && isPoolEarningReward
+        isProfitable: isPoolOpen && isPoolNominating && isPoolEarningReward,
+        isCrowded: maxPoolMembers ? bondedPool.memberCounter >= maxPoolMembers : false
       });
     }));
 
@@ -549,21 +578,19 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNominationPool;
-    const { address, amount, selectedPool } = data;
+    const { address, amount } = data;
     const positionInfo = await this.getPoolPosition(address);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
-    const joinPoolData: RequestStakePoolingBonding = {
-      poolPosition: positionInfo,
-      slug: this.slug,
-      selectedPool,
-      amount,
-      address
+    const joinPoolData: RequestYieldStepSubmit = {
+      path,
+      data: data,
+      currentStep
     };
 
     return {
       txChain: this.chain,
-      extrinsicType: ExtrinsicType.STAKING_JOIN_POOL,
+      extrinsicType: ExtrinsicType.JOIN_YIELD_POOL,
       extrinsic,
       txData: joinPoolData,
       transferNativeAmount: amount,
@@ -658,6 +685,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {
+      // @ts-ignore
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address });
     }
   }

@@ -52,11 +52,12 @@ function Component (
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const priceMap = useSelector((state: RootState) => state.price.priceMap);
   const chainAssetMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
+  const { currencyData } = useSelector((state: RootState) => state.price);
 
   const time = customFormatDate(item.time, '#hhhh#:#mm#');
   const link = getLink(item, chainInfoMap);
 
-  const showAmount = useMemo(() => item.type !== ExtrinsicType.TOKEN_APPROVE, [item.type]);
+  const showAmount = useMemo(() => item.type !== ExtrinsicType.TOKEN_SPENDING_APPROVAL, [item.type]);
 
   const handleOnClick = useCallback(
     (e?: SyntheticEvent) => {
@@ -189,7 +190,7 @@ function Component (
           decimalOpacity={0.45}
           hide={!isShowBalance}
           intOpacity={0.45}
-          prefix='$'
+          prefix={(currencyData?.isPrefix && currencyData?.symbol) || ''}
           unitOpacity={0.45}
           value={convertedBalanceValue.isNaN() ? '0' : convertedBalanceValue}
         />

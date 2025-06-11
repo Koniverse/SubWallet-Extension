@@ -12,7 +12,7 @@
     },
     { "path": "../extension-inject/tsconfig.build.json"
     },
-    { "path": "../extension-mocks/tsconfig.build.json"
+    { "path": "../subwallet-api-sdk/tsconfig.build.json"
     }
   ]
 }

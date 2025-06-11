@@ -1,11 +1,14 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { balanceNoPrefixFormater, formatNumber } from '@subwallet/extension-base/utils';
+import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { saveShowBalance } from '@subwallet/extension-koni-ui/messaging';
+import { PriceChartArea } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/PriceChartArea';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, Number } from '@subwallet/react-ui';
+import { Button, Icon, Tooltip } from '@subwallet/react-ui';
 import { SwNumberProps } from '@subwallet/react-ui/es/number';
 import CN from 'classnames';
 import { ArrowsLeftRight, CaretLeft, CopySimple, PaperPlaneTilt, ShoppingCartSimple } from 'phosphor-react';
@@ -13,11 +16,16 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import { ActionButtonsContainer } from './ActionButtonsContainer';
+
 type Props = ThemeProps & {
   balanceValue: SwNumberProps['value'];
+  priceId?: string;
   symbol: string;
   isSupportBuyTokens: boolean;
+  isSupportSwap: boolean;
   isShrink: boolean;
+  isChartSupported?: boolean;
   onClickBack: () => void;
   onOpenSendFund: () => void;
   onOpenBuyTokens: () => void;
@@ -28,24 +36,27 @@ type Props = ThemeProps & {
 function Component (
   { balanceValue,
     className = '',
+    isChartSupported,
     isShrink,
     isSupportBuyTokens,
+    isSupportSwap,
     onClickBack,
     onOpenBuyTokens,
     onOpenReceive,
     onOpenSendFund,
     onOpenSwap,
+    priceId,
     symbol }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { isShowBalance } = useSelector((state: RootState) => state.settings);
-
+  const { currencyData } = useSelector((state: RootState) => state.price);
   const onChangeShowBalance = useCallback(() => {
     saveShowBalance(!isShowBalance).catch(console.error);
   }, [isShowBalance]);
 
   return (
     <div className={`tokens-upper-block ${className} ${isShrink ? '-shrink' : ''}`}>
-      <div className='__top'>
+      <div className='__top-part'>
         <Button
           className={'__back-button'}
           icon={
@@ -60,23 +71,17 @@ function Component (
         />
         <div className={'__token-display'}>{t('Token')}: {symbol}</div>
       </div>
-      <div className='__bottom'>
-        <div
-          className='__balance-value-wrapper'
-          onClick={isShrink ? onChangeShowBalance : undefined}
-        >
-          <Number
-            className={'__balance-value'}
-            decimal={0}
-            decimalOpacity={0.45}
-            hide={!isShowBalance}
-            prefix='$'
-            size={38}
-            subFloatNumber
-            value={balanceValue}
-          />
-        </div>
-        <div className={'__action-button-container'}>
+
+      <div className='__middle-part'>
+        <PriceChartArea
+          className={'__price-chart-area'}
+          isChartSupported={isChartSupported}
+          priceId={priceId}
+        />
+      </div>
+
+      <div className='__bottom-part'>
+        <ActionButtonsContainer className={'__action-buttons-container'}>
           <Button
             icon={(
               <Icon
@@ -106,6 +111,7 @@ function Component (
           />
           <div className={'__button-space'} />
           <Button
+            disabled={!isSupportSwap}
             icon={(
               <Icon
                 phosphorIcon={ArrowsLeftRight}
@@ -134,6 +140,37 @@ function Component (
             size={isShrink ? 'xs' : 'sm'}
             tooltip={t('Buy token')}
           />
+        </ActionButtonsContainer>
+
+        <div className={'__your-balance-container'}>
+          <div className='__your-balance-label'>
+            {t('Your balance')}
+          </div>
+
+          <Tooltip
+            overlayClassName={CN('__currency-value-detail-tooltip', {
+              'ant-tooltip-hidden': !isShowBalance
+            })}
+            placement={'top'}
+            title={currencyData.symbol + ' ' + formatNumber(balanceValue, 0, balanceNoPrefixFormater)}
+          >
+            <div
+              className='__balance-value-wrapper'
+              onClick={onChangeShowBalance}
+            >
+              <NumberDisplay
+                className={'__balance-value'}
+                decimal={0}
+                decimalOpacity={0.45}
+                hide={!isShowBalance}
+                prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                size={isShrink ? 38 : 20}
+                subFloatNumber={isShrink}
+                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                value={balanceValue}
+              />
+            </div>
+          </Tooltip>
         </div>
       </div>
     </div>
@@ -142,13 +179,16 @@ function Component (
 
 export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    padding: '0px 8px 24px 8px',
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
+    paddingBottom: 20,
 
-    '.__top': {
+    '.__top-part': {
       display: 'flex',
-      marginBottom: 16,
+      paddingLeft: token.paddingXS,
+      paddingRight: token.paddingXS,
+      marginBottom: token.marginXXS,
       alignItems: 'center'
     },
 
@@ -176,36 +216,81 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
       }
     },
 
-    '.__balance-value': {
-      textAlign: 'center',
-      padding: '0px 8px',
-      lineHeight: token.lineHeightHeading1,
-      fontSize: token.fontSizeHeading1,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-
-      '.ant-typography': {
-        lineHeight: 'inherit'
-      }
-    },
-
-    '.__action-button-container': {
+    '.__action-buttons-container': {
       display: 'flex',
       justifyContent: 'center',
-      padding: '24px 8px 0 8px'
+      padding: '24px 8px'
     },
 
     '.__button-space': {
-      width: token.size
+      width: 36
+    },
+
+    '.__your-balance-container': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      'white-space': 'nowrap',
+      paddingLeft: token.padding,
+      paddingRight: token.padding,
+      fontSize: token.fontSizeHeading4,
+      lineHeight: token.lineHeightHeading4
+    },
+
+    '.__your-balance-label': {
+      flexShrink: 1,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    },
+
+    '.__balance-value-wrapper': {
+      cursor: 'pointer',
+      width: 'fit-content'
+    },
+
+    '.__balance-value': {
+      lineHeight: 'inherit',
+      fontWeight: 'inherit',
+      fontSize: 'inherit',
+      overflow: 'hidden'
+    },
+
+    '&:not(.-shrink)': {
+      '.__balance-value': {
+        '.ant-typography': {
+          lineHeight: 'inherit !important',
+          fontWeight: 'inherit !important',
+          color: 'inherit !important'
+        }
+      }
     },
 
     '&.-shrink': {
-      '.__bottom': {
-        display: 'flex'
+      '.__top-part': {
+        marginBottom: token.marginSM
+      },
+
+      '.__middle-part, .__your-balance-label': {
+        display: 'none'
+      },
+
+      '.__bottom-part': {
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: token.paddingXS,
+        paddingRight: token.paddingXS
+      },
+
+      '.__your-balance-container': {
+        flex: 1,
+        paddingRight: 0,
+        order: -1
       },
 
       '.__balance-value-wrapper': {
-        flex: 1
+        display: 'block',
+        margin: 0,
+        cursor: 'pointer',
+        width: 'fit-content'
       },
 
       '.__balance-value': {
@@ -215,18 +300,29 @@ export const DetailUpperBlock = styled(Component)<Props>(({ theme: { token } }: 
         cursor: 'pointer',
         width: 'fit-content',
 
-        '.ant-number-prefix, .ant-number-integer, .ant-number-hide-content': {
-          fontSize: 'inherit !important'
+        '.ant-number-integer, .ant-number-decimal, .ant-number-hide-content': {
+          fontSize: 'inherit !important',
+          lineHeight: 'inherit !important',
+          fontWeight: 'inherit !important'
+        },
+
+        '.ant-number-prefix': {
+          fontSize: `${token.fontSizeHeading5}px !important`,
+          lineHeight: `${token.lineHeightHeading5} !important`,
+          verticalAlign: 'super',
+          marginRight: token.marginXXS
         }
       },
 
-      '.__action-button-container': {
-        paddingTop: 0
+      '.__action-buttons-container': {
+        paddingTop: 0,
+        paddingBottom: 0
       },
 
       '.__button-space': {
         width: token.sizeXS
       }
     }
+
   });
 });

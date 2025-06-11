@@ -3,9 +3,11 @@
 
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
+import { NetworkTag } from '@subwallet/extension-koni-ui/components';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { ExtraYieldPositionInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ExtraYieldPositionInfo, NetworkType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isRelatedToAstar } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -26,15 +28,12 @@ const Component: React.FC<Props> = (props: Props) => {
   const { className, isShowBalance,
     onClick,
     positionInfo } = props;
-  const { asset, balanceToken, chain, group, price, slug, totalStake, type } = positionInfo;
+  const { chainInfoMap } = useSelector((state) => state.chainStore);
+  const { asset, balanceToken, chain, currency, group, price, slug, totalStake, type } = positionInfo;
 
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const poolInfo = poolInfoMap[slug];
-
-  const showSubLogo = useMemo(() => {
-    return ![YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(type);
-  }, [type]);
 
   const poolName = useMemo(() => {
     return (multiChainAssetMap[group] || assetRegistry[group]).symbol;
@@ -50,23 +49,45 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const _isRelatedToAstar = isRelatedToAstar(slug);
 
+  const isTestnet = useMemo(() => {
+    return chainInfoMap[positionInfo.chain].isTestnet;
+  }, [chainInfoMap, positionInfo.chain]);
+
+  const subnetShortName = useMemo(() => {
+    return positionInfo.subnetData?.subnetShortName ? `(${positionInfo.subnetData.subnetShortName})` : '';
+  }, [positionInfo.subnetData?.subnetShortName]);
+
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
+
   return (
     <div
       className={CN(className)}
       onClick={onClick}
     >
-      <div className={'__item-left-part'}>
-        <Logo
-          className={'__item-logo'}
-          isShowSubLogo={showSubLogo}
-          size={40}
-          subNetwork={poolInfo.metadata.logo || poolInfo.chain}
-          token={balanceToken.toLowerCase()}
-        />
-
+      <div className='__item-left-part'>
+        {!isSubnetStaking || !DefaultLogosMap[`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`]
+          ? (
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={true}
+              size={40}
+              subNetwork={poolInfo.metadata.logo || poolInfo.chain}
+              token={balanceToken.toLowerCase()}
+            />
+          )
+          : (
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={false}
+              network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
+              size={40}
+            />
+          )}
         <div className='__item-lines-container'>
           <div className='__item-line-1'>
-            <div className='__item-name'>{poolName}</div>
+            <div className='__item-name'> { poolName }
+              <span className='__subnet-short-name'> {subnetShortName} </span>
+            </div>
 
             {
               !_isRelatedToAstar && (
@@ -88,6 +109,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__item-tag'}
                 type={type}
               />
+              {isTestnet && <NetworkTag
+                className={'__item-tag'}
+                type={isTestnet ? NetworkType.TEST_NETWORK : NetworkType.MAIN_NETWORK}
+              />}
             </div>
 
             {
@@ -96,7 +121,8 @@ const Component: React.FC<Props> = (props: Props) => {
                   <Number
                     decimal={0}
                     hide={!isShowBalance}
-                    prefix={'$'}
+                    prefix={(currency?.isPrefix && currency.symbol) || ''}
+                    suffix={(!currency?.isPrefix && currency?.symbol) || ''}
                     value={convertedBalanceValue}
                   />
                 </div>
@@ -183,6 +209,9 @@ const EarningPositionItem = styled(Component)<Props>(({ theme: { token } }: Prop
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     },
+    '.__subnet-short-name': {
+      color: token.colorTextLight4
+    },
 
     '.__item-balance-value': {
       fontSize: token.fontSizeLG,
@@ -211,7 +240,7 @@ const EarningPositionItem = styled(Component)<Props>(({ theme: { token } }: Prop
       flex: 1,
       display: 'flex',
       overflow: 'hidden',
-      gap: token.sizeXS
+      gap: token.sizeXXS
     },
 
     '.__item-tag': {

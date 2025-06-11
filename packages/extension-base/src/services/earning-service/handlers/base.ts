@@ -8,10 +8,13 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { DEFAULT_YIELD_FIRST_STEP } from '@subwallet/extension-base/services/earning-service/constants';
-import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import { formatNumber } from '@subwallet/extension-base/utils';
+import { createClaimNotification, createWithdrawNotifications } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
 import { BN, BN_TEN } from '@polkadot/util';
+
+import { EarningSlippageResult } from './native-staking/dtao';
 
 /**
  * @class BasePoolHandler
@@ -104,7 +107,9 @@ export default abstract class BasePoolHandler {
     const decimals = this.nativeToken.decimals || 0;
     const defaultMaintainBalance = new BN(1).mul(BN_TEN.pow(new BN(decimals)));
     const ed = new BN(this.nativeToken.minAmount || '0');
-    const maintainBalance = ed.gte(defaultMaintainBalance) ? new BN(15).mul(ed).div(BN_TEN) : defaultMaintainBalance;
+    const calculateMaintainBalance = new BN(15).mul(ed).div(BN_TEN);
+
+    const maintainBalance = ed.gte(defaultMaintainBalance) ? calculateMaintainBalance : defaultMaintainBalance;
 
     return maintainBalance.toString();
   }
@@ -122,17 +127,31 @@ export default abstract class BasePoolHandler {
     };
   }
 
+  public async createWithdrawNotifications (unstakingInfos: UnstakingInfo[], tokenInfo: _ChainAsset, address: string) {
+    const notifications = createWithdrawNotifications(unstakingInfos, tokenInfo, address, this.baseInfo.slug, this.type);
+
+    await this.state.inappNotificationService.validateAndWriteNotificationsToDB(notifications, address);
+  }
+
+  public async createClaimNotification (claimItemInfo: EarningRewardItem, tokenInfo: _ChainAsset) {
+    const notification = createClaimNotification(claimItemInfo, tokenInfo);
+
+    await this.state.inappNotificationService.validateAndWriteNotificationsToDB([notification], claimItemInfo.address);
+  }
+
   /** Can mint when haven't enough native token (use input token for fee) */
   public get isPoolSupportAlternativeFee (): boolean {
     return false;
   }
 
-  public async getPoolInfo (): Promise<YieldPoolInfo | undefined> {
-    return await this.state.earningService.getYieldPool(this.slug);
+  public async getPoolInfo (slug: string = this.slug): Promise<YieldPoolInfo | undefined> {
+    return await this.state.earningService.getYieldPool(slug);
   }
 
-  public async getPoolPosition (address: string): Promise<YieldPositionInfo | undefined> {
-    return await this.state.earningService.getYieldPosition(address, this.slug);
+  public async getPoolPosition (address: string, slug: string = this.slug): Promise<YieldPositionInfo | undefined> {
+    const originAddress = reformatAddress(address);
+
+    return await this.state.earningService.getYieldPosition(originAddress, slug);
   }
 
   /* Subscribe data */
@@ -155,7 +174,7 @@ export default abstract class BasePoolHandler {
   /* Early validate */
 
   public async earlyValidate (request: RequestEarlyValidateYield): Promise<ResponseEarlyValidateYield> {
-    const poolInfo = await this.getPoolInfo();
+    const poolInfo = await this.getPoolInfo(request.slug);
 
     if (!poolInfo || !poolInfo.statistic?.earningThreshold.join) {
       return {
@@ -171,7 +190,7 @@ export default abstract class BasePoolHandler {
     }
 
     const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(this.chain);
-    const nativeTokenBalance = await this.state.balanceService.getTokenFreeBalance(request.address, this.chain);
+    const nativeTokenBalance = await this.state.balanceService.getTransferableBalance(request.address, this.chain);
     const bnNativeTokenBalance = new BN(nativeTokenBalance.value);
     const bnMinBalanceToJoin = new BN(poolInfo.statistic?.earningThreshold?.join || '0').add(new BN(poolInfo.metadata.maintainBalance));
 
@@ -312,17 +331,17 @@ export default abstract class BasePoolHandler {
   /* Leave action */
 
   /** Validate param to leave the pool */
-  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string): Promise<TransactionError[]>
+  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]>
   /** Create `transaction` to leave the pool normal (default unstake) */
-  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]>;
+  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool fast (swap token) */
   protected abstract handleYieldRedeem (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool */
-  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]> {
+  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
     if (fastLeave) {
       return this.handleYieldRedeem(amount, address, selectedTarget);
     } else {
-      return this.handleYieldUnstake(amount, address, selectedTarget);
+      return this.handleYieldUnstake(amount, address, selectedTarget, netuid, slippage);
     }
   }
 
@@ -337,5 +356,16 @@ export default abstract class BasePoolHandler {
   /** Create `transaction` to claim reward */
   public abstract handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData>;
 
+  /** Check handler can handle slug */
+  public canHandleSlug (slug: string): boolean {
+    return this.slug === slug;
+  }
+
+  public getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+    return Promise.resolve({
+      slippage: 0,
+      rate: 1
+    });
+  }
   /* Other actions */
 }

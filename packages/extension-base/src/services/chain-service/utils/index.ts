@@ -6,6 +6,7 @@ import { BasicTokenInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
+import { AccountChainType } from '@subwallet/extension-base/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -61,11 +62,19 @@ export function _isEqualSmartContractAsset (asset1: _ChainAsset, asset2: _ChainA
 }
 
 export function _isPureEvmChain (chainInfo: _ChainInfo) {
-  return (chainInfo.evmInfo !== null && chainInfo.substrateInfo === null);
+  return (!!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
 }
 
 export function _isPureSubstrateChain (chainInfo: _ChainInfo) {
-  return (chainInfo.evmInfo === null && chainInfo.substrateInfo !== null);
+  return (!chainInfo.evmInfo && !!chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
+}
+
+export function _isPureTonChain (chainInfo: _ChainInfo) {
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.tonInfo && !chainInfo.cardanoInfo);
+}
+
+export function _isPureCardanoChain (chainInfo: _ChainInfo) {
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo);
 }
 
 export function _getOriginChainOfAsset (assetSlug: string) {
@@ -88,8 +97,24 @@ export function _getContractAddressOfToken (tokenInfo: _ChainAsset) {
   return tokenInfo.metadata?.contractAddress as string || '';
 }
 
+/**
+ * @function _isNativeTokenTransferredByEvm
+ * @description Check if the native token is transferred by EVM, some token is only transferred by Substrate, need to check disableEvmTransfer flag
+ * @param {_ChainAsset} tokenInfo - The token info object
+ * @returns {boolean} - Return true if the native token can transfer by EVM
+ * */
+export function _isNativeTokenTransferredByEvm (tokenInfo: _ChainAsset) {
+  return !tokenInfo.metadata?.disableEvmTransfer;
+}
+
+/**
+ * @function _isTokenTransferredByEvm
+ * @description Check if the token is transferred by EVM
+ * @param {_ChainAsset} tokenInfo - The token info object
+ * @returns {boolean} - Return true if the token can transfer by EVM
+ * */
 export function _isTokenTransferredByEvm (tokenInfo: _ChainAsset) {
-  return !!tokenInfo.metadata?.contractAddress || _isNativeToken(tokenInfo);
+  return !!tokenInfo.metadata?.contractAddress || (_isNativeToken(tokenInfo) && _isNativeTokenTransferredByEvm(tokenInfo));
 }
 
 export function _checkSmartContractSupportByChain (chainInfo: _ChainInfo, contractType: _AssetType) {
@@ -99,6 +124,18 @@ export function _checkSmartContractSupportByChain (chainInfo: _ChainInfo, contra
   }
 
   return (chainInfo.substrateInfo.supportSmartContract !== null && chainInfo.substrateInfo.supportSmartContract.includes(contractType));
+}
+
+export function _isJettonToken (tokenInfo: _ChainAsset) {
+  return tokenInfo.assetType === _AssetType.TEP74 && !!tokenInfo.metadata?.contractAddress;
+}
+
+export function _isTokenTransferredByTon (tokenInfo: _ChainAsset) {
+  return _isJettonToken(tokenInfo) || _isNativeToken(tokenInfo);
+}
+
+export function _isTokenTransferredByCardano (tokenInfo: _ChainAsset) {
+  return _isCIP26Token(tokenInfo) || _isNativeToken(tokenInfo);
 }
 
 // Utils for balance functions
@@ -122,6 +159,18 @@ export function _isChainEvmCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.evmInfo;
 }
 
+export function _isChainBitcoinCompatible (chainInfo: _ChainInfo) {
+  return !!chainInfo.bitcoinInfo;
+}
+
+export function _isChainTonCompatible (chainInfo: _ChainInfo) {
+  return !!chainInfo.tonInfo;
+}
+
+export function _isChainCardanoCompatible (chainInfo: _ChainInfo) {
+  return !!chainInfo.cardanoInfo;
+}
+
 export function _isNativeToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.NATIVE;
 }
@@ -134,12 +183,12 @@ export function _isSmartContractToken (tokenInfo: _ChainAsset) {
   return _SMART_CONTRACT_STANDARDS.includes(tokenInfo.assetType);
 }
 
-export function _isSubstrateChain (chainInfo: _ChainInfo) {
+export function _isChainSubstrateCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.substrateInfo; // fallback to Ethereum
 }
 
 export function _getEvmChainId (chainInfo: _ChainInfo) {
-  return chainInfo.evmInfo?.evmChainId || 1; // fallback to Ethereum
+  return chainInfo.evmInfo?.evmChainId; // fallback to Ethereum
 }
 
 export function _getSubstrateParaId (chainInfo: _ChainInfo) {
@@ -147,7 +196,7 @@ export function _getSubstrateParaId (chainInfo: _ChainInfo) {
 }
 
 export function _getSubstrateRelayParent (chainInfo: _ChainInfo) {
-  return chainInfo.substrateInfo?.relaySlug || '';
+  return chainInfo.substrateInfo?.relaySlug;
 }
 
 export function _getSubstrateGenesisHash (chainInfo: _ChainInfo) {
@@ -176,6 +225,30 @@ export function _isChainSupportEvmNft (chainInfo: _ChainInfo) {
 
 export function _isChainSupportWasmNft (chainInfo: _ChainInfo) {
   return chainInfo.substrateInfo?.supportSmartContract?.includes(_AssetType.PSP34) || false;
+}
+
+export function _isChainSupportEvmERC20 (chainInfo: _ChainInfo) {
+  return chainInfo.evmInfo?.supportSmartContract?.includes(_AssetType.ERC20) || false;
+}
+
+export function _isChainSupportWasmPSP22 (chainInfo: _ChainInfo) {
+  return chainInfo.substrateInfo?.supportSmartContract?.includes(_AssetType.PSP22) || false;
+}
+
+export function _isAssetHubChain (chainInfo: _ChainInfo) {
+  return ['statemint', 'statemine'].includes(chainInfo.slug);
+}
+
+export function _isAssetHubToken (token: _ChainAsset) {
+  return ['statemint', 'statemine'].includes(token.originChain);
+}
+
+export function _isChainSupportGRC20 (chainInfo: _ChainInfo) {
+  return chainInfo.substrateInfo?.supportSmartContract?.includes(_AssetType.GRC20) || false;
+}
+
+export function _isChainSupportVFT (chainInfo: _ChainInfo) {
+  return chainInfo.substrateInfo?.supportSmartContract?.includes(_AssetType.VFT) || false;
 }
 
 export const _isSupportOrdinal = (chain: string) => {
@@ -211,7 +284,7 @@ export function _getTokenTypesSupportedByChain (chainInfo: _ChainInfo): _AssetTy
 
   if (chainInfo.substrateInfo && chainInfo.substrateInfo.supportSmartContract) {
     chainInfo.substrateInfo.supportSmartContract.forEach((assetType) => {
-      if ([_AssetType.PSP22].includes(assetType)) {
+      if ([_AssetType.PSP22, _AssetType.GRC20, _AssetType.VFT].includes(assetType)) {
         result.push(assetType);
       }
     });
@@ -225,33 +298,46 @@ export function _getTokenTypesSupportedByChain (chainInfo: _ChainInfo): _AssetTy
     });
   }
 
+  if (['statemint', 'statemine'].includes(chainInfo.slug)) {
+    result.push(_AssetType.LOCAL);
+  }
+
   return result;
 }
 
 export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicTokenInfo {
+  const defaultTokenInfo = {
+    symbol: '',
+    decimals: -1
+  };
+
   if (!chainInfo) {
-    return {
-      symbol: '',
-      decimals: -1
-    };
+    return defaultTokenInfo;
   }
 
-  if (chainInfo.substrateInfo !== null) { // substrate by default
+  if (chainInfo.substrateInfo) { // substrate by default
     return {
       symbol: chainInfo.substrateInfo.symbol,
       decimals: chainInfo.substrateInfo.decimals
     };
-  } else if (chainInfo.evmInfo !== null) {
+  } else if (chainInfo.evmInfo) {
     return {
       symbol: chainInfo.evmInfo.symbol,
       decimals: chainInfo.evmInfo.decimals
     };
+  } else if (chainInfo.tonInfo) {
+    return {
+      symbol: chainInfo.tonInfo.symbol,
+      decimals: chainInfo.tonInfo.decimals
+    };
+  } else if (chainInfo.cardanoInfo) {
+    return {
+      symbol: chainInfo.cardanoInfo.symbol,
+      decimals: chainInfo.cardanoInfo.decimals
+    };
   }
 
-  return {
-    symbol: '',
-    decimals: -1
-  };
+  return defaultTokenInfo;
 }
 
 export function _getChainNativeTokenSlug (chainInfo: _ChainInfo) {
@@ -270,12 +356,24 @@ export function _isTokenEvmSmartContract (tokenInfo: _ChainAsset) {
   return [_AssetType.ERC721, _AssetType.ERC20].includes(tokenInfo.assetType);
 }
 
+export function _isTokenTonSmartContract (tokenInfo: _ChainAsset) {
+  return [_AssetType.TEP74].includes(tokenInfo.assetType); // add TEP-62 when supporting
+}
+
+export function _isCIP26Token (tokenInfo: _ChainAsset) {
+  return [_AssetType.CIP26].includes(tokenInfo.assetType);
+}
+
 export function _isTokenWasmSmartContract (tokenInfo: _ChainAsset) {
   return [_AssetType.PSP22, _AssetType.PSP34].includes(tokenInfo.assetType);
 }
 
 export function _isAssetSmartContractNft (assetInfo: _ChainAsset) {
   return [_AssetType.PSP34, _AssetType.ERC721].includes(assetInfo.assetType);
+}
+
+export function _isTokenGearSmartContract (tokenInfo: _ChainAsset) {
+  return [_AssetType.GRC20, _AssetType.GRC721, _AssetType.VFT].includes(tokenInfo.assetType);
 }
 
 export function _parseAssetRefKey (originTokenSlug: string, destinationTokenSlug: string) {
@@ -308,6 +406,10 @@ export function _getXcmTransferType (originChainInfo: _ChainInfo, destinationCha
   return `${originChainInfo.substrateInfo?.chainType || ''}-${destinationChainInfo.substrateInfo?.chainType || ''}`;
 }
 
+export function _isRelayChain (chainInfo: _ChainInfo) {
+  return _isSubstrateRelayChain(chainInfo) || _isPureEvmChain(chainInfo);
+}
+
 export function _isSubstrateRelayChain (chainInfo: _ChainInfo) {
   return chainInfo.substrateInfo?.chainType === _SubstrateChainType.RELAYCHAIN;
 }
@@ -324,19 +426,23 @@ export function _isAssetValuable (assetInfo: _ChainAsset) {
   return assetInfo.hasValue;
 }
 
-export function _getMultiChainAsset (assetInfo: _ChainAsset) {
+export function _getMultiChainAsset (assetInfo?: _ChainAsset) {
   return assetInfo?.multiChainAsset || '';
 }
 
-export function _getAssetPriceId (assetInfo: _ChainAsset) {
+export function _getAssetPriceId (assetInfo?: _ChainAsset) {
   return assetInfo?.priceId || '';
+}
+
+export function _getAssetName (assetInfo?: _ChainAsset) {
+  return assetInfo?.name || '';
 }
 
 export function _getMultiChainAssetPriceId (multiChainAsset: _MultiChainAsset) {
   return multiChainAsset?.priceId || '';
 }
 
-export function _getAssetSymbol (assetInfo: _ChainAsset) {
+export function _getAssetSymbol (assetInfo?: _ChainAsset) {
   return assetInfo?.symbol || '';
 }
 
@@ -344,16 +450,16 @@ export function _getMultiChainAssetSymbol (multiChainAsset: _MultiChainAsset) {
   return multiChainAsset.symbol;
 }
 
-export function _getAssetOriginChain (assetInfo: _ChainAsset) {
-  return assetInfo.originChain;
+export function _getAssetOriginChain (assetInfo?: _ChainAsset) {
+  return assetInfo?.originChain || '';
 }
 
-export function _getChainName (chainInfo: _ChainInfo) {
-  return chainInfo.name;
+export function _getChainName (chainInfo?: _ChainInfo) {
+  return chainInfo?.name || '';
 }
 
-export function _getAssetDecimals (assetInfo: _ChainAsset): number {
-  return assetInfo.decimals || 0;
+export function _getAssetDecimals (assetInfo?: _ChainAsset): number {
+  return assetInfo?.decimals || 0;
 }
 
 export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | undefined {
@@ -365,6 +471,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
 
   if (_isPureEvmChain(chainInfo)) {
     blockExplorer = chainInfo?.evmInfo?.blockExplorer;
+  } else if (_isPureCardanoChain(chainInfo)) {
+    blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }
@@ -383,6 +491,12 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
 export function _parseMetadataForSmartContractAsset (contractAddress: string): Record<string, string> {
   return {
     contractAddress
+  };
+}
+
+export function _parseMetadataForAssetId (assetId: string): Record<string, string> {
+  return {
+    assetId
   };
 }
 
@@ -442,6 +556,14 @@ export function _isMantaZkAsset (chainAsset: _ChainAsset) {
   return _MANTA_ZK_CHAIN_GROUP.includes(chainAsset.originChain) && chainAsset.symbol.startsWith(_ZK_ASSET_PREFIX);
 }
 
+export function _getChainExistentialDeposit (chainInfo: _ChainInfo): string {
+  return chainInfo?.substrateInfo?.existentialDeposit || '0';
+}
+
+export function _getAssetExistentialDeposit (chainAsset: _ChainAsset): string {
+  return chainAsset?.minAmount || '0';
+}
+
 export function randomizeProvider (providers: Record<string, string>, excludedKeys?: string[]) {
   if (Object.keys(providers).length === 0) {
     return {
@@ -469,6 +591,10 @@ export function randomizeProvider (providers: Record<string, string>, excludedKe
     providerKey: selectedProviderKey,
     providerValue: selectedProviderValue
   };
+}
+
+export function _isAssetCanPayTxFee (chainAsset: _ChainAsset): boolean {
+  return chainAsset.metadata?.canPayTxFee as boolean ?? false;
 }
 
 export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfoList: _ChainInfo[]) {
@@ -502,7 +628,9 @@ export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfo
 
         currentChainState.currentProvider = providerKey;
 
-        needUpdateChainApiList.push(currentChainInfo);
+        if (currentChainState.active) {
+          needUpdateChainApiList.push(currentChainInfo);
+        }
       }
 
       needUpdate = true;
@@ -510,7 +638,10 @@ export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfo
 
     if (currentChainInfo) {
       needUpdate = true;
-      currentChainInfo.extraInfo = latestChainInfo.extraInfo;
+
+      if (Object.keys(currentChainInfo.providers).length === 0) {
+        currentChainInfo.chainStatus = _ChainStatus.INACTIVE;
+      }
     }
 
     if (needUpdate) {
@@ -526,5 +657,35 @@ export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfo
     needUpdateChainApiList
   };
 }
+
+export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType => {
+  if (_isPureSubstrateChain(chainInfo)) {
+    return AccountChainType.SUBSTRATE;
+  }
+
+  if (_isChainEvmCompatible(chainInfo)) {
+    return AccountChainType.ETHEREUM;
+  }
+
+  if (_isChainTonCompatible(chainInfo)) {
+    return AccountChainType.TON;
+  }
+
+  if (_isChainCardanoCompatible(chainInfo)) {
+    return AccountChainType.CARDANO;
+  }
+
+  if (_isChainBitcoinCompatible(chainInfo)) {
+    return AccountChainType.BITCOIN;
+  }
+
+  return AccountChainType.SUBSTRATE;
+};
+
+export const _getAssetNetuid = (assetInfo: _ChainAsset): number => {
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return assetInfo.metadata?.netuid ?? -1;
+};
 
 export * from './patch';

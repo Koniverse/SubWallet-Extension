@@ -1,16 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { EmptyList, FilterModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EarningPoolItem } from '@subwallet/extension-koni-ui/components/Earning';
-import { DEFAULT_EARN_PARAMS, EARN_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, DEFAULT_EARN_PARAMS, EARN_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useFilterModal, useHandleChainConnection, useSelector, useTranslation, useYieldPoolInfoByGroup } from '@subwallet/extension-koni-ui/hooks';
+import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
+import { useFilterModal, useGroupYieldPosition, useHandleChainConnection, useSelector, useTranslation, useYieldPoolInfoByGroup } from '@subwallet/extension-koni-ui/hooks';
+import { getBalanceValue } from '@subwallet/extension-koni-ui/hooks/screen/home/useAccountBalance';
 import { ChainConnectionWrapper } from '@subwallet/extension-koni-ui/Popup/Home/Earning/shared/ChainConnectionWrapper';
 import { EarningEntryParam, EarningEntryView, EarningPoolsParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -40,30 +44,77 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
 
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
-  const { currentAccount } = useSelector((state) => state.accountState);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
 
   const [, setEarnStorage] = useLocalStorage(EARN_TRANSACTION, DEFAULT_EARN_PARAMS);
+  const yieldPositions = useGroupYieldPosition();
 
   const [selectedPool, setSelectedPool] = React.useState<YieldPoolInfo | undefined>(undefined);
 
   const { activeModal } = useContext(ModalContext);
+  const { accountBalance: { tokenBalanceMap } } = useContext(HomeContext);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
-  const filterOptions = [
+  const filterOptions = useMemo(() => [
     { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
     { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
-  ];
+    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
+  ], [t]);
+
+  const positionSlugs = useMemo(() => {
+    return yieldPositions.map((p) => p.slug);
+  }, [yieldPositions]);
+
   const items: YieldPoolInfo[] = useMemo(() => {
     if (!pools.length) {
       return [];
     }
 
-    const result = [...pools];
+    const result: YieldPoolInfo[] = [];
+
+    pools.forEach((poolInfo) => {
+      if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+        return;
+      }
+
+      if (poolInfo.chain === 'interlay' && poolInfo.type === YieldPoolType.LENDING) {
+        return;
+      }
+
+      if (poolInfo.type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain)) {
+        let minJoinPool: string;
+
+        if (poolInfo.statistic && !positionSlugs.includes(poolInfo.slug)) {
+          minJoinPool = poolInfo.statistic.earningThreshold.join;
+        } else {
+          minJoinPool = '0';
+        }
+
+        let nativeSlug: string | undefined;
+
+        const nativeAsset = poolInfo && poolInfo?.statistic?.assetEarning.find((item) => item.slug.toLowerCase().includes('native'));
+
+        if (nativeAsset) {
+          nativeSlug = nativeAsset.slug;
+        }
+
+        const assetInfo = nativeSlug && assetRegistry[nativeSlug];
+        const minJoinPoolBalanceValue = (assetInfo && getBalanceValue(minJoinPool, _getAssetDecimals(assetInfo))) || BN_ZERO;
+
+        const availableBalance = (nativeSlug && tokenBalanceMap[nativeSlug] && tokenBalanceMap[nativeSlug].free.value) || BN_ZERO;
+
+        if (availableBalance.isGreaterThanOrEqualTo(minJoinPoolBalanceValue)) {
+          result.push(poolInfo);
+        }
+      } else {
+        result.push(poolInfo);
+      }
+    });
 
     result.sort((a, b) => {
       const getType = (pool: YieldPoolInfo) => {
@@ -84,7 +135,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     });
 
     return result;
-  }, [pools]);
+  }, [assetRegistry, pools, positionSlugs, tokenBalanceMap]);
 
   const filterFunction = useMemo<(item: YieldPoolInfo) => boolean>(() => {
     return (item) => {
@@ -105,6 +156,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           return true;
         } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
           return true;
+        } else if (filter === YieldPoolType.SUBNET_STAKING && item.type === YieldPoolType.SUBNET_STAKING) {
+          return true;
         }
         // Uncomment the following code block if needed
         // else if (filter === YieldPoolType.PARACHAIN_STAKING && item.type === YieldPoolType.PARACHAIN_STAKING) {
@@ -124,11 +177,11 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         ...DEFAULT_EARN_PARAMS,
         slug: item.slug,
         chain: item.chain,
-        from: currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : ''
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
       navigate('/transaction/earn');
     },
-    [currentAccount?.address, navigate, setEarnStorage]
+    [currentAccountProxy, navigate, setEarnStorage]
   );
 
   const onConnectChainSuccess = useCallback(() => {

@@ -4,8 +4,8 @@
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { CHANNEL_ID } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseYieldStepDetail, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, SubmitYieldJoinData, TransactionData, YieldStepType } from '@subwallet/extension-base/types';
-import fetch from 'cross-fetch';
 
 import BifrostLiquidStakingPoolHandler from './bifrost';
 
@@ -144,7 +144,7 @@ export default class BifrostMantaLiquidStakingPoolHandler extends BifrostLiquidS
     const substrateApi = await this.substrateApi.isReady;
     const inputTokenSlug = this.inputAsset;
     const inputTokenInfo = this.state.getAssetBySlug(inputTokenSlug);
-    const extrinsic = substrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), data.amount, undefined, undefined);
+    const extrinsic = substrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), data.amount, undefined, CHANNEL_ID);
 
     return {
       txChain: this.chain,
@@ -173,7 +173,7 @@ export default class BifrostMantaLiquidStakingPoolHandler extends BifrostLiquidS
     const chainApi = await this.substrateApi.isReady;
     const derivativeTokenSlug = this.derivativeAssets[0];
     const derivativeTokenInfo = this.state.getAssetBySlug(derivativeTokenSlug);
-    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(_getTokenOnChainInfo(derivativeTokenInfo), amount);
+    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(null, _getTokenOnChainInfo(derivativeTokenInfo), amount);
 
     return [ExtrinsicType.UNSTAKE_VMANTA, extrinsic];
   }

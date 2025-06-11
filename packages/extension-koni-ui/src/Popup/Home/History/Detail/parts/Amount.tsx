@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, TransactionAdditionalInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { BN_TEN } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -86,6 +88,28 @@ const Component: React.FC<Props> = (props: Props) => {
     return <PoolLeaveAmount data={data} />;
   }
 
+  let amountValue = amount?.value;
+
+  if (data.type === ExtrinsicType.CLAIM_BRIDGE) {
+    const additionalInfo = data.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo.notification.actionType === NotificationActionType.CLAIM_POLYGON_BRIDGE) {
+      const metadata = additionalInfo.notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+
+      amountValue = metadata.amounts[0];
+    }
+  }
+
+  let symbol = amount?.symbol;
+
+  if (data.type === ExtrinsicType.STAKING_UNBOND) {
+    const additionalInfo = data.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo?.symbol) {
+      symbol = additionalInfo.symbol;
+    }
+  }
+
   return (
     <>
       {
@@ -94,8 +118,8 @@ const Component: React.FC<Props> = (props: Props) => {
             <MetaInfo.Number
               decimals={amount?.decimals || undefined}
               label={amountLabel}
-              suffix={amount?.symbol || undefined}
-              value={amount?.value || '0'}
+              suffix={symbol || undefined}
+              value={amountValue || '0'}
             />
           )
       }

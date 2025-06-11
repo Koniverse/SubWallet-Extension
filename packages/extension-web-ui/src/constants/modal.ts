@@ -19,6 +19,7 @@ export const CONFIRMATION_QR_MODAL = 'confirmation-qr-modal';
 export const CONFIRMATION_SCAN_MODAL = 'confirmation-scan-modal';
 export const REQUEST_CAMERA_ACCESS_MODAL = 'request-camera-access-modal';
 export const VALIDATOR_DETAIL_MODAL = 'validator-detail-modal';
+export const VALIDATOR_DETAIL_RW_MODAL = 'validator-detail-modal-rw';
 export const HISTORY_DETAIL_MODAL = 'history-detail-modal';
 export const RECEIVE_TOKEN_SELECTOR_MODAL = 'receive-tokens-selector-modal';
 export const CONNECT_EXTENSION = 'connect-extension';
@@ -30,10 +31,12 @@ export const EDIT_UNLOCK_TYPE_MODAL = 'edit-unlock-type-modal';
 export const RESET_WALLET_MODAL = 'reset-wallet-modal';
 export const SEED_PHRASE_MODAL = 'seed-phrase-modal';
 export const ADD_CONNECTION_MODAL = 'add-connection-modal';
+export const ADD_NETWORK_WALLET_CONNECT_MODAL = 'add-network-wallet-connect-modal';
 
 export const TRANSFER_NFT_MODAL = 'transfer-nft-modal';
 
 export const ACCOUNT_EXPORT_MODAL = 'account-export-modal';
+export const ACCOUNT_EXPORT_ALL_MODAL = 'account-export-modal';
 
 export const WALLET_CONNECT_CREATE_MODAL = 'wallet-connect-create-modal';
 export const WALLET_CONNECT_DETAIL_MODAL = 'wallet-connect-detail-modal';
@@ -52,6 +55,7 @@ export const IMPORT_NFT_MODAL = 'import-nft-modal';
 
 export const DISCONNECT_EXTENSION_MODAL = 'disconnect-extension-modal';
 export const SELECT_EXTENSION_MODAL = 'select-extension-modal';
+export const EXPORT_ACCOUNTS_PASSWORD_MODAL = 'export-accounts-password-modal';
 
 /* Extension  */
 
@@ -90,3 +94,9 @@ export const TERM_AND_CONDITION_SEED_PHRASE_MODAL = 'term-and-condition-seed-phr
 
 export const EARNING_INSTRUCTION_MODAL = 'earning-instruction-modal';
 export const EARNING_NOMINATION_MODAL = 'earning-nomination-modal';
+export const SWAP_SLIPPAGE_MODAL = 'swap-slippage-modal';
+export const SWAP_ALL_QUOTES_MODAL = 'swap-all-quotes-modal';
+export const SWAP_MORE_BALANCE_MODAL = 'swap-more-balance-modal';
+export const SWAP_CHOOSE_FEE_TOKEN_MODAL = 'swap-choose-fee-token-modal';
+export const SWAP_TERMS_OF_SERVICE_MODAL = 'swap-terms-of-service-modal';
+export const SWAP_IDLE_WARNING_MODAL = 'swap-idle-warning-modal';

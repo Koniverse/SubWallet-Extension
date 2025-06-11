@@ -104,7 +104,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const walletNamePrefixIcon = useMemo((): PhosphorIcon => {
     switch (signMode) {
-      case AccountSignMode.LEDGER:
+      case AccountSignMode.LEGACY_LEDGER:
+      case AccountSignMode.GENERIC_LEDGER:
         return Swatches;
       case AccountSignMode.QR:
         return QrCode;
@@ -157,7 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       setTimeout(() => {
         deriveAccountV3({
-          address: account.address
+          proxyId: account.address
         }).then(() => {
           goHome();
         }).catch((e: Error) => {

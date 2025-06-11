@@ -3,6 +3,7 @@
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { YieldPoolInfo } from '@subwallet/extension-base/types';
 import { StakingNominationItem } from '@subwallet/extension-koni-ui/components';
 import { Avatar } from '@subwallet/extension-koni-ui/components/Avatar';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -20,21 +21,16 @@ import { GeneralEmptyList } from '../EmptyList';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   nominators: NominationInfo[];
-  chain: string
+  chain: string,
+  poolInfo: YieldPoolInfo
+  networkPrefix?: number;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
-const renderItem = (item: NominationInfo, isSelected: boolean) => (
-  <StakingNominationItem
-    isSelected={isSelected}
-    nominationInfo={item}
-  />
-);
-
 // todo: update filter for this component, after updating filter for SelectModal
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, nominators, placeholder, statusHelp, value } = props;
+  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, networkPrefix, nominators, placeholder, poolInfo, statusHelp, value } = props;
 
   const filteredItems = useMemo(() => {
     return nominators.filter((item) => new BigN(item.activeStake).gt(0));
@@ -67,6 +63,25 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     []
   );
 
+  const renderItem = useCallback(
+    (item: NominationInfo, isSelected: boolean) => {
+      return (
+        <StakingNominationItem
+          isSelected={isSelected}
+          nominationInfo={item}
+          poolInfo={poolInfo}
+        />
+      );
+    },
+    [poolInfo]
+  );
+
+  const handleValidatorLabel = useMemo(() => {
+    const label = getValidatorLabel(chain);
+
+    return label !== 'dApp' ? label.toLowerCase() : label;
+  }, [chain]);
+
   useEffect(() => {
     if (!value) {
       if (defaultValue || filteredItems[0]?.validatorAddress) {
@@ -95,6 +110,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         placeholder={placeholder || label}
         prefix={
           <Avatar
+            identPrefix={networkPrefix}
             size={20}
             value={value}
           />
@@ -104,10 +120,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>(`Search ${getValidatorLabel(chain)}`)}
+        searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={label || placeholder || t('Select validator')}
+        title={t('Select') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
       />
     </>
   );

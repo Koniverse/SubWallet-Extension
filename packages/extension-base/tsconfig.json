@@ -9,6 +9,6 @@
     { "path": "../extension-chains" },
     { "path": "../extension-dapp" },
     { "path": "../extension-inject" },
-    { "path": "../extension-mocks" }
+    { "path": "../subwallet-api-sdk" }
   ]
 }

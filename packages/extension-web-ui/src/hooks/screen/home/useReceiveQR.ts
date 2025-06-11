@@ -3,9 +3,9 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { MantaPayConfig } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { AccountSelectorModalId } from '@subwallet/extension-web-ui/components/Modal/AccountSelectorModal';
 import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { useChainAssets } from '@subwallet/extension-web-ui/hooks/assets';
@@ -90,37 +90,27 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
         }
 
         if (account.isHardware) {
-          if (!isEvm) {
-            const availableGen: string[] = account.availableGenesisHashes || [];
-            const networks = availableGen
-              .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
-              .filter((slug) => slug) as string[];
+          if (!account.isGeneric) {
+            if (!isEvm) {
+              const availableGen: string[] = account.availableGenesisHashes || [];
+              const networks = availableGen
+                .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
+                .filter((slug) => slug) as string[];
 
-            return networks.some((n) => chains.includes(n));
-          } else {
-            return chains.some((chain) => {
-              const info = chainInfoMap[chain];
-
-              if (info) {
-                return _isChainEvmCompatible(info);
-              } else {
-                return false;
-              }
-            });
-          }
-        } else {
-          for (const chain of chains) {
-            const info = chainInfoMap[chain];
-
-            if (info) {
-              if (isEvm === _isChainEvmCompatible(info)) {
-                return true;
-              }
+              return networks.some((n) => chains.includes(n));
             }
           }
-
-          return false;
         }
+
+        return chains.some((chain) => {
+          const info = chainInfoMap[chain];
+
+          if (info) {
+            return isEvm === _isChainEvmCompatible(info);
+          } else {
+            return false;
+          }
+        });
       });
     }
 
@@ -144,7 +134,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
     return Object.values(assetRegistryMap).filter((asset) => {
       const availableGen: string[] = acc?.availableGenesisHashes || [];
 
-      if (acc?.isHardware && !isEvmAddress && !availableGen.includes(chainInfoMap[asset.originChain].substrateInfo?.genesisHash || '')) {
+      if (acc?.isHardware && !acc?.isGeneric && !availableGen.includes(chainInfoMap[asset.originChain].substrateInfo?.genesisHash || '')) {
         return false;
       }
 
@@ -176,7 +166,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
     } else {
       // if currentAccount is ledger type
       if (currentAccount.isHardware) {
-        if (!isEthereumAddress(currentAccount.address)) {
+        if (!currentAccount.isGeneric) {
           const availableGen: string[] = currentAccount.availableGenesisHashes || [];
           const networks = availableGen
             .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
