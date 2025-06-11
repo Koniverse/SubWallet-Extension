@@ -7,6 +7,7 @@ import { SingleModeJson, ThemeNames } from '@subwallet/extension-base/background
 
 export const API_AUTO_CONNECT_MS = 3000;
 export const API_CONNECT_TIMEOUT = 30000;
+export const BITCOIN_CACHE_TIMEOUT = 30000; // 30 seconds
 export const API_MAX_RETRY = 2;
 
 export const _API_OPTIONS_CHAIN_GROUP = {
