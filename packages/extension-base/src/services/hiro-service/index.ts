@@ -38,12 +38,12 @@ export class HiroService extends BaseApiRequestStrategy {
 
   getBRC20Metadata (ticker: string): Promise<Brc20MetadataFetchedData> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`brc-20/tokens/${ticker}`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<Brc20MetadataFetchedData>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('HiroService.getBRC20Metadata', rs.message);
-      }
+      const rs = await getRequest<OBResponse<Brc20MetadataFetchedData>>(this.getUrl(`brc-20/tokens/${ticker}`), {
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('HiroService.getBRC20Metadata', `Failed to fetch BRC20 metadata: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 3);
@@ -51,12 +51,13 @@ export class HiroService extends BaseApiRequestStrategy {
 
   getAddressBRC20BalanceInfo (address: string, params: Record<string, string>): Promise<Brc20BalanceFetchedData> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`brc-20/balances/${address}`), params, this.headers);
-      const rs = await _rs.json() as OBResponse<Brc20BalanceFetchedData>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('HiroService.getAddressBRC20BalanceInfo', rs.message);
-      }
+      const rs = await getRequest<OBResponse<Brc20BalanceFetchedData>>(this.getUrl(`brc-20/balances/${address}`), {
+        params,
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('HiroService.getAddressBRC20BalanceInfo', `Failed to fetch BRC20 balance: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 3);
@@ -64,12 +65,13 @@ export class HiroService extends BaseApiRequestStrategy {
 
   getAddressInscriptionsInfo (params: Record<string, string>): Promise<InscriptionFetchedData> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl('inscriptions'), params, this.headers);
-      const rs = await _rs.json() as OBResponse<InscriptionFetchedData>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('HiroService.getAddressInscriptionsInfo', rs.message);
-      }
+      const rs = await getRequest<OBResponse<InscriptionFetchedData>>(this.getUrl('inscriptions'), {
+        params,
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('HiroService.getAddressInscriptionsInfo', `Failed to fetch inscriptions: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 0);
@@ -77,12 +79,12 @@ export class HiroService extends BaseApiRequestStrategy {
 
   getInscriptionContent (inscriptionId: string): Promise<Record<string, any>> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`inscriptions/${inscriptionId}/content`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<Record<string, any>>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('HiroService.getInscriptionContent', rs.message);
-      }
+      const rs = await getRequest<OBResponse<Record<string, any>>>(this.getUrl(`inscriptions/${inscriptionId}/content`), {
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('HiroService.getInscriptionContent', `Failed to fetch inscription content: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 0);
