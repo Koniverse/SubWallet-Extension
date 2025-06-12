@@ -114,7 +114,7 @@ export const DEFAULT_EARN_PARAMS: EarnParams = {
 
 export const DEFAULT_CHANGE_VALIDATOR_PARAMS: ChangeValidatorParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
-  fromTarget: '',
+  originValidator: '',
   slug: '',
   target: '',
   value: ''

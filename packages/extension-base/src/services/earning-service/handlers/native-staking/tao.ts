@@ -636,20 +636,30 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, fromValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, originValidator, selectedValidators: targetValidators, subnetData } = data;
 
-    if (!subnetData || !fromValidator) {
+    if (!subnetData || !originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
     const selectedValidatorInfo = targetValidators[0];
     const destValidator = selectedValidatorInfo.address;
 
-    if (fromValidator === destValidator) {
+    if (new BigN(amount).lte(0)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+    }
+
+    if (originValidator === destValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
     }
 
-    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(fromValidator, destValidator, 0, 0, amount);
+    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+
+    if (new BigN(amount).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
+    }
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);
 
     return extrinsic;
   }

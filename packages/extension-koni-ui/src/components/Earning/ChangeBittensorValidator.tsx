@@ -59,7 +59,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
-  const fromTarget = useWatchTransaction('fromTarget', form, defaultData);
+  const originValidator = useWatchTransaction('originValidator', form, defaultData);
   const toTarget = useWatchTransaction('target', form, defaultData);
   const value = useWatchTransaction('value', form, defaultData);
 
@@ -93,8 +93,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { compound: positionInfo } = useYieldPositionDetail(slug, from);
 
   const selectedValidator = useMemo(() => {
-    return positionInfo?.nominations.find((item) => item.validatorAddress === fromTarget);
-  }, [fromTarget, positionInfo]);
+    return positionInfo?.nominations.find((item) => item.validatorAddress === originValidator);
+  }, [originValidator, positionInfo]);
 
   const mustChooseValidator = useMemo(() => isActionFromValidator(poolType, poolChain || ''), [poolChain, poolType]);
   const persistValidator = useMemo(() => {
@@ -164,8 +164,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const isDisabled = useMemo(() =>
-    !fromTarget || !toTarget || (isShowAmountChange && !value),
-  [fromTarget, toTarget, isShowAmountChange, value]
+    !originValidator || !toTarget || (isShowAmountChange && !value),
+  [originValidator, toTarget, isShowAmountChange, value]
   );
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
@@ -208,13 +208,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const onValuesChange: FormCallbacks<ChangeValidatorParams>['onValuesChange'] = useCallback(
     (changes: Partial<ChangeValidatorParams>, values: ChangeValidatorParams) => {
-      const { from, fromTarget, target, value } = changes;
+      const { from, originValidator, target, value } = changes;
 
       if (from) {
         setIsChangeData(true);
       }
 
-      if ((from || fromTarget || target) && (amountChange || defaultData.value)) {
+      if ((from || originValidator || target) && (amountChange || defaultData.value)) {
         form.validateFields(['value']).finally(noop);
       }
 
@@ -235,7 +235,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const onClickSubmit = useCallback(
     (values: ChangeValidatorParams) => {
-      const { fromTarget, value } = values;
+      const { originValidator, value } = values;
 
       if (isShowAmountChange && ((new BigN(value)).gt(bondedValue))) {
         notifyTooHighAmount();
@@ -245,12 +245,18 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       setSubmitLoading(true);
 
+      const isChangeTitle = (new BigN(value)).lt(bondedValue);
+
       const submitData: SubmitChangeValidatorStaking = {
         slug: poolInfo.slug,
         address: from,
         amount: isShowAmountChange ? value : bondedValue,
         selectedValidators: poolTargets,
-        fromValidator: fromTarget,
+        originValidator: originValidator,
+        metadata: {
+          subnetSymbol: symbol as string
+        },
+        isChangeTitle: isChangeTitle,
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
@@ -271,7 +277,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           });
       }, 300);
     },
-    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, netuid, notifyTooHighAmount, onError, onSuccess, inactiveAll]
+    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, netuid, symbol, notifyTooHighAmount, onError, onSuccess, inactiveAll]
   );
 
   const onPreCheck = usePreCheckAction(from);
@@ -329,7 +335,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           </div>
         </Form.Item>
 
-        <Form.Item name={'fromTarget'}>
+        <Form.Item name={'originValidator'}>
           <NominationSelector
             chain={chain}
             defaultValue={persistValidator}

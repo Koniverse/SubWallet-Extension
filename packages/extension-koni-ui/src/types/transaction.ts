@@ -39,7 +39,7 @@ export interface EarnParams extends TransactionFormBaseProps {
 }
 
 export interface ChangeValidatorParams extends EarnParams {
-  fromTarget: string;
+  originValidator: string;
 }
 
 export interface UnStakeParams extends TransactionFormBaseProps {

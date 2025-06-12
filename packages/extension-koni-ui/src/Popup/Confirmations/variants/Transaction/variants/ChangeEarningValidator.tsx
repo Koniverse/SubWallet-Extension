@@ -8,6 +8,7 @@ import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/c
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import { SelectedValidatorInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/SelectedValidatorInfoPart';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,10 @@ const Component: React.FC<Props> = (props: Props) => {
     return transaction.chain === 'bittensor' || transaction.chain === 'bittensor_testnet';
   }, [transaction.chain]);
 
+  const isShowAmount = useMemo(() => {
+    return new BigN(data.amount).gt(0);
+  }, [data.amount]);
+
   return (
     <div>
       <div className={CN(className)}>
@@ -60,6 +65,14 @@ const Component: React.FC<Props> = (props: Props) => {
             className={'meta-info'}
             hasBackgroundWrapper
           >
+            {isShowAmount && (
+              <MetaInfo.Number
+                decimals={decimals}
+                label={t('Amount')}
+                suffix={data.metadata?.subnetSymbol || symbol}
+                value={data.amount}
+              />
+            )}
             <MetaInfo.Number
               decimals={decimals}
               label={t('Estimated fee')}
@@ -84,21 +97,21 @@ const Component: React.FC<Props> = (props: Props) => {
           <MetaInfo
             className={'nomination-wrapper'}
           >
-            {(deselectedCount > 0 || data.fromValidator) && (
-              data.fromValidator
+            {(deselectedCount > 0 || data.originValidator) && (
+              data.originValidator
                 ? (
                   <MetaInfo.Default
                     className='__validator-address deselected'
-                    label='Deselected validator'
+                    label='From validator'
                   >
-                    {truncateAddress(data.fromValidator)}
+                    {truncateAddress(data.originValidator)}
                   </MetaInfo.Default>
                 )
                 : deselectedCount === 1
                   ? (
                     <MetaInfo.Default
                       className='__validator-address deselected'
-                      label='Deselected validator'
+                      label='From validator'
                     >
                       {truncateAddress(deselectedAddresses[0])}
                     </MetaInfo.Default>
@@ -122,7 +135,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 ? (
                   <MetaInfo.Default
                     className='__validator-address newly-selected'
-                    label='Newly selected validator'
+                    label='To validator'
                   >
                     {truncateAddress(newlySelectedAddresses[0])}
                   </MetaInfo.Default>

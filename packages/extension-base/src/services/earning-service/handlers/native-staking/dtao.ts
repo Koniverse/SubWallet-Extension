@@ -745,9 +745,9 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, fromValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
 
-    if (!subnetData || !fromValidator) {
+    if (!subnetData || !originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
@@ -755,11 +755,24 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const selectedValidatorInfo = targetValidators[0];
     const destValidator = selectedValidatorInfo.address;
 
-    if (fromValidator === destValidator) {
+    if (new BigN(amount).lte(0)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+    }
+
+    if (originValidator === destValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
     }
 
-    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(fromValidator, destValidator, netuid, netuid, amount);
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(alphaToTaoPrice);
+
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
+
+    if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+    }
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
 
     return extrinsic;
   }
