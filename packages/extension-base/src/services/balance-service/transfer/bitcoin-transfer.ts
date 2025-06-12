@@ -23,7 +23,7 @@ export interface TransferBitcoinProps extends TransactionFee {
   network: Network
 }
 
-export async function createBitcoinTransaction (params: TransferBitcoinProps): Promise<[Psbt, string, string]> {
+export async function createBitcoinTransaction (params: TransferBitcoinProps): Promise<[Psbt, string, string|undefined]> {
   const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, from, network, to, transferAll, value } = params;
   const feeCustom = _feeCustom as BitcoinFeeRate;
 
@@ -42,7 +42,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       utxos
     };
 
-    const { fee, inputs, outputs, size } = transferAll
+    const { fee, inputs, isCustomFeeRate, outputs, size } = transferAll
       ? determineUtxosForSpendAll(determineUtxosArgs)
       : determineUtxosForSpend(determineUtxosArgs);
 
@@ -100,8 +100,9 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
     }
 
     const customFeeRate = fee / size;
+    const customFeeRateResult = isCustomFeeRate ? customFeeRate.toString() : undefined;
 
-    return [tx, customFeeRate.toString(), transferAmount.toString()];
+    return [tx, transferAmount.toString(), customFeeRateResult];
   } catch (e) {
     if (e instanceof TransactionError) {
       throw e;

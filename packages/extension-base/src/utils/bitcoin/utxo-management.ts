@@ -107,7 +107,8 @@ export function determineUtxosForSpendAll ({ feeRate,
     inputs: filteredUtxos,
     outputs,
     size: sizeInfo.txVBytes,
-    fee
+    fee,
+    isCustomFeeRate: false
   };
 }
 
@@ -207,7 +208,8 @@ export function determineUtxosForSpend ({ amount,
       inputs: neededUtxos,
       outputs,
       size: sizeInfo.txVBytes,
-      fee: newFee
+      fee: newFee,
+      isCustomFeeRate: true
     };
   }
 
@@ -216,7 +218,8 @@ export function determineUtxosForSpend ({ amount,
     inputs: neededUtxos,
     outputs,
     size: sizeInfo.txVBytes,
-    fee
+    fee,
+    isCustomFeeRate: false
   };
 }
 
