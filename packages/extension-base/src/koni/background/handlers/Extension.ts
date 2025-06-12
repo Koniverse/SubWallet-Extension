@@ -1522,7 +1522,6 @@ export default class KoniExtension {
           value: txVal,
           network: network });
 
-
         if (calculatedBitcoinFeeRate) {
           const feeRate = parseFloat(calculatedBitcoinFeeRate);
 
