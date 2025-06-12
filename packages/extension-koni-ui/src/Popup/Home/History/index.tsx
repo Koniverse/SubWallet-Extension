@@ -398,8 +398,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           return -1;
         } else if (PROCESSING_STATUSES.includes(b.status) && !PROCESSING_STATUSES.includes(a.status)) {
           return 1;
-        } else if (b.displayTime !== a.displayTime) {
-          return b.displayTime - a.displayTime;
+        } else if ((!!b.blockTime && !!a.blockTime) && (b.blockTime !== a.blockTime)) {
+          return b.blockTime - a.blockTime;
+        } else if ((!!b.time && !!a.time) && (b.time !== a.time)) {
+          return b.time - a.time;
         } else {
           return (a.apiTxIndex ?? 0) - (b.apiTxIndex ?? 0);
         }
@@ -541,6 +543,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       {
         (isAllAccount || accountAddressItems.length > 1) && (
           <AccountAddressSelector
+            autoSelectFirstItem={true}
             className={'__history-address-selector'}
             items={accountAddressItems}
             onChange={onSelectAccount}

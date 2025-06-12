@@ -42,7 +42,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       utxos
     };
 
-    const { fee, inputs, outputs } = transferAll
+    const { inputs, outputs } = transferAll
       ? determineUtxosForSpendAll(determineUtxosArgs)
       : determineUtxosForSpend(determineUtxosArgs);
 
@@ -81,7 +81,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
             script: pair.bitcoin.output,
             value: input.value // UTXO value in satoshis
           },
-          tapInternalKey: pair.bitcoin.internalPubkey.slice(1) // X-only public key (32 bytes)
+          tapInternalKey: pair.bitcoin.internalPubkey // X-only public key (32 bytes)
         });
       } else {
         throw new Error(`Unsupported address type: ${addressInfo.type}`);
@@ -99,16 +99,13 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       }
     }
 
-    console.log(inputs, inputs.reduce((v, i) => v + i.value, 0));
-    console.log(outputs, (outputs as Array<{value: number}>).reduce((v, i) => v + i.value, 0));
-    console.log(fee, bitcoinFee);
-
     return [tx, transferAmount.toString()];
   } catch (e) {
     if (e instanceof TransactionError) {
       throw e;
     }
 
+    console.warn('Failed to create Bitcoin transaction:', e);
     throw new Error(`You don’t have enough BTC (${convertChainToSymbol(chain)}) for the transaction. Lower your BTC amount and try again`);
   }
 }

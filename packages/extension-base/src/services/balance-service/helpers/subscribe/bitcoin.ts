@@ -26,8 +26,6 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
         bitcoinApi.api.getAddressSummaryInfo(address)
       ]);
 
-      console.log('addressSummaryInfo', addressSummaryInfo);
-
       if (Number(addressSummaryInfo.balance) < 0) {
         return getDefaultBalanceResult();
       }
