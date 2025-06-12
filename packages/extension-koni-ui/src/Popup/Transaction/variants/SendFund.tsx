@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetType, _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -23,14 +23,14 @@ import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwa
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useCoreCreateGetChainSlugsByAccountProxy, useCoreCreateReformatAddress, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
@@ -59,44 +59,6 @@ interface TransferOptions {
 }
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
-
-function getTokenItems (
-  accountProxy: AccountProxy,
-  accountProxies: AccountProxy[],
-  chainInfoMap: Record<string, _ChainInfo>,
-  assetRegistry: Record<string, _ChainAsset>,
-  tokenGroupSlug?: string // is ether a token slug or a multiChainAsset slug
-): TokenSelectorItemType[] {
-  let allowedChains: string[];
-
-  if (!isAccountAll(accountProxy.id)) {
-    // TODO: Review logic getChainsByAccountType after handle transfer for bitcoin
-    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, undefined, accountProxy.specialChain);
-  } else {
-    allowedChains = getChainsByAccountAll(accountProxy, accountProxies, chainInfoMap);
-  }
-
-  const items: TokenSelectorItemType[] = [];
-
-  Object.values(assetRegistry).forEach((chainAsset) => {
-    const originChain = _getAssetOriginChain(chainAsset);
-
-    if (!allowedChains.includes(originChain)) {
-      return;
-    }
-
-    if (!tokenGroupSlug || (chainAsset.slug === tokenGroupSlug || _getMultiChainAsset(chainAsset) === tokenGroupSlug)) {
-      items.push({
-        slug: chainAsset.slug,
-        name: _getAssetName(chainAsset),
-        symbol: _getAssetSymbol(chainAsset),
-        originChain
-      });
-    }
-  });
-
-  return items;
-}
 
 function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<string, _AssetRef>, chainInfoMap: Record<string, _ChainInfo>): ChainItemType[] {
   if (!tokenSlug) {
@@ -158,7 +120,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
 
   const { chainInfoMap, chainStateMap, chainStatusMap, ledgerGenericAllowNetworks, priorityTokens } = useSelector((root) => root.chainStore);
@@ -172,6 +134,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
   const getAccountTokenBalance = useGetAccountTokenBalance();
+  const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
@@ -316,13 +279,30 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
   const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
-    const items = getTokenItems(
-      targetAccountProxy,
-      accountProxies,
-      chainInfoMap,
-      assetRegistry,
-      sendFundSlug
-    );
+    const items = (() => {
+      const allowedChains = getChainSlugsByAccountProxy(targetAccountProxy);
+
+      const result: TokenSelectorItemType[] = [];
+
+      Object.values(assetRegistry).forEach((chainAsset) => {
+        const originChain = _getAssetOriginChain(chainAsset);
+
+        if (!allowedChains.includes(originChain)) {
+          return;
+        }
+
+        if (!sendFundSlug || (chainAsset.slug === sendFundSlug || _getMultiChainAsset(chainAsset) === sendFundSlug)) {
+          result.push({
+            slug: chainAsset.slug,
+            name: _getAssetName(chainAsset),
+            symbol: _getAssetSymbol(chainAsset),
+            originChain
+          });
+        }
+      });
+
+      return result;
+    })();
 
     const tokenBalanceMap = getAccountTokenBalance(
       items.map((item) => item.slug),
@@ -354,7 +334,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     sortTokensByBalanceInSelector(tokenItemsSorted, priorityTokens);
 
     return tokenItemsSorted;
-  }, [accountProxies, assetRegistry, chainInfoMap, chainStateMap, getAccountTokenBalance, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
+  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getChainSlugsByAccountProxy, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
@@ -847,6 +827,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     if (fromValue && assetValue) {
       subscribeMaxTransfer({
         address: fromValue,
+        to: toValue,
         chain: assetRegistry[assetValue].originChain,
         token: assetValue,
         value: transferAmountValue,
@@ -871,7 +852,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');

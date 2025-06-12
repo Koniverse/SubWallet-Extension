@@ -4,8 +4,9 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { resolveAzeroAddressToDomain, resolveAzeroDomainToAddress } from '@subwallet/extension-base/koni/api/dotsama/domain';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _chainInfoToChainType, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainSubstrateAddressPrefix, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountChainType, AccountProxy, AddressJson, AnalyzeAddress, AnalyzedGroup, ResponseInputAccountSubscribe } from '@subwallet/extension-base/types';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
 
 import { isAddress } from '@polkadot/util-crypto';
 
@@ -67,14 +68,13 @@ export const _analyzeAddress = async (data: string, accountProxies: AccountProxy
   const chain = chainInfo.slug;
   const _data = data.trim().toLowerCase();
   const options: AnalyzeAddress[] = [];
-  const currentChainType = _chainInfoToChainType(chainInfo);
   let current: AnalyzeAddress | undefined;
 
   // Filter account proxies
   for (const accountProxy of accountProxies) {
     const _name = accountProxy.name.trim().toLowerCase();
     const nameCondition = isNameValid(_data, _name);
-    const filterAccounts = accountProxy.accounts.filter((account) => account.chainType === currentChainType);
+    const filterAccounts = accountProxy.accounts.filter((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type));
 
     for (const account of filterAccounts) {
       const addressCondition = isStrValidWithAddress(_data, account, chainInfo);
@@ -108,7 +108,7 @@ export const _analyzeAddress = async (data: string, accountProxies: AccountProxy
     }
   }
 
-  const filterContacts = contacts.filter((contact) => contact.chainType === currentChainType);
+  const filterContacts = contacts.filter((contact) => _isChainInfoCompatibleWithAccountInfo(chainInfo, contact.chainType, getKeypairTypeByAddress(contact.address)));
 
   // Filter address book addresses
   for (const contact of filterContacts) {

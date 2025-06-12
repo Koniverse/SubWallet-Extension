@@ -1189,6 +1189,30 @@ export default class TransactionService {
     ].includes(transaction.extrinsicType)) {
       this.handlePostEarningTransaction(id);
     }
+
+    // Trigger balance update for Bitcoin transactions after receiving extrinsicHash
+    if (ExtrinsicType.TRANSFER_BALANCE && transaction.chainType === 'bitcoin') {
+      const balanceService = this.state.balanceService;
+      const inputData = parseTransactionData<ExtrinsicType.TRANSFER_BALANCE>(transaction.data);
+
+      try {
+        const sender = keyring.getPair(inputData.from);
+
+        balanceService.runSubscribeBalanceForAddress(sender.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+          .catch((error) => console.error('Failed to run balance subscription:', error));
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
+        const recipient = keyring.getPair(inputData.to);
+
+        balanceService.runSubscribeBalanceForAddress(recipient.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+          .catch((error) => console.error('Failed to run balance subscription:', error));
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   private handlePostProcessing (id: string) { // must be done after success/failure to make sure the transaction is finalized
@@ -2060,7 +2084,6 @@ export default class TransactionService {
               throw new Error('Bad signature');
             }
 
-            console.log('Transaction Signed:', payload);
             // Emit signed event
             emitter.emit('signed', eventData);
             // Add start info

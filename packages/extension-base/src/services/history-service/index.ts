@@ -189,16 +189,24 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     }
 
     const bitcoinApi = this.chainService.getBitcoinApi(chain);
+    const allParsedItems: TransactionHistoryItem[] = [];
 
     for (const address of addresses) {
+      const existingItems = await this.dbService.getHistories({ address, chain });
+      const maxIndex = existingItems.length > 0 ? Math.max(...existingItems.map((item) => item.apiTxIndex || -1)) : -1;
+
       const transferItems = await bitcoinApi.api.getAddressTransaction(address);
 
-      const parsedItems = Object.values(transferItems).map((i) => {
-        return parseBitcoinTransferData(address, i, chainInfo);
+      const parsedItems = transferItems.map((item, index) => {
+        const parsedItem = parseBitcoinTransferData(address, item, chainInfo);
+
+        return { ...parsedItem, apiTxIndex: maxIndex + index + 1 };
       });
 
-      await this.addHistoryItems(parsedItems);
+      allParsedItems.push(...parsedItems);
     }
+
+    await this.addHistoryItems(allParsedItems);
   }
 
   subscribeHistories (chain: string, proxyId: string, cb: (items: TransactionHistoryItem[]) => void) {
@@ -334,6 +342,9 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       switch (recoverResult.status) {
         case HistoryRecoverStatus.API_INACTIVE:
           break;
+        case HistoryRecoverStatus.TX_PENDING:
+          delete this.#needRecoveryHistories[currentExtrinsicHash];
+          break;
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
@@ -380,7 +391,13 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
 
     histories
       .filter((history) => {
-        return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
+        if ([ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status)) {
+          return true;
+        } else if (history.status === ExtrinsicStatus.SUCCESS && history.chainType === 'bitcoin') {
+          return !history.blockTime;
+        }
+
+        return false;
       })
       .filter((history) => {
         if (history.type === ExtrinsicType.TRANSFER_XCM) {

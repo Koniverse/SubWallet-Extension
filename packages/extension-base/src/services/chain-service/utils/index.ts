@@ -7,6 +7,7 @@ import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-ba
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import { AccountChainType } from '@subwallet/extension-base/types';
+import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -696,6 +697,44 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   }
 
   return AccountChainType.SUBSTRATE;
+};
+
+export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
+  if (accountChainType === AccountChainType.SUBSTRATE) {
+    return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.ETHEREUM) {
+    return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.TON) {
+    return _isChainTonCompatible(chainInfo) && TonKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.CARDANO) {
+    return _isChainCardanoCompatible(chainInfo) && CardanoKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.BITCOIN) {
+    if (!_isChainBitcoinCompatible(chainInfo) || ![...BitcoinMainnetKeypairTypes, ...BitcoinTestnetKeypairTypes].includes(accountType)) {
+      return false;
+    }
+
+    const network = chainInfo.bitcoinInfo?.bitcoinNetwork;
+
+    if (BitcoinMainnetKeypairTypes.includes(accountType)) {
+      return network === 'mainnet';
+    }
+
+    if (BitcoinTestnetKeypairTypes.includes(accountType)) {
+      return network === 'testnet';
+    }
+
+    return false;
+  }
+
+  return false;
 };
 
 export const _getAssetNetuid = (assetInfo: _ChainAsset): number => {

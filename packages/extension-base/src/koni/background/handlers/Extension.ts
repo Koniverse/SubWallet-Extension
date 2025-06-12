@@ -2249,7 +2249,7 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, token, tokenPayFeeSlug, value } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, value } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
@@ -2272,6 +2272,7 @@ export default class KoniExtension {
 
     const _request: CalculateMaxTransferable = {
       address: address,
+      to: to,
       value, // todo: lazy subscribe to improve performance
       cardanoApi: this.#koniState.chainService.getCardanoApi(chain),
       destChain,
