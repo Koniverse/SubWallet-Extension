@@ -400,6 +400,10 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
     return [YieldAction.START_EARNING, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
   }
 
+  if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    return [YieldAction.STAKE, YieldAction.UNSTAKE];
+  }
+
   return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
 }
 
@@ -447,6 +451,14 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
 
     if (hasWithdrawal) {
       result.push(YieldAction.WITHDRAW);
+    }
+  } else if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    result.push(YieldAction.STAKE);
+
+    const activeBalance = new BigNumber(yieldPosition.activeStake);
+
+    if (activeBalance.gt('0')) {
+      result.push(YieldAction.UNSTAKE);
     }
 
     // TODO: check has unstakings to withdraw
