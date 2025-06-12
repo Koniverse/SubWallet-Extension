@@ -2010,7 +2010,6 @@ export default class TransactionService {
     } else {
       this.state.requestService.addConfirmationBitcoin(id, url || EXTENSION_REQUEST_URL, 'bitcoinSendTransactionRequest', payload, {})
         .then(({ isApproved, payload }) => {
-
           if (isApproved) {
             if (!payload) {
               throw new Error('Bad signature');
