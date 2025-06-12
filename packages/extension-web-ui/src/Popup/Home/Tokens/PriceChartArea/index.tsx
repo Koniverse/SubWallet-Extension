@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -11,7 +12,6 @@ import { PriceChart } from './PriceChart';
 import { PriceInfoContainer } from './PriceInfoContainer';
 import { PriceInfoUI } from './PriceInfoUI';
 import { TimeframeSelector } from './TimeframeSelector';
-import { useSelector } from '@subwallet/extension-web-ui/hooks';
 
 type WrapperProps = ThemeProps & {
   priceId?: string;

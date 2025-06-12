@@ -705,8 +705,8 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
     },
 
     '.ton-solo-acc-alert-area': {
-    marginBottom: token.marginXS
-  },
+      marginBottom: token.marginXS
+    },
 
     '.tokens-upper-block': {
       flex: 1,
