@@ -24,7 +24,7 @@ import { getTransactionFromAccountProxyValue, isAccountAll, isRelatedToAstar, op
 import { Button, ButtonProps, Icon, ModalContext, SwIconProps, SwList } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsClockwise, Database, FadersHorizontal, HandsClapping, Leaf, Plus, PlusCircle, SquaresFour, Users, Vault } from 'phosphor-react';
+import { ArrowsClockwise, CirclesThreePlus, Database, FadersHorizontal, HandsClapping, Leaf, Plus, PlusCircle, SquaresFour, Users, Vault } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -50,7 +50,8 @@ enum FilterValue {
   NOMINATION_POOL = 'NOMINATION_POOL',
   DIRECT_NOMINATION = 'NATIVE_STAKING',
   LIQUID_STAKING = 'LIQUID_STAKING',
-  LENDING = 'LENDING'
+  LENDING = 'LENDING',
+  SUBNET_STAKING = 'SUBNET_STAKING'
 }
 
 const FILTER_MODAL_ID = 'earning-positions-filter-modal';
@@ -136,6 +137,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         value: FilterValue.LENDING,
         icon: HandsClapping,
         iconColor: token['green-6']
+      },
+      {
+        label: t('Subnet staking'),
+        value: FilterValue.SUBNET_STAKING,
+        icon: CirclesThreePlus,
+        iconColor: token['blue-6'],
+        weight: 'fill'
       }
     ];
   }, [t, token]);
