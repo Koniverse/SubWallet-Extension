@@ -1975,6 +1975,8 @@ export default class KoniExtension {
     const nativeTokenSlug: string = nativeTokenInfo.slug;
     const isTransferNativeToken = nativeTokenSlug === tokenSlug;
     const chainType = ChainType.BITCOIN;
+    const bitcoinNetwork = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+    const psbtGenerate = bitcoin.Psbt.fromHex(psbt, { network: bitcoinNetwork });
 
     const tokenBaseAmount: AmountData = { value: inputData_.value, symbol: transferTokenInfo.symbol, decimals: transferTokenInfo.decimals || 0 };
     const transferAmount: AmountData = { ...tokenBaseAmount };
@@ -1997,7 +1999,7 @@ export default class KoniExtension {
       estimateFee,
       chainType,
       transferNativeAmount,
-      transaction: psbt,
+      transaction: psbtGenerate,
       data: inputData_,
       extrinsicType: isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN,
       ignoreWarnings: [],
@@ -3431,7 +3433,7 @@ export default class KoniExtension {
     function convertRs (rs: Record<string, SWTransactionBase>, processMap: Record<string, ProcessTransactionData>): Record<string, SWTransactionResult> {
       return Object.fromEntries(Object.entries(rs).map(([key, value]) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const { additionalValidator, eventsHandler, step, transaction, ..._transactionResult } = value;
+        const { additionalValidator, emitterTransaction, eventsHandler, step, transaction, ..._transactionResult } = value;
         const transactionResult = _transactionResult as SWTransactionResult;
 
         if (step?.processId) {

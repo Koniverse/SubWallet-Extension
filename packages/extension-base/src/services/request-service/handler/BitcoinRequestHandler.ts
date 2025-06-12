@@ -277,8 +277,10 @@ export default class BitcoinRequestHandler {
   private async signPsbt (request: ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]): Promise<BitcoinSignPsbtResult> {
     // Extract necessary information from the BitcoinSendTransactionRequest
     const { address, payload } = request.payload;
-    const { allowedSighash, autoFinalized = true, broadcast, psbt, signAtIndex } = payload;
+    const { allowedSighash, autoFinalized = true, broadcast, network, psbt: psbtHex, signAtIndex } = payload;
     const transaction = this.#transactionService.getTransaction(request.id);
+    const bitcoinNetwork = network === 'bitcoinTestnet' ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+    const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoinNetwork });
     let eventData: TransactionEventResponse = {
       id: request.id,
       errors: [],
