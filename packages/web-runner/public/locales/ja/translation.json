@@ -1523,5 +1523,6 @@
   "SubWallet fee": "",
   "Swap fees": "",
   "Estimated total fee": "",
-  "Transaction summary": ""
+  "Transaction summary": "",
+  "Switched network successfully": ""
 }
