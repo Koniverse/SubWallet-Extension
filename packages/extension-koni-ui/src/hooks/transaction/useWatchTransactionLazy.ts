@@ -4,6 +4,7 @@
 import { TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { Form, FormInstance } from '@subwallet/react-ui';
+import { NamePath } from '@subwallet/react-ui/es/form/interface';
 import { useEffect, useState } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
@@ -14,8 +15,10 @@ const useLazyWatchTransaction = <T extends TransactionFormBaseProps, K extends k
   const [isBlur, setIsBlur] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const formObject = form.getFieldInstance(key as NamePath);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const inputElement = form.getFieldInstance(key)?.input as HTMLInputElement;
+    const inputElement = formObject?.input as HTMLInputElement;
 
     if (inputElement) {
       inputElement.onfocus = () => {
