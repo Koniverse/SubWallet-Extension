@@ -626,8 +626,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setLoading(true);
 
     setCurrentItemDisplayCount(DEFAULT_ITEMS_COUNT);
-    console.log('selectedAddress', selectedAddress);
-    console.log('selectedChain', selectedChain);
 
     subscribeTransactionHistory(
       selectedChain,

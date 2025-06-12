@@ -42,7 +42,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       utxos
     };
 
-    const { fee, inputs, outputs } = transferAll
+    const { inputs, outputs } = transferAll
       ? determineUtxosForSpendAll(determineUtxosArgs)
       : determineUtxosForSpend(determineUtxosArgs);
 
@@ -98,10 +98,6 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
         transferAmount = transferAmount.plus(output.value);
       }
     }
-
-    console.log(inputs, inputs.reduce((v, i) => v + i.value, 0));
-    console.log(outputs, (outputs as Array<{value: number}>).reduce((v, i) => v + i.value, 0));
-    console.log(fee, bitcoinFee);
 
     return [tx, transferAmount.toString()];
   } catch (e) {

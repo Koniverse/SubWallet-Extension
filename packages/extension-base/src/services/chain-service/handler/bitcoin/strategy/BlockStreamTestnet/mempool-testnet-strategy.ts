@@ -174,8 +174,6 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
       const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
       const estimates = await response.json() as BlockStreamFeeEstimates;
 
-      console.log('getRecommendedFeeRate: rs', estimates);
-
       if (!response.ok) {
         throw new SWError('BlockStreamTestnetRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
       }

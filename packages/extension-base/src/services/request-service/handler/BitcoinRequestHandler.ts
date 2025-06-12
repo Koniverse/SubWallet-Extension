@@ -76,8 +76,6 @@ export default class BitcoinRequestHandler {
     const isInternal = isInternalRequest(url);
 
     if (['bitcoinSignatureRequest', 'bitcoinSendTransactionRequest', 'bitcoinSendTransactionRequestAfterConfirmation'].includes(type)) {
-      console.log('bitcoinSendTransactionRequest.type', type);
-      console.log('bitcoinSendTransactionRequest.payload', payload);
       const isAlwaysRequired = await this.#requestService.settingService.isAlwaysRequired;
 
       if (isAlwaysRequired) {
@@ -419,9 +417,6 @@ export default class BitcoinRequestHandler {
       if (isApproved) {
         try {
           // Fill signature for some special type
-          console.log('request.type', type);
-          console.log('request.confirmation', confirmation);
-          console.log('request.result', result);
           await this.decorateResultBitcoin(type, confirmation, result);
           const error = validator && validator(result);
 
