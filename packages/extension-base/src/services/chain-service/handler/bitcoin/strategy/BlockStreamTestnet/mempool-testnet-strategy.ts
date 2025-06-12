@@ -209,9 +209,9 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: 1, time: convertTimeMilisec.hourFee },
-          average: { feeRate: 1, time: convertTimeMilisec.halfHourFee },
-          fast: { feeRate: 1, time: convertTimeMilisec.fastestFee },
+          slow: { feeRate: 1.5, time: convertTimeMilisec.hourFee },
+          average: { feeRate: 1.5, time: convertTimeMilisec.halfHourFee },
+          fast: { feeRate: 1.5, time: convertTimeMilisec.fastestFee },
           default: 'slow'
         }
       };
@@ -227,7 +227,11 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
         const estimates = await response.json() as RecommendedFeeEstimates;
 
-        const convertFee = (fee: number) => parseInt(new BigN(fee).toFixed(), 10);
+        const convertFee = (fee: number) => {
+          const adjustedFee = parseInt(new BigN(fee).toFixed(), 10);
+
+          return Math.max(adjustedFee, 1.5);
+        };
 
         return {
           type: 'bitcoin',
