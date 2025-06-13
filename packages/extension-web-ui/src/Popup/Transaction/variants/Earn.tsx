@@ -588,8 +588,9 @@ const Component = ({ className }: ComponentProps) => {
         const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer ?? 1;
         const userSelectedPoolCount = poolTargetValue?.split(',').length ?? 1;
         const label = getValidatorLabel(chainValue);
+        const isRelayChain = _STAKING_CHAIN_GROUP.relay.includes(chainValue);
 
-        if (userSelectedPoolCount < maxCount && label === 'Validator') {
+        if (isRelayChain && (userSelectedPoolCount < maxCount && label === 'Validator')) {
           openAlert({
             title: t('Pay attention!'),
             content: t('You are recommended to choose {{maxCount}} validators to optimize your earnings. Do you wish to continue with {{userSelectedPoolCount}} validator{{x}}?', { replace: { maxCount, userSelectedPoolCount, x: userSelectedPoolCount === 1 ? '' : 's' } }),
