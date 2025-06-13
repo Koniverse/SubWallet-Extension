@@ -5,7 +5,7 @@ import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/backg
 import { RequestSign } from '@subwallet/extension-base/background/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
-import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_ECDSA_KEY, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
+import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 import { InjectContext } from '@subwallet/extension-koni-ui/contexts/InjectContext';
 import { useAlert, useGetAccountByAddress, useGetChainInfoByGenesisHash, useLedger, useMetadata, useNotification, useParseSubstrateRequestPayload, useSelector, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { approveSignPasswordV2, approveSignSignature, cancelSignRequest, shortenMetadata } from '@subwallet/extension-koni-ui/messaging';
@@ -49,10 +49,6 @@ const handleSignature = async (id: string, { signature, signedTransaction }: Sub
 const getChainSlug = (signMode: AccountSignMode, originGenesisHash?: string | null, accountChainInfoSlug?: string) => {
   if (signMode === AccountSignMode.GENERIC_LEDGER) {
     return originGenesisHash ? SUBSTRATE_MIGRATION_KEY : SUBSTRATE_GENERIC_KEY;
-  }
-
-  if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
-    return SUBSTRATE_ECDSA_KEY;
   }
 
   return accountChainInfoSlug || '';

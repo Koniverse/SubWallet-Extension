@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainInfoMap } from '@subwallet/chain-list';
-import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
-export const SUBSTRATE_ECDSA_KEY = 'substrate_ecdsa';
 export const POLKADOT_KEY = 'polkadot';
 export const POLKADOT_SLIP_44 = 354;
 export const RECOVERY_SLUG = '_recovery';
@@ -25,20 +24,6 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isGeneric: true,
     isEthereum: false,
     slip44: 354
-  },
-  {
-    accountName: 'Polkadot Eth',
-    appName: 'Polkadot',
-    networkName: 'Polkadot Eth',
-    genesisHash: '',
-    network: 'PokadotEth',
-    icon: 'substrate',
-    slug: SUBSTRATE_ECDSA_KEY,
-    isDevMode: false,
-    isGeneric: true,
-    isEthereum: false,
-    slip44: 354,
-    scheme: LEDGER_SCHEME.ECDSA
   },
   {
     accountName: 'Polkadot Migration',
@@ -528,13 +513,12 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
   //   ss58_addr_type: 7391
   // }
 ];
-
 export const isLedgerCapable = !!(window as unknown as { USB?: unknown }).USB;
 
 export const PolkadotDerivationPathGens: string[] = [POLKADOT_KEY].map((slug) => ChainInfoMap[slug].substrateInfo?.genesisHash || '');
 export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedgerNetwork)
   .filter((network) => {
-    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY, SUBSTRATE_ECDSA_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
+    return ![POLKADOT_KEY, SUBSTRATE_MIGRATION_KEY].includes(network.slug) && network.slip44 === POLKADOT_SLIP_44 && !network.isGeneric;
   })
   .map(({ genesisHash }) => genesisHash);
 

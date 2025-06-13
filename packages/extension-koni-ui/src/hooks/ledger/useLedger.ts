@@ -55,7 +55,7 @@ const getNetworkByGenesisHash = (ledgerChains: MigrationLedgerNetwork[], genesis
   return ledgerChains.find((network) => network.genesisHash === genesisHash);
 };
 
-const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean): Ledger => {
+const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: string): Ledger => {
   const { isLedgerCapable } = baseState;
 
   assert(isLedgerCapable, ledgerIncompatible);
@@ -93,7 +93,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
   }
 };
 
-export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean): Result {
+export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: string): Result {
   const { t } = useTranslation();
 
   const [ledgerChains, migrateLedgerChains] = useGetSupportedLedger();
@@ -140,7 +140,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
       }
 
       try {
-        return retrieveLedger(chainSlug, ledgerChains, migrateLedgerChains, isEvmNetwork, forceMigration, originGenesisHash, isRecovery);
+        return retrieveLedger(chainSlug, ledgerChains, migrateLedgerChains, isEvmNetwork, forceMigration, originGenesisHash, isRecovery, ledgerScheme);
       } catch (error) {
         setError((error as Error).message);
       }

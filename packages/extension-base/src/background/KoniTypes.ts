@@ -1434,8 +1434,6 @@ export interface LedgerNetwork {
   isRecovery?: boolean;
   /** Slip44 in the derivation path */
   slip44: number;
-  /** Signature substrate scheme */
-  scheme?: LEDGER_SCHEME;
 }
 
 export const enum LEDGER_SCHEME {
