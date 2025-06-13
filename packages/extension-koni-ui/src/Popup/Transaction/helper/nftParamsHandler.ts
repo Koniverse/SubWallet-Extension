@@ -95,7 +95,7 @@ export default function nftParamsHandler (nftItem: NftItem, chain: string) {
   } else if (nftItem.type === _AssetType.PSP34) {
     return psp34Parser(nftItem);
   } else {
-    if (_NFT_CHAIN_GROUP.acala.includes(chain) || _NFT_CHAIN_GROUP.karura.includes(chain) || _NFT_CHAIN_GROUP.bitcountry.includes(chain)) {
+    if (_NFT_CHAIN_GROUP.acala.includes(chain) || _NFT_CHAIN_GROUP.karura.includes(chain)) {
       return acalaParser(nftItem);
     } else if (_NFT_CHAIN_GROUP.rmrk.includes(chain)) {
       return rmrkParser(nftItem);

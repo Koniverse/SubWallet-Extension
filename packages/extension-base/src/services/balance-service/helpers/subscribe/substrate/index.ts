@@ -26,7 +26,6 @@ import { timer } from 'rxjs';
 import { ContractPromise } from '@polkadot/api-contract';
 
 import { subscribeERC20Interval } from '../evm';
-import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
@@ -53,7 +52,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
     substrateApi
   };
 
-  if (!_BALANCE_CHAIN_GROUP.kintsugi.includes(chain) && !_BALANCE_CHAIN_GROUP.genshiro.includes(chain) && !_BALANCE_CHAIN_GROUP.equilibrium_parachain.includes(chain)) {
+  if (!_BALANCE_CHAIN_GROUP.kintsugi.includes(chain)) {
     unsubNativeToken = await subscribeWithSystemAccountPallet(substrateParams);
   }
 
@@ -67,11 +66,6 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
       });
     } else if (_BALANCE_CHAIN_GROUP.statemine.includes(chain)) {
       unsubLocalToken = await subscribeAssetsAccountPallet(substrateParams);
-    } else if (_BALANCE_CHAIN_GROUP.genshiro.includes(chain) || _BALANCE_CHAIN_GROUP.equilibrium_parachain.includes(chain)) {
-      unsubLocalToken = await subscribeEquilibriumTokenBalance({
-        ...substrateParams,
-        includeNativeToken: true
-      });
     } else if (_BALANCE_CHAIN_GROUP.centrifuge.includes(chain)) {
       unsubLocalToken = await subscribeOrmlTokensPallet(substrateParams);
     }
