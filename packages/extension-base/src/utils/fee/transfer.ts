@@ -8,7 +8,7 @@ import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-p
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
-import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
+import { createSubstrateExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, _isAcrossTestnetBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
@@ -169,7 +169,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         nativeTokenInfo: nativeToken
       });
     } else {
-      [transaction] = await createSubstrateExtrinsic({
+      [transaction] = await createSubstrateExtrinsicV2({
         transferAll: false,
         value,
         from: address,
