@@ -4,7 +4,7 @@
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { useIsPopup, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes, useSidePanelUtils, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, CommonProcessAction } from '@subwallet/extension-koni-ui/reducer';
 import { ClaimRewardParams } from '@subwallet/extension-koni-ui/types';
@@ -17,22 +17,25 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
   const notify = useNotification();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isPopup = useIsPopup();
+  const { closeSidePanel } = useSidePanelUtils();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
 
   const { onDone } = useTransactionContext<ClaimRewardParams>();
 
   const onHandleOneSignConfirmation = useCallback((transactionProcessId: string) => {
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({
         allowedPath: '/transaction-submission',
         params: {
           'transaction-process-id': transactionProcessId
         }
       }).then(window.close).catch(console.log);
+
+      isSidePanelMode && closeSidePanel();
     } else {
       navigate(`/transaction-submission?transaction-process-id=${transactionProcessId}`);
     }
-  }, [isPopup, navigate]);
+  }, [closeSidePanel, isExpanseMode, isSidePanelMode, navigate]);
 
   const onError = useCallback(
     (error: Error) => {

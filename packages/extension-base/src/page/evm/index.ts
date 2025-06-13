@@ -9,13 +9,13 @@ import { SendRequest } from '@subwallet/extension-base/page/types';
 import { JsonRpcRequest, JsonRpcResponse, JsonRpcSuccess } from 'json-rpc-engine';
 import { RequestArguments } from 'web3-core';
 
-export interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
+interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
   method: 'net_version';
 }
 
 let subscribeFlag = false;
 
-export class SubWalletEvmProvider extends SafeEventEmitter implements EvmProvider {
+export default class SubWalletEvmProvider extends SafeEventEmitter implements EvmProvider {
   public readonly isSubWallet = true;
   public readonly isMetaMask = false;
   public readonly version;

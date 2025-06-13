@@ -6,7 +6,7 @@ import AppInstructionModal from '@subwallet/extension-koni-ui/components/Modal/C
 import { StaticDataProps } from '@subwallet/extension-koni-ui/components/Modal/Campaign/AppPopupModal';
 import { APP_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, Image, ModalContext } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import { X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
@@ -59,20 +59,22 @@ const Component = ({ className, data, dismissBanner, instructionDataList, onClic
   return (
     <>
       <div className={className}>
-        <Image
-          className='banner-image'
+        <div
+          className={'banner-image'}
           onClick={_onClickBanner}
-          src={data.media}
-          width='100%'
+          style={{ backgroundImage: `url(${data.media})` }}
         />
+
         {!!dismissBanner && (
           <Button
             className={'dismiss-button'}
-            icon={<Icon
-              phosphorIcon={X}
-              size={'sm'}
-              weight={'bold'}
-            />}
+            icon={(
+              <Icon
+                phosphorIcon={X}
+                size={'sm'}
+                weight={'bold'}
+              />
+            )}
             onClick={_dismissBanner}
             shape={'round'}
             size={'xs'}
@@ -98,6 +100,14 @@ const Component = ({ className, data, dismissBanner, instructionDataList, onClic
 const Banner = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     position: 'relative',
+
+    '.banner-image': {
+      height: 68,
+      borderRadius: token.borderRadiusLG,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+      backgroundPosition: '0 50%'
+    },
 
     '.dismiss-button': {
       position: 'absolute',

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { EarningTypeTag, Table } from '@subwallet/extension-web-ui/components';
 import { BN_TEN } from '@subwallet/extension-web-ui/constants';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
@@ -38,13 +39,26 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
       key: 'token_name',
       className: '__table-token-col',
       render: (row: YieldPoolInfo) => {
+        const isSubnetStaking = [YieldPoolType.SUBNET_STAKING].includes(row.type);
+        const subnetLogoNetwork = `subnet-${row.metadata.subnetData?.netuid || 0}`;
+
         return (
           <div className={'__row-token-info-wrapper'}>
-            <Logo
-              className={'__row-token-logo'}
-              network={row.metadata.logo || row.chain}
-              size={48}
-            />
+            {!isSubnetStaking || !DefaultLogosMap[subnetLogoNetwork]
+              ? (
+                <Logo
+                  className={'__item-logo'}
+                  network={row.metadata.logo || row.chain}
+                  size={40}
+                />)
+              : (
+                <Logo
+                  className='__item-logo'
+                  isShowSubLogo={false}
+                  network={subnetLogoNetwork}
+                  size={40}
+                />
+              )}
             <div className={'__row-token-meta'}>
               <div className={'__row-token-title'}>
                 <span>{assetRegistry[row.metadata.inputAsset]?.symbol}</span>
@@ -145,9 +159,31 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
 
           return undefined;
         })();
+        const label = (() => {
+          const isSubnetStaking = [YieldPoolType.SUBNET_STAKING].includes(row.type);
+          const isBittensor = row.chain === 'bittensor';
+
+          if (isSubnetStaking) {
+            return t('Emission');
+          }
+
+          if (isBittensor) {
+            return t('Max APY');
+          }
+
+          return undefined;
+        })();
 
         return (
           <div className={'__row-reward-wrapper'}>
+            {
+              !!label && (
+                <span className={'__row-reward-label'}>
+                  {label}:
+                </span>
+              )
+            }
+
             {apy
               ? (
                 <Number
@@ -272,7 +308,18 @@ export const EarningPoolsTable = styled(Component)<Props>(({ theme: { token } }:
       }
     },
 
+    '.__row-reward-wrapper': {
+      color: token.colorSuccess
+    },
+
+    '.__row-reward-label': {
+      '&:after': {
+        content: '" "'
+      }
+    },
+
     '.__row-reward-per-year-value': {
+      display: 'inline',
       fontSize: token.fontSizeLG,
       lineHeight: token.lineHeightLG,
       fontWeight: token.fontWeightStrong,
@@ -352,9 +399,6 @@ export const EarningPoolsTable = styled(Component)<Props>(({ theme: { token } }:
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap'
-    },
-    '.__row-reward-wrapper': {
-      color: token.colorSuccess
     },
     '.__item-tag': {
       marginRight: 0,

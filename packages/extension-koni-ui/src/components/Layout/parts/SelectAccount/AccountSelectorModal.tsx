@@ -10,7 +10,7 @@ import ExportAllSelector from '@subwallet/extension-koni-ui/components/Layout/pa
 import SelectAccountFooter from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount/Footer';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { ACCOUNT_CHAIN_ADDRESSES_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
-import { useDefaultNavigate, useIsPopup, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useExtensionDisplayModes, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -88,7 +88,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const navigate = useNavigate();
   const { setStateSelectAccount } = useSetSessionLatest();
   const isModalVisible = useMemo(() => checkActive(modalId), [checkActive]);
-  const isPopup = useIsPopup();
+  const { isPopupMode } = useExtensionDisplayModes();
 
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
@@ -419,7 +419,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           <>
             {t('Select account')}
 
-            {isPopup && (
+            {isPopupMode && (
               <Button
                 {...accountSettingButtonProps}
                 className={'__account-setting-button -schema-header'}

@@ -111,6 +111,8 @@ export interface ApproveStepMetadata {
   contractAddress: string;
   spenderAddress: string;
   amount?: string;
+  owner?: string;
+  isUniswapApprove?: boolean;
 }
 
 export interface RequestSubscribeProcessById {

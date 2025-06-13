@@ -3,7 +3,7 @@
 
 import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { hasAnyAccountForMigration } from '@subwallet/extension-base/services/keyring-service/utils';
-import { useDefaultNavigate, useIsPopup } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import { saveMigrationAcknowledgedStatus } from '@subwallet/extension-koni-ui/messaging';
 import { migrateSoloAccount, migrateUnifiedAndFetchEligibleSoloAccounts } from '@subwallet/extension-koni-ui/messaging/migrate-unified-account';
 import { BriefView } from '@subwallet/extension-koni-ui/Popup/MigrateAccount/BriefView';
@@ -40,7 +40,7 @@ function Component ({ className = '' }: Props) {
   const [resultProxyIds, setResultProxyIds] = useState<string[]>([]);
   const [soloAccountToBeMigratedGroups, setSoloAccountToBeMigratedGroups] = useState<SoloAccountToBeMigrated[][]>([]);
   const isAcknowledgedUnifiedAccountMigration = useSelector((state: RootState) => state.settings.isAcknowledgedUnifiedAccountMigration);
-  const isPopup = useIsPopup();
+  const { isPopupMode } = useExtensionDisplayModes();
 
   const accountProxies = useSelector((root: RootState) => root.accountState.accountProxies);
 
@@ -122,10 +122,10 @@ function Component ({ className = '' }: Props) {
   }, [goHome]);
 
   useEffect(() => {
-    if (!isPopup) {
+    if (!isPopupMode) {
       goHome();
     }
-  }, [goHome, isPopup]);
+  }, [goHome, isPopupMode]);
 
   return (
     <>

@@ -588,8 +588,9 @@ const Component = ({ className }: ComponentProps) => {
         const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer ?? 1;
         const userSelectedPoolCount = poolTargetValue?.split(',').length ?? 1;
         const label = getValidatorLabel(chainValue);
+        const isRelayChain = _STAKING_CHAIN_GROUP.relay.includes(chainValue);
 
-        if (userSelectedPoolCount < maxCount && label === 'Validator') {
+        if (isRelayChain && (userSelectedPoolCount < maxCount && label === 'Validator')) {
           openAlert({
             title: t('Pay attention!'),
             content: t('You are recommended to choose {{maxCount}} validators to optimize your earnings. Do you wish to continue with {{userSelectedPoolCount}} validator{{x}}?', { replace: { maxCount, userSelectedPoolCount, x: userSelectedPoolCount === 1 ? '' : 's' } }),
@@ -686,6 +687,7 @@ const Component = ({ className }: ComponentProps) => {
 
   const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [earningRate, setEarningRate] = useState<number>(0);
+  const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const isDisabledSubnetContent = useMemo(
     () =>
@@ -762,10 +764,12 @@ const Component = ({ className }: ComponentProps) => {
 
   const closeSlippageModal = useCallback(() => {
     inactiveModal(EARNING_SLIPPAGE_MODAL);
+    setIsSlippageModalVisible(false);
   }, [inactiveModal]);
 
   const onOpenSlippageModal = useCallback(() => {
     activeModal(EARNING_SLIPPAGE_MODAL);
+    setIsSlippageModalVisible(true);
   }, [activeModal]);
 
   const renderSubnetStaking = useCallback(() => {
@@ -1617,7 +1621,7 @@ const Component = ({ className }: ComponentProps) => {
                     />
                   </div>
 
-                  {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
+                  {(poolType === YieldPoolType.NOMINATION_POOL) && (
                     <Form.Item
                       name={'target'}
                     >
@@ -1634,7 +1638,7 @@ const Component = ({ className }: ComponentProps) => {
                     </Form.Item>
                   )}
 
-                  {poolType === YieldPoolType.NATIVE_STAKING && (
+                  {(poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) && (
                     <Form.Item
                       name={'target'}
                     >
@@ -1741,12 +1745,14 @@ const Component = ({ className }: ComponentProps) => {
         )
       }
 
-      <SlippageModal
-        modalId={EARNING_SLIPPAGE_MODAL}
-        onApplySlippage={onSelectSlippage}
-        onCancel={closeSlippageModal}
-        slippageValue={maxSlippage}
-      />
+      {isSlippageModalVisible && (
+        <SlippageModal
+          modalId={EARNING_SLIPPAGE_MODAL}
+          onApplySlippage={onSelectSlippage}
+          onCancel={closeSlippageModal}
+          slippageValue={maxSlippage}
+        />
+      )}
     </>
   );
 };

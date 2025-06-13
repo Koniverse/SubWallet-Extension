@@ -345,7 +345,7 @@ const useGetSwapProcessStepContent = () => {
               />
               &nbsp;
 
-              {`on ${analysisResult.chainName} for swap`}
+              {`on ${analysisResult.chainName}`}
             </div>
           </StepContent>
         );

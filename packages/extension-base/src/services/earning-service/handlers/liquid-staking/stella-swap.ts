@@ -24,15 +24,13 @@ export const getStellaswapLiquidStakingContract = (networkKey: string, assetAddr
   return new evmApi.api.eth.Contract(ST_LIQUID_TOKEN_ABI, assetAddress, options);
 };
 
-const APR_STATS_URL = 'https://apr-api.stellaswap.com/api/v1/stdot';
+const APR_STATS_URL = 'https://stdot-apr.stellaswap.com/';
 
 const SUBWALLET_REFERRAL = '0x7e6815f45E624768548d085231f2d453f16FD7DD';
 const TOP_HOLDER = '0x4300e09284e3bB4d9044DdAB31EfAF5f3301DABa';
 
 interface StellaswapApr {
-  code: number,
-  result: number,
-  isSuccess: boolean
+  stDOTAPR: number,
 }
 
 interface StellaswapUnbonding {
@@ -120,7 +118,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
         assetEarning: [
           {
             slug: this.rewardAssets[0],
-            apr: (aprObject as StellaswapApr).result,
+            apr: (aprObject as StellaswapApr).stDOTAPR,
             exchangeRate: exchangeRate
           }
         ],
@@ -132,7 +130,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
           defaultUnstake: '0',
           fastUnstake: '0'
         },
-        totalApr: (aprObject as StellaswapApr).result,
+        totalApr: (aprObject as StellaswapApr).stDOTAPR,
         tvl: (tvl as number).toString()
       }
     };

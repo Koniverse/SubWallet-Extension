@@ -9,7 +9,7 @@ import { changeAuthorizationAll, forgetAllSite } from '@subwallet/extension-web-
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-web-ui/stores/utils';
 import { ManageWebsiteAccessDetailParam, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { FadersHorizontal, GearSix, GlobeHemisphereWest, Plugs, PlugsConnected, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -47,6 +47,10 @@ function getAccountCount (item: AuthUrlInfo, accountProxies: AccountProxy[]): nu
         return authType.includes('ton') && item.isAllowedMap[account.address];
       }
 
+      if (isCardanoAddress(account.address)) {
+        return authType.includes('cardano') && item.isAllowedMap[account.address];
+      }
+
       return false;
     });
   }).length;
@@ -58,6 +62,7 @@ const FILTER_MODAL_ID = 'manage-website-access-filter-id';
 enum FilterValue {
   SUBSTRATE = 'substrate',
   ETHEREUM = 'ethereum',
+  CARDANO = 'cardano',
   BLOCKED = 'blocked',
   Connected = 'connected',
 }
@@ -94,6 +99,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           if (item.isAllowed) {
             return true;
           }
+        } else if (filter === FilterValue.CARDANO) {
+          if (item.accountAuthTypes?.includes('cardano')) {
+            return true;
+          }
         }
       }
 
@@ -109,6 +118,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return [
       { label: t('Substrate dApp'), value: FilterValue.SUBSTRATE },
       { label: t('Ethereum dApp'), value: FilterValue.ETHEREUM },
+      { label: t('Cardano dApp'), value: FilterValue.CARDANO },
       { label: t('Blocked dApp'), value: FilterValue.BLOCKED },
       { label: t('Connected dApp'), value: FilterValue.Connected }
     ];
