@@ -29,6 +29,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { SubnetInfoDesktopPart } from './desktop/SubnetInfoDesktopPart';
+
 type Props = ThemeProps;
 
 type ComponentProp = {
@@ -204,6 +206,7 @@ function Component ({ compound,
       }
     ];
   }, [isChainUnsupported, onEarnMore]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <>
@@ -250,14 +253,25 @@ function Component ({ compound,
                   />
                 </div>
                 <div className={'__middle-part-item-wrapper'}>
-                  <WithdrawInfoDesktopPart
-                    inputAsset={inputAsset}
-                    poolInfo={poolInfo}
-                    transactionChainValue={transactionChainValue}
-                    transactionFromValue={transactionFromValue}
-                    unstakings={compound.unstakings}
-                  />
+                  {
+                    isSubnetStaking
+                      ? (
+                        <SubnetInfoDesktopPart
+                          poolInfo={poolInfo}
+                        />
+                      )
+                      : (
+                        <WithdrawInfoDesktopPart
+                          inputAsset={inputAsset}
+                          poolInfo={poolInfo}
+                          transactionChainValue={transactionChainValue}
+                          transactionFromValue={transactionFromValue}
+                          unstakings={compound.unstakings}
+                        />
+                      )
+                  }
                 </div>
+
               </div>
               <AccountInfoDesktopPart
                 compound={compound}
@@ -446,10 +460,11 @@ const EarningPositionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Prop
 
   '.__middle-part-item-wrapper': {
     flex: '1 1 384px',
-    display: 'flex'
+    display: 'flex',
+    overflow: 'hidden'
   },
 
-  '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part': {
+  '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part, .__subnet-info-desktop-part': {
     marginLeft: 8,
     marginRight: 8,
     marginBottom: 16

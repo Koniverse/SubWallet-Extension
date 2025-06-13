@@ -90,6 +90,7 @@ const Component: React.FC<Props> = ({ className, compound,
   }, [assetRegistry, compound]);
 
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
   const onCloseNominationModal = useCallback(() => {
     inactiveModal(EARNING_NOMINATION_MODAL);
@@ -139,7 +140,7 @@ const Component: React.FC<Props> = ({ className, compound,
       render: (row: YieldPositionInfo) => {
         return (
           <div className={CN('__row-active-stake-wrapper', {
-            '-has-derivative': isSpecial
+            '-has-derivative': isSpecial || isSubnetStaking
           })}
           >
             <div className={'__active-stake'}>
@@ -160,6 +161,21 @@ const Component: React.FC<Props> = ({ className, compound,
                       decimal={deriveAsset?.decimals || 0}
                       suffix={deriveAsset?.symbol}
                       value={row.activeStake}
+                    />
+                  </div>
+                </div>
+              )
+            }
+
+            {
+              isSubnetStaking && (
+                <div className={'__derivative-balance'}>
+                  <span className={'__derivative-title'}>{`${t('Derivative balance')}: `}</span>
+                  <div className={'__derivative-balance-value'}>
+                    <Number
+                      decimal={inputAsset?.decimals || 0}
+                      suffix={row.subnetData?.subnetSymbol}
+                      value={row.subnetData?.originalTotalStake || ''}
                     />
                   </div>
                 </div>
@@ -268,12 +284,12 @@ const Component: React.FC<Props> = ({ className, compound,
 
     if (type === YieldPoolType.NOMINATION_POOL) {
       result.push(poolCol);
-    } else if (type === YieldPoolType.NATIVE_STAKING) {
+    } else if (type === YieldPoolType.NATIVE_STAKING || isSubnetStaking) {
       result.push(nominationCol);
     }
 
     return result;
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isSpecial, t, type]);
+  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isSpecial, isSubnetStaking, t, type]);
 
   const getRowKey = useCallback((item: YieldPositionInfo) => {
     return item.address;
