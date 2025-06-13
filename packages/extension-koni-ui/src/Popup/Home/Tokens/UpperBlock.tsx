@@ -195,7 +195,7 @@ function Component (
           onClick={onOpenBuyTokens}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('Buy token')}
+          tooltip={t('Buy & sell token')}
         />
       </ActionButtonsContainer>
     </div>
