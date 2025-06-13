@@ -318,7 +318,7 @@ export class SubstrateChainHandler extends AbstractChainHandler {
       existed.connect();
 
       if (apiUrl !== existed.apiUrl) {
-        await existed.updateApiUrl(apiUrl);
+        await existed.updateApiUrl(apiUrl, chainSlug);
       }
 
       // Update data in case of existed api (if needed - old provider cannot connect)

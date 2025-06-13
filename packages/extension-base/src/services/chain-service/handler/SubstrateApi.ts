@@ -4,6 +4,7 @@
 import '@polkadot/types-augment';
 
 import { options as acalaOptions } from '@acala-network/api';
+import { SubstrateApi as DedotSubstrateApi } from '@dedot/chaintypes/substrate';
 import { GearApi } from '@gear-js/api';
 import { rpc as oakRpc, types as oakTypes } from '@oak-foundation/types';
 import { MetadataItem } from '@subwallet/extension-base/background/KoniTypes';
@@ -13,7 +14,8 @@ import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/ha
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
-import { DedotClient, SmoldotProvider, WsProvider as DedotWsProvider } from 'dedot';
+import { DedotClient, ISubstrateClient, LegacyClient, SmoldotProvider, WsProvider as DedotWsProvider } from 'dedot';
+import { RpcVersion } from 'dedot/types';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
 import * as smoldot from 'smoldot';
 
@@ -43,10 +45,27 @@ if (typesBundle.spec) {
 
 type DedotProvider = DedotWsProvider | SmoldotProvider;
 
+// todo: can move to static data
+const legacyChains = [
+  'moonbeam', 'aleph', 'astar', 'acala', 'alephTest', 'aventus',
+  'moonbase', 'bifrost_dot', 'bifrost_testnet', 'calamari', 'amplitude', 'amplitude_test',
+  'clover', 'hydradx_main', 'edgeware', 'centrifuge', 'interlay', 'nodle',
+  'darwinia2', 'sora_ksm', 'polkadex', 'composableFinance', 'phala', 'crust',
+  'karura', 'kilt', 'basilisk', 'altair', 'kintsugi', 'picasso',
+  'zeitgeist', 'shadow', 'robonomics', 'crabParachain', 'chainx', 'acala_testnet',
+  'mangatax_para', 'origintrail', 'kabocha', 'ternoa', 'pendulum', 'kilt_peregrine',
+  'xx_network', 'frequency', 'ipci', 'shiden', 'logion', 'polymesh',
+  'sora_substrate', 'joystream', 'krest_network', 'deeper_network', 'energy_web_x', 'manta_network',
+  'polimec', 'xcavate', 'energy_web_x_testnet', 'energy_web_x_rococo', 'liberlandTest', 'liberland',
+  'tangleTest', 'dentnet', 'hydradx_rococo', 'creditcoinTest', 'acurast', 'humanode',
+  'dbcchain', 'availTuringTest', 'avail_mainnet', 'curio', 'peaq', 'cere',
+  'creditcoin_native', 'tangle', 'jamton', 'truth_network'
+];
+
 export class SubstrateApi implements _SubstrateApi {
   chainSlug: string;
   api: ApiPromise;
-  client: DedotClient;
+  client: ISubstrateClient<DedotSubstrateApi[RpcVersion]>;
   providerName?: string;
   provider: ProviderInterface;
   apiUrl: string;
@@ -189,10 +208,12 @@ export class SubstrateApi implements _SubstrateApi {
     return api;
   }
 
-  private createClient (apiUrl: string) {
+  private createClient (apiUrl: string, chainSlug?: string) { // todo: chainSlug is required
     // todo: re-check metadata, typesBundle, registry,
     const provider = this.createDeDotProvider(apiUrl);
-    const client = new DedotClient({ provider });
+    const client: ISubstrateClient<DedotSubstrateApi[RpcVersion]> = chainSlug && legacyChains.includes(chainSlug)
+      ? new LegacyClient({ provider, throwOnUnknownApi: false })
+      : new DedotClient({ provider, throwOnUnknownApi: false });
 
     client.on('connected', () => console.log(`Dedot: On successfully ${apiUrl}`));
     client.on('ready', () => {
@@ -215,7 +236,7 @@ export class SubstrateApi implements _SubstrateApi {
     return client;
   }
 
-  private stopListenClientEvent (client: DedotClient) {
+  private stopListenClientEvent (client: ISubstrateClient<DedotSubstrateApi[RpcVersion]>) {
     client.off('connected');
     client.off('ready');
     client.off('disconnected');
@@ -229,7 +250,7 @@ export class SubstrateApi implements _SubstrateApi {
     this.registry = new TypeRegistry();
     this.metadata = metadata;
     this.provider = this.createProvider(apiUrl);
-    this.client = this.createClient(apiUrl);
+    this.client = this.createClient(apiUrl, chainSlug);
     this.api = this.createApi(this.provider, externalApiPromise);
 
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
@@ -244,7 +265,7 @@ export class SubstrateApi implements _SubstrateApi {
     return this.handleClientReady.promise;
   }
 
-  async updateApiUrl (apiUrl: string) {
+  async updateApiUrl (apiUrl: string, chainSlug?: string) {
     if (this.apiUrl === apiUrl) {
       return;
     }
@@ -265,7 +286,7 @@ export class SubstrateApi implements _SubstrateApi {
 
     // Create new provider and api
     this.apiUrl = apiUrl;
-    this.client = this.createClient(apiUrl);
+    this.client = this.createClient(apiUrl, chainSlug);
     this.provider = this.createProvider(apiUrl);
     this.api = this.createApi(this.provider);
   }

@@ -5,6 +5,7 @@
 
 import type { ApiInterfaceRx } from '@polkadot/api/types';
 
+import { SubstrateApi as DedotSubstrateApi } from '@dedot/chaintypes';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _CrowdloanFund } from '@subwallet/chain-list/types';
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { AccountState, TxByMsgResponse } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/types';
@@ -12,7 +13,8 @@ import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chai
 import { TonWalletContract } from '@subwallet/keyring/types';
 import { Cell } from '@ton/core';
 import { Address, Contract, OpenedContract } from '@ton/ton';
-import { DedotClient } from 'dedot';
+import { ISubstrateClient } from 'dedot';
+import { RpcVersion } from 'dedot/types';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import Web3 from 'web3';
 
@@ -72,7 +74,7 @@ export interface _ChainBaseApi {
   isApiReadyOnce: boolean;
   isApiConnected: boolean; // might be redundant
   connectionStatus: _ChainConnectionStatus; // might be redundant
-  updateApiUrl: (apiUrl: string) => Promise<void>;
+  updateApiUrl: (apiUrl: string, chainSlug?: string) => Promise<void>;
   connect: () => void;
   disconnect: () => Promise<void>;
   recoverConnect: () => Promise<void>;
@@ -97,7 +99,7 @@ export interface _SubstrateApiState {
 
 export interface _SubstrateApi extends _SubstrateApiState, _ChainBaseApi, _SubstrateApiAdapter {
   api: ApiPromise;
-  client: DedotClient
+  client: ISubstrateClient<DedotSubstrateApi[RpcVersion]>;
   isReady: Promise<_SubstrateApi>;
   isClientReady: Promise<_SubstrateApi>;
   connect: (_callbackUpdateMetadata?: (substrateApi: _SubstrateApi) => void) => void;
