@@ -5,8 +5,8 @@ import { _AssetType } from '@subwallet/chain-list/types';
 import { AddressBalanceResult, APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
-import { BalanceItem, SusbcribeBitcoinPalletBalance, UtxoResponseItem } from '@subwallet/extension-base/types';
-import { filterAssetsByChainAndType, filteredOutTxsUtxos, getInscriptionUtxos, getRuneUtxos } from '@subwallet/extension-base/utils';
+import { BalanceItem, SusbcribeBitcoinPalletBalance } from '@subwallet/extension-base/types';
+import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 
 function getDefaultBalanceResult (): AddressBalanceResult {
   return {
@@ -19,46 +19,12 @@ function getDefaultBalanceResult (): AddressBalanceResult {
   };
 }
 
-export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
-  try {
-    const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
-      await bitcoinApi.api.getUtxos(address),
-      await getRuneUtxos(bitcoinApi, address),
-      await getInscriptionUtxos(bitcoinApi, address)
-    ]);
-
-    let filteredUtxos: UtxoResponseItem[];
-
-    if (!utxos || !utxos.length) {
-      return [];
-    }
-
-    // filter out pending utxos
-    // filteredUtxos = filterOutPendingTxsUtxos(utxos);
-
-    // filter out rune utxos
-    filteredUtxos = filteredOutTxsUtxos(utxos, runeTxsUtxos);
-
-    // filter out dust utxos
-    // filter out inscription utxos
-    filteredUtxos = filteredOutTxsUtxos(utxos, inscriptionUtxos);
-
-    return filteredUtxos;
-  } catch (error) {
-    console.log('Error while fetching Bitcoin balances', error);
-
-    return [];
-  }
-};
-
 async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) {
   return await Promise.all(addresses.map(async (address) => {
     try {
       const [addressSummaryInfo] = await Promise.all([
         bitcoinApi.api.getAddressSummaryInfo(address)
       ]);
-
-      console.log('addressSummaryInfo', addressSummaryInfo);
 
       if (Number(addressSummaryInfo.balance) < 0) {
         return getDefaultBalanceResult();

@@ -4,3 +4,4 @@
 export * from './crowdloan';
 export * from './token';
 export * from './staking';
+export * from './address';

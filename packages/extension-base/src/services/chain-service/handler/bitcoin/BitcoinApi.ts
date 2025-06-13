@@ -1,9 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import '@polkadot/types-augment';
-
-import { BlockStreamRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream';
+import { BlockStreamTestnetRequestStrategy, MempoolTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStreamTestnet';
+import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { BehaviorSubject } from 'rxjs';
@@ -12,6 +11,8 @@ import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
 
 // const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
+// const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
+// const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
 
 export class BitcoinApi implements _BitcoinApi {
   chainSlug: string;
@@ -32,13 +33,26 @@ export class BitcoinApi implements _BitcoinApi {
     this.apiUrl = apiUrl;
     this.providerName = providerName || 'unknown';
     this.isReadyHandler = createPromiseHandler<_BitcoinApi>();
-    this.api = new BlockStreamRequestStrategy(apiUrl);
+    this.api = this.createApiStrategy(apiUrl);
 
     this.connect();
   }
 
   get isApiConnected (): boolean {
     return this.isApiConnectedSubject.getValue();
+  }
+
+  private createApiStrategy (apiUrl: string): BitcoinApiStrategy {
+    const isTestnet = apiUrl.includes('testnet');
+    const isBlockstreamUrl = apiUrl.includes('blockstream');
+
+    if (isTestnet) {
+      return isBlockstreamUrl
+        ? new BlockStreamTestnetRequestStrategy(apiUrl)
+        : new MempoolTestnetRequestStrategy(apiUrl);
+    }
+
+    return new SubWalletMainnetRequestStrategy(apiUrl);
   }
 
   get connectionStatus (): _ChainConnectionStatus {
@@ -68,7 +82,9 @@ export class BitcoinApi implements _BitcoinApi {
 
     await this.disconnect();
     this.apiUrl = apiUrl;
-    this.api = new BlockStreamRequestStrategy(apiUrl);
+
+    this.api = this.createApiStrategy(apiUrl);
+
     this.connect();
   }
 
@@ -83,7 +99,6 @@ export class BitcoinApi implements _BitcoinApi {
   }
 
   async disconnect () {
-    this.api.stop();
     this.onDisconnect();
 
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);

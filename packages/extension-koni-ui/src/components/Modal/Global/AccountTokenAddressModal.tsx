@@ -110,7 +110,8 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
       title={t<string>('Select address type')}
     >
       <div>
-        <div className={'sub-title'}>
+        {/* TODO: Move this description content into a prop passed to the component */}
+        <div className={'description'}>
           {t('SubWallet supports three Bitcoin address types for receiving and transferring assets. Make sure you choose the correct address type to avoid risks of fund loss. ')}
           <a
             href={LEARN_MORE_DOCS_URL}
@@ -142,7 +143,7 @@ const AccountTokenAddressModal = styled(Component)<Props>(({ theme: { token } }:
       marginTop: 8
     },
 
-    '.sub-title': {
+    '.description': {
       paddingBottom: token.padding,
       fontSize: token.fontSizeSM,
       fontWeight: token.bodyFontWeight,

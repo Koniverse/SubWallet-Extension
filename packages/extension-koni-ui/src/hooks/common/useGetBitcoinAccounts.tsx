@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import { AccountInfoType, AccountTokenAddress } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinAccountDetails } from '@subwallet/extension-koni-ui/utils';
-import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes } from '@subwallet/keyring/types';
 import { useCallback } from 'react';
 
 const transformBitcoinAccounts = (
@@ -13,12 +14,9 @@ const transformBitcoinAccounts = (
   tokenSlug: string,
   chainInfo: _ChainInfo
 ): AccountTokenAddress[] => {
-  const isBitcoinTestnet = chainInfo.isTestnet;
-  const keypairTypes = isBitcoinTestnet ? BitcoinTestnetKeypairTypes : BitcoinMainnetKeypairTypes;
-
   return accounts
     .filter(
-      (acc) => keypairTypes.includes(acc.type)
+      (acc) => _isChainInfoCompatibleWithAccountInfo(chainInfo, AccountChainType.BITCOIN, acc.type)
     )
     .map((item) => ({
       accountInfo: item,
@@ -28,9 +26,9 @@ const transformBitcoinAccounts = (
 };
 
 const useGetBitcoinAccounts = () => {
-  return useCallback((chainSlug: string, tokenSlug: string, chainInfo: _ChainInfo, accountProxy: AccountInfoType[]): AccountTokenAddress[] => {
+  return useCallback((chainSlug: string, tokenSlug: string, chainInfo: _ChainInfo, accounts: AccountInfoType[]): AccountTokenAddress[] => {
     const accountTokenAddressList = transformBitcoinAccounts(
-      accountProxy || [],
+      accounts || [],
       chainSlug,
       tokenSlug,
       chainInfo

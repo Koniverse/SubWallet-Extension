@@ -29,6 +29,7 @@ interface Props extends ThemeProps {
   onCancel?: VoidFunction;
   onBack?: VoidFunction;
   selectedValue?: string;
+  autoSelectFirstItem?: boolean;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
@@ -37,7 +38,7 @@ function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
   return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
 }
 
-function Component ({ className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -190,6 +191,34 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
       }, 100);
     }
   }, [isActive]);
+
+  useEffect(() => {
+    const doFunction = () => {
+      if (!listItems.length) {
+        return;
+      }
+
+      const firstItem = listItems.find((i) => isAccountAddressItem(i)) as AccountAddressItemType | undefined;
+
+      if (!firstItem) {
+        return;
+      }
+
+      if (!selectedValue) {
+        onSelectItem?.(firstItem);
+
+        return;
+      }
+
+      if (!listItems.some((i) => isAccountAddressItem(i) && i.address === selectedValue)) {
+        onSelectItem?.(firstItem);
+      }
+    };
+
+    if (autoSelectFirstItem) {
+      doFunction();
+    }
+  }, [autoSelectFirstItem, listItems, onSelectItem, selectedValue]);
 
   return (
     <SwModal

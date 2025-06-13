@@ -9,7 +9,7 @@ import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/T
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainSlugsByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
@@ -44,7 +44,7 @@ const Component = (): React.ReactElement => {
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { accountBalance: { tokenGroupBalanceMap,
-    totalBalanceInfo }, tokenGroupStructure: { sortedTokenGroups } } = useContext(HomeContext);
+    totalBalanceInfo }, tokenGroupStructure: { tokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement => {
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token');
-  const allowedChains = useGetChainSlugsByAccount();
+  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
@@ -277,7 +277,7 @@ const Component = (): React.ReactElement => {
   const tokenGroupBalanceItems = useMemo((): TokenBalanceItemType[] => {
     const result: TokenBalanceItemType[] = [];
 
-    sortedTokenGroups.forEach((tokenGroupSlug) => {
+    tokenGroups.forEach((tokenGroupSlug) => {
       if (debouncedTokenGroupBalanceMap[tokenGroupSlug]) {
         result.push(debouncedTokenGroupBalanceMap[tokenGroupSlug]);
       }
@@ -286,7 +286,7 @@ const Component = (): React.ReactElement => {
     sortTokensByStandard(result, priorityTokens, true);
 
     return result;
-  }, [sortedTokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
+  }, [tokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);

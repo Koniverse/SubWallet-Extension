@@ -3,7 +3,7 @@
 
 import { YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
@@ -12,7 +12,7 @@ const useGetYieldPositionForSpecificAccount = (address?: string): YieldPositionI
   const yieldPositions = useSelector((state) => state.earning.yieldPositions);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
   const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const chainsByAccountType = useGetChainSlugsByCurrentAccountProxy();
 
   return useMemo(() => {
     const infoSpecificList: YieldPositionInfo[] = [];
