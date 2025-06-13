@@ -24,6 +24,10 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     claimReward: false
   };
 
+  static generateSlug (symbol: string, chain: string): string {
+    return `${symbol}___native_staking___${chain}`;
+  }
+
   constructor (state: KoniState, chain: string) {
     super(state, chain);
 
