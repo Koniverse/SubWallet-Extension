@@ -133,11 +133,11 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('BUY'),
+        label: t('Buy'),
         value: ViewValue.BUY
       },
       {
-        label: t('SELL'),
+        label: t('Sell'),
         value: ViewValue.SELL
       }
     ];
@@ -431,7 +431,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Buy token')}
+          title={t('Buy & sell token')}
         />
 
         <Form
@@ -661,7 +661,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
     '.__form-container': {
       height: '100%',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      marginTop: 4
     },
 
     '.__scroll-container': {
@@ -688,8 +689,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       alignItems: 'center',
       marginLeft: 'auto',
       marginRight: 'auto',
-      marginTop: token.margin,
-      marginBottom: token.marginLG,
+      marginTop: 20,
+      marginBottom: token.marginXL,
 
       '&:before': {
         content: '""',
@@ -723,7 +724,6 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
 
     '.__layout-footer': {
       display: 'flex',
-      padding: token.paddingMD,
       paddingBottom: token.paddingLG,
       gap: token.paddingXS,
 
