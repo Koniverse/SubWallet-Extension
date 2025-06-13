@@ -35,6 +35,10 @@ interface TaoStakingStakeOption {
   amount: string;
   rate?: BigN;
   identity?: string
+  metadata: {
+    commission: string;
+    apr: string;
+  }
 }
 
 interface Hotkey {
@@ -480,18 +484,26 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             }
 
             let identity = '';
+            let commision = '';
+            let apr = '';
 
             if (_delegateInfo) {
               const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
 
               identity = delegateInfo ? delegateInfo.name : '';
+              commision = delegateInfo ? delegateInfo.take : '';
+              apr = delegateInfo ? delegateInfo.apr : '';
             }
 
             subnetPositions[netuid].delegatorState.push({
               owner: hotkey,
               amount: stake.toString(),
               rate: aplhaToTaoPrice,
-              identity: identity
+              identity: identity,
+              metadata: {
+                commission: commision,
+                apr: apr
+              }
             });
 
             subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));
@@ -627,7 +639,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
-          apy: apyCalculate.apy,
+          expectedReturn: apyCalculate.apy,
           blocked: false,
           isVerified: false,
           chain: this.chain,

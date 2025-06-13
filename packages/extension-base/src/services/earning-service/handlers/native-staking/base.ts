@@ -141,7 +141,6 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     const data = _data as SubmitJoinNativeStaking;
     const { address, amount, selectedValidators, slug } = data;
 
-    console.log('data', data);
     const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 

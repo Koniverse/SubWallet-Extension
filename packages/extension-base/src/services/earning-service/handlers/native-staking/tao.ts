@@ -540,7 +540,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
-          apy: apyCalculate.apy,
+          expectedReturn: apyCalculate.apy,
           blocked: false,
           isVerified: false,
           chain: this.chain,
@@ -636,9 +636,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, originValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, originValidator, selectedValidators: targetValidators } = data;
 
-    if (!subnetData || !originValidator) {
+    if (!originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 

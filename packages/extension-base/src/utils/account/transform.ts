@@ -237,7 +237,8 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
-  ExtrinsicType.SWAP
+  ExtrinsicType.SWAP,
+  ExtrinsicType.CROWDLOAN
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
@@ -518,6 +519,8 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
     case AccountSignMode.ALL_ACCOUNT:
       return AccountProxyType.ALL_ACCOUNT;
     case AccountSignMode.UNKNOWN:
+      return AccountProxyType.UNKNOWN;
+    default:
       return AccountProxyType.UNKNOWN;
   }
 };
