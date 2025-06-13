@@ -28,6 +28,7 @@ export interface CommonFeeComponent {
   feeType: BaseFeeType;
   amount: string;
   tokenSlug: string;
+  percentage?: number;
 }
 
 export interface CommonStepFeeInfo {
