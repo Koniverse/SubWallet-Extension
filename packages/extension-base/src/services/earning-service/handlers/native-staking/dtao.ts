@@ -10,7 +10,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -35,6 +35,10 @@ interface TaoStakingStakeOption {
   amount: string;
   rate?: BigN;
   identity?: string
+  metadata: {
+    commission: string;
+    apr: string;
+  }
 }
 
 interface Hotkey {
@@ -480,18 +484,26 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
             }
 
             let identity = '';
+            let commision = '';
+            let apr = '';
 
             if (_delegateInfo) {
               const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
 
               identity = delegateInfo ? delegateInfo.name : '';
+              commision = delegateInfo ? delegateInfo.take : '';
+              apr = delegateInfo ? delegateInfo.apr : '';
             }
 
             subnetPositions[netuid].delegatorState.push({
               owner: hotkey,
               amount: stake.toString(),
               rate: aplhaToTaoPrice,
-              identity: identity
+              identity: identity,
+              metadata: {
+                commission: commision,
+                apr: apr
+              }
             });
 
             subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.add(new BN(stake.toString()));
@@ -656,6 +668,11 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const { amount, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData) {
+      throw new Error(BasicTxErrorType.INVALID_PARAMS);
+    }
+
     const { netuid, slippage } = subnetData;
 
     const chainApi = await this.substrateApi.isReady;
@@ -736,4 +753,39 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   /* Leave pool action */
+
+  /* Change validator */
+  override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+    const { amount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData || !originValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const { netuid } = subnetData;
+    const selectedValidatorInfo = targetValidators[0];
+    const destValidator = selectedValidatorInfo.address;
+
+    if (new BigN(amount).lte(0)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+    }
+
+    if (originValidator === destValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
+    }
+
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(alphaToTaoPrice);
+
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
+
+    if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+    }
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
+
+    return extrinsic;
+  }
 }
