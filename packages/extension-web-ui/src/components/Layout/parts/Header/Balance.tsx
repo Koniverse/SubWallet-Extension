@@ -496,7 +496,13 @@ const Balance = styled(Component)<Props>(({ theme: { token } }: Props) => ({
     display: 'flex',
     justifyContent: 'start',
     alignItems: 'center',
-    marginTop: token.marginSM
+    marginTop: token.marginSM,
+
+    '.ant-typography': {
+      lineHeight: 'inherit',
+      color: 'inherit !important',
+      fontSize: 'inherit !important'
+    }
   },
 
   '.__balance-change-value': {
