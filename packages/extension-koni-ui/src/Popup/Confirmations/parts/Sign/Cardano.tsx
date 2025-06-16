@@ -164,7 +164,13 @@ const Component: React.FC<Props> = (props: Props) => {
 };
 
 const CardanoSignArea = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '&.confirmation-footer': {
+      '.alert-box': {
+        width: '100%'
+      }
+    }
+  };
 });
 
 export default CardanoSignArea;

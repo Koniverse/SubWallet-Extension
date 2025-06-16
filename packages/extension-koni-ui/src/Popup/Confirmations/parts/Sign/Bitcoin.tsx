@@ -335,7 +335,13 @@ const Component: React.FC<Props> = (props: Props) => {
 };
 
 const BitcoinSignArea = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '&.confirmation-footer': {
+      '.alert-box': {
+        width: '100%'
+      }
+    }
+  };
 });
 
 export default BitcoinSignArea;
