@@ -93,23 +93,27 @@ const Component: FC<Props> = (props: Props) => {
       tooltip: getTooltip(percentage)
     });
 
-    const feeTypeMap: Record<SwapFeeType, FeeItem> = feeConfigs.reduce((map, { getTooltip, label, type }) => ({
-      ...map,
-      [type]: createFeeItem(type, label, getTooltip)
-    }), {} as Record<SwapFeeType, FeeItem>);
+    const activeFeeTypes = new Set(currentQuote?.feeInfo?.feeComponent?.map((item) => item.feeType) ?? []);
+
+    const feeTypeMap: Record<SwapFeeType, FeeItem> = feeConfigs
+      .filter((config) => activeFeeTypes.has(config.type))
+      .reduce((map, { getTooltip, label, type }) => ({
+        ...map,
+        [type]: createFeeItem(type, label, getTooltip)
+      }), {} as Record<SwapFeeType, FeeItem>);
 
     currentQuote?.feeInfo.feeComponent.forEach((feeItem) => {
       const { feeType, percentage } = feeItem;
 
       feeTypeMap[feeType].value = feeTypeMap[feeType].value.plus(getConvertedBalance(feeItem));
 
-      if (feeType === SwapFeeType.WALLET_FEE && percentage !== undefined) {
+      if (feeType === SwapFeeType.WALLET_FEE) {
         feeTypeMap[feeType].tooltip = defaultTooltipMap[feeType](percentage);
       }
     });
 
     Object.values(feeTypeMap).forEach((fee) => {
-      if (!fee.value.lte(new BigN(0))) {
+      if (!fee.value.lt(new BigN(0))) {
         result.push(fee);
       }
     });

@@ -6,7 +6,8 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { _reformatAddressWithChain, combineEthFee, fetchFromProxyService } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
@@ -76,48 +77,57 @@ export interface KyberSwapQuoteMetadata {
   priceImpact?: string;
 }
 
-export const KYBER_CLIENT_ID = process.env.KYBER_CLIENT_ID || '';
-
-const kyberUrl = 'https://aggregator-api.kyberswap.com';
-
 type BuildTxForSwapResult = { data?: TransactionConfig; error?: SwapError | TransactionError };
 
-async function buildTxForSwap (params: BuildTxForSwapParams, chain: string): Promise<BuildTxForSwapResult> {
+async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string): Promise<BuildTxForSwapResult> {
   const { recipient, sender, slippageTolerance } = params;
   let routeSummary = params.routeSummary;
 
+  console.log('routeSummary1', routeSummary);
+
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
-    const queryParams = new URLSearchParams({
-      tokenIn: routeSummary.tokenIn,
-      tokenOut: routeSummary.tokenOut,
-      amountIn: routeSummary.amountIn,
-      gasInclude: 'true'
+    return {
+      error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Invalid Route Summary')
+    };
+  }
+
+  const { amountIn, tokenIn, tokenOut } = routeSummary;
+
+  const queryParams = new URLSearchParams({
+    tokenIn,
+    tokenOut,
+    amountIn,
+    gasInclude: 'true'
+  });
+
+  const path = `/${chain}/api/v1/routes?${queryParams.toString()}`;
+
+  try {
+    const res = await fetchFromProxyService(ProxyServiceRoute.KYBER, path, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        accept: 'application/json'
+      }
     });
 
-    const url = `${kyberUrl}/${chain}/api/v1/routes?${queryParams.toString()}`;
+    if (!res.ok) {
+      const errorText = await res.text();
 
-    try {
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-client-id': KYBER_CLIENT_ID,
-          accept: 'application/json'
-        }
-      });
-
-      const routeData = (await res.json()) as KyberApiResponse<KyberRouteData>;
-
-      if (!routeData.success || !routeData.data?.routeSummary) {
-        return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, routeData.message) };
-      }
-
-      routeSummary = routeData.data.routeSummary;
-    } catch (error) {
-      console.error('Error:', error);
-
-      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, `Fetch Kyber routes failed: ${errorText}`) };
     }
+
+    const routeData = (await res.json()) as KyberApiResponse<KyberRouteData>;
+
+    if (!routeData.data?.routeSummary) {
+      return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, routeData.message) };
+    }
+
+    routeSummary = routeData.data.routeSummary;
+  } catch (error) {
+    console.error('Error:', error);
+
+    return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Unable to build Kyber swap transaction') };
   }
 
   const body = {
@@ -129,12 +139,13 @@ async function buildTxForSwap (params: BuildTxForSwapParams, chain: string): Pro
     enableGasEstimation: true
   };
 
+  console.log('routeSummary2', routeSummary);
+
   try {
-    const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
+    const res = await fetchFromProxyService(ProxyServiceRoute.KYBER, `/${chain}/api/v1/route/build`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': KYBER_CLIENT_ID,
         accept: 'application/json'
       },
       body: JSON.stringify(body)
@@ -377,7 +388,7 @@ export class KyberHandler implements SwapBaseInterface {
     const metadata = params.quote.metadata as KyberMetadata;
     const slippageTolerance = params.slippage * 10000;
 
-    const rawTx = await buildTxForSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
+    const rawTx = await buildTxForKyberSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
     if (rawTx.error) {
       console.error('Kyber error:', rawTx.error);
