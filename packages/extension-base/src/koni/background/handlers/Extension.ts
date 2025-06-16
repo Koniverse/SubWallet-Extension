@@ -1429,6 +1429,7 @@ export default class KoniExtension {
     const transferAmount: AmountData = { value: '0', symbol: _getAssetSymbol(transferTokenInfo), decimals: _getAssetDecimals(transferTokenInfo) };
 
     let transaction: SWTransaction['transaction'] | null | undefined;
+    let overrideFeeCustom: FeeCustom | undefined;
 
     const transferTokenAvailable = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug, extrinsicType });
 
@@ -1513,8 +1514,9 @@ export default class KoniExtension {
         const txVal: string = transferAll ? transferTokenAvailable.value : (value || '0');
         const bitcoinApi = this.#koniState.getBitcoinApi(chain);
         const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'bitcoin');
+        let calculatedBitcoinFeeRate: string | undefined;
 
-        [transaction, transferAmount.value] = await createBitcoinTransaction({ bitcoinApi,
+        [transaction, transferAmount.value, calculatedBitcoinFeeRate] = await createBitcoinTransaction({ bitcoinApi,
           chain,
           from,
           feeInfo,
@@ -1522,6 +1524,14 @@ export default class KoniExtension {
           transferAll: !!transferAll,
           value: txVal,
           network: network });
+
+        if (calculatedBitcoinFeeRate) {
+          const feeRate = parseFloat(calculatedBitcoinFeeRate);
+
+          if (!isNaN(feeRate)) {
+            overrideFeeCustom = { feeRate };
+          }
+        }
 
         // TODO: This is a hotfix until transferMax for Bitcoin is supported.
         if (transferAll) {
@@ -1623,8 +1633,8 @@ export default class KoniExtension {
       warnings,
       address: from,
       chain,
-      feeCustom,
-      feeOption,
+      feeCustom: overrideFeeCustom || feeCustom,
+      feeOption: overrideFeeCustom ? 'custom' : feeOption,
       tokenPayFeeSlug,
       chainType,
       transferNativeAmount,
