@@ -4,7 +4,6 @@
 import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
-import { CHAINFLIP_BROKER_API } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType, SwapStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -81,42 +80,50 @@ export function convertSwapRate (rate: string, fromAsset: _ChainAsset, toAsset: 
   return bnRate.times(10 ** decimalDiff).pow(-1).toNumber();
 }
 
-export function getChainflipOptions (isTestnet: boolean) {
-  if (isTestnet) {
-    return {
-      network: getChainflipNetwork(isTestnet)
-    };
-  }
+// export function getChainflipOptions (isTestnet: boolean) {
+//   if (isTestnet) {
+//     return {
+//       network: getChainflipNetwork(isTestnet)
+//     };
+//   }
 
-  return {
-    network: getChainflipNetwork(isTestnet),
-    broker: getChainflipBroker(isTestnet)
-  };
-}
+//   return {
+//     network: getChainflipNetwork(isTestnet),
+//     broker: getChainflipBroker(isTestnet)
+//   };
+// }
 
-function getChainflipNetwork (isTestnet: boolean) {
-  return isTestnet ? 'perseverance' : 'mainnet';
-}
+// function getChainflipNetwork (isTestnet: boolean) {
+//   return isTestnet ? 'perseverance' : 'mainnet';
+// }
 
-export function getChainflipBroker (isTestnet: boolean) { // noted: currently not use testnet broker
-  if (isTestnet) {
-    return {
-      url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
-    };
-  } else {
-    return {
-      url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
-    };
-  }
-}
+// export function getChainflipBroker (isTestnet: boolean) { // noted: currently not use testnet broker
+//   if (isTestnet) {
+//     return {
+//       url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+//     };
+//   } else {
+//     return {
+//       url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
+//     };
+//   }
+// }
 
-export function getChainflipSwap (isTestnet: boolean) {
-  if (isTestnet) {
-    return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
-  } else {
-    return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
-  }
-}
+// export function getChainflipSwap (isTestnet: boolean) {
+//   if (isTestnet) {
+//     return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+//   } else {
+//     return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
+//   }
+// }
+
+// export function getAssetsUrl (isTestnet: boolean) {
+//   if (isTestnet) {
+//     return 'https://perseverance.chainflip-broker.io/assets';
+//   } else {
+//     return 'https://chainflip-broker.io/assets';
+//   }
+// }
 
 export function getBridgeStep (from: string, to: string): DynamicSwapAction {
   return {

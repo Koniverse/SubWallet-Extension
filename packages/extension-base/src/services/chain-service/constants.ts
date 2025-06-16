@@ -31,12 +31,13 @@ export const _PURE_EVM_CHAINS = ['binance', 'binance_test', 'ethereum', 'ethereu
 
 export const _BALANCE_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'interlay', 'kintsugi_test', 'mangatax_para'],
-  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'moonbeam', 'moonbase', 'moonriver', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub'],
+  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
-  bittensor: ['bittensor', 'bittensor_testnet']
+  bittensor: ['bittensor', 'bittensor_testnet'],
+  moonbeam: ['moonbeam', 'moonriver', 'moonbase']
 };
 
 export const _NFT_CHAIN_GROUP = {
@@ -226,11 +227,11 @@ export const _KNOWN_CHAIN_INFLATION_PARAMS: Record<string, _SubstrateInflationPa
 export const _TRANSFER_CHAIN_GROUP = {
   acala: ['karura', 'acala', 'acala_testnet'],
   kintsugi: ['kintsugi', 'kintsugi_test', 'interlay', 'mangatax_para'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
-  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot'],
+  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin']
 };
