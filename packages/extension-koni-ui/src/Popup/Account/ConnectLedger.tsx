@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, LedgerAccountTypeSelector, LedgerPolkadotAccountItemType, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { LedgerChainSelector, LedgerItemType } from '@subwallet/extension-koni-ui/components/Field/LedgerChainSelector';
@@ -47,12 +47,12 @@ export const PolkadotLedgerAccountTypeItems: LedgerPolkadotAccountItemType[] = [
   name: 'Polkadot account',
   slug: 'polkadot',
   description: 'Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem',
-  scheme: 'ed25519'
+  scheme: LEDGER_SCHEME.ED25519
 }, {
   name: 'Ethereum account',
   slug: 'ethereum',
   description: 'Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem',
-  scheme: 'ecdsa'
+  scheme: LEDGER_SCHEME.ECDSA
 }];
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -88,7 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const [chain, setChain] = useState(supportedLedger[0].slug);
   const [chainMigrateMode, setChainMigrateMode] = useState<string | undefined>();
   const [ledgerAccounts, setLedgerAccounts] = useState<Array<ImportLedgerItem | null>>([]);
-  const [polkadotAccountType, setPolkadotAccountType] = useState<string | undefined>();
+  const [polkadotAccountType, setPolkadotAccountType] = useState<LEDGER_SCHEME | undefined>();
   const [firstStep, setFirstStep] = useState(ledgerAccounts.length === 0);
   const [page, setPage] = useState(0);
   const [selectedAccounts, setSelectedAccounts] = useState<ImportLedgerItem[]>([]);
@@ -111,7 +111,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return chainMigrateMode && selectedChain ? `${selectedChain.accountName}` : '';
   }, [chainMigrateMode, migrateSupportLedger]);
 
-  const { error, getAllAddress, isLoading, isLocked, ledger, refresh, warning } = useLedger(selectedChain?.slug, true, false, false, selectedChainMigrateMode?.genesisHash, selectedChain?.isRecovery);
+  const { error, getAllAddress, isLoading, isLocked, ledger, refresh, warning } = useLedger(selectedChain?.slug, true, false, false, selectedChainMigrateMode?.genesisHash, selectedChain?.isRecovery, polkadotAccountType);
 
   const onPreviousStep = useCallback(() => {
     setFirstStep(true);
@@ -147,7 +147,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const onPolkadotAccountTypeChange: BasicOnChangeFunction = useCallback((event) => {
     const value = event.target.value;
 
-    setPolkadotAccountType(value);
+    setPolkadotAccountType(value as LEDGER_SCHEME);
   }, []);
 
   const onLoadMore = useCallback(async () => {
@@ -278,7 +278,7 @@ const Component: React.FC<Props> = (props: Props) => {
           isEthereum: selectedChain.isEthereum,
           isGeneric: selectedChain.isGeneric,
           isLedgerRecovery: selectedChain?.isRecovery,
-          isSubstrateECDSA: polkadotAccountType === 'ecdsa'
+          isSubstrateECDSA: polkadotAccountType === LEDGER_SCHEME.ECDSA
         }))
       })
         .then(() => {

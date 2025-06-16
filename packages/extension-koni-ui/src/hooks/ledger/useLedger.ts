@@ -55,7 +55,7 @@ const getNetworkByGenesisHash = (ledgerChains: MigrationLedgerNetwork[], genesis
   return ledgerChains.find((network) => network.genesisHash === genesisHash);
 };
 
-const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: string): Ledger => {
+const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: LEDGER_SCHEME): Ledger => {
   const { isLedgerCapable } = baseState;
 
   assert(isLedgerCapable, ledgerIncompatible);
@@ -68,7 +68,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
     if (def.isEthereum) {
       return new EVMLedger('webusb', def.slip44);
     } else {
-      if (def.scheme === LEDGER_SCHEME.ECDSA) {
+      if (ledgerScheme === LEDGER_SCHEME.ECDSA) {
         return new SubstrateECDSALedger('webusb', def.slip44);
       } else if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
@@ -93,7 +93,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
   }
 };
 
-export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: string): Result {
+export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: LEDGER_SCHEME): Result {
   const { t } = useTranslation();
 
   const [ledgerChains, migrateLedgerChains] = useGetSupportedLedger();
@@ -147,7 +147,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
     }
 
     return null;
-  }, [refreshLock, chainSlug, active, ledgerChains, migrateLedgerChains, isEvmNetwork, forceMigration, originGenesisHash, isRecovery]);
+  }, [refreshLock, chainSlug, active, ledgerChains, migrateLedgerChains, isEvmNetwork, forceMigration, originGenesisHash, isRecovery, ledgerScheme]);
 
   const appName = useMemo(() => {
     const unknownNetwork = 'unknown network';

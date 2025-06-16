@@ -1437,8 +1437,8 @@ export interface LedgerNetwork {
 }
 
 export const enum LEDGER_SCHEME {
-  ED25519 = 0,
-  ECDSA = 2
+  ED25519 = 'ed25519',
+  ECDSA = 'ecdsa',
 }
 
 export interface MigrationLedgerNetwork extends Omit<LedgerNetwork, 'isGeneric' | 'isEthereum' | 'isDevMode' | 'icon' > {
