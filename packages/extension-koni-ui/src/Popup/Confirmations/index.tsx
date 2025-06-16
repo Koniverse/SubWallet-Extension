@@ -4,7 +4,7 @@
 import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, ProcessType, SubmitChangeValidatorStaking } from '@subwallet/extension-base/types';
+import { AccountJson, ProcessType, SubmitBittensorChangeValidatorStaking } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
@@ -284,7 +284,7 @@ const Component = function ({ className }: Props) {
           return t('Cancel unstake confirm');
 
         case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
-          if ((transaction.data as SubmitChangeValidatorStaking)?.isChangeTitle) {
+          if ((transaction.data as SubmitBittensorChangeValidatorStaking)?.isMovePartialStake) {
             return t('Move your stake confirm');
           }
 

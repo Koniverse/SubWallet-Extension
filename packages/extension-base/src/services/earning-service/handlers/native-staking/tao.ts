@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -634,7 +634,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Leave pool action */
 
   /* Change validator */
-  override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+  override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
     const { amount, originValidator, selectedValidators: targetValidators } = data;
 
@@ -642,6 +642,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
+    // Bittensor only supports changing 1 validator at a time, not multiple
     const selectedValidatorInfo = targetValidators[0];
     const destValidator = selectedValidatorInfo.address;
 

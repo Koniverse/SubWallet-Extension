@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
@@ -13,6 +13,7 @@ import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/compon
 import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/FilterModal';
 import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/SortingModal';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -86,6 +87,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveAll } = useContext(ModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
@@ -234,16 +236,25 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     };
   }, [selectedFilters]);
 
-  const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
-    setSubmitLoading(true);
-    const { target } = values;
+  const isNoValidatorChanged = useMemo(() => {
+    if (changeValidators.length !== nominatorValueList.length) {
+      return false;
+    }
 
+    const selectedSet = new Set(changeValidators);
+
+    return nominatorValueList.every((validator) => selectedSet.has(validator));
+  }, [changeValidators, nominatorValueList]);
+
+  const submit = useCallback((target: ValidatorInfo[]) => {
     const submitData: SubmitChangeValidatorStaking = {
       slug: poolInfo.slug,
       address: from,
       amount: '0',
       selectedValidators: target
     };
+
+    setSubmitLoading(true);
 
     setTimeout(() => {
       changeEarningValidator(submitData)
@@ -257,6 +268,33 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         });
     }, 300);
   }, [poolInfo.slug, from, onSuccess, onError, inactiveAll]);
+
+  const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
+    const { target } = values;
+
+    if (isNoValidatorChanged) {
+      openAlert({
+        type: NotificationType.INFO,
+        content: t('Your new selections of validators is the same as the original selection. Do you still want to continue'),
+        title: t('No changes detected!'),
+        okButton: {
+          text: t('Continue'),
+          onClick: () => {
+            closeAlert();
+            submit(target);
+          }
+        },
+        cancelButton: {
+          text: t('Cancel'),
+          onClick: closeAlert
+        }
+      });
+
+      return;
+    }
+
+    submit(target);
+  }, [isNoValidatorChanged, openAlert, t, closeAlert, submit]);
 
   const onResetSort = useCallback(() => {
     setSortSelection(SortKey.DEFAULT);
@@ -369,49 +407,49 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         form={form}
         onFinish={onClickSubmit}
       >
-        <Form.Item
-          name={'target'}
-        >
-          <SwModal
-            className={`${className} modal-full`}
-            closeIcon={(
-              <Icon
-                phosphorIcon={CaretLeft}
-                size='md'
-              />
-            )}
-            footer={(
-              <Button
-                block
-                disabled={!changeValidators.length}
-                icon={(
-                  <Icon
-                    phosphorIcon={CheckCircle}
-                    weight={'fill'}
-                  />
-                )}
-                loading={submitLoading}
-                onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+        <SwModal
+          className={`${className} modal-full`}
+          closeIcon={(
+            <Icon
+              phosphorIcon={CaretLeft}
+              size='md'
+            />
+          )}
+          footer={(
+            <Button
+              block
+              disabled={!changeValidators.length}
+              icon={(
+                <Icon
+                  phosphorIcon={CheckCircle}
+                  weight={'fill'}
+                />
+              )}
+              loading={submitLoading}
+              onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+            >
+              {t(applyLabel, { number: changeValidators.length })}
+            </Button>
+          )}
+          id={modalId}
+          onCancel={onCancelSelectValidator}
+          rightIconProps={{
+            icon: (
+              <Badge
+                className={'g-filter-badge'}
+                dot={sortSelection !== SortKey.DEFAULT}
               >
-                {t(applyLabel, { number: changeValidators.length })}
-              </Button>
-            )}
-            id={modalId}
-            onCancel={onCancelSelectValidator}
-            rightIconProps={{
-              icon: (
-                <Badge
-                  className={'g-filter-badge'}
-                  dot={sortSelection !== SortKey.DEFAULT}
-                >
-                  <Icon phosphorIcon={SortAscending} />
-                </Badge>
-              ),
-              onClick: () => {
-                activeModal(SORTING_MODAL_ID);
-              }
-            }}
-            title={t('Select') + ' ' + t(handleValidatorLabel)}
+                <Icon phosphorIcon={SortAscending} />
+              </Badge>
+            ),
+            onClick: () => {
+              activeModal(SORTING_MODAL_ID);
+            }
+          }}
+          title={t('Select') + ' ' + t(handleValidatorLabel)}
+        >
+          <Form.Item
+            name={'target'}
           >
             <SwList.Section
               actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -425,35 +463,35 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               searchFunction={searchFunction}
               searchMinCharactersCount={2}
               searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
-              // showActionBtn
+            // showActionBtn
             />
-          </SwModal>
+          </Form.Item>
+        </SwModal>
 
-          <FilterModal
-            id={FILTER_MODAL_ID}
-            onApplyFilter={onApplyFilter}
-            onCancel={onCloseFilterModal}
-            onChangeOption={onChangeFilterOption}
-            optionSelectionMap={filterSelectionMap}
-            options={filterOptions}
+        <FilterModal
+          id={FILTER_MODAL_ID}
+          onApplyFilter={onApplyFilter}
+          onCancel={onCloseFilterModal}
+          onChangeOption={onChangeFilterOption}
+          optionSelectionMap={filterSelectionMap}
+          options={filterOptions}
+        />
+
+        <SortingModal
+          id={SORTING_MODAL_ID}
+          onChangeOption={onChangeSortOpt}
+          onReset={onResetSort}
+          optionSelection={sortSelection}
+          options={sortingOptions}
+        />
+
+        {viewDetailItem && (
+          <EarningValidatorDetailModal
+            chain={chain}
+            maxPoolMembersValue={maxPoolMembersValue}
+            validatorItem={viewDetailItem}
           />
-
-          <SortingModal
-            id={SORTING_MODAL_ID}
-            onChangeOption={onChangeSortOpt}
-            onReset={onResetSort}
-            optionSelection={sortSelection}
-            options={sortingOptions}
-          />
-
-          {viewDetailItem && (
-            <EarningValidatorDetailModal
-              chain={chain}
-              maxPoolMembersValue={maxPoolMembersValue}
-              validatorItem={viewDetailItem}
-            />
-          )}
-        </Form.Item>
+        )}
       </Form>
     </>
   );

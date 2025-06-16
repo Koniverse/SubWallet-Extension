@@ -10,7 +10,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -683,6 +683,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
+    // Bittensor only supports changing 1 validator at a time, not multiple
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
 
@@ -755,7 +756,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Leave pool action */
 
   /* Change validator */
-  override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+  override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
     const { amount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
 

@@ -102,10 +102,12 @@ export interface BondingSubmitParams extends BaseRequestSign {
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
 
-export interface SubmitChangeValidatorStaking extends SubmitJoinNativeStaking {
-  originValidator?: string;
-  isChangeTitle?: boolean;
-  metadata?: {
+export type SubmitChangeValidatorStaking = SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking;
+
+export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeStaking {
+  originValidator: string;
+  isMovePartialStake: boolean;
+  metadata: {
     subnetSymbol: string;
   }
 }

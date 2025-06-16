@@ -4,7 +4,7 @@
 import { ExtrinsicType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { NominationInfo, SubmitChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -245,9 +245,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       setSubmitLoading(true);
 
-      const isChangeTitle = (new BigN(value)).lt(bondedValue);
+      const isMovePartialStake = (new BigN(value)).lt(bondedValue);
 
-      const submitData: SubmitChangeValidatorStaking = {
+      const submitData: SubmitBittensorChangeValidatorStaking = {
         slug: poolInfo.slug,
         address: from,
         amount: isShowAmountChange ? value : bondedValue,
@@ -256,7 +256,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         metadata: {
           subnetSymbol: symbol as string
         },
-        isChangeTitle: isChangeTitle,
+        isMovePartialStake: isMovePartialStake,
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
@@ -353,6 +353,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             disabled={!from}
             from={from}
             label={t('Change to')}
+            originValidator={originValidator}
             setForceFetchValidator={setForceFetchValidator}
             slug={slug}
           />
@@ -423,6 +424,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
 const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
+    '.ant-sw-modal-content': {
+      height: '90vh !important'
+    },
+
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
       paddingBottom: token.paddingLG

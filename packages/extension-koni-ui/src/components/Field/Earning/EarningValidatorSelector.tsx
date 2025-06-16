@@ -29,6 +29,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;
   from: string;
   slug: string;
+  originValidator?: string;
   onClickBookButton?: (e: SyntheticEvent) => void;
   onClickLightningButton?: (e: SyntheticEvent) => void;
   isSingleSelect?: boolean;
@@ -77,7 +78,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { chain, className = '', defaultValue, from
     , id = defaultModalId, isSingleSelect: _isSingleSelect = false,
     loading, onChange, setForceFetchValidator
-    , slug, value } = props;
+    , slug, value, originValidator } = props;
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -277,6 +278,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.address === originValidator) {
+      return null;
+    }
+
     const key = getValidatorKey(item.address, item.identity);
     const keyBase = key.split('___')[0];
 
@@ -296,7 +301,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         validatorInfo={item}
       />
     );
-  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore]);
+  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore, originValidator]);
 
   const onClickActionBtn = useCallback(() => {
     activeModal(FILTER_MODAL_ID);
