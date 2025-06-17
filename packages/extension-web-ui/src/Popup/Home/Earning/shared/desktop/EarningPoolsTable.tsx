@@ -313,9 +313,10 @@ export const EarningPoolsTable = styled(Component)<Props>(({ theme: { token } }:
     },
 
     '.__row-reward-label': {
-      '&:after': {
-        content: '" "'
-      }
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight1,
+      marginRight: token.marginXXS
     },
 
     '.__row-reward-per-year-value': {
