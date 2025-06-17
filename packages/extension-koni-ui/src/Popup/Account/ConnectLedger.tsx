@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
+import { detectTranslate, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, LedgerAccountTypeSelector, LedgerPolkadotAccountItemType, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { LedgerChainSelector, LedgerItemType } from '@subwallet/extension-koni-ui/components/Field/LedgerChainSelector';
 import { ATTACH_ACCOUNT_MODAL, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
@@ -44,15 +44,15 @@ const FooterIcon = (
 );
 
 export const PolkadotLedgerAccountTypeItems: LedgerPolkadotAccountItemType[] = [{
-  name: 'Polkadot account',
+  name: detectTranslate('Polkadot account'),
   slug: 'polkadot',
-  description: 'Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem',
-  scheme: LEDGER_SCHEME.ED25519
+  description: detectTranslate('Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem'),
+  scheme: POLKADOT_LEDGER_SCHEME.ED25519
 }, {
-  name: 'Ethereum account',
+  name: detectTranslate('Ethereum account'),
   slug: 'ethereum',
-  description: 'Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem',
-  scheme: LEDGER_SCHEME.ECDSA
+  description: detectTranslate('Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem'),
+  scheme: POLKADOT_LEDGER_SCHEME.ECDSA
 }];
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -88,7 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const [chain, setChain] = useState(supportedLedger[0].slug);
   const [chainMigrateMode, setChainMigrateMode] = useState<string | undefined>();
   const [ledgerAccounts, setLedgerAccounts] = useState<Array<ImportLedgerItem | null>>([]);
-  const [polkadotAccountType, setPolkadotAccountType] = useState<LEDGER_SCHEME | undefined>();
+  const [polkadotAccountType, setPolkadotAccountType] = useState<POLKADOT_LEDGER_SCHEME | undefined>();
   const [firstStep, setFirstStep] = useState(ledgerAccounts.length === 0);
   const [page, setPage] = useState(0);
   const [selectedAccounts, setSelectedAccounts] = useState<ImportLedgerItem[]>([]);
@@ -147,7 +147,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const onPolkadotAccountTypeChange: BasicOnChangeFunction = useCallback((event) => {
     const value = event.target.value;
 
-    setPolkadotAccountType(value as LEDGER_SCHEME);
+    setPolkadotAccountType(value as POLKADOT_LEDGER_SCHEME);
   }, []);
 
   const onLoadMore = useCallback(async () => {
@@ -240,7 +240,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       const selected = !!selectedAccounts.find((it) => it.address === item.address);
       const originAddress = reformatAddress(item.address, 42);
-      const existedAccount = accounts.some((acc) => acc.address === originAddress);
+      const existedAccount = accounts.some((acc) => isSameAddress(acc.address, originAddress));
 
       return (
         <AccountItemWithName
@@ -278,7 +278,7 @@ const Component: React.FC<Props> = (props: Props) => {
           isEthereum: selectedChain.isEthereum,
           isGeneric: selectedChain.isGeneric,
           isLedgerRecovery: selectedChain?.isRecovery,
-          isSubstrateECDSA: polkadotAccountType === LEDGER_SCHEME.ECDSA
+          isSubstrateECDSA: polkadotAccountType === POLKADOT_LEDGER_SCHEME.ECDSA
         }))
       })
         .then(() => {

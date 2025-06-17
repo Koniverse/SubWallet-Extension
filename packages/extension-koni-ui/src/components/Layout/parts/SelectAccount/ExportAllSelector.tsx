@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountExportPasswordModal, AccountProxySelectorAllItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import ExportAllSelectItem from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount/ExportAllSelectItem';
@@ -10,7 +10,7 @@ import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/Filte
 import { EXPORT_ACCOUNTS_PASSWORD_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useFilterModal, useGoBackSelectAccount } from '@subwallet/extension-koni-ui/hooks';
 import { useSelectAccount } from '@subwallet/extension-koni-ui/hooks/modal/useSelectAccount';
-import { AccountSignMode, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll, searchAccountProxyFunction } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, InputRef, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';

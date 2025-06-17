@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
+import { POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { wrapBytes } from '@subwallet/extension-dapp';
 import { PolkadotGenericApp } from '@zondax/ledger-substrate';
 import { GenericeResponseAddress } from '@zondax/ledger-substrate/dist/common';
@@ -26,7 +26,7 @@ export async function loadWasm () {
 
 export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
   protected ss58_addr_type = 42;
-  protected scheme = LEDGER_SCHEME.ED25519;
+  protected scheme = POLKADOT_LEDGER_SCHEME.ED25519;
 
   getVersion (): Promise<LedgerVersion> {
     return this.withApp(async (app): Promise<LedgerVersion> => {
@@ -53,7 +53,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
       let result: GenericeResponseAddress;
 
-      if (this.scheme === LEDGER_SCHEME.ECDSA) {
+      if (this.scheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
         result = await this.wrapError(app.getAddressEcdsa(path, confirm));
         result.address = hexAddPrefix(result.address);
       } else {
@@ -70,7 +70,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
   async signTransaction (message: Uint8Array, metadata: Uint8Array, accountOffset?: number, addressOffset?: number, accountOptions?: Partial<AccountOptions>): Promise<LedgerSignature> {
     return this.withApp(async (app): Promise<LedgerSignature> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
-      const rs = this.scheme === LEDGER_SCHEME.ECDSA
+      const rs = this.scheme === POLKADOT_LEDGER_SCHEME.ECDSA
         ? await this.wrapError(app.signWithMetadataEcdsa(path, Buffer.from(message), Buffer.from(metadata)))
         : await this.wrapError(app.signWithMetadataEd25519(path, Buffer.from(message), Buffer.from(metadata)));
 
@@ -84,7 +84,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
     return this.withApp(async (app): Promise<LedgerSignature> => {
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
 
-      if (this.scheme === LEDGER_SCHEME.ECDSA) {
+      if (this.scheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
         const result = await this.wrapError(app.signRawEcdsa(path, Buffer.from(wrapBytes(message))));
 
         return {

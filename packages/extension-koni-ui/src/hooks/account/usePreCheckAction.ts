@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
-// TODO: Use AccountSignMode from the background for consistency.
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';

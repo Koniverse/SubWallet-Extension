@@ -1436,7 +1436,7 @@ export interface LedgerNetwork {
   slip44: number;
 }
 
-export const enum LEDGER_SCHEME {
+export const enum POLKADOT_LEDGER_SCHEME {
   ED25519 = 'ed25519',
   ECDSA = 'ecdsa',
 }

@@ -1,15 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, LEDGER_SCHEME, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 import { InjectContext } from '@subwallet/extension-koni-ui/contexts/InjectContext';
 import { useAlert, useGetAccountByAddress, useGetChainInfoByGenesisHash, useLedger, useMetadata, useNotification, useParseSubstrateRequestPayload, useSelector, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { approveSignPasswordV2, approveSignSignature, cancelSignRequest, shortenMetadata } from '@subwallet/extension-koni-ui/messaging';
-import { AccountSignMode, PhosphorIcon, SubstrateSigData, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { PhosphorIcon, SubstrateSigData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getSignMode, isRawPayload, isSubstrateMessage, removeTransactionPersist, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -46,7 +47,7 @@ const handleConfirm = async (id: string) => await approveSignPasswordV2({ id });
 const handleCancel = async (id: string) => await cancelSignRequest(id);
 const handleSignature = async (id: string, { signature, signedTransaction }: SubstrateSigData) => await approveSignSignature(id, signature, signedTransaction);
 
-const getChainSlug = (signMode: AccountSignMode, originGenesisHash?: string | null, accountChainInfoSlug?: string) => {
+const getLedgerChainSlug = (signMode: AccountSignMode, originGenesisHash?: string | null, accountChainInfoSlug?: string) => {
   if (signMode === AccountSignMode.GENERIC_LEDGER) {
     return originGenesisHash ? SUBSTRATE_MIGRATION_KEY : SUBSTRATE_GENERIC_KEY;
   }
@@ -127,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
         return CheckCircle;
     }
   }, [signMode]);
-  const chainSlug = useMemo(() => getChainSlug(signMode, account?.originGenesisHash, accountChainInfo?.slug), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
+  const chainSlug = useMemo(() => getLedgerChainSlug(signMode, account?.originGenesisHash, accountChainInfo?.slug), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
   const networkName = useMemo(() => chainInfo?.name || chain?.name || toShort(genesisHash), [chainInfo, genesisHash, chain]);
 
   const isMetadataOutdated = useMemo(() => {
@@ -271,7 +272,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const activeLedger = useMemo(() => isLedger && !loadingChain && alertData?.type !== 'error', [isLedger, loadingChain, alertData?.type]);
   const forceUseMigrationApp = useMemo(() => isRuntimeUpdated || (isMessage && chainSlug !== 'avail_mainnet'), [isRuntimeUpdated, isMessage, chainSlug]);
-  const accountSchema = useMemo(() => signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER ? LEDGER_SCHEME.ECDSA : LEDGER_SCHEME.ED25519, [signMode]);
+  const accountSchema = useMemo(() => signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER ? POLKADOT_LEDGER_SCHEME.ECDSA : POLKADOT_LEDGER_SCHEME.ED25519, [signMode]);
 
   const { error: ledgerError,
     isLoading: isLedgerLoading,

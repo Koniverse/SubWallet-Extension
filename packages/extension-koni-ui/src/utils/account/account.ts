@@ -6,11 +6,11 @@ import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
-import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressType, AccountType } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
 import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
@@ -59,6 +59,10 @@ export const findAccountByAddress = (accounts: AccountJson[], address?: string):
 
     return null;
   }
+};
+
+export const getSignModeByAccountProxy = (accountProxy: AccountProxy | null | undefined): AccountSignMode => {
+  return getSignMode(accountProxy?.accounts[0]);
 };
 
 export const getSignMode = (account: AccountJson | null | undefined): AccountSignMode => {

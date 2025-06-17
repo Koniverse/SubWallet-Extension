@@ -5,7 +5,7 @@ import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ExtrinsicType 
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, ProcessType } from '@subwallet/extension-base/types';
+import { AccountJson, AccountSignMode, ProcessType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
@@ -13,7 +13,7 @@ import { useAlert, useConfirmationsInfo, useSelector } from '@subwallet/extensio
 import { SubmitApiConfirmation } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Action';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ConfirmationType } from '@subwallet/extension-koni-ui/stores/base/RequestState';
-import { AccountSignMode, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, findChainInfoByGenesisHash, getSignMode, isRawPayload } from '@subwallet/extension-koni-ui/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

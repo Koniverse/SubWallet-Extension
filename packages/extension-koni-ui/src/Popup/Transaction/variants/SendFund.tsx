@@ -30,7 +30,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, isHasOnlySubstrateEcdsaAccountProxy, isSubstrateEcdsaAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, getSignModeByAccountProxy, hasOnlySubstrateEcdsaAccountProxy, isSubstrateEcdsaAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
@@ -65,13 +65,14 @@ function getTokenItems (
   accountProxies: AccountProxy[],
   chainInfoMap: Record<string, _ChainInfo>,
   assetRegistry: Record<string, _ChainAsset>,
-  tokenGroupSlug?: string, // is ether a token slug or a multiChainAsset slug
-  isSubstrateEcdsa?: boolean
+  tokenGroupSlug?: string // is ether a token slug or a multiChainAsset slug
 ): TokenSelectorItemType[] {
   let allowedChains: string[];
 
   if (!isAccountAll(accountProxy.id)) {
-    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain, isSubstrateEcdsa);
+    const signMode = getSignModeByAccountProxy(accountProxy);
+
+    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain, signMode);
   } else {
     allowedChains = getChainsByAccountAll(accountProxy, accountProxies, chainInfoMap);
   }
@@ -181,7 +182,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     if (!isAllAccount) {
       return isSubstrateEcdsaAccountProxy(targetAccountProxy);
     } else {
-      return isHasOnlySubstrateEcdsaAccountProxy(accountProxies);
+      return hasOnlySubstrateEcdsaAccountProxy(accountProxies);
     }
   }, [accountProxies, isAllAccount, targetAccountProxy]);
 
@@ -329,8 +330,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       accountProxies,
       chainInfoMap,
       assetRegistry,
-      sendFundSlug,
-      isSubstrateEcdsa
+      sendFundSlug
     );
 
     const tokenBalanceMap = getAccountTokenBalance(
@@ -363,7 +363,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     sortTokensByBalanceInSelector(tokenItemsSorted, priorityTokens);
 
     return tokenItemsSorted;
-  }, [accountProxies, assetRegistry, chainInfoMap, chainStateMap, getAccountTokenBalance, isSubstrateEcdsa, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
+  }, [accountProxies, assetRegistry, chainInfoMap, chainStateMap, getAccountTokenBalance, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
@@ -535,7 +535,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        isSubstrateTransaction: isSubstrateEcdsa
+        isSubstrateECDSATransaction: isSubstrateEcdsa
       });
     } else {
       // Make cross chain transfer

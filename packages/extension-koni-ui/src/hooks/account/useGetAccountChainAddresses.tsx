@@ -4,7 +4,7 @@
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress } from '@subwallet/extension-koni-ui/types';
-import { getChainsByAccountType } from '@subwallet/extension-koni-ui/utils';
+import { getChainsByAccountType, getSignModeByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 // todo:
@@ -15,8 +15,8 @@ const useGetAccountChainAddresses = (accountProxy: AccountProxy): AccountChainAd
 
   return useMemo(() => {
     const result: AccountChainAddress[] = [];
-    const isSubstrateECDSA = !!accountProxy.accounts[0]?.isSubstrateECDSA;
-    const chains: string[] = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain, isSubstrateECDSA);
+    const accountSignMode = getSignModeByAccountProxy(accountProxy);
+    const chains: string[] = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain, accountSignMode);
 
     accountProxy.accounts.forEach((a) => {
       for (const chain of chains) {

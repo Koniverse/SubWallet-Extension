@@ -43,7 +43,6 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   const { activeModal } = useContext(ModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
-  const accounts = useSelector((state: RootState) => state.accountState.accounts);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   // const [oldConnected, setOldConnected] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
@@ -52,10 +51,6 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   const _isNotConnected = isNotConnected || !authInfo;
   const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
   const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap?.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap?.evm, chainInfoMap]);
-
-  const substrateEcdsaAddresses = useMemo(() =>
-    accounts.filter((ac) => ac.isSubstrateECDSA)
-      .map(({ address }) => address), [accounts]);
   const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
       setAllowedMap((values) => {
@@ -137,7 +132,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       // setOldConnected(0);
       setAllowedMap({});
     }
-  }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap, substrateEcdsaAddresses]);
+  }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap]);
 
   const actionButtons = useMemo(() => {
     if (_isNotConnected) {
@@ -276,7 +271,10 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       );
     }
 
-    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || [], authInfo?.isSubstrateConnector).map((proxy) => {
+    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, {
+      accountAuthTypes: authInfo?.accountAuthTypes || [],
+      isSubstrateConnector: authInfo?.isSubstrateConnector
+    }).map((proxy) => {
       const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 
       return {

@@ -5,7 +5,14 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 
-export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], accountAuthTypes: AccountAuthType[], isSubstrateConnector = false): AccountProxy[] => {
+interface AuthorizeAccountProxiesConditions {
+  accountAuthTypes: AccountAuthType[];
+  isSubstrateConnector?: boolean;
+}
+
+export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], conditions: AuthorizeAccountProxiesConditions): AccountProxy[] => {
+  const { accountAuthTypes, isSubstrateConnector } = conditions;
+
   const rs = accountProxies.filter(({ accounts, chainTypes, id }) => {
     if (isAccountAll(id)) {
       return false;

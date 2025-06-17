@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, isAccountAll, isHasOnlySubstrateEcdsaAccountProxy, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, getSignModeByAccountProxy, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -65,22 +65,22 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
     return undefined;
   }, [accountProxies, accounts, address, currentAccountProxy?.id]);
 
-  const isSubstrateECDSA = useMemo((): boolean => {
+  const accountSignMode = useMemo(() => {
     const _address = address || currentAccountProxy?.id;
 
     if (_address) {
       if (isAccountAll(_address)) {
-        return isHasOnlySubstrateEcdsaAccountProxy(accountProxies);
+        return AccountSignMode.ALL_ACCOUNT;
       }
 
       const proxy = accountProxies.find((proxy) => proxy.id === _address);
 
       if (proxy) {
-        return isSubstrateEcdsaAccountProxy(proxy);
+        return getSignModeByAccountProxy(proxy);
       }
     }
 
-    return false;
+    return AccountSignMode.UNKNOWN;
   }, [accountProxies, address, currentAccountProxy?.id]);
 
   return useMemo<string[]>(() => {
@@ -92,6 +92,6 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
       return allAccount ? getChainsByAccountAll(allAccount, accountProxies, chainInfoMap) : [];
     }
 
-    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain, isSubstrateECDSA);
-  }, [address, currentAccountProxy?.id, chainInfoMap, chainTypes, specialChain, isSubstrateECDSA, accountProxies]);
+    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain, accountSignMode);
+  }, [address, currentAccountProxy?.id, chainInfoMap, chainTypes, specialChain, accountSignMode, accountProxies]);
 };

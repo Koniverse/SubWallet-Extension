@@ -3,9 +3,9 @@
 
 import { _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isPureSubstrateChain, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
-import { isHasOnlySubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import { hasOnlySubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 
 export const findChainInfoByGenesisHash = (chainMap: Record<string, _ChainInfo>, genesisHash?: string): _ChainInfo | null => {
   if (!genesisHash) {
@@ -63,7 +63,7 @@ export const isChainCompatibleWithAccountChainTypes = (chainInfo: _ChainInfo, ch
   return chainTypes.some((chainType) => isChainInfoAccordantAccountChainType(chainInfo, chainType));
 };
 
-export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>, chainTypes: AccountChainType[], specialChain?: string, isSubstrateECDSA?: boolean): string[] => {
+export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>, chainTypes: AccountChainType[], specialChain?: string, accountSignMode?: AccountSignMode): string[] => {
   const chainInfoMap = Object.fromEntries(Object.entries(_chainInfoMap).filter(([, chainInfo]) => chainInfo.chainStatus === _ChainStatus.ACTIVE));
 
   if (specialChain) {
@@ -72,7 +72,7 @@ export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>
     const result: string[] = [];
 
     for (const chainInfo of Object.values(chainInfoMap)) {
-      if (isSubstrateECDSA) {
+      if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
         if (_isSubstrateEvmCompatibleChain(chainInfo)) {
           result.push(chainInfo.slug);
         }
@@ -89,7 +89,7 @@ export const getChainsByAccountType = (_chainInfoMap: Record<string, _ChainInfo>
 export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProxies: AccountProxy[], _chainInfoMap: Record<string, _ChainInfo>): string[] => {
   const specialChainRecord: Record<AccountChainType, string[]> = {} as Record<AccountChainType, string[]>;
   const { chainTypes, specialChain } = accountAllProxy;
-  const isSubstrateECDSA = isHasOnlySubstrateEcdsaAccountProxy(accountProxies);
+  const isSubstrateECDSA = hasOnlySubstrateEcdsaAccountProxy(accountProxies);
   const chainInfoMap = Object.fromEntries(Object.entries(_chainInfoMap).filter(([, chainInfo]) => chainInfo.chainStatus === _ChainStatus.ACTIVE));
   /*
     Special chain List

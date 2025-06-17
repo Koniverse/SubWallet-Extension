@@ -48,8 +48,10 @@ function Component ({ className, request }: Props) {
   const setSelectedAccountTypes = useSetSelectedAccountTypes(true);
 
   // List all of all accounts by auth type
-  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, isSubstrateConnector)),
-    [accountAuthTypes, accountProxies, isSubstrateConnector]);
+  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, {
+    accountAuthTypes: accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, isSubstrateConnector
+  })),
+  [accountAuthTypes, accountProxies, isSubstrateConnector]);
 
   // Selected map with default values is map of all accounts
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});

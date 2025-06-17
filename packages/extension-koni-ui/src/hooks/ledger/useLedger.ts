@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { LEDGER_SCHEME, LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-koni-ui/connector';
@@ -55,7 +55,7 @@ const getNetworkByGenesisHash = (ledgerChains: MigrationLedgerNetwork[], genesis
   return ledgerChains.find((network) => network.genesisHash === genesisHash);
 };
 
-const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: LEDGER_SCHEME): Ledger => {
+const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrateLedgerChains: MigrationLedgerNetwork[], isEthereumNetwork: boolean, forceMigration: boolean, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: POLKADOT_LEDGER_SCHEME): Ledger => {
   const { isLedgerCapable } = baseState;
 
   assert(isLedgerCapable, ledgerIncompatible);
@@ -68,7 +68,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
     if (def.isEthereum) {
       return new EVMLedger('webusb', def.slip44);
     } else {
-      if (ledgerScheme === LEDGER_SCHEME.ECDSA) {
+      if (ledgerScheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
         return new SubstrateECDSALedger('webusb', def.slip44);
       } else if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
@@ -93,7 +93,7 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
   }
 };
 
-export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: LEDGER_SCHEME): Result {
+export function useLedger (chainSlug?: string, active = true, isSigning = false, forceMigration = false, originGenesisHash?: string | null, isRecovery?: boolean, ledgerScheme?: POLKADOT_LEDGER_SCHEME): Result {
   const { t } = useTranslation();
 
   const [ledgerChains, migrateLedgerChains] = useGetSupportedLedger();

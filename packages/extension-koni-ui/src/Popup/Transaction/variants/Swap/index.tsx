@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isSubstrateEcdsaAccountProxy, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, getSignModeByAccountProxy, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -295,9 +295,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         return false;
       }
 
-      const isSubstrateECDSA = isSubstrateEcdsaAccountProxy(targetAccountProxy);
+      const signMode = getSignModeByAccountProxy(targetAccountProxy);
 
-      if (!isTokenCompatibleWithAccountChainTypes(slug, targetAccountProxy.chainTypes, chainInfoMap, isSubstrateECDSA)) {
+      if (!isTokenCompatibleWithAccountChainTypes(slug, targetAccountProxy.chainTypes, chainInfoMap, signMode)) {
         return false;
       }
 
@@ -324,9 +324,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
-    const isSubstrateECDSA = isSubstrateEcdsaAccountProxy(targetAccountProxy);
+    const signMode = getSignModeByAccountProxy(targetAccountProxy);
 
-    return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap, isSubstrateECDSA);
+    return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap, signMode);
   }, [chainInfoMap, targetAccountProxy, toTokenSlugValue]);
 
   // Unable to use useEffect due to infinity loop caused by conflict setCurrentSlippage and currentQuote

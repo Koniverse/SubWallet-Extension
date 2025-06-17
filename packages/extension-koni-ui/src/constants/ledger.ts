@@ -3,7 +3,7 @@
 
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
