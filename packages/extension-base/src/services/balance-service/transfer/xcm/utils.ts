@@ -140,7 +140,7 @@ function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Submittable
 }
 
 export async function buildXcm (request: CreateXcmExtrinsicProps) {
-  const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi, sender } = request;
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
     throw new Error('Substrate API is not available');
