@@ -89,6 +89,8 @@ function Component ({ className, request, type }: Props) {
           duration: 8
         });
         setIsErrorTransaction(true);
+        setTransferInfo(transferInfo);
+        cancelSubscription(transferInfo.id).catch(console.error);
       } else if (!cancel) {
         setTransferInfo(transferInfo);
         id = transferInfo.id;
