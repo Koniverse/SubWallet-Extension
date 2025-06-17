@@ -111,7 +111,7 @@ export interface RequestSignatures extends KoniRequestSignatures {
   'pub(accounts.list)': [RequestAccountList, InjectedAccount[]];
   'pub(accounts.subscribe)': [RequestAccountSubscribe, boolean, InjectedAccount[]];
   'pub(authorize.tab)': [RequestAuthorizeTab, null];
-  'pub(authorize.tabV2)': [RequestAuthorizeTab, null];
+  'pub(authorize.tabV2)': [RequestAuthorizeTab, boolean];
   'pub(bytes.sign)': [SignerPayloadRaw, ResponseSigning];
   'pub(extrinsic.sign)': [SignerPayloadJSON, ResponseSigning];
   'pub(metadata.list)': [null, InjectedMetadataKnown[]];
@@ -143,7 +143,7 @@ export interface TransportRequestMessage<TMessageType extends MessageTypes> {
   request: RequestTypes[TMessageType];
 }
 
-export type AccountAuthType = 'substrate' | 'evm' | 'ton';
+export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano';
 
 export interface RequestAuthorizeTab {
   origin: string;

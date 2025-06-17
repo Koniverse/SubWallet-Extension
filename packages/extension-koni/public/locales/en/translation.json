@@ -1495,5 +1495,16 @@
   "Do not close the app!": "",
   "View process": "",
   "Quote": "",
-  "Expected amount": ""
+  "Expected amount": "",
+  "Not found auth info": "",
+  "Not found owner key hash": "",
+  "No available Cardano account": "",
+  "Input": "",
+  "Output": "",
+  "Cardano dApp": "",
+  "Your balance": "",
+  "Network display": "",
+  "Open in sidebar": "",
+  "Open in popup": "",
+  "Amount too high. Lower your amount and try again": ""
 }

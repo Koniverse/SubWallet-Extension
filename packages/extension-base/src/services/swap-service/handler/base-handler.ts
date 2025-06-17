@@ -11,8 +11,9 @@ import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from 
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { _isAcrossChainBridge, AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
@@ -24,6 +25,8 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+import { createAcrossBridgeExtrinsic } from '../../balance-service/transfer/xcm';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -85,6 +88,12 @@ export class SwapBaseHandler {
 
       return result;
     } catch (e) {
+      const errorMessage = (e as Error).message;
+
+      if (errorMessage.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW) || errorMessage.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+        throw new Error(errorMessage);
+      }
+
       return result;
     }
   }
@@ -241,7 +250,19 @@ export class SwapBaseHandler {
     }
   }
 
-  public async handleBridgeStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
+  public async handleBridgeStep (params: SwapSubmitParams, type: string): Promise<SwapSubmitStepData> {
+    if (type === 'xcm') {
+      return this.handleBridgeSubstrate(params);
+    }
+
+    if (type === 'across') {
+      return this.handleBridgeAcross(params);
+    }
+
+    throw Error('Not support this type');
+  }
+
+  public async handleBridgeSubstrate (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const briefXcmStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
 
     if (!briefXcmStep || !briefXcmStep.originTokenInfo || !briefXcmStep.destinationTokenInfo || !briefXcmStep.sendingValue) {
@@ -293,6 +314,55 @@ export class SwapBaseHandler {
     } as SwapSubmitStepData;
   }
 
+  public async handleBridgeAcross (params: SwapSubmitParams) {
+    const bridgeStep = params.process.steps[params.currentStep].metadata as unknown as BaseSwapStepMetadata;
+
+    if (!bridgeStep || !bridgeStep.originTokenInfo || !bridgeStep.destinationTokenInfo || !bridgeStep.sendingValue) {
+      throw new Error('Bridge metadata error');
+    }
+
+    const originTokenInfo = bridgeStep.originTokenInfo;
+    const destinationTokenInfo = bridgeStep.destinationTokenInfo;
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+    const evmApi = await this.chainService.getEvmApi(originTokenInfo.originChain).isReady;
+    const feeInfo = await this.feeService.subscribeChainFee(getId(), originTokenInfo.originChain, 'evm');
+    const sendingValue = bridgeStep.sendingValue;
+    const sender = bridgeStep.sender;
+    const recipient = bridgeStep.receiver;
+
+    const tx = await createAcrossBridgeExtrinsic({
+      originTokenInfo,
+      destinationTokenInfo,
+      originChain,
+      destinationChain,
+      evmApi,
+      feeInfo,
+      sendingValue,
+      sender,
+      recipient
+    });
+
+    const txData: RequestCrossChainTransfer = {
+      originNetworkKey: originTokenInfo.originChain,
+      destinationNetworkKey: destinationTokenInfo.originChain,
+      from: sender,
+      to: recipient,
+      value: sendingValue,
+      tokenSlug: originTokenInfo.slug,
+      showExtraWarning: true
+    };
+
+    return {
+      txChain: originTokenInfo.originChain,
+      extrinsic: tx,
+      transferNativeAmount: _isNativeToken(originTokenInfo) ? bridgeStep.sendingValue : '0',
+      extrinsicType: ExtrinsicType.TRANSFER_XCM,
+      chainType: ChainType.EVM,
+      txData: txData
+    } as SwapSubmitStepData;
+  }
+
   public async validateSetFeeTokenStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
     if (!params.selectedQuote) {
       return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
@@ -327,22 +397,26 @@ export class SwapBaseHandler {
       return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: fromToken.symbol } }))];
     }
 
-    // By here, we know that the user is receiving a valid amount of toToken
-    const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
-    const sufficientChain = this.chainService.value.sufficientChains;
+    const isAcrossBridge = _isAcrossChainBridge(_getAssetOriginChain(fromToken), _getAssetOriginChain(toToken));
 
-    if (!toChainApi) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
-    }
+    if (!isAcrossBridge) {
+      // By here, we know that the user is receiving a valid amount of toToken
+      const toChainApi = this.chainService.getSubstrateApi(toToken.originChain);
+      const sufficientChain = this.chainService.value.sufficientChains;
 
-    // Only need to check if account is alive with the receiving toToken
-    const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi, sufficientChain);
+      if (!toChainApi) {
+        return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      }
 
-    if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
-      const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+      // Only need to check if account is alive with the receiving toToken
+      const isToTokenSufficient = await _isSufficientToken(toToken, toChainApi, sufficientChain);
 
-      if (!_isAccountActive(toChainNativeTokenBalance.metadata as FrameSystemAccountInfo)) {
-        return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
+      if (!isToTokenSufficient && !_isNativeToken(toToken)) { // sending token cannot keep account alive, must check with native token
+        const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
+
+        if (!_isAccountActive(toChainNativeTokenBalance.metadata as FrameSystemAccountInfo)) {
+          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
+        }
       }
     }
 

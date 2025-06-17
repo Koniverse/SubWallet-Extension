@@ -3,3 +3,4 @@
 
 export { default as EvmSignatureConfirmation } from './EvmSignatureConfirmation';
 export { default as EvmSignatureWithProcess } from './EvmSignatureWithProcess';
+export { default as CardanoSignatureConfirmation } from './CardanoSignatureConfirmation';
