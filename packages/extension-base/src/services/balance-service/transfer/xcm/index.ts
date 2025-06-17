@@ -7,7 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, DryRunNodeResult, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -169,21 +169,25 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
   try {
     const dryRunResult = await dryRunXcm(request);
-    const originDryRunResult = dryRunResult.origin;
+    const originDryRunRs = dryRunResult.origin;
 
-    if (originDryRunResult.success) {
-      const destinationDryRunResult = dryRunResult.destination as DryRunNodeResult;
+    if (originDryRunRs.success) {
+      const { assetHub, bridgeHub, destination } = dryRunResult;
 
-      if (destinationDryRunResult.success) {
-        return true;
+      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
+        if (destination?.success === false) {
+          // pass dry-run in these cases
+          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
+        }
+
+        return false;
       }
 
-      // pass dry-run in these cases
-      return isChainNotSupportDryRun(destinationDryRunResult.failureReason) || isChainNotSupportPolkadotApi(destinationDryRunResult.failureReason);
+      return true;
     }
 
     // pass dry-run in these cases
-    return isChainNotSupportDryRun(originDryRunResult.failureReason) || isChainNotSupportPolkadotApi(originDryRunResult.failureReason);
+    return isChainNotSupportDryRun(originDryRunRs.failureReason) || isChainNotSupportPolkadotApi(originDryRunRs.failureReason);
   } catch (e) {
     return false;
   }
