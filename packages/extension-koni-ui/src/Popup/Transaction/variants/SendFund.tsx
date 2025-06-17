@@ -93,7 +93,7 @@ const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 
 const alertModalId = 'confirmation-alert-modal';
 const defaultAddressInputRenderKey = 'address-input-render-key';
 
-const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm', 'bitcoin'];
+const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
 
 const Component = ({ className = '', isAllAccount, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
   useSetCurrentPage('/transaction/send-fund');

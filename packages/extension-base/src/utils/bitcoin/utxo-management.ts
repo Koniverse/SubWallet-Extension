@@ -199,7 +199,7 @@ export function determineUtxosForSpend ({ amount,
     sizeInfo = getSizeInfo({
       inputLength: neededUtxos.length,
       sender,
-      recipients: recipients.slice(-1)
+      recipients: recipients.slice(0, 1)
     });
     const newFee = sum.minus(amount).toNumber();
 
