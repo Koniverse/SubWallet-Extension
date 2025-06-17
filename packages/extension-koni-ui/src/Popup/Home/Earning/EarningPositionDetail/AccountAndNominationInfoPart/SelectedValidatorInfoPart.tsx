@@ -28,7 +28,7 @@ type Props = ThemeProps & {
   modalId?: string
 };
 
-function Component ({ addresses, className, compound, disabledButton, maxValidator, modalId, poolInfo, title, totalValidator }: Props) {
+function Component ({ addresses, className, compound, disabledButton, maxValidator, modalId, poolInfo, title = 'Your validators', totalValidator }: Props) {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
@@ -94,7 +94,7 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
           className='__panel-header'
           onClick={onClick}
         >
-          <div className='__panel-title'>{t(title || 'Your validators')}</div>
+          <div className='__panel-title'>{t(title)}</div>
           <div className='__panel-icon'>
             <div className='__panel-count'>{countText}</div>
             <Icon
@@ -116,6 +116,7 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
         nominations={compound.nominations}
         setForceFetchValidator={setForceFetchValidator}
         slug={poolInfo.slug}
+        title={title}
       />
     </>
   );

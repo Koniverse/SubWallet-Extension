@@ -10,9 +10,10 @@ import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { InputRef, SelectModal } from '@subwallet/react-ui';
+import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
+import { Book } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -24,13 +25,14 @@ interface Props extends ThemeProps, BasicInputWrapper {
   chain: string,
   poolInfo: YieldPoolInfo
   networkPrefix?: number;
+  isChangeValidator?: boolean
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
 // todo: update filter for this component, after updating filter for SelectModal
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, networkPrefix, nominators, placeholder, poolInfo, statusHelp, value } = props;
+  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', isChangeValidator, label, networkPrefix, nominators, placeholder, poolInfo, statusHelp, value } = props;
 
   const filteredItems = useMemo(() => {
     return nominators.filter((item) => new BigN(item.activeStake).gt(0));
@@ -67,13 +69,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     (item: NominationInfo, isSelected: boolean) => {
       return (
         <StakingNominationItem
+          isChangeValidator={isChangeValidator}
           isSelected={isSelected}
           nominationInfo={item}
           poolInfo={poolInfo}
         />
       );
     },
-    [poolInfo]
+    [isChangeValidator, poolInfo]
   );
 
   const handleValidatorLabel = useMemo(() => {
@@ -123,6 +126,16 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
         selected={value || ''}
         statusHelp={statusHelp}
+        suffix={
+          isChangeValidator
+            ? (
+              <Icon
+                phosphorIcon={Book}
+                size='sm'
+              />
+            )
+            : undefined
+        }
         title={t('Select') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
       />
     </>

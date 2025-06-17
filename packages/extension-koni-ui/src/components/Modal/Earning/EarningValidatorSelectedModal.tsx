@@ -24,6 +24,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;
   from: string;
   slug: string;
+  title?: string;
   nominations: NominationInfo[]
   setForceFetchValidator: (val: boolean) => void;
   disabledButton?: boolean;
@@ -32,12 +33,12 @@ interface Props extends ThemeProps, BasicInputWrapper {
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { addresses, chain, className = '', disabledButton, from
-    , loading, modalId, nominations, onChange, setForceFetchValidator, slug } = props;
+    , loading, modalId, nominations, onChange, setForceFetchValidator, slug, title = 'Your validators' } = props;
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
 
   const { t } = useTranslation();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const { poolInfoMap } = useSelector((state) => state.earning);
@@ -63,7 +64,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
     const nominatedValidatorAddresses = nominations.map((n) => n.validatorAddress);
 
-    return items.filter((item) => nominatedValidatorAddresses.includes(item.address.trim()));
+    const list = items.filter((item) => nominatedValidatorAddresses.includes(item.address.trim()));
+
+    return list;
   }, [items, nominations, addresses]);
 
   const handleValidatorLabel = useMemo(() => {
@@ -79,9 +82,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      inactiveModal(modalId);
       activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
     },
-    [activeModal]
+    [activeModal, inactiveModal, modalId]
   );
 
   const onClickMore = useCallback((item: ValidatorDataType) => {
@@ -100,7 +104,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         validatorTitle={t(handleValidatorLabel)}
       />
     );
-  }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
+  }, [handleValidatorLabel, items, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
@@ -131,7 +135,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   return (
     <>
       <SwModal
-        className={`${className} modal-full`}
+        className={`${className} ${!disabledButton ? 'modal-full' : ''}`}
         closeIcon={(
           <Icon
             phosphorIcon={CaretLeft}
@@ -156,7 +160,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         }
         id={modalId}
         onCancel={onCancelSelectValidator}
-        title={t('Your validators')}
+        title={t(title)}
       >
         <SwList.Section
           list={resultList}
@@ -203,12 +207,28 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   );
 };
 
-const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ disabledButton, theme: { token } }: Props) => {
   return {
+    ...(!disabledButton
+      ? {}
+      : {
+        '.ant-sw-list': {
+          paddingLeft: 0,
+          paddingRight: 0
+        }
+      }),
+
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingLG,
+
+      '.ant-typography-ellipsis': {
+        maxWidth: 'none',
+        overflow: 'visible',
+        textOverflow: 'initial'
+      }
     },
+
     '.__pool-item-wrapper': {
       marginBottom: token.marginXS
     },

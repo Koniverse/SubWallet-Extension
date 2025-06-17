@@ -149,7 +149,6 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return list.find((item) => isSameAddress(item.address, selectedAddress));
   }, [list, selectedAddress]);
 
-  console.log('compound', [compound.nominations, selectedItem]);
   const renderAccount = useCallback(
     (item: YieldPositionInfo) => {
       const account = findAccountByAddress(accounts, item.address);

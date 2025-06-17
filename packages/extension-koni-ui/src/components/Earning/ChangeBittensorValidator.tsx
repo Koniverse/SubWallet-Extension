@@ -286,37 +286,37 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useExcludeModal(modalId);
 
   return (
-    <Form
-      className={'form-container form-space-sm'}
-      form={form}
-      initialValues={formDefault}
-      name='change-validator-form'
-      onFinish={onClickSubmit}
-      onValuesChange={onValuesChange}
+    <SwModal
+      className={`${className}`}
+      closeIcon={<Icon
+        phosphorIcon={CaretLeft}
+        size='md'
+      />}
+      footer={
+        <Button
+          block
+          disabled={isDisabled}
+          icon={<Icon
+            phosphorIcon={CheckCircle}
+            weight={'fill'}
+          />}
+          loading={submitLoading}
+          onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+        >
+          {t('Update validator')}
+        </Button>
+      }
+      id={modalId}
+      onCancel={onCancelSelectValidator}
+      title={t('Change validator')}
     >
-      <SwModal
-        className={`${className} modal-full`}
-        closeIcon={<Icon
-          phosphorIcon={CaretLeft}
-          size='md'
-        />}
-        footer={
-          <Button
-            block
-            disabled={isDisabled}
-            icon={<Icon
-              phosphorIcon={CheckCircle}
-              weight={'fill'}
-            />}
-            loading={submitLoading}
-            onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
-          >
-            {t('Update validator')}
-          </Button>
-        }
-        id={modalId}
-        onCancel={onCancelSelectValidator}
-        title={t('Change validator')}
+      <Form
+        className={'form-container form-space-sm'}
+        form={form}
+        initialValues={formDefault}
+        name='change-validator-form'
+        onFinish={onClickSubmit}
+        onValuesChange={onValuesChange}
       >
         <Form.Item name={'from'}>
           <AccountItemWithName
@@ -340,6 +340,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             chain={chain}
             defaultValue={persistValidator}
             disabled={!from}
+            isChangeValidator={true}
             label={t('From')}
             networkPrefix={networkPrefix}
             nominators={nominations}
@@ -417,17 +418,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           </div>
         </>
         )}
-      </SwModal>
-    </Form>
+      </Form>
+    </SwModal>
   );
 };
 
 const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
-    '.ant-sw-modal-content': {
-      height: '90vh !important'
-    },
-
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
       paddingBottom: token.paddingLG

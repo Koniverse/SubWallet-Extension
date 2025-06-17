@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     disabledButton={true}
                     modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-newly`}
                     poolInfo={poolInfo}
-                    title={'Validators newly selected'}
+                    title={'Newly selected validators'}
                     totalValidator={newlySelectedCount}
                   />
                 )

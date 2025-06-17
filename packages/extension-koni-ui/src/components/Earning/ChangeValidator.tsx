@@ -275,7 +275,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (isNoValidatorChanged) {
       openAlert({
         type: NotificationType.INFO,
-        content: t('Your new selections of validators is the same as the original selection. Do you still want to continue'),
+        content: t('Your new selections of validators is the same as the original selection. Do you still want to continue?'),
         title: t('No changes detected!'),
         okButton: {
           text: t('Continue'),
@@ -402,51 +402,51 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   return (
     <>
-      <Form
-        className={'form-container form-space-sm'}
-        form={form}
-        onFinish={onClickSubmit}
-      >
-        <SwModal
-          className={`${className} modal-full`}
-          closeIcon={(
-            <Icon
-              phosphorIcon={CaretLeft}
-              size='md'
-            />
-          )}
-          footer={(
-            <Button
-              block
-              disabled={!changeValidators.length}
-              icon={(
-                <Icon
-                  phosphorIcon={CheckCircle}
-                  weight={'fill'}
-                />
-              )}
-              loading={submitLoading}
-              onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+      <SwModal
+        className={`${className} modal-full`}
+        closeIcon={(
+          <Icon
+            phosphorIcon={CaretLeft}
+            size='md'
+          />
+        )}
+        footer={(
+          <Button
+            block
+            disabled={!changeValidators.length}
+            icon={(
+              <Icon
+                phosphorIcon={CheckCircle}
+                weight={'fill'}
+              />
+            )}
+            loading={submitLoading}
+            onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+          >
+            {t(applyLabel, { number: changeValidators.length })}
+          </Button>
+        )}
+        id={modalId}
+        onCancel={onCancelSelectValidator}
+        rightIconProps={{
+          icon: (
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
             >
-              {t(applyLabel, { number: changeValidators.length })}
-            </Button>
-          )}
-          id={modalId}
-          onCancel={onCancelSelectValidator}
-          rightIconProps={{
-            icon: (
-              <Badge
-                className={'g-filter-badge'}
-                dot={sortSelection !== SortKey.DEFAULT}
-              >
-                <Icon phosphorIcon={SortAscending} />
-              </Badge>
-            ),
-            onClick: () => {
-              activeModal(SORTING_MODAL_ID);
-            }
-          }}
-          title={t('Select') + ' ' + t(handleValidatorLabel)}
+              <Icon phosphorIcon={SortAscending} />
+            </Badge>
+          ),
+          onClick: () => {
+            activeModal(SORTING_MODAL_ID);
+          }
+        }}
+        title={t('Select') + ' ' + t(handleValidatorLabel)}
+      >
+        <Form
+          className={'form-container form-space-sm'}
+          form={form}
+          onFinish={onClickSubmit}
         >
           <Form.Item
             name={'target'}
@@ -466,33 +466,33 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             // showActionBtn
             />
           </Form.Item>
-        </SwModal>
+        </Form>
+      </SwModal>
 
-        <FilterModal
-          id={FILTER_MODAL_ID}
-          onApplyFilter={onApplyFilter}
-          onCancel={onCloseFilterModal}
-          onChangeOption={onChangeFilterOption}
-          optionSelectionMap={filterSelectionMap}
-          options={filterOptions}
+      <FilterModal
+        id={FILTER_MODAL_ID}
+        onApplyFilter={onApplyFilter}
+        onCancel={onCloseFilterModal}
+        onChangeOption={onChangeFilterOption}
+        optionSelectionMap={filterSelectionMap}
+        options={filterOptions}
+      />
+
+      <SortingModal
+        id={SORTING_MODAL_ID}
+        onChangeOption={onChangeSortOpt}
+        onReset={onResetSort}
+        optionSelection={sortSelection}
+        options={sortingOptions}
+      />
+
+      {viewDetailItem && (
+        <EarningValidatorDetailModal
+          chain={chain}
+          maxPoolMembersValue={maxPoolMembersValue}
+          validatorItem={viewDetailItem}
         />
-
-        <SortingModal
-          id={SORTING_MODAL_ID}
-          onChangeOption={onChangeSortOpt}
-          onReset={onResetSort}
-          optionSelection={sortSelection}
-          options={sortingOptions}
-        />
-
-        {viewDetailItem && (
-          <EarningValidatorDetailModal
-            chain={chain}
-            maxPoolMembersValue={maxPoolMembersValue}
-            validatorItem={viewDetailItem}
-          />
-        )}
-      </Form>
+      )}
     </>
   );
 };
