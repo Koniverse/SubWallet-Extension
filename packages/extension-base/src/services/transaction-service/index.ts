@@ -50,10 +50,6 @@ import NotificationService from '../notification-service/NotificationService';
 
 export default class TransactionService {
   private readonly state: KoniState;
-  private readonly eventService: EventService;
-  private readonly historyService: HistoryService;
-  private readonly notificationService: NotificationService;
-  private readonly chainService: ChainService;
 
   private readonly watchTransactionSubscribes: Record<string, Promise<void>> = {};
 
@@ -70,10 +66,6 @@ export default class TransactionService {
 
   constructor (state: KoniState) {
     this.state = state;
-    this.eventService = state.eventService;
-    this.historyService = state.historyService;
-    this.notificationService = state.notificationService;
-    this.chainService = state.chainService;
   }
 
   private get allTransactions (): SWTransactionBase[] {
@@ -160,7 +152,7 @@ export default class TransactionService {
     const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(chain);
     const tokenPayFeeSlug = transactionInput.tokenPayFeeSlug;
     const isNonNativeTokenPayFee = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug);
-    const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
+    const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
     validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
@@ -1247,16 +1239,16 @@ export default class TransactionService {
     if (transaction) {
       this.updateTransaction(id, { status: nextStatus, errors, extrinsicHash });
 
-      this.historyService.updateHistoryByExtrinsicHash(transaction.extrinsicHash, {
+      this.state.historyService.updateHistoryByExtrinsicHash(transaction.extrinsicHash, {
         extrinsicHash: extrinsicHash || transaction.extrinsicHash,
         status: nextStatus,
         blockNumber: blockNumber || 0,
         blockHash: blockHash || ''
       }).catch(console.error);
 
-      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.chainService.getChainInfoMap());
+      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-      this.notificationService.notify({
+      this.state.notificationService.notify({
         type: NotificationType.ERROR,
         title: t('Transaction timed out'),
         message: t('Transaction {{info}} timed out', { replace: { info } }),
@@ -1265,7 +1257,7 @@ export default class TransactionService {
       });
     }
 
-    this.eventService.emit('transaction.timeout', transaction);
+    this.state.eventService.emit('transaction.timeout', transaction);
   }
 
   public generateHashPayload (chain: string, transaction: TransactionConfig): HexString {
@@ -1955,7 +1947,7 @@ export default class TransactionService {
     // Add start info
     emitter.emit('send', eventData);
 
-    const event = this.chainService.getBitcoinApi(chain).api.sendRawTransaction(payload);
+    const event = this.state.chainService.getBitcoinApi(chain).api.sendRawTransaction(payload);
 
     event.on('extrinsicHash', (txHash) => {
       eventData.extrinsicHash = txHash;
