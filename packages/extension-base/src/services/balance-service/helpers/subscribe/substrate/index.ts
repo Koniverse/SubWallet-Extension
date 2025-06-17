@@ -21,7 +21,8 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
-import { timer } from 'rxjs';
+import { AnyFunc, GenericStorageQuery, RpcVersion } from 'dedot/types';
+import { Observable, timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
@@ -616,3 +617,25 @@ async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[
     } as unknown as BalanceItem;
   }));
 }
+
+export const createObservable = <F extends AnyFunc>(func: GenericStorageQuery<RpcVersion, F>, ...args: Parameters<F>): Observable<ReturnType<F>> => {
+  return new Observable<ReturnType<F>>((_subscriber) => {
+    let unsub: (() => void) | undefined;
+
+    func(...args, (value: ReturnType<F>) => {
+      if (!_subscriber.closed) {
+        _subscriber.next(value);
+      } else {
+        unsub?.();
+      }
+    }).then((_unsub) => {
+      if (!_subscriber.closed) {
+        unsub = _unsub;
+      }
+    }).catch((err) => _subscriber.error(err));
+
+    return () => {
+      unsub?.();
+    };
+  });
+};

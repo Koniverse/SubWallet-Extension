@@ -134,7 +134,7 @@ export const createSubstrateExtrinsicV2 = async ({ from, networkKey, substrateAp
 
   // @ts-ignore
   let transfer: SubmittableExtrinsic<'promise'> | null = null;
-  const isTxCurrenciesSupported = !!client && !!client && !!client.tx.currencies;
+  const isTxCurrenciesSupported = !!client && !!client.tx && !!client.tx.currencies;
   const isTxBalancesSupported = !!client && !!client.tx && !!client.tx.balances;
   const isTxTokensSupported = !!client && !!client.tx && !!client.tx.tokens;
   const isTxAssetsSupported = !!client && !!client.tx && !!client.tx.assets;
