@@ -1632,7 +1632,7 @@ export default class KoniExtension {
     const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
     const isAcrossBridgeTransfer = _isAcrossChainBridge(originNetworkKey, destinationNetworkKey);
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
-    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer);
+    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
@@ -1732,46 +1732,58 @@ export default class KoniExtension {
         let isSendingTokenSufficient = false;
         let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
-        if (!_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
-          return undefined;
+        if (_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
+          const setting = { visible: true };
+
+          await this.#koniState.chainService.updateAssetSetting(destinationTokenInfo.slug, setting, true);
+
+          const { value: _senderTransferable } = await this.getAddressTransferableBalance({
+            address: from,
+            networkKey: originNetworkKey,
+            token: originTokenInfo.slug
+          });
+          const senderTransferable = BigInt(_senderTransferable);
+
+          const sendingAmount = BigInt(value);
+
+          const { value: _receiverDestinationTokenKeepAliveBalance } = await this.getAddressTotalBalance({
+            address: to,
+            networkKey: destinationNetworkKey,
+            token: destinationTokenInfo.slug,
+            extrinsicType
+          });
+          const receiverDestinationTokenKeepAliveBalance = BigInt(_receiverDestinationTokenKeepAliveBalance);
+
+          if (!_isNativeToken(destinationTokenInfo)) {
+            const _receiverNativeTotal = await this.getAddressTotalBalance({
+              address: to,
+              networkKey: destinationNetworkKey,
+              token: destinationNativeTokenSlug,
+              extrinsicType
+            });
+
+            receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
+          }
+
+          const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+          const sufficientChain = this.#koniState.chainService.value.sufficientChains;
+
+          isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
+
+          const [warning, error] = additionalValidateTransferForRecipient(
+            destinationTokenInfo,
+            destinationNativeTokenInfo,
+            extrinsicType,
+            receiverDestinationTokenKeepAliveBalance,
+            sendingAmount,
+            senderTransferable, // different from sendingTokenInfo being passed in
+            receiverSystemAccountInfo,
+            isSendingTokenSufficient
+          );
+
+          warning.length && inputTransaction.warnings.push(...warning);
+          error.length && inputTransaction.errors.push(...error);
         }
-
-        const setting = { visible: true };
-
-        await this.#koniState.chainService.updateAssetSetting(destinationTokenInfo.slug, setting, true);
-
-        const { value: _senderTransferable } = await this.getAddressTransferableBalance({ address: from, networkKey: originNetworkKey, token: originTokenInfo.slug });
-        const senderTransferable = BigInt(_senderTransferable);
-
-        const sendingAmount = BigInt(value);
-
-        const { value: _receiverDestinationTokenKeepAliveBalance } = await this.getAddressTotalBalance({ address: to, networkKey: destinationNetworkKey, token: destinationTokenInfo.slug, extrinsicType });
-        const receiverDestinationTokenKeepAliveBalance = BigInt(_receiverDestinationTokenKeepAliveBalance);
-
-        if (!_isNativeToken(destinationTokenInfo)) {
-          const _receiverNativeTotal = await this.getAddressTotalBalance({ address: to, networkKey: destinationNetworkKey, token: destinationNativeTokenSlug, extrinsicType });
-
-          receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
-        }
-
-        const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
-        const sufficientChain = this.#koniState.chainService.value.sufficientChains;
-
-        isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
-
-        const [warning, error] = additionalValidateTransferForRecipient(
-          destinationTokenInfo,
-          destinationNativeTokenInfo,
-          extrinsicType,
-          receiverDestinationTokenKeepAliveBalance,
-          sendingAmount,
-          senderTransferable, // different from sendingTokenInfo being passed in
-          receiverSystemAccountInfo,
-          isSendingTokenSufficient
-        );
-
-        warning.length && inputTransaction.warnings.push(...warning);
-        error.length && inputTransaction.errors.push(...error);
 
         if (isSubstrateXcm) {
           const isDryRunSuccess = await dryRunXcmExtrinsicV2(params);
