@@ -60,16 +60,16 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
   return (
     <>
       <MetaInfo.Default
-        className={CN(className, '__validator-address')}
+        className={CN(className, 'meta-info_validator-group')}
         label={t(title)}
       >
         <div
-          className='__panel-header'
+          className='validator-group__info'
           onClick={onClick}
         >
           {totalValidatorSelected}
           <Icon
-            className='__panel-icon'
+            className='validator-group__icon'
             phosphorIcon={Info}
             size='sm'
           />
@@ -232,7 +232,7 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       marginBottom: '0px'
     },
 
-    '.__panel-header': {
+    '.validator-group__info': {
       display: 'flex',
       alignItems: 'center',
       gap: token.sizeXXS,
