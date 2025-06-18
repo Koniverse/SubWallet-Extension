@@ -863,7 +863,16 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     if (!targets.length && handler) {
       await this.eventService.waitChainReady;
-      targets = await handler.getPoolTargets();
+
+      const isSubnet = slug.match(/subnet_(\d+)/);
+
+      if (isSubnet) {
+        const subnet = Number(isSubnet[1]);
+
+        targets = await handler.getPoolTargets(subnet);
+      } else {
+        targets = await handler.getPoolTargets();
+      }
     }
 
     return targets;

@@ -165,7 +165,7 @@ export default abstract class BasePoolHandler {
   /** Get pool reward history */
   public abstract getPoolRewardHistory (useAddresses: string[], callback: (rs: EarningRewardHistoryItem) => void): Promise<VoidFunction>;
   /** Get pool target */
-  public abstract getPoolTargets (): Promise<YieldPoolTarget[]>;
+  public abstract getPoolTargets (netuid?: number): Promise<YieldPoolTarget[]>;
 
   /* Subscribe data */
 
