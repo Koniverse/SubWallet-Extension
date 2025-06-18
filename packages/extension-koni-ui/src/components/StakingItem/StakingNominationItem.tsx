@@ -31,7 +31,6 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
 
-  console.log('decimals', props);
   const subnetSymbol = poolInfo.metadata.subnetData?.subnetSymbol;
 
   return (
@@ -57,18 +56,26 @@ const Component: React.FC<Props> = (props: Props) => {
 
             <div className={'middle-item__info'}>
               {
-                isChangeValidator
+                isChangeValidator && (nominationInfo.commission || nominationInfo.expectedReturn)
                   ? (
                     <div className={'middle-item__change-validator'}>
-                      <span className={'middle-item__apy'}>
-                        <Icon
-                          phosphorIcon={CurrencyCircleDollar}
-                          size='xs'
-                          weight='fill'
-                        />
-                        : 15%
-                        {/* Currently Bittensor api is having error, will update later */}
-                      </span>
+                      <div className={'middle-item'}>
+                        {nominationInfo.commission && (
+                          <span className='middle-item__commission'>
+                            <Icon
+                              phosphorIcon={CurrencyCircleDollar}
+                              size='xs'
+                              weight='fill'
+                            />
+                            &nbsp;: {nominationInfo.commission} -
+                          </span>
+                        )}
+                        {nominationInfo.expectedReturn && (
+                          <div className='middle-item__apy'>
+                            &nbsp;APY: {nominationInfo.expectedReturn}%
+                          </div>
+                        )}
+                      </div>
                       <span className={'middle-item__active-stake'}>
                         {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
                       </span>
@@ -156,7 +163,19 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
       maxWidth: '236px'
     },
 
+    '.middle-item': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.marginXXS
+    },
+
+    '.middle-item__commission': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
     '.middle-item__apy': {
+      color: token.colorSuccess,
       display: 'flex',
       alignItems: 'center'
     }

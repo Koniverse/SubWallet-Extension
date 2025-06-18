@@ -162,6 +162,30 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return [];
   }, [toTarget, poolTargetsMap, poolType, slug]);
 
+  const expandNominations = useMemo(() => {
+    const validatorList = poolTargetsMap[slug] as ValidatorInfo[];
+
+    if (!nominations || !validatorList) {
+      return nominations;
+    }
+
+    const validatorMap = validatorList.reduce<Record<string, ValidatorInfo>>((acc, val) => {
+      acc[reformatAddress(val.address)] = val;
+
+      return acc;
+    }, {});
+
+    return nominations.map((nomination) => {
+      const matched = validatorMap[reformatAddress(nomination.validatorAddress)];
+
+      return {
+        ...nomination,
+        commission: matched?.commission,
+        expectedReturn: matched?.expectedReturn
+      };
+    });
+  }, [nominations, poolTargetsMap, slug]);
+
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const isDisabled = useMemo(() =>
     !originValidator || !toTarget || (isShowAmountChange && !value),
@@ -343,7 +367,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             isChangeValidator={true}
             label={t('From')}
             networkPrefix={networkPrefix}
-            nominators={nominations}
+            nominators={expandNominations}
             poolInfo={poolInfo}
           />
         </Form.Item>
@@ -402,6 +426,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             <AmountInput
               decimals={decimals}
               maxValue={bondedValue}
+              prefix={ <Logo
+                className='__item-logo'
+                isShowSubLogo={false}
+                network={networkKey}
+                shape='squircle'
+                size={24}
+              />}
               showMaxButton={true}
             />
           </Form.Item>
@@ -427,13 +458,7 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
-    },
-
-    '.ant-sw-modal-footer': {
-      margin: 0,
-      marginTop: token.marginXS,
-      borderTop: 0,
+      paddingBottom: token.paddingLG,
       marginBottom: token.margin
     },
 

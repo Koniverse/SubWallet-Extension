@@ -6,14 +6,12 @@ import { YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/exte
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useFetchChainState, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
-import { store } from '@subwallet/extension-koni-ui/stores';
+import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info, PencilSimpleLine } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -21,51 +19,21 @@ type Props = ThemeProps & {
   poolInfo: YieldPoolInfo;
   inputAsset?: _ChainAsset;
   title?: string;
-  disabledButton?: boolean
+  readOnly?: boolean
   maxValidator?: number;
   totalValidator?: number;
   addresses?: string[],
   modalId?: string
 };
 
-function Component ({ addresses, className, compound, disabledButton, maxValidator, modalId, poolInfo, title = 'Your validators', totalValidator }: Props) {
+function Component ({ addresses, className, compound, maxValidator, modalId, poolInfo, readOnly, title = 'Your validators', totalValidator }: Props) {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
-  const [forceFetchValidator, setForceFetchValidator] = useState(false);
-  const [targetLoading, setTargetLoading] = useState(false);
-
-  const chainState = useFetchChainState(poolInfo?.chain || '');
-  const slug = poolInfo.slug;
 
   const onClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     activeModal(modalId || EARNING_SELECTED_VALIDATOR_MODAL);
   }, [activeModal, modalId]);
-
-  useEffect(() => {
-    let unmount = false;
-
-    if ((!!poolInfo.chain && !!compound.address && chainState?.active) || forceFetchValidator) {
-      setTargetLoading(true);
-      fetchPoolTarget({ slug })
-        .then((result) => {
-          if (!unmount) {
-            store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
-          }
-        })
-        .catch(console.error)
-        .finally(() => {
-          if (!unmount) {
-            setTargetLoading(false);
-            setForceFetchValidator(false);
-          }
-        });
-    }
-
-    return () => {
-      unmount = true;
-    };
-  }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound.address]);
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
 
@@ -77,7 +45,8 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
     return !haveNomination || isAllAccount || !compound.nominations.length;
   }, [compound.nominations.length, haveNomination, isAllAccount]);
 
-  const countText = totalValidator
+  // Show amount of validators selected with max number (if exists)
+  const totalValidatorSelected = totalValidator
     ? maxValidator
       ? `${totalValidator} (max ${maxValidator}) `
       : `${totalValidator} `
@@ -96,9 +65,11 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
         >
           <div className='__panel-title'>{t(title)}</div>
           <div className='__panel-icon'>
-            <div className='__panel-count'>{countText}</div>
+            {totalValidatorSelected && (
+              <div className='__panel-total-validator'>{totalValidatorSelected}</div>
+            )}
             <Icon
-              phosphorIcon={disabledButton ? Info : PencilSimpleLine}
+              phosphorIcon={readOnly ? Info : PencilSimpleLine}
               size='sm'
             />
           </div>
@@ -108,13 +79,12 @@ function Component ({ addresses, className, compound, disabledButton, maxValidat
       <EarningValidatorSelectedModal
         addresses={addresses}
         chain={poolInfo.chain}
+        compound={compound}
         disabled={false}
-        disabledButton={disabledButton}
         from={compound.address}
-        loading={targetLoading}
         modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
         nominations={compound.nominations}
-        setForceFetchValidator={setForceFetchValidator}
+        readOnly={readOnly}
         slug={poolInfo.slug}
         title={title}
       />
@@ -185,7 +155,7 @@ export const SelectedValidatorInfoPart = styled(Component)<Props>(({ theme: { to
     color: token.colorTextLight3
   },
 
-  '.__panel-count': {
+  '.__panel-total-validator': {
     marginRight: token.sizeXXS
   }
 }));

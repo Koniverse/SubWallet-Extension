@@ -9,16 +9,14 @@ import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/p
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
-import { useFetchChainState, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
-import { store } from '@subwallet/extension-koni-ui/stores';
+import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretLeft, CaretRight } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
 
@@ -66,38 +64,6 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { accounts } = useSelector((state) => state.accountState);
   const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
-
-  // Validator Handler
-  const [forceFetchValidator, setForceFetchValidator] = useState(false);
-  const [targetLoading, setTargetLoading] = useState(false);
-  const chainState = useFetchChainState(poolInfo?.chain || '');
-  const slug = poolInfo.slug;
-
-  useEffect(() => {
-    let unmount = false;
-
-    if ((!!poolInfo.chain && !!compound.address && chainState?.active) || forceFetchValidator) {
-      setTargetLoading(true);
-      fetchPoolTarget({ slug })
-        .then((result) => {
-          if (!unmount) {
-            store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
-          }
-        })
-        .catch(console.error)
-        .finally(() => {
-          if (!unmount) {
-            setTargetLoading(false);
-            setForceFetchValidator(false);
-          }
-        });
-    }
-
-    return () => {
-      unmount = true;
-    };
-  }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound.address]);
-  // Validator Handler
 
   const sliderSettings: Settings = useMemo(() => {
     return {
@@ -334,12 +300,11 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       {selectedItem && (
         <EarningValidatorSelectedModal
           chain={poolInfo.chain}
+          compound={compound}
           disabled={false}
           from={selectedAddress}
-          loading={targetLoading}
           modalId={EARNING_SELECTED_VALIDATOR_MODAL}
           nominations={selectedItem?.nominations}
-          setForceFetchValidator={setForceFetchValidator}
           slug={poolInfo.slug}
         />)}
     </>

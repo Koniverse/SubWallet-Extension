@@ -431,7 +431,6 @@ const Component = () => {
           });
 
           if (lastStep) {
-            console.log('onDoneId1', id);
             processId ? onHandleOneSignConfirmation(processId) : onDone(id);
 
             return false;
@@ -446,7 +445,6 @@ const Component = () => {
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
-  // HMM
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {

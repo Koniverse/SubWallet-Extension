@@ -1570,11 +1570,10 @@ export interface NominationInfo {
   hasUnstaking?: boolean;
   validatorMinStake?: string;
   status: EarningStatus;
-  originActiveStake?: string
-  metadata?: {
-    apy: string,
-    commission: string
-  }
+  originActiveStake?: string;
+
+  commission?: number
+  expectedReturn?: number;
 }
 
 export interface UnstakingInfo {

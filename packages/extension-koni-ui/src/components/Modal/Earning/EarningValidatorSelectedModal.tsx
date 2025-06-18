@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useChainChecker, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
+import { store } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
-import { Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { Book, CaretLeft } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -26,16 +28,18 @@ interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;
   title?: string;
   nominations: NominationInfo[]
-  setForceFetchValidator: (val: boolean) => void;
-  disabledButton?: boolean;
+  readOnly?: boolean;
   addresses?: string[];
+  compound?: YieldPositionInfo;
 }
 
-const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { addresses, chain, className = '', disabledButton, from
-    , loading, modalId, nominations, onChange, setForceFetchValidator, slug, title = 'Your validators' } = props;
+const Component = (props: Props) => {
+  const { addresses, chain, className = '', compound, from
+    , modalId, nominations, onChange, readOnly, slug, title = 'Your validators' } = props;
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
+  const [forceFetchValidator, setForceFetchValidator] = useState(false);
+  const [targetLoading, setTargetLoading] = useState(false);
 
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
@@ -43,6 +47,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const { poolInfoMap } = useSelector((state) => state.earning);
   const poolInfo = poolInfoMap[slug];
+  const chainState = useFetchChainState(poolInfo?.chain || '');
+
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange);
 
@@ -127,6 +133,31 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const checkChain = useChainChecker();
 
   useEffect(() => {
+    let unmount = false;
+
+    if ((!!poolInfo.chain && !!compound?.address && chainState?.active) || forceFetchValidator) {
+      setTargetLoading(true);
+      fetchPoolTarget({ slug })
+        .then((result) => {
+          if (!unmount) {
+            store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
+          }
+        })
+        .catch(console.error)
+        .finally(() => {
+          if (!unmount) {
+            setTargetLoading(false);
+            setForceFetchValidator(false);
+          }
+        });
+    }
+
+    return () => {
+      unmount = true;
+    };
+  }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound?.address]);
+
+  useEffect(() => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
 
@@ -135,7 +166,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   return (
     <>
       <SwModal
-        className={`${className} ${!disabledButton ? 'modal-full' : ''}`}
+        className={`${className} ${!readOnly ? 'modal-full' : ''}`}
         closeIcon={(
           <Icon
             phosphorIcon={CaretLeft}
@@ -143,7 +174,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           />
         )}
         footer={
-          !disabledButton && (
+          !readOnly && (
             <Button
               block
               icon={(
@@ -183,7 +214,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             disabled={false}
             from={from}
             items={items}
-            loading={loading}
+            loading={targetLoading}
             modalId={EARNING_CHANGE_VALIDATOR_MODAL}
             nominations={nominations}
             setForceFetchValidator={setForceFetchValidator}
@@ -196,7 +227,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             disabled={false}
             from={from}
             items={items}
-            loading={loading}
+            loading={targetLoading}
             modalId={EARNING_CHANGE_VALIDATOR_MODAL}
             nominations={nominations}
             setForceFetchValidator={setForceFetchValidator}
@@ -207,9 +238,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   );
 };
 
-const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ disabledButton, theme: { token } }: Props) => {
+const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ readOnly, theme: { token } }: Props) => {
   return {
-    ...(!disabledButton
+    ...(!readOnly
       ? {}
       : {
         '.ant-sw-list': {

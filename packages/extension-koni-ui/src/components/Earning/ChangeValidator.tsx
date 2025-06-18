@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
@@ -18,11 +17,11 @@ import { useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelec
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
-import { Badge, Button, Form, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
+import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -75,7 +74,7 @@ const filterOptions = [
   }
 ];
 
-const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
+const Component = (props: Props) => {
   const { chain, className = '', from
     , isSingleSelect: _isSingleSelect = false,
     items, modalId, nominations
@@ -84,6 +83,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
+  const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
 
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveAll } = useContext(ModalContext);
@@ -91,7 +91,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const [form] = Form.useForm();
   const onPreCheck = usePreCheckAction(from);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
@@ -155,30 +154,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const fewValidators = changeValidators.length > 1;
+  const handleValidatorLabel = 'Validator';
 
   const applyLabel = useMemo(() => {
-    const label = getValidatorLabel(chain);
-
     if (!fewValidators) {
-      switch (label) {
-        case 'dApp':
-          return detectTranslate('Apply {{number}} dApp');
-        case 'Collator':
-          return detectTranslate('Apply {{number}} collator');
-        case 'Validator':
-          return detectTranslate('Apply {{number}} validator');
-      }
+      return detectTranslate('Apply {{number}} validator');
     } else {
-      switch (label) {
-        case 'dApp':
-          return detectTranslate('Apply {{number}} dApps');
-        case 'Collator':
-          return detectTranslate('Apply {{number}} collators');
-        case 'Validator':
-          return detectTranslate('Apply {{number}} validators');
-      }
+      return detectTranslate('Apply {{number}} validators');
     }
-  }, [chain, fewValidators]);
+  }, [fewValidators]);
 
   const nominatorValueList = useMemo(() => {
     return nominations && nominations.length
@@ -315,11 +299,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       activeModal(VALIDATOR_DETAIL_MODAL);
     };
   }, [activeModal]);
-  const handleValidatorLabel = useMemo(() => {
-    const label = getValidatorLabel(chain);
-
-    return label !== 'dApp' ? label.toLowerCase() : label;
-  }, [chain]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -369,19 +348,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, []);
 
   useEffect(() => {
-    const selectedValidators = changeValidators
+    const selected = changeValidators
       .map((key) => {
         const [address] = key.split('___');
 
         return items.find((item) => item.address === address);
       })
       .filter((item): item is ValidatorDataType => !!item)
-      .map((item) => ({
-        ...item
-      }));
+      .map((item) => ({ ...item }));
 
-    form.setFieldsValue({ target: selectedValidators });
-  }, [changeValidators, form, items, chain]);
+    setSelectedValidators(selected);
+  }, [changeValidators, items]);
 
   useEffect(() => {
     if (!isActive) {
@@ -421,7 +398,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               />
             )}
             loading={submitLoading}
-            onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
+            onClick={onPreCheck(() => onClickSubmit({ target: selectedValidators }), ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
           >
             {t(applyLabel, { number: changeValidators.length })}
           </Button>
@@ -443,30 +420,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         }}
         title={t('Select') + ' ' + t(handleValidatorLabel)}
       >
-        <Form
-          className={'form-container form-space-sm'}
-          form={form}
-          onFinish={onClickSubmit}
-        >
-          <Form.Item
-            name={'target'}
-          >
-            <SwList.Section
-              actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
-              enableSearchInput={true}
-              filterBy={filterFunction}
-              list={resultList}
-              onClickActionBtn={onClickActionBtn}
-              ref={sectionRef}
-              renderItem={renderItem}
-              renderWhenEmpty={renderEmpty}
-              searchFunction={searchFunction}
-              searchMinCharactersCount={2}
-              searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
-            // showActionBtn
-            />
-          </Form.Item>
-        </Form>
+        <SwList.Section
+          actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
+          enableSearchInput={true}
+          filterBy={filterFunction}
+          list={resultList}
+          onClickActionBtn={onClickActionBtn}
+          ref={sectionRef}
+          renderItem={renderItem}
+          renderWhenEmpty={renderEmpty}
+          searchFunction={searchFunction}
+          searchMinCharactersCount={2}
+          searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
+          // showActionBtn
+        />
       </SwModal>
 
       <FilterModal
