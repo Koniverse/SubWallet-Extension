@@ -20,11 +20,14 @@ export function parseBitcoinTransferData (address: string, transferItem: Bitcoin
   const receiver = isCurrentAddressSender ? transferItem.vout[0]?.scriptpubkey_address || '' : address;
 
   const amountValue = (() => {
-    if (isCurrentAddressSender) {
-      return (transferItem.vout.find((i) => i.scriptpubkey_address === receiver))?.value || '0';
-    }
+    const targetAddress = isCurrentAddressSender ? receiver : address;
+    const vouts = transferItem.vout.filter((i) => i.scriptpubkey_address === targetAddress);
 
-    return (transferItem.vout.find((i) => i.scriptpubkey_address === address))?.value || '0';
+    if (vouts.length) {
+      return vouts.reduce((total, item) => total + item.value, 0).toString();
+    } else {
+      return '0'
+    }
   })();
 
   return {
@@ -47,7 +50,7 @@ export function parseBitcoinTransferData (address: string, transferItem: Bitcoin
     blockNumber: transferItem.status.block_height || 0,
     blockHash: transferItem.status.block_hash || '',
     amount: {
-      value: `${amountValue}`,
+      value: amountValue,
       decimals: nativeDecimals,
       symbol: nativeSymbol
     },

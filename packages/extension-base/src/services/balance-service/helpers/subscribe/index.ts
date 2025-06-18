@@ -42,16 +42,16 @@ export const getAccountJsonByAddress = (address: string): AccountJson | null => 
 
 /** Filter addresses to subscribe by chain info */
 const filterAddress = (addresses: string[], chainInfo: _ChainInfo): [string[], string[]] => {
-  const { bitcoin, cardano, evm, substrate, ton } = getAddressesByChainTypeMap(addresses, chainInfo);
+  const { bitcoin, cardano, evm, substrate, ton, _bitcoin } = getAddressesByChainTypeMap(addresses, chainInfo);
 
   if (_isChainEvmCompatible(chainInfo)) {
-    return [evm, [...bitcoin, ...substrate, ...ton, ...cardano]];
+    return [evm, [bitcoin, substrate, ton, cardano, _bitcoin].flat()];
   } else if (_isChainBitcoinCompatible(chainInfo)) {
-    return [bitcoin, [...evm, ...substrate, ...ton, ...cardano]];
+    return [bitcoin, [evm, substrate, ton, cardano, _bitcoin].flat()];
   } else if (_isChainTonCompatible(chainInfo)) {
-    return [ton, [...bitcoin, ...evm, ...substrate, ...cardano]];
+    return [ton, [bitcoin, evm, substrate, cardano, _bitcoin].flat()];
   } else if (_isChainCardanoCompatible(chainInfo)) {
-    return [cardano, [...bitcoin, ...evm, ...substrate, ...ton]];
+    return [cardano, [bitcoin, evm, substrate, ton, _bitcoin].flat()];
   } else {
     const fetchList: string[] = [];
     const unfetchList: string[] = [];
@@ -81,7 +81,7 @@ const filterAddress = (addresses: string[], chainInfo: _ChainInfo): [string[], s
       }
     });
 
-    return [fetchList, [...unfetchList, ...bitcoin, ...evm, ...ton, ...cardano]];
+    return [fetchList, [unfetchList, bitcoin, evm, ton, cardano, _bitcoin].flat()];
   }
 };
 
