@@ -67,13 +67,16 @@ const Component: React.FC<Props> = (props: Props) => {
                               size='xs'
                               weight='fill'
                             />
-                            &nbsp;: {nominationInfo.commission} -
+                            &nbsp;: {nominationInfo.commission}%
                           </span>
                         )}
                         {nominationInfo.expectedReturn && (
-                          <div className='middle-item__apy'>
+                          <>
+                            -
+                            <div className='middle-item__apy'>
                             &nbsp;APY: {nominationInfo.expectedReturn}%
-                          </div>
+                            </div>
+                          </>
                         )}
                       </div>
                       <span className={'middle-item__active-stake'}>

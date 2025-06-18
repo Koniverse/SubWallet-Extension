@@ -10,7 +10,7 @@ import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Info, PencilSimpleLine } from 'phosphor-react';
+import { PencilSimpleLine } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -18,15 +18,13 @@ type Props = ThemeProps & {
   compound: YieldPositionInfo;
   poolInfo: YieldPoolInfo;
   inputAsset?: _ChainAsset;
-  title?: string;
-  readOnly?: boolean
   maxValidator?: number;
   totalValidator?: number;
   addresses?: string[],
   modalId?: string
 };
 
-function Component ({ addresses, className, compound, maxValidator, modalId, poolInfo, readOnly, title = 'Your validators', totalValidator }: Props) {
+function Component ({ addresses, className, compound, modalId, poolInfo }: Props) {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
 
@@ -45,16 +43,11 @@ function Component ({ addresses, className, compound, maxValidator, modalId, poo
     return !haveNomination || isAllAccount || !compound.nominations.length;
   }, [compound.nominations.length, haveNomination, isAllAccount]);
 
-  // Show amount of validators selected with max number (if exists)
-  const totalValidatorSelected = totalValidator
-    ? maxValidator
-      ? `${totalValidator} (max ${maxValidator}) `
-      : `${totalValidator} `
-    : '';
-
   if (noNomination) {
     return null;
   }
+
+  const title = 'Your validators';
 
   return (
     <>
@@ -65,11 +58,8 @@ function Component ({ addresses, className, compound, maxValidator, modalId, poo
         >
           <div className='__panel-title'>{t(title)}</div>
           <div className='__panel-icon'>
-            {totalValidatorSelected && (
-              <div className='__panel-total-validator'>{totalValidatorSelected}</div>
-            )}
             <Icon
-              phosphorIcon={readOnly ? Info : PencilSimpleLine}
+              phosphorIcon={PencilSimpleLine}
               size='sm'
             />
           </div>
@@ -84,7 +74,6 @@ function Component ({ addresses, className, compound, maxValidator, modalId, poo
         from={compound.address}
         modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
         nominations={compound.nominations}
-        readOnly={readOnly}
         slug={poolInfo.slug}
         title={title}
       />
@@ -153,9 +142,5 @@ export const SelectedValidatorInfoPart = styled(Component)<Props>(({ theme: { to
     justifyContent: 'flex-end',
     alignItems: 'center',
     color: token.colorTextLight3
-  },
-
-  '.__panel-total-validator': {
-    marginRight: token.sizeXXS
   }
 }));

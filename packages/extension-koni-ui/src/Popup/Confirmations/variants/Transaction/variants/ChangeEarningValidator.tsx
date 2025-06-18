@@ -4,13 +4,15 @@
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
+import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { SelectedValidatorInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/SelectedValidatorInfoPart';
+import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import React, { useMemo } from 'react';
+import { Info } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -33,35 +35,74 @@ type ValidatorGroupProps = {
   maxValidator?: number
 };
 
-const ValidatorGroup = ({ addresses, className, compound, isBittensorChain, label, maxValidator, modalId, poolInfo, title, total }: ValidatorGroupProps) => {
+const ValidatorAddress = ({ addresses, className, label, title }: ValidatorGroupProps) => (
+  <MetaInfo.Default
+    className={CN('__validator-address', className)}
+    label={label || title}
+  >
+    {truncateAddress(addresses[0])}
+  </MetaInfo.Default>
+);
+
+const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, modalId, poolInfo, title, total }: ValidatorGroupProps) => {
+  const { t } = useTranslation();
+  const { activeModal } = useContext(ModalContext);
+
+  const onClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    activeModal(modalId || EARNING_SELECTED_VALIDATOR_MODAL);
+  }, [activeModal, modalId]);
+
+  const totalValidatorSelected = maxValidator
+    ? `${total} (max ${maxValidator}) `
+    : `${total} `;
+
+  return (
+    <>
+      <div className={CN(className)}>
+        <div
+          className='__panel-header'
+          onClick={onClick}
+        >
+          <div className='__panel-title'>{t(title)}</div>
+          <div className='__panel-icon'>
+            <div className='__panel-total-validator'>{totalValidatorSelected}</div>
+            <Icon
+              phosphorIcon={Info}
+              size='sm'
+            />
+          </div>
+        </div>
+      </div>
+
+      <EarningValidatorSelectedModal
+        addresses={addresses}
+        chain={poolInfo.chain}
+        compound={compound}
+        disabled={false}
+        from={compound.address}
+        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
+        nominations={compound.nominations}
+        readOnly={true}
+        slug={poolInfo.slug}
+        title={title}
+      />
+    </>
+  );
+};
+
+const ValidatorGroup = (props: ValidatorGroupProps) => {
+  const { isBittensorChain, total } = props;
+
   if (total === 0) {
     return null;
   }
 
   if (total === 1 || isBittensorChain) {
-    return (
-      <MetaInfo.Default
-        className={CN('__validator-address', className)}
-        label={label || title}
-      >
-        {truncateAddress(addresses[0])}
-      </MetaInfo.Default>
-    );
+    return <ValidatorAddress {...props} />;
   }
 
-  return (
-    <SelectedValidatorInfoPart
-      addresses={addresses}
-      className='nomination-info-part'
-      compound={compound}
-      maxValidator={maxValidator}
-      modalId={modalId}
-      poolInfo={poolInfo}
-      readOnly
-      title={title}
-      totalValidator={total}
-    />
-  );
+  return <ValidatorGroupModal {...props} />;
 };
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -154,7 +195,7 @@ const Component: React.FC<Props> = (props: Props) => {
             label='From validator'
             modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-deselected`}
             poolInfo={poolInfo}
-            title='Validators deselected'
+            title='Deselected validators'
             total={deselectedCount}
           />
 
@@ -197,6 +238,72 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
 
     '.__validator-address.newly-selected': {
       paddingBottom: '12px'
+    },
+
+    '.__nomination-item': {
+      gap: token.sizeSM,
+
+      '.__label': {
+        'white-space': 'nowrap',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: token.sizeXS,
+        overflow: 'hidden'
+      },
+
+      '.__value-col': {
+        flex: '0 1 auto'
+      }
+    },
+
+    '.__nomination-item.-hide-number': {
+      '.__value-col': {
+        display: 'none'
+      }
+    },
+
+    '.__nomination-name': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden'
+    },
+
+    '.__panel-header': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: token.sizeXS,
+      padding: `${token.paddingXS}px ${token.padding}px`,
+      height: 46
+    },
+
+    '&.nomination-info-part .__panel-header': {
+      padding: `${token.paddingXS}px ${token.paddingSM}px`,
+      height: 46
+    },
+
+    '.__panel-title': {
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      fontSize: token.fontSize,
+      lineHeight: token.lineHeight,
+      color: token.colorTextLight2,
+      textAlign: 'start'
+    },
+
+    '.__panel-icon': {
+      cursor: 'pointer',
+      minWidth: 40,
+      height: 40,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      color: token.colorTextLight3
+    },
+
+    '.__panel-total-validator': {
+      marginRight: token.sizeXXS
     }
   };
 });
