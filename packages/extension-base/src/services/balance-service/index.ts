@@ -445,7 +445,7 @@ export class BalanceService implements StoppableServiceInterface {
     };
   }
 
-  async runSubscribeBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
+  async refreshBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
     // Check if address and chain are valid
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 

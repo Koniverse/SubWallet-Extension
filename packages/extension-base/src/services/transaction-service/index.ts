@@ -1117,7 +1117,7 @@ export default class TransactionService {
       try {
         const sender = keyring.getPair(inputData.from);
 
-        balanceService.runSubscribeBalanceForAddress(sender.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+        balanceService.refreshBalanceForAddress(sender.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
           .catch((error) => console.error('Failed to run balance subscription:', error));
       } catch (e) {
         console.error(e);
@@ -1126,7 +1126,7 @@ export default class TransactionService {
       try {
         const recipient = keyring.getPair(inputData.to);
 
-        balanceService.runSubscribeBalanceForAddress(recipient.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
+        balanceService.refreshBalanceForAddress(recipient.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
           .catch((error) => console.error('Failed to run balance subscription:', error));
       } catch (e) {
         console.error(e);

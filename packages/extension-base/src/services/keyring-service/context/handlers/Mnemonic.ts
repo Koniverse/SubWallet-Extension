@@ -4,7 +4,7 @@
 import { CommonAccountErrorType, MnemonicType, RequestAccountCreateSuriV2, RequestExportAccountProxyMnemonic, RequestMnemonicCreateV2, RequestMnemonicValidateV2, ResponseAccountCreateSuriV2, ResponseExportAccountProxyMnemonic, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, SWCommonAccountError } from '@subwallet/extension-base/types';
 import { createAccountProxyId, getSuri } from '@subwallet/extension-base/utils';
 import { tonMnemonicGenerate } from '@subwallet/keyring';
-import { KeypairType, KeyringPair } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair } from '@subwallet/keyring/types';
 import { tonMnemonicValidate } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
@@ -27,7 +27,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
   /* Create seed */
   public async mnemonicCreateV2 ({ length = SEED_DEFAULT_LENGTH, mnemonic: _seed, type = 'general' }: RequestMnemonicCreateV2): Promise<ResponseMnemonicCreateV2> {
-    const types: KeypairType[] = type === 'general' ? ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'] : ['ton-native'];
+    const types: KeypairType[] = type === 'general' ? ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes] : ['ton-native'];
     const seed = _seed ||
     type === 'general'
       ? mnemonicGenerate(length)
@@ -57,7 +57,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
         assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
 
         mnemonicTypes = 'general';
-        pairTypes = ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
+        pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
         mnemonicTypes = 'ton';
@@ -89,7 +89,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', 'ethereum', 'ton', 'cardano', 'bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
+    const types: KeypairType[] = type ? [type] : ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
 
     if (!hasMasterPassword) {
       if (!password) {
