@@ -6,10 +6,12 @@ import { isProductionMode } from '@subwallet/extension-base/constants';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, RadioGroup, ServiceItem } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
+import { SELL_TOKEN_TAB } from '@subwallet/extension-koni-ui/constants';
 import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
@@ -49,11 +51,6 @@ enum ViewValue {
   SELL = 'Sell'
 }
 
-interface ViewOption {
-  label: string;
-  value: ViewValue;
-}
-
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
 
 const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
@@ -77,6 +74,10 @@ const baseUrl = isProductionMode ? 'https://web.subwallet.app' : 'https://cf62cf
 function Component ({ className, currentAccountProxy }: ComponentProps) {
   const locationState = useLocation().state as BuyTokensParam;
   const [currentSymbol] = useState<string | undefined>(locationState?.symbol);
+
+  const [buyTokenTab, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
+
+  const [buyForm, setBuyForm] = useState(buyTokenTab !== 'SELL');
 
   const notify = useNotification();
 
@@ -128,20 +129,6 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const selectedAddress = Form.useWatch('address', form);
   const selectedTokenSlug = Form.useWatch('tokenSlug', form);
   const selectedService = Form.useWatch('service', form);
-  const view = Form.useWatch('view', form);
-
-  const viewOptions = useMemo((): ViewOption[] => {
-    return [
-      {
-        label: t('Buy'),
-        value: ViewValue.BUY
-      },
-      {
-        label: t('Sell'),
-        value: ViewValue.SELL
-      }
-    ];
-  }, [t]);
 
   const { contactUrl, name: serviceName, policyUrl, termUrl, url } = useMemo((): BuyServiceInfo => {
     return services[selectedService] || { name: '', url: '', contactUrl: '', policyUrl: '', termUrl: '' };
@@ -154,14 +141,16 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     for (const serviceItem of baseServiceItems) {
       const temp: ServiceItem = {
         ...serviceItem,
-        disabled: buyInfo ? !buyInfo.services.includes(serviceItem.key) : true
+        disabled: buyInfo
+          ? !buyInfo.services.includes(serviceItem.key) || (!buyForm && !buyInfo.serviceInfo[serviceItem.key]?.supportSell)
+          : true
       };
 
       result.push(temp);
     }
 
     return result;
-  }, [tokens]);
+  }, [tokens, buyForm]);
 
   const onConfirm = useCallback((): Promise<void> => {
     activeModal(modalId);
@@ -233,6 +222,73 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
+
+  const tokenBalanceMap = useMemo(() => {
+    return getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
+  }, [currentAccountProxy.id, getAccountTokenBalance, tokens]);
+
+  const sellTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
+      return {
+        name: assetRegistry[info.slug]?.name || info.symbol,
+        slug: info.slug,
+        symbol: info.symbol,
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
+      };
+    };
+
+    const sellList = [...Object.values(tokens)].filter((token) => token.supportSell);
+
+    const filtered = currentSymbol
+      ? sellList.filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol)
+      : sellList;
+
+    Object.values(filtered).forEach((item) => {
+      if (!allowedChains.includes(item.network)) {
+        return;
+      }
+
+      result.push(convertToItem(item));
+    });
+
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
+    return result;
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
+
+  const isSellTabDisabled = useMemo(() => {
+    if (sellTokenItems.length > 1) {
+      return false;
+    }
+
+    const tokenInfo = sellTokenItems[0]?.slug ? tokens[sellTokenItems[0].slug] : undefined;
+
+    for (const serviceItem of baseServiceItems) {
+      if (tokenInfo?.serviceInfo[serviceItem.key]?.supportSell) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [sellTokenItems, tokens]);
 
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
@@ -361,6 +417,19 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     openInNewTab(`${baseUrl}/redirect-handler/sell-token`)();
   }, []);
 
+  const handleForm = useCallback((mode: string) => {
+    setBuyForm(mode === 'BUY');
+  }, []);
+
+  const handleBuyForm = useCallback(() => handleForm('BUY'), [handleForm]);
+  const handleSellForm = useCallback(() => {
+    if (isSellTabDisabled) {
+      return;
+    }
+
+    handleForm('SELL');
+  }, [handleForm, isSellTabDisabled]);
+
   useEffect(() => {
     if (!fixedTokenSlug && tokenItems.length) {
       const { tokenSlug } = form.getFieldsValue();
@@ -418,6 +487,10 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
   }, [selectedTokenSlug, form, getServiceItems]);
 
+  useEffect(() => {
+    setBuyTokenModalTab('');
+  }, [setBuyTokenModalTab]);
+
   return (
     <Layout.Home
       showFaderIcon
@@ -439,18 +512,38 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           form={form}
           initialValues={formDefault}
         >
-          <Form.Item
-            className={'__radio-group'}
-            name='view'
-          >
-            <RadioGroup
-              optionType='button'
-              options={viewOptions}
-            />
-          </Form.Item>
-
           <div className={'__scroll-container'}>
-            {view === ViewValue.BUY && (
+
+            <div className='form-row __service-container'>
+              <div style={{
+                position: 'absolute',
+                top: '0.25rem',
+                left: buyForm ? '0.25rem' : 'calc(50% + 0.25rem)',
+                width: 'calc(50% - 0.5rem)',
+                height: 'calc(100% - 0.5rem)',
+                backgroundColor: '#252525',
+                borderRadius: '0.5rem',
+                transition: 'left 0.3s ease-in-out'
+              }}
+              ></div>
+
+              <div
+                className={'__service-selector'}
+                onClick={handleBuyForm}
+              >
+                Buy
+              </div>
+              <div
+                className={CN('__service-selector', {
+                  '-disabled': isSellTabDisabled
+                })}
+                onClick={handleSellForm}
+              >
+                Sell
+              </div>
+            </div>
+
+            {buyForm && (
               <div className={'__buy-service-wrapper'}>
                 <div className={'__buy-service-content'}>
                   <div className='__buy-icon-wrapper'>
@@ -481,9 +574,9 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                   </div>
 
                   <Form.Item
-                  // className={CN({
-                  //   hidden: !isAllAccount && accountAddressItems.length <= 1
-                  // })}
+                    // className={CN({
+                    //   hidden: !isAllAccount && accountAddressItems.length <= 1
+                    // })}
                     name={'address'}
                   >
                     <AccountAddressSelector
@@ -515,7 +608,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 </div>
               </div>
             )}
-            {view === ViewValue.SELL && (
+            {!buyForm && (
               <div className={'__sell-service-wrapper'}>
                 <div className={'__content-wrapper'}>
                   <div className='__buy-icon-wrapper'>
@@ -645,6 +738,16 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
     display: 'flex',
     flexDirection: 'column',
 
+    '.__service-container': {
+      backgroundColor: token.colorBgSecondary,
+      borderRadius: token.borderRadius,
+      padding: '0.25rem',
+      height: 40,
+      position: 'relative',
+      display: 'flex',
+      overflow: 'hidden'
+    },
+
     '.ant-sw-modal-footer': {
       display: 'flex'
     },
@@ -670,7 +773,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       overflow: 'auto',
       paddingLeft: token.padding,
       paddingRight: token.padding,
-      displaay: 'flex'
+      display: 'flex',
+      flexDirection: 'column'
     },
 
     '.__sell-service-wrapper, .__buy-service-wrapper': {
@@ -689,7 +793,7 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       alignItems: 'center',
       marginLeft: 'auto',
       marginRight: 'auto',
-      marginTop: 20,
+      marginTop: 32,
       marginBottom: token.marginXL,
 
       '&:before': {
@@ -701,6 +805,20 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
         borderRadius: '100%',
         opacity: '0.1'
       }
+    },
+
+    '.__service-selector': {
+      cursor: 'pointer',
+      width: '50%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      zIndex: 1
+    },
+
+    '.__service-selector.-disabled': {
+      cursor: 'not-allowed'
     },
 
     '.__buy-icon': {
@@ -724,7 +842,7 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
 
     '.__layout-footer': {
       display: 'flex',
-      paddingBottom: token.paddingLG,
+      paddingBottom: 40,
       gap: token.paddingXS,
 
       '.ant-btn': {

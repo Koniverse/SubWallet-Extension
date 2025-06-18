@@ -6,6 +6,7 @@ import { AccountChainType } from './account';
 export interface BuyService {
   network: string;
   symbol: string;
+  supportSell: boolean;
 }
 
 export type SupportService = 'transak' | 'banxa' | 'coinbase' | 'moonpay' | 'onramper' | 'meld';
@@ -19,6 +20,7 @@ export interface BuyTokenInfo {
   support: AccountChainType;
   services: Array<SupportService>;
   serviceInfo: Record<SupportService, BuyService>;
+  supportSell: boolean;
 }
 
 export interface BuyServiceInfo {
