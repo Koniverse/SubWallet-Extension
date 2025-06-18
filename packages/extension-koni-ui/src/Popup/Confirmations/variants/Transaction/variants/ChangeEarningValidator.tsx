@@ -59,21 +59,22 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
 
   return (
     <>
-      <div className={CN(className)}>
+      <MetaInfo.Default
+        className={CN(className, '__validator-address')}
+        label={t(title)}
+      >
         <div
           className='__panel-header'
           onClick={onClick}
         >
-          <div className='__panel-title'>{t(title)}</div>
-          <div className='__panel-icon'>
-            <div className='__panel-total-validator'>{totalValidatorSelected}</div>
-            <Icon
-              phosphorIcon={Info}
-              size='sm'
-            />
-          </div>
+          {totalValidatorSelected}
+          <Icon
+            className='__panel-icon'
+            phosphorIcon={Info}
+            size='sm'
+          />
         </div>
-      </div>
+      </MetaInfo.Default>
 
       <EarningValidatorSelectedModal
         addresses={addresses}
@@ -171,22 +172,25 @@ const Component: React.FC<Props> = (props: Props) => {
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
           />
+          {(compound && !isBittensorChain) && (
+            <ValidatorGroup
+              addresses={newlySelectedAddresses}
+              compound={compound}
+              maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
+              modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
+              poolInfo={poolInfo}
+              title={'Total validators selected'}
+              total={totalSelectedCount}
+            />
+          )}
         </MetaInfo>
-        {(compound && !isBittensorChain) && (
-          <ValidatorGroup
-            addresses={newlySelectedAddresses}
-            compound={compound}
-            maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
-            modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
-            poolInfo={poolInfo}
-            title={'Total validators selected'}
-            total={totalSelectedCount}
-          />
-        )}
       </MetaInfo>
 
       {compound && (
-        <MetaInfo className='nomination-wrapper'>
+        <MetaInfo
+          className='nomination-wrapper'
+          hasBackgroundWrapper
+        >
           <ValidatorGroup
             addresses={deselectedAddresses}
             className='deselected'
@@ -223,87 +227,16 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       marginTop: token.marginSM,
       whiteSpace: 'nowrap'
     },
+
     '.form-space-sm .ant-form-item': {
       marginBottom: '0px'
     },
 
-    '.__validator-address': {
-      paddingLeft: '12px',
-      paddingRight: '12px'
-    },
-
-    '.__validator-address.deselected': {
-      paddingTop: '12px'
-    },
-
-    '.__validator-address.newly-selected': {
-      paddingBottom: '12px'
-    },
-
-    '.__nomination-item': {
-      gap: token.sizeSM,
-
-      '.__label': {
-        'white-space': 'nowrap',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: token.sizeXS,
-        overflow: 'hidden'
-      },
-
-      '.__value-col': {
-        flex: '0 1 auto'
-      }
-    },
-
-    '.__nomination-item.-hide-number': {
-      '.__value-col': {
-        display: 'none'
-      }
-    },
-
-    '.__nomination-name': {
-      textOverflow: 'ellipsis',
-      overflow: 'hidden'
-    },
-
     '.__panel-header': {
       display: 'flex',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      gap: token.sizeXS,
-      padding: `${token.paddingXS}px ${token.padding}px`,
-      height: 46
-    },
-
-    '&.nomination-info-part .__panel-header': {
-      padding: `${token.paddingXS}px ${token.paddingSM}px`,
-      height: 46
-    },
-
-    '.__panel-title': {
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-      fontSize: token.fontSize,
-      lineHeight: token.lineHeight,
-      color: token.colorTextLight2,
-      textAlign: 'start'
-    },
-
-    '.__panel-icon': {
-      cursor: 'pointer',
-      minWidth: 40,
-      height: 40,
-      display: 'flex',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      color: token.colorTextLight3
-    },
-
-    '.__panel-total-validator': {
-      marginRight: token.sizeXXS
+      gap: token.sizeXXS,
+      cursor: 'pointer'
     }
   };
 });
