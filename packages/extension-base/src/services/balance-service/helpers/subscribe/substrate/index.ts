@@ -16,20 +16,7 @@ import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/cont
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import {
-  _checkSmartContractSupportByChain,
-  _getAssetExistentialDeposit,
-  _getAssetNetuid,
-  _getChainExistentialDeposit,
-  _getChainNativeTokenSlug,
-  _getContractAddressOfToken,
-  _getTokenOnChainAssetId,
-  _getTokenOnChainInfo,
-  _getTokenTypesSupportedByChain,
-  _getXcmAssetMultilocation,
-  _isBridgedToken,
-  _isChainEvmCompatible
-} from '@subwallet/extension-base/services/chain-service/utils';
+import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
@@ -161,6 +148,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       }
     );
   }
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
     const balances = rs[systemAccountKey];

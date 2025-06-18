@@ -7,7 +7,7 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 
 const defaultErrorMap: Record<SwapErrorType, { message: string, code?: number }> = {
   ERROR_FETCHING_QUOTE: {
-    message: detectTranslate('No swap quote found. Adjust your amount or try again later'),
+    message: detectTranslate('No swap quote found. Change your network endpoint or adjust amount and try again'),
     code: undefined
   },
   NOT_MEET_MIN_SWAP: {

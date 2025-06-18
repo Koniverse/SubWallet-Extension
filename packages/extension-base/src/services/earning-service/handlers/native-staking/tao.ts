@@ -7,32 +7,17 @@ import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/backgro
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import {
-  BaseYieldPositionInfo,
-  BasicTxErrorType,
-  EarningStatus,
-  NativeYieldPoolInfo,
-  OptimalYieldPath,
-  StakeCancelWithdrawalParams,
-  SubmitJoinNativeStaking,
-  TransactionData,
-  UnstakingInfo,
-  ValidatorInfo,
-  YieldPoolInfo,
-  YieldPoolMethodInfo,
-  YieldPositionInfo,
-  YieldTokenBaseInfo
-} from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { calculateReward } from '../../utils';
-import {DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo} from './dtao';
-import {_getAssetDecimals, _getAssetSymbol} from "@subwallet/extension-base/services/chain-service/utils";
-import {t} from "i18next";
+import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -268,7 +253,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           }
         }
 
-        const bnTaoIn = new BigN(taoIn);
+        const bnTaoIn = new BN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
         const apr = this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0;
 
@@ -627,7 +612,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const { amount } = data;
 
-    if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
+    if (new BN(amount).lt(new BN(DEFAULT_DTAO_MINBOND))) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
     }
 

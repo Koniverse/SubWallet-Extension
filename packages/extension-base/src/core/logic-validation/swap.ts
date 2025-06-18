@@ -5,12 +5,23 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _getAssetDecimals, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, SwapQuote } from '@subwallet/extension-base/types';
 import { AssetHubPreValidationMetadata, ChainflipPreValidationMetadata, HydradxPreValidationMetadata, SimpleSwapValidationMetadata, SwapErrorType } from '@subwallet/extension-base/types/swap';
 import { formatNumber } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+interface RequestValidateSwap {
+  chainInfo: _ChainInfo;
+  fromToken: _ChainAsset;
+  fromTokenBalance: string;
+  feeToken: _ChainAsset;
+  feeTokenBalance: string;
+  feeAmount: string;
+  swapAmount: string;
+  minSwapAmount?: string;
+}
 
 export function _validateBalanceToSwapOnAssetHub (fromToken: _ChainAsset, feeToken: _ChainAsset, feeTokenChainInfo: _ChainInfo, feeAmount: string, fromTokenBalance: string, feeTokenBalance: string, swapAmount: string, isXcmOk: boolean, minSwap?: string): TransactionError | undefined {
   const bnFromTokenBalance = new BigN(fromTokenBalance);
@@ -124,7 +135,7 @@ export function _getChainflipEarlyValidationError (error: SwapErrorType, metadat
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }
@@ -141,7 +152,7 @@ export function _getEarlyHydradxValidationError (error: SwapErrorType, metadata:
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }
@@ -156,7 +167,7 @@ export function _getEarlyAssetHubValidationError (error: SwapErrorType, metadata
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     case SwapErrorType.MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT:
       return new SwapError(error, 'You swap too much. It make pool not enough existential deposit'); // TODO: i18n this
     default:
@@ -185,8 +196,66 @@ export function _getSimpleSwapEarlyValidationError (error: SwapErrorType, metada
     case SwapErrorType.UNKNOWN:
       return new SwapError(error, `Undefined error. Check your Internet and ${metadata.chain.slug} connection or contact support`);
     case SwapErrorType.ERROR_FETCHING_QUOTE:
-      return new SwapError(error, 'No swap quote found. Adjust your amount or try again later.');
+      return new SwapError(error, 'No swap quote found. Change your network endpoint or adjust amount and try again');
     default:
       return new SwapError(error);
   }
+}
+
+export function _validateQuoteV2 (selectedQuote: SwapQuote): TransactionError | undefined {
+  if (!selectedQuote) {
+    return new TransactionError(BasicTxErrorType.INTERNAL_ERROR);
+  }
+
+  // Check swapQuote alive
+  if (selectedQuote.aliveUntil <= +Date.now()) {
+    return new TransactionError(SwapErrorType.QUOTE_TIMEOUT);
+  }
+
+  return undefined;
+}
+
+export function _validateBalanceToSwapV2 (request: RequestValidateSwap): TransactionError | undefined {
+  const { chainInfo, feeAmount, feeToken, feeTokenBalance, fromToken, fromTokenBalance, minSwapAmount, swapAmount } = request;
+
+  const bnFromTokenBalance = BigN(fromTokenBalance);
+
+  if (new BigN(feeTokenBalance).lte(feeAmount)) {
+    return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `You don't have enough ${feeToken.symbol} (${chainInfo.name}) to pay transaction fee`);
+  }
+
+  if (fromToken.slug === feeToken.slug) { // todo: need review and refactor
+    if (bnFromTokenBalance.lte(BigN(feeAmount).plus(swapAmount))) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Insufficient balance. Deposit ${fromToken.symbol} and try again.`);
+    }
+  } else {
+    if (bnFromTokenBalance.lt((swapAmount))) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Insufficient balance. Deposit ${fromToken.symbol} and try again.`);
+    }
+  }
+
+  if (minSwapAmount) {
+    if (bnFromTokenBalance.lte(minSwapAmount)) {
+      const parsedMinSwapValue = formatNumber(minSwapAmount, _getAssetDecimals(fromToken));
+
+      return new TransactionError(SwapErrorType.SWAP_NOT_ENOUGH_BALANCE, `Insufficient balance. You need more than ${parsedMinSwapValue} ${fromToken.symbol} to start swapping. Deposit ${fromToken.symbol} and try again.`); // todo: min swap or amount?
+    }
+  }
+
+  return undefined;
+}
+
+export function _validateSwapRecipientV2 (destChainInfo: _ChainInfo, recipient: string | undefined): TransactionError | undefined {
+  if (!recipient) {
+    return undefined;
+  }
+
+  const isEvmAddress = isEthereumAddress(recipient);
+  const isEvmDestChain = _isChainEvmCompatible(destChainInfo);
+
+  if ((isEvmAddress && !isEvmDestChain) || (!isEvmAddress && isEvmDestChain)) {
+    return new TransactionError(SwapErrorType.INVALID_RECIPIENT);
+  }
+
+  return undefined;
 }

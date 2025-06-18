@@ -18,110 +18,7 @@ import { AuthUrls } from '@subwallet/extension-base/services/request-service/typ
 import { CrowdloanContributionsResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import {
-  AccountChainType,
-  AccountJson,
-  AccountsWithCurrentAddress,
-  AddressJson,
-  BalanceJson,
-  BaseRequestSign,
-  BuyServiceInfo,
-  BuyTokenInfo,
-  CommonOptimalPath,
-  CurrentAccountInfo,
-  EarningRewardHistoryItem,
-  EarningRewardJson,
-  EarningStatus,
-  HandleYieldStepParams,
-  InternalRequestSign,
-  LeavePoolAdditionalData,
-  NominationPoolInfo,
-  OptimalSwapPathParams,
-  OptimalYieldPath,
-  OptimalYieldPathParams,
-  RequestAccountBatchExportV2,
-  RequestAccountCreateSuriV2,
-  RequestAccountNameValidate,
-  RequestAccountProxyEdit,
-  RequestAccountProxyForget,
-  RequestBatchJsonGetAccountInfo,
-  RequestBatchRestoreV2,
-  RequestBounceableValidate,
-  RequestChangeAllowOneSign,
-  RequestChangeTonWalletContractVersion,
-  RequestCheckCrossChainTransfer,
-  RequestCheckPublicAndSecretKey,
-  RequestCheckTransfer,
-  RequestCrossChainTransfer,
-  RequestDeriveCreateMultiple,
-  RequestDeriveCreateV3,
-  RequestDeriveValidateV2,
-  RequestEarlyValidateYield,
-  RequestEarningSlippage,
-  RequestExportAccountProxyMnemonic,
-  RequestGetAllTonWalletContractVersion,
-  RequestGetAmountForPair,
-  RequestGetDeriveAccounts,
-  RequestGetDeriveSuggestion,
-  RequestGetTokensCanPayFee,
-  RequestGetYieldPoolTargets,
-  RequestInputAccountSubscribe,
-  RequestJsonGetAccountInfo,
-  RequestJsonRestoreV2,
-  RequestMetadataHash,
-  RequestMnemonicCreateV2,
-  RequestMnemonicValidateV2,
-  RequestPrivateKeyValidateV2,
-  RequestShortenMetadata,
-  RequestStakeCancelWithdrawal,
-  RequestStakeClaimReward,
-  RequestSubmitProcessTransaction,
-  RequestSubscribeProcessById,
-  RequestTransfer,
-  RequestUnlockDotCheckCanMint,
-  RequestUnlockDotSubscribeMintedData,
-  RequestYieldLeave,
-  RequestYieldStepSubmit,
-  RequestYieldWithdrawal,
-  ResponseAccountBatchExportV2,
-  ResponseAccountCreateSuriV2,
-  ResponseAccountNameValidate,
-  ResponseBatchJsonGetAccountInfo,
-  ResponseCheckPublicAndSecretKey,
-  ResponseDeriveValidateV2,
-  ResponseEarlyValidateYield,
-  ResponseExportAccountProxyMnemonic,
-  ResponseGetAllTonWalletContractVersion,
-  ResponseGetDeriveAccounts,
-  ResponseGetDeriveSuggestion,
-  ResponseGetYieldPoolTargets,
-  ResponseInputAccountSubscribe,
-  ResponseJsonGetAccountInfo,
-  ResponseMetadataHash,
-  ResponseMnemonicCreateV2,
-  ResponseMnemonicValidateV2,
-  ResponsePrivateKeyValidateV2,
-  ResponseShortenMetadata,
-  ResponseSubscribeProcessAlive,
-  ResponseSubscribeProcessById,
-  StorageDataInterface,
-  SubmitYieldStepData,
-  SubnetYieldPositionInfo,
-  SwapPair,
-  SwapQuoteResponse,
-  SwapRequest,
-  SwapRequestResult,
-  SwapSubmitParams,
-  SwapTxData,
-  TokenSpendingApprovalParams,
-  UnlockDotTransactionNft,
-  UnstakingStatus,
-  ValidateSwapProcessParams,
-  ValidateYieldProcessParams,
-  YieldPoolInfo,
-  YieldPoolType,
-  YieldPositionInfo
-} from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningSlippage, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
@@ -139,8 +36,8 @@ import { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
 import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
+import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { TransactionWarning } from './warnings/TransactionWarning';
-import { EarningSlippageResult } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/dtao';
 
 export enum RuntimeEnvironment {
   Web = 'Web',
@@ -2348,6 +2245,7 @@ export interface KoniRequestSignatures {
   'pri(yield.cancelWithdrawal.submit)': [RequestStakeCancelWithdrawal, SWTransactionResponse];
   'pri(yield.claimReward.submit)': [RequestStakeClaimReward, SWTransactionResponse];
   'pri(yield.getEarningSlippage)': [RequestEarningSlippage, EarningSlippageResult];
+
   /* Other */
 
   /* Actions */
@@ -2366,7 +2264,7 @@ export interface KoniRequestSignatures {
   // Transfer
   'pri(accounts.checkTransfer)': [RequestCheckTransfer, ValidateTransactionResponse];
   'pri(accounts.transfer)': [RequestSubmitTransfer, SWTransactionResponse];
-  'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalPath];
+  'pri(accounts.getOptimalTransferProcess)': [RequestOptimalTransferProcess, CommonOptimalTransferPath];
   'pri(accounts.approveSpending)': [TokenSpendingApprovalParams, SWTransactionResponse];
 
   'pri(accounts.checkCrossChainTransfer)': [RequestCheckCrossChainTransfer, ValidateTransactionResponse];
@@ -2496,8 +2394,8 @@ export interface KoniRequestSignatures {
 
   /* Swap */
   'pri(swapService.subscribePairs)': [null, SwapPair[], SwapPair[]];
-  'pri(swapService.generateOptimalProcess)': [OptimalSwapPathParams, CommonOptimalPath];
   'pri(swapService.handleSwapRequest)': [SwapRequest, SwapRequestResult];
+  'pri(swapService.handleSwapRequestV2)': [SwapRequestV2, SwapRequestResult];
   'pri(swapService.handleSwapStep)': [SwapSubmitParams, SWTransactionResponse];
   'pri(swapService.getLatestQuote)': [SwapRequest, SwapQuoteResponse];
   'pri(swapService.validateSwapProcess)': [ValidateSwapProcessParams, TransactionError[]];
