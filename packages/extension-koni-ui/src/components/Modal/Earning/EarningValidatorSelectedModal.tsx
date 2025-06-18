@@ -193,7 +193,7 @@ const Component = (props: Props) => {
         onCancel={onCancelSelectValidator}
         title={t(title)}
       >
-        <SwList.Section
+        <SwList
           list={resultList}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
@@ -238,21 +238,9 @@ const Component = (props: Props) => {
   );
 };
 
-const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ readOnly, theme: { token } }: Props) => {
+const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
-    ...(!readOnly
-      ? {}
-      : {
-        '.ant-sw-list': {
-          paddingLeft: 0,
-          paddingRight: 0
-        }
-      }),
-
     '.ant-sw-modal-header': {
-      paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG,
-
       '.ant-typography-ellipsis': {
         maxWidth: 'none',
         overflow: 'visible',
@@ -270,15 +258,31 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ re
       flexDirection: 'column'
     },
 
+    '.ant-sw-list': {
+      flex: 1,
+      overflowX: 'auto'
+    },
+
     '.ant-sw-modal-footer': {
       margin: 0,
-      marginTop: token.marginXS,
       borderTop: 0,
       marginBottom: token.margin
     },
 
-    '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXS
+    '.pool-item + .pool-item': {
+      marginTop: token.marginXXS
+    },
+
+    '&.modal-full': {
+      '.ant-sw-modal-header': {
+        paddingTop: token.paddingXS,
+        paddingBottom: token.paddingLG
+      },
+
+      '.ant-sw-list': {
+        paddingLeft: token.padding,
+        paddingRight: token.padding
+      }
     }
   };
 });
