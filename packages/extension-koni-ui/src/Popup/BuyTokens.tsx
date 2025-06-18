@@ -431,7 +431,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Buy & sell token')}
+          title={t('Buy & sell tokens')}
         />
 
         <Form
