@@ -42,7 +42,7 @@ export const getAccountJsonByAddress = (address: string): AccountJson | null => 
 
 /** Filter addresses to subscribe by chain info */
 const filterAddress = (addresses: string[], chainInfo: _ChainInfo): [string[], string[]] => {
-  const { bitcoin, cardano, evm, substrate, ton, _bitcoin } = getAddressesByChainTypeMap(addresses, chainInfo);
+  const { _bitcoin, bitcoin, cardano, evm, substrate, ton } = getAddressesByChainTypeMap(addresses, chainInfo);
 
   if (_isChainEvmCompatible(chainInfo)) {
     return [evm, [bitcoin, substrate, ton, cardano, _bitcoin].flat()];

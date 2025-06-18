@@ -26,7 +26,7 @@ export function parseBitcoinTransferData (address: string, transferItem: Bitcoin
     if (vouts.length) {
       return vouts.reduce((total, item) => total + item.value, 0).toString();
     } else {
-      return '0'
+      return '0';
     }
   })();
 
