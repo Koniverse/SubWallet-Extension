@@ -98,7 +98,7 @@ function Component ({ className, request, type }: Props) {
       />
       <BaseDetailModal
         className={CN(className, 'transaction-detail-modal')}
-        title={t('Transaction details')}
+        title={t('PSBT details')}
       >
         <MetaInfo>
           <MetaInfo.Data label={t('Input')}>

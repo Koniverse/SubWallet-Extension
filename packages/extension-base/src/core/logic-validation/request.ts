@@ -6,7 +6,7 @@ import { BitcoinProviderError } from '@subwallet/extension-base/background/error
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
@@ -233,6 +233,10 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
 
         if (!authInfo || !authInfo.isAllowed || !authInfo.isAllowedMap[payload.pair.address]) {
           return handleAuthError(payload, 'Account not in allowed list', 'dApp', errors);
+        }
+
+        if (payload.pair.meta.noPublicKey) {
+          return handleAuthError(payload, t('This account is not supported for this action'), 'dApp', errors);
         }
 
         payload.authInfo = authInfo;
@@ -844,7 +848,7 @@ export async function validationBitcoinSignMessageMiddleware (koni: KoniState, u
   };
 
   if (address === '' || !message) {
-    handleError(t('Not found address or payload to sign'));
+    handleError(t('not found address or payload to sign'));
   }
 
   if (!isBitcoinAddress(address)) {
@@ -983,15 +987,15 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   };
 
   if (transactionParams.network !== senderAccountInfo.network) {
-    handleError(t('The account or the network is incorrect'));
+    handleError(t('The account or the network is not matched'));
   }
 
   if (!transactionParams.recipients?.length) {
-    handleError(t('Please provide the recipient and the amount'));
+    handleError(t('please provide the recipient and the amount'));
   }
 
   if (transactionParams.recipients?.length > 1) {
-    handleError(t("We don't support multiple recipients yet. Please provide only one for now."));
+    handleError(t("we don't support multiple recipients yet. Please provide only one for now."));
   }
 
   if (transactionParams.recipients.filter(({ address, amount }) => !address || !amount).length > 0) {
@@ -1001,27 +1005,37 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   const recipientAccountInfo = getBitcoinAddressInfo(transactionParams.recipients[0].address);
 
   if (recipientAccountInfo.network !== transactionParams.network) {
-    handleError(t('The recipient account or the network is incorrect'));
+    handleError(t('invalid recipient address'));
   }
 
   if (transactionParams.recipients.length !== 1) {
-    handleError(t('Receiving address must be a single account'));
+    handleError(t('receiving address must be a single account'));
   }
 
   if (address === transactionParams.recipients[0].address) {
-    handleError(t('Receiving address must be different from sending address'));
+    handleError(t('must be different from sending address'));
   }
 
   const pair = pair_ || keyring.getPair(address);
 
   if (!pair) {
-    handleError(t('Unable to find account'));
+    handleError(t('unable to find account'));
   }
 
   const tokenInfo = koni.getNativeTokenInfo(networkKey);
-  const freeBalance = await koni.balanceService.getTransferableBalance(address, networkKey, tokenInfo.slug);
+  let freeBalance: AmountData = {
+    decimals: 0,
+    symbol: 'BTC',
+    value: '0'
+  };
 
   let totalValue = new BigN('0');
+
+  try {
+    freeBalance = await koni.balanceService.getTransferableBalance(address, networkKey, tokenInfo.slug);
+  } catch (e) {
+    handleError((e as Error).message);
+  }
 
   const to = transactionParams.recipients.map((value) => {
     const amount = autoFormatNumber(value.amount);
@@ -1035,7 +1049,7 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   });
 
   if (new BigN(freeBalance.value).lte(totalValue)) {
-    handleError(t('Insufficient balance'));
+    handleError(t('insufficient balance'));
   }
 
   const sendTransactionRequest = {
@@ -1067,7 +1081,8 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
     message.includes('connection not open') ||
     message.includes('connection timeout') ||
     message.includes('can not active chain') ||
-    message.includes('invalid json rpc')
+    message.includes('invalid json rpc') ||
+    message.includes('internet connection')
   ) {
     return [t('Re-enable the network or change RPC on the extension and try again'), t('Unstable network connection')];
   }
@@ -1110,6 +1125,18 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
 
   if (message.includes('the sender address must be the ethereum address type')) {
     return [t('The sender address must be the ethereum address type'), t('Invalid address type')];
+  }
+
+  if (message.includes('the sender address must be the ethereum address type')) {
+    return [t('The sender address must be the bitcoin address type'), t('Invalid address type')];
+  }
+
+  if (message.includes('account or the network is not matched')) {
+    return [t('The account does not match the selected network'), t('Invalid address type')];
+  }
+
+  if (message.includes('receiving address must be a single account')) {
+    return [t('The receiving address must be a single account'), t('Invalid recipient address')];
   }
 
   if (message.includes('insufficient balance') || message.includes('insufficient funds')) {

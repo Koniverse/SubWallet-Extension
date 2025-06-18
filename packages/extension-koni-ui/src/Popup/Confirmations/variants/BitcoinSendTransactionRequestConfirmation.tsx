@@ -4,7 +4,6 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { BitcoinSendTransactionRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { BitcoinFeeDetail } from '@subwallet/extension-base/types';
 import { RequestSubmitTransferWithId, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO, getDomainFromUrl } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -139,10 +138,7 @@ function Component ({ className, request, type }: Props) {
 
   useEffect(() => {
     if (transferInfo) {
-      const feeDetail = transferInfo.feeOptions as BitcoinFeeDetail;
-      const feeRate = feeDetail.options.slow.feeRate;
-
-      setTransactionFeeValue(new BigN(feeRate).multipliedBy(feeDetail.vSize));
+      setTransactionFeeValue(new BigN(transferInfo.feeOptions.estimatedFee));
 
       setTransactionInfo((prevState) => ({ ...prevState, feeOption: 'slow' }));
     }
@@ -255,6 +251,10 @@ const BitcoinSendTransactionRequestConfirmation = styled(Component)<Props>(({ th
       width: '50%',
       float: 'left'
     }
+  },
+
+  '.__account-item-address': {
+    textAlign: 'right'
   },
 
   '.network-box': {
