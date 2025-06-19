@@ -742,10 +742,14 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       backgroundColor: token.colorBgSecondary,
       borderRadius: token.borderRadius,
       padding: '0.25rem',
-      height: 40,
+      minHeight: 40,
       position: 'relative',
       display: 'flex',
       overflow: 'hidden'
+    },
+
+    '.ant-sw-header-container': {
+      minHeight: 'auto'
     },
 
     '.ant-sw-modal-footer': {
@@ -764,8 +768,7 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
     '.__form-container': {
       height: '100%',
       display: 'flex',
-      flexDirection: 'column',
-      marginTop: 4
+      flexDirection: 'column'
     },
 
     '.__scroll-container': {
@@ -842,7 +845,7 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
 
     '.__layout-footer': {
       display: 'flex',
-      paddingBottom: 40,
+      paddingBottom: 24,
       gap: token.paddingXS,
 
       '.ant-btn': {
