@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
+import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import CN from 'classnames';
@@ -23,6 +25,18 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   const chainInfoMap = useSelector((root: RootState) => root.chainStore.chainInfoMap);
   const assetRegistryMap = useSelector((root: RootState) => root.assetRegistry.assetRegistry);
   const tokenInfo = assetRegistryMap[transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM ? xcmData.tokenSlug : data.tokenSlug];
+
+  const isAcrossBridge = useMemo(() => {
+    return _isAcrossChainBridge(xcmData.originNetworkKey, xcmData.destinationNetworkKey);
+  }, [xcmData.originNetworkKey, xcmData.destinationNetworkKey]);
+
+  const destTokenInfo = useMemo(() => {
+    if (isAcrossBridge && xcmData.metadata?.destChainSlug) {
+      return assetRegistryMap[xcmData.metadata?.destChainSlug];
+    }
+
+    return tokenInfo;
+  }, [isAcrossBridge, xcmData.metadata?.destChainSlug, tokenInfo, assetRegistryMap]);
 
   const chainInfo = useMemo(
     () => chainInfoMap[transaction.chain],
@@ -77,12 +91,33 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       </MetaInfo>
 
       <MetaInfo hasBackgroundWrapper>
-        <MetaInfo.Number
-          decimals={tokenInfo.decimals || 0}
-          label={t('Amount')}
-          suffix={tokenInfo.symbol}
-          value={data.value || 0}
-        />
+        {isAcrossBridge && xcmData.metadata
+          ? <>
+            <MetaInfo.Default
+              label={t('Quote')}
+            >
+              <QuoteRateDisplay
+                className={'__quote-estimate-swap-value'}
+                fromAssetInfo={tokenInfo}
+                rateValue={Number(xcmData.metadata.rate)}
+                toAssetInfo={destTokenInfo}
+              />
+            </MetaInfo.Default>
+            <MetaInfo.Number
+              decimals={destTokenInfo.decimals || 0}
+              label={t('Expected amount')}
+              suffix={destTokenInfo.symbol}
+              value={xcmData.metadata.amountOut}
+            />
+          </>
+          : (
+            <MetaInfo.Number
+              decimals={tokenInfo.decimals || 0}
+              label={t('Amount')}
+              suffix={tokenInfo.symbol}
+              value={data.value || 0}
+            />
+          )}
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
