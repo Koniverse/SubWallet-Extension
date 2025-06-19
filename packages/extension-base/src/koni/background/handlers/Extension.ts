@@ -2037,7 +2037,8 @@ export default class KoniExtension {
       extrinsicType: isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN,
       ignoreWarnings: [],
       isTransferAll: false,
-      edAsWarning: isTransferNativeToken
+      edAsWarning: isTransferNativeToken,
+      skipFeeRecalculation: true
     });
   }
 
