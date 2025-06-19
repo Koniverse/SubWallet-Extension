@@ -740,8 +740,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
 
     '.__service-container': {
       backgroundColor: token.colorBgSecondary,
-      borderRadius: token.borderRadius,
-      padding: '0.25rem',
+      borderRadius: 8,
+      padding: 4,
       minHeight: 40,
       position: 'relative',
       display: 'flex',
