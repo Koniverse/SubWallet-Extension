@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 1.3.41
+Build date: Jun 11, 2025.
+
+Features & Update:
+- Support Asset Hub Testnet swap for Chainflip (#4265)
+- Exposed API Key in SubWallet Chrome Extension
+- Moving BlockFrost interaction Logic to the Backend (#4368)
+- Update UI Connect dApp screen (#4377)
+
+Bug fixed:
+- Fixed bug show Moonbeam local token balance (#4413)
+- Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416)
+- Fixed bug Error page when use marketing campaign (#4403)
+- Fixed bug navigating actions in Earning feature (#4441)
+
+
+## 1.3.40
+Build date: May 30, 2025.
+
+Features & Update:
+- Update chain-list stable v0.2.105 (#4273),
+- Update SimpleSwap API
+- Update Paraspell's fee calculation API (#4314),
+
+Bug fixed:
+- Fixed bug Wrong Price Impact When Swapping on PAH (#4241)
+
+
+## 1.3.39
+Build date: May 26, 2025.
+
+Bug fixed:
+- Fix bug error page when connect with dApp (#4401)
+
+
 ## 1.3.38
 Build date: May 23, 2025.
 
