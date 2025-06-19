@@ -768,7 +768,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
     '.__form-container': {
       height: '100%',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      marginTop: 4
     },
 
     '.__scroll-container': {
