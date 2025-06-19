@@ -9,8 +9,8 @@ import { AccountChainType, AccountJson } from '@subwallet/extension-base/types';
 import { getAccountChainTypeFromKeypairType, pairToAccount } from '@subwallet/extension-base/utils';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isAddress, isBitcoinAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
-import { keyring } from '@subwallet/ui-keyring';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
+import { keyring } from '@subwallet/ui-keyring';
 
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 
