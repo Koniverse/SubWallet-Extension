@@ -2,13 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Resolver } from '@subwallet/extension-base/background/types';
+import { isProductionMode } from '@subwallet/extension-base/constants';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
+import { SELL_TOKEN_TAB } from '@subwallet/extension-koni-ui/constants';
 import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
@@ -17,7 +20,7 @@ import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOr
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, ShoppingCartSimple, XCircle } from 'phosphor-react';
+import { CheckCircle, ShoppingCartSimple, Tag, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -60,10 +63,15 @@ const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
 };
 
 const modalId = 'disclaimer-modal';
+const baseUrl = isProductionMode ? 'https://web.subwallet.app' : 'https://cf62cfe9.subwallet-webapp.pages.dev';
 
 function Component ({ className, currentAccountProxy }: ComponentProps) {
   const locationState = useLocation().state as BuyTokensParam;
   const [currentSymbol] = useState<string | undefined>(locationState?.symbol);
+
+  const [buyTokenTab, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
+
+  const [buyForm, setBuyForm] = useState(buyTokenTab !== 'SELL');
 
   const notify = useNotification();
 
@@ -126,14 +134,16 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     for (const serviceItem of baseServiceItems) {
       const temp: ServiceItem = {
         ...serviceItem,
-        disabled: buyInfo ? !buyInfo.services.includes(serviceItem.key) : true
+        disabled: buyInfo
+          ? !buyInfo.services.includes(serviceItem.key) || (!buyForm && !buyInfo.serviceInfo[serviceItem.key]?.supportSell)
+          : true
       };
 
       result.push(temp);
     }
 
     return result;
-  }, [tokens]);
+  }, [tokens, buyForm]);
 
   const onConfirm = useCallback((): Promise<void> => {
     activeModal(modalId);
@@ -205,6 +215,73 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
+
+  const tokenBalanceMap = useMemo(() => {
+    return getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
+  }, [currentAccountProxy.id, getAccountTokenBalance, tokens]);
+
+  const sellTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
+      return {
+        name: assetRegistry[info.slug]?.name || info.symbol,
+        slug: info.slug,
+        symbol: info.symbol,
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
+      };
+    };
+
+    const sellList = [...Object.values(tokens)].filter((token) => token.supportSell);
+
+    const filtered = currentSymbol
+      ? sellList.filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol)
+      : sellList;
+
+    Object.values(filtered).forEach((item) => {
+      if (!allowedChains.includes(item.network)) {
+        return;
+      }
+
+      result.push(convertToItem(item));
+    });
+
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
+    return result;
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
+
+  const isSellTabDisabled = useMemo(() => {
+    if (sellTokenItems.length > 1) {
+      return false;
+    }
+
+    const tokenInfo = sellTokenItems[0]?.slug ? tokens[sellTokenItems[0].slug] : undefined;
+
+    for (const serviceItem of baseServiceItems) {
+      if (tokenInfo?.serviceInfo[serviceItem.key]?.supportSell) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [sellTokenItems, tokens]);
 
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
@@ -329,6 +406,23 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
   }, [form, tokens, chainInfoMap, disclaimerAgree, onConfirm, walletReference, notify, t]);
 
+  const onClickContinue = useCallback(() => {
+    openInNewTab(`${baseUrl}/redirect-handler/sell-token`)();
+  }, []);
+
+  const handleForm = useCallback((mode: string) => {
+    setBuyForm(mode === 'BUY');
+  }, []);
+
+  const handleBuyForm = useCallback(() => handleForm('BUY'), [handleForm]);
+  const handleSellForm = useCallback(() => {
+    if (isSellTabDisabled) {
+      return;
+    }
+
+    handleForm('SELL');
+  }, [handleForm, isSellTabDisabled]);
+
   useEffect(() => {
     if (!fixedTokenSlug && tokenItems.length) {
       const { tokenSlug } = form.getFieldsValue();
@@ -386,6 +480,10 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
   }, [selectedTokenSlug, form, getServiceItems]);
 
+  useEffect(() => {
+    setBuyTokenModalTab('');
+  }, [setBuyTokenModalTab]);
+
   return (
     <Layout.Home
       showFaderIcon
@@ -399,75 +497,137 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Buy token')}
+          title={t('Buy & sell tokens')}
         />
-        <div className={'__scroll-container'}>
-          <div className='__buy-icon-wrapper'>
-            <Icon
-              className={'__buy-icon'}
-              phosphorIcon={ShoppingCartSimple}
-              weight={'fill'}
-            />
-          </div>
 
-          <Form
-            className='__form-container form-space-sm'
-            form={form}
-            initialValues={formDefault}
-          >
-            <div className='form-row'>
-              <Form.Item name={'tokenSlug'}>
-                <TokenSelector
-                  disabled={tokenItems.length < 2}
-                  items={tokenItems}
-                  showChainInSelected={false}
-                />
-              </Form.Item>
+        <Form
+          className='__form-container form-space-sm'
+          form={form}
+          initialValues={formDefault}
+        >
+          <div className={'__scroll-container'}>
 
-              <Form.Item name={'service'}>
-                <ServiceSelector
-                  disabled={!selectedTokenSlug}
-                  items={serviceItems}
-                  placeholder={t('Select supplier')}
-                  title={t('Select supplier')}
-                />
-              </Form.Item>
+            <div className='form-row __service-container'>
+              <div style={{
+                position: 'absolute',
+                top: '0.25rem',
+                left: buyForm ? '0.25rem' : 'calc(50% + 0.25rem)',
+                width: 'calc(50% - 0.5rem)',
+                height: 'calc(100% - 0.5rem)',
+                backgroundColor: '#252525',
+                borderRadius: '0.5rem',
+                transition: 'left 0.3s ease-in-out'
+              }}
+              ></div>
+
+              <div
+                className={'__service-selector'}
+                onClick={handleBuyForm}
+              >
+                Buy
+              </div>
+              <div
+                className={CN('__service-selector', {
+                  '-disabled': isSellTabDisabled
+                })}
+                onClick={handleSellForm}
+              >
+                Sell
+              </div>
             </div>
 
-            <Form.Item
-              // className={CN({
-              //   hidden: !isAllAccount && accountAddressItems.length <= 1
-              // })}
-              name={'address'}
-            >
-              <AccountAddressSelector
-                items={accountAddressItems}
-                label={`${t('To')}:`}
-                labelStyle={'horizontal'}
-              />
-            </Form.Item>
-          </Form>
+            {buyForm && (
+              <div className={'__buy-service-wrapper'}>
+                <div className={'__buy-service-content'}>
+                  <div className='__buy-icon-wrapper'>
+                    <Icon
+                      className={'__buy-icon'}
+                      phosphorIcon={ShoppingCartSimple}
+                      weight={'fill'}
+                    />
+                  </div>
 
-          <div className={'common-text __note'}>
-            {t('You will be directed to the chosen supplier to complete this transaction')}
-          </div>
-        </div>
+                  <div className='form-row'>
+                    <Form.Item name={'tokenSlug'}>
+                      <TokenSelector
+                        disabled={tokenItems.length < 2}
+                        items={tokenItems}
+                        showChainInSelected={false}
+                      />
+                    </Form.Item>
 
-        <div className={'__layout-footer'}>
-          <Button
-            disabled={!isSupportBuyTokens}
-            icon={ (
-              <Icon
-                phosphorIcon={ShoppingCartSimple}
-                weight={'fill'}
-              />
+                    <Form.Item name={'service'}>
+                      <ServiceSelector
+                        disabled={!selectedTokenSlug}
+                        items={serviceItems}
+                        placeholder={t('Select supplier')}
+                        title={t('Select supplier')}
+                      />
+                    </Form.Item>
+                  </div>
+
+                  <Form.Item
+                    // className={CN({
+                    //   hidden: !isAllAccount && accountAddressItems.length <= 1
+                    // })}
+                    name={'address'}
+                  >
+                    <AccountAddressSelector
+                      items={accountAddressItems}
+                      label={`${t('To')}:`}
+                      labelStyle={'horizontal'}
+                    />
+                  </Form.Item>
+
+                  <div className={'common-text __note'}>
+                    {t('You will be directed to the chosen supplier to complete this transaction')}
+                  </div>
+                </div>
+
+                <div className={'__layout-footer'}>
+                  <Button
+                    disabled={!isSupportBuyTokens}
+                    icon={(
+                      <Icon
+                        phosphorIcon={ShoppingCartSimple}
+                        weight={'fill'}
+                      />
+                    )}
+                    loading={loading}
+                    onClick={onClickNext}
+                  >
+                    {t('Buy now')}
+                  </Button>
+                </div>
+              </div>
             )}
-            loading={loading}
-            onClick={onClickNext}
-          >
-            {t('Buy now')}
-          </Button>
-        </div>
+            {!buyForm && (
+              <div className={'__sell-service-wrapper'}>
+                <div className={'__content-wrapper'}>
+                  <div className='__buy-icon-wrapper'>
+                    <Icon
+                      className={'__buy-icon'}
+                      phosphorIcon={Tag}
+                      weight={'fill'}
+                    />
+                  </div>
+                  <div className={'common-text __note __sell-service'}>
+                    {t('You will be directed to SubWallet Web Dashboard to use this feature. Hit “Continue” to proceed with the payment')}
+                  </div>
+                </div>
+
+                <div className={'__layout-footer'}>
+                  <Button
+                    loading={loading}
+                    onClick={onClickContinue}
+                  >
+                    {t('Continue')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Form>
         <SwModal
           className={CN(className)}
           footer={(
@@ -571,6 +731,20 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
     display: 'flex',
     flexDirection: 'column',
 
+    '.__service-container': {
+      backgroundColor: token.colorBgSecondary,
+      borderRadius: 8,
+      padding: 4,
+      minHeight: 40,
+      position: 'relative',
+      display: 'flex',
+      overflow: 'hidden'
+    },
+
+    '.ant-sw-header-container': {
+      minHeight: 'auto'
+    },
+
     '.ant-sw-modal-footer': {
       display: 'flex'
     },
@@ -579,11 +753,32 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       color: token.colorTextSecondary
     },
 
+    '.__radio-group': {
+      paddingLeft: token.padding,
+      paddingRight: token.padding
+    },
+
+    '.__form-container': {
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      marginTop: 4
+    },
+
     '.__scroll-container': {
       flex: 1,
       overflow: 'auto',
       paddingLeft: token.padding,
-      paddingRight: token.padding
+      paddingRight: token.padding,
+      display: 'flex',
+      flexDirection: 'column'
+    },
+
+    '.__sell-service-wrapper, .__buy-service-wrapper': {
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between'
     },
 
     '.__buy-icon-wrapper': {
@@ -595,8 +790,8 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       alignItems: 'center',
       marginLeft: 'auto',
       marginRight: 'auto',
-      marginTop: token.margin,
-      marginBottom: token.marginLG,
+      marginTop: 32,
+      marginBottom: token.marginXL,
 
       '&:before': {
         content: '""',
@@ -607,6 +802,20 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
         borderRadius: '100%',
         opacity: '0.1'
       }
+    },
+
+    '.__service-selector': {
+      cursor: 'pointer',
+      width: '50%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      zIndex: 1
+    },
+
+    '.__service-selector.-disabled': {
+      cursor: 'not-allowed'
     },
 
     '.__buy-icon': {
@@ -621,10 +830,16 @@ const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperPr
       textAlign: 'center'
     },
 
+    '.__sell-service': {
+      color: token.colorTextSecondary,
+      paddingTop: token.paddingSM,
+      paddingRight: token.padding,
+      paddingLeft: token.padding
+    },
+
     '.__layout-footer': {
       display: 'flex',
-      padding: token.paddingMD,
-      paddingBottom: token.paddingLG,
+      paddingBottom: 24,
       gap: token.paddingXS,
 
       '.ant-btn': {
