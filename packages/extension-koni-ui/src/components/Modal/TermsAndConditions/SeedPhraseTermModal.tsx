@@ -81,6 +81,7 @@ const Component = ({ className }: Props) => {
     return (
       <Web3Block
         className={'term-box'}
+        key={term}
         leftItem={_leftItem}
         middleItem={_middleItem}
         onClick={onCheckedTerm(term)}

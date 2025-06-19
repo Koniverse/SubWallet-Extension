@@ -5,6 +5,9 @@ on:
       - koni-dev
       - upgrade-ui
       - subwallet-dev
+      - koni/dev/issue-4200-v2
+      - koni/dev/issue-4297
+      - koni/dev/issue-4263
   push:
     branches:
       - koni-dev
@@ -72,6 +75,7 @@ jobs:
         TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
         CURRENT_BRANCH: ${{ github.event.pull_request.head.ref || github.ref }}
         BRANCH_NAME: ${{ github.ref_name }}
+        BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
         yarn install --immutable | grep -v 'YN0013'
         yarn build:koni-dev

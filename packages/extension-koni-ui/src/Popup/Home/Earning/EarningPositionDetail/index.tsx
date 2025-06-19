@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainInfoCompatibleWithAccountInfo, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, UN_STAKE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -14,7 +14,7 @@ import { EarningInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning
 import { RewardInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart';
 import { WithdrawInfoPart } from '@subwallet/extension-koni-ui/Popup/Home/Earning/EarningPositionDetail/WithdrawInfoPart';
 import { EarningEntryParam, EarningEntryView, EarningPositionDetailParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getTransactionFromAccountProxyValue, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { Button, ButtonProps, Icon, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -53,15 +53,11 @@ function Component ({ compound,
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, isSubstrateECDSA }) => {
+    const accountAddress = currentAccountProxy?.accounts.find((accountInfo) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        if (isSubstrateECDSA) {
-          return _isSubstrateEvmCompatibleChain(chainInfo);
-        }
-
-        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, accountInfo);
       }
 
       return false;

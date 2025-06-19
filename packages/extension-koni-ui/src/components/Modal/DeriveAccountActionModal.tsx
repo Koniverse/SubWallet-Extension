@@ -2,26 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountProxyType, DerivePathInfo } from '@subwallet/extension-base/types';
-import { addLazy, detectTranslate } from '@subwallet/extension-base/utils';
+import { AccountChainType, AccountProxyType, DerivePathInfo } from '@subwallet/extension-base/types';
+import { addLazy, detectTranslate, getAccountChainTypeFromKeypairType } from '@subwallet/extension-base/utils';
 import { DERIVE_ACCOUNT_ACTION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useCompleteCreateAccount, useGetAccountProxyById, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { deriveAccountV3, deriveSuggest, validateAccountName, validateDerivePathV2 } from '@subwallet/extension-koni-ui/messaging';
-import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { FormCallbacks, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
-import { KeypairType } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes } from '@subwallet/keyring/types';
 import { Button, Form, Icon, Input, ModalContext, SwModal } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import CN from 'classnames';
 import { CaretLeft, CheckCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
-import React, { Context, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
-import styled, { ThemeContext } from 'styled-components';
+import styled from 'styled-components';
 
-import { AccountProxyTypeTag } from '../AccountProxy';
+import { AccountChainTypeLogos, AccountProxyTypeTag } from '../AccountProxy';
 
 export interface AccountDeriveActionProps {
   proxyId: string;
@@ -37,7 +36,19 @@ interface DeriveFormState {
 
 const modalId = DERIVE_ACCOUNT_ACTION_MODAL;
 
-const alertTypes: DerivePathInfo['type'][] = ['unified', 'ton', 'ethereum', 'cardano'];
+const alertTypes: DerivePathInfo['type'][] = ['unified', 'ton', 'ethereum', 'cardano', ...BitcoinKeypairTypes];
+
+const convertToChainType = (type?: DerivePathInfo['type'], chainTypes?: AccountChainType[]): AccountChainType[] => {
+  if (!type) {
+    return [];
+  }
+
+  if (type === 'unified') {
+    return chainTypes || [];
+  }
+
+  return [getAccountChainTypeFromKeypairType(type)];
+};
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, onCompleteCb, proxyId } = props;
@@ -46,7 +57,6 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { addExclude, checkActive, inactiveModal, removeExclude } = useContext(ModalContext);
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
-  const { logoMap } = useContext<Theme>(ThemeContext as Context<Theme>);
 
   const isActive = checkActive(modalId);
 
@@ -63,30 +73,13 @@ const Component: React.FC<Props> = (props: Props) => {
     />
   ), []);
 
-  const keypairTypeLogoMap = useMemo((): Record<KeypairType, string> => {
-    return {
-      sr25519: logoMap.network.polkadot as string,
-      ed25519: logoMap.network.polkadot as string,
-      ecdsa: logoMap.network.polkadot as string,
-      ethereum: logoMap.network.ethereum as string,
-      ton: logoMap.network.ton as string,
-      'ton-native': logoMap.network.ton as string,
-      'bitcoin-44': logoMap.network.bitcoin as string,
-      'bitcoin-84': logoMap.network.bitcoin as string,
-      'bitcoin-86': logoMap.network.bitcoin as string,
-      'bittest-44': logoMap.network.bitcoin as string,
-      'bittest-84': logoMap.network.bitcoin as string,
-      'bittest-86': logoMap.network.bitcoin as string,
-      cardano: logoMap.network.cardano as string
-    };
-  }, [logoMap.network.bitcoin, logoMap.network.cardano, logoMap.network.ethereum, logoMap.network.polkadot, logoMap.network.ton]);
-
   const [form] = Form.useForm<DeriveFormState>();
 
   const [loading, setLoading] = useState(false);
   const [, setUpdate] = useState({});
   const infoRef = useRef<DerivePathInfo | undefined>();
   const networkType = infoRef.current?.type;
+  const chainTypes = useMemo(() => convertToChainType(networkType, accountProxy?.chainTypes), [networkType, accountProxy?.chainTypes]);
 
   const closeModal = useCallback(
     () => {
@@ -333,30 +326,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 placeholder={t('Account name')}
                 suffix={(
                   <div className='__item-chain-types'>
-                    {
-                      networkType
-                        ? networkType === 'unified'
-                          ? (
-                            accountProxy.accounts.map(({ type }) => {
-                              return (
-                                <img
-                                  alt='Network type'
-                                  className={'__item-chain-type-item'}
-                                  key={type}
-                                  src={keypairTypeLogoMap[type]}
-                                />
-                              );
-                            })
-                          )
-                          : (
-                            <img
-                              alt='Network type'
-                              className={'__item-chain-type-item'}
-                              src={keypairTypeLogoMap[networkType]}
-                            />
-                          )
-                        : null
-                    }
+                    <AccountChainTypeLogos chainTypes={chainTypes} />
                   </div>
                 )}
               />

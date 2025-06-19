@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@types/node": "^17.0.10",
+    "bitcoinjs-lib": "6.1.5",
     "dexie": "^3.2.2",
     "loglevel": "^1.8.1",
     "react-markdown": "^9.0.1",
@@ -110,6 +111,7 @@
     "@subwallet/keyring": "^0.1.12",
     "@subwallet/react-ui": "5.1.2-b79",
     "@subwallet/ui-keyring": "^0.1.12",
+    "bitcoinjs-lib": "6.1.5",
     "@types/bn.js": "^5.1.6",
     "@zondax/ledger-substrate": "1.1.2",
     "babel-core": "^7.0.0-bridge.0",

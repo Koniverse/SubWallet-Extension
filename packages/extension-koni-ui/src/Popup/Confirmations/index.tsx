@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -35,6 +35,11 @@ const titleMap: Record<ConfirmationType, string> = {
   evmSignatureRequest: detectTranslate('Signature request'),
   cardanoSignatureRequest: detectTranslate('Signature request'),
   cardanoSignTransactionRequest: detectTranslate('Transaction request'),
+  bitcoinSignatureRequest: detectTranslate('Signature request'),
+  bitcoinSendTransactionRequest: detectTranslate('Transaction request'),
+  bitcoinSendTransactionRequestAfterConfirmation: detectTranslate('Transaction request'),
+  bitcoinWatchTransactionRequest: detectTranslate('Transaction request'),
+  bitcoinSignPsbtRequest: detectTranslate('Sign PSBT request'),
   metadataRequest: detectTranslate('Update metadata'),
   signingRequest: detectTranslate('Signature request'),
   connectWCRequest: detectTranslate('WalletConnect'),
@@ -124,6 +129,12 @@ const Component = function ({ className }: Props) {
         account = findAccountByAddress(accounts, request.payload.address) || undefined;
         canSign = request.payload.canSign;
         isMessage = false;
+      } else if (['bitcoinSignatureRequest', 'bitcoinSendTransactionRequest', 'bitcoinWatchTransactionRequest', 'bitcoinSignPsbtRequest', 'bitcoinSendTransactionRequestAfterConfirmation'].includes(confirmation.type)) {
+        const request = confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest' | 'bitcoinSendTransactionRequest' | 'bitcoinWatchTransactionRequest' | 'bitcoinSendTransactionRequestAfterConfirmation'][0];
+
+        account = request.payload.account;
+        canSign = request.payload.canSign;
+        isMessage = confirmation.type === 'bitcoinSignatureRequest';
       }
 
       const signMode = getSignMode(account);
@@ -210,6 +221,28 @@ const Component = function ({ className }: Props) {
             type={confirmation.type}
           />
         );
+
+      // case 'bitcoinSignatureRequest':
+      //   return (
+      //     <BitcoinSignatureConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
+      // case 'bitcoinSignPsbtRequest':
+      //   return (
+      //     <BitcoinSignPsbtConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSignPsbtRequest'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
+      // case 'bitcoinSendTransactionRequestAfterConfirmation':
+      //   return (
+      //     <BitcoinSendTransactionRequestConfirmation
+      //       request={confirmation.item as ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]}
+      //       type={confirmation.type}
+      //     />
+      //   );
       case 'authorizeRequest':
         return (
           <AuthorizeConfirmation request={confirmation.item as AuthorizeRequest} />

@@ -57,7 +57,7 @@ const AccountChainTypeLogos = styled(Component)<Props>(({ theme: { token } }: Pr
     },
 
     '.__chain-type-logo + .__chain-type-logo': {
-      marginLeft: -token.marginXXS
+      marginLeft: -6
     }
   };
 });

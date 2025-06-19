@@ -5,6 +5,9 @@ import { SWTransactionBase } from '@subwallet/extension-base/services/transactio
 import { CurrentAccountInfo } from '@subwallet/extension-base/types';
 
 export interface EventRegistry {
+  'general.init': [boolean];
+  'general.start': [boolean];
+  'general.start_full': [boolean];
   'general.sleep': [boolean];
   'general.wakeup': [boolean];
   'crypto.ready': [boolean];

@@ -1,12 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
-import { useChainInfo, useFilterModal, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-koni-ui/utils';
+import { isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { Badge, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
@@ -57,7 +59,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const chainInfo = useChainInfo(chainSlug);
 
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 
@@ -101,7 +103,10 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (isChainInfoAccordantAccountChainType(chainInfo, getAccountChainTypeForAddress(acc.address))) {
+      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, {
+        chainType: getAccountChainTypeForAddress(acc.address),
+        type: getKeypairTypeByAddress(acc.address)
+      })) {
         result.push({
           displayName: acc.name,
           formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),
@@ -136,9 +141,7 @@ const Component: React.FC<Props> = (props: Props) => {
     // todo: may need better solution for this sorting below
 
     return result
-      .sort((a: AnalyzeAddress, b: AnalyzeAddress) => {
-        return ((a?.displayName || '').toLowerCase() > (b?.displayName || '').toLowerCase()) ? 1 : -1;
-      })
+      .sort(sortFuncAnalyzeAddress)
       .sort((a, b) => getGroupPriority(b) - getGroupPriority(a));
   }, [accountProxies, chainInfo, chainSlug, contacts, getReformatAddress, recent, selectedFilters]);
 
