@@ -9,7 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { DEFAULT_SERVICE_INFO } from './constants';
 
-const convertSupportType = (support: OnrampAccountSupportType): AccountChainType => {
+const convertSupportType = (support: OnrampAccountSupportType): AccountChainType | null => {
   switch (support) {
     case 'ETHEREUM':
       return AccountChainType.ETHEREUM;
@@ -19,6 +19,8 @@ const convertSupportType = (support: OnrampAccountSupportType): AccountChainType
       return AccountChainType.CARDANO;
     case 'TON':
       return AccountChainType.TON;
+    default:
+      return null;
   }
 };
 
@@ -53,11 +55,17 @@ export default class BuyService {
     const result: Record<string, BuyTokenInfo> = {};
 
     for (const datum of data) {
+      const support = convertSupportType(datum.support);
+
+      if (!support) {
+        continue;
+      }
+
       const temp: BuyTokenInfo = {
         serviceInfo: {
           ...DEFAULT_SERVICE_INFO
         },
-        support: convertSupportType(datum.support),
+        support,
         services: [],
         slug: datum.slug,
         symbol: datum.symbol,
