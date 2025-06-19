@@ -8,7 +8,7 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
@@ -197,7 +197,23 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [availableBalanceHookResult.isLoading, availableBalanceHookResult.nativeTokenBalance, availableBalanceHookResult.nativeTokenSlug, availableBalanceHookResult.tokenBalance, fromTokenSlugValue]);
 
   const { checkChainConnected, turnOnChain } = useChainConnection();
-  const onPreCheck = usePreCheckAction(fromValue);
+
+  const preCheckMessage = useMemo(() => {
+    if (!fromTokenSlugValue) {
+      return undefined;
+    }
+
+    const chainAsset = assetRegistryMap[fromTokenSlugValue];
+    const chainSlug = _getAssetOriginChain(chainAsset);
+    const chainName = _getChainName(chainInfoMap[chainSlug]);
+
+    return t('{{symbol}} on {{chainName}} is not supported for swapping. Select another token and try again', { replace: {
+      symbol: _getAssetSymbol(chainAsset),
+      chainName
+    } });
+  }, [assetRegistryMap, chainInfoMap, fromTokenSlugValue, t]);
+
+  const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
   const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
