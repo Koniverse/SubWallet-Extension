@@ -39,8 +39,8 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
-  if (explorerLink.includes('explorer.zkverify.io')) {
-    return 'account';
+  if (explorerLink.includes('explorer.gen6.app')) {
+    return '#/accounts';
   }
 
   if (explorerLink.includes('astral.autonomys')) {
@@ -65,6 +65,10 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
 
   if (['aventus', 'deeper_network'].includes(chainInfo.slug)) {
     return 'transaction';
+  }
+
+  if (['gen6_public'].includes(chainInfo.slug)) {
+    return '#/extrinsics';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
