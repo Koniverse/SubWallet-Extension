@@ -117,7 +117,7 @@ export class BittensorCache {
         return this.cache || { data: [] };
       }
 
-      const rawData = await resp.json() as ValidatorResponse; 
+      const rawData = await resp.json() as ValidatorResponse;
       const data = {
         data: rawData.data.filter((validator) => parseFloat(validator.root_stake) > 0)
       };

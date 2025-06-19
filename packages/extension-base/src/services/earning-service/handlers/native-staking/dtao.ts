@@ -436,7 +436,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   override async subscribePoolPosition (useAddresses: string[], rsCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
     await this.init();
-    console.log('was here2');
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
 
@@ -593,7 +592,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
-    console.log('was here');
     const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator;
