@@ -205,39 +205,18 @@ export default class BitcoinRequestHandler {
     const transaction = this.#transactionService.getTransaction(request.id);
     const { chain, emitterTransaction, id } = transaction;
     const { from } = transaction.data as ExtrinsicDataTypeMap['transfer.balance'];
+    const { promise, reject, resolve } = createPromiseHandler<string>();
 
     if (!emitterTransaction) {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INTERNAL_ERROR);
     }
 
-    const chainInfo = this.#chainService.getChainInfoByKey(chain);
     const eventData: TransactionEventResponse = {
       id,
       errors: [],
       warnings: [],
       extrinsicHash: id
     };
-
-    const psbt = transaction.transaction as Psbt;
-    const pair = keyring.getPair(from);
-
-    // Unlock the pair if it is locked
-    if (pair.isLocked) {
-      keyring.unlockPair(pair.address);
-    }
-
-    // Finalize all inputs in the Psbt
-
-    // Sign the Psbt using the pair's bitcoin object
-    const signedTransaction = pair.bitcoin.signTransaction(psbt, psbt.txInputs.map((v, i) => i));
-
-    signedTransaction.finalizeAllInputs();
-
-    const signature = signedTransaction.extractTransaction().toHex();
-
-    this.#transactionService.emitterEventTransaction(emitterTransaction, eventData, chainInfo.slug, signature);
-
-    const { promise, reject, resolve } = createPromiseHandler<string>();
 
     emitterTransaction.on('extrinsicHash', (data) => {
       if (!data.extrinsicHash) {
@@ -250,6 +229,29 @@ export default class BitcoinRequestHandler {
     emitterTransaction.on('error', (error) => {
       reject(error);
     });
+
+    try {
+      const chainInfo = this.#chainService.getChainInfoByKey(chain);
+      const psbt = transaction.transaction as Psbt;
+      const pair = keyring.getPair(from);
+
+      // Unlock the pair if it is locked
+      if (pair.isLocked) {
+        keyring.unlockPair(pair.address);
+      }
+
+      // Finalize all inputs in the Psbt
+      // Sign the Psbt using the pair's bitcoin object
+      const signedTransaction = pair.bitcoin.signTransaction(psbt, psbt.txInputs.map((v, i) => i));
+
+      signedTransaction.finalizeAllInputs();
+
+      const signature = signedTransaction.extractTransaction().toHex();
+
+      this.#transactionService.emitterEventTransaction(emitterTransaction, eventData, chainInfo.slug, signature);
+    } catch (e) {
+      emitterTransaction.emit('error', { ...eventData, errors: [new TransactionError(BasicTxErrorType.INTERNAL_ERROR, (e as Error).message)] });
+    }
 
     return promise;
   }
