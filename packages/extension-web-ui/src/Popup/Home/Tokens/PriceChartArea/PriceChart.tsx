@@ -55,6 +55,44 @@ const Component: React.FC<Props> = (props: Props) => {
     }));
   }, [pricePoints, hoverPricePointIndex]);
 
+  const formatXAxis = useCallback(
+    (tick: string | number) => {
+      switch (timeframe) {
+        case '1D':
+          return customFormatDate(tick, '#hh#:#mm#');
+        case '1W':
+        case '1M':
+        case '3M':
+          return customFormatDate(tick, '#MMM# #D#');
+        case 'YTD':
+        case '1Y':
+        case 'ALL':
+          return customFormatDate(tick, '#MMM# #D#, #YYYY#');
+        default:
+          return tick.toString();
+      }
+    },
+    [timeframe]
+  );
+
+  const getTickValues = useMemo(() => {
+    if (pricePoints.length < 5) {
+      return pricePoints.map((point) => point.time); // Hiển thị tất cả nếu ít hơn 5 điểm
+    }
+
+    const step = Math.floor((pricePoints.length - 1) / 4); // Chia thành 5 nhãn (4 khoảng)
+
+    return [
+      pricePoints[0].time,
+      pricePoints[step].time,
+      pricePoints[step * 2].time,
+      pricePoints[step * 3].time,
+      pricePoints[pricePoints.length - 1].time
+    ];
+  }, [pricePoints]);
+
+  console.log('getTickValues', getTickValues);
+
   const isUp = useMemo(() => {
     if (pricePoints.length < 2) {
       return true;
@@ -137,7 +175,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <LineChart
           data={displayData}
-          margin={{ top: 22, bottom: 0, left: 0, right: 0 }}
+          margin={{ top: 22, bottom: 0, left: 16, right: 0 }}
           onMouseLeave={handleMouseLeave}
           onMouseMove={handleMouseMove}
         >
@@ -152,8 +190,12 @@ const Component: React.FC<Props> = (props: Props) => {
 
           <XAxis
             dataKey='time'
-            hide
-            padding={{ right: 16 }}
+            padding={{ right: 16, left: 24 }}
+            tickFormatter={formatXAxis}
+            ticks={getTickValues}
+            axisLine={false}
+            minTickGap={0}
+            className={'__chart-xaxis'}
           />
 
           <YAxis
@@ -207,5 +249,11 @@ export const PriceChart = styled(Component)<ThemeProps>(({ theme: { token } }: T
     fontWeight: token.headingFontWeight,
     lineHeight: '18px',
     color: token.colorTextLight3
+  },
+
+  '.__chart-xaxis': {
+    fontSize: token.fontSizeSM,
+    fontWeight: token.bodyFontWeight,
+    lineHeight: token.lineHeightSM
   }
 }));

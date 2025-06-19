@@ -35,6 +35,7 @@ import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import DetailTable from './DetailTable';
+import { PriceChartArea } from '@subwallet/extension-web-ui/Popup/Home/Tokens/PriceChartArea';
 
 type Props = ThemeProps;
 
@@ -610,72 +611,83 @@ function Component (): React.ReactElement {
             </div>
           )
           : (
-            <DetailTable
-              className={'__table'}
-              columns={[
-                {
-                  title: 'Token name',
-                  dataIndex: 'name',
-                  key: 'name',
-                  render: (_, row) => {
-                    return (
-                      <TokenItem
-                        chain={row.chain}
-                        logoKey={row.logoKey}
-                        slug={row.slug}
-                        subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
-                        symbol={row.symbol}
-                        tokenGroupSlug={tokenGroupSlug}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Transferable',
-                  dataIndex: 'percentage',
-                  key: 'percentage',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.free.convertedValue}
-                        symbol={row.symbol}
-                        value={row.free.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Locked',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.locked.convertedValue}
-                        symbol={row.symbol}
-                        value={row.locked.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Balance',
-                  dataIndex: 'balance',
-                  key: 'balance',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.total.convertedValue}
-                        symbol={row.symbol}
-                        value={row.total.value}
-                      />
-                    );
-                  }
-                }
-              ]}
-              dataSource={tokenBalanceItems}
-              onClick={onClickRow}
-            />
+            <div className={'__token-wrapper'}>
+              <div className={'__left-part'}>
+                <PriceChartArea
+                  className={'__price-chart-area'}
+                  isChartSupported={isChartSupported}
+                  priceId={priceId}
+                />
+              </div>
+              <div className={'__right-part'}>
+                <DetailTable
+                  className={'__table'}
+                  columns={[
+                    {
+                      title: 'Token name',
+                      dataIndex: 'name',
+                      key: 'name',
+                      render: (_, row) => {
+                        return (
+                          <TokenItem
+                            chain={row.chain}
+                            logoKey={row.logoKey}
+                            slug={row.slug}
+                            subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
+                            symbol={row.symbol}
+                            tokenGroupSlug={tokenGroupSlug}
+                          />
+                        );
+                      }
+                    },
+                    {
+                      title: 'Transferable',
+                      dataIndex: 'percentage',
+                      key: 'percentage',
+                      render: (_, row) => {
+                        return (
+                          <TokenBalance
+                            convertedValue={row.free.convertedValue}
+                            symbol={row.symbol}
+                            value={row.free.value}
+                          />
+                        );
+                      }
+                    },
+                    {
+                      title: 'Locked',
+                      dataIndex: 'price',
+                      key: 'price',
+                      render: (_, row) => {
+                        return (
+                          <TokenBalance
+                            convertedValue={row.locked.convertedValue}
+                            symbol={row.symbol}
+                            value={row.locked.value}
+                          />
+                        );
+                      }
+                    },
+                    {
+                      title: 'Balance',
+                      dataIndex: 'balance',
+                      key: 'balance',
+                      render: (_, row) => {
+                        return (
+                          <TokenBalance
+                            convertedValue={row.total.convertedValue}
+                            symbol={row.symbol}
+                            value={row.total.value}
+                          />
+                        );
+                      }
+                    }
+                  ]}
+                  dataSource={tokenBalanceItems}
+                  onClick={onClickRow}
+                />
+              </div>
+            </div>
           )}
       {isShowBanner &&
         <Banner
@@ -738,6 +750,40 @@ function Component (): React.ReactElement {
 const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, token } }: ThemeProps) => {
   return ({
     overflow: 'hidden',
+
+    '.__token-wrapper': {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      gap: '20px',
+      padding: '20px',
+      width: '100%',
+      margin: '0 auto',
+      minHeight: '100vh'
+    },
+
+    '.__left-part': {
+      flex: '0 0 41.3%',
+      height: '431px',
+      minWidth: '200px',
+      '.__price-info-container': {
+        paddingLeft: 0
+      },
+      '.__price-change-container': {
+        justifyContent: 'flex-start'
+      },
+      '.__price-value-wrapper': {
+        margin: 0,
+        marginBottom: 4
+      }
+    },
+
+    '.__right-part': {
+      minWidth: '300px',
+      flex: '0 0 58.7%',
+      height: '431px'
+    },
 
     '.__table': {
       flex: 1,

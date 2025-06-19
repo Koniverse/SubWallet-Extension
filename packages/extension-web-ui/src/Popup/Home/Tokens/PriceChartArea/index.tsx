@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -11,7 +12,6 @@ import { PriceChart } from './PriceChart';
 import { PriceInfoContainer } from './PriceInfoContainer';
 import { PriceInfoUI } from './PriceInfoUI';
 import { TimeframeSelector } from './TimeframeSelector';
-import { useSelector } from '@subwallet/extension-web-ui/hooks';
 
 type WrapperProps = ThemeProps & {
   priceId?: string;
@@ -147,11 +147,14 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
 
   return (
     <>
-      <PriceInfoContainer
-        className='__price-info-container'
-        hoverPricePointIndex={hoverPricePointIndex}
-        pricePoints={mergedRawPricePoints}
-      />
+      <div className={'__price-info-area'}>
+        <PriceInfoContainer
+          className='__price-info-container'
+          hoverPricePointIndex={hoverPricePointIndex}
+          pricePoints={mergedRawPricePoints}
+        />
+
+      </div>
 
       <PriceChart
         className='__price-chart-area'
@@ -173,6 +176,8 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className, isChartSupported, priceId } = props;
   const priceMap = useSelector((state) => state.price.priceMap);
+  console.log('priceId', priceId);
+  console.log('isChartSupported', isChartSupported);
 
   return (
     <div className={className}>
