@@ -38,17 +38,11 @@ type BuyTokensFormProps = {
   address: string;
   tokenSlug: string;
   service: SupportService;
-  view: ViewValue;
 }
 
 interface LinkUrlProps {
   url: string;
   content: string;
-}
-
-enum ViewValue {
-  BUY = 'Buy',
-  SELL = 'Sell'
 }
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
@@ -108,7 +102,6 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const { goBack } = useDefaultNavigate();
   const [form] = Form.useForm<BuyTokensFormProps>();
   const formDefault = useMemo((): BuyTokensFormProps => ({
-    view: ViewValue.BUY,
     address: '',
     tokenSlug: fixedTokenSlug || '',
     service: '' as SupportService
