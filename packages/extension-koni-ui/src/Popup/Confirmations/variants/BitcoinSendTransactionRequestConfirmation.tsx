@@ -4,7 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { BitcoinSendTransactionRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { RequestSubmitTransferWithId, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
+import { ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO, getDomainFromUrl } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useNotification } from '@subwallet/extension-koni-ui/hooks';
@@ -43,7 +43,7 @@ function Component ({ className, request, type }: Props) {
   const chainValue = useMemo(() => networkKey as string, [networkKey]);
   const assetValue = useMemo(() => tokenSlug as string, [tokenSlug]);
   const [transactionFeeValue, setTransactionFeeValue] = useState<BigN>(BN_ZERO);
-  const [transactionInfo, setTransactionInfo] = useState<RequestSubmitTransferWithId>({
+  const transactionInfo = useMemo(() => ({
     id,
     chain: networkKey as string,
     from: address,
@@ -51,7 +51,7 @@ function Component ({ className, request, type }: Props) {
     tokenSlug: tokenSlug as string,
     transferAll: false,
     value: value?.toString() || '0'
-  });
+  }), [id, networkKey, address, toValue, tokenSlug, value]);
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransferConfirmation | undefined>();
   const [isErrorTransaction, setIsErrorTransaction] = useState(false);
@@ -139,8 +139,6 @@ function Component ({ className, request, type }: Props) {
   useEffect(() => {
     if (transferInfo) {
       setTransactionFeeValue(new BigN(transferInfo.feeOptions.estimatedFee));
-
-      setTransactionInfo((prevState) => ({ ...prevState, feeOption: 'slow' }));
     }
   }, [transferInfo]);
 

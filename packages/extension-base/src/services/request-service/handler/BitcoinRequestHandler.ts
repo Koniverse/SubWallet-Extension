@@ -5,15 +5,12 @@ import { BitcoinProviderError } from '@subwallet/extension-base/background/error
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { BitcoinProviderErrorType, BitcoinSignMessageResult, BitcoinSignPsbtResult, ConfirmationDefinitionsBitcoin, ConfirmationsQueueBitcoin, ConfirmationsQueueItemOptions, ConfirmationTypeBitcoin, ExtrinsicDataTypeMap, RequestConfirmationCompleteBitcoin } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
-import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import { createPromiseHandler } from '@subwallet/extension-base/utils';
-import { getId } from '@subwallet/extension-base/utils/getId';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
 import { Psbt } from 'bitcoinjs-lib';
@@ -28,7 +25,6 @@ export default class BitcoinRequestHandler {
   readonly #requestService: RequestService;
   readonly #chainService: ChainService;
   readonly #transactionService: TransactionService;
-  readonly #feeService: FeeService;
   readonly #logger: Logger;
   private readonly confirmationsQueueSubjectBitcoin = new BehaviorSubject<ConfirmationsQueueBitcoin>({
     bitcoinSignatureRequest: {},
@@ -40,10 +36,9 @@ export default class BitcoinRequestHandler {
 
   private readonly confirmationsPromiseMap: Record<string, { resolver: Resolver<any>, validator?: (rs: any) => Error | undefined }> = {};
 
-  constructor (requestService: RequestService, chainService: ChainService, feeService: FeeService, transactionService: TransactionService) {
+  constructor (requestService: RequestService, chainService: ChainService, transactionService: TransactionService) {
     this.#requestService = requestService;
     this.#chainService = chainService;
-    this.#feeService = feeService;
     this.#transactionService = transactionService;
     this.#logger = createLogger('BitcoinRequestHandler');
   }
@@ -208,15 +203,14 @@ export default class BitcoinRequestHandler {
 
   private async signTransactionBitcoinWithPayload (request: ConfirmationDefinitionsBitcoin['bitcoinSendTransactionRequestAfterConfirmation'][0]): Promise<string> {
     const transaction = this.#transactionService.getTransaction(request.id);
-    const { chain, emitterTransaction, feeCustom, feeOption, id } = transaction;
-    const { from, to, value } = transaction.data as ExtrinsicDataTypeMap['transfer.balance'];
+    const { chain, emitterTransaction, id } = transaction;
+    const { from } = transaction.data as ExtrinsicDataTypeMap['transfer.balance'];
 
     if (!emitterTransaction) {
       throw new BitcoinProviderError(BitcoinProviderErrorType.INTERNAL_ERROR);
     }
 
     const chainInfo = this.#chainService.getChainInfoByKey(chain);
-    const bitcoinApi = this.#chainService.getBitcoinApi(chain);
     const eventData: TransactionEventResponse = {
       id,
       errors: [],
@@ -224,21 +218,7 @@ export default class BitcoinRequestHandler {
       extrinsicHash: id
     };
 
-    const network = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
-    const feeInfo = await this.#feeService.subscribeChainFee(getId(), chain, 'bitcoin');
-    const [psbt] = await createBitcoinTransaction({
-      bitcoinApi,
-      chain,
-      from,
-      feeCustom,
-      feeOption,
-      feeInfo,
-      to,
-      transferAll: false,
-      value: value || '0',
-      network
-    });
-
+    const psbt = transaction.transaction as Psbt;
     const pair = keyring.getPair(from);
 
     // Unlock the pair if it is locked

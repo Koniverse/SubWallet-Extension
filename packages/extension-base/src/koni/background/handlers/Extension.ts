@@ -1901,6 +1901,8 @@ export default class KoniExtension {
     const transferAmount: AmountData = { ...tokenBaseAmount };
 
     let transaction: Psbt | undefined;
+    let overrideFeeCustom: FeeCustom | undefined;
+    let calculatedBitcoinFeeRate: string | undefined;
 
     // Get native token amount
     const freeBalance = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug });
@@ -1916,7 +1918,7 @@ export default class KoniExtension {
 
         const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'bitcoin');
 
-        [transaction, transferAmount.value] = await createBitcoinTransaction({ bitcoinApi,
+        [transaction, transferAmount.value, calculatedBitcoinFeeRate] = await createBitcoinTransaction({ bitcoinApi,
           chain,
           from,
           feeInfo,
@@ -1924,6 +1926,14 @@ export default class KoniExtension {
           transferAll: transferAll,
           value: txVal,
           network: network });
+
+        if (calculatedBitcoinFeeRate) {
+          const feeRate = parseFloat(calculatedBitcoinFeeRate);
+
+          if (!isNaN(feeRate)) {
+            overrideFeeCustom = { feeRate };
+          }
+        }
       }
     } catch (e) {
       const error = e as Error;
@@ -1943,8 +1953,8 @@ export default class KoniExtension {
       warnings,
       address: from,
       chain: chain,
-      feeCustom,
-      feeOption,
+      feeCustom: overrideFeeCustom || feeCustom,
+      feeOption: overrideFeeCustom ? 'custom' : feeOption,
       chainType,
       transferNativeAmount,
       transaction,
@@ -2437,18 +2447,18 @@ export default class KoniExtension {
 
         if (amountLeft.lte(0)) {
           error = 'Insufficient balance';
-        }
+        } else {
+          const senderAddressInfo = getBitcoinAddressInfo(address);
+          const dustLimit = BTC_DUST_AMOUNT[senderAddressInfo.type] || 546;
 
-        const senderAddressInfo = getBitcoinAddressInfo(address);
-        const dustLimit = BTC_DUST_AMOUNT[senderAddressInfo.type] || 546;
-
-        if (amountLeft.lte(dustLimit)) {
-          sizeInfo = getSizeInfo({
-            inputLength: neededUtxos.length,
-            sender: address,
-            recipients: [to || address]
-          });
-          estimatedFee = sum.minus(amount).toString();
+          if (amountLeft.lte(dustLimit)) {
+            sizeInfo = getSizeInfo({
+              inputLength: neededUtxos.length,
+              sender: address,
+              recipients: [to || address]
+            });
+            estimatedFee = sum.minus(amount).toString();
+          }
         }
 
         feeOptions = {

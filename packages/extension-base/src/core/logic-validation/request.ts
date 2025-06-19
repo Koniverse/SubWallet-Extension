@@ -1034,7 +1034,21 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   try {
     freeBalance = await koni.balanceService.getTransferableBalance(address, networkKey, tokenInfo.slug);
   } catch (e) {
-    handleError((e as Error).message);
+    const message = (e as Error).message;
+
+    if (message.toLowerCase().includes(t('please enable network'))) {
+      const chainInfo = koni.chainService.getChainInfoByKey(networkKey);
+
+      payload_.errorPosition = 'ui';
+      payload_.confirmationType = 'bitcoinSendTransactionRequestAfterConfirmation';
+      const [message, name] = [t('Enable {{chain}} network on the extension and try again', { replace: { chain: chainInfo.name } }), t('Network not enabled')];
+      const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
+
+      console.error(error);
+      errors.push(error);
+    } else {
+      handleError(message);
+    }
   }
 
   const to = transactionParams.recipients.map((value) => {
