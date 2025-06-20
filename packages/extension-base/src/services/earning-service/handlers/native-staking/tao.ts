@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -17,7 +17,6 @@ import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { calculateReward } from '../../utils';
 import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
@@ -30,10 +29,6 @@ interface TaoStakingStakeOption {
   owner: string;
   amount: string;
   identity?: string
-}
-
-interface Hotkey {
-  ss58: string;
 }
 
 export interface RawDelegateState {
@@ -55,11 +50,26 @@ interface Validator {
     ss58: string;
   };
   name: string;
-  nominators: number;
+  global_nominators: number;
+  validator_return_per_day: string;
+  nominator_return_per_day: string;
   stake: string;
   validator_stake: string;
   take: string;
-  apr: string;
+  root_stake: string;
+}
+
+interface ValidatorAprResponse {
+  data: ValidatorApr[];
+}
+
+interface ValidatorApr {
+  hotkey: {
+    ss58: string;
+  },
+  name: string;
+  netuid: number;
+  thirty_day_apy: string;
 }
 
 /* Fetch data */
@@ -96,7 +106,7 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, '/validator/latest/v1?limit=50', {
+      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, '/dtao/validator/latest/v1?limit=100', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -109,7 +119,7 @@ export class BittensorCache {
 
       const rawData = await resp.json() as ValidatorResponse;
       const data = {
-        data: rawData.data.filter((validator) => parseFloat(validator.apr) > 0.0001)
+        data: rawData.data.filter((validator) => parseFloat(validator.root_stake) > 0)
       };
 
       this.cache = data;
@@ -133,6 +143,23 @@ export class BittensorCache {
       this.promise = null;
 
       return this.cache || { data: [] };
+    }
+  }
+
+  public async fetchApr (netuid: number): Promise<ValidatorAprResponse> {
+    try {
+      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, `/dtao/validator/yield/latest/v1?netuid=${netuid}&limit=100&order=thirty_day_apy_desc`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const rawData = await resp.json() as ValidatorAprResponse;
+
+      return rawData;
+    } catch (error) {
+      console.error(error);
+
+      return { data: [] };
     }
   }
 }
@@ -216,20 +243,14 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
         const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
         const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
-        const _topValidator = await this.bittensorCache.get();
+        const _topValidator = await this.bittensorCache.fetchApr(0);
 
         const validators = _topValidator.data;
-        let highestApr = validators[0];
-
-        for (let i = 1; i < validators.length; i++) {
-          if (parseFloat(validators[i].apr) > parseFloat(highestApr.apr)) {
-            highestApr = validators[i];
-          }
-        }
+        const highestApr = validators[0];
 
         const bnTaoIn = new BigN(taoIn);
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
-        const apr = this.chain === 'bittensor' ? Number(highestApr.apr) * 100 : 0;
+        const apr = this.chain === 'bittensor' ? Number(highestApr.thirty_day_apy) * 100 : 0;
 
         const data: NativeYieldPoolInfo = {
           ...this.baseInfo,
@@ -510,27 +531,43 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
     const _topValidator = await this.bittensorCache.get();
 
-    const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
+    const topValidator = _topValidator;
     const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
     const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
     const bnMinBond = new BigN(nominatorMinRequiredStake);
     const validatorList = topValidator.data;
-    const validatorAddresses = Object.keys(validatorList);
+
+    const aprResponse = await this.bittensorCache.fetchApr(0);
+    const aprMap: Record<string, string> = {};
+
+    aprResponse.data.forEach((item) => {
+      aprMap[item.hotkey.ss58] = item.thirty_day_apy;
+    });
 
     const results = await Promise.all(
-      validatorAddresses.map((i) => {
-        const address = (validatorList[i].hotkey as unknown as Hotkey).ss58;
-        const bnTotalStake = new BigN(validatorList[i].stake);
-        const bnOwnStake = new BigN(validatorList[i].validator_stake);
-        const otherStake = bnTotalStake.minus(bnOwnStake);
-        const nominatorCount = validatorList[i].nominators;
-        const commission = validatorList[i].take;
+      validatorList.map((validator) => {
+        const address = validator.hotkey.ss58;
+        const bnTotalStake = new BigN(validator.root_stake);
+        const bnValidatorReward = new BigN(validator.validator_return_per_day);
+        const bnNominatorReward = new BigN(validator.nominator_return_per_day);
+        const bnTotalReward = bnValidatorReward.plus(bnNominatorReward);
+
+        let bnOwnStake = new BigN(0);
+        let otherStake = new BigN(0);
+
+        if (!bnTotalReward.eq(0)) {
+          bnOwnStake = bnTotalStake.multipliedBy(bnValidatorReward.dividedBy(bnTotalReward));
+          otherStake = bnTotalStake.minus(bnOwnStake);
+        }
+
+        const nominatorCount = validator.global_nominators;
+        const commission = validator.take;
         const roundedCommission = (parseFloat(commission) * 100).toFixed(0);
 
-        const apr = ((parseFloat(validatorList[i].apr) / 10 ** 9) * 100).toFixed(2);
-        const apyCalculate = calculateReward(parseFloat(apr));
+        const apr = aprMap[address];
+        const expectedReturn = apr ? new BigN(apr).multipliedBy(100).toFixed(2) : '0';
 
-        const name = validatorList[i].name || address;
+        const name = validator.name || address;
 
         return {
           address: address,
@@ -540,7 +577,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
-          expectedReturn: apyCalculate.apy,
+          expectedReturn: expectedReturn,
           blocked: false,
           isVerified: false,
           chain: this.chain,
@@ -632,4 +669,36 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   /* Leave pool action */
+
+  /* Change validator */
+  override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+    const { amount, originValidator, selectedValidators: targetValidators } = data;
+
+    if (!originValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    // Bittensor only supports changing 1 validator at a time, not multiple
+    const selectedValidatorInfo = targetValidators[0];
+    const destValidator = selectedValidatorInfo.address;
+
+    if (new BigN(amount).lte(0)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+    }
+
+    if (originValidator === destValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
+    }
+
+    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+
+    if (new BigN(amount).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
+    }
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);
+
+    return extrinsic;
+  }
 }
