@@ -7,7 +7,7 @@ import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown, CaretUp } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { timeframes } from './shared';
@@ -33,7 +33,8 @@ const Component: React.FC<Props> = (props: Props) => {
   }), []);
 
   const onClickItem = useCallback((timeframe: PriceChartTimeframe) => {
-    return () => {
+    return (e?: SyntheticEvent) => {
+      e && e.stopPropagation();
       onSelect(timeframe);
 
       if (isWebUI) {

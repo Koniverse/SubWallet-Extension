@@ -92,6 +92,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [pricePoints]);
 
   console.log('getTickValues', getTickValues);
+  console.log('pricePoints', pricePoints);
 
   const isUp = useMemo(() => {
     if (pricePoints.length < 2) {

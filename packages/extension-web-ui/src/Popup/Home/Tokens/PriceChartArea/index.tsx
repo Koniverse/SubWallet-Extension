@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import CN from 'classnames';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { PriceChart } from './PriceChart';
@@ -20,6 +22,7 @@ type WrapperProps = ThemeProps & {
 
 type ComponentProps = {
   priceId: string;
+  isWebUI?: boolean;
 };
 
 interface TimeframeConfig {
@@ -43,7 +46,7 @@ const TIMEFRAMES: Record<PriceChartTimeframe, TimeframeConfig> = {
 };
 
 const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
-  const { priceId } = props;
+  const { isWebUI, priceId } = props;
   const [selectedTimeframe, setSelectedTimeframe] = useState<PriceChartTimeframe>('1D');
 
   const [rawPricePoints, setRawPricePoints] = useState<PriceChartPoint[]>([]);
@@ -145,15 +148,27 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
     };
   }, [priceId]);
 
+  const renderTimeframeSelector = () => (
+    <TimeframeSelector
+      className={'__timeframe-selector'}
+      onSelect={onSelectTimeframe}
+      selectedTimeframe={selectedTimeframe}
+    />
+  );
+
   return (
     <>
-      <div className={'__price-info-area'}>
+      <div className={CN('__price-info-area', {
+        'price-info--web-mode': isWebUI
+      })}
+      >
         <PriceInfoContainer
           className='__price-info-container'
           hoverPricePointIndex={hoverPricePointIndex}
           pricePoints={mergedRawPricePoints}
         />
 
+        {isWebUI && renderTimeframeSelector()}
       </div>
 
       <PriceChart
@@ -164,11 +179,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
         timeframe={selectedTimeframe}
       />
 
-      <TimeframeSelector
-        className={'__timeframe-selector'}
-        onSelect={onSelectTimeframe}
-        selectedTimeframe={selectedTimeframe}
-      />
+      {!isWebUI && renderTimeframeSelector()}
     </>
   );
 };
@@ -176,6 +187,8 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className, isChartSupported, priceId } = props;
   const priceMap = useSelector((state) => state.price.priceMap);
+  const { isWebUI } = useContext(ScreenContext);
+
   console.log('priceId', priceId);
   console.log('isChartSupported', isChartSupported);
 
@@ -185,6 +198,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
         priceId && isChartSupported
           ? (
             <Component
+              isWebUI={isWebUI}
               priceId={priceId}
             />
           )
@@ -207,6 +221,21 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 export const PriceChartArea = styled(Wrapper)<WrapperProps>(({ theme: { token } }: ThemeProps) => ({
   '.__price-info-container, .__price-info-container-empty': {
     paddingBottom: token.paddingXXS
+  },
+
+  '.price-info--web-mode': {
+    position: 'relative',
+    '.__timeframe-selector': {
+      position: 'absolute',
+      right: 16,
+      top: 0,
+      zIndex: 1000,
+      '.__panel-header': {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }
+    }
   },
 
   '.__price-info-container': {
