@@ -4,13 +4,14 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountJson } from '@subwallet/extension-base/types';
 
-export type LedgerMustCheckType = 'polkadot' | 'migration' | 'unnecessary';
+export type LedgerMustCheckType = 'polkadot' | 'migration' | 'polkadot_ecdsa' | 'unnecessary';
 
 export enum ValidationCondition {
   IS_NOT_NULL = 'IS_NOT_NULL',
   IS_ADDRESS = 'IS_ADDRESS',
   IS_VALID_ADDRESS_FOR_ECOSYSTEM = 'IS_VALID_ADDRESS_FOR_ECOSYSTEM',
   IS_VALID_SUBSTRATE_ADDRESS_FORMAT = 'IS_VALID_SUBSTRATE_ADDRESS_FORMAT',
+  IS_VALID_EVM_ADDRESS_FORMAT = 'IS_VALID_EVM_ADDRESS_FORMAT',
   IS_VALID_TON_ADDRESS_FORMAT = 'IS_VALID_TON_ADDRESS_FORMAT',
   IS_VALID_CARDANO_ADDRESS_FORMAT = 'IS_VALID_CARDANO_ADDRESS_FORMAT',
   IS_VALID_BITCOIN_ADDRESS_FORMAT = 'IS_VALID_BITCOIN_ADDRESS_FORMAT',

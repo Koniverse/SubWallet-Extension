@@ -29,7 +29,6 @@ type Props = ThemeProps & {
 function Component (props: Props): React.ReactElement<Props> {
   const { accountProxy, accountProxyName, chainTypes, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showUnselectIcon } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
-
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
       <Icon

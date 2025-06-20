@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import useAccountAvatarInfo from '@subwallet/extension-koni-ui/hooks/account/useAccountAvatarInfo';
 import useAccountAvatarTheme from '@subwallet/extension-koni-ui/hooks/account/useAccountAvatarTheme';
 import useGetAccountSignModeByAddress from '@subwallet/extension-koni-ui/hooks/account/useGetAccountSignModeByAddress';
@@ -8,7 +9,6 @@ import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotifi
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types';
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types/account';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
@@ -73,6 +73,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return {
           type: 'icon',
           value: Swatches
