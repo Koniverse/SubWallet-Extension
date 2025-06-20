@@ -6693,15 +6693,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.106":
-  version: 0.2.106
-  resolution: "@subwallet/chain-list@npm:0.2.106"
+"@subwallet/chain-list@npm:0.2.107":
+  version: 0.2.107
+  resolution: "@subwallet/chain-list@npm:0.2.107"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: ec61a83dc0144fb901a78925dc0a302bad0a3ecb3bea6135bc20a1ce61303c98960156c2bbcfe13f2b4c9589165debf083a06534be4dfc5fbbc6ba8ea13d630a
+  checksum: a3535986ceedc166e832d06c45e2db47c8bafabe0a4ae9f041097acf8e86b698ac5f1a82a0f4cf2d2d76f24e4243e50b75c9b086304f85804387cf801572ffb3
   languageName: node
   linkType: hard
 
@@ -6743,7 +6743,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.106
+    "@subwallet/chain-list": 0.2.107
     "@subwallet/extension-base": ^1.3.41-0
     "@subwallet/extension-chains": ^1.3.41-0
     "@subwallet/extension-dapp": ^1.3.41-0
@@ -6883,7 +6883,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.106
+    "@subwallet/chain-list": 0.2.107
     "@subwallet/extension-base": ^1.3.41-0
     "@subwallet/extension-chains": ^1.3.41-0
     "@subwallet/extension-dapp": ^1.3.41-0
@@ -7025,7 +7025,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.106
+    "@subwallet/chain-list": 0.2.107
     "@subwallet/extension-base": ^1.3.41-0
     "@subwallet/extension-chains": ^1.3.41-0
     "@subwallet/extension-dapp": ^1.3.41-0
@@ -7207,7 +7207,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.106
+    "@subwallet/chain-list": 0.2.107
   languageName: unknown
   linkType: soft
 
