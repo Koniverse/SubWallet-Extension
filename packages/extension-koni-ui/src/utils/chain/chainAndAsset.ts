@@ -4,8 +4,8 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getOriginChainOfAsset, _isAssetFungibleToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { _getOriginChainOfAsset, _isAssetFungibleToken, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { isChainCompatibleWithAccountChainTypes } from '@subwallet/extension-koni-ui/utils';
 
 export function isTokenAvailable (
@@ -38,8 +38,13 @@ export function getChainInfoFromToken (tokenSlug: string, chainInfoMap: Record<s
 export function isTokenCompatibleWithAccountChainTypes (
   tokenSlug: string,
   chainTypes: AccountChainType[],
-  chainInfoMap: Record<string, _ChainInfo>): boolean {
+  chainInfoMap: Record<string, _ChainInfo>,
+  accountSignMode?: AccountSignMode): boolean {
   const chainInfo = getChainInfoFromToken(tokenSlug, chainInfoMap);
+
+  if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+    return !!chainInfo && _isSubstrateEvmCompatibleChain(chainInfo);
+  }
 
   return !!chainInfo && isChainCompatibleWithAccountChainTypes(chainInfo, chainTypes);
 }

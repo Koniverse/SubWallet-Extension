@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, getSignModeByAccountProxy, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -65,6 +65,24 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
     return undefined;
   }, [accountProxies, accounts, address, currentAccountProxy?.id]);
 
+  const accountSignMode = useMemo(() => {
+    const _address = address || currentAccountProxy?.id;
+
+    if (_address) {
+      if (isAccountAll(_address)) {
+        return AccountSignMode.ALL_ACCOUNT;
+      }
+
+      const proxy = accountProxies.find((proxy) => proxy.id === _address);
+
+      if (proxy) {
+        return getSignModeByAccountProxy(proxy);
+      }
+    }
+
+    return AccountSignMode.UNKNOWN;
+  }, [accountProxies, address, currentAccountProxy?.id]);
+
   return useMemo<string[]>(() => {
     const _address = address || currentAccountProxy?.id;
 
@@ -74,6 +92,6 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
       return allAccount ? getChainsByAccountAll(allAccount, accountProxies, chainInfoMap) : [];
     }
 
-    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain);
-  }, [address, currentAccountProxy?.id, accountProxies, chainTypes, chainInfoMap, specialChain]);
+    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain, accountSignMode);
+  }, [address, currentAccountProxy?.id, chainInfoMap, chainTypes, specialChain, accountSignMode, accountProxies]);
 };
