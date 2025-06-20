@@ -133,10 +133,10 @@ export default class FeeService {
           if (cancel) {
             clearInterval(interval);
           } else {
-            const api = this.state.getEvmApi(chain);
-
             // TODO: Handle case type === evm and not have api
             if (type === 'evm') {
+              const api = this.state.getEvmApi(chain);
+
               if (api) {
                 calculateGasFeeParams(api, chain)
                   .then((info) => {
@@ -161,6 +161,14 @@ export default class FeeService {
                   options: undefined
                 } as EvmFeeInfo);
               }
+            } else if (type === 'bitcoin') {
+              const api = this.state.getBitcoinApi(chain);
+
+              api.api.getRecommendedFeeRate()
+                .then((info) => {
+                  observer.next(info);
+                })
+                .catch(console.error);
             } else {
               observer.next({
                 type,

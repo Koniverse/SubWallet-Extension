@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetBitcoinAccounts, useGetChainSlugsByAccount, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useReformatAddress } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainSlugsByCurrentAccountProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
-import { KeypairType } from '@subwallet/keyring/types';
+import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -20,6 +20,11 @@ type HookType = {
   onOpenReceive: VoidFunction;
   receiveModalProps: ReceiveModalProps;
 };
+
+type SelectedTokenInfo = {
+  tokenSlug: string;
+  chainSlug: string;
+}
 
 const tokenSelectorModalId = RECEIVE_MODAL_TOKEN_SELECTOR;
 const accountSelectorModalId = RECEIVE_MODAL_ACCOUNT_SELECTOR;
@@ -33,20 +38,23 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const assetRegistryMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const [selectedChain, setSelectedChain] = useState<string | undefined>();
+  const [selectedTokenInfo, setSelectedTokenInfo] = useState<SelectedTokenInfo | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
-  const chainSupported = useGetChainSlugsByAccount();
+  const chainSupported = useGetChainSlugsByCurrentAccountProxy();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
-  const getBitcoinAccount = useGetBitcoinAccounts();
+  const getBitcoinAccounts = useGetBitcoinAccounts();
 
-  // chain related to tokenGroupSlug, if it is token slug
-  const specificChain = useMemo(() => {
+  // token info related to tokenGroupSlug, if it is token slug
+  const specificSelectedTokenInfo = useMemo<SelectedTokenInfo | undefined>(() => {
     if (tokenGroupSlug && assetRegistryMap[tokenGroupSlug]) {
-      return _getAssetOriginChain(assetRegistryMap[tokenGroupSlug]);
+      return {
+        tokenSlug: tokenGroupSlug,
+        chainSlug: _getAssetOriginChain(assetRegistryMap[tokenGroupSlug])
+      };
     }
 
     return undefined;
@@ -137,7 +145,10 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    setSelectedChain(chainSlug);
+    setSelectedTokenInfo({
+      tokenSlug: item.slug,
+      chainSlug
+    });
 
     if (isAllAccount) {
       setTimeout(() => {
@@ -150,14 +161,14 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
 
     if (isBitcoinChain) {
-      const accountTokenAddressList = getBitcoinAccount(chainSlug, item.slug, chainInfo, currentAccountProxy.accounts);
+      const accountTokenAddressList = getBitcoinAccounts(chainSlug, item.slug, chainInfo, currentAccountProxy.accounts);
 
       if (accountTokenAddressList.length > 1) {
         openAccountTokenAddressModal(accountTokenAddressList, () => {
           inactiveModal(tokenSelectorModalId);
           setSelectedAccountAddressItem(undefined);
         });
-      } else {
+      } else if (accountTokenAddressList.length === 1) {
         openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
           inactiveModal(tokenSelectorModalId);
           setSelectedAccountAddressItem(undefined);
@@ -198,15 +209,15 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         break;
       }
     }
-  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, getBitcoinAccount, openAccountTokenAddressModal, inactiveModal, openAddressQrModal, getReformatAddress, openAddressFormatModal]);
+  }, [currentAccountProxy, chainInfoMap, isAllAccount, checkIsPolkadotUnifiedChain, activeModal, getBitcoinAccounts, openAccountTokenAddressModal, inactiveModal, openAddressQrModal, getReformatAddress, openAddressFormatModal]);
 
   /* token Selector --- */
 
   /* --- account Selector */
 
   const accountSelectorItems = useMemo<AccountAddressItemType[]>(() => {
-    const targetChain = specificChain || selectedChain;
-    const chainInfo = targetChain ? chainInfoMap[targetChain] : undefined;
+    const targetTokenInfo = specificSelectedTokenInfo || selectedTokenInfo;
+    const chainInfo = targetTokenInfo ? chainInfoMap[targetTokenInfo.chainSlug] : undefined;
 
     if (!chainInfo) {
       return [];
@@ -214,52 +225,100 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
     const result: AccountAddressItemType[] = [];
 
-    accountProxies.forEach((ap) => {
-      ap.accounts.forEach((a) => {
-        const reformatedAddress = getReformatAddress(a, chainInfo);
+    const updateResult = (ap: AccountProxy, a: AccountJson, chainInfo: _ChainInfo) => {
+      const reformatedAddress = getReformatAddress(a, chainInfo);
 
-        if (reformatedAddress) {
-          result.push({
-            accountName: ap.name,
-            accountProxyId: ap.id,
-            accountProxyType: ap.accountType,
-            accountType: a.type,
-            address: reformatedAddress,
-            accountActions: ap.accountActions
-          });
+      if (reformatedAddress) {
+        result.push({
+          accountName: ap.name,
+          accountProxyId: ap.id,
+          accountProxyType: ap.accountType,
+          accountType: a.type,
+          address: reformatedAddress,
+          accountActions: ap.accountActions
+        });
+      }
+    };
+
+    const getPreferredBitcoinAccount = (accounts: AccountJson[]) => {
+      const bitcoinAccounts = accounts.filter((a) => a.chainType === AccountChainType.BITCOIN && _isChainInfoCompatibleWithAccountInfo(chainInfo, a.chainType, a.type));
+
+      return bitcoinAccounts.find((a) => a.type === 'bitcoin-84' || a.type === 'bittest-84') || bitcoinAccounts[0];
+    };
+
+    accountProxies.forEach((ap) => {
+      // case bitcoin accounts
+      if (ap.chainTypes.includes(AccountChainType.BITCOIN)) {
+        const preferredBitcoinAccount = getPreferredBitcoinAccount(ap.accounts);
+
+        preferredBitcoinAccount && updateResult(ap, preferredBitcoinAccount, chainInfo);
+      }
+
+      // case non-bitcoin accounts
+      ap.accounts.forEach((a) => {
+        if (a.chainType === AccountChainType.BITCOIN) {
+          return;
         }
+
+        updateResult(ap, a, chainInfo);
       });
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, getReformatAddress, selectedChain, specificChain]);
+  }, [accountProxies, chainInfoMap, getReformatAddress, selectedTokenInfo, specificSelectedTokenInfo]);
 
   const onBackAccountSelector = useMemo(() => {
     // if specificChain has value, it means tokenSelector does not show up, so accountSelector does not have back action
-    if (specificChain) {
+    if (specificSelectedTokenInfo) {
       return undefined;
     }
 
     return () => {
       inactiveModal(accountSelectorModalId);
     };
-  }, [inactiveModal, specificChain]);
+  }, [inactiveModal, specificSelectedTokenInfo]);
 
   const onCloseAccountSelector = useCallback(() => {
     inactiveModal(accountSelectorModalId);
     inactiveModal(tokenSelectorModalId);
-    setSelectedChain(undefined);
+    setSelectedTokenInfo(undefined);
     setSelectedAccountAddressItem(undefined);
   }, [inactiveModal]);
 
   const onSelectAccountSelector = useCallback((item: AccountAddressItemType) => {
-    const targetChain = specificChain || selectedChain;
+    const targetTokenInfo = specificSelectedTokenInfo || selectedTokenInfo;
 
-    if (!targetChain) {
+    if (!targetTokenInfo) {
       return;
     }
 
+    const targetChain = targetTokenInfo.chainSlug;
+
     const chainInfo = chainInfoMap[targetChain];
+
+    if (!chainInfo) {
+      return;
+    }
+
+    const isBitcoinAccountItem = [...BitcoinMainnetKeypairTypes, ...BitcoinTestnetKeypairTypes].includes(item.accountType);
+
+    if (isBitcoinAccountItem) {
+      const targetAccountProxy = accountProxies.find((ap) => ap.id === item.accountProxyId);
+
+      if (!targetAccountProxy) {
+        return;
+      }
+
+      const accountTokenAddressList = getBitcoinAccounts(targetChain, targetTokenInfo.tokenSlug, chainInfo, targetAccountProxy.accounts);
+
+      if (accountTokenAddressList.length > 1) {
+        openAccountTokenAddressModal(accountTokenAddressList, onCloseAccountSelector);
+      } else {
+        openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, onCloseAccountSelector);
+      }
+
+      return;
+    }
 
     setSelectedAccountAddressItem(item);
     const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(targetChain);
@@ -269,7 +328,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     } else {
       openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, onCloseAccountSelector);
     }
-  }, [chainInfoMap, checkIsPolkadotUnifiedChain, onCloseAccountSelector, openAddressFormatModal, openAddressQrModal, selectedChain, specificChain]);
+  }, [accountProxies, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccounts, onCloseAccountSelector, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, selectedTokenInfo, specificSelectedTokenInfo]);
 
   /* account Selector --- */
 
@@ -316,8 +375,8 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       }
     };
 
-    if (specificChain) {
-      if (!chainSupported.includes(specificChain)) {
+    if (specificSelectedTokenInfo) {
+      if (!chainSupported.includes(specificSelectedTokenInfo.chainSlug)) {
         console.warn('tokenGroupSlug does not work with current account');
 
         return;
@@ -332,14 +391,17 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
       // current account is not All, just do show QR logic
 
-      handleShowQrModal(specificChain);
+      handleShowQrModal(specificSelectedTokenInfo.chainSlug);
 
       return;
     }
 
     if (tokenSelectorItems.length === 1 && tokenGroupSlug) {
       if (isAllAccount) {
-        setSelectedChain(tokenSelectorItems[0].originChain);
+        setSelectedTokenInfo({
+          tokenSlug: tokenSelectorItems[0].slug,
+          chainSlug: tokenSelectorItems[0].originChain
+        });
         activeModal(accountSelectorModalId);
 
         return;
@@ -351,7 +413,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificChain, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

@@ -60,5 +60,11 @@ export type AccountAddressItemType = {
   accountProxyType: AccountProxyType;
   accountType: KeypairType;
   address: string;
-  accountActions?: AccountActions[]
+  accountActions?: AccountActions[];
+
+  /**
+   * Alternative display version of the address (for UI only).
+   * The original `address` remains the source of truth for identity, selection, and comparison.
+   */
+  displayAddress?: string;
 }

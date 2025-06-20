@@ -274,6 +274,10 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [
           ...BASE_TRANSFER_ACTIONS
         ];
+      case AccountChainType.BITCOIN:
+        return [
+          ...BASE_TRANSFER_ACTIONS
+        ];
     }
   } else if (signMode === AccountSignMode.QR) {
     switch (networkType) {
@@ -310,6 +314,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [];
       case AccountChainType.CARDANO:
         return [];
+      case AccountChainType.BITCOIN:
+        return [];
     }
   } else if (signMode === AccountSignMode.GENERIC_LEDGER) {
     switch (networkType) {
@@ -340,6 +346,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...BASE_TRANSFER_ACTIONS
         ];
       case AccountChainType.CARDANO:
+        return [];
+      case AccountChainType.BITCOIN:
         return [];
     }
   } else if (signMode === AccountSignMode.LEGACY_LEDGER) { // Only for Substrate

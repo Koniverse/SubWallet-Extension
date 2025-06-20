@@ -3,8 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
-import { BitcoinAddressSummaryInfo, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStream/types';
-import { BitcoinApiStrategy, BitcoinTransactionEventMap } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
@@ -15,7 +14,7 @@ import { BitcoinFeeInfo, BitcoinTx, UtxoResponseItem } from '@subwallet/extensio
 import BigN from 'bignumber.js';
 import EventEmitter from 'eventemitter3';
 
-export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implements BitcoinApiStrategy {
+export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy implements BitcoinApiStrategy {
   private readonly baseUrl: string;
   private readonly isTestnet: boolean;
   private timePerBlock = 0; // in milliseconds
@@ -25,16 +24,8 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
     super(context);
 
-    this.baseUrl = 'https://btc-api.koni.studio';
+    this.baseUrl = url;
     this.isTestnet = url.includes('testnet');
-
-    this.getBlockTime()
-      .then((rs) => {
-        this.timePerBlock = rs;
-      })
-      .catch(() => {
-        this.timePerBlock = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000;
-      });
   }
 
   private headers = {
@@ -66,6 +57,31 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
 
       return time / length;
     }, 0);
+  }
+
+  async computeBlockTime (): Promise<number> {
+    let blockTime = this.timePerBlock;
+
+    if (blockTime > 0) {
+      return blockTime;
+    }
+
+    try {
+      blockTime = await this.getBlockTime();
+
+      this.timePerBlock = blockTime;
+    } catch (e) {
+      console.error('Failed to compute block time', e);
+
+      blockTime = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000; // Default to 10 minutes if failed
+    }
+
+    // Cache block time in 60 seconds
+    setTimeout(() => {
+      this.timePerBlock = 0;
+    }, 60000);
+
+    return blockTime;
   }
 
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo> {
@@ -120,8 +136,10 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
     }, 1);
   }
 
-  getFeeRate (): Promise<BitcoinFeeInfo> {
-    return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
+  async getFeeRate (): Promise<BitcoinFeeInfo> {
+    const timePerBlock = await this.computeBlockTime();
+
+    return await this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
       const _rs = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
       const rs = await _rs.json() as OBResponse<BlockStreamFeeEstimates>;
 
@@ -141,9 +159,9 @@ export class BlockStreamRequestStrategy extends BaseApiRequestStrategy implement
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(result[low]), time: this.timePerBlock * low },
-          average: { feeRate: convertFee(result[average]), time: this.timePerBlock * average },
-          fast: { feeRate: convertFee(result[fast]), time: this.timePerBlock * fast },
+          slow: { feeRate: convertFee(result[low]), time: timePerBlock * low },
+          average: { feeRate: convertFee(result[average]), time: timePerBlock * average },
+          fast: { feeRate: convertFee(result[fast]), time: timePerBlock * fast },
           default: 'slow'
         }
       };

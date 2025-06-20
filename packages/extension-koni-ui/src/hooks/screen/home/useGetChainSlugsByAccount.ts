@@ -9,6 +9,9 @@ import { KeypairType } from '@subwallet/keyring/types';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+/**
+ * @deprecated Use hook `useGetChainSlugsByCurrentAccountProxy` or 'useCoreCreateGetChainSlugsByAccountProxy' instead.
+ */
 // TODO: Recheck the usages of the address in this hook.
 export const useGetChainSlugsByAccount = (address?: string): string[] => {
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);

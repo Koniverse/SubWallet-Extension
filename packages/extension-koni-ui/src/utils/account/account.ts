@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
@@ -14,12 +14,11 @@ import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } 
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
 import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
+import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
-import { isChainInfoAccordantAccountChainType } from '../chain';
 import { getLogoByNetworkKey } from '../common';
 
 export function getAccountType (address: string): AccountType {
@@ -224,7 +223,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return undefined;
   }
 
-  if (!isChainInfoAccordantAccountChainType(chainInfo, accountJson.chainType)) {
+  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson.chainType, accountJson.type)) {
     return undefined;
   }
 
@@ -237,14 +236,6 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
   } else if (accountJson.chainType === AccountChainType.CARDANO && chainInfo.cardanoInfo) {
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
   } else if (accountJson.chainType === AccountChainType.BITCOIN && chainInfo.bitcoinInfo) {
-    const isTestnet = chainInfo.isTestnet;
-    const isBitcoinTestnet = BitcoinTestnetKeypairTypes.includes(accountJson.type);
-
-    // Both must be testnet or both must be mainnet
-    if (isTestnet !== isBitcoinTestnet) {
-      return undefined;
-    }
-
     return accountJson.address;
   }
 

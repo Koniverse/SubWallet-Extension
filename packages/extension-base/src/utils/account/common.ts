@@ -71,29 +71,31 @@ export const getAccountChainTypeForAddress = (address: string): AccountChainType
   return getAccountChainTypeFromKeypairType(type);
 };
 
-interface AddressesByChainType {
-  [ChainType.SUBSTRATE]: string[],
-  [ChainType.EVM]: string[],
-  [ChainType.BITCOIN]: string[],
-  [ChainType.TON]: string[],
-  [ChainType.CARDANO]: string[]
+type AddressesByChainType = {
+  [key in ChainType]: string[]
 }
 
-export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[]): string[] {
-  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses);
+interface ExtendAddressesByChainType extends AddressesByChainType {
+  _bitcoin: string[];
+}
+
+// TODO: Recheck the usage of this function for Bitcoin; it is currently applied to history.
+export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[], chainInfo?: _ChainInfo): string[] {
+  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses, chainInfo);
 
   return chainTypes.map((chainType) => {
     return addressByChainTypeMap[chainType];
   }).flat(); // todo: recheck
 }
 
-export function getAddressesByChainTypeMap (addresses: string[], chainInfo?: _ChainInfo): AddressesByChainType {
-  const addressByChainType: AddressesByChainType = {
+export function getAddressesByChainTypeMap (addresses: string[], chainInfo?: _ChainInfo): ExtendAddressesByChainType {
+  const addressByChainType: ExtendAddressesByChainType = {
     substrate: [],
     evm: [],
     bitcoin: [],
     ton: [],
-    cardano: []
+    cardano: [],
+    _bitcoin: []
   };
 
   addresses.forEach((address) => {
@@ -109,6 +111,8 @@ export function getAddressesByChainTypeMap (addresses: string[], chainInfo?: _Ch
 
         if (isNetworkMatch) {
           addressByChainType.bitcoin.push(address);
+        } else {
+          addressByChainType._bitcoin.push(address);
         }
       }
     } else if (isCardanoAddress(address)) {
