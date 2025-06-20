@@ -471,8 +471,6 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
 
   const isChainNotSupportTransferAll = [
     ..._TRANSFER_CHAIN_GROUP.acala,
-    ..._TRANSFER_CHAIN_GROUP.genshiro,
-    ..._TRANSFER_CHAIN_GROUP.bitcountry,
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 

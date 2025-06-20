@@ -325,7 +325,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     let cancel = false;
 
     const updateStakingInfo = async () => {
-      await this.substrateApi.isReady;
+      await this.substrateApi?.isReady;
 
       try {
         if (cancel) {
