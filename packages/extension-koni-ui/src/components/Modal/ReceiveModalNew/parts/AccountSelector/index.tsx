@@ -52,7 +52,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     const lowerCaseSearchText = searchText.toLowerCase();
 
     return item.accountName.toLowerCase().includes(lowerCaseSearchText) ||
-      item.address.toLowerCase().includes(lowerCaseSearchText);
+      (item.displayAddress || item.address).toLowerCase().includes(lowerCaseSearchText);
   }, []);
 
   const onSelect = useCallback((item: AccountAddressItemType) => {
@@ -75,7 +75,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
 
     return (
       <AccountSelectorItem
-        address={(item as AccountAddressItemType).address}
+        address={(item as AccountAddressItemType).displayAddress || (item as AccountAddressItemType).address}
         avatarValue={(item as AccountAddressItemType).accountProxyId}
         className={'account-selector-item'}
         isSelected={selectedValue === (item as AccountAddressItemType).address}

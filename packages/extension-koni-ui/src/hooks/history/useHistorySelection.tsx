@@ -57,7 +57,8 @@ export default function useHistorySelection () {
             accountProxyId: ap.id,
             accountProxyType: ap.accountType,
             accountType: a.type,
-            address: formatedAddress
+            address: a.address,
+            displayAddress: formatedAddress
           });
         }
       });
