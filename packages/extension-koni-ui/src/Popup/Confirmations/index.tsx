@@ -3,16 +3,18 @@
 
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
+import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, ProcessType } from '@subwallet/extension-base/types';
+import { AccountJson, AccountSignMode, ProcessType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useConfirmationsInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { SubmitApiConfirmation } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Action';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ConfirmationType } from '@subwallet/extension-koni-ui/stores/base/RequestState';
-import { AccountSignMode, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, getSignMode, isRawPayload } from '@subwallet/extension-koni-ui/utils';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { findAccountByAddress, findChainInfoByGenesisHash, getSignMode, isRawPayload } from '@subwallet/extension-koni-ui/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -56,6 +58,7 @@ const Component = function ({ className }: Props) {
   const { t } = useTranslation();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const { transactionRequest } = useSelector((state) => state.requestState);
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
 
   const nextConfirmation = useCallback(() => {
     setIndex((val) => Math.min(val + 1, numberOfConfirmations - 1));
@@ -81,11 +84,18 @@ const Component = function ({ className }: Props) {
         const address = request.request.payload.address;
 
         account = findAccountByAddress(accounts, address) || undefined;
-        const isEthereum = isEthereumAddress(address);
+        const isEthereum = isEthereumAddress(address) && !account?.isSubstrateECDSA;
 
         if (account?.isHardware) {
           if (account?.isGeneric) {
-            canSign = !isEthereum;
+            if (account.isSubstrateECDSA && !_isMessage) {
+              const payload = request.request.payload as SignerPayloadJSON;
+              const chainInfo = findChainInfoByGenesisHash(chainInfoMap, payload.genesisHash);
+
+              canSign = !!chainInfo && (_isChainEvmCompatible(chainInfo) && _isChainSubstrateCompatible(chainInfo));
+            } else {
+              canSign = !isEthereum;
+            }
           } else {
             if (_isMessage) {
               canSign = true;
@@ -260,7 +270,7 @@ const Component = function ({ className }: Props) {
     }
 
     return null;
-  }, [accounts, closeAlert, confirmation, openAlert]);
+  }, [accounts, chainInfoMap, closeAlert, confirmation, openAlert]);
 
   const headerTitle = useMemo((): string => {
     if (!confirmation) {

@@ -169,6 +169,10 @@ export function _isChainEvmCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.evmInfo;
 }
 
+export function _isSubstrateEvmCompatibleChain (chainInfo: _ChainInfo) {
+  return !!chainInfo.evmInfo && !!chainInfo.substrateInfo;
+}
+
 export function _isChainBitcoinCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.bitcoinInfo;
 }

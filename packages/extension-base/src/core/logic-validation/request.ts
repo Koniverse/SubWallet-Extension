@@ -327,7 +327,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   const errors: Error[] = payload.errors || [];
   let estimateGas = '';
   const transactionParams = payload.payloadAfterValidated as EvmSendTransactionParams;
-  const { address: fromAddress, networkKey } = payload;
+  const { address: fromAddress, networkKey, pair: pair_ } = payload;
   const evmApi = koni.getEvmApi(networkKey || '');
   const web3 = evmApi?.api;
 
@@ -369,6 +369,16 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   // Address is validated in before step
   if (!fromAddress || !isEthereumAddress(fromAddress)) {
     handleError('the sender address must be the ethereum address type');
+  }
+
+  const pair = pair_ || keyring.getPair(fromAddress);
+
+  if (!pair) {
+    handleError('Not found address to sign');
+  }
+
+  if (pair_?.meta.isSubstrateECDSA) {
+    handleError('Substrate account can not send this transaction');
   }
 
   if (transaction.to && !isEthereumAddress(transaction.to)) {
@@ -534,6 +544,14 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
   }
 
   const pair = pair_ || keyring.getPair(address);
+
+  if (!pair) {
+    handleError('Not found address to sign');
+  }
+
+  if (pair_?.meta.isSubstrateECDSA) {
+    handleError('Substrate account can not sign this message');
+  }
 
   if (method) {
     if (['eth_sign', 'personal_sign', 'eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].indexOf(method) < 0) {

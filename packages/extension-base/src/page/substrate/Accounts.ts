@@ -13,7 +13,7 @@ export default class Accounts implements InjectedAccounts {
   }
 
   public get (anyType?: boolean): Promise<InjectedAccount[]> {
-    return sendRequest('pub(accounts.listV2)', { anyType });
+    return sendRequest('pub(accounts.listV2)', { anyType, isSubstrateConnector: true });
   }
 
   public subscribe (cb: (accounts: InjectedAccount[]) => unknown): Unsubcall {

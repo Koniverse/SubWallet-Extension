@@ -44,7 +44,7 @@ interface AccountSub {
   url: string;
 }
 
-function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[]): InjectedAccount[] {
+function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[], isSubstrateConnector?: boolean): InjectedAccount[] {
   const accountSelected = authInfo
     ? (
       authInfo.isAllowed
@@ -77,6 +77,11 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
 
       // This condition ensures that the resulting UTXOs from the user's transaction are not sent to addresses the wallet cannot manage.
       if (type === 'cardano' && json.meta.isReadOnly) {
+        return false;
+      }
+
+      // If the dApp has not connected to the Substrate type yet, we do not return Substrate ECDSA accounts.
+      if (type === 'ethereum' && json.meta.isSubstrateECDSA && !isSubstrateConnector) {
         return false;
       }
 
@@ -316,7 +321,7 @@ export default class KoniTabs {
     return authList[shortenUrl];
   }
 
-  private async accountsListV2 (url: string, { accountAuthType, anyType }: RequestAccountList): Promise<InjectedAccount[]> {
+  private async accountsListV2 (url: string, { accountAuthType, anyType, isSubstrateConnector }: RequestAccountList): Promise<InjectedAccount[]> {
     const authInfo = await this.getAuthInfo(url);
 
     const accountAuthTypes: AccountAuthType[] = [];
@@ -341,7 +346,7 @@ export default class KoniTabs {
       }
     }
 
-    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
+    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes, isSubstrateConnector);
   }
 
   // TODO: Update logic
@@ -369,7 +374,7 @@ export default class KoniTabs {
 
             const accounts = this.#koniState.keyringService.context.pairs;
 
-            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes));
+            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes, true));
           })
           .catch(console.error);
       }),

@@ -5,17 +5,26 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 
-export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], accountAuthTypes: AccountAuthType[]): AccountProxy[] => {
-  const rs = accountProxies.filter(({ chainTypes, id }) => {
+interface AuthorizeAccountProxiesConditions {
+  accountAuthTypes: AccountAuthType[];
+  isSubstrateConnector?: boolean;
+}
+
+export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], conditions: AuthorizeAccountProxiesConditions): AccountProxy[] => {
+  const { accountAuthTypes, isSubstrateConnector } = conditions;
+
+  const rs = accountProxies.filter(({ accounts, chainTypes, id }) => {
     if (isAccountAll(id)) {
       return false;
     }
+
+    const isEcdsaAccountProxy = accounts.some((account) => account.isSubstrateECDSA);
 
     return accountAuthTypes.some((type) => {
       if (type === 'substrate') {
         return chainTypes.includes(AccountChainType.SUBSTRATE);
       } else if (type === 'evm') {
-        return chainTypes.includes(AccountChainType.ETHEREUM);
+        return chainTypes.includes(AccountChainType.ETHEREUM) && (isSubstrateConnector || !isEcdsaAccountProxy);
       } else if (type === 'ton') {
         return chainTypes.includes(AccountChainType.TON);
       } else if (type === 'cardano') {
