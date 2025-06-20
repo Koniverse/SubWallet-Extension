@@ -3,7 +3,6 @@
 
 import { PsbtTransactionArg } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseRequestSign } from '@subwallet/extension-base/types';
-import { Psbt } from 'bitcoinjs-lib';
 
 import { FeeChainType, FeeDetail, TransactionFee } from '../fee';
 
@@ -29,6 +28,10 @@ export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{
   id?: string;
 }
 
+export interface ResponseSubscribeTransferConfirmation extends Omit<ResponseSubscribeTransfer, 'maxTransferable'> {
+  error?: string;
+}
+
 export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   chain: string;
   from: string;
@@ -48,5 +51,5 @@ export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {
   txInput: PsbtTransactionArg[];
   txOutput: PsbtTransactionArg[];
   tokenSlug: string;
-  psbt: Psbt;
+  psbt: string;
 }
