@@ -6,7 +6,7 @@ import type { AccountAuthType, MessageTypes, MessageTypesWithNoSubscriptions, Me
 import { ProviderError } from '@subwallet/extension-base/background/errors/ProviderError';
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
 import SubWalletCardanoProvider from '@subwallet/extension-base/page/cardano';
-import SubWalletEvmProvider from '@subwallet/extension-base/page/evm';
+import { createSubWalletEvmProvider } from '@subwallet/extension-base/page/evm';
 import Injected from '@subwallet/extension-base/page/substrate';
 import { AuthRequestOption, CardanoProvider, EvmProvider } from '@subwallet/extension-inject/types';
 
@@ -88,7 +88,7 @@ export function handleResponse<TMessageType extends MessageTypes> (data: Transpo
 }
 
 export function initEvmProvider (version: string): EvmProvider {
-  return new SubWalletEvmProvider(sendMessage, version);
+  return createSubWalletEvmProvider(sendMessage, version);
 }
 
 export function initCardanoProvider (): CardanoProvider {
