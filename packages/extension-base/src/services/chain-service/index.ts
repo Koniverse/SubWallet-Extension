@@ -1283,6 +1283,10 @@ export class ChainService {
     return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
   }
 
+  public async fetchAhMapChain () {
+    return await fetchStaticData<Record<string, string>>('asset-hub-staking-map');
+  }
+
   private async initChains () {
     const storedChainSettings = await this.dbService.getAllChainStore();
     const defaultChainInfoMap = filterChainInfoMap(ChainInfoMap, ignoredList);
