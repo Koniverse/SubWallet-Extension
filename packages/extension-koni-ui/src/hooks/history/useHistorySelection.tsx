@@ -49,17 +49,15 @@ export default function useHistorySelection () {
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
-        // TODO: This is a temporary validation method.
-        //  Find a more efficient way to get isValid.
-        const isValid = getReformatAddress(a, chainInfo);
+        const formatedAddress = getReformatAddress(a, chainInfo);
 
-        if (isValid) {
+        if (formatedAddress) {
           result.push({
             accountName: ap.name,
             accountProxyId: ap.id,
             accountProxyType: ap.accountType,
             accountType: a.type,
-            address: a.address
+            address: formatedAddress
           });
         }
       });
