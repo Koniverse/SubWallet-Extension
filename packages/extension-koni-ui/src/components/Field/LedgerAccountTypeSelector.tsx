@@ -62,7 +62,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           <Logo
             className='chain-logo'
             network={item.slug}
-            shape='squircle'
+            shape='circle'
             size={28}
           />
         }

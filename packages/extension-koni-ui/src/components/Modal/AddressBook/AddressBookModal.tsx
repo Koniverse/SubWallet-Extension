@@ -103,7 +103,10 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, getAccountChainTypeForAddress(acc.address), getKeypairTypeByAddress(acc.address))) {
+      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, {
+        chainType: getAccountChainTypeForAddress(acc.address),
+        type: getKeypairTypeByAddress(acc.address)
+      })) {
         result.push({
           displayName: acc.name,
           formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),

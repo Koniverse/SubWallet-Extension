@@ -74,7 +74,7 @@ export const _analyzeAddress = async (data: string, accountProxies: AccountProxy
   for (const accountProxy of accountProxies) {
     const _name = accountProxy.name.trim().toLowerCase();
     const nameCondition = isNameValid(_data, _name);
-    const filterAccounts = accountProxy.accounts.filter((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type));
+    const filterAccounts = accountProxy.accounts.filter((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account));
 
     for (const account of filterAccounts) {
       const addressCondition = isStrValidWithAddress(_data, account, chainInfo);
@@ -108,7 +108,10 @@ export const _analyzeAddress = async (data: string, accountProxies: AccountProxy
     }
   }
 
-  const filterContacts = contacts.filter((contact) => _isChainInfoCompatibleWithAccountInfo(chainInfo, contact.chainType, getKeypairTypeByAddress(contact.address)));
+  const filterContacts = contacts.filter((contact) => _isChainInfoCompatibleWithAccountInfo(chainInfo, {
+    chainType: contact.chainType,
+    type: getKeypairTypeByAddress(contact.address)
+  }));
 
   // Filter address book addresses
   for (const contact of filterContacts) {

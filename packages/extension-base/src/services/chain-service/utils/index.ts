@@ -6,7 +6,7 @@ import { BasicTokenInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -703,12 +703,24 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   return AccountChainType.SUBSTRATE;
 };
 
-export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
+interface AccountInfo {
+  chainType: AccountChainType;
+  type: KeypairType;
+  signMode?: AccountSignMode;
+}
+
+export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountInfo: AccountInfo): boolean => {
+  const { chainType: accountChainType, signMode: accountSignMode, type: accountType } = accountInfo;
+
   if (accountChainType === AccountChainType.SUBSTRATE) {
     return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
   }
 
   if (accountChainType === AccountChainType.ETHEREUM) {
+    if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+      return _isSubstrateEvmCompatibleChain(chainInfo) && EthereumKeypairTypes.includes(accountType);
+    }
+
     return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
   }
 

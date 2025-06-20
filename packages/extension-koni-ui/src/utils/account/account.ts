@@ -227,7 +227,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return undefined;
   }
 
-  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson.chainType, accountJson.type)) {
+  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson)) {
     return undefined;
   }
 

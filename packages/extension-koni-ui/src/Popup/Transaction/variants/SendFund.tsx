@@ -31,7 +31,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, noop, SortableTokenItem, sortTokensByBalanceInSelector, hasOnlySubstrateEcdsaAccountProxy, isSubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, hasOnlySubstrateEcdsaAccountProxy, isSubstrateEcdsaAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { KeypairType } from '@subwallet/keyring/types';
@@ -103,24 +103,6 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
 
     return undefined;
   }, [accountProxies, accounts, address, currentAccountProxy?.id]);
-
-  const accountSignMode = useMemo(() => {
-    const _address = address || currentAccountProxy?.id;
-
-    if (_address) {
-      if (isAccountAll(_address)) {
-        return AccountSignMode.ALL_ACCOUNT;
-      }
-
-      const proxy = accountProxies.find((proxy) => proxy.id === _address);
-
-      if (proxy) {
-        return getSignModeByAccountProxy(proxy);
-      }
-    }
-
-    return AccountSignMode.UNKNOWN;
-  }, [accountProxies, address, currentAccountProxy?.id]);
 
   return useMemo<string[]>(() => {
     const _address = address || currentAccountProxy?.id;

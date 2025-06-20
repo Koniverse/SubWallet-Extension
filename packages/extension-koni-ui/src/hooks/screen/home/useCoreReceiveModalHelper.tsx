@@ -241,7 +241,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     };
 
     const getPreferredBitcoinAccount = (accounts: AccountJson[]) => {
-      const bitcoinAccounts = accounts.filter((a) => a.chainType === AccountChainType.BITCOIN && _isChainInfoCompatibleWithAccountInfo(chainInfo, a.chainType, a.type));
+      const bitcoinAccounts = accounts.filter((a) => a.chainType === AccountChainType.BITCOIN && _isChainInfoCompatibleWithAccountInfo(chainInfo, a));
 
       return bitcoinAccounts.find((a) => a.type === 'bitcoin-84' || a.type === 'bittest-84') || bitcoinAccounts[0];
     };
