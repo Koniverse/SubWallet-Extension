@@ -53,6 +53,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   async getPoolRewardHistory (useAddresses: string[], callBack: (rs: EarningRewardHistoryItem) => void): Promise<VoidFunction> {
     let cancel = false;
     const haveSubscanService = this.state.subscanService.checkSupportedSubscanChain(this.chain);
+    const requestGroupId = this.state.subscanService.getGroupId();
 
     if (haveSubscanService) {
       for (const address of useAddresses) {
@@ -60,39 +61,44 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
           break;
         }
 
-        try {
-          const rs = await this.state.subscanService.getRewardHistoryList(this.chain, address);
-          const items = rs?.list;
+        this.state.subscanService.getRewardHistoryList(requestGroupId, this.chain, address)
+          .then((rs) => {
+            const items = rs?.list;
 
-          if (items) {
-            for (const item of items) {
-              const now = new Date();
-              const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
-              const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
-
-              const data: EarningRewardHistoryItem = {
-                slug: this.slug,
-                type: this.type,
-                chain: this.chain,
-                address: address,
-                group: this.group,
-                blockTimestamp: timeStamp,
-                amount: item.amount,
-                eventIndex: item.event_index
-              };
-
-              callBack(data);
+            if (cancel) {
+              return;
             }
-          }
-        } catch (e) {
-          console.error(e);
-        }
+
+            if (items) {
+              for (const item of items) {
+                const now = new Date();
+                const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
+                const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
+
+                const data: EarningRewardHistoryItem = {
+                  slug: this.slug,
+                  type: this.type,
+                  chain: this.chain,
+                  address: address,
+                  group: this.group,
+                  blockTimestamp: timeStamp,
+                  amount: item.amount,
+                  eventIndex: item.event_index
+                };
+
+                callBack(data);
+              }
+            }
+          })
+          .catch(console.error);
       }
     }
 
-    return () => {
+    return Promise.resolve(() => {
+      console.log('Cancel get pool reward history', requestGroupId);
       cancel = false;
-    };
+      this.state.subscanService.cancelGroupRequest(requestGroupId);
+    });
   }
 
   /* Get pool reward */

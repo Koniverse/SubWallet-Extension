@@ -3,14 +3,17 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 
-import { ApiRequest, ApiRequestContext, ApiRequestStrategy } from './types';
+import { ApiRequestContext } from '../api-request-strategy/types';
+import { ApiRequestStrategyV2, ApiRequestV2 } from './types';
 
-export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
+export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
   private nextId = 0;
+  private groupId = 0;
   private isRunning = false;
-  private requestMap: Record<number, ApiRequest<any>> = {};
+  private requestMap: Record<number, ApiRequestV2<any>> = {};
   private context: ApiRequestContext;
   private processInterval: NodeJS.Timeout | undefined = undefined;
+  private canceledGroupIds: Set<number> = new Set();
 
   private getId () {
     return this.nextId++;
@@ -20,12 +23,22 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
     this.context = context;
   }
 
-  addRequest<T> (run: ApiRequest<T>['run'], ordinal: number) {
+  public getGroupId (): number {
+    return this.groupId++;
+  }
+
+  addRequest<T> (run: ApiRequestV2<T>['run'], ordinal: number, _groupId?: number) {
     const newId = this.getId();
+    const groupId = _groupId ?? this.getGroupId();
+
+    if (this.canceledGroupIds.has(groupId)) {
+      return Promise.reject(new SWError('CANCELED', 'Request has been canceled'));
+    }
 
     return new Promise<T>((resolve, reject) => {
       this.requestMap[newId] = {
         id: newId,
+        groupId,
         status: 'pending',
         retry: -1,
         ordinal,
@@ -57,6 +70,8 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
 
         return;
       }
+
+      console.log('[ApiRequestStrategyV2] Processing requests...', remainingRequests.map((r) => r.groupId));
 
       // Get first this.limit requests base on id
       const requests = remainingRequests
@@ -98,6 +113,20 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
   stop () {
     clearInterval(this.processInterval);
     this.processInterval = undefined;
+  }
+
+  cancelGroupRequest (groupId: number): void {
+    Object.values(this.requestMap).forEach((request) => {
+      if (request.groupId === groupId) {
+        request.reject(new SWError('CANCELED', 'Request has been canceled'));
+      }
+
+      this.canceledGroupIds.add(groupId);
+    });
+
+    this.requestMap = Object.fromEntries(
+      Object.entries(this.requestMap).filter(([_, request]) => request.groupId !== groupId)
+    );
   }
 
   setContext (context: ApiRequestContext): void {

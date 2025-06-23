@@ -4,7 +4,9 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/api/nft/ordinal_nft/constants';
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
-import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanRequest, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
+import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
+import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
+import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
 import { wait } from '@subwallet/extension-base/utils';
 
@@ -15,35 +17,11 @@ interface SubscanError {
   message: string;
 }
 
-export class SubscanService {
-  private callRate = 2; // limit per interval check
-  private limitRate = 2; // max rate per interval check
-  private intervalCheck = 1000; // interval check in ms
-  private maxRetry = 9; // interval check in ms
-  private rollbackRateTime = 30 * 1000; // rollback rate time in ms
-  private timeoutRollbackRate: NodeJS.Timeout | undefined = undefined;
-  private requestMap: Record<number, SubscanRequest<any>> = {};
-  private nextId = 0;
-  private isRunning = false;
-  private getId () {
-    return this.nextId++;
-  }
-
+export class SubscanService extends BaseApiRequestStrategyV2 {
   constructor (private subscanChainMap: Record<string, string>, options?: {limitRate?: number, intervalCheck?: number, maxRetry?: number}) {
-    this.callRate = options?.limitRate || this.callRate;
-    this.limitRate = options?.limitRate || this.limitRate;
-    this.intervalCheck = options?.intervalCheck || this.intervalCheck;
-    this.maxRetry = options?.maxRetry || this.maxRetry;
-  }
+    const context = new BaseApiRequestContext(options);
 
-  private reduceLimitRate () {
-    clearTimeout(this.timeoutRollbackRate);
-
-    this.callRate = Math.ceil(this.limitRate / 2);
-
-    this.timeoutRollbackRate = setTimeout(() => {
-      this.callRate = this.limitRate;
-    }, this.rollbackRateTime);
+    super(context);
   }
 
   private getApiUrl (chain: string, path: string) {
@@ -66,71 +44,10 @@ export class SubscanService {
     });
   }
 
-  public addRequest<T> (run: SubscanRequest<T>['run'], ordinal: number) {
-    const newId = this.getId();
+  isRateLimited (e: Error): boolean {
+    const error = JSON.parse(e.message) as SubscanError;
 
-    return new Promise<T>((resolve, reject) => {
-      this.requestMap[newId] = {
-        id: newId,
-        status: 'pending',
-        retry: -1,
-        ordinal,
-        run,
-        resolve,
-        reject
-      };
-
-      if (!this.isRunning) {
-        this.process();
-      }
-    });
-  }
-
-  private process () {
-    this.isRunning = true;
-    const maxRetry = this.maxRetry;
-
-    const interval = setInterval(() => {
-      const remainingRequests = Object.values(this.requestMap);
-
-      if (remainingRequests.length === 0) {
-        this.isRunning = false;
-        clearInterval(interval);
-
-        return;
-      }
-
-      // Get first this.limit requests base on id
-      const requests = remainingRequests
-        .filter((request) => request.status !== 'running')
-        .sort((a, b) => a.id - b.id)
-        .sort((a, b) => a.ordinal - b.ordinal)
-        .slice(0, this.callRate);
-
-      // Start requests
-      requests.forEach((request) => {
-        request.status = 'running';
-        request.run().then((rs) => {
-          request.resolve(rs);
-        }).catch((e: Error) => {
-          const error = JSON.parse(e.message) as SubscanError;
-
-          // Limit rate
-          if (error.code === 20008) {
-            if (request.retry < maxRetry) {
-              request.status = 'pending';
-              request.retry++;
-              this.reduceLimitRate();
-            } else {
-              // Reject request
-              request.reject(new SWError('MAX_RETRY', String(e)));
-            }
-          } else {
-            request.reject(new SWError('UNKNOWN', String(e)));
-          }
-        });
-      });
-    }, this.intervalCheck);
+    return error.code === 20008;
   }
 
   public checkSupportedSubscanChain (chain: string): boolean {
@@ -175,7 +92,7 @@ export class SubscanService {
     }, 2);
   }
 
-  public getExtrinsicsList (chain: string, address: string, page = 0, blockRange?: RequestBlockRange): Promise<ExtrinsicsListResponse> {
+  public getExtrinsicsList (groupId: number, chain: string, address: string, page = 0, blockRange?: RequestBlockRange): Promise<ExtrinsicsListResponse> {
     const _blockRange = (() => {
       if (!blockRange || !blockRange.to) {
         return null;
@@ -199,10 +116,11 @@ export class SubscanService {
       const jsonData = (await rs.json()) as SubscanResponse<ExtrinsicsListResponse>;
 
       return jsonData.data;
-    }, 0);
+    }, 0, groupId);
   }
 
   public async fetchAllPossibleExtrinsicItems (
+    groupId: number,
     chain: string,
     address: string,
     cbAfterEachRequest?: (items: ExtrinsicItem[]) => void,
@@ -220,7 +138,7 @@ export class SubscanService {
     const resultMap: Record<string, ExtrinsicItem> = {};
 
     const _getExtrinsicItems = async (page: number) => {
-      const res = await this.getExtrinsicsList(chain, address, page, blockRange);
+      const res = await this.getExtrinsicsList(groupId, chain, address, page, blockRange);
 
       if (!res || !res.count || !res.extrinsics || !res.extrinsics.length) {
         return;
@@ -232,7 +150,7 @@ export class SubscanService {
 
       const extrinsics = res.extrinsics;
       const extrinsicIndexes = extrinsics.map((item) => item.extrinsic_index);
-      const extrinsicParams = await this.getExtrinsicParams(chain, extrinsicIndexes, 0);
+      const extrinsicParams = await this.getExtrinsicParams(groupId, chain, extrinsicIndexes, 0);
 
       for (const data of extrinsicParams) {
         const { extrinsic_index: extrinsicIndex, params } = data;
@@ -273,7 +191,7 @@ export class SubscanService {
     return Object.values(resultMap);
   }
 
-  public getTransfersList (chain: string, address: string, page = 0, direction?: 'sent' | 'received', blockRange?: RequestBlockRange): Promise<TransfersListResponse> {
+  public getTransfersList (groupId: number, chain: string, address: string, page = 0, direction?: 'sent' | 'received', blockRange?: RequestBlockRange): Promise<TransfersListResponse> {
     return this.addRequest<TransfersListResponse>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/v2/scan/transfers'), {
         page,
@@ -291,10 +209,11 @@ export class SubscanService {
       const jsonData = (await rs.json()) as SubscanResponse<TransfersListResponse>;
 
       return jsonData.data;
-    }, 0);
+    }, 0, groupId);
   }
 
   public async fetchAllPossibleTransferItems (
+    groupId: number,
     chain: string,
     address: string,
     direction?: 'sent' | 'received',
@@ -313,7 +232,7 @@ export class SubscanService {
     const resultMap: Record<string, TransferItem[]> = {};
 
     const _getTransferItems = async (page: number) => {
-      const res = await this.getTransfersList(chain, address, page, direction, blockRange);
+      const res = await this.getTransfersList(groupId, chain, address, page, direction, blockRange);
 
       if (!res || !res.count || !res.transfers || !res.transfers.length) {
         return;
@@ -354,7 +273,7 @@ export class SubscanService {
     return resultMap;
   }
 
-  public getRewardHistoryList (chain: string, address: string, page = 0): Promise<RewardHistoryListResponse> {
+  public getRewardHistoryList (groupId: number, chain: string, address: string, page = 0): Promise<RewardHistoryListResponse> {
     return this.addRequest<RewardHistoryListResponse>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/account/reward_slash'), {
         page,
@@ -375,10 +294,10 @@ export class SubscanService {
       }
 
       return jsonData.data;
-    }, 2);
+    }, 2, groupId);
   }
 
-  public getAccountRemarkEvents (chain: string, address: string): Promise<SubscanEventBaseItemData[]> {
+  public getAccountRemarkEvents (groupId: number, chain: string, address: string): Promise<SubscanEventBaseItemData[]> {
     return this.addRequest<SubscanEventBaseItemData[]>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/v2/scan/events'), {
         ...BASE_FETCH_ORDINAL_EVENT_DATA,
@@ -392,10 +311,10 @@ export class SubscanService {
       const jsonData = (await rs.json()) as SubscanEventListResponse;
 
       return jsonData.data.events;
-    }, 3);
+    }, 3, groupId);
   }
 
-  public getExtrinsicParams (chain: string, extrinsicIndexes: string[], ordinal = 3): Promise<SubscanExtrinsicParam[]> {
+  public getExtrinsicParams (groupId: number, chain: string, extrinsicIndexes: string[], ordinal = 3): Promise<SubscanExtrinsicParam[]> {
     return this.addRequest<SubscanExtrinsicParam[]>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/extrinsic/params'), {
         extrinsic_index: extrinsicIndexes
@@ -408,7 +327,7 @@ export class SubscanService {
       const jsonData = (await rs.json()) as SubscanExtrinsicParamResponse;
 
       return jsonData.data;
-    }, ordinal);
+    }, ordinal, groupId);
   }
 
   // Singleton
