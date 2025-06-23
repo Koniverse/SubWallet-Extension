@@ -620,13 +620,13 @@ async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[
 
 export const createObservable = <F extends AnyFunc>(func: GenericStorageQuery<RpcVersion, F>, ...args: Parameters<F>): Observable<ReturnType<F>> => {
   return new Observable<ReturnType<F>>((_subscriber) => {
-    let unsub: (() => void) | undefined;
+    let unsub: (() => Promise<void>) | undefined;
 
     func(...args, (value: ReturnType<F>) => {
       if (!_subscriber.closed) {
         _subscriber.next(value);
       } else {
-        unsub?.();
+        unsub?.().catch((e) => _subscriber.error(e));
       }
     }).then((_unsub) => {
       if (!_subscriber.closed) {
@@ -635,7 +635,7 @@ export const createObservable = <F extends AnyFunc>(func: GenericStorageQuery<Rp
     }).catch((err) => _subscriber.error(err));
 
     return () => {
-      unsub?.();
+      unsub?.().catch((e) => _subscriber.error(e));
     };
   });
 };
