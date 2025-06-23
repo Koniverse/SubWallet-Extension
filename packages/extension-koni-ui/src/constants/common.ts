@@ -21,3 +21,5 @@ export const ASTAR_PORTAL_URL = 'https://portal.astar.network/astar/dapp-staking
 export const STATIC_DATA_CONTENT_URL = 'https://static-data.subwallet.app/';
 
 export const DEFAULT_CLAIM_DAPP_STAKING_REWARDS_STATE = ClaimDAppStakingRewardsState.NONE;
+
+export const AUTHORIZE_TYPE_SUPPORTS_NETWORK_SWITCH = 'evm';

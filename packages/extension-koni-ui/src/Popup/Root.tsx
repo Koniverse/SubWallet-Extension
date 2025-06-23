@@ -37,7 +37,6 @@ const migrateAccountNotionUrl = '/migrate-account?is-notion=true';
 const forcedAccountMigrationUrl = '/migrate-account?is-forced-migration=true';
 const loginUrl = '/keyring/login';
 const phishingUrl = '/phishing-page-detected';
-const mv3MigrationUrl = '/mv3-migration';
 // const remindExportAccountUrl = '/remind-export-account';
 const createPasswordUrl = '/keyring/create-password';
 const migratePasswordUrl = '/keyring/migrate-password';
@@ -127,7 +126,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
       return null;
     }
 
-    const requireLogin = pathName !== mv3MigrationUrl && !pathName.startsWith(phishingUrl);
+    const requireLogin = !pathName.startsWith(phishingUrl);
 
     if (!requireLogin) {
       // Do nothing

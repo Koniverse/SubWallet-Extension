@@ -53,23 +53,8 @@ const _additionalEnv = {
   NFT_MINTING_HOST: JSON.stringify(process.env.NFT_MINTING_HOST),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
-  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
-  BITTENSOR_API_KEY_1: JSON.stringify(process.env.BITTENSOR_API_KEY_1),
-  BITTENSOR_API_KEY_2: JSON.stringify(process.env.BITTENSOR_API_KEY_2),
-  BITTENSOR_API_KEY_3: JSON.stringify(process.env.BITTENSOR_API_KEY_3),
-  BITTENSOR_API_KEY_4: JSON.stringify(process.env.BITTENSOR_API_KEY_4),
-  BITTENSOR_API_KEY_5: JSON.stringify(process.env.BITTENSOR_API_KEY_5),
-  BITTENSOR_API_KEY_6: JSON.stringify(process.env.BITTENSOR_API_KEY_6),
-  BITTENSOR_API_KEY_7: JSON.stringify(process.env.BITTENSOR_API_KEY_7),
-  BITTENSOR_API_KEY_8: JSON.stringify(process.env.BITTENSOR_API_KEY_8),
-  BITTENSOR_API_KEY_9: JSON.stringify(process.env.BITTENSOR_API_KEY_9),
-  BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
-  SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
-  UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
-  BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
-  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
-  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY)
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API)
 };
 
 // Overwrite babel babel config from polkadot dev
