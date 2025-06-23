@@ -65,7 +65,7 @@ cryptoWaitReady()
     responseMessage({ id: '0', response: { status: 'crypto_ready' } } as PageStatus);
 
     // wake webapp up
-    SWHandler.instance.state.wakeup().catch((err) => console.warn(err));
+    SWHandler.instance.state.wakeup(true).catch((err) => console.warn(err));
 
     console.log('[WebApp] initialization completed');
   })

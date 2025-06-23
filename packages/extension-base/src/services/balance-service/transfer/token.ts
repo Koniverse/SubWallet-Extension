@@ -118,6 +118,8 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
         transfer = api.tx.balances.transfer(to, new BN(value));
       }
     }
+  } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
+    transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   }
 
   return [transfer, transferAmount || value];
