@@ -24,6 +24,7 @@ const SwLogosMap: Record<string, string> = {
   kyber: DefaultLogosMap.kyber,
   hydradx_mainnet: DefaultLogosMap.hydradx,
   hydradx_testnet: DefaultLogosMap.hydradx,
+  ordinal_rune: DefaultLogosMap.ordinal_rune,
   [SUBSTRATE_GENERIC_KEY]: DefaultLogosMap[SUBSTRATE_GENERIC_KEY],
   [SUBSTRATE_MIGRATION_KEY]: DefaultLogosMap[SUBSTRATE_MIGRATION_KEY],
   [SwapProviderId.POLKADOT_ASSET_HUB.toLowerCase()]: DefaultLogosMap.polkadot_assethub,

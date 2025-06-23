@@ -7,6 +7,7 @@ import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-ba
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import { AccountChainType } from '@subwallet/extension-base/types';
+import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -62,19 +63,23 @@ export function _isEqualSmartContractAsset (asset1: _ChainAsset, asset2: _ChainA
 }
 
 export function _isPureEvmChain (chainInfo: _ChainInfo) {
-  return (!!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureSubstrateChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !!chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !!chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureTonChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.tonInfo && !chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !!chainInfo.tonInfo && !chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
 }
 
 export function _isPureCardanoChain (chainInfo: _ChainInfo) {
-  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo);
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !!chainInfo.cardanoInfo && !chainInfo.bitcoinInfo);
+}
+
+export function _isPureBitcoinChain (chainInfo: _ChainInfo) {
+  return (!chainInfo.evmInfo && !chainInfo.substrateInfo && !chainInfo.tonInfo && !chainInfo.cardanoInfo && !!chainInfo.bitcoinInfo);
 }
 
 export function _getOriginChainOfAsset (assetSlug: string) {
@@ -136,6 +141,11 @@ export function _isTokenTransferredByTon (tokenInfo: _ChainAsset) {
 
 export function _isTokenTransferredByCardano (tokenInfo: _ChainAsset) {
   return _isCIP26Token(tokenInfo) || _isNativeToken(tokenInfo);
+}
+
+// TODO [Review]: Currently supports transferring only the native token, Bitcoin.
+export function _isTokenTransferredByBitcoin (tokenInfo: _ChainAsset) {
+  return _isNativeToken(tokenInfo);
 }
 
 // Utils for balance functions
@@ -335,6 +345,11 @@ export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicToke
       symbol: chainInfo.cardanoInfo.symbol,
       decimals: chainInfo.cardanoInfo.decimals
     };
+  } else if (chainInfo.bitcoinInfo) {
+    return {
+      symbol: chainInfo.bitcoinInfo.symbol,
+      decimals: chainInfo.bitcoinInfo.decimals
+    };
   }
 
   return defaultTokenInfo;
@@ -481,6 +496,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
     blockExplorer = chainInfo?.evmInfo?.blockExplorer;
   } else if (_isPureCardanoChain(chainInfo)) {
     blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
+  } else if (_isPureBitcoinChain(chainInfo)) {
+    blockExplorer = chainInfo?.bitcoinInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }
@@ -688,6 +705,44 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   }
 
   return AccountChainType.SUBSTRATE;
+};
+
+export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
+  if (accountChainType === AccountChainType.SUBSTRATE) {
+    return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.ETHEREUM) {
+    return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.TON) {
+    return _isChainTonCompatible(chainInfo) && TonKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.CARDANO) {
+    return _isChainCardanoCompatible(chainInfo) && CardanoKeypairTypes.includes(accountType);
+  }
+
+  if (accountChainType === AccountChainType.BITCOIN) {
+    if (!_isChainBitcoinCompatible(chainInfo) || ![...BitcoinMainnetKeypairTypes, ...BitcoinTestnetKeypairTypes].includes(accountType)) {
+      return false;
+    }
+
+    const network = chainInfo.bitcoinInfo?.bitcoinNetwork;
+
+    if (BitcoinMainnetKeypairTypes.includes(accountType)) {
+      return network === 'mainnet';
+    }
+
+    if (BitcoinTestnetKeypairTypes.includes(accountType)) {
+      return network === 'testnet';
+    }
+
+    return false;
+  }
+
+  return false;
 };
 
 export const _getAssetNetuid = (assetInfo: _ChainAsset): number => {

@@ -1,40 +1,74 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountDeriveData, DeriveInfo, NextDerivePair } from '@subwallet/extension-base/types';
+import { AccountDeriveData, DeriveInfo, IDerivePathInfo_, NextDerivePair } from '@subwallet/extension-base/types';
 import { getDerivePath } from '@subwallet/keyring';
-import { EthereumKeypairTypes, KeypairType, KeyringPair, SubstrateKeypairType, SubstrateKeypairTypes, TonWalletContractVersion } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair, SubstrateKeypairType, SubstrateKeypairTypes, TonWalletContractVersion } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
 import { assert } from '@polkadot/util';
 
-import { validateCardanoDerivationPath, validateEvmDerivationPath, validateOtherSubstrateDerivationPath, validateSr25519DerivationPath, validateTonDerivationPath, validateUnifiedDerivationPath } from '../validate';
+import { validateBitcoinDerivationPath, validateCardanoDerivationPath, validateEvmDerivationPath, validateOtherSubstrateDerivationPath, validateSr25519DerivationPath, validateTonDerivationPath, validateUnifiedDerivationPath } from '../validate';
+
+const bitPathLv1 = "m/{proposal}'/{slip44}'/{firstIndex}'/0/0";
+const bitPathLv2 = "m/{proposal}'/{slip44}'/{firstIndex}'/0/0/{secondIndex}";
+
+const getBitLv1DerivePathFunction = (slip44: number, proposal: number) => {
+  return bitPathLv1
+    .replace('{proposal}', proposal.toString())
+    .replace('{slip44}', slip44.toString());
+};
+
+const getBitLv2DerivePathFunction = (slip44: number, proposal: number) => {
+  return bitPathLv2
+    .replace('{proposal}', proposal.toString())
+    .replace('{slip44}', slip44.toString());
+};
+
+const level1DerivationPathMap: Partial<Record<KeypairType, string>> = {
+  ethereum: "m/44'/60'/0'/0/{firstIndex}",
+  ton: "m/44'/607'/{firstIndex}'",
+  cardano: "m/1852'/1815'/{firstIndex}'",
+  'bitcoin-44': getBitLv1DerivePathFunction(0, 44),
+  'bitcoin-84': getBitLv1DerivePathFunction(0, 84),
+  'bitcoin-86': getBitLv1DerivePathFunction(0, 86),
+  'bittest-44': getBitLv1DerivePathFunction(1, 44),
+  'bittest-84': getBitLv1DerivePathFunction(1, 84),
+  'bittest-86': getBitLv1DerivePathFunction(1, 86)
+};
+
+const level2DerivationPathMap: Partial<Record<KeypairType, string>> = {
+  ethereum: "m/44'/60'/0'/0/{firstIndex}/{secondIndex}",
+  ton: "m/44'/607'/{firstIndex}'/{secondIndex}'",
+  cardano: "m/1852'/1815'/{firstIndex}'/{secondIndex}'",
+  'bitcoin-44': getBitLv2DerivePathFunction(0, 44),
+  'bitcoin-84': getBitLv2DerivePathFunction(0, 84),
+  'bitcoin-86': getBitLv2DerivePathFunction(0, 86),
+  'bittest-44': getBitLv2DerivePathFunction(1, 44),
+  'bittest-84': getBitLv2DerivePathFunction(1, 84),
+  'bittest-86': getBitLv2DerivePathFunction(1, 86)
+};
 
 export const parseUnifiedSuriToDerivationPath = (suri: string, type: KeypairType): string => {
   const reg = /^\/\/(\d+)(\/\/\d+)?$/;
 
   if (suri.match(reg)) {
     const [, firstIndex, secondData] = suri.match(reg) as string[];
-    const first = parseInt(firstIndex, 10);
 
     if (secondData) {
       const [, secondIndex] = secondData.match(/\/\/(\d+)/) as string[];
 
-      if (type === 'ethereum') {
-        return `m/44'/60'/0'/0/${first}/${secondIndex}`;
-      } else if (type === 'ton') {
-        return `m/44'/607'/${first}'/${secondIndex}'`;
-      } else if (type === 'cardano') {
-        return `m/1852'/1815'/${first}'/${secondIndex}'`;
+      const path = level2DerivationPathMap[type];
+
+      if (path) {
+        return path.replace('{firstIndex}', firstIndex).replace('{secondIndex}', secondIndex);
       }
     } else {
-      if (type === 'ethereum') {
-        return `m/44'/60'/0'/0/${first}`;
-      } else if (type === 'ton') {
-        return `m/44'/607'/${first}'`;
-      } else if (type === 'cardano') {
-        return `m/1852'/1815'/${first}'`;
+      const path = level1DerivationPathMap[type];
+
+      if (path) {
+        return path.replace('{firstIndex}', firstIndex);
       }
     }
 
@@ -46,19 +80,42 @@ export const parseUnifiedSuriToDerivationPath = (suri: string, type: KeypairType
   return '';
 };
 
+const validateNonSubstrateDerivationPath = (derivePath: string, type: KeypairType): IDerivePathInfo_ | undefined => {
+  let validateTypeRs: IDerivePathInfo_ | undefined;
+
+  switch (type) {
+    case 'ethereum':
+      validateTypeRs = validateEvmDerivationPath(derivePath);
+      break;
+    case 'ton':
+      validateTypeRs = validateTonDerivationPath(derivePath);
+      break;
+    case 'cardano':
+      validateTypeRs = validateCardanoDerivationPath(derivePath);
+      break;
+    case 'bitcoin-44':
+    case 'bitcoin-84':
+    case 'bitcoin-86':
+    case 'bittest-44':
+    case 'bittest-84':
+    case 'bittest-86':
+      validateTypeRs = validateBitcoinDerivationPath(derivePath);
+      break;
+  }
+
+  if (validateTypeRs && validateTypeRs.type === type) {
+    return validateTypeRs;
+  } else {
+    return undefined;
+  }
+};
+
 export const getSoloDerivationInfo = (type: KeypairType, metadata: AccountDeriveData = {}): DeriveInfo => {
   const { derivationPath: derivePath, parentAddress, suri } = metadata;
 
   if (suri) {
     if (derivePath) {
-      const validateTypeFunc = type === 'ethereum'
-        ? validateEvmDerivationPath
-        : type === 'ton'
-          ? validateTonDerivationPath
-          : type === 'cardano'
-            ? validateCardanoDerivationPath
-            : () => undefined;
-      const validateTypeRs = validateTypeFunc(derivePath);
+      const validateTypeRs = validateNonSubstrateDerivationPath(derivePath, type);
 
       if (validateTypeRs) {
         return {
@@ -116,14 +173,7 @@ export const getSoloDerivationInfo = (type: KeypairType, metadata: AccountDerive
     }
   } else {
     if (derivePath) {
-      const validateTypeFunc = type === 'ethereum'
-        ? validateEvmDerivationPath
-        : type === 'ton'
-          ? validateTonDerivationPath
-          : type === 'cardano'
-            ? validateCardanoDerivationPath
-            : () => undefined;
-      const validateTypeRs = validateTypeFunc(derivePath);
+      const validateTypeRs = validateNonSubstrateDerivationPath(derivePath, type);
 
       if (validateTypeRs) {
         return {
@@ -251,6 +301,7 @@ export const derivePair = (parentPair: KeyringPair, name: string, suri: string, 
   const isEvm = EthereumKeypairTypes.includes(parentPair.type);
   const isTon = parentPair.type === 'ton';
   const isCardano = parentPair.type === 'cardano';
+  const isBitcoin = BitcoinKeypairTypes.includes(parentPair.type);
 
   const meta = {
     name,
@@ -264,8 +315,14 @@ export const derivePair = (parentPair: KeyringPair, name: string, suri: string, 
     meta.tonContractVersion = parentPair.ton.contractVersion;
   }
 
-  if (derivationPath && (isEvm || isTon || isCardano)) {
-    return isEvm ? parentPair.evm.deriveCustom(derivationPath, meta) : isTon ? parentPair.ton.deriveCustom(derivationPath, meta) : parentPair.cardano.deriveCustom(derivationPath, meta);
+  if (derivationPath && (isEvm || isTon || isCardano || isBitcoin)) {
+    return isEvm
+      ? parentPair.evm.deriveCustom(derivationPath, meta)
+      : isTon
+        ? parentPair.ton.deriveCustom(derivationPath, meta)
+        : isCardano
+          ? parentPair.cardano.deriveCustom(derivationPath, meta)
+          : parentPair.bitcoin.deriveCustom(derivationPath, meta);
   } else {
     return parentPair.substrate.derive(suri, meta);
   }

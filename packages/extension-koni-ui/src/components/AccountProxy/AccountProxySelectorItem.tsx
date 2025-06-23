@@ -161,6 +161,10 @@ function Component (props: Props): React.ReactElement<Props> {
                   <div className={'__derive-account-path'}>
                     {accountProxy.suri || ''}
                   </div>
+                  <AccountChainTypeLogos
+                    chainTypes={accountProxy.chainTypes}
+                    className={'__item-chain-type-logos'}
+                  />
                 </div>
               )
               : (
@@ -343,13 +347,17 @@ const AccountProxySelectorItem = styled(Component)<Props>(({ theme }) => {
 
     '.__item-derived-path': {
       display: 'flex',
-      gap: token.sizeXS - 2,
+      gap: 4,
       alignItems: 'center',
 
       '.__derive-account-path': {
         fontSize: token.fontSizeSM,
         color: token.colorTextLight4,
-        lineHeight: token.lineHeightSM
+        lineHeight: token.lineHeightSM,
+        maxWidth: 103,
+        overflow: 'hidden',
+        'white-space': 'nowrap',
+        textOverflow: 'ellipsis'
       }
     },
 
