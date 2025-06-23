@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 1.3.42
+Build date: Jun 23, 2025.
+
+Features & Update:
+- Support Bitcoin account (#4168)
+  - Support Bitcoin for new unified account (#4200)
+  - Migrate unifed account to support Bitcoin (#4201)
+  - Support watch-only account for Bitcoin (#4228)
+  - Support bitcoin derivation with unified account (#4261)
+  - Support import/export Bitcoin account (#4262)
+  - Improvements unified account after Bitcoin supported (#4094)
+  - Review address/chain/token handling for Bitcoin support (#4297)
+  - Improve UI after Bitcoin integration (#4316)
+- Update logic fetching Bitcoin balance (#4162)
+- Support transfer for Bitcoin (#4263)
+- Optimize Request Handling in SendFund Form (#4434)
+- Optimize Lifecycle Management - P1 (#4428)
+- Update chain-list stable v0.2.106 (#4410)
+
+Bug fixed:
+- Fixed some UI bugs after Bitcoin integration (#4412, #4425)
+
+
 ## 1.3.41
 Build date: Jun 11, 2025.
 
