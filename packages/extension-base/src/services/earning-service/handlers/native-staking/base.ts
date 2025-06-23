@@ -61,6 +61,12 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
           break;
         }
 
+        const positionInfo = await this.getPoolPosition(address);
+
+        if (!positionInfo || positionInfo.totalStake === '0') {
+          continue;
+        }
+
         this.state.subscanService.getRewardHistoryList(requestGroupId, this.chain, address)
           .then((rs) => {
             const items = rs?.list;
