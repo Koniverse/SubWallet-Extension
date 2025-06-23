@@ -197,6 +197,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
   async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, delegatorState: PalletParachainStakingDelegator): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const nominationList: NominationInfo[] = [];
     const unstakingMap: Record<string, UnstakingInfo> = {};
+    const substrateIdentityApi = this.substrateIdentityApi;
 
     let bnTotalActiveStake = BN_ZERO;
     let bnTotalStake = BN_ZERO;
@@ -209,7 +210,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     await Promise.all(delegatorState.delegations.map(async (delegation) => {
       const [_delegationScheduledRequests, [identity], _collatorInfo, _currentBlock, _currentTimestamp] = await Promise.all([
         substrateApi.api.query.parachainStaking.delegationScheduledRequests(delegation.owner),
-        parseIdentity(substrateApi, delegation.owner),
+        parseIdentity(substrateIdentityApi, delegation.owner),
         substrateApi.api.query.parachainStaking.candidateInfo(delegation.owner),
         substrateApi.api.query.system.number(),
         substrateApi.api.query.timestamp.now()
@@ -363,6 +364,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
   /* Get pool targets */
   async getMantaPoolTargets (): Promise<ValidatorInfo[]> {
     const apiProps = await this.substrateApi.isReady;
+    const substrateIdentityApi = this.substrateIdentityApi;
     const allCollators: ValidatorInfo[] = [];
 
     const DECIMAL = this.chainInfo.substrateInfo?.decimals as number;
@@ -443,7 +445,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     await Promise.all(allCollators.map(async (collator) => {
       const [_info, [identity, isReasonable]] = await Promise.all([
         apiProps.api.query.parachainStaking.candidateInfo(collator.address),
-        parseIdentity(apiProps, collator.address)
+        parseIdentity(substrateIdentityApi, collator.address)
       ]);
 
       const rawInfo = _info.toHuman() as Record<string, any>;
@@ -470,6 +472,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
 
   async getParachainPoolTargets (): Promise<ValidatorInfo[]> {
     const apiProps = await this.substrateApi.isReady;
+    const substrateIdentityApi = this.substrateIdentityApi;
     const allCollators: ValidatorInfo[] = [];
 
     const [_allCollators, _collatorCommission, _selectedCandidates] = await Promise.all([
@@ -517,7 +520,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     await Promise.all(allCollators.map(async (collator) => {
       const [_info, [identity, isReasonable]] = await Promise.all([
         apiProps.api.query.parachainStaking.candidateInfo(collator.address),
-        parseIdentity(apiProps, collator.address)
+        parseIdentity(substrateIdentityApi, collator.address)
       ]);
 
       const rawInfo = _info.toHuman() as Record<string, any>;

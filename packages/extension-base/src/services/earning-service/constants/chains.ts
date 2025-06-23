@@ -30,3 +30,8 @@ export const MANTA_VALIDATOR_POINTS_PER_BLOCK = 20;
 export const MANTA_MIN_DELEGATION = 500;
 
 export const CHANNEL_ID = 7;
+
+export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
+  polkadot: 'polkadot_people',
+  kusama: 'peopleKusama'
+};
