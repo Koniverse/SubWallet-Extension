@@ -12,4 +12,5 @@ export interface ApiRequestStrategyV2 {
 
 export interface ApiRequestV2<T> extends ApiRequest<T> {
   groupId: number;
+  cacheKey?: string;
 }

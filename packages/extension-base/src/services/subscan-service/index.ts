@@ -6,6 +6,7 @@ import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/ap
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
 import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
+import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
 import { wait } from '@subwallet/extension-base/utils';
@@ -18,7 +19,7 @@ interface SubscanError {
 }
 
 export class SubscanService extends BaseApiRequestStrategyV2 {
-  constructor (private subscanChainMap: Record<string, string>, options?: {limitRate?: number, intervalCheck?: number, maxRetry?: number}) {
+  constructor (private subscanChainMap: Record<string, string>, options?: Partial<ApiRequestContextProps>) {
     const context = new BaseApiRequestContext(options);
 
     super(context);
@@ -274,6 +275,8 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
   }
 
   public getRewardHistoryList (groupId: number, chain: string, address: string, page = 0): Promise<RewardHistoryListResponse> {
+    const hashKey = this.createKeyHash([chain, 'reward_slash', address, page]);
+
     return this.addRequest<RewardHistoryListResponse>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/account/reward_slash'), {
         page,
@@ -294,7 +297,7 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       }
 
       return jsonData.data;
-    }, 2, groupId);
+    }, 2, groupId, hashKey);
   }
 
   public getAccountRemarkEvents (groupId: number, chain: string, address: string): Promise<SubscanEventBaseItemData[]> {

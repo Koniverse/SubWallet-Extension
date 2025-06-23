@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
+import { BASE_MINUTE_INTERVAL } from '@subwallet/extension-base/constants';
+import { Md5 } from 'ts-md5';
 
 import { ApiRequestContext } from '../api-request-strategy/types';
 import { ApiRequestStrategyV2, ApiRequestV2 } from './types';
@@ -14,6 +16,7 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
   private context: ApiRequestContext;
   private processInterval: NodeJS.Timeout | undefined = undefined;
   private canceledGroupIds: Set<number> = new Set();
+  private cacheMap: Map<string, unknown> = new Map<string, unknown>();
 
   private getId () {
     return this.nextId++;
@@ -27,7 +30,11 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
     return this.groupId++;
   }
 
-  addRequest<T> (run: ApiRequestV2<T>['run'], ordinal: number, _groupId?: number) {
+  public createKeyHash (keys: Array<string | number>): string {
+    return Md5.hashStr(JSON.stringify([this.constructor.name, ...keys]));
+  }
+
+  addRequest<T> (run: ApiRequestV2<T>['run'], ordinal: number, _groupId?: number, keyHash?: string) {
     const newId = this.getId();
     const groupId = _groupId ?? this.getGroupId();
 
@@ -37,14 +44,15 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
 
     return new Promise<T>((resolve, reject) => {
       this.requestMap[newId] = {
-        id: newId,
+        cacheKey: keyHash,
         groupId,
-        status: 'pending',
-        retry: -1,
+        id: newId,
         ordinal,
-        run,
+        reject,
         resolve,
-        reject
+        retry: -1,
+        run,
+        status: 'pending'
       };
 
       if (!this.isRunning) {
@@ -83,8 +91,33 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
       // Start requests
       requests.forEach((request) => {
         request.status = 'running';
+
+        if (request.cacheKey) {
+          if (this.cacheMap.has(request.cacheKey)) {
+            const resp = this.cacheMap.get(request.cacheKey);
+
+            request.resolve(resp);
+
+            console.log('[ApiRequestStrategyV2] Cache hit for request', request.id, 'with cache key', request.cacheKey);
+
+            delete this.requestMap[request.id];
+
+            return;
+          }
+        }
+
         request.run().then((rs) => {
           request.resolve(rs);
+
+          if (request.cacheKey) {
+            this.cacheMap.set(request.cacheKey, rs);
+
+            setTimeout(() => {
+              if (request.cacheKey) {
+                this.cacheMap.delete(request.cacheKey);
+              }
+            }, BASE_MINUTE_INTERVAL);
+          }
 
           delete this.requestMap[request.id];
         }).catch((e: Error) => {
