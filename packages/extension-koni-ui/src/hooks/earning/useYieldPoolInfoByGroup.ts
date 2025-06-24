@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { YieldPoolInfo } from '@subwallet/extension-base/types';
-import { useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useMemo } from 'react';
 
 const useYieldPoolInfoByGroup = (group: string): YieldPoolInfo[] => {
   const { poolInfoMap } = useSelector((state) => state.earning);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const chainsByAccountType = useGetChainSlugsByCurrentAccountProxy();
 
   return useMemo(() => {
     const result: YieldPoolInfo[] = [];

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionType, ValidateRecipientParams, ValidationCondition } from '@subwallet/extension-base/core/types';
-import { _isAddress, _isNotDuplicateAddress, _isNotNull, _isSupportLedgerAccount, _isValidAddressForEcosystem, _isValidCardanoAddressFormat, _isValidSubstrateAddressFormat, _isValidTonAddressFormat } from '@subwallet/extension-base/core/utils';
+import { _isAddress, _isNotDuplicateAddress, _isNotNull, _isSupportLedgerAccount, _isValidAddressForEcosystem, _isValidBitcoinAddressFormat, _isValidCardanoAddressFormat, _isValidSubstrateAddressFormat, _isValidTonAddressFormat } from '@subwallet/extension-base/core/utils';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 
 function getConditions (validateRecipientParams: ValidateRecipientParams): ValidationCondition[] {
   const { account, actionType, autoFormatValue, destChainInfo, srcChain, toAddress } = validateRecipientParams;
@@ -27,6 +28,10 @@ function getConditions (validateRecipientParams: ValidateRecipientParams): Valid
 
   if (isCardanoAddress(toAddress)) {
     conditions.push(ValidationCondition.IS_VALID_CARDANO_ADDRESS_FORMAT);
+  }
+
+  if (isBitcoinAddress(toAddress)) {
+    conditions.push(ValidationCondition.IS_VALID_BITCOIN_ADDRESS_FORMAT);
   }
 
   if (srcChain === destChainInfo.slug && isSendAction && !destChainInfo.tonInfo && !destChainInfo.cardanoInfo) {
@@ -81,6 +86,12 @@ function getValidationFunctions (conditions: ValidationCondition[]): Array<(vali
 
       case ValidationCondition.IS_VALID_CARDANO_ADDRESS_FORMAT: {
         validationFunctions.push(_isValidCardanoAddressFormat);
+
+        break;
+      }
+
+      case ValidationCondition.IS_VALID_BITCOIN_ADDRESS_FORMAT: {
+        validationFunctions.push(_isValidBitcoinAddressFormat);
 
         break;
       }
