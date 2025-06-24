@@ -22,6 +22,15 @@ type ListItemGroupLabel = {
 
 type ListItem = AccountAddressItemType | ListItemGroupLabel;
 
+type GroupedItems = {
+  master: AccountAddressItemType[];
+  qrSigner: AccountAddressItemType[];
+  watchOnly: AccountAddressItemType[];
+  ledger: AccountAddressItemType[];
+  injected: AccountAddressItemType[];
+  unknown: AccountAddressItemType[];
+};
+
 interface Props extends ThemeProps {
   modalId: string;
   onSelectItem?: (item: AccountAddressItemType) => void,
@@ -50,7 +59,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     const lowerCaseSearchText = searchText.toLowerCase();
 
     return item.accountName.toLowerCase().includes(lowerCaseSearchText) ||
-      item.address.toLowerCase().includes(lowerCaseSearchText);
+      (item.displayAddress || item.address).toLowerCase().includes(lowerCaseSearchText);
   }, []);
 
   const onSelect = useCallback((item: AccountAddressItemType) => {
@@ -71,9 +80,13 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       );
     }
 
+    // NOTE:
+    // displayAddress is only for visual representation.
+    // The original address should always be used for identification, selection, comparison, and any logic-related operations.
+
     return (
       <AddressSelectorItem
-        address={(item as AccountAddressItemType).address}
+        address={(item as AccountAddressItemType).displayAddress || (item as AccountAddressItemType).address}
         avatarValue={(item as AccountAddressItemType).accountProxyId}
         className={'account-selector-item'}
         isSelected={selectedValue === (item as AccountAddressItemType).address}
@@ -84,101 +97,85 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     );
   }, [onSelect, selectedValue]);
 
-  const listItems = useMemo<ListItem[]>(() => {
-    const result: ListItem[] = [];
-    const masterAccounts: AccountAddressItemType[] = [];
-    const qrSignerAccounts: ListItem[] = [];
-    const watchOnlyAccounts: ListItem[] = [];
-    const ledgerAccounts: ListItem[] = [];
-    const injectedAccounts: ListItem[] = [];
-    const unknownAccounts: ListItem[] = [];
+  const sortedItems = useMemo<AccountAddressItemType[]>(() => {
+    return [...items].sort((a, b) => {
+      const _isABitcoin = isBitcoinAddress(a.address);
+      const _isBBitcoin = isBitcoinAddress(b.address);
+      const _isSameProxyId = a.accountProxyId === b.accountProxyId;
 
-    items.forEach((item) => {
-      if (searchValue && !searchFunction(item, searchValue)) {
-        return;
-      }
+      if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
+        const aDetails = getBitcoinAccountDetails(a.accountType);
+        const bDetails = getBitcoinAccountDetails(b.accountType);
 
-      if (item.accountProxyType === AccountProxyType.SOLO || item.accountProxyType === AccountProxyType.UNIFIED) {
-        masterAccounts.push(item);
-      } else if (item.accountProxyType === AccountProxyType.QR) {
-        qrSignerAccounts.push(item);
-      } else if (item.accountProxyType === AccountProxyType.READ_ONLY) {
-        watchOnlyAccounts.push(item);
-      } else if (item.accountProxyType === AccountProxyType.LEDGER) {
-        ledgerAccounts.push(item);
-      } else if (item.accountProxyType === AccountProxyType.INJECTED) {
-        injectedAccounts.push(item);
-      } else if (item.accountProxyType === AccountProxyType.UNKNOWN) {
-        unknownAccounts.push(item);
-      }
-    });
-
-    if (masterAccounts.length) {
-      result.push(...masterAccounts);
-    }
-
-    if (qrSignerAccounts.length) {
-      qrSignerAccounts.unshift({
-        id: 'qr',
-        groupLabel: t('QR signer account')
-      });
-
-      result.push(...qrSignerAccounts);
-    }
-
-    if (watchOnlyAccounts.length) {
-      watchOnlyAccounts.unshift({
-        id: 'watch-only',
-        groupLabel: t('Watch-only account')
-      });
-
-      result.push(...watchOnlyAccounts);
-    }
-
-    if (ledgerAccounts.length) {
-      ledgerAccounts.unshift({
-        id: 'ledger',
-        groupLabel: t('Ledger account')
-      });
-
-      result.push(...ledgerAccounts);
-    }
-
-    if (injectedAccounts.length) {
-      injectedAccounts.unshift({
-        id: 'injected',
-        groupLabel: t('Injected account')
-      });
-
-      result.push(...ledgerAccounts);
-    }
-
-    if (unknownAccounts.length) {
-      unknownAccounts.unshift({
-        id: 'unknown',
-        groupLabel: t('Unknown account')
-      });
-
-      result.push(...unknownAccounts);
-    }
-
-    return result.sort((a: ListItem, b: ListItem) => {
-      if (isAccountAddressItem(a) && isAccountAddressItem(b)) {
-        const _isABitcoin = isBitcoinAddress(a.address);
-        const _isBBitcoin = isBitcoinAddress(b.address);
-        const _isSameProxyId = a.accountProxyId === b.accountProxyId;
-
-        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
-          const aDetails = getBitcoinAccountDetails(a.accountType);
-          const bDetails = getBitcoinAccountDetails(b.accountType);
-
-          return aDetails.order - bDetails.order;
-        }
+        return aDetails.order - bDetails.order;
       }
 
       return 0;
     });
-  }, [items, searchFunction, searchValue, t]);
+  }, [items]);
+
+  const groupedItemMap = useMemo<GroupedItems>(() => {
+    const result: GroupedItems = {
+      master: [],
+      qrSigner: [],
+      watchOnly: [],
+      ledger: [],
+      injected: [],
+      unknown: []
+    };
+
+    sortedItems.forEach((item) => {
+      switch (item.accountProxyType) {
+        case AccountProxyType.SOLO:
+        case AccountProxyType.UNIFIED:
+          result.master.push(item);
+          break;
+        case AccountProxyType.QR:
+          result.qrSigner.push(item);
+          break;
+        case AccountProxyType.READ_ONLY:
+          result.watchOnly.push(item);
+          break;
+        case AccountProxyType.LEDGER:
+          result.ledger.push(item);
+          break;
+        case AccountProxyType.INJECTED:
+          result.injected.push(item);
+          break;
+        default:
+          result.unknown.push(item);
+      }
+    });
+
+    return result;
+  }, [sortedItems]);
+
+  const listItems = useMemo<ListItem[]>(() => {
+    const result: ListItem[] = [];
+
+    const addGroup = (group: AccountAddressItemType[], label?: string, id?: string) => {
+      const filtered = group.filter((item) =>
+        !searchValue || searchFunction(item, searchValue)
+      );
+
+      if (filtered.length) {
+        if (label && id) {
+          result.push({ id, groupLabel: t(label) });
+        }
+
+        result.push(...filtered);
+      }
+    };
+
+    addGroup(groupedItemMap.master);
+    addGroup(groupedItemMap.qrSigner, 'QR signer account', 'qr');
+    addGroup(groupedItemMap.watchOnly, 'Watch-only account', 'watch-only');
+    addGroup(groupedItemMap.ledger, 'Ledger account', 'ledger');
+    addGroup(groupedItemMap.injected, 'Injected account', 'injected');
+    addGroup(groupedItemMap.unknown, 'Unknown account', 'unknown');
+
+    return result;
+  }, [groupedItemMap, searchFunction, searchValue, t]);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -194,11 +191,20 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
 
   useEffect(() => {
     const doFunction = () => {
-      if (!listItems.length) {
+      const _items = [
+        ...groupedItemMap.master,
+        ...groupedItemMap.qrSigner,
+        ...groupedItemMap.watchOnly,
+        ...groupedItemMap.ledger,
+        ...groupedItemMap.injected,
+        ...groupedItemMap.unknown
+      ];
+
+      if (!_items.length) {
         return;
       }
 
-      const firstItem = listItems.find((i) => isAccountAddressItem(i)) as AccountAddressItemType | undefined;
+      const firstItem = _items[0];
 
       if (!firstItem) {
         return;
@@ -210,7 +216,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         return;
       }
 
-      if (!listItems.some((i) => isAccountAddressItem(i) && i.address === selectedValue)) {
+      if (!_items.some((i) => isAccountAddressItem(i) && i.address === selectedValue)) {
         onSelectItem?.(firstItem);
       }
     };
@@ -218,7 +224,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     if (autoSelectFirstItem) {
       doFunction();
     }
-  }, [autoSelectFirstItem, listItems, onSelectItem, selectedValue]);
+  }, [autoSelectFirstItem, groupedItemMap, onSelectItem, selectedValue]);
 
   return (
     <SwModal
