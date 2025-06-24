@@ -57,6 +57,9 @@ interface Validator {
   validator_stake: string;
   take: string;
   root_stake: string;
+  global_weighted_stake: string;
+  weighted_root_stake: string;
+  global_alpha_stake_as_tao: string;
 }
 
 interface ValidatorAprResponse {
@@ -547,18 +550,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const results = await Promise.all(
       validatorList.map((validator) => {
         const address = validator.hotkey.ss58;
-        const bnTotalStake = new BigN(validator.root_stake);
-        const bnValidatorReward = new BigN(validator.validator_return_per_day);
-        const bnNominatorReward = new BigN(validator.nominator_return_per_day);
-        const bnTotalReward = bnValidatorReward.plus(bnNominatorReward);
-
-        let bnOwnStake = new BigN(0);
-        let otherStake = new BigN(0);
-
-        if (!bnTotalReward.eq(0)) {
-          bnOwnStake = bnTotalStake.multipliedBy(bnValidatorReward.dividedBy(bnTotalReward));
-          otherStake = bnTotalStake.minus(bnOwnStake);
-        }
+        // With bittensor we use total weight, root weight and alpha staked insted of total stake, own stake and other stake
+        const bnTotalWeightStake = new BigN(validator.global_weighted_stake);
+        const bnRootWeightStake = new BigN(validator.weighted_root_stake);
+        const bnAlphaStake = new BigN(validator.global_alpha_stake_as_tao);
 
         const nominatorCount = validator.global_nominators;
         const commission = validator.take;
@@ -571,9 +566,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         return {
           address: address,
-          totalStake: bnTotalStake.toString(),
-          ownStake: bnOwnStake.toString(),
-          otherStake: otherStake.toString(),
+          totalStake: bnTotalWeightStake.toString(),
+          ownStake: bnRootWeightStake.toString(),
+          otherStake: bnAlphaStake.toString(),
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
