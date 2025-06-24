@@ -67,6 +67,7 @@ export const SWAP_MORE_BALANCE_MODAL = 'swap-more-balance-modal';
 export const SWAP_CHOOSE_FEE_TOKEN_MODAL = 'swap-choose-fee-token-modal';
 export const SWAP_TERMS_OF_SERVICE_MODAL = 'swap-terms-of-service-modal';
 export const SWAP_IDLE_WARNING_MODAL = 'swap-idle-warning-modal';
+export const SWAP_FEES_MODAL = 'swap-fees-modal';
 /* Swap */
 
 /* Announcement */
@@ -87,3 +88,9 @@ export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
 export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
+
+/* Other */
+export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
+export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';
+/* Other */

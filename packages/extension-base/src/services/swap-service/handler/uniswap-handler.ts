@@ -4,23 +4,24 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateTypedSignMessageDataV3V4 } from '@subwallet/extension-base/core/logic-validation';
-import { DynamicSwapType } from '@subwallet/extension-base/services/swap-service/interface';
+import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
+import { createAcrossBridgeExtrinsic, CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
-import { ApproveStepMetadata, BaseStepDetail, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, FeeOptionKey, HandleYieldStepData, OptimalSwapPathParams, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ApproveStepMetadata, BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, FeeOptionKey, GenSwapStepFuncV2, HandleYieldStepData, OptimalSwapPathParamsV2, PermitSwapData, SwapBaseTxData, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { _reformatAddressWithChain, fetchFromProxyService } from '@subwallet/extension-base/utils';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
-import { _getContractAddressOfToken, _isNativeToken } from '../../chain-service/utils';
+import { _getAssetOriginChain, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _isNativeToken } from '../../chain-service/utils';
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
-
-const API_URL = 'https://trade-api.gateway.uniswap.org/v1';
-const headers = {
-  'x-api-key': process.env.UNISWAP_API_KEY || ''
-};
 
 export type PermitData = {
   domain: Record<string, unknown>;
@@ -28,25 +29,71 @@ export type PermitData = {
   values: unknown;
 };
 
-interface UniswapMetadata {
+export interface UniswapMetadata {
   permitData: PermitData;
   quote: UniswapQuote;
   routing: string;
 }
 
-interface UniswapQuote {
-  chainId: number;
+type UniswapQuote = UniswapClassicQuote | UniswapDutchQuote;
+
+interface UniswapClassicQuote {
+  swapper: string
+  chainId: number
   input: {
-    amount: string;
-    token: string;
-  };
+    amount: string
+    token: string
+  }
   output: {
-    amount: string;
-    token: string;
-  };
+    amount: string
+    token: string
+  }
 }
+
+interface UniswapDutchQuote {
+  orderInfo: {
+    swapper: string
+    chainId: number
+    input: UniswapDutchInput,
+    outputs: UniswapDutchOutput[]
+  },
+  orderId: string
+}
+
+interface UniswapDutchInput {
+  startAmount: string
+  endAmount: string
+  token: string
+}
+
+interface UniswapDutchOutput {
+  startAmount: string
+  endAmount: string
+  token: string,
+  recipient: string
+}
+
+export interface UniswapOrders {
+  orders: UniswapOrderInfo[]
+}
+
+export interface UniswapOrderInfo {
+  orderStatus: 'open' | 'expired' | 'error' | 'cancelled' | 'filled' | 'unverified' | 'insufficient-funds',
+  orderId: string,
+  swapper: string,
+  txHash: string
+}
+
 interface SwapResponse {
   swap: TransactionConfig
+}
+
+interface CheckApprovalRequest {
+  address: string,
+  amount: string,
+  // only one in two quote is provided.
+  dutchQuote?: UniswapDutchQuote,
+  classicQuote?: UniswapClassicQuote
 }
 
 interface CheckApprovalResponse {
@@ -60,27 +107,51 @@ interface CheckApprovalResponse {
   cancel: any;
 }
 
-async function fetchCheckApproval (walletAddress: string, fromAmount: string, quote: UniswapQuote): Promise<CheckApprovalResponse> {
-  const chainId = quote.chainId;
-  const response = await fetch(`${API_URL}/check_approval`, {
+async function fetchCheckApproval (request: CheckApprovalRequest): Promise<CheckApprovalResponse | undefined> {
+  const { address, amount, classicQuote, dutchQuote } = request;
+
+  let chainId;
+  let tokenIn;
+  let tokenOut;
+
+  if (classicQuote) {
+    chainId = classicQuote.chainId;
+    tokenIn = classicQuote.input.token;
+    tokenOut = classicQuote.output.token;
+  } else if (dutchQuote) {
+    /**
+     *  In Dutch order swap, the outputs field is an array instead of a single output since it might contain filler's output to pay fee.
+     *  Need to filter exactly output that come to recipient address.
+     */
+    const output = dutchQuote.orderInfo.outputs.find((output) =>
+      output.recipient.toLowerCase() === address.toLowerCase()
+    );
+
+    if (!output) {
+      return undefined; // todo: recheck
+    }
+
+    chainId = dutchQuote.orderInfo.chainId;
+    tokenIn = dutchQuote.orderInfo.input.token;
+    tokenOut = output.token;
+  } else {
+    return undefined;
+  }
+
+  const response = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/check_approval', {
     method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      walletAddress,
-      amount: BigNumber(fromAmount).multipliedBy(2).toString(),
-      token: quote.input.token,
+      walletAddress: address,
+      amount: BigNumber(amount).multipliedBy(2).toFixed(0),
+      token: tokenIn,
       chainId: chainId,
-      tokenOut: quote.output.token,
-      tokenOutChainId: chainId
+      tokenOut: tokenOut,
+      tokenOutChainId: chainId // swap in-chain
     })
   });
 
-  const data = await response.json() as CheckApprovalResponse;
-
-  return data;
+  return await response.json() as CheckApprovalResponse;
 }
 
 export class UniswapHandler implements SwapBaseInterface {
@@ -117,63 +188,249 @@ export class UniswapHandler implements SwapBaseInterface {
     return this.swapBaseHandler.providerInfo;
   }
 
-  generateOptimalProcess (params: OptimalSwapPathParams): Promise<CommonOptimalSwapPath> {
-    return this.swapBaseHandler.generateOptimalProcess(params, [
-      this.getApprovalStep.bind(this),
-      this.getPermitStep.bind(this),
-      this.getSubmitStep.bind(this)
-    ]);
-  }
-
   generateOptimalProcessV2 (params: OptimalSwapPathParamsV2): Promise<CommonOptimalSwapPath> {
-    return this.swapBaseHandler.generateOptimalProcessV2(params, [
-      this.getApprovalStep.bind(this),
-      this.getPermitStep.bind(this),
-      this.getSubmitStep.bind(this)
-    ]);
+    const stepFuncList: GenSwapStepFuncV2[] = [];
+    /**
+     * approve - permit - swap or
+     * approve - permit - swap - approve - bridge or
+     * approve - bridge - approve - permit - swap
+     */
+
+    params.path.forEach((step) => {
+      if (step.action === DynamicSwapType.SWAP) {
+        stepFuncList.push(...[
+          this.getApprovalStep.bind(this),
+          this.getPermitStep.bind(this),
+          this.getSubmitStep.bind(this)
+        ]);
+
+        return;
+      }
+
+      if (step.action === DynamicSwapType.BRIDGE) {
+        stepFuncList.push(...[
+          this.getApprovalStep.bind(this),
+          this.getBridgeStep.bind(this)
+        ]);
+
+        return;
+      }
+
+      throw new Error(`Error generating optimal process: Action ${step.action as string} is not supported`);
+    });
+
+    return this.swapBaseHandler.generateOptimalProcessV2(params, stepFuncList);
   }
 
-  async getApprovalStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (params.selectedQuote) {
-      const walletAddress = params.request.address;
-      const fromAmount = params.selectedQuote.fromAmount;
-      const inputTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
-      const { quote } = params.selectedQuote.metadata as UniswapMetadata;
+  async getApprovalStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    /**
+     * Explain: All processes will go through one of below processes. If a step do not have, it returns undefined and
+     * the stepIndex is still counted up
+     *
+     * Processes:
+     * approve - permit - swap or
+     * approve - permit - swap - approve - bridge or
+     * approve - bridge - approve - permit - swap
+     */
+    const actionList = JSON.stringify(params.path.map((step) => step.action));
+    const swap = actionList === JSON.stringify([DynamicSwapType.SWAP]);
+    const swapBridge = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const bridgeSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const isApproveBridge = (stepIndex === 3 && swapBridge) || (stepIndex === 0 && bridgeSwap);
+    const isApproveSwap = (stepIndex === 0 && swap) || (stepIndex === 0 && swapBridge) || (stepIndex === 2 && bridgeSwap);
 
-      const checkApprovalResponse = await fetchCheckApproval(walletAddress, fromAmount, quote);
-      const approval = checkApprovalResponse.approval;
+    if (isApproveSwap) {
+      return this.getApproveSwap(params);
+    }
 
-      if (approval) {
-        let spender = '';
-
-        try {
-          const valueLength = 40;
-
-          spender = approval.data.slice(-(valueLength * 2), -valueLength);
-        } catch (e) {
-          // Empty
-        }
-
-        const metadata: ApproveStepMetadata = {
-          tokenApprove: inputTokenInfo.slug,
-          contractAddress: _getContractAddressOfToken(inputTokenInfo),
-          spenderAddress: spender
-        };
-
-        const submitStep = {
-          name: 'Approve token',
-          type: CommonStepType.TOKEN_APPROVAL,
-          metadata: metadata as unknown as Record<string, unknown>
-        };
-
-        return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
-      }
+    if (isApproveBridge) {
+      return this.getApproveBridge(params, bridgeSwap);
     }
 
     return Promise.resolve(undefined);
   }
 
-  async getPermitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+  async getApproveSwap (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const selectedQuote = params.selectedQuote;
+
+    if (!selectedQuote) {
+      return Promise.resolve(undefined);
+    }
+
+    const quoteMetadata = selectedQuote.metadata as UniswapMetadata;
+
+    let sender;
+    let sendingValue;
+    let checkApprovalResponse;
+
+    if (quoteMetadata.routing === 'CLASSIC') {
+      const quote = quoteMetadata.quote as UniswapClassicQuote;
+
+      sender = quote.swapper;
+      sendingValue = quote.input.amount;
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        classicQuote: quote
+      });
+    } else if (quoteMetadata.routing === 'DUTCH_LIMIT' || quoteMetadata.routing === 'DUTCH_V2') {
+      const quote = quoteMetadata.quote as UniswapDutchQuote;
+
+      sender = quote.orderInfo.swapper;
+      sendingValue = quote.orderInfo.input.startAmount;
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        dutchQuote: quote
+      });
+    } else {
+      return undefined;
+    }
+
+    if (!checkApprovalResponse) {
+      return undefined;
+    }
+
+    const fromTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+    const fromChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(fromTokenInfo));
+    const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
+    const tokenContract = _getContractAddressOfToken(fromTokenInfo);
+
+    const approval = checkApprovalResponse.approval;
+
+    if (!approval) {
+      return Promise.resolve(undefined);
+    }
+
+    let spender = '';
+
+    try {
+      const valueLength = 40;
+
+      spender = approval.data.slice(-(valueLength * 2), -valueLength);
+    } catch (e) {
+      // Empty
+    }
+
+    const tx = await getERC20SpendingApprovalTx(spender, sender, tokenContract, evmApi);
+    const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+    const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+    const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+    const feeInfo: CommonStepFeeInfo = {
+      feeComponent: [{
+        feeType: SwapFeeType.NETWORK_FEE,
+        amount: estimatedFee,
+        tokenSlug: nativeTokenSlug
+      }],
+      defaultFeeToken: nativeTokenSlug,
+      feeOptions: [nativeTokenSlug]
+    };
+
+    const submitStep: BaseStepDetail = {
+      name: 'Approve token for swap',
+      type: CommonStepType.TOKEN_APPROVAL,
+      // @ts-ignore
+      metadata: {
+        tokenApprove: fromTokenInfo.slug,
+        contractAddress: _getContractAddressOfToken(fromTokenInfo) || approval.to,
+        spenderAddress: spender,
+        owner: sender, // todo: use approval.from?
+        amount: sendingValue,
+        isUniswapApprove: true
+      } as ApproveStepMetadata
+    };
+
+    return Promise.resolve([submitStep, feeInfo]);
+  }
+
+  async getApproveBridge (params: OptimalSwapPathParamsV2, isBridgeFirst: boolean): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const { path, request, selectedQuote } = params;
+
+    if (!selectedQuote) {
+      return Promise.resolve(undefined);
+    }
+
+    const bridgePairInfo = path.find((action) => action.action === DynamicSwapType.BRIDGE);
+
+    if (!bridgePairInfo || !bridgePairInfo.pair) {
+      return Promise.resolve(undefined);
+    }
+
+    const _sendingAmount = isBridgeFirst ? request.fromAmount : selectedQuote.toAmount;
+    const sendingAmount = BigNumber(_sendingAmount).multipliedBy(2).toFixed(0, 1); // ensure approve enough amount
+    const senderAddress = request.address;
+    const fromTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.from);
+    const fromChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(fromTokenInfo));
+    const fromChainId = _getEvmChainId(fromChainInfo);
+    const evmApi = this.chainService.getEvmApi(fromChainInfo.slug);
+    const tokenContract = _getContractAddressOfToken(fromTokenInfo);
+
+    const toTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.to);
+    const toChainInfo = this.chainService.getChainInfoByKey(_getAssetOriginChain(toTokenInfo));
+
+    if (_isNativeToken(fromTokenInfo)) {
+      return Promise.resolve(undefined);
+    }
+
+    if (!fromChainId) {
+      throw Error('Error getting Evm chain Id');
+    }
+
+    const inputData = {
+      destinationTokenInfo: toTokenInfo,
+      originTokenInfo: fromTokenInfo,
+      sendingValue: _sendingAmount,
+      sender: senderAddress,
+      recipient: senderAddress, // todo: there's a case swap - bridge to another address
+      destinationChain: toChainInfo,
+      originChain: fromChainInfo
+    } as CreateXcmExtrinsicProps;
+
+    const acrossQuote = await getAcrossQuote(
+      inputData
+    );
+
+    const spokePoolAddress = acrossQuote.to;
+
+    const allowance = await getERC20Allowance(spokePoolAddress, senderAddress, tokenContract, evmApi);
+
+    if (allowance && BigNumber(allowance).gt(sendingAmount)) {
+      return Promise.resolve(undefined);
+    }
+
+    const tx = await getERC20SpendingApprovalTx(spokePoolAddress, senderAddress, tokenContract, evmApi);
+    const evmFeeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+    const estimatedFee = await estimateTxFee(tx, evmApi, evmFeeInfo);
+
+    const nativeTokenSlug = _getChainNativeTokenSlug(fromChainInfo);
+    const feeInfo: CommonStepFeeInfo = {
+      feeComponent: [{
+        feeType: SwapFeeType.NETWORK_FEE,
+        amount: estimatedFee,
+        tokenSlug: nativeTokenSlug
+      }],
+      defaultFeeToken: nativeTokenSlug,
+      feeOptions: [nativeTokenSlug]
+    };
+
+    const submitStep: BaseStepDetail = {
+      name: 'Approve token for bridge',
+      type: CommonStepType.TOKEN_APPROVAL,
+      // @ts-ignore
+      metadata: {
+        tokenApprove: fromTokenInfo.slug,
+        contractAddress: tokenContract,
+        spenderAddress: spokePoolAddress,
+        amount: sendingAmount,
+        owner: senderAddress
+      } as ApproveStepMetadata
+    };
+
+    return Promise.resolve([submitStep, feeInfo]);
+  }
+
+  async getPermitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     if (params.selectedQuote && (params.selectedQuote.metadata as UniswapMetadata).permitData) {
       const submitStep = {
         name: 'Permit Step',
@@ -199,56 +456,178 @@ export class UniswapHandler implements SwapBaseInterface {
     return Promise.resolve(undefined);
   }
 
-  async getSubmitStep (params: OptimalSwapPathParams): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    if (params.selectedQuote) {
-      const submitStep: BaseStepDetail = {
-        name: 'Swap',
-        type: SwapStepType.SWAP,
-        metadata: {
-          sendingValue: params.request.fromAmount.toString(),
-          originTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.from),
-          destinationTokenInfo: this.chainService.getAssetBySlug(params.selectedQuote.pair.to)
-        }
-      };
+  async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const { path, request, selectedQuote } = params;
 
-      return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    // stepIndex is not corresponding index in path, because uniswap include approval and permit step
+    const stepData = path.find((action) => action.action === DynamicSwapType.SWAP);
+
+    if (!stepData || !stepData.pair) {
+      return Promise.resolve(undefined);
     }
 
-    return Promise.resolve(undefined);
+    if (!selectedQuote) {
+      return Promise.resolve(undefined);
+    }
+
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const swapXcm = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const sendingValue = swapXcm ? BigNumber(request.fromAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1) : request.fromAmount;
+    const expectedReceive = swapXcm ? BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1) : selectedQuote.toAmount;
+
+    const originTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(selectedQuote.pair.to);
+    const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
+    const submitStep: BaseStepDetail = {
+      name: 'Swap',
+      type: SwapStepType.SWAP,
+      // @ts-ignore
+      metadata: {
+        sendingValue,
+        expectedReceive,
+        originTokenInfo,
+        destinationTokenInfo,
+        sender: _reformatAddressWithChain(request.address, originChain),
+        receiver: _reformatAddressWithChain(request.recipient || request.address, destinationChain),
+        version: 2
+      } as unknown as BaseSwapStepMetadata
+    };
+
+    return Promise.resolve([submitStep, selectedQuote.feeInfo]);
   }
 
-  public async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
-    const amount = params.selectedQuote.fromAmount;
-    const bnAmount = BigInt(amount);
+  async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
+    const { path, request, selectedQuote } = params;
+    /**
+     * Explain: All processes will go through one of below processes. If a step do not have, it returns undefined and
+     * the stepIndex is still counted up
+     *
+     * Processes:
+     * approve - permit - swap or
+     * approve - permit - swap - approve - bridge or
+     * approve - bridge - approve - permit - swap
+     */
+    const actionList = JSON.stringify(path.map((step) => step.action));
+    const bridgeSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
+    const swapBridge = actionList === JSON.stringify([DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
+    const isBridgeFirst = stepIndex === 1 && bridgeSwap;
+    const isBridgeSecond = stepIndex === 4 && swapBridge;
 
-    if (bnAmount <= BigInt(0)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')]);
+    // stepIndex is not corresponding index in path, because uniswap include approval and permit step
+    const bridgePairInfo = path.find((action) => action.action === DynamicSwapType.BRIDGE);
+
+    if (!bridgePairInfo || !bridgePairInfo.pair) {
+      return Promise.resolve(undefined);
     }
 
-    let isXcmOk = false;
+    if (!selectedQuote) {
+      return Promise.resolve(undefined);
+    }
 
-    for (const [index, step] of params.process.steps.entries()) {
-      const getErrors = async (): Promise<TransactionError[]> => {
-        switch (step.type) {
-          case CommonStepType.DEFAULT:
-            return Promise.resolve([]);
-          case CommonStepType.TOKEN_APPROVAL:
-            return Promise.resolve([]);
-          default:
-            return this.swapBaseHandler.validateSwapStep(params, isXcmOk, index);
-        }
+    const fromTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.from);
+    const toTokenInfo = this.chainService.getAssetBySlug(bridgePairInfo.pair.to);
+    const fromChainInfo = this.chainService.getChainInfoByKey(fromTokenInfo.originChain);
+    const toChainInfo = this.chainService.getChainInfoByKey(toTokenInfo.originChain);
+
+    if (!fromChainInfo || !toChainInfo || !fromChainInfo || !toChainInfo) {
+      throw Error('Token or chain not found');
+    }
+
+    let receiverAddress;
+    let mockSendingValue;
+    const senderAddress = _reformatAddressWithChain(request.address, fromChainInfo);
+
+    if (isBridgeFirst) {
+      receiverAddress = _reformatAddressWithChain(request.address, toChainInfo);
+      mockSendingValue = BigNumber(selectedQuote.fromAmount).toFixed(0, 1);
+    } else if (isBridgeSecond) {
+      receiverAddress = _reformatAddressWithChain(request.recipient || request.address, toChainInfo);
+      mockSendingValue = BigNumber(selectedQuote.toAmount).toFixed(0, 1);
+    } else {
+      return undefined;
+    }
+
+    try {
+      const evmApi = await this.chainService.getEvmApi(fromChainInfo.slug).isReady;
+      const feeInfo = await this.feeService.subscribeChainFee(getId(), fromTokenInfo.originChain, 'evm') as EvmFeeInfo;
+
+      const tx = await createAcrossBridgeExtrinsic({
+        originTokenInfo: fromTokenInfo,
+        destinationTokenInfo: toTokenInfo,
+        originChain: fromChainInfo,
+        destinationChain: toChainInfo,
+        evmApi,
+        feeInfo,
+        // Mock sending value to get payment info
+        sendingValue: mockSendingValue,
+        sender: senderAddress,
+        recipient: receiverAddress
+      });
+
+      const acrossQuote = await getAcrossQuote({
+        destinationChain: toChainInfo,
+        destinationTokenInfo: toTokenInfo,
+        originChain: fromChainInfo,
+        originTokenInfo: fromTokenInfo,
+        recipient: receiverAddress,
+        sender: senderAddress,
+        sendingValue: mockSendingValue,
+        feeInfo
+      });
+
+      const acrossQuoteMetadata = acrossQuote.metadata as AcrossQuote;
+
+      const estimatedBridgeFee = await estimateTxFee(tx, evmApi, feeInfo);
+      const estimatedDestinationFee = BigNumber(mockSendingValue).minus(acrossQuoteMetadata.outputAmount).toFixed(0, 1); // todo: should better handle on backend and return desFee metadata instead of minus like this
+
+      let sendingValue;
+      let expectedReceive;
+
+      if (isBridgeFirst) {
+        expectedReceive = selectedQuote.fromAmount;
+        sendingValue = BigNumber(estimatedDestinationFee).multipliedBy(FEE_RATE_MULTIPLIER.medium).plus(selectedQuote.fromAmount).toFixed(0, 1);
+      } else if (isBridgeSecond) {
+        expectedReceive = selectedQuote.toAmount;
+        sendingValue = BigNumber(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT).toFixed(0, 1);
+      } else {
+        return undefined;
+      }
+
+      console.log('[i] estimatedBridgeFee', estimatedBridgeFee);
+      console.log('[i] estimatedDestinationFee', estimatedDestinationFee);
+
+      const fee: CommonStepFeeInfo = {
+        feeComponent: [{
+          feeType: SwapFeeType.NETWORK_FEE,
+          amount: estimatedBridgeFee,
+          tokenSlug: _getChainNativeTokenSlug(fromChainInfo)
+        }],
+        defaultFeeToken: _getChainNativeTokenSlug(fromChainInfo),
+        feeOptions: [_getChainNativeTokenSlug(fromChainInfo)]
       };
 
-      const errors = await getErrors();
+      const step: BaseStepDetail = {
+        // @ts-ignore
+        metadata: {
+          sendingValue: sendingValue,
+          expectedReceive,
+          originTokenInfo: fromTokenInfo,
+          destinationTokenInfo: toTokenInfo,
+          receiver: receiverAddress,
+          sender: senderAddress
+        } as BaseSwapStepMetadata,
+        name: `Transfer ${fromTokenInfo.symbol} from ${fromChainInfo.name}`,
+        type: CommonStepType.XCM
+      };
 
-      if (errors.length) {
-        return errors;
-      } else if (step.type === CommonStepType.XCM) {
-        isXcmOk = true;
-      }
+      return [step, fee];
+    } catch (e) {
+      console.error('Error creating bridge step', e);
+
+      throw new Error((e as Error).message);
     }
-
-    return [];
   }
 
   public async handleSwapProcess (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
@@ -260,6 +639,8 @@ export class UniswapHandler implements SwapBaseInterface {
         return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
       case CommonStepType.TOKEN_APPROVAL:
         return this.tokenApproveSpending(params);
+      case CommonStepType.XCM:
+        return this.swapBaseHandler.handleBridgeStep(params, 'across');
       case SwapStepType.SWAP:
         return this.handleSubmitStep(params);
       case SwapStepType.PERMIT:
@@ -270,13 +651,66 @@ export class UniswapHandler implements SwapBaseInterface {
   }
 
   private async tokenApproveSpending (params: SwapSubmitParams): Promise<HandleYieldStepData> {
-    const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
-    const walletAddress = params.address;
-    const fromAmount = params.quote.fromAmount;
-    const { quote } = params.quote.metadata as UniswapMetadata;
+    const approveStep = params.process.steps[params.currentStep].metadata as unknown as ApproveStepMetadata;
 
-    const checkApprovalResponse = await fetchCheckApproval(walletAddress, fromAmount, quote);
+    if (!approveStep || !approveStep.tokenApprove || !approveStep.contractAddress || !approveStep.spenderAddress) {
+      throw new Error('Approval spending metadata error');
+    }
+
+    if (approveStep.isUniswapApprove) {
+      return this.approveSpendingSwap(params, approveStep);
+    }
+
+    return this.approveSpendingBridge(approveStep);
+  }
+
+  private async approveSpendingSwap (params: SwapSubmitParams, approveStep: ApproveStepMetadata): Promise<HandleYieldStepData> {
+    const fromAsset = this.chainService.getAssetBySlug(approveStep.tokenApprove);
+    const sender = approveStep.owner;
+    const sendingValue = approveStep.amount;
+
+    if (!sender || !sendingValue) {
+      throw new Error('Sender or value is not found');
+    }
+
+    const quoteMetadata = params.quote.metadata as UniswapMetadata;
+
+    let spenderAddress;
+    let contractAddress;
+    let chainId;
+    let checkApprovalResponse;
+
+    if (quoteMetadata.routing === 'CLASSIC') {
+      const quote = quoteMetadata.quote as UniswapClassicQuote;
+
+      spenderAddress = quote.output.token;
+      contractAddress = quote.input.token;
+      chainId = quote.chainId.toString();
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        classicQuote: quote
+      });
+    } else if (quoteMetadata.routing === 'DUTCH_LIMIT' || quoteMetadata.routing === 'DUTCH_V2') {
+      const quote = quoteMetadata.quote as UniswapDutchQuote;
+
+      spenderAddress = quote.orderInfo.outputs[0].token;
+      contractAddress = quote.orderInfo.input.token;
+      chainId = quote.orderInfo.chainId.toString();
+      checkApprovalResponse = await fetchCheckApproval({
+        address: sender,
+        amount: sendingValue,
+        dutchQuote: quote
+      });
+    } else {
+      throw Error('Unsupported quote route');
+    }
+
     let transactionConfig: TransactionConfig = {} as TransactionConfig;
+
+    if (!checkApprovalResponse) {
+      throw new Error('Check approval fail');
+    }
 
     const approval = checkApprovalResponse.approval as TransactionConfig;
 
@@ -301,15 +735,49 @@ export class UniswapHandler implements SwapBaseInterface {
     const chain = fromAsset.originChain;
 
     const _data: TokenSpendingApprovalParams = {
-      spenderAddress: quote.output.token,
-      contractAddress: quote.input.token,
+      spenderAddress,
+      contractAddress,
       amount: params.quote.fromAmount,
       owner: params.address,
-      chain: quote.chainId.toString()
+      chain: chainId
     };
 
     return Promise.resolve({
       txChain: chain,
+      extrinsicType: ExtrinsicType.TOKEN_SPENDING_APPROVAL,
+      extrinsic: transactionConfig,
+      txData: _data,
+      transferNativeAmount: '0',
+      chainType: ChainType.EVM
+    });
+  }
+
+  private async approveSpendingBridge (approveStep: ApproveStepMetadata): Promise<HandleYieldStepData> {
+    const fromAsset = this.chainService.getAssetBySlug(approveStep.tokenApprove);
+    const fromChain = _getAssetOriginChain(fromAsset);
+    const evmApi = this.chainService.getEvmApi(fromAsset.originChain);
+    const sender = approveStep.owner;
+    const sendingValue = approveStep.amount;
+
+    if (!sender) {
+      throw new Error('Sender or value is not found');
+    }
+
+    const spenderAddress = approveStep.spenderAddress;
+    const contractAddress = approveStep.contractAddress;
+
+    const transactionConfig = await getERC20SpendingApprovalTx(spenderAddress, sender, contractAddress, evmApi);
+
+    const _data: TokenSpendingApprovalParams = {
+      spenderAddress: approveStep.spenderAddress,
+      contractAddress: approveStep.contractAddress,
+      amount: sendingValue,
+      owner: sender,
+      chain: fromChain
+    };
+
+    return Promise.resolve({
+      txChain: fromChain,
       extrinsicType: ExtrinsicType.TOKEN_SPENDING_APPROVAL,
       extrinsic: transactionConfig,
       txData: _data,
@@ -343,10 +811,9 @@ export class UniswapHandler implements SwapBaseInterface {
         body.permitData = permitData;
       }
 
-      postTransactionResponse = await fetch(`${API_URL}/swap`, {
+      postTransactionResponse = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/swap', {
         method: 'POST',
         headers: {
-          ...headers,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -355,17 +822,105 @@ export class UniswapHandler implements SwapBaseInterface {
 
       extrinsic = transactionResponse.swap;
     } else if (routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2') {
-      postTransactionResponse = await fetch(`${API_URL}/order`, {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json'
+      const dutchQuote = quote as UniswapDutchQuote;
+
+      const submitSwapOrder = async () => {
+        try {
+          const res = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, '/order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              signature: signature,
+              quote: dutchQuote
+            })
+          });
+
+          return res.ok;
+        } catch (e) {
+          console.log(e);
+
+          return false;
+        }
+      };
+
+      const retryGetUniswapTx = async (fn: () => Promise<UniswapOrderInfo | undefined>, options: { retries: number, delay: number }): Promise<UniswapOrderInfo | undefined> => {
+        let lastError: Error | undefined;
+
+        for (let i = 0; i < options.retries; i++) {
+          try {
+            const orderInfo = await fn();
+
+            if (orderInfo && orderInfo.orderStatus === 'filled') {
+              return orderInfo;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          } catch (e) {
+            if (e instanceof Error) {
+              lastError = e;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, options.delay));
+          }
+        }
+
+        console.error('UniswapX order timeout', lastError); // throw only last error, in case no successful result from fn()
+
+        return undefined;
+      };
+
+      const cronCheckTxSuccess = async (): Promise<UniswapOrderInfo | undefined> => {
+        const delay = 10000;
+        const retries = 50;
+
+        const orderId = dutchQuote.orderId;
+        const swapper = dutchQuote.orderInfo.swapper;
+
+        return retryGetUniswapTx(async () => {
+          try {
+            const response = await fetchFromProxyService(ProxyServiceRoute.UNISWAP, `/orders?orderId=${orderId}&swapper=${swapper}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              const res = await response.json() as UniswapOrders;
+
+              return res.orders.find((e) => e.orderId === orderId && e.swapper === swapper.toLowerCase());
+            }
+
+            return undefined;
+          } catch (e) {
+            return undefined;
+          }
+        }, { retries, delay });
+      };
+
+      const txData: SwapBaseTxData = {
+        address: params.address,
+        provider: this.providerInfo,
+        quote: params.quote,
+        slippage: params.slippage,
+        recipient: params.recipient,
+        process: params.process
+      };
+
+      return {
+        txChain: fromAsset.originChain,
+        txData,
+        extrinsic: {
+          submitSwapOrder,
+          cronCheckTxSuccess
         },
-        body: JSON.stringify({
-          signature: signature,
-          quote: quote
-        })
-      });
+        transferNativeAmount: _isNativeToken(fromAsset) ? params.quote.fromAmount : '0',
+        extrinsicType: ExtrinsicType.SWAP,
+        chainType: ChainType.EVM,
+        isDutch: true
+      } as SwapSubmitStepData;
     }
 
     const txData: SwapBaseTxData = {
@@ -389,8 +944,13 @@ export class UniswapHandler implements SwapBaseInterface {
 
   public handlePermitStep (params: SwapSubmitParams) {
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
-    const { permitData } = params.quote.metadata as UniswapMetadata;
+    const { permitData, routing } = params.quote.metadata as UniswapMetadata;
     const processId = params.cacheProcessId;
+    const primaryType = routing === 'CLASSIC'
+      ? 'PermitSingle'
+      : routing === 'DUTCH_LIMIT' || routing === 'DUTCH_V2'
+        ? 'PermitWitnessTransferFrom'
+        : ''; // todo
 
     let validatePayload;
 
@@ -405,7 +965,7 @@ export class UniswapHandler implements SwapBaseInterface {
           ...permitData.types
         },
         domain: permitData.domain,
-        primaryType: 'PermitSingle',
+        primaryType,
         message: permitData.values
       };
 
@@ -444,9 +1004,14 @@ export class UniswapHandler implements SwapBaseInterface {
     const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
 
-    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP); // todo
+    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP);
+    const bridgeIndex = params.process.steps.findIndex((step) => step.type === CommonStepType.XCM);
 
     if (swapIndex <= -1) {
+      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+    }
+
+    if ((swapXcm || xcmSwap) && bridgeIndex <= -1) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
@@ -455,11 +1020,11 @@ export class UniswapHandler implements SwapBaseInterface {
     }
 
     if (swapXcm) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateSwapXcmProcess(params, swapIndex, bridgeIndex);
     }
 
     if (xcmSwap) {
-      return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
+      return this.swapBaseHandler.validateXcmSwapProcess(params, swapIndex, bridgeIndex);
     }
 
     if (xcmSwapXcm) {

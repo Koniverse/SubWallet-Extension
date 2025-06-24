@@ -23,6 +23,8 @@ const BLIM = new BigNumber(1e14);
 const NUM_1M = new BigNumber(1e6);
 const NUM_100M = new BigNumber(1e8);
 
+export const swapNumberMetadata = { minNumberFormat: 4 };
+
 export const swapCustomFormatter: NumberFormatter = (
   input: string,
   metadata?: Record<string, number>

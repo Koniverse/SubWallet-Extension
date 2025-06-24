@@ -58,3 +58,27 @@ export async function getSnowbridgeTransferProcessFromEvm (address: string, evmA
 
   return Promise.resolve(result);
 }
+
+export async function getAcrossbridgeTransferProcessFromEvm (SpokePoolAddress: string): Promise<CommonOptimalTransferPath> {
+  const result: CommonOptimalTransferPath = {
+    totalFee: [MOCK_STEP_FEE],
+    steps: [DEFAULT_FIRST_STEP]
+  };
+
+  result.steps.push({
+    id: result.steps.length,
+    type: CommonStepType.TOKEN_APPROVAL,
+    name: 'Approve spending',
+    metadata: { SpokePoolAddress }
+  });
+  result.totalFee.push(MOCK_STEP_FEE);
+
+  result.steps.push({
+    id: result.steps.length,
+    type: CommonStepType.TRANSFER,
+    name: 'Transfer'
+  });
+  result.totalFee.push(MOCK_STEP_FEE);
+
+  return Promise.resolve(result);
+}

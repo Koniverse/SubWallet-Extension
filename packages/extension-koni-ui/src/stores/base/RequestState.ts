@@ -26,6 +26,7 @@ const initialState: RequestState = {
   evmSendTransactionRequest: {},
   evmWatchTransactionRequest: {},
   errorConnectNetwork: {},
+  submitApiRequest: {},
 
   tonSignatureRequest: {},
   tonSendTransactionRequest: {},
@@ -34,6 +35,7 @@ const initialState: RequestState = {
   cardanoSignatureRequest: {},
   cardanoSendTransactionRequest: {},
   cardanoWatchTransactionRequest: {},
+  cardanoSignTransactionRequest: {},
 
   aliveProcess: {},
 
@@ -54,11 +56,13 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'evmSendTransactionRequest',
   'evmWatchTransactionRequest',
   'errorConnectNetwork',
+  'submitApiRequest',
   'tonSignatureRequest',
   'tonSendTransactionRequest',
   'tonWatchTransactionRequest',
   'cardanoSignatureRequest',
   'cardanoSendTransactionRequest',
+  'cardanoSignTransactionRequest',
   'tonWatchTransactionRequest',
   'connectWCRequest',
   'notSupportWCRequest'

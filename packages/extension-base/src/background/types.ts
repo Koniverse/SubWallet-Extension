@@ -10,7 +10,7 @@ import type { JsonRpcResponse } from '@polkadot/rpc-provider/types';
 import type { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 import type { HexString } from '@polkadot/util/types';
 
-import { KoniRequestSignatures, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
+import { KoniRequestSignatures, NetworkJson, RequestSwitchCurrentNetworkAuthorization } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { AccountJson } from '@subwallet/extension-base/types';
 
@@ -91,6 +91,7 @@ export interface RequestSignatures extends KoniRequestSignatures {
   'pri(authorize.reject)': [RequestAuthorizeReject, boolean];
   'pri(authorize.requests)': [RequestAuthorizeSubscribe, boolean, AuthorizeRequest[]];
   'pri(authorize.toggle)': [string, ResponseAuthorizeList];
+  'pri(authorize.switchCurrentNetwork)': [RequestSwitchCurrentNetworkAuthorization, ResponseAuthorizeList]
   'pri(derivation.create)': [RequestDeriveCreate, boolean];
   'pri(derivation.validate)': [RequestDeriveValidate, ResponseDeriveValidate];
   'pri(json.batchRestore)': [RequestBatchRestore, void];
@@ -111,7 +112,7 @@ export interface RequestSignatures extends KoniRequestSignatures {
   'pub(accounts.list)': [RequestAccountList, InjectedAccount[]];
   'pub(accounts.subscribe)': [RequestAccountSubscribe, boolean, InjectedAccount[]];
   'pub(authorize.tab)': [RequestAuthorizeTab, null];
-  'pub(authorize.tabV2)': [RequestAuthorizeTab, null];
+  'pub(authorize.tabV2)': [RequestAuthorizeTab, boolean];
   'pub(bytes.sign)': [SignerPayloadRaw, ResponseSigning];
   'pub(extrinsic.sign)': [SignerPayloadJSON, ResponseSigning];
   'pub(metadata.list)': [null, InjectedMetadataKnown[]];
@@ -143,7 +144,7 @@ export interface TransportRequestMessage<TMessageType extends MessageTypes> {
   request: RequestTypes[TMessageType];
 }
 
-export type AccountAuthType = 'substrate' | 'evm' | 'ton';
+export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano';
 
 export interface RequestAuthorizeTab {
   origin: string;

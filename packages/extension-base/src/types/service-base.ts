@@ -1,12 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { DynamicSwapAction } from '@subwallet/extension-base/services/swap-service/interface';
-import { OptimalSwapPathParams, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
+import { DynamicSwapAction, OptimalSwapPathParamsV2, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
 import { OptimalYieldPath, OptimalYieldPathParams, YieldStepType } from '@subwallet/extension-base/types/yield';
 
 /* ServiceWithProcess */
-export type OptimalProcessParams = OptimalYieldPathParams | OptimalSwapPathParams;
+export type OptimalProcessParams = OptimalYieldPathParams | OptimalSwapPathParamsV2;
 export type OptimalProcessResult = OptimalYieldPath | CommonOptimalSwapPath;
 
 export enum CommonStepType {
@@ -29,6 +28,7 @@ export interface CommonFeeComponent {
   feeType: BaseFeeType;
   amount: string;
   tokenSlug: string;
+  percentage?: number;
 }
 
 export interface CommonStepFeeInfo {

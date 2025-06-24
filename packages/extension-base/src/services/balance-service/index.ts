@@ -6,9 +6,9 @@ import { AmountData, APIItemState, BalanceErrorType, DetectBalanceCache, Extrins
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
+import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
@@ -23,6 +23,8 @@ import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
 
+import { CreateXcmExtrinsicProps } from './transfer/xcm';
+import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
 import { subscribeBalance } from './helpers';
 
@@ -639,6 +641,39 @@ export class BalanceService implements StoppableServiceInterface {
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       return getSnowbridgeTransferProcessFromEvm(params.address, evmApi, tokenInfo, params.amount);
+    }
+
+    // Across Bridge
+    if (_isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug)) {
+      const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
+
+      if (!_isNativeToken(tokenInfo)) {
+        const chainInfoMap = this.state.getChainInfoMap();
+        const originTokenInfo = this.state.getAssetBySlug(params.tokenSlug);
+        const destinationTokenInfo = this.state.getXcmEqualAssetByChain(params.destChain, params.tokenSlug);
+
+        if (!destinationTokenInfo) {
+          throw new Error('Destination token info not found');
+        }
+
+        const inputData = {
+          destinationTokenInfo,
+          originTokenInfo,
+          sendingValue: params.amount,
+          sender: params.address,
+          recipient: params.address,
+          destinationChain: chainInfoMap[destinationTokenInfo.originChain],
+          originChain: chainInfoMap[originTokenInfo.originChain]
+        } as CreateXcmExtrinsicProps;
+
+        const data = await getAcrossQuote(inputData);
+
+        if (!data) {
+          throw new Error('Failed to fetch Across Bridge Data. Please try again later');
+        }
+
+        return getAcrossbridgeTransferProcessFromEvm(data.to);
+      }
     }
 
     return getDefaultTransferProcess();
