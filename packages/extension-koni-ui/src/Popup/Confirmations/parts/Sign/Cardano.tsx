@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationDefinitionsCardano, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useUnlockChecker from '@subwallet/extension-koni-ui/hooks/common/useUnlockChecker';
 import { completeConfirmationCardano } from '@subwallet/extension-koni-ui/messaging';
@@ -38,7 +39,8 @@ const handleCancel = async (type: CardanoSignatureSupportType, id: string) => {
 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, extrinsicType, id, txExpirationTime, type } = props;
+  const { className, extrinsicType, id, payload, txExpirationTime, type } = props;
+  const { payload: { errors } } = payload;
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -52,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const approveIcon = useMemo((): PhosphorIcon => {
     return CheckCircle;
   }, []);
-
+  const isErrorTransaction = useMemo(() => errors && errors.length > 0, [errors]);
   // Handle buttons actions
   const onCancel = useCallback(() => {
     setLoading(true);
@@ -111,20 +113,40 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={CN(className, 'confirmation-footer')}>
-      <Button
-        disabled={loading}
-        icon={(
-          <Icon
-            phosphorIcon={XCircle}
-            weight='fill'
+      {
+        isErrorTransaction && errors && (
+          <AlertBox
+            className={CN(className, 'alert-box')}
+            description={errors[0].message}
+            title={errors[0].name}
+            type={'error'}
           />
-        )}
-        onClick={onCancel}
-        schema={'secondary'}
-      >
-        {t('Cancel')}
-      </Button>
-      <Button
+        )
+      }
+      {
+        isErrorTransaction
+          ? <Button
+            disabled={loading}
+            onClick={onCancel}
+            schema={'primary'}
+          >
+            {t('I understand')}
+          </Button>
+          : <Button
+            disabled={loading}
+            icon={(
+              <Icon
+                phosphorIcon={XCircle}
+                weight='fill'
+              />
+            )}
+            onClick={onCancel}
+            schema={'secondary'}
+          >
+            {t('Cancel')}
+          </Button>
+      }
+      {!isErrorTransaction && <Button
         disabled={showQuoteExpired}
         icon={(
           <Icon
@@ -136,13 +158,19 @@ const Component: React.FC<Props> = (props: Props) => {
         onClick={onConfirm}
       >
         {t('Approve')}
-      </Button>
+      </Button> }
     </div>
   );
 };
 
 const CardanoSignArea = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {};
+  return {
+    '&.confirmation-footer': {
+      '.alert-box': {
+        width: '100%'
+      }
+    }
+  };
 });
 
 export default CardanoSignArea;
