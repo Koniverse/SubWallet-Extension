@@ -354,7 +354,7 @@ export default class AuthRequestHandler {
     const idStr = stripUrl(url);
     const isAllowedDappConnectBothType = !!DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL.find((url_) => url.includes(url_));
     let accountAuthTypes = [...new Set<AccountAuthType>(isAllowedDappConnectBothType ? ['evm', 'substrate'] : (request.accountAuthTypes || ['substrate']))];
-    const isSubstrateConnector = !!request.isSubstrateConnector;
+    let isSubstrateConnector = !!request.isSubstrateConnector;
 
     if (!authList) {
       authList = {};
@@ -388,6 +388,10 @@ export default class AuthRequestHandler {
             const filteredAccountAuthTypes = new Set<AccountAuthType>([..._request.accountAuthTypes, ...accountAuthTypes]);
 
             accountAuthTypes = [...filteredAccountAuthTypes];
+
+            if (_request.request.isSubstrateConnector) {
+              isSubstrateConnector = true;
+            }
           }
 
           mergeKeys.push(key);

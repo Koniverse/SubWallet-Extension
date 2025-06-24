@@ -55,6 +55,20 @@ export const PolkadotLedgerAccountTypeItems: LedgerPolkadotAccountItemType[] = [
   scheme: POLKADOT_LEDGER_SCHEME.ECDSA
 }];
 
+function generateLedgerAccountName (accountName: string, index: number, address: string, accountMigrateNetworkName?: string, polkadotAccountType?: POLKADOT_LEDGER_SCHEME): string {
+  const isSubstrateECDSAAccount = polkadotAccountType === POLKADOT_LEDGER_SCHEME.ECDSA;
+  const baseName = accountMigrateNetworkName || accountName;
+  let suffix = `${index + 1} - ${address.slice(-4)}`;
+
+  if (accountMigrateNetworkName) {
+    suffix = `(${accountName}) ${suffix}`;
+  } else if (isSubstrateECDSAAccount) {
+    suffix = `(EVM) ${suffix}`;
+  }
+
+  return `Ledger ${baseName} ${suffix}`;
+}
+
 const Component: React.FC<Props> = (props: Props) => {
   useAutoNavigateToCreatePassword();
 
@@ -171,7 +185,7 @@ const Component: React.FC<Props> = (props: Props) => {
         (await getAllAddress(start, end)).forEach(({ address }, index) => {
           rs[start + index] = {
             accountIndex: start + index,
-            name: `Ledger ${accountMigrateNetworkName} ${accountMigrateNetworkName ? `(${accountName})` : accountName} ${start + index + 1} - ${address.slice(-4)}`,
+            name: generateLedgerAccountName(accountName, start + index, address, accountMigrateNetworkName, polkadotAccountType),
             address: address
           };
         });
@@ -200,7 +214,7 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     loadingFlag.current = false;
-  }, [page, getAllAddress, accountName, accountMigrateNetworkName, refresh]);
+  }, [page, getAllAddress, accountName, accountMigrateNetworkName, polkadotAccountType, refresh]);
 
   const onNextStep = useCallback(() => {
     setFirstStep(false);
@@ -297,7 +311,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setSelectedAccounts([]);
     setLedgerAccounts([]);
     setPage(0);
-  }, [chain, chainMigrateMode]);
+  }, [chain, chainMigrateMode, polkadotAccountType]);
 
   const isConnected = !isLocked && !isLoading && !!ledger && (selectedChain?.slug !== SUBSTRATE_GENERIC_KEY || !!polkadotAccountType);
 

@@ -68,14 +68,14 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
     if (def.isEthereum) {
       return new EVMLedger('webusb', def.slip44);
     } else {
-      if (ledgerScheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
-        return new SubstrateECDSALedger('webusb', def.slip44);
-      } else if (originGenesisHash) {
+      if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
 
         assert(def, 'There is no known Ledger app available for this chain');
 
         return new SubstrateMigrationLedger('webusb', def.slip44, def.ss58_addr_type);
+      } else if (ledgerScheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
+        return new SubstrateECDSALedger('webusb', def.slip44);
       } else {
         return new SubstrateGenericLedger('webusb', def.slip44);
       }
