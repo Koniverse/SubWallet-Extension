@@ -6,7 +6,7 @@ import { AuthRequestV2, ResultResolver } from '@subwallet/extension-base/backgro
 import { AccountAuthType, AuthorizeRequest, RequestAuthorizeTab, Resolver } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES } from '@subwallet/extension-base/constants';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
@@ -15,6 +15,7 @@ import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -205,6 +206,18 @@ export default class AuthRequestHandler {
       }
     }
 
+    if (options.accessType === 'bitcoin') {
+      const bitcoinChains = Object.values(chainInfoMaps).filter(_isChainBitcoinCompatible);
+
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.bitcoin) || bitcoinChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
+
+      if (options.autoActive) {
+        if (!needEnableChains.includes(chainInfo?.slug)) {
+          needEnableChains.push(chainInfo?.slug);
+        }
+      }
+    }
+
     needEnableChains = needEnableChains.filter((slug) => !chainStateMap[slug]?.active);
     needEnableChains.length > 0 && this.#chainService.enableChains(needEnableChains);
 
@@ -254,6 +267,10 @@ export default class AuthRequestHandler {
             }
 
             if (isCardanoAddress(a) && !accountAuthTypes.includes('cardano')) {
+              return true;
+            }
+
+            if (isBitcoinAddress(a) && !accountAuthTypes.includes('bitcoin')) {
               return true;
             }
 
@@ -419,6 +436,8 @@ export default class AuthRequestHandler {
           list.push(...allowedListByRequestType.filter((a) => isTonAddress(a)));
         } else if (accountAuthType === 'cardano') {
           list.push(...allowedListByRequestType.filter((a) => isCardanoAddress(a)));
+        } else if (accountAuthType === 'bitcoin') {
+          list.push(...allowedListByRequestType.filter((a) => isBitcoinAddress(a)));
         }
 
         return list;

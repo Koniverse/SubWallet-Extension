@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TypedDataV1Field, typedSignatureHash } from '@metamask/eth-sig-util';
+import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
@@ -16,6 +17,8 @@ import { isContractAddress, parseContractInput } from '@subwallet/extension-base
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { isCardanoAddress, isCardanoBaseAddress, isCardanoRewardAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { keyring } from '@subwallet/ui-keyring';
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
@@ -24,7 +27,7 @@ import { t } from 'i18next';
 import Joi from 'joi';
 import { TransactionConfig } from 'web3-core';
 
-import { isString } from '@polkadot/util';
+import { isArray, isHex, isString } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 export type ValidateStepFunction = (koni: KoniState, url: string, payload: PayloadValidated, topic?: string) => Promise<PayloadValidated>
@@ -38,7 +41,7 @@ export interface PayloadValidated {
   method?: string,
   payloadAfterValidated: any,
   errorPosition?: 'dApp' | 'ui',
-  confirmationType?: ConfirmationType | ConfirmationTypeCardano,
+  confirmationType?: ConfirmationType | ConfirmationTypeCardano | ConfirmationTypeBitcoin,
   errors: Error[]
 }
 
@@ -232,6 +235,10 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
           return handleAuthError(payload, 'Account not in allowed list', 'dApp', errors);
         }
 
+        if (payload.pair.meta.noPublicKey) {
+          return handleAuthError(payload, t('This account is not supported for this action'), 'dApp', errors);
+        }
+
         payload.authInfo = authInfo;
       }
     } catch (e) {
@@ -242,6 +249,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
   return payload;
 }
 
+// ====== EVM ======
 export async function validationConnectMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
   let currentChain: string | undefined;
   let autoActiveChain = false;
@@ -724,6 +732,10 @@ export async function validationAuthCardanoMiddleware (koni: KoniState, url: str
   return payload;
 }
 
+// ====== EVM ======
+
+// ====== Cardano ======
+
 export async function validationCardanoSignDataMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
   const { address, authInfo, errors, pair: pair_, type } = payload_;
   const payload = payload_.payloadAfterValidated as DataMessageParam;
@@ -785,6 +797,313 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
   return promise;
 }
 
+// ====== Cardano ======
+
+// ====== Bitcoin ======
+
+export async function validationBitcoinConnectMiddleware (koni: KoniState, url: string, payload: PayloadValidated): Promise<PayloadValidated> {
+  const { authInfo, errors, networkKey } = payload;
+  let autoActiveChain = false;
+
+  const handleError = (message_: string) => {
+    payload.errorPosition = 'ui';
+    payload.confirmationType = 'errorConnectNetwork';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new TransactionError(BasicTxErrorType.INVALID_PARAMS, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (url && authInfo) {
+    if (authInfo?.isAllowed) {
+      autoActiveChain = true;
+    }
+  }
+
+  const currentBitcoinNetwork = koni.requestService.getDAppChainInfo({
+    autoActive: autoActiveChain,
+    accessType: 'bitcoin',
+    defaultChain: networkKey,
+    url
+  });
+
+  if (currentBitcoinNetwork) {
+    const chainStatus = koni.getChainStateByKey(networkKey);
+    const chainInfo = koni.getChainInfo(networkKey);
+
+    if (!chainStatus.active) {
+      try {
+        await koni.chainService.enableChain(networkKey);
+      } catch (e) {
+        handleError('Can not active chain: ' + chainInfo.name);
+      }
+    }
+  } else {
+    handleError('This network is currently not supported');
+  }
+
+  return {
+    ...payload,
+    networkKey: currentBitcoinNetwork?.slug || networkKey,
+    errors
+  };
+}
+
+export async function validationBitcoinSignMessageMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { address, errors, pair: pair_ } = payload_;
+  const message = payload_.payloadAfterValidated as string;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'bitcoinSignatureRequest';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (address === '' || !message) {
+    handleError(t('not found address or payload to sign'));
+  }
+
+  if (!isBitcoinAddress(address)) {
+    handleError(t('Invalid bitcoin address'));
+  }
+
+  const pair = pair_ || keyring.getPair(address);
+
+  if (!pair) {
+    handleError(t('Unable to find account'));
+  }
+
+  const hashPayload = '';
+  let canSign = false;
+
+  if (!pair?.meta.isExtneral) {
+    canSign = true;
+  }
+
+  const payloadAfterValidated: BitcoinSignatureRequest = {
+    address,
+    payload: message as unknown,
+    payloadJson: message,
+    hashPayload,
+    canSign,
+    id: ''
+  };
+
+  resolve(
+    {
+      ...payload_,
+      errors,
+      payloadAfterValidated
+    }
+  );
+
+  return promise;
+}
+
+export async function validationBitcoinSignPsbtMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { errors, networkKey, pair: pair_ } = payload_;
+  const psbtParams = payload_.payloadAfterValidated as BitcoinSignPsbtParams;
+  const { address, allowedSighash, autoFinalized, broadcast, psbt, signAtIndex } = payload_.payloadAfterValidated as BitcoinSignPsbtParams;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'bitcoinSignPsbtRequest';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  if (!(psbtParams.network === 'mainnet' || psbtParams.network === 'testnet')) {
+    handleError(t('Network to try this request is must be mainnet or testnet'));
+  }
+
+  if (!networkKey) {
+    handleError(t('Network unavailable. Please switch network or manually add network to wallet'));
+  }
+
+  if (!psbt || !address) {
+    handleError(t('Not found payload to sign'));
+  }
+
+  if (!isHex(`0x${psbt}`)) {
+    handleError(t('Psbt to be signed must be hex-encoded'));
+  }
+
+  if (!isBitcoinAddress(address)) {
+    handleError(t('Not found address'));
+  }
+
+  const addressInfo = getBitcoinAddressInfo(address);
+
+  if (psbtParams.network !== addressInfo.network) {
+    handleError(t('The account or the network is not matched'));
+  }
+
+  const payload = {
+    broadcast: !!broadcast,
+    network: networkKey,
+    signAtIndex: isArray(signAtIndex) && signAtIndex.length === 0 ? undefined : signAtIndex,
+    address,
+    allowedSighash,
+    autoFinalized
+  } as BitcoinSignPsbtPayload;
+  const hashPayload = '';
+  const pair = pair_ || keyring.getPair(address);
+  const canSign = !pair?.meta.isExternal;
+
+  const signPayload: BitcoinSignPsbtRequest = {
+    address,
+    payload,
+    hashPayload,
+    canSign
+  };
+
+  resolve(
+    {
+      ...payload_,
+      errors,
+      payloadAfterValidated: signPayload
+    }
+  );
+
+  return promise;
+}
+
+export async function validationBitcoinSendTransactionMiddleware (koni: KoniState, url: string, payload_: PayloadValidated): Promise<PayloadValidated> {
+  const { address, errors, networkKey, pair: pair_ } = payload_;
+  const transactionParams = payload_.payloadAfterValidated as BitcoinSendTransactionParams;
+  const { promise, resolve } = createPromiseHandler<PayloadValidated>();
+  const senderAccountInfo = getBitcoinAddressInfo(address);
+
+  const handleError = (message_: string) => {
+    payload_.errorPosition = 'ui';
+    payload_.confirmationType = 'bitcoinSendTransactionRequestAfterConfirmation';
+    const [message, name] = convertErrorMessage(message_);
+    const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
+
+    console.error(error);
+    errors.push(error);
+  };
+
+  const autoFormatNumber = (val: string | number): string => {
+    if (typeof val === 'string' && val.startsWith('0x')) {
+      return new BigN(val.replace('0x', ''), 16).toString();
+    } else if (typeof val === 'number') {
+      return val.toString();
+    }
+
+    return val;
+  };
+
+  if (transactionParams.network !== senderAccountInfo.network) {
+    handleError(t('The account or the network is not matched'));
+  }
+
+  if (!transactionParams.recipients?.length) {
+    handleError(t('please provide the recipient and the amount'));
+  }
+
+  if (transactionParams.recipients?.length > 1) {
+    handleError(t("we don't support multiple recipients yet. Please provide only one for now."));
+  }
+
+  if (transactionParams.recipients.filter(({ address, amount }) => !address || !amount).length > 0) {
+    throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS);
+  }
+
+  const recipientAccountInfo = getBitcoinAddressInfo(transactionParams.recipients[0].address);
+
+  if (recipientAccountInfo.network !== transactionParams.network) {
+    handleError(t('invalid recipient address'));
+  }
+
+  if (transactionParams.recipients.length !== 1) {
+    handleError(t('receiving address must be a single account'));
+  }
+
+  if (address === transactionParams.recipients[0].address) {
+    handleError(t('must be different from sending address'));
+  }
+
+  const pair = pair_ || keyring.getPair(address);
+
+  if (!pair) {
+    handleError(t('unable to find account'));
+  }
+
+  const tokenInfo = koni.getNativeTokenInfo(networkKey);
+  let freeBalance: AmountData = {
+    decimals: 0,
+    symbol: 'BTC',
+    value: '0'
+  };
+
+  let totalValue = new BigN('0');
+
+  try {
+    freeBalance = await koni.balanceService.getTransferableBalance(address, networkKey, tokenInfo.slug);
+  } catch (e) {
+    const message = (e as Error).message;
+
+    if (message.toLowerCase().includes(t('please enable network'))) {
+      const chainInfo = koni.chainService.getChainInfoByKey(networkKey);
+
+      payload_.errorPosition = 'ui';
+      payload_.confirmationType = 'bitcoinSendTransactionRequestAfterConfirmation';
+      const [message, name] = [t('Enable {{chain}} network on the extension and try again', { replace: { chain: chainInfo.name } }), t('Network not enabled')];
+      const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
+
+      console.error(error);
+      errors.push(error);
+    } else {
+      handleError(message);
+    }
+  }
+
+  const to = transactionParams.recipients.map((value) => {
+    const amount = autoFormatNumber(value.amount);
+
+    totalValue = totalValue.plus(amount);
+
+    return {
+      ...value,
+      amount
+    };
+  });
+
+  if (new BigN(freeBalance.value).lte(totalValue)) {
+    handleError(t('insufficient balance'));
+  }
+
+  const sendTransactionRequest = {
+    networkKey,
+    address,
+    canSign: !pair.meta.isExternal,
+    value: totalValue.toString(),
+    to,
+    tokenSlug: tokenInfo.slug
+  } as BitcoinSendTransactionRequest;
+
+  resolve({
+    ...payload_,
+    errors,
+    payloadAfterValidated: sendTransactionRequest
+  });
+
+  return promise;
+}
+
+// ====== Bitcoin ======
+
 export function convertErrorMessage (message_: string, name?: string): string[] {
   const message = message_.toLowerCase();
 
@@ -794,7 +1113,8 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
     message.includes('connection not open') ||
     message.includes('connection timeout') ||
     message.includes('can not active chain') ||
-    message.includes('invalid json rpc')
+    message.includes('invalid json rpc') ||
+    message.includes('internet connection')
   ) {
     return [t('Re-enable the network or change RPC on the extension and try again'), t('Unstable network connection')];
   }
@@ -837,6 +1157,18 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
 
   if (message.includes('the sender address must be the ethereum address type')) {
     return [t('The sender address must be the ethereum address type'), t('Invalid address type')];
+  }
+
+  if (message.includes('the sender address must be the ethereum address type')) {
+    return [t('The sender address must be the bitcoin address type'), t('Invalid address type')];
+  }
+
+  if (message.includes('account or the network is not matched')) {
+    return [t('The account does not match the selected network'), t('Invalid address type')];
+  }
+
+  if (message.includes('receiving address must be a single account')) {
+    return [t('The receiving address must be a single account'), t('Invalid recipient address')];
   }
 
   if (message.includes('insufficient balance') || message.includes('insufficient funds')) {

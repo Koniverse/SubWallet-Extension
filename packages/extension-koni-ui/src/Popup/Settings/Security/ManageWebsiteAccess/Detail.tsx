@@ -45,6 +45,7 @@ const isValidAccountChainType = (chainType: AccountChainType, conditions: Accoun
     case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') && (isSubstrateConnector || accountSignMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER);
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
+    case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
 
   return false;

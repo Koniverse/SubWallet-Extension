@@ -144,7 +144,7 @@ export interface TransportRequestMessage<TMessageType extends MessageTypes> {
   request: RequestTypes[TMessageType];
 }
 
-export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano';
+export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano' | 'bitcoin';
 
 export interface RequestAuthorizeTab {
   origin: string;

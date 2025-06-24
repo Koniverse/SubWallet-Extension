@@ -5,10 +5,11 @@ import type { AccountAuthType, MessageTypes, MessageTypesWithNoSubscriptions, Me
 
 import { ProviderError } from '@subwallet/extension-base/background/errors/ProviderError';
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
+import SubWalletBitcoinProvider from '@subwallet/extension-base/page/bitcoin';
 import SubWalletCardanoProvider from '@subwallet/extension-base/page/cardano';
 import SubWalletEvmProvider from '@subwallet/extension-base/page/evm';
 import Injected from '@subwallet/extension-base/page/substrate';
-import { AuthRequestOption, CardanoProvider, EvmProvider } from '@subwallet/extension-inject/types';
+import { AuthRequestOption, BitcoinProvider, CardanoProvider, EvmProvider } from '@subwallet/extension-inject/types';
 
 import { MESSAGE_ORIGIN_PAGE } from '../defaults';
 import { getId } from '../utils/getId';
@@ -93,4 +94,8 @@ export function initEvmProvider (version: string): EvmProvider {
 
 export function initCardanoProvider (): CardanoProvider {
   return new SubWalletCardanoProvider(sendMessage);
+}
+
+export function initBitcoinProvider (): BitcoinProvider {
+  return new SubWalletBitcoinProvider(sendMessage).apis;
 }
