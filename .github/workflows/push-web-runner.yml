@@ -34,6 +34,7 @@ jobs:
         COINBASE_PAY_ID: ${{ secrets.COINBASE_PAY_ID }}
         MELD_WIZARD_KEY: ${{ secrets.MELD_WIZARD_KEY }}
         BRANCH_NAME: master
+        BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
         yarn install --immutable | grep -v 'YN0013'
         yarn ${{ matrix.step }}
