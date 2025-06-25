@@ -389,8 +389,18 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     handleError('Substrate account can not send this transaction');
   }
 
-  if (transaction.to && !isEthereumAddress(transaction.to)) {
-    handleError('invalid recipient address');
+  if (transaction.to) {
+    if (!isEthereumAddress(transaction.to)) {
+      handleError('invalid recipient address');
+    } else {
+      try {
+        const pairTo = keyring.getPair(transaction.to);
+
+        if (pairTo && pairTo.meta.isSubstrateECDSA) {
+          handleError('substrate account cannot receive this token');
+        }
+      } catch (e) {}
+    }
   }
 
   if (fromAddress === transaction.to) {
@@ -1173,6 +1183,10 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
 
   if (message.includes('insufficient balance') || message.includes('insufficient funds')) {
     return [t('Insufficient balance on the sender address. Top up your balance and try again'), t('Unable to sign transaction')];
+  }
+
+  if (message.includes('substrate') && message.includes('receive this token')) {
+    return [t('The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again'), t('Invalid account type')];
   }
 
   // Sign Message

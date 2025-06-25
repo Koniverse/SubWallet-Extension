@@ -39,7 +39,7 @@ async function handleBlock ({ id }: AuthorizeRequest) {
 function Component ({ className, request }: Props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const { accountAuthTypes, allowedAccounts, isSubstrateConnector } = request.request;
+  const { accountAuthTypes, allowedAccounts, canConnectSubstrateEcdsa } = request.request;
   const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
   const navigate = useNavigate();
 
@@ -48,9 +48,9 @@ function Component ({ className, request }: Props) {
 
   // List all of all accounts by auth type
   const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, {
-    accountAuthTypes: accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, isSubstrateConnector
+    accountAuthTypes: accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, canConnectSubstrateEcdsa
   })),
-  [accountAuthTypes, accountProxies, isSubstrateConnector]);
+  [accountAuthTypes, accountProxies, canConnectSubstrateEcdsa]);
 
   // Selected map with default values is map of all accounts
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});

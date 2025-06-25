@@ -7,8 +7,8 @@ import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/typ
 import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountJson } from '@subwallet/extension-base/types';
+import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountJson, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAddressAndChainCompatible, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { isAddress, isCardanoTestnetAddress, isTonAddress } from '@subwallet/keyring';
 import { getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
@@ -148,6 +148,13 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
         return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
       }
     } else {
+      // For ecdsa substrate account in polkadot ledger app
+      if (account.signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+        if (!_isSubstrateEvmCompatibleChain(destChainInfo)) {
+          return 'Ledger Polkadot (EVM) address is not supported for this transfer';
+        }
+      }
+
       // For ledger generic
       const ledgerCheck = ledgerMustCheckNetwork(account);
 

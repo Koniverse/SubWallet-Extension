@@ -11,7 +11,6 @@ export enum ValidationCondition {
   IS_ADDRESS = 'IS_ADDRESS',
   IS_VALID_ADDRESS_FOR_ECOSYSTEM = 'IS_VALID_ADDRESS_FOR_ECOSYSTEM',
   IS_VALID_SUBSTRATE_ADDRESS_FORMAT = 'IS_VALID_SUBSTRATE_ADDRESS_FORMAT',
-  IS_VALID_EVM_ADDRESS_FORMAT = 'IS_VALID_EVM_ADDRESS_FORMAT',
   IS_VALID_TON_ADDRESS_FORMAT = 'IS_VALID_TON_ADDRESS_FORMAT',
   IS_VALID_CARDANO_ADDRESS_FORMAT = 'IS_VALID_CARDANO_ADDRESS_FORMAT',
   IS_VALID_BITCOIN_ADDRESS_FORMAT = 'IS_VALID_BITCOIN_ADDRESS_FORMAT',
@@ -30,7 +29,7 @@ export interface ValidateRecipientParams {
   destChainInfo: _ChainInfo,
   fromAddress: string,
   toAddress: string,
-  account: AccountJson | null,
+  account: AccountJson | null, // If the recipient address exists in the wallet, then `account` is the information of that address.
   actionType: ActionType,
   autoFormatValue?: boolean,
   allowLedgerGenerics: string[]

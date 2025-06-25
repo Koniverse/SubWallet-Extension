@@ -273,7 +273,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
 
     const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, {
       accountAuthTypes: authInfo?.accountAuthTypes || [],
-      isSubstrateConnector: authInfo?.isSubstrateConnector
+      canConnectSubstrateEcdsa: authInfo?.canConnectSubstrateEcdsa
     }).map((proxy) => {
       const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 

@@ -151,6 +151,7 @@ export interface RequestAuthorizeTab {
   accountAuthTypes?: AccountAuthType[];
   allowedAccounts?: string[];
   reConfirm?: boolean;
+  canConnectSubstrateEcdsa?: boolean;
   isSubstrateConnector?: boolean;
 }
 

@@ -29,12 +29,12 @@ type WrapperProps = ThemeProps;
 
 interface AccountAddressValidationConditions {
   accountAuthTypes: AccountAuthType[];
-  isSubstrateConnector?: boolean;
+  canConnectSubstrateEcdsa?: boolean;
   accountSignMode?: AccountSignMode;
 }
 
 const isValidAccountChainType = (chainType: AccountChainType, conditions: AccountAddressValidationConditions): boolean => {
-  const { accountAuthTypes, accountSignMode, isSubstrateConnector } = conditions;
+  const { accountAuthTypes, accountSignMode, canConnectSubstrateEcdsa } = conditions;
 
   if (!accountAuthTypes) {
     return false;
@@ -42,7 +42,7 @@ const isValidAccountChainType = (chainType: AccountChainType, conditions: Accoun
 
   switch (chainType) {
     case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
-    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') && (isSubstrateConnector || accountSignMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER);
+    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') && (canConnectSubstrateEcdsa || accountSignMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER);
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
     case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
@@ -65,10 +65,10 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
       return ap.id !== 'ALL' && ap.chainTypes.some((chainType) => isValidAccountChainType(chainType, {
         accountAuthTypes,
         accountSignMode,
-        isSubstrateConnector: authInfo.isSubstrateConnector
+        canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
       }));
     });
-  }, [accountAuthTypes, accountProxies, authInfo.isSubstrateConnector]);
+  }, [accountAuthTypes, accountProxies, authInfo.canConnectSubstrateEcdsa]);
 
   const onOpenDAppConfigurationModal = useCallback(() => {
     activeModal(dAppConfigurationModalId);
@@ -90,7 +90,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
         if (isValidAccountChainType(account.chainType, {
           accountAuthTypes: authInfo.accountAuthTypes,
           accountSignMode: getSignMode(account),
-          isSubstrateConnector: authInfo.isSubstrateConnector
+          canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
         })) {
           newAllowedMap[account.address] = !isEnabled;
         }
@@ -127,7 +127,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
         )}
       />
     );
-  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, authInfo.isSubstrateConnector, pendingMap]);
+  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, authInfo.canConnectSubstrateEcdsa, pendingMap]);
 
   const searchFunc = useCallback((item: AccountJson, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();

@@ -14,7 +14,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll, searchAccountProxyFunction } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, InputRef, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
-import { CaretLeft, Export, FadersHorizontal } from 'phosphor-react';
+import { CaretLeft, Export, FadersHorizontal, Info } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -36,10 +36,6 @@ const filterOptions = [
   {
     label: 'QR signer account',
     value: AccountProxyType.QR
-  },
-  {
-    label: 'Ledger account',
-    value: AccountProxyType.LEDGER
   },
   {
     label: 'Watch-only account',
@@ -99,8 +95,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           return true;
         } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
           return true;
-        } else if (filter === AccountProxyType.LEDGER && accountType === AccountProxyType.LEDGER) {
-          return true;
         }
       }
 
@@ -125,6 +119,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (currentAccountIsAll) {
       return (
         <AccountProxySelectorAllItem
+          accountProxies={items}
           className='all-account-selection'
           isSelected={selected}
           key={item.id}
@@ -144,7 +139,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         showUnSelectedIcon
       />
     );
-  }, [changeAccounts, className, onAccountSelect, onClickItem]);
+  }, [changeAccounts, className, onAccountSelect, onClickItem, items]);
 
   const onClickFilterButton = useCallback(
     (e?: SyntheticEvent) => {
@@ -216,6 +211,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         )}
         id={id}
         onCancel={onBack}
+        rightIconProps={{
+          icon: <Icon
+            phosphorIcon={Info}
+            weight={'fill'}
+          />,
+          tooltipPlacement: 'bottomRight',
+          tooltip: t('SubWallet doesn’t support exporting Ledger accounts')
+        }}
         title={t('Export account')}
       >
         <SwList.Section

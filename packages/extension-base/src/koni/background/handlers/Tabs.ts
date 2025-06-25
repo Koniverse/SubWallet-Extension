@@ -83,8 +83,10 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         return false;
       }
 
+      const canConnectSubstrateEcdsa = authInfo?.canConnectSubstrateEcdsa && isSubstrateConnector;
+
       // If the dApp has not connected to the Substrate type yet, we do not return Substrate ECDSA accounts.
-      if (type === 'ethereum' && json.meta.isSubstrateECDSA && !isSubstrateConnector) {
+      if (type === 'ethereum' && json.meta.isSubstrateECDSA && !canConnectSubstrateEcdsa) {
         return false;
       }
 
