@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.3.43
+Build date: Jun 26, 2025.
+
+Features & Update:
+- TAO On-ramp Integration in SubWallet (#4358)
+- Update content for Buy & Sell tokens (#4456)
+- Update script scan list token support feature on/off-ramp (#4350)
+- Unblock when perform stake on Bifrost with ledger account (#3931)
+
+Bug fixed:
+- Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver (#4224)
+- Fixed bug Fails to Load on the Hone and earning screen (#4478)
+
+
 ## 1.3.42
 Build date: Jun 23, 2025.
 
