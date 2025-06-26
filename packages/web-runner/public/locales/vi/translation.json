@@ -1493,5 +1493,14 @@
   "Hanging in there...": "",
   "Pro tip: You can hit \"View process\" to view step-by-step details of your transaction": "",
   "Do not close the app!": "",
-  "View process": ""
+  "View process": "",
+  "Quote": "",
+  "Expected amount": "",
+  "Not found auth info": "",
+  "Not found owner key hash": "",
+  "No available Cardano account": "",
+  "Input": "",
+  "Output": "",
+  "Cardano dApp": "",
+  "No swap quote found. Adjust your amount and try again": ""
 }

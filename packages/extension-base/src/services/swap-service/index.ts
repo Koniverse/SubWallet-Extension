@@ -16,7 +16,7 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportSwapChain, getSwapAltToken, getSwapStep, getTokenPairFromStep, isChainsHasSameProvider, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportedSwapChains, getSwapAltToken, getSwapStep, getTokenPairFromStep, isChainsHasSameProvider, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
@@ -127,17 +127,27 @@ export class SwapService implements StoppableServiceInterface {
     * */
 
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
-    const optimalProcess = await this.generateOptimalProcessV2({
-      request,
-      selectedQuote: swapQuoteResponse.optimalQuote,
-      path
-    });
 
-    console.log('-------');
+    console.group('Swap Logger');
+    console.log('path', path);
+    console.log('swapQuoteResponse', swapQuoteResponse);
+
+    let optimalProcess;
+
+    try {
+      optimalProcess = await this.generateOptimalProcessV2({
+        request,
+        selectedQuote: swapQuoteResponse.optimalQuote,
+        path
+      });
+    } catch (e) {
+      throw new Error((e as Error).message);
+    }
+
     console.log('optimalProcess', optimalProcess);
-    console.log('-------');
+    console.groupEnd();
 
-    if (optimalProcess.steps.length - 1 < optimalProcess.path.length) { // minus the fill info step
+    if (JSON.stringify(processStepsToPathActions(optimalProcess.steps)) !== JSON.stringify(optimalProcess.path.map((e) => e.action))) {
       throw new Error('Swap pair is not found');
     }
 
@@ -151,7 +161,7 @@ export class SwapService implements StoppableServiceInterface {
   public getAvailablePath (request: SwapRequestV2): [DynamicSwapAction[], SwapRequestV2 | undefined] {
     const { address, pair } = request;
     // todo: control provider tighter
-    const supportSwapChains = getSupportSwapChain();
+    const supportSwapChains = getSupportedSwapChains();
     const fromToken = this.chainService.getAssetBySlug(pair.from);
     const toToken = this.chainService.getAssetBySlug(pair.to);
     const fromChain = _getAssetOriginChain(fromToken);
@@ -269,10 +279,28 @@ export class SwapService implements StoppableServiceInterface {
   }
 
   public async getLatestQuoteFromSwapRequest (request: SwapRequestV2): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
-    const [path, directSwapRequest] = this.getAvailablePath(request);
+    const availablePath = await subwalletApiSdk.swapApi?.findAvailablePath(request);
+
+    if (!availablePath) {
+      throw Error('No available path');
+    }
+
+    const { path } = availablePath;
+
+    const swapAction = path.find((step) => step.action === DynamicSwapType.SWAP);
+
+    const directSwapRequest: SwapRequestV2 | undefined = swapAction
+      ? { ...request,
+        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from)))),
+        pair: swapAction.pair }
+      : undefined;
 
     if (!directSwapRequest) {
       throw Error('Swap pair is not found');
+    }
+
+    if (path.length > 1 && path.map((action) => action.action).includes(DynamicSwapType.BRIDGE)) {
+      directSwapRequest.isCrossChain = true;
     }
 
     const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
