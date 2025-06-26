@@ -1,17 +1,17 @@
-    3073	AnhMTV                        	Release version 1.3.42
+    3082	AnhMTV                        	
     2671	Nam Phạm                      	disable block explorer for truth network
-    2575	S2kael                        	[Issue-4410] Update stable version for chain-list
+    2578	S2kael                        	[Issue-4410] Update stable version for chain-list
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      865	bluezdot                      	[Issue-4263] chores: migrate local flag `isAcknowledgedUnifiedAccountMigration`
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
-     458	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
+     459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
      354	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      291	tunghp2002                    	[Feat] Rollback subwallet api and rename api
      270	lw                            	
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
+     185	PDTnhah                       	[Issue-465][Chainlist] Remove more inactive networks in the Polkadot ecosystem
      185	quangdo                       	
-     182	PDTnhah                       	[Issue-465][Chainlist] Remove more inactive networks in the Polkadot ecosystem
      170	lw-cdm                        	
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
@@ -19,9 +19,9 @@
       83	leewong                       	
       82	Thibaut Sardan                	Add account filtering feature (#832)
       77	bluedot                       	[Issue-3888] build: upgrade version polkadot api
+      74	Thiendekaco                   	[Issue 4365] fix(ledger): add option skip recalculate fee for signPsbt
       63	Roman                         	fix ui issues
       53	Dominhquangdev                	update Bridge code
-      37	Thiendekaco                   	[Issue-4377] feat(dApp): update UI Connect dApp screen
       34	S2kael                        	
       28	Thiendekaco                   	[Issue-4100] fix: resolve PR feedback
       11	Phong Le Nhat                 	remove autoEnableTokens and modify method get free balance bitcoin
