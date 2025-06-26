@@ -152,7 +152,6 @@ export interface RequestAuthorizeTab {
   allowedAccounts?: string[];
   reConfirm?: boolean;
   canConnectSubstrateEcdsa?: boolean;
-  isSubstrateConnector?: boolean;
 }
 
 export interface RequestAuthorizeApprove {

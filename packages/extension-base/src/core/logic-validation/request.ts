@@ -9,6 +9,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { AmountData, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, reformatAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
@@ -389,6 +390,8 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     handleError('Substrate account can not send this transaction');
   }
 
+  const evmNetwork = koni.getChainInfo(networkKey || '');
+
   if (transaction.to) {
     if (!isEthereumAddress(transaction.to)) {
       handleError('invalid recipient address');
@@ -396,7 +399,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       try {
         const pairTo = keyring.getPair(transaction.to);
 
-        if (pairTo && pairTo.meta.isSubstrateECDSA) {
+        if (pairTo && pairTo.meta.isSubstrateECDSA && !_isSubstrateEvmCompatibleChain(evmNetwork)) {
           handleError('substrate account cannot receive this token');
         }
       } catch (e) {}
@@ -508,7 +511,6 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   }
 
   const hasError = (errors && errors.length > 0) || !networkKey;
-  const evmNetwork = koni.getChainInfo(networkKey || '');
   let isToContract = false;
   let hashPayload = '';
   let parseData: EvmTransactionData = '';

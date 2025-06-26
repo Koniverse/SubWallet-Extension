@@ -24,7 +24,7 @@ function Component ({ chainTypes, className }: Props): React.ReactElement<Props>
 
     result.sort((a, b) => ACCOUNT_CHAIN_TYPE_ORDINAL_MAP[a] - ACCOUNT_CHAIN_TYPE_ORDINAL_MAP[b]);
 
-    return [...new Set(result)];
+    return Array.from(new Set(result));
   }, [chainTypes]);
 
   return (

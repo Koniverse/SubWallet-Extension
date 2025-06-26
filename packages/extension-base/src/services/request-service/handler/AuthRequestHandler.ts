@@ -9,7 +9,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
-import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, SUBSTRATE_ECDSA_LEDGER_BLOCKLIST, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
+import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
@@ -61,7 +61,7 @@ export default class AuthRequestHandler {
         value.currentNetworkMap = {};
       }
 
-      if (value.accountAuthTypes?.includes('substrate') && !SUBSTRATE_ECDSA_LEDGER_BLOCKLIST.includes(stripUrl(value.url))) {
+      if (existKeyBothConnectAuthType) {
         value.canConnectSubstrateEcdsa = true;
       }
 
@@ -353,7 +353,7 @@ export default class AuthRequestHandler {
     const idStr = stripUrl(url);
     const isAllowedDappConnectBothType = !!DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL.find((url_) => url.includes(url_));
     let accountAuthTypes = [...new Set<AccountAuthType>(isAllowedDappConnectBothType ? ['evm', 'substrate'] : (request.accountAuthTypes || ['substrate']))];
-    let canConnectSubstrateEcdsa = !!request.isSubstrateConnector && !SUBSTRATE_ECDSA_LEDGER_BLOCKLIST.includes(idStr);
+    let canConnectSubstrateEcdsa = !!request.canConnectSubstrateEcdsa || isAllowedDappConnectBothType;
 
     if (!authList) {
       authList = {};
@@ -388,7 +388,7 @@ export default class AuthRequestHandler {
 
             accountAuthTypes = [...filteredAccountAuthTypes];
 
-            if (_request.request.isSubstrateConnector && !SUBSTRATE_ECDSA_LEDGER_BLOCKLIST.includes(idStr)) {
+            if (_request.request.canConnectSubstrateEcdsa) {
               canConnectSubstrateEcdsa = true;
             }
           }

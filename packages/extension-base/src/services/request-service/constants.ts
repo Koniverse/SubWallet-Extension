@@ -23,8 +23,3 @@ export const DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL = [
   'https://polkadot.js.org/apps/',
   'https://ipfs.io/ipns/dotapps.io'
 ];
-
-export const SUBSTRATE_ECDSA_LEDGER_BLOCKLIST = [
-  'subwallet-webapp.pages.dev', // Pull request build
-  'web.subwallet.app' // Production,
-];

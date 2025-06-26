@@ -71,13 +71,15 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
 
             case AccountSignMode.LEGACY_LEDGER:
             case AccountSignMode.GENERIC_LEDGER:
-            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
               if (account.chainType === AccountChainType.ETHEREUM) {
                 accountTitle = t('Ledger - EVM account');
               } else if (account.chainType === AccountChainType.SUBSTRATE) {
                 accountTitle = t('Ledger - Substrate account');
               }
 
+              break;
+            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+              accountTitle = t('Ledger - Polkadot (EVM) account');
               break;
           }
         }
