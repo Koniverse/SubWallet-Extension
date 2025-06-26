@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getSwapChainsFromPath, getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
-import { ProcessTransactionData, ProcessType } from '@subwallet/extension-base/types';
+import { ProcessTransactionData, ProcessType, SwapProviderId } from '@subwallet/extension-base/types';
 import { SwapBaseTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-web-ui/components/Swap';
@@ -58,6 +58,10 @@ const Component: React.FC<Props> = (props: Props) => {
   //   return data.process.steps.some((item) => item.type === CommonStepType.XCM);
   // }, [data.process.steps]);
   //
+
+  const isKyberSwap = useMemo(() => {
+    return data.provider.id === SwapProviderId.KYBER;
+  }, [data.provider.id]);
 
   const getWaitingTime = useMemo(() => {
     return Math.ceil((data.quote.estimatedArrivalTime || 0) / 60);
@@ -163,6 +167,15 @@ const Component: React.FC<Props> = (props: Props) => {
         {/*   /> */}
         {/* )} */}
       </MetaInfo>
+
+      {isKyberSwap && (
+        <AlertBox
+          className={'__swap-quote-expired'}
+          description={t('Due to market conditions, you may receive more or less than expected.')}
+          title={t('Pay attention!')}
+          type='warning'
+        />
+      )}
 
       {showQuoteExpired &&
         (

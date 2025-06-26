@@ -3,7 +3,7 @@
 
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { SwapTxData } from '@subwallet/extension-base/types/swap';
+import { SwapProviderId, SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo, QuoteRateDisplay, SwapRoute, SwapTransactionBlock } from '@subwallet/extension-web-ui/components';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -64,6 +64,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const originSwapPair = useMemo(() => {
     return getTokenPairFromStep(data.process.steps);
   }, [data.process.steps]);
+
+  const isKyberProvider = useMemo(() => {
+    return data.provider.id === SwapProviderId.KYBER;
+  }, [data.provider.id]);
 
   useEffect(() => {
     let timer: NodeJS.Timer;
@@ -126,31 +130,39 @@ const Component: React.FC<Props> = (props: Props) => {
         >
         </MetaInfo.Default>
         <SwapRoute swapRoute={data.quote.route} />
-        {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
-          className={'__swap-arrival-time'}
-          description={t(`Swapping via ${data.provider.name} can take up to ${getWaitingTime} minutes. Make sure you review all information carefully before submitting.`)}
+
+      </MetaInfo>
+      {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
+        className={'__swap-arrival-time'}
+        description={t(`Swapping via ${data.provider.name} can take up to ${getWaitingTime} minutes. Make sure you review all information carefully before submitting.`)}
+        title={t('Pay attention!')}
+        type='warning'
+      />}
+      {!showQuoteExpired && isSwapXCM && (
+        <AlertBox
+          className={'__swap-quote-warning'}
+          description={t('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')}
           title={t('Pay attention!')}
           type='warning'
-        />}
-        {!showQuoteExpired && isSwapXCM && (
-          <AlertBox
-            className={'__swap-quote-expired'}
-            description={t('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')}
-            title={t('Pay attention!')}
-            type='warning'
-          />
-        )}
-        {showQuoteExpired &&
+        />
+      )}
+      {isKyberProvider && (
+        <AlertBox
+          className={'__swap-quote-warning'}
+          description={t('Due to market conditions, you may receive more or less than expected')}
+          title={t('Pay attention!')}
+          type='warning'
+        />
+      )}
+      {showQuoteExpired &&
           (
             <AlertBox
-              className={'__swap-quote-expired'}
+              className={'__swap-quote-warning'}
               description={t('Swap quote expired. Cancel to get a new quote.')}
               title={t('Pay attention!')}
               type='warning'
             />)
-        }
-
-      </MetaInfo>
+      }
     </div>
   );
 };
@@ -164,7 +176,7 @@ const SwapTransactionConfirmation = styled(Component)<Props>(({ theme: { token }
     '.__swap-arrival-time': {
       marginTop: 12
     },
-    '.__swap-quote-expired': {
+    '.__swap-quote-warning': {
       marginTop: 12
     },
     '.__summary-to, .__summary-from': {

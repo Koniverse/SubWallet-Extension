@@ -3,17 +3,19 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-web-ui/components';
-import { DEFAULT_TRANSACTION_PARAMS, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL } from '@subwallet/extension-web-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-web-ui/contexts/TransactionContext';
 import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-web-ui/types';
-import { detectTransactionPersistKey } from '@subwallet/extension-web-ui/utils';
+import { detectTransactionPersistKey, getTransactionFromAccountProxyValue } from '@subwallet/extension-web-ui/utils';
 import { ButtonProps, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import React, { useCallback, useContext, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -40,8 +42,11 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
   const { isWebUI } = useContext(ScreenContext);
   const dataContext = useContext(DataContext);
 
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
+  const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
 
   const transactionType = useMemo((): ExtrinsicType => {
     const pathName = location.pathname;
@@ -92,15 +97,100 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
 
   const storageKey = useMemo((): string => detectTransactionPersistKey(transactionType), [transactionType]);
 
-  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, DEFAULT_TRANSACTION_PARAMS);
+  const defaultTransactionStorageValue = useMemo(() => {
+    const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
 
-  const cacheStorage = useDeferredValue(storage);
+    if (storageKey === NFT_TRANSACTION) {
+      return {
+        ...DEFAULT_NFT_PARAMS,
+        fromAccountProxy
+      };
+    }
 
-  const needPersistData = useMemo(() => {
-    return JSON.stringify(cacheStorage) === JSON.stringify(DEFAULT_TRANSACTION_PARAMS);
-  }, [cacheStorage]);
+    if (storageKey === TRANSFER_TRANSACTION) {
+      return {
+        ...DEFAULT_TRANSFER_PARAMS,
+        fromAccountProxy
+      };
+    }
 
-  const [defaultData] = useState(storage);
+    // STAKE_TRANSACTION current is deprecated
+    // if (storageKey === STAKE_TRANSACTION) {
+    //   return {
+    //     ...DEFAULT_STAKE_PARAMS,
+    //     fromAccountProxy
+    //   };
+    // }
+
+    if (storageKey === EARN_TRANSACTION) {
+      return {
+        ...DEFAULT_EARN_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === UN_STAKE_TRANSACTION) {
+      return {
+        ...DEFAULT_UN_STAKE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CANCEL_UN_STAKE_TRANSACTION) {
+      return {
+        ...DEFAULT_CANCEL_UN_STAKE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === WITHDRAW_TRANSACTION) {
+      return {
+        ...DEFAULT_WITHDRAW_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CLAIM_REWARD_TRANSACTION) {
+      return {
+        ...DEFAULT_CLAIM_REWARD_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === SWAP_TRANSACTION) {
+      return {
+        ...DEFAULT_SWAP_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CLAIM_BRIDGE_TRANSACTION) {
+      return {
+        ...DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    return {
+      ...DEFAULT_TRANSACTION_PARAMS,
+      fromAccountProxy
+    };
+  }, [currentAccountProxy, storageKey]);
+
+  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, { ...defaultTransactionStorageValue });
+
+  // TODO: Review needPersistData — may be outdated and misaligned with current logic
+  //  Temporarily set needPersistData to false to avoid unintended side effects
+
+  // const cacheStorage = useDeferredValue(storage);
+
+  // const needPersistData = useMemo(() => {
+  //   return JSON.stringify(cacheStorage) === JSON.stringify(DEFAULT_TRANSACTION_PARAMS);
+  // }, [cacheStorage]);
+
+  const needPersistData = false;
+
+  const [defaultData, setDefaultData] = useState(storage);
   const { chain, from } = storage;
 
   const homePath = useMemo((): string => {
@@ -217,12 +307,48 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
     </>
   );
 
+  // TODO (Hotfix):
+  //  Temporary workaround for handling cases where a user opens a transaction screen via direct link.
+  //  This fixes the issue where form values are incorrectly restored from a previously cached transaction.
+  //  Expected direction:
+  //  - Allow external logic to override form values cleanly.
+  //  - fromAccountProxy should not be strictly tied to currentAccountProxy.
+  //  - Ensure direct link access to transaction screens works reliably and cleanly without stale form data.
+  useEffect(() => {
+    const doFunction = () => {
+      if (![SWAP_TRANSACTION, TRANSFER_TRANSACTION, EARN_TRANSACTION].includes(storageKey)) {
+        return;
+      }
+
+      if (!currentAccountProxy) {
+        return;
+      }
+
+      if (getTransactionFromAccountProxyValue(currentAccountProxy) === storage.fromAccountProxy) {
+        return;
+      }
+
+      setStorage({
+        ...defaultTransactionStorageValue
+      });
+      setDefaultData({
+        ...defaultTransactionStorageValue
+      });
+      setForceRerenderKey(`${Date.now()}_ForceRerenderKey`);
+    };
+
+    doFunction();
+  }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy, storageKey]);
+
   if (modalContent) {
     return (
       <>
         <TransactionContext.Provider value={contextValues}>
           <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
-            <div className={CN(className, 'transaction-wrapper __modal-content')}>
+            <div
+              className={CN(className, 'transaction-wrapper __modal-content')}
+              key={forceRerenderKey}
+            >
               {children}
             </div>
           </PageWrapper>
@@ -243,7 +369,10 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
         >
           <TransactionContext.Provider value={contextValues}>
             <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
-              <div className={CN(className, 'transaction-wrapper')}>
+              <div
+                className={CN(className, 'transaction-wrapper')}
+                key={forceRerenderKey}
+              >
                 <Outlet />
               </div>
             </PageWrapper>
@@ -263,7 +392,10 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
       >
         <TransactionContext.Provider value={contextValues}>
           <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
-            <div className={CN(className, 'transaction-wrapper')}>
+            <div
+              className={CN(className, 'transaction-wrapper')}
+              key={forceRerenderKey}
+            >
               <SwSubHeader
                 background={'transparent'}
                 center

@@ -52,7 +52,7 @@ function Component ({ className, request, type }: Props) {
   const ownerAddresses = useMemo(() => filterAddresses(txInputs, 'isOwner'), [txInputs]);
   const recipientAddresses = useMemo(() => filterAddresses(txOutputs, 'isRecipient'), [txOutputs]);
 
-  const amount = useMemo(() => calculateAccountBalance(value), [value]);
+  const totalValue = useMemo(() => calculateAccountBalance(value), [value]);
 
   const renderAccountTransactionDetail = useCallback((accountMap: Record<string, AddressCardanoTransactionBalance>) => {
     return (
@@ -95,9 +95,9 @@ function Component ({ className, request, type }: Props) {
         <MetaInfo className={'confirmation-content-body'}>
           <MetaInfo.Number
             decimals={chainInfo?.cardanoInfo?.decimals}
-            label={t('Amount')}
+            label={t('Transaction summary')}
             suffix={chainInfo?.cardanoInfo?.symbol}
-            value={amount}
+            value={totalValue}
           />
           <div className='input-transaction'>
             <div className='account-label'>{t('From account')}</div>

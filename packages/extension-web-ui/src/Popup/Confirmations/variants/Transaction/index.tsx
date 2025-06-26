@@ -8,6 +8,7 @@ import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-web-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { SubmitApiArea } from '@subwallet/extension-web-ui/Popup/Confirmations/parts';
 import TonSignArea from '@subwallet/extension-web-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-web-ui/stores/base/RequestState';
@@ -207,6 +208,17 @@ const Component: React.FC<Props> = (props: Props) => {
             extrinsicType={transaction.extrinsicType}
             id={item.id}
             payload={(item as ConfirmationDefinitions['evmSendTransactionRequest' | 'evmWatchTransactionRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
+        (type === 'submitApiRequest') && (
+          <SubmitApiArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitions['submitApiRequest'][0])}
             txExpirationTime={txExpirationTime}
             type={type}
           />

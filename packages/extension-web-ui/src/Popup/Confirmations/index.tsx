@@ -9,6 +9,7 @@ import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/ut
 import { AlertModal } from '@subwallet/extension-web-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-web-ui/constants';
 import { useAlert, useConfirmationsInfo, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { SubmitApiConfirmation } from '@subwallet/extension-web-ui/Popup/Confirmations/variants/Action';
 import { ConfirmationType } from '@subwallet/extension-web-ui/stores/base/RequestState';
 import { AccountSignMode, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { findAccountByAddress, getSignMode, isRawPayload } from '@subwallet/extension-web-ui/utils';
@@ -37,7 +38,8 @@ const titleMap: Record<ConfirmationType, string> = {
   signingRequest: detectTranslate('Signature request'),
   connectWCRequest: detectTranslate('WalletConnect'),
   notSupportWCRequest: detectTranslate('WalletConnect'),
-  errorConnectNetwork: detectTranslate('Transaction request')
+  errorConnectNetwork: detectTranslate('Transaction request'),
+  submitApiRequest: detectTranslate('Approve request')
 } as Record<ConfirmationType, string>;
 
 const alertModalId = 'confirmation-alert-modal';
@@ -107,6 +109,12 @@ const Component = function ({ className }: Props) {
         account = findAccountByAddress(accounts, request.payload.address) || undefined;
         canSign = request.payload.canSign;
         isMessage = confirmation.type === 'cardanoSignatureRequest';
+      } else if (confirmation.type === 'submitApiRequest') {
+        const request = confirmation.item as ConfirmationDefinitions['submitApiRequest'][0];
+
+        account = findAccountByAddress(accounts, request.payload.address) || undefined;
+        canSign = request.payload.canSign;
+        isMessage = false;
       }
 
       const signMode = getSignMode(account);
@@ -129,7 +137,7 @@ const Component = function ({ className }: Props) {
       }
     }
 
-    if (confirmation.item.isInternal && confirmation.type !== 'connectWCRequest' && confirmation.type !== 'evmSignatureRequest') {
+    if (confirmation.item.isInternal && !['connectWCRequest', 'evmSignatureRequest', 'submitApiRequest'].includes(confirmation.type)) {
       return (
         <TransactionConfirmation
           closeAlert={closeAlert}
@@ -170,6 +178,13 @@ const Component = function ({ className }: Props) {
         return (
           <EvmTransactionConfirmation
             request={confirmation.item as ConfirmationDefinitions['evmSendTransactionRequest'][0]}
+            type={confirmation.type}
+          />
+        );
+      case 'submitApiRequest':
+        return (
+          <SubmitApiConfirmation
+            request={confirmation.item as ConfirmationDefinitions['submitApiRequest'][0]}
             type={confirmation.type}
           />
         );

@@ -1,14 +1,16 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
+import { AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, SwitchNetworkAuthorizeModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
 import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Account/SeedPhraseModal';
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
 import { AddressQrModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AddressQrModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/SelectAddressFormatModal';
+import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-web-ui/components/Modal/Swap/SwapFeesModal';
+import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-web-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-web-ui/components/Modal/TransactionStepsModal';
-import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, SELECT_ADDRESS_FORMAT_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { useAlert, useGetConfig, useSetSessionLatest, useSwitchModal } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -93,6 +95,14 @@ export interface WalletModalContextType {
   },
   transactionStepsModal: {
     open: (props: TransactionStepsModalProps) => void
+  },
+  swapFeesModal: {
+    open: (props: SwapFeesModalProps) => void,
+    checkActive: () => boolean,
+    update: React.Dispatch<React.SetStateAction<SwapFeesModalProps | undefined>>;
+  }
+  switchNetworkAuthorizeModal: {
+    open: (props: SwitchNetworkAuthorizeModalProps) => void
   }
 }
 
@@ -135,6 +145,16 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
   },
   transactionStepsModal: {
     open: noop
+  },
+  switchNetworkAuthorizeModal: {
+    open: noop
+  },
+  swapFeesModal: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    open: () => {},
+    checkActive: () => false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update: () => {}
   }
 });
 
@@ -174,6 +194,8 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const [tonWalletContractSelectorModalProps, setTonWalletContractSelectorModalProps] = useState<TonWalletContractSelectorModalProps | undefined>();
   const [transactionProcessId, setTransactionProcessId] = useState('');
   const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
+  const [switchNetworkAuthorizeModalProps, setSwitchNetworkAuthorizeModalProps] = useState<SwitchNetworkAuthorizeModalProps | undefined>(undefined);
+  const [swapFeesModalProps, setSwapFeesModalProps] = useState<SwapFeesModalProps | undefined>(undefined);
 
   const openAddressQrModal = useCallback((props: AddressQrModalProps) => {
     setAddressQrModalProps(props);
@@ -252,7 +274,33 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setTransactionStepsModalProps(undefined);
     inactiveModal(TRANSACTION_STEPS_MODAL);
   }, [inactiveModal]);
+
+  const openSwapFeesModal = useCallback((props: SwapFeesModalProps) => {
+    setSwapFeesModalProps(props);
+    activeModal(SWAP_FEES_MODAL);
+  }, [activeModal]);
+
+  const closeSwapFeesModal = useCallback(() => {
+    setSwapFeesModalProps(undefined);
+    inactiveModal(SWAP_FEES_MODAL);
+  }, [inactiveModal]);
+
+  const checkSwapFeesModalActive = useCallback(() => {
+    return checkActive(SWAP_FEES_MODAL);
+  }, [checkActive]);
   /* Process modal */
+
+  /* Switch current network authorize modal */
+  const openSwitchNetworkAuthorizeModal = useCallback((props: SwitchNetworkAuthorizeModalProps) => {
+    setSwitchNetworkAuthorizeModalProps(props);
+    activeModal(SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL);
+  }, [activeModal]);
+
+  const closeSwitchNetworkAuthorizeModal = useCallback(() => {
+    inactiveModal(SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL);
+    setSwitchNetworkAuthorizeModalProps(undefined);
+  }, [inactiveModal]);
+  /* Switch current network authorize modal */
 
   const contextValue: WalletModalContextType = useMemo(() => ({
     addressQrModal: {
@@ -282,8 +330,16 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     },
     transactionStepsModal: {
       open: openTransactionStepsModal
+    },
+    switchNetworkAuthorizeModal: {
+      open: openSwitchNetworkAuthorizeModal
+    },
+    swapFeesModal: {
+      open: openSwapFeesModal,
+      checkActive: checkSwapFeesModalActive,
+      update: setSwapFeesModalProps
     }
-  }), [openAddressQrModal, checkAddressQrModalActive, closeAddressQrModal, openSelectAddressFormatModal, closeSelectAddressFormatModal, openTonWalletContractSelectorModal, onCancelTonWalletContractSelectorModal, openAlert, updateAlertProps, closeAlert, openDeriveModal, openProcessModal, openTransactionStepsModal]);
+  }), [openAddressQrModal, checkAddressQrModalActive, closeAddressQrModal, openSelectAddressFormatModal, closeSelectAddressFormatModal, openTonWalletContractSelectorModal, onCancelTonWalletContractSelectorModal, openAlert, updateAlertProps, closeAlert, openDeriveModal, openProcessModal, openTransactionStepsModal, openSwitchNetworkAuthorizeModal, openSwapFeesModal, checkSwapFeesModalActive]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -390,6 +446,23 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         <TransactionStepsModal
           {...transactionStepsModalProps}
           onCancel={closeTransactionStepsModal}
+        />
+      )
+    }
+
+    {
+      !!switchNetworkAuthorizeModalProps && (
+        <SwitchNetworkAuthorizeModal
+          {...switchNetworkAuthorizeModalProps}
+          onCancel={closeSwitchNetworkAuthorizeModal}
+        />
+      )
+    }
+    {
+      swapFeesModalProps && (
+        <SwapFeesModal
+          {...swapFeesModalProps}
+          onCancel={closeSwapFeesModal}
         />
       )
     }
