@@ -13,7 +13,7 @@ import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isAddress, isBitcoinAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
@@ -277,6 +277,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
     return true;
   }
 
+  if (isBitcoinAddress(address) && authAccountTypes?.includes('bitcoin')) {
+    return true;
+  }
+
   return false;
 };
 
@@ -286,7 +290,8 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
     [AccountChainType.ETHEREUM]: logoMap.network.ethereum as string,
     [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string,
     [AccountChainType.TON]: logoMap.network.ton as string,
-    [AccountChainType.CARDANO]: logoMap.network.cardano as string
+    [AccountChainType.CARDANO]: logoMap.network.cardano as string,
+    [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string
   };
 }
 
