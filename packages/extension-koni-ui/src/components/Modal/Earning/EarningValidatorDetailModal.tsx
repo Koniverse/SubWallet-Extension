@@ -8,7 +8,7 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { ModalContext, Number, SwModal } from '@subwallet/react-ui';
+import { ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -45,6 +45,11 @@ function Component (props: Props): React.ReactElement<Props> {
   const isParaChain = useMemo(() => {
     return _STAKING_CHAIN_GROUP.para.includes(chain) || _STAKING_CHAIN_GROUP.amplitude.includes(chain);
   }, [chain]);
+
+  const isBittensorChain = useMemo(() => {
+    return chain === 'bittensor' || chain === 'bittensor_testnet';
+  }, [chain]);
+
   const title = useMemo(() => {
     const label = getValidatorLabel(chain);
 
@@ -115,27 +120,41 @@ function Component (props: Props): React.ReactElement<Props> {
         />
 
         {
-          totalStake !== '0' && <MetaInfo.Number
-            decimals={decimals}
-            label={t('Total stake')}
-            suffix={symbol}
-            value={totalStake}
-            valueColorSchema={'even-odd'}
-          />
+          totalStake !== '0' &&
+            <MetaInfo.Number
+              decimals={decimals}
+              label={isBittensorChain ? t('Total stake weight') : t('Total stake')}
+              suffix={symbol}
+              value={totalStake}
+              valueColorSchema={'even-odd'}
+            />
         }
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Own stake')}
+          label={
+            isBittensorChain
+              ? (
+                <Tooltip
+                  placement='topLeft'
+                  title={t('Calculated as 18% of the root stake')}
+                >
+                  <span style={{ cursor: 'pointer' }}>
+                    {t('Root weight')}
+                  </span>
+                </Tooltip>
+              )
+              : t('Own stake')
+          }
           suffix={symbol}
           value={ownStake}
-          valueColorSchema={'even-odd'}
+          valueColorSchema='even-odd'
         />
 
         {
           otherStake !== '0' && <MetaInfo.Number
             decimals={decimals}
-            label={t('Stake from others')}
+            label={isBittensorChain ? t('Subnet stake') : t('Stake from others')}
             suffix={symbol}
             value={otherStake}
             valueColorSchema={'even-odd'}

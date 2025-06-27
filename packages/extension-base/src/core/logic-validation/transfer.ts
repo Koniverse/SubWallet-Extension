@@ -225,6 +225,14 @@ export function checkSupportForAction (validationResponse: SWTransactionResponse
       break;
     }
 
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR: {
+      const data = validationResponse.data as ExtrinsicDataTypeMap[ExtrinsicType.CHANGE_EARNING_VALIDATOR];
+      const slug = data.slug;
+
+      currentAction = `${extrinsicType}___${slug}`;
+      break;
+    }
+
     case ExtrinsicType.STAKING_CLAIM_REWARD: {
       const data = validationResponse.data as ExtrinsicDataTypeMap[ExtrinsicType.STAKING_CLAIM_REWARD];
       const slug = data.slug;

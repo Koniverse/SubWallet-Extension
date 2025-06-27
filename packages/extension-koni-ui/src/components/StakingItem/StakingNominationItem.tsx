@@ -9,7 +9,7 @@ import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
-import { CheckCircle } from 'phosphor-react';
+import { CheckCircle, CurrencyCircleDollar } from 'phosphor-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -18,10 +18,11 @@ type Props = ThemeProps & {
   nominationInfo: NominationInfo;
   isSelected?: boolean;
   poolInfo: YieldPoolInfo
+  isChangeValidator?: boolean
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isSelected, nominationInfo, poolInfo } = props;
+  const { className, isChangeValidator, isSelected, nominationInfo, poolInfo } = props;
   const { chain } = nominationInfo;
   const networkPrefix = useGetChainPrefixBySlug(chain);
 
@@ -48,19 +49,49 @@ const Component: React.FC<Props> = (props: Props) => {
         middleItem={
           <>
             <div className={'middle-item__name-wrapper'}>
-              <div className={'middle-item__name'}>{nominationInfo.validatorIdentity || toShort(nominationInfo.validatorAddress)}</div>
+              <div className={'middle-item__name'}>
+                {nominationInfo.validatorIdentity || toShort(nominationInfo.validatorAddress)}
+              </div>
             </div>
 
             <div className={'middle-item__info'}>
-              <div className={'middle-item__active-stake'}>
-                <span>
-                  {t('Staked:')}
-                </span>
-                <span>
-                  &nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;
-                </span>
-                <span>{ subnetSymbol || symbol }</span>
-              </div>
+              {
+                isChangeValidator && (nominationInfo.commission || nominationInfo.expectedReturn)
+                  ? (
+                    <div className={'middle-item__change-validator'}>
+                      <div className={'middle-item'}>
+                        {nominationInfo.commission && (
+                          <span className='middle-item__commission'>
+                            <Icon
+                              phosphorIcon={CurrencyCircleDollar}
+                              size='xs'
+                              weight='fill'
+                            />
+                            &nbsp;: {nominationInfo.commission}%
+                          </span>
+                        )}
+                        {nominationInfo.expectedReturn && (
+                          <>
+                            -
+                            <div className='middle-item__apy'>
+                            &nbsp;APY: {nominationInfo.expectedReturn}%
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <span className={'middle-item__active-stake'}>
+                        {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
+                      </span>
+                    </div>
+                  )
+                  : (
+                    <div className={'middle-item__active-stake'}>
+                      <span>{t('Staked:')}</span>
+                      <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
+                      <span>{subnetSymbol || symbol}</span>
+                    </div>
+                  )
+              }
             </div>
           </>
         }
@@ -123,6 +154,33 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
     '.right-item__select-icon': {
       paddingLeft: token.paddingSM - 2,
       paddingRight: token.paddingSM - 2
+    },
+
+    '.middle-item__change-validator': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight4,
+      maxWidth: '236px'
+    },
+
+    '.middle-item': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.marginXXS
+    },
+
+    '.middle-item__commission': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.middle-item__apy': {
+      color: token.colorSuccess,
+      display: 'flex',
+      alignItems: 'center'
     }
   };
 });
