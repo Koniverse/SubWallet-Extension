@@ -85,7 +85,11 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
   const [selectedOption, setSelectedOption] = useState<AnalyzeAddress | undefined>();
   const [openDropdownManually, setOpenDropdownManually] = useState<boolean | undefined>();
   const [inputValue, setInputValue] = useState<string | undefined>(value);
-  const [autoFormatValue, setAutoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
+
+  // TODO: Temporarily disable "Advanced address conversion" to prevent invalid token transfers.
+  //  Re-enable after related issues are fixed.
+  const [, setAutoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
+  const autoFormatValue = false;
 
   const chainInfo = useGetChainInfo(chainSlug || '');
 
@@ -112,9 +116,12 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     setOpenDropdownManually(undefined);
   }, []);
 
-  const isShowAdvancedAddressDetection = useMemo(() => {
-    return !!chainInfo && _isPureSubstrateChain(chainInfo);
-  }, [chainInfo]);
+  // TODO: Temporarily disable "Advanced address conversion" to prevent invalid token transfers.
+  //  Re-enable after related issues are fixed.
+  // const isShowAdvancedAddressDetection = useMemo(() => {
+  //   return !!chainInfo && _isPureSubstrateChain(chainInfo);
+  // }, [chainInfo]);
+  const isShowAdvancedAddressDetection = false;
 
   const _onBlur: React.FocusEventHandler<HTMLInputElement> = useCallback((event) => {
     const _inputValue = (inputValue || '').trim();
