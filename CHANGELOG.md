@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.44
+Build date: Jun 27, 2025.
+
+Bug fixed:
+- Fixed error validate receive address when transferring MYTH (Mythos) ($4486)
+
+
 ## 1.3.43
 Build date: Jun 26, 2025.
 
