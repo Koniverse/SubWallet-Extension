@@ -20,6 +20,8 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
         return chainTypes.includes(AccountChainType.TON);
       } else if (type === 'cardano') {
         return chainTypes.includes(AccountChainType.CARDANO);
+      } else if (type === 'bitcoin') {
+        return chainTypes.includes(AccountChainType.BITCOIN);
       }
 
       return false;
@@ -49,6 +51,8 @@ export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthTy
       chainTypes.push(AccountChainType.TON);
     } else if (type === 'cardano') {
       chainTypes.push(AccountChainType.CARDANO);
+    } else if (type === 'bitcoin') {
+      chainTypes.push(AccountChainType.BITCOIN);
     }
   });
 
