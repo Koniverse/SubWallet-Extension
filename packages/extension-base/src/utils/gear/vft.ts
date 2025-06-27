@@ -101,12 +101,14 @@ export class VftService {
 // Cache sail
 let cachedSails: Sails | null = null;
 
-export async function getSails(): Promise<Sails> {
+export async function getSails (): Promise<Sails> {
   if (!cachedSails) {
     const parser = await SailsIdlParser.new();
+
     cachedSails = new Sails(parser);
     cachedSails.parseIdl(vftIdl);
   }
+
   return cachedSails;
 }
 

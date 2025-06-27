@@ -22,7 +22,8 @@ export function getGRC20ContractPromise (apiPromise: ApiPromise, contractAddress
   return new GRC20(gearApi, contractAddress as HexString);
 }
 
-export async function getVFTContractPromise(api: GearApi, contractAddress: string = '0x'): Promise<VFT> {
+export async function getVFTContractPromise (api: GearApi, contractAddress = '0x'): Promise<VFT> {
   const sails = await getSails();
+
   return new VFT(api, contractAddress as `0x${string}`, sails);
 }
