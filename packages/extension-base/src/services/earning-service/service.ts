@@ -454,17 +454,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
         return;
       }
 
-      const updatedMetadata = {
-        ...item.metadata,
-        availableMethod: handler.availableMethod
-      };
+      const updatedItem = structuredClone(item);
 
-      const updatedItem = {
-        ...item,
-        metadata: updatedMetadata
-      };
+      updatedItem.metadata.availableMethod = handler.availableMethod;
 
-      this.updateYieldPoolInfo(updatedItem as YieldPoolInfo);
+      this.updateYieldPoolInfo(updatedItem);
     });
 
     return onlineData;
