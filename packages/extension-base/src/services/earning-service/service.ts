@@ -76,6 +76,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
       const symbol = _getChainSubstrateTokenSymbol(chainInfo);
 
       if (_STAKING_CHAIN_GROUP.relay.includes(chain)) {
+        if (_STAKING_CHAIN_GROUP.assetHub.includes(chain)) {
+          continue;
+        }
+
         const ahChain = ahMapChain[chain];
 
         if (ahChain) {
