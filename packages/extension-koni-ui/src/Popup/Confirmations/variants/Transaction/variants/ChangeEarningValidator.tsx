@@ -31,7 +31,6 @@ type ValidatorGroupProps = {
   total: number;
   label?: string;
   className?: string;
-  isBittensorChain?: boolean
   maxValidator?: number
 };
 
@@ -93,13 +92,13 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
 };
 
 const ValidatorGroup = (props: ValidatorGroupProps) => {
-  const { isBittensorChain, total } = props;
+  const { total } = props;
 
   if (total === 0) {
     return null;
   }
 
-  if (total === 1 || isBittensorChain) {
+  if (total === 1) {
     return <ValidatorAddress {...props} />;
   }
 
@@ -118,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
-  const { deselectedAddresses, deselectedCount, newlySelectedAddresses, newlySelectedCount, totalSelectedCount } = useMemo(() => {
+  const { deselectedAddresses, deselectedCount, newValidatorAddresses, newlySelectedAddresses, newlySelectedCount, totalSelectedCount } = useMemo(() => {
     const oldValidatorAddresses = compound?.nominations?.map((item) => item.validatorAddress) || [];
     const newValidatorAddresses = data.selectedValidators.map((v) => v.address);
 
@@ -132,7 +131,8 @@ const Component: React.FC<Props> = (props: Props) => {
       deselectedCount: deselectedAddresses.length,
       newlySelectedCount: newlySelectedAddresses.length,
       deselectedAddresses,
-      newlySelectedAddresses
+      newlySelectedAddresses,
+      newValidatorAddresses
     };
   }, [compound?.nominations, data.selectedValidators]);
 
@@ -174,7 +174,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
           {(compound && !isBittensorChain) && (
             <ValidatorGroup
-              addresses={newlySelectedAddresses}
+              addresses={newValidatorAddresses}
               compound={compound}
               maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
               modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
@@ -186,16 +186,15 @@ const Component: React.FC<Props> = (props: Props) => {
         </MetaInfo>
       </MetaInfo>
 
-      {compound && (
+      {compound && isBittensorChain && (
         <MetaInfo
           className='nomination-wrapper'
           hasBackgroundWrapper
         >
-          <ValidatorGroup
+          <ValidatorAddress
             addresses={deselectedAddresses}
             className='deselected'
             compound={compound}
-            isBittensorChain={isBittensorChain}
             label='From validator'
             modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-deselected`}
             poolInfo={poolInfo}
@@ -203,7 +202,7 @@ const Component: React.FC<Props> = (props: Props) => {
             total={deselectedCount}
           />
 
-          <ValidatorGroup
+          <ValidatorAddress
             addresses={newlySelectedAddresses}
             className='newly-selected'
             compound={compound}

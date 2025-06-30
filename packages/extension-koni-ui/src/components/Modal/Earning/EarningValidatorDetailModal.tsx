@@ -8,7 +8,8 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-ui';
+import { Icon, ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-ui';
+import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -139,8 +140,9 @@ function Component (props: Props): React.ReactElement<Props> {
                   placement='topLeft'
                   title={t('Calculated as 18% of the root stake')}
                 >
-                  <span style={{ cursor: 'pointer' }}>
+                  <span className={'__tooltip-label'}>
                     {t('Root weight')}
+                    <Icon phosphorIcon={Info} />
                   </span>
                 </Tooltip>
               )
@@ -211,6 +213,12 @@ const EarningValidatorDetailModal = styled(Component)<Props>(({ theme: { token }
   return ({
     '.__maximum-validator .__value': {
       display: 'flex'
+    },
+    '.__tooltip-label': {
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+      gap: token.sizeXXS
     }
   });
 });

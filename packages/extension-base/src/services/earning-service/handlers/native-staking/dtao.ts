@@ -192,7 +192,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: true
   };
 
   constructor (state: KoniState, chain: string) {
@@ -419,7 +420,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
       }
     }
 
-    console.log('nominationList', nominationList);
     const stakingStatus = getEarningStatusByNominations(allActiveStake, nominationList);
 
     return {
@@ -595,9 +595,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const _topValidator = await this.bittensorCache.get();
 
     const topValidator = _topValidator;
-    const getNominatorMinRequiredStake = this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake();
-    const nominatorMinRequiredStake = (await getNominatorMinRequiredStake).toString();
-    const bnMinBond = new BigN(nominatorMinRequiredStake);
+    const bnMinBond = new BigN(DEFAULT_DTAO_MINBOND);
     const validatorList = topValidator.data;
 
     const aprResponse = await this.bittensorCache.fetchApr(netuid);

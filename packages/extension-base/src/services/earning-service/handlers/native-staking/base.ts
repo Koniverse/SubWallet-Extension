@@ -15,13 +15,14 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: true,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   constructor (state: KoniState, chain: string) {

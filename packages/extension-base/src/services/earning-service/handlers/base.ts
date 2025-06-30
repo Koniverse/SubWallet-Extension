@@ -46,7 +46,7 @@ export default abstract class BasePoolHandler {
   public readonly transactionChainType: ChainType = ChainType.SUBSTRATE;
 
   /** Pool's available method */
-  protected abstract readonly availableMethod: YieldPoolMethodInfo;
+  public abstract readonly availableMethod: YieldPoolMethodInfo;
 
   /**
    * @constructor

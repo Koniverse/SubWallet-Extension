@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
@@ -20,8 +20,9 @@ type Props = ThemeProps & {
 };
 
 function Component ({ className, compound, inputAsset, list, poolInfo }: Props) {
-  const { type } = compound;
-  const isValidator = useMemo(() => [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(type), [type]);
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
 
   return (
     <div
@@ -33,7 +34,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         list={list}
         poolInfo={poolInfo}
       />
-      {isValidator
+      {canChangeValidator
         ? <SelectedValidatorInfoPart
           compound={compound}
           inputAsset={inputAsset}

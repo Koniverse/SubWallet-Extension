@@ -249,9 +249,10 @@ const Component = (props: Props) => {
         .catch(onError)
         .finally(() => {
           setSubmitLoading(false);
+          onCancelSelectValidator();
         });
     }, 300);
-  }, [poolInfo.slug, from, onSuccess, onError, inactiveAll]);
+  }, [poolInfo.slug, from, onError, onSuccess, inactiveAll, onCancelSelectValidator]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

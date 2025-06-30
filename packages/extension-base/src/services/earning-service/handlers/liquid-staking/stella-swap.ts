@@ -49,13 +49,14 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
   protected readonly feeAssets: string[] = ['moonbeam-NATIVE-GLMR'];
   public override transactionChainType: ChainType = ChainType.EVM;
   protected readonly rateDecimals = 10; // Derivative asset decimals
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   constructor (state: KoniState, chain: string) {

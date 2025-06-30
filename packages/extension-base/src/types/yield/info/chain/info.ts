@@ -54,6 +54,9 @@ export interface YieldPoolMethodInfo {
 
   /** Pool can claim reward */
   claimReward: boolean;
+
+  /** Pool can change validator */
+  changeValidator: boolean;
 }
 
 /**

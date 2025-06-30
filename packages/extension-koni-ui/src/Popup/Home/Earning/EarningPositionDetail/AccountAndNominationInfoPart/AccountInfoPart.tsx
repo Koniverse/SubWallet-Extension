@@ -104,6 +104,10 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);
   }, [poolInfo.type]);
 
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
+
   const noNomination = useMemo(
     () => !haveNomination || isAllAccount || !compound.nominations.length,
     [compound.nominations.length, haveNomination, isAllAccount]
@@ -240,7 +244,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   className={'__nomination-button'}
                   disabled={disableButton}
                   onClick={
-                    haveValidator
+                    canChangeValidator
                       ? createOpenValidator(item)
                       : createOpenNomination(item)
                   }
@@ -248,7 +252,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   type='ghost'
                 >
                   <div className='__nomination-button-label'>
-                    {t(haveValidator ? 'Your validators' : 'Nomination info')}
+                    {t(canChangeValidator ? 'Your validators' : 'Nomination info')}
                   </div>
 
                   <Icon
@@ -262,7 +266,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, createOpenValidator, createOpenNomination]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination]);
 
   return (
     <>
@@ -359,8 +363,9 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
   '.__carousel-container': {
     '.slick-prev, .slick-next': {
       width: 40,
+      height: 0,
       position: 'absolute',
-      top: 0,
+      top: 'calc(50% - 20px)',
       bottom: 0,
       cursor: 'pointer',
       zIndex: 20
@@ -384,7 +389,6 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__left-arrow, .__right-arrow': {
       width: '100%',
-      height: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'

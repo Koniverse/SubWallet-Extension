@@ -448,7 +448,23 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const onlineData = await fetchPoolsData();
 
     Object.values(onlineData).forEach((item) => {
-      this.updateYieldPoolInfo(item);
+      const handler = this.getPoolHandler(item.slug);
+
+      if (!handler) {
+        return;
+      }
+
+      const updatedMetadata = {
+        ...item.metadata,
+        availableMethod: handler.availableMethod
+      };
+
+      const updatedItem = {
+        ...item,
+        metadata: updatedMetadata
+      };
+
+      this.updateYieldPoolInfo(updatedItem as YieldPoolInfo);
     });
 
     return onlineData;

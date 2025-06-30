@@ -197,13 +197,14 @@ export class BittensorCache {
 // };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: true
   };
 
   private bittensorCache: BittensorCache;

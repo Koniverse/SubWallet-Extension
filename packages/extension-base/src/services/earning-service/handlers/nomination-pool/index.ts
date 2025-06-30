@@ -27,13 +27,14 @@ export default class NominationPoolHandler extends BasePoolHandler {
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   constructor (state: KoniState, chain: string) {

@@ -5,12 +5,13 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { calculateAlephZeroValidatorReturn, calculateChainStakedReturnV2, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getAvgValidatorEraReward, getCommission, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getRelayBlockedValidatorList, getRelayEraRewardMap, getRelayMaxNominations, getRelayTopValidatorByPoints, getRelayValidatorPointsMap, getRelayWaitingValidatorList, getSupportedDaysByHistoryDepth } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, _SUPPORT_CHANGE_VALIDATOR_CHAIN, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
 import { applyDecimal, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
-import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -24,6 +25,26 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import BaseNativeStakingPoolHandler from './base';
 
 export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPoolHandler {
+  override availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: true,
+    withdraw: true,
+    claimReward: false,
+    changeValidator: false
+  };
+
+  constructor (state: KoniState, chain: string) {
+    super(state, chain);
+
+    if (_SUPPORT_CHANGE_VALIDATOR_CHAIN.includes(chain)) {
+      this.availableMethod = {
+        ...this.availableMethod,
+        changeValidator: true
+      };
+    }
+  }
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
