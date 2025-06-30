@@ -61,6 +61,8 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
   // Implement Subscan API
   public getMultiChainBalance (address: string): Promise<IMultiChainBalance[]> {
+    const hashKey = this.createKeyHash(['multi_chain_balance', address]);
+
     return this.addRequest(async () => {
       const rs = await this.postRequest(this.getApiUrl('polkadot', 'api/scan/multiChain/account'), { address });
 
@@ -71,7 +73,7 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       const jsonData = (await rs.json()) as SubscanResponse<IMultiChainBalance[]>;
 
       return jsonData.data;
-    }, 1);
+    }, 1, undefined, hashKey);
   }
 
   public getCrowdloanContributions (relayChain: string, address: string, page = 0): Promise<CrowdloanContributionsResponse> {
