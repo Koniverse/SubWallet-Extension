@@ -40,6 +40,7 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   transferAll: boolean;
   value: string;
   transferBounceable?: boolean;
+  isSubstrateECDSATransaction?: boolean;
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

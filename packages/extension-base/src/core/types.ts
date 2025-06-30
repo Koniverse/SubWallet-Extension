@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountJson } from '@subwallet/extension-base/types';
 
-export type LedgerMustCheckType = 'polkadot' | 'migration' | 'unnecessary';
+export type LedgerMustCheckType = 'polkadot' | 'migration' | 'polkadot_ecdsa' | 'unnecessary';
 
 export enum ValidationCondition {
   IS_NOT_NULL = 'IS_NOT_NULL',
@@ -29,7 +29,7 @@ export interface ValidateRecipientParams {
   destChainInfo: _ChainInfo,
   fromAddress: string,
   toAddress: string,
-  account: AccountJson | null,
+  account: AccountJson | null, // If the recipient address exists in the wallet, then `account` is the information of that address.
   actionType: ActionType,
   autoFormatValue?: boolean,
   allowLedgerGenerics: string[]

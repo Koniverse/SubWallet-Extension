@@ -9,6 +9,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { AmountData, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignPsbtParams, BitcoinSignPsbtPayload, BitcoinSignPsbtRequest, CardanoProviderErrorType, CardanoSignatureRequest, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ErrorValidation, EvmProviderErrorType, EvmSendTransactionParams, EvmSignatureRequest, EvmTransactionData } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { BasicTxErrorType, EvmFeeInfo } from '@subwallet/extension-base/types';
 import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, reformatAddress, stripUrl, wait } from '@subwallet/extension-base/utils';
@@ -335,7 +336,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   const errors: Error[] = payload.errors || [];
   let estimateGas = '';
   const transactionParams = payload.payloadAfterValidated as EvmSendTransactionParams;
-  const { address: fromAddress, networkKey } = payload;
+  const { address: fromAddress, networkKey, pair: pair_ } = payload;
   const evmApi = koni.getEvmApi(networkKey || '');
   const web3 = evmApi?.api;
 
@@ -379,8 +380,30 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     handleError('the sender address must be the ethereum address type');
   }
 
-  if (transaction.to && !isEthereumAddress(transaction.to)) {
-    handleError('invalid recipient address');
+  const pair = pair_ || keyring.getPair(fromAddress);
+
+  if (!pair) {
+    handleError('Not found address to sign');
+  }
+
+  if (pair_?.meta.isSubstrateECDSA) {
+    handleError('Substrate account can not send this transaction');
+  }
+
+  const evmNetwork = koni.getChainInfo(networkKey || '');
+
+  if (transaction.to) {
+    if (!isEthereumAddress(transaction.to)) {
+      handleError('invalid recipient address');
+    } else {
+      try {
+        const pairTo = keyring.getPair(transaction.to);
+
+        if (pairTo && pairTo.meta.isSubstrateECDSA && !_isSubstrateEvmCompatibleChain(evmNetwork)) {
+          handleError('substrate account cannot receive this token');
+        }
+      } catch (e) {}
+    }
   }
 
   if (fromAddress === transaction.to) {
@@ -488,7 +511,6 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
   }
 
   const hasError = (errors && errors.length > 0) || !networkKey;
-  const evmNetwork = koni.getChainInfo(networkKey || '');
   let isToContract = false;
   let hashPayload = '';
   let parseData: EvmTransactionData = '';
@@ -542,6 +564,14 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
   }
 
   const pair = pair_ || keyring.getPair(address);
+
+  if (!pair) {
+    handleError('Not found address to sign');
+  }
+
+  if (pair_?.meta.isSubstrateECDSA) {
+    handleError('Substrate account can not sign this message');
+  }
 
   if (method) {
     if (['eth_sign', 'personal_sign', 'eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].indexOf(method) < 0) {
@@ -1155,6 +1185,10 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
 
   if (message.includes('insufficient balance') || message.includes('insufficient funds')) {
     return [t('Insufficient balance on the sender address. Top up your balance and try again'), t('Unable to sign transaction')];
+  }
+
+  if (message.includes('substrate') && message.includes('receive this token')) {
+    return [t('The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again'), t('Invalid account type')];
   }
 
   // Sign Message
