@@ -4,6 +4,7 @@
 export interface RequestInputAccountSubscribe {
   data: string;
   chain: string;
+  token: string;
 }
 
 export enum AnalyzedGroup {

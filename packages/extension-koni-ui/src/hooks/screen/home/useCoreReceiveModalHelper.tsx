@@ -7,7 +7,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainSlugsByCurrentAccountProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcludedTokenByCurrentProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -41,7 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<SelectedTokenInfo | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
-  const chainSupported = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains: chainSupported, excludedTokens } = useGetChainAndExcludedTokenByCurrentProxy();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useCoreCreateReformatAddress();
@@ -116,14 +116,14 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   /* --- token Selector */
 
   const tokenSelectorItems = useMemo<_ChainAsset[]>(() => {
-    const rawAssets = chainAssets.filter((asset) => chainSupported.includes(asset.originChain));
+    const rawAssets = chainAssets.filter((asset) => chainSupported.includes(asset.originChain) && !excludedTokens.includes(asset.slug));
 
     if (tokenGroupSlug) {
       return rawAssets.filter((asset) => asset.slug === tokenGroupSlug || _getMultiChainAsset(asset) === tokenGroupSlug);
     }
 
     return rawAssets;
-  }, [chainAssets, tokenGroupSlug, chainSupported]);
+  }, [chainAssets, tokenGroupSlug, chainSupported, excludedTokens]);
 
   const onCloseTokenSelector = useCallback(() => {
     inactiveModal(tokenSelectorModalId);
@@ -382,6 +382,12 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         return;
       }
 
+      if (excludedTokens.includes(specificSelectedTokenInfo.tokenSlug)) {
+        console.warn('tokenGroupSlug is not supported by current account');
+
+        return;
+      }
+
       // current account is All
       if (isAllAccount) {
         activeModal(accountSelectorModalId);
@@ -413,7 +419,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, excludedTokens, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

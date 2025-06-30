@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetNetuid } from '@subwallet/extension-base/services/chain-service/utils';
+import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { IGNORE_SUBSTRATE_ECDSA_LEDGER_ASSETS_LIST } from '@subwallet/extension-base/constants';
+import { _getAssetNetuid, _getAssetOriginChain, _isNativeToken, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 
 export const filterAssetsByChainAndType = (chainAssetMap: Record<string, _ChainAsset>, chain: string, assetTypes: _AssetType[]): Record<string, _ChainAsset> => {
   const result: Record<string, _ChainAsset> = {};
@@ -30,4 +31,12 @@ export const filterAlphaAssetsByChain = (chainAssetMap: Record<string, _ChainAss
   });
 
   return result;
+};
+
+export const isSubstrateEcdsaLedgerAssetSupported = (chainsAsset: _ChainAsset, chainInfo: _ChainInfo) => {
+  if (IGNORE_SUBSTRATE_ECDSA_LEDGER_ASSETS_LIST.includes(chainInfo.slug)) {
+    return _isNativeToken(chainsAsset);
+  }
+
+  return _isSubstrateEvmCompatibleChain(chainInfo);
 };

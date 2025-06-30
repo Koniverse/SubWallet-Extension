@@ -41,6 +41,7 @@ type AutoCompleteGroupItem = {
 
 interface Props extends BasicInputWrapper, ThemeProps {
   chainSlug?: string;
+  tokenSlug?: string;
   showAddressBook?: boolean;
   showScanner?: boolean;
   labelStyle?: 'horizontal' | 'vertical';
@@ -71,9 +72,9 @@ function getInputValueFromGraftedValue (graftedValue: string) {
 //  - Rename to AddressInput, after this component is done
 
 function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.ReactElement<Props> {
-  const { chainSlug, className = '', disabled, dropdownHeight = 240,
-    id, label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly,
-    saveAddress, showAddressBook, showScanner, status, statusHelp, value } = props;
+  const { chainSlug, className = '', disabled, dropdownHeight = 240, id,
+    label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly, saveAddress,
+    showAddressBook, showScanner, status, statusHelp, tokenSlug, value } = props;
   const { t } = useTranslation();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const chainOldPrefixMap = useSelector((state: RootState) => state.chainStore.chainOldPrefixMap);
@@ -415,7 +416,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     let sync = true;
     let id: string | undefined;
 
-    if (!inputValue || inputValue.length < 2 || !chainSlug) {
+    if (!inputValue || inputValue.length < 2 || !chainSlug || !tokenSlug) {
       setResponseOptions([]);
     } else {
       const handler = (data: ResponseInputAccountSubscribe) => {
@@ -427,6 +428,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       };
 
       subscribeAccountsInputAddress({
+        token: tokenSlug,
         data: inputValue,
         chain: chainSlug
       }, handler).then(handler).catch(console.error);
@@ -439,7 +441,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         cancelSubscription(id).catch(console.log);
       }
     };
-  }, [chainSlug, inputValue]);
+  }, [chainSlug, inputValue, tokenSlug]);
 
   return (
     <>
@@ -577,6 +579,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
             chainSlug={chainSlug}
             id={addressBookId}
             onSelect={onSelectAddressBook}
+            tokenSlug={tokenSlug}
             value={value}
           />
         )

@@ -21,6 +21,7 @@ import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSel
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useCoreCreateGetChainSlugsByAccountProxy, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -217,6 +218,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
   const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
+  const getExcludedToken = useGetExcludedTokens();
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -299,6 +301,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return getChainSlugsByAccountProxy(targetAccountProxy);
   }, [getChainSlugsByAccountProxy, targetAccountProxy]);
 
+  const excludedTokensSlugForTargetAccountProxy = useMemo(() => {
+    return getExcludedToken(allowedChainSlugsForTargetAccountProxy, targetAccountProxy);
+  }, [allowedChainSlugsForTargetAccountProxy, getExcludedToken, targetAccountProxy]);
+
   const isTokenCompatibleWithTargetAccountProxy = useCallback((tokenSlug: string): boolean => {
     if (!tokenSlug) {
       return false;
@@ -306,8 +312,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     const chainSlug = _getOriginChainOfAsset(tokenSlug);
 
-    return allowedChainSlugsForTargetAccountProxy.includes(chainSlug);
-  }, [allowedChainSlugsForTargetAccountProxy]);
+    return allowedChainSlugsForTargetAccountProxy.includes(chainSlug) && !excludedTokensSlugForTargetAccountProxy.includes(tokenSlug);
+  }, [allowedChainSlugsForTargetAccountProxy, excludedTokensSlugForTargetAccountProxy]);
 
   const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     return tokenSelectorItems.filter((item) => {
@@ -405,12 +411,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
       fromAddress: from,
+      assetInfo: toAssetInfo,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SWAP,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks]);
+  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks, toAssetInfo]);
 
   const onSelectFromToken = useCallback((tokenSlug: string) => {
     form.setFieldValue('fromTokenSlug', tokenSlug);
@@ -1259,6 +1266,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   ref={addressInputRef}
                   showAddressBook={true}
                   showScanner={true}
+                  tokenSlug={toTokenSlugValue}
                 />
               </Form.Item>
 

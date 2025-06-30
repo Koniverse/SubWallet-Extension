@@ -24,6 +24,7 @@ import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, Ale
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useAlert, useCoreCreateGetChainSlugsByAccountProxy, useCoreCreateReformatAddress, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
@@ -136,6 +137,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
   const getAccountTokenBalance = useGetAccountTokenBalance();
   const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
+  const getExcludedToken = useGetExcludedTokens();
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
@@ -282,6 +284,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
     const items = (() => {
       const allowedChains = getChainSlugsByAccountProxy(targetAccountProxy);
+      const excludedTokens = getExcludedToken(allowedChains, targetAccountProxy);
 
       const result: TokenSelectorItemType[] = [];
 
@@ -289,6 +292,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         const originChain = _getAssetOriginChain(chainAsset);
 
         if (!allowedChains.includes(originChain)) {
+          return;
+        }
+
+        if (excludedTokens.includes(chainAsset.slug)) {
           return;
         }
 
@@ -335,7 +342,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     sortTokensByBalanceInSelector(tokenItemsSorted, priorityTokens);
 
     return tokenItemsSorted;
-  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getChainSlugsByAccountProxy, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
+  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getChainSlugsByAccountProxy, getExcludedToken, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
@@ -363,13 +370,14 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
+      assetInfo,
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SEND_FUND,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
+  }, [accounts, assetInfo, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
     const maxTransfer = transferInfo?.maxTransferable || '0';
@@ -1027,6 +1035,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
+              tokenSlug={assetValue}
             />
           </Form.Item>
 

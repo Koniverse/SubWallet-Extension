@@ -6,6 +6,7 @@ import { AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
@@ -24,6 +25,7 @@ interface Props extends ThemeProps {
   value?: string;
   id: string;
   chainSlug?: string;
+  tokenSlug?: string;
   onSelect: (val: string, item: AnalyzeAddress) => void;
 }
 
@@ -47,7 +49,7 @@ const getGroupPriority = (item: AnalyzeAddress): number => {
 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { chainSlug, className, id, onSelect, value = '' } = props;
+  const { chainSlug, className, id, onSelect, tokenSlug = '', value = '' } = props;
 
   const { t } = useTranslation();
 
@@ -60,6 +62,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const chainInfo = useChainInfo(chainSlug);
 
   const getReformatAddress = useCoreCreateReformatAddress();
+
+  const getExcludedTokenByAccountProxy = useGetExcludedTokens();
 
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 
@@ -122,6 +126,11 @@ const Component: React.FC<Props> = (props: Props) => {
       }
 
       // todo: recheck with ledger
+      const excludedTokens = getExcludedTokenByAccountProxy([chainInfo.slug], ap);
+
+      if (excludedTokens.includes(tokenSlug)) {
+        return;
+      }
 
       ap.accounts.forEach((acc) => {
         const formatedAddress = getReformatAddress(acc, chainInfo);
@@ -143,7 +152,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return result
       .sort(sortFuncAnalyzeAddress)
       .sort((a, b) => getGroupPriority(b) - getGroupPriority(a));
-  }, [accountProxies, chainInfo, chainSlug, contacts, getReformatAddress, recent, selectedFilters]);
+  }, [accountProxies, chainInfo, chainSlug, contacts, getExcludedTokenByAccountProxy, getReformatAddress, recent, selectedFilters, tokenSlug]);
 
   const searchFunction = useCallback((item: AnalyzeAddress, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();

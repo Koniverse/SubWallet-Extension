@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
-import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountSignMode, ProcessType } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
@@ -92,7 +93,7 @@ const Component = function ({ className }: Props) {
               const payload = request.request.payload as SignerPayloadJSON;
               const chainInfo = findChainInfoByGenesisHash(chainInfoMap, payload.genesisHash);
 
-              canSign = !!chainInfo && (_isChainEvmCompatible(chainInfo) && _isChainSubstrateCompatible(chainInfo));
+              canSign = !!chainInfo && _isSubstrateEvmCompatibleChain(chainInfo);
             } else {
               canSign = !isEthereum;
             }

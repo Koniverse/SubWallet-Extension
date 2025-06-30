@@ -62,7 +62,7 @@ import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/e
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
-import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -345,16 +345,28 @@ export default class KoniExtension {
   }
 
   private async subscribeInputAddressData (request: RequestInputAccountSubscribe, id: string, port: chrome.runtime.Port): Promise<ResponseInputAccountSubscribe> {
-    const { chain, data } = request;
+    const { chain, data, token } = request;
 
     const cb = createSubscription<'pri(accounts.subscribeAccountsInputAddress)'>(id, port);
 
-    const combineFunction = async (chainInfoMap: Record<string, _ChainInfo>, accountProxyMap: AccountProxyMap, _contacts: SubjectInfo): Promise<ResponseInputAccountSubscribe> => {
+    const combineFunction = async (chainInfoMap: Record<string, _ChainInfo>, tokenInfoMap: Record<string, _ChainAsset>, accountProxyMap: AccountProxyMap, _contacts: SubjectInfo): Promise<ResponseInputAccountSubscribe> => {
       const accountProxies = Object.values(accountProxyMap);
       const contacts = transformAddresses(_contacts);
       const chainInfo = chainInfoMap[chain];
+      const tokenInfo = tokenInfoMap[token];
       const substrateApi = this.#koniState.chainService.getSubstrateApi(chain);
-      const rs = await _analyzeAddress(data, accountProxies, contacts, chainInfo, substrateApi);
+
+      const accountProxiesFiltered = accountProxies.filter((accountProxy) => {
+        const signMode = accountProxy.accounts[0]?.signMode;
+
+        if (tokenInfo && signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+          return isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
+        }
+
+        return true;
+      });
+
+      const rs = await _analyzeAddress(data, accountProxiesFiltered, contacts, chainInfo, substrateApi);
 
       return {
         id,
@@ -365,9 +377,10 @@ export default class KoniExtension {
     const accountObservable = this.#koniState.keyringService.context.observable.accounts;
     const contactObservable = this.#koniState.keyringService.context.observable.contacts;
     const chainInfoMapObservable = this.#koniState.chainService.subscribeChainInfoMap().asObservable();
+    const tokenInfoMapObservable = this.#koniState.chainService.subscribeAssetRegistry().asObservable();
 
-    const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts }) => {
-      combineFunction(chainInfoMap, accountProxies, contacts)
+    const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, tokenInfoMap: tokenInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts, tokenInfoMap }) => {
+      combineFunction(chainInfoMap, tokenInfoMap, accountProxies, contacts)
         .then((rs) => cb(rs))
         .catch(console.error);
     });
@@ -383,8 +396,9 @@ export default class KoniExtension {
     const accountProxyMap = this.#koniState.keyringService.context.value.accounts;
     const contacts = this.#koniState.keyringService.context.value.contacts;
     const chainInfoMap = this.#koniState.chainService.getChainInfoMap();
+    const tokenInfoMap = this.#koniState.chainService.getAssetRegistry();
 
-    return combineFunction(chainInfoMap, accountProxyMap, contacts);
+    return combineFunction(chainInfoMap, tokenInfoMap, accountProxyMap, contacts);
   }
 
   /**

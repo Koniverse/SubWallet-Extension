@@ -169,6 +169,10 @@ export function _isChainEvmCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.evmInfo;
 }
 
+export function _isChainCompatibleLedgerEvm (chainInfo: _ChainInfo) {
+  return !!chainInfo.evmInfo && chainInfo.evmInfo.evmChainId > 0;
+}
+
 export function _isSubstrateEvmCompatibleChain (chainInfo: _ChainInfo) {
   return !!chainInfo.evmInfo && !!chainInfo.substrateInfo;
 }
@@ -719,6 +723,10 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
   if (accountChainType === AccountChainType.ETHEREUM) {
     if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
       return _isSubstrateEvmCompatibleChain(chainInfo) && EthereumKeypairTypes.includes(accountType);
+    }
+
+    if (accountSignMode === AccountSignMode.GENERIC_LEDGER) {
+      return _isChainCompatibleLedgerEvm(chainInfo) && EthereumKeypairTypes.includes(accountType);
     }
 
     return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
