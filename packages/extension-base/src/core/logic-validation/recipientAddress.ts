@@ -130,15 +130,8 @@ function runValidationFunctions (validateRecipientParams: ValidateRecipientParam
 }
 
 export function validateRecipientAddress (validateRecipientParams: ValidateRecipientParams): Promise<void> {
-  // TODO: Temporarily disable "Advanced address conversion" to prevent invalid token transfers.
-  //  Re-enable after related issues are fixed.
-  const prams: ValidateRecipientParams = {
-    ...validateRecipientParams,
-    autoFormatValue: false
-  };
-
-  const conditions = getConditions(prams);
+  const conditions = getConditions(validateRecipientParams);
   const validationFunctions = getValidationFunctions(conditions);
 
-  return runValidationFunctions(prams, validationFunctions);
+  return runValidationFunctions(validateRecipientParams, validationFunctions);
 }
