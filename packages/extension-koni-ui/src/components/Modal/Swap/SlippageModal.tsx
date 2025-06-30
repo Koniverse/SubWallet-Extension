@@ -14,7 +14,8 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   modalId: string,
   onApplySlippage?: (slippage: SlippageType) => void,
-  slippageValue: SlippageType
+  slippageValue: SlippageType,
+  onCancel: VoidFunction,
 }
 const SLIPPAGE_TOLERANCE: Record<string, number> = {
   option_1: 0.001,
@@ -28,11 +29,11 @@ interface FormProps {
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, modalId, onApplySlippage, slippageValue } = props;
+  const { className, modalId, onApplySlippage, onCancel, slippageValue } = props;
   const [selectedSlippage, setSelectedSlippage] = useState<string | undefined>();
   const firstRenderRef = useRef(false);
 
-  const { checkActive, inactiveModal } = useContext(ModalContext);
+  const { checkActive } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
   const [form] = Form.useForm<FormProps>();
@@ -40,10 +41,6 @@ const Component: React.FC<Props> = (props: Props) => {
   const formDefault = useMemo((): FormProps => ({
     slippage: '0'
   }), []);
-
-  const onCancel = useCallback(() => {
-    inactiveModal(modalId);
-  }, [inactiveModal, modalId]);
 
   const handleSelectSlippage = useCallback((item: string) => {
     return () => {
@@ -83,7 +80,6 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [isActive]);
 
   const handleApplySlippage = useCallback(() => {
-    inactiveModal(modalId);
     const slippageValueForm = form.getFieldValue('slippage') as string;
 
     if (selectedSlippage) {
@@ -101,7 +97,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
       onApplySlippage?.(slippageObject);
     }
-  }, [form, inactiveModal, modalId, onApplySlippage, selectedSlippage]);
+
+    onCancel();
+  }, [form, onApplySlippage, onCancel, selectedSlippage]);
 
   const onValuesChange: FormCallbacks<FormProps>['onValuesChange'] = useCallback((changes: Partial<FormProps>, values: FormProps) => {
     setSelectedSlippage(undefined);

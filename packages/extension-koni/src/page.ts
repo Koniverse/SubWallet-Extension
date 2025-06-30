@@ -5,8 +5,8 @@ import type { RequestSignatures, TransportRequestMessage } from '@subwallet/exte
 import type { Message } from '@subwallet/extension-base/types';
 
 import { MESSAGE_ORIGIN_CONTENT } from '@subwallet/extension-base/defaults';
-import { enable, handleResponse, initEvmProvider } from '@subwallet/extension-base/page';
-import { injectEvmExtension, injectExtension } from '@subwallet/extension-inject';
+import { enable, handleResponse, initCardanoProvider, initEvmProvider } from '@subwallet/extension-base/page';
+import { injectCardanoExtension, injectEvmExtension, injectExtension } from '@subwallet/extension-inject';
 
 const version = process.env.PKG_VERSION as string;
 
@@ -16,6 +16,8 @@ function inject () {
     version: version
   });
   injectEvmExtension(initEvmProvider(version));
+
+  injectCardanoExtension(initCardanoProvider());
 }
 
 // setup a response listener (events created by the loader for extension responses)

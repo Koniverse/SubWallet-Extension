@@ -64,6 +64,8 @@ function Component ({ className, closeAlert, compound,
       case YieldPoolType.NOMINATION_POOL:
         return true;
     }
+
+    return false;
   }, [isDAppStaking, type]);
 
   const title = useMemo(() => {

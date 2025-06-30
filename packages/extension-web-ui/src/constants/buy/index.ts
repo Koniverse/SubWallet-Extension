@@ -4,3 +4,4 @@
 export * from './banxa';
 export * from './coinbase';
 export * from './transak';
+export * from './meld';

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
@@ -30,6 +31,12 @@ type Props = ThemeProps & {
 
 const FILTER_MODAL_ID = 'earning-positions-filter-modal';
 const alertModalId = 'earning-positions-alert-modal';
+
+const getOrdinalChainTypeValue = (item: ExtraYieldPositionInfo, chainInfoMap: Record<string, _ChainInfo>): number => {
+  const chainInfo = chainInfoMap[item.chain];
+
+  return chainInfo?.isTestnet ? 0 : 1;
+};
 
 function Component ({ className, earningPositions, setEntryView, setLoading }: Props) {
   const { t } = useTranslation();
@@ -74,9 +81,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
             .toNumber();
         };
 
-        return getValue(secondItem) - getValue(firstItem);
+        return getOrdinalChainTypeValue(secondItem, chainInfoMap) - getOrdinalChainTypeValue(firstItem, chainInfoMap) ||
+          getValue(secondItem) - getValue(firstItem);
       });
-  }, [assetInfoMap, currencyData, earningPositions, priceMap]);
+  }, [assetInfoMap, chainInfoMap, currencyData, earningPositions, priceMap]);
 
   const chainStakingBoth = useMemo(() => {
     if (!currentAccountProxy) {
@@ -184,39 +192,14 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
     { label: t('Lending'), value: YieldPoolType.LENDING },
     { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING }
+    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
   ];
 
-  const filterFunction = useMemo<(items: ExtraYieldPositionInfo) => boolean>(() => {
-    return (item) => {
-      if (!selectedFilters.length) {
-        return true;
-      }
+  const filterFunction = useMemo<(item: ExtraYieldPositionInfo) => boolean>(() => {
+    const filterMap: Record<string, boolean> = Object.fromEntries(selectedFilters.map((filter) => [filter, true]));
 
-      for (const filter of selectedFilters) {
-        if (filter === '') {
-          return true;
-        }
-
-        if (filter === YieldPoolType.NOMINATION_POOL && item.type === YieldPoolType.NOMINATION_POOL) {
-          return true;
-        } else if (filter === YieldPoolType.NATIVE_STAKING && item.type === YieldPoolType.NATIVE_STAKING) {
-          return true;
-        } else if (filter === YieldPoolType.LIQUID_STAKING && item.type === YieldPoolType.LIQUID_STAKING) {
-          return true;
-        } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
-          return true;
-        }
-        // Uncomment the following code block if needed
-        // else if (filter === YieldPoolType.PARACHAIN_STAKING && item.type === YieldPoolType.PARACHAIN_STAKING) {
-        //   return true;
-        // } else if (filter === YieldPoolType.SINGLE_FARMING && item.type === YieldPoolType.SINGLE_FARMING) {
-        //   return true;
-        // }
-      }
-
-      return false;
-    };
+    return (item) => !selectedFilters.length || filterMap[item.type] || false;
   }, [selectedFilters]);
 
   const onClickItem = useCallback((item: ExtraYieldPositionInfo) => {
@@ -252,11 +235,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const renderItem = useCallback(
     (item: ExtraYieldPositionInfo) => {
       return (
-        <>
+        <React.Fragment key={item.slug}>
           <EarningPositionItem
             className={'earning-position-item'}
             isShowBalance={isShowBalance}
-            key={item.slug}
             onClick={onClickItem(item)}
             positionInfo={item}
           />
@@ -275,7 +257,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
               {t('Explore earning options')}
             </Button>
           </div>}
-        </>
+        </React.Fragment>
       );
     },
     [lastItem.slug, isShowBalance, onClickItem, onClickExploreEarning, t]
@@ -304,14 +286,17 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     );
   }, [setEntryView, t]);
 
-  const searchFunction = useCallback(({ balanceToken, chain: _chain }: ExtraYieldPositionInfo, searchText: string) => {
+  // SEARCH LOGIC HERE
+  const searchFunction = useCallback(({ balanceToken, chain: _chain, subnetData }: ExtraYieldPositionInfo, searchText: string) => {
     const chainInfo = chainInfoMap[_chain];
     const assetInfo = assetInfoMap[balanceToken];
+    const search = searchText.toLowerCase();
 
-    return (
-      chainInfo?.name.replace(' Relay Chain', '').toLowerCase().includes(searchText.toLowerCase()) ||
-      assetInfo?.symbol.toLowerCase().includes(searchText.toLowerCase())
-    );
+    return [
+      chainInfo?.name.replace(' Relay Chain', '').toLowerCase(),
+      assetInfo?.symbol.toLowerCase(),
+      subnetData?.subnetShortName?.toLowerCase()
+    ].some((value) => value?.includes(search));
   }, [assetInfoMap, chainInfoMap]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {

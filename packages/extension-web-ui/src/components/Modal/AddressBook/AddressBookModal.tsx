@@ -5,9 +5,9 @@ import { AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
-import { useChainInfo, useFilterModal, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { useChainInfo, useFilterModal, useReformatAddress, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getReformatedAddressRelatedToChain, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-web-ui/utils';
+import { isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-web-ui/utils';
 import { Badge, Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
@@ -57,6 +57,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const { accountProxies, contacts, recent } = useSelector((state) => state.accountState);
 
   const chainInfo = useChainInfo(chainSlug);
+
+  const getReformatAddress = useReformatAddress();
 
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 
@@ -118,7 +120,7 @@ const Component: React.FC<Props> = (props: Props) => {
       // todo: recheck with ledger
 
       ap.accounts.forEach((acc) => {
-        const formatedAddress = getReformatedAddressRelatedToChain(acc, chainInfo);
+        const formatedAddress = getReformatAddress(acc, chainInfo);
 
         if (formatedAddress) {
           result.push({
@@ -139,7 +141,7 @@ const Component: React.FC<Props> = (props: Props) => {
         return ((a?.displayName || '').toLowerCase() > (b?.displayName || '').toLowerCase()) ? 1 : -1;
       })
       .sort((a, b) => getGroupPriority(b) - getGroupPriority(a));
-  }, [accountProxies, chainInfo, chainSlug, contacts, recent, selectedFilters]);
+  }, [accountProxies, chainInfo, chainSlug, contacts, getReformatAddress, recent, selectedFilters]);
 
   const searchFunction = useCallback((item: AnalyzeAddress, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
@@ -237,7 +239,10 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <SwList.Section
           actionBtnIcon={(
-            <Badge dot={!!selectedFilters.length}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={!!selectedFilters.length}
+            >
               <Icon
                 phosphorIcon={FadersHorizontal}
                 size='sm'

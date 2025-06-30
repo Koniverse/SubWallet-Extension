@@ -262,7 +262,7 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
         <FreeBalance
           address={from}
           chain={chain}
-          label={t('Sender transferable balance') + ':'}
+          label={t('Sender transferable balance')}
           onBalanceReady={setIsBalanceReady}
         />
       </TransactionContent>

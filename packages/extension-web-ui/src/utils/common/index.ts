@@ -12,3 +12,4 @@ export * from './getLanguageOptions';
 export * from './i18n';
 export * from './number';
 export * from './mobile';
+export * from './balance';

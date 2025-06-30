@@ -29,6 +29,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { SubnetInfoDesktopPart } from './desktop/SubnetInfoDesktopPart';
+
 type Props = ThemeProps;
 
 type ComponentProp = {
@@ -131,11 +133,6 @@ function Component ({ compound,
     return compound.chain || poolInfo.chain || '';
   }, [compound.chain, poolInfo.chain]);
 
-  // Update bittensor logic later
-  const isBittensorStake = useMemo(() => {
-    return poolInfo.chain === 'bittensor';
-  }, [poolInfo.chain]);
-
   const onLeavePool = useCallback(() => {
     if (isActiveStakeZero) {
       openAlert({
@@ -144,28 +141,6 @@ function Component ({ compound,
         content: t("You don't have any staked funds left to unstake. Check withdrawal status (how long left until the unstaking period ends) by checking the Withdraw info. Keep in mind that you need to withdraw manually."),
         okButton: {
           text: t('OK'),
-          onClick: closeAlert
-        }
-      });
-
-      return;
-    }
-
-    // Update bittensor logic later
-    if (isBittensorStake) {
-      openAlert({
-        title: t('Open dApp to unstake'),
-        type: NotificationType.INFO,
-        content: t('Open Taostats Dashboard and connect your SubWallet account to unstake your funds. This feature will come back to SubWallet soon!'),
-        okButton: {
-          text: t('Open dApp'),
-          onClick: () => {
-            window.open('https://dash.taostats.io/stake');
-            closeAlert();
-          }
-        },
-        cancelButton: {
-          text: t('Cancel'),
           onClick: closeAlert
         }
       });
@@ -186,7 +161,7 @@ function Component ({ compound,
       navigate('/transaction/unstake');
     }
     // todo: open modal is isWebUI
-  }, [isActiveStakeZero, isBittensorStake, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, isWebUI, openAlert, t, closeAlert, activeModal, navigate]);
+  }, [isActiveStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, isWebUI, openAlert, t, closeAlert, activeModal, navigate]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({
@@ -231,6 +206,7 @@ function Component ({ compound,
       }
     ];
   }, [isChainUnsupported, onEarnMore]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <>
@@ -277,14 +253,25 @@ function Component ({ compound,
                   />
                 </div>
                 <div className={'__middle-part-item-wrapper'}>
-                  <WithdrawInfoDesktopPart
-                    inputAsset={inputAsset}
-                    poolInfo={poolInfo}
-                    transactionChainValue={transactionChainValue}
-                    transactionFromValue={transactionFromValue}
-                    unstakings={compound.unstakings}
-                  />
+                  {
+                    isSubnetStaking
+                      ? (
+                        <SubnetInfoDesktopPart
+                          poolInfo={poolInfo}
+                        />
+                      )
+                      : (
+                        <WithdrawInfoDesktopPart
+                          inputAsset={inputAsset}
+                          poolInfo={poolInfo}
+                          transactionChainValue={transactionChainValue}
+                          transactionFromValue={transactionFromValue}
+                          unstakings={compound.unstakings}
+                        />
+                      )
+                  }
                 </div>
+
               </div>
               <AccountInfoDesktopPart
                 compound={compound}
@@ -473,10 +460,11 @@ const EarningPositionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Prop
 
   '.__middle-part-item-wrapper': {
     flex: '1 1 384px',
-    display: 'flex'
+    display: 'flex',
+    overflow: 'hidden'
   },
 
-  '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part': {
+  '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part, .__subnet-info-desktop-part': {
     marginLeft: 8,
     marginRight: 8,
     marginBottom: 16

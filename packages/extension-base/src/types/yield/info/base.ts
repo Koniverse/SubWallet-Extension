@@ -22,7 +22,10 @@ export enum YieldPoolType {
   NATIVE_STAKING = 'NATIVE_STAKING',
 
   /** Parachain staking */
-  PARACHAIN_STAKING = 'PARACHAIN_STAKING'
+  PARACHAIN_STAKING = 'PARACHAIN_STAKING',
+
+  /** Subnet stakingg */
+  SUBNET_STAKING = 'SUBNET_STAKING'
 }
 
 /**

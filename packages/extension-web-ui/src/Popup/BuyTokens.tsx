@@ -7,12 +7,13 @@ import { AccountProxy, AccountProxyType, BuyServiceInfo, BuyTokenInfo, SupportSe
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { ServiceSelector } from '@subwallet/extension-web-ui/components/Field/BuyTokens/ServiceSelector';
-import { TokenItemType, TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useGetChainSlugsByAccount, useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
+import { SELL_TOKEN_TAB } from '@subwallet/extension-web-ui/constants';
+import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
 import { BuyTokensParam } from '@subwallet/extension-web-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createTransakOrder, getReformatedAddressRelatedToChain, noop, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -22,6 +23,7 @@ import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type SharedProps = {
   modalContent?: boolean;
@@ -46,6 +48,8 @@ interface LinkUrlProps {
   content: string;
 }
 
+type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
+
 const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
   if (props.url) {
     return (
@@ -66,8 +70,9 @@ const modalId = 'disclaimer-modal';
 function Component ({ className, currentAccountProxy, modalContent, slug }: Props) {
   const locationState = useLocation().state as BuyTokensParam;
   const [_currentSymbol] = useState<string | undefined>(locationState?.symbol);
+  const [buyTokenTab, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
 
-  const [buyForm, setBuyForm] = useState(true);
+  const [buyForm, setBuyForm] = useState(buyTokenTab !== 'SELL');
 
   const currentSymbol = slug || _currentSymbol;
 
@@ -76,12 +81,17 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
-  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
+
+  const { chainInfoMap, chainStateMap, priorityTokens } = useSelector((root: RootState) => root.chainStore);
   const { assetRegistry } = useSelector((state: RootState) => state.assetRegistry);
   const { walletReference } = useSelector((state: RootState) => state.settings);
   const { services, tokens } = useSelector((state: RootState) => state.buyService);
+
+  const getAccountTokenBalance = useGetAccountTokenBalance();
+
   const checkAsset = useAssetChecker();
   const allowedChains = useGetChainSlugsByAccount();
+  const getReformatAddress = useReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {
@@ -92,7 +102,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   }, [currentSymbol, tokens]);
 
   const { t } = useTranslation();
-  const { goBack } = useDefaultNavigate();
+  const { goHome } = useDefaultNavigate();
   const [form] = Form.useForm<BuyTokensFormProps>();
   const formDefault = useMemo((): BuyTokensFormProps => ({
     address: '',
@@ -108,7 +118,8 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     banxa: false,
     onramper: false,
     moonpay: false,
-    coinbase: false
+    coinbase: false,
+    meld: false
   });
 
   const selectedAddress = Form.useWatch('address', form);
@@ -161,15 +172,35 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     promiseRef.current.reject(new Error('User reject'));
   }, []);
 
-  const buyTokenItems = useMemo<TokenItemType[]>(() => {
-    const result: TokenItemType[] = [];
+  const tokenBalanceMap = useMemo(() => {
+    return getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
+  }, [currentAccountProxy.id, getAccountTokenBalance, tokens]);
 
-    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
+  const buyTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
-        originChain: info.network
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };
 
@@ -183,18 +214,36 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
       }
     });
 
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
     return result;
-  }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
 
-  const sellTokenItems = useMemo<TokenItemType[]>(() => {
-    const result: TokenItemType[] = [];
+  const sellTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
 
-    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
-        originChain: info.network
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };
 
@@ -212,11 +261,13 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
       result.push(convertToItem(item));
     });
 
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
     return result;
-  }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
 
   const tokenItems = buyForm ? buyTokenItems : sellTokenItems;
-  
+
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 
   const isSellTabDisabled = useMemo(() => {
@@ -260,7 +311,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
-        const address = getReformatedAddressRelatedToChain(a, chainInfo);
+        const address = getReformatAddress(a, chainInfo);
 
         if (address) {
           result.push({
@@ -287,7 +338,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, selectedTokenSlug]);
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
     if (selectedService && selectedAddress && selectedTokenSlug) {
@@ -337,6 +388,9 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
         break;
       case 'coinbase':
         urlPromise = createCoinbaseOrder;
+        break;
+      case 'meld':
+        urlPromise = createMeldOrder;
         break;
     }
 
@@ -437,6 +491,10 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     }
   }, [selectedTokenSlug, form, getServiceItems]);
 
+  useEffect(() => {
+    setBuyTokenModalTab('');
+  }, [setBuyTokenModalTab]);
+
   return (
     <PageWrapper className={CN(className, 'transaction-wrapper', {
       '__web-wrapper': modalContent
@@ -447,7 +505,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           background={'transparent'}
           center
           className={'transaction-header'}
-          onBack={goBack}
+          onBack={goHome}
           paddingVertical
           showBackButton
           title={t('Buy & sell tokens')}

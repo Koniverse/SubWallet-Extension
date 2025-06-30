@@ -251,7 +251,7 @@ const Component: React.FC = () => {
         <FreeBalance
           address={from}
           chain={chain}
-          label={t('Sender transferable balance') + ':'}
+          label={t('Sender transferable balance')}
           onBalanceReady={setIsBalanceReady}
         />
       </TransactionContent>
