@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/types';
+import { ApiRequestContext, ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 
 export class BaseApiRequestContext implements ApiRequestContext {
   callRate = 2; // limit per interval check
@@ -11,7 +11,7 @@ export class BaseApiRequestContext implements ApiRequestContext {
   private rollbackRateTime = 30 * 1000; // rollback rate time in ms
   private timeoutRollbackRate: NodeJS.Timeout | undefined = undefined;
 
-  constructor (options?: {limitRate?: number, intervalCheck?: number, maxRetry?: number}) {
+  constructor (options?: Partial<ApiRequestContextProps>) {
     this.callRate = options?.limitRate || this.callRate;
     this.limitRate = options?.limitRate || this.limitRate;
     this.intervalCheck = options?.intervalCheck || this.intervalCheck;

@@ -1,11 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-export interface ApiRequestContext {
-  callRate: number; // limit per interval check
+export interface ApiRequestContextProps {
   limitRate: number; // max rate per interval check
   intervalCheck: number; // interval check in ms
   maxRetry: number; // interval check in ms
+}
+
+export interface ApiRequestContext extends ApiRequestContextProps {
+  callRate: number; // limit per interval check
   reduceLimitRate: () => void;
 }
 
