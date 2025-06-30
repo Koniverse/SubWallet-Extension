@@ -7,7 +7,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { DEFAULT_YIELD_FIRST_STEP } from '@subwallet/extension-base/services/earning-service/constants';
+import { DEFAULT_YIELD_FIRST_STEP, STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
 import { createClaimNotification, createWithdrawNotifications } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
@@ -75,6 +75,22 @@ export default abstract class BasePoolHandler {
 
   protected get substrateApi (): _SubstrateApi {
     return this.state.getSubstrateApi(this.chain);
+  }
+
+  protected get substrateIdentityApi (): _SubstrateApi {
+    const otherChainSupported = STAKING_IDENTITY_API_SLUG[this.chain];
+
+    if (otherChainSupported) {
+      const api = this.state.getSubstrateApi(otherChainSupported) || this.substrateApi;
+
+      if (api.isApiReady && api.isApiConnected) {
+        return api;
+      }
+
+      return this.substrateApi;
+    }
+
+    return this.substrateApi;
   }
 
   protected get evmApi (): _EvmApi {

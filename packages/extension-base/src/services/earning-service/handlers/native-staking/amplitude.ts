@@ -166,7 +166,8 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
     let unstakingBalance = '0';
 
     if (delegatorState) { // delegatorState can be null while unstaking all
-      const identityPromises = delegatorState.map((delegate) => parseIdentity(substrateApi, delegate.owner));
+      const substrateIdentityApi = this.substrateIdentityApi;
+      const identityPromises = delegatorState.map((delegate) => parseIdentity(substrateIdentityApi, delegate.owner));
       const identities = await Promise.all(identityPromises);
 
       for (let i = 0; i < delegatorState.length; i++) {
@@ -360,7 +361,7 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
 
   /* Get pool targets */
 
-  async getKrestPoolTargets (chainApi: _SubstrateApi): Promise<ValidatorInfo[]> {
+  async getKrestPoolTargets (chainApi: _SubstrateApi, chainIdentityApi: _SubstrateApi): Promise<ValidatorInfo[]> {
     const _allCollators = await chainApi.api.query.parachainStaking.candidatePool.entries();
     const minDelegatorStake = chainApi.api.consts.parachainStaking.minDelegatorStake.toString();
     const maxDelegatorsPerCollator = chainApi.api.consts.parachainStaking.maxDelegatorsPerCollator?.toString();
@@ -369,7 +370,7 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
       const collatorInfo = collator[1].toPrimitive() as unknown as CollatorInfo;
       const address = collatorInfo.id;
 
-      return parseIdentity(chainApi, address);
+      return parseIdentity(chainIdentityApi, address);
     });
     const identities = await Promise.all(identityPromises);
 
@@ -411,7 +412,7 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
     });
   }
 
-  async getOtherPoolTargets (chainApi: _SubstrateApi): Promise<ValidatorInfo[]> {
+  async getOtherPoolTargets (chainApi: _SubstrateApi, chainIdentityApi: _SubstrateApi): Promise<ValidatorInfo[]> {
     const [_allCollators, _inflationConfig] = await Promise.all([
       chainApi.api.query.parachainStaking.candidatePool.entries(),
       chainApi.api.query.parachainStaking.inflationConfig()
@@ -427,7 +428,7 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
       const collatorInfo = collator[1].toPrimitive() as unknown as CollatorInfo;
       const address = collatorInfo.id;
 
-      return parseIdentity(chainApi, address);
+      return parseIdentity(chainIdentityApi, address);
     });
     const identities = await Promise.all(identityPromises);
 
@@ -472,11 +473,12 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const chainApi = await this.substrateApi.isReady;
+    const chainIdentityApi = this.substrateIdentityApi;
 
     if (_STAKING_CHAIN_GROUP.krest_network.includes(this.chain)) {
-      return this.getKrestPoolTargets(chainApi);
+      return this.getKrestPoolTargets(chainApi, chainIdentityApi);
     } else {
-      return this.getOtherPoolTargets(chainApi);
+      return this.getOtherPoolTargets(chainApi, chainIdentityApi);
     }
   }
 
