@@ -685,8 +685,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-      const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
-      const slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      const slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {
