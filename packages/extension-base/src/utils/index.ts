@@ -304,7 +304,7 @@ export function isSameAddressType (address1: string, address2: string) {
 
 export function isAddressAndChainCompatible (address: string, chain: _ChainInfo) {
   const keypairType = getKeypairTypeByAddress(address);
-  const isEvmCompatible = isEthereumAddress(address) && _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType);
+  const isEvmCompatible = _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType); // some chains compatible to substrate and evm, and use evm-address
   const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
   const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
   const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
