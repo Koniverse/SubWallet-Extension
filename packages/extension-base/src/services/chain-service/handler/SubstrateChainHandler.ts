@@ -199,7 +199,7 @@ export class SubstrateChainHandler extends AbstractChainHandler {
       return tokenSmartContract;
     }
 
-    const tokenContract = tokenType === _AssetType.GRC20 ? getGRC20ContractPromise(apiPromise, contractAddress) : await getVFTContractPromise(apiPromise, contractAddress);
+    const tokenContract = tokenType === _AssetType.GRC20 ? getGRC20ContractPromise(apiPromise, contractAddress) : getVFTContractPromise(apiPromise, contractAddress);
 
     const [nameRes, symbolRes, decimalsRes] = await Promise.all([
       tokenContract.service.name(GEAR_DEFAULT_ADDRESS),

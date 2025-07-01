@@ -92,7 +92,7 @@ export const subscribeVftBalance = ({ addresses,
   }
 
   const chain = chainInfo.slug;
-  const vftContractMap = {} as Record<string, Promise<VFT>>;
+  const vftContractMap = {} as Record<string, VFT>;
   const tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.VFT]);
 
   Object.entries(tokenList).forEach(([slug, tokenInfo]) => {
@@ -102,7 +102,7 @@ export const subscribeVftBalance = ({ addresses,
   const getTokenBalances = () => {
     Object.values(tokenList).map(async (tokenInfo) => {
       try {
-        const contract = await vftContractMap[tokenInfo.slug];
+        const contract = vftContractMap[tokenInfo.slug];
         const balances: BalanceItem[] = await Promise.all(addresses.map(async (address): Promise<BalanceItem> => {
           try {
             const actor = u8aToHex(decodeAddress(address));

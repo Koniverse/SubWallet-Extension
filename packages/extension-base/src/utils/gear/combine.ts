@@ -7,7 +7,7 @@ import { ApiPromise } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
 
 import { GRC20 } from './grc20';
-import { getSails, VFT } from './vft';
+import { sailsCache, VFT } from './vft';
 
 export const DEFAULT_GEAR_ADDRESS = {
   ALICE: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
@@ -22,8 +22,8 @@ export function getGRC20ContractPromise (apiPromise: ApiPromise, contractAddress
   return new GRC20(gearApi, contractAddress as HexString);
 }
 
-export async function getVFTContractPromise (api: GearApi, contractAddress = '0x'): Promise<VFT> {
-  const sails = await getSails();
+export function getVFTContractPromise (api: GearApi, contractAddress = '0x'): VFT {
+  const sails = sailsCache.get();
 
   return new VFT(api, contractAddress as `0x${string}`, sails);
 }
