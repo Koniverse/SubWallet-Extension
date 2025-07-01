@@ -109,6 +109,8 @@ const Component: React.FC<Props> = (props: Props) => {
           } as NotificationScreenParam
         });
       } else {
+        goHome();
+
         openNotificationModal({
           transactionProcess: {
             processId: transactionProcessId,
@@ -117,7 +119,7 @@ const Component: React.FC<Props> = (props: Props) => {
         });
       }
     },
-    [isWebUI, navigate, openNotificationModal, transactionProcessId]
+    [goHome, isWebUI, navigate, openNotificationModal, transactionProcessId]
   );
 
   const isFinal = useMemo(() => {
