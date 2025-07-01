@@ -15,4 +15,4 @@ export { default as useChainConnection } from './useChainConnection';
 
 export { default as useCoreCreateGetChainSlugsByAccountProxy } from './useCoreCreateGetChainSlugsByAccountProxy';
 export { default as useGetChainAndExcludedTokenByCurrentAccountProxy } from './useGetChainAndExcludedTokenByCurrentAccountProxy';
-export { default as useGetChainAndExcludedTokenByAccountProxy } from './useGetChainAndExcludedTokenByAccountProxy';
+export { default as useCreateGetChainAndExcludedTokenByAccountProxy } from './useCreateGetChainAndExcludedTokenByAccountProxy';
