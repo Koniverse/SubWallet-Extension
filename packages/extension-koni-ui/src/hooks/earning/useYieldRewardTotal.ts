@@ -5,14 +5,14 @@ import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning
 import { EarningRewardItem, YieldPoolType } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainAndExcludedTokenByCurrentProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { findAccountByAddress } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 const useYieldRewardTotal = (slug: string): string | undefined => {
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
-  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo(() => {
     const checkAddress = (item: EarningRewardItem) => {

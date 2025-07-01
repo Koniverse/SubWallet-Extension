@@ -416,7 +416,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     let sync = true;
     let id: string | undefined;
 
-    if (!inputValue || inputValue.length < 2 || !chainSlug || !tokenSlug) {
+    if (!inputValue || inputValue.length < 2 || !chainSlug) {
       setResponseOptions([]);
     } else {
       const handler = (data: ResponseInputAccountSubscribe) => {

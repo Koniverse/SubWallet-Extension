@@ -353,7 +353,7 @@ export default class KoniExtension {
       const accountProxies = Object.values(accountProxyMap);
       const contacts = transformAddresses(_contacts);
       const chainInfo = chainInfoMap[chain];
-      const tokenInfo = tokenInfoMap[token];
+      const tokenInfo = tokenInfoMap[token || ''];
       const substrateApi = this.#koniState.chainService.getSubstrateApi(chain);
 
       const accountProxiesFiltered = accountProxies.filter((accountProxy) => {

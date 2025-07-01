@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';

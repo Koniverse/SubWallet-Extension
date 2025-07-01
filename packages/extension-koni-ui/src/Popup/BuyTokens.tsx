@@ -8,7 +8,7 @@ import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainAndExcludedTokenByCurrentProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
@@ -79,7 +79,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
   const checkAsset = useAssetChecker();
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const getReformatAddress = useCoreCreateReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
@@ -194,6 +194,10 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
         return;
       }
 
+      if (excludedTokens.includes(item.slug)) {
+        return;
+      }
+
       if (!currentSymbol || (item.slug === currentSymbol || item.symbol === currentSymbol)) {
         result.push(convertToItem(item));
       }
@@ -202,7 +206,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     sortTokensByBalanceInSelector(result, priorityTokens);
 
     return result;
-  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, getAccountTokenBalance, priorityTokens, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, excludedTokens, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 

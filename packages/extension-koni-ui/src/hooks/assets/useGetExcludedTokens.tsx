@@ -7,6 +7,8 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getExcludedTokensForSubstrateEcdsa, getSignModeByAccountProxy, hasOnlySubstrateEcdsaAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
+// This hook retrieves a list of excluded tokens based on the provided chain list and account proxy.
+// For Substrate ECDSA Ledger accounts, excluded tokens are those that are non-native and backed by smart contracts (e.g., ERC-20).
 const useGetExcludedTokens = () => {
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
   const accountProxies = useSelector((state) => state.accountState.accountProxies);

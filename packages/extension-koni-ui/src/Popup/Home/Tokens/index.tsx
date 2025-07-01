@@ -9,7 +9,7 @@ import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/T
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement => {
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token');
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentProxy();
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);

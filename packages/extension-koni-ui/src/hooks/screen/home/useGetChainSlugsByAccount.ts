@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 /**
- * @deprecated Use hook `useGetChainAndExcludedTokenByCurrentProxy` or 'useCoreCreateGetChainSlugsByAccountProxy' instead.
+ * @deprecated Use hook `useGetChainAndExcludedTokenByCurrentAccountProxy` or 'useCoreCreateGetChainSlugsByAccountProxy' instead.
  */
 // TODO: Recheck the usages of the address in this hook.
 export const useGetChainSlugsByAccount = (address?: string): string[] => {

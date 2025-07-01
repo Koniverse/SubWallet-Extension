@@ -7,7 +7,7 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcludedTokenByCurrentProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcludedTokenByCurrentAccountProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
@@ -41,7 +41,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<SelectedTokenInfo | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
-  const { allowedChains: chainSupported, excludedTokens } = useGetChainAndExcludedTokenByCurrentProxy();
+  const { allowedChains: chainSupported, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useCoreCreateReformatAddress();

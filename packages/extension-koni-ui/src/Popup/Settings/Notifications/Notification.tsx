@@ -15,7 +15,7 @@ import Search from '@subwallet/extension-koni-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
@@ -79,7 +79,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
-  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);

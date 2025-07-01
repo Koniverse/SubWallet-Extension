@@ -23,8 +23,7 @@ import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwa
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useCoreCreateGetChainSlugsByAccountProxy, useCoreCreateReformatAddress, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
-import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
+import { useAlert, useCoreCreateReformatAddress, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetChainAndExcludedTokenByAccountProxy, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
@@ -136,8 +135,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
   const getAccountTokenBalance = useGetAccountTokenBalance();
-  const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
-  const getExcludedToken = useGetExcludedTokens();
+  const { getAllowedChainsByAccountProxy, getExcludedTokensByAccountProxy } = useGetChainAndExcludedTokenByAccountProxy();
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
@@ -283,8 +281,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
     const items = (() => {
-      const allowedChains = getChainSlugsByAccountProxy(targetAccountProxy);
-      const excludedTokens = getExcludedToken(allowedChains, targetAccountProxy);
+      const allowedChains = getAllowedChainsByAccountProxy(targetAccountProxy);
+      const excludedTokens = getExcludedTokensByAccountProxy(allowedChains, targetAccountProxy);
 
       const result: TokenSelectorItemType[] = [];
 
@@ -342,7 +340,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     sortTokensByBalanceInSelector(tokenItemsSorted, priorityTokens);
 
     return tokenItemsSorted;
-  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getChainSlugsByAccountProxy, getExcludedToken, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
+  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getAllowedChainsByAccountProxy, getExcludedTokensByAccountProxy, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const isNotShowAccountSelector = !isAllAccount && accountAddressItems.length < 2;
 
