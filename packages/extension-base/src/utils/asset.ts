@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _getAssetNetuid, _isNativeToken, _isSubstrateEvmCompatibleChain, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetNetuid, _getContractAddressOfToken, _isNativeToken, _isSubstrateEvmCompatibleChain, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 
 export const filterAssetsByChainAndType = (chainAssetMap: Record<string, _ChainAsset>, chain: string, assetTypes: _AssetType[]): Record<string, _ChainAsset> => {
   const result: Record<string, _ChainAsset> = {};
@@ -37,5 +37,5 @@ export const isSubstrateEcdsaLedgerAssetSupported = (chainsAsset: _ChainAsset, c
     return false;
   }
 
-  return _isNativeToken(chainsAsset) || !chainsAsset.metadata?.contractAddress;
+  return _isNativeToken(chainsAsset) || !_getContractAddressOfToken(chainsAsset);
 };
