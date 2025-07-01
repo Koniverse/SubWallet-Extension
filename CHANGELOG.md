@@ -1,10 +1,17 @@
 # CHANGELOG
 
+## 1.3.45
+Build date: Jul 01, 2025.
+
+Bug fixed:
+- Fixed error validate receive address when transferring MYTH (Mythos) (#4486)
+
+
 ## 1.3.44
 Build date: Jun 27, 2025.
 
 Bug fixed:
-- Fixed error validate receive address when transferring MYTH (Mythos) ($4486)
+- Hot fix error validate receive address when transferring MYTH (Mythos) (#4486)
 
 
 ## 1.3.43
