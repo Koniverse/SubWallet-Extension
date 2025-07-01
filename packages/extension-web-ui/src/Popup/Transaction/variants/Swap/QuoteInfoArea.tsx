@@ -35,12 +35,13 @@ type Props = ThemeProps & {
   openSwapQuotesModal: VoidFunction;
   slippage: number;
   openSlippageModal: VoidFunction;
+  customSwapErrorMessage?: string;
 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, currentOptimalSwapPath, currentQuote, estimatedFeeValue,
-    fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal, openSwapQuotesModal,
-    quoteAliveUntil, quoteOptions, slippage, swapError,
+  const { className, currentOptimalSwapPath, currentQuote, customSwapErrorMessage,
+    estimatedFeeValue, fromAssetInfo, handleRequestLoading, isFormInvalid, openSlippageModal,
+    openSwapQuotesModal, quoteAliveUntil, quoteOptions, slippage, swapError,
     toAssetInfo } = props;
   const { t } = useTranslation();
   const currencyData = useSelector((state) => state.price.currencyData);
@@ -125,13 +126,15 @@ const Component: React.FC<Props> = (props: Props) => {
       return null;
     }
 
-    const isError = !!swapError || isFormInvalid;
+    const isError = !!customSwapErrorMessage || !!swapError || isFormInvalid;
     let message = '';
 
     if (isFormInvalid) {
       message = t('Invalid input. Re-enter information in the red field and try again');
     } else if (handleRequestLoading) {
       message = t('Loading...');
+    } else if (customSwapErrorMessage) {
+      message = customSwapErrorMessage;
     } else {
       message = swapError ? swapError?.message : t('Swap pair not supported. Select another pair and try again');
     }

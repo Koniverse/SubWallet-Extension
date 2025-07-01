@@ -136,6 +136,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const [preferredProvider, setPreferredProvider] = useState<SwapProviderId | undefined>(undefined);
 
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
+  const [customSwapErrorMessage, setCustomSwapErrorMessage] = useState<string|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
 
@@ -416,31 +417,34 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
     setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
     setSwapError(rs.quote.error);
+    setCustomSwapErrorMessage(undefined);
   }, []);
 
-  const notifyNoQuote = useCallback(() => {
-    notify({
-      message: t('Swap pair not supported. Select another pair and try again'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+  const showSwapError = useCallback((message: string) => {
+    if (isWebUI) {
+      setCustomSwapErrorMessage(message);
 
-  const notifyTooLowAmount = useCallback(() => {
-    notify({
-      message: t('Amount too low. Increase your amount and try again'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+      return;
+    }
 
-  const notifyTooHighAmount = useCallback(() => {
     notify({
-      message: t('Amount too high. Lower your amount and try again'),
+      message,
       type: 'error',
       duration: 5
     });
-  }, [notify, t]);
+  }, [isWebUI, notify]);
+
+  const showNoQuoteError = useCallback(() => {
+    showSwapError(t('Swap pair not supported. Select another pair and try again'));
+  }, [showSwapError, t]);
+
+  const showTooLowAmountError = useCallback(() => {
+    showSwapError(t('Amount too low. Increase your amount and try again'));
+  }, [showSwapError, t]);
+
+  const showTooHighAmountError = useCallback(() => {
+    showSwapError(t('Amount too high. Lower your amount and try again'));
+  }, [showSwapError, t]);
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
@@ -524,7 +528,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     }
 
     if (!currentQuote || !currentOptimalSwapPath) {
-      !isWebUI && notifyNoQuote();
+      showNoQuoteError();
 
       return;
     }
@@ -675,7 +679,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, isWebUI, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, isWebUI, notify, showNoQuoteError, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -871,6 +875,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           setQuoteAliveUntil(undefined);
           setCurrentQuote(undefined);
           setSwapError(undefined);
+          setCustomSwapErrorMessage(undefined);
           setIsFormInvalid(false);
           setShowQuoteArea(true);
 
@@ -907,15 +912,15 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
             if (sync) {
               if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-                !isWebUI && notifyNoQuote();
+                showNoQuoteError();
               }
 
               if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-                notifyTooLowAmount();
+                showTooLowAmountError();
               }
 
               if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-                notifyTooHighAmount();
+                showTooHighAmountError();
               }
 
               setHandleRequestLoading(false);
@@ -937,7 +942,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, isWebUI, notifyNoQuote, notifyTooHighAmount, notifyTooLowAmount, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, isWebUI, showNoQuoteError, showTooHighAmountError, showTooLowAmountError, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -953,23 +958,24 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         handleSwapRequestV2(currentQuoteRequest).then((rs) => {
           if (sync) {
             updateSwapStates(rs);
+            setHandleRequestLoading(false);
           }
         }).catch((e: Error) => {
           console.log('Error when doing refreshSwapRequestResult', e);
 
-          if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-            !isWebUI && notifyNoQuote();
-          }
-
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-            notifyTooLowAmount();
-          }
-
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-            notifyTooHighAmount();
-          }
-        }).finally(() => {
           if (sync) {
+            if (e.message.toLowerCase().startsWith('swap pair is not found')) {
+              showNoQuoteError();
+            }
+
+            if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+              showTooLowAmountError();
+            }
+
+            if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+              showTooHighAmountError();
+            }
+
             setHandleRequestLoading(false);
           }
         });
@@ -1010,7 +1016,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, isWebUI, notifyNoQuote, notifyTooHighAmount, notifyTooLowAmount, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, isWebUI, showNoQuoteError, showTooHighAmountError, showTooLowAmountError, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
@@ -1271,6 +1277,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   className={'__quote-info-area'}
                   currentOptimalSwapPath={currentOptimalSwapPath}
                   currentQuote={currentQuote}
+                  customSwapErrorMessage={customSwapErrorMessage}
                   estimatedFeeValue={estimatedFeeValue}
                   fromAssetInfo={fromAssetInfo}
                   handleRequestLoading={handleRequestLoading}
