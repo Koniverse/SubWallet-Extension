@@ -101,7 +101,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const allowedMap = currentAuth.isAllowedMap;
 
         const filterType = (address: string, isSubstrateECDSA?: boolean) => {
-          if (isSubstrateECDSA && !types.includes('substrate')) {
+          if (isSubstrateECDSA && !currentAuth.canConnectSubstrateEcdsa) {
             return false;
           }
 
