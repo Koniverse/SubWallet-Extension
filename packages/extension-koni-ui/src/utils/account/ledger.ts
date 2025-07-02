@@ -5,7 +5,8 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { LedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { PredefinedLedgerNetwork, RECOVERY_SLUG } from '@subwallet/extension-koni-ui/constants/ledger';
 import { getSignModeByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 
@@ -35,7 +36,13 @@ export const isSubstrateEcdsaAccountProxy = (accountProxy: AccountProxy) => {
 };
 
 export const hasOnlySubstrateEcdsaAccountProxy = (accountProxies: AccountProxy[]) => {
-  return accountProxies.every((accountProxy) => {
-    return accountProxy.accounts.length === 1 && accountProxy.accounts[0].isSubstrateECDSA;
+  const noAllAccountProxy = accountProxies.filter((accountProxy) => !isAccountAll(accountProxy.id));
+
+  return noAllAccountProxy.every((accountProxy) => {
+    if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
+      return getSignModeByAccountProxy(accountProxy) === AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
+    }
+
+    return true;
   });
 };
