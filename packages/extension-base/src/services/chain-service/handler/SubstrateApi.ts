@@ -4,18 +4,22 @@
 import '@polkadot/types-augment';
 
 import { options as acalaOptions } from '@acala-network/api';
+import { SubstrateApi as DedotSubstrateApi } from '@dedot/chaintypes/substrate';
 import { GearApi } from '@gear-js/api';
 import { rpc as oakRpc, types as oakTypes } from '@oak-foundation/types';
 import { MetadataItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _API_OPTIONS_CHAIN_GROUP, API_AUTO_CONNECT_MS, API_CONNECT_TIMEOUT } from '@subwallet/extension-base/services/chain-service/constants';
-import { getSubstrateConnectProvider } from '@subwallet/extension-base/services/chain-service/handler/light-client';
+import { getSubstrateConnectProvider, paraChainSpecs, relayChainSpecs } from '@subwallet/extension-base/services/chain-service/handler/light-client';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
+import { DedotClient, ISubstrateClient, LegacyClient, SmoldotProvider, WsProvider as DedotWsProvider } from 'dedot';
+import { RpcVersion } from 'dedot/types';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import * as smoldot from 'smoldot';
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, WsProvider as PapiWsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
 import { typesBundle as _typesBundle } from '@polkadot/apps-config/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
@@ -39,9 +43,29 @@ if (typesBundle.spec) {
   typesBundle.spec['data-avail'] = _goldbergSpec;
 }
 
+type DedotProvider = DedotWsProvider | SmoldotProvider;
+
+// todo: can move to static data
+const legacyChains = [
+  'moonbeam', 'aleph', 'astar', 'acala', 'alephTest', 'aventus',
+  'moonbase', 'bifrost_dot', 'bifrost_testnet', 'calamari', 'amplitude', 'amplitude_test',
+  'clover', 'hydradx_main', 'edgeware', 'centrifuge', 'interlay', 'nodle',
+  'darwinia2', 'sora_ksm', 'polkadex', 'composableFinance', 'phala', 'crust',
+  'karura', 'kilt', 'basilisk', 'altair', 'kintsugi', 'picasso',
+  'zeitgeist', 'shadow', 'robonomics', 'crabParachain', 'chainx', 'acala_testnet',
+  'mangatax_para', 'origintrail', 'kabocha', 'ternoa', 'pendulum', 'kilt_peregrine',
+  'xx_network', 'frequency', 'ipci', 'shiden', 'logion', 'polymesh',
+  'sora_substrate', 'joystream', 'krest_network', 'deeper_network', 'energy_web_x', 'manta_network',
+  'polimec', 'xcavate', 'energy_web_x_testnet', 'energy_web_x_rococo', 'liberlandTest', 'liberland',
+  'tangleTest', 'dentnet', 'hydradx_rococo', 'creditcoinTest', 'acurast', 'humanode',
+  'dbcchain', 'availTuringTest', 'avail_mainnet', 'curio', 'peaq', 'cere',
+  'creditcoin_native', 'tangle', 'jamton', 'truth_network'
+];
+
 export class SubstrateApi implements _SubstrateApi {
   chainSlug: string;
   api: ApiPromise;
+  client: ISubstrateClient<DedotSubstrateApi[RpcVersion]>;
   providerName?: string;
   provider: ProviderInterface;
   apiUrl: string;
@@ -52,6 +76,7 @@ export class SubstrateApi implements _SubstrateApi {
   isApiReadyOnce = false;
   apiError?: string;
   private handleApiReady: PromiseHandler<_SubstrateApi>;
+  private handleClientReady: PromiseHandler<_SubstrateApi>;
   public readonly isApiConnectedSubject = new BehaviorSubject(false);
   public readonly connectionStatusSubject = new BehaviorSubject(_ChainConnectionStatus.DISCONNECTED);
   get isApiConnected (): boolean {
@@ -93,9 +118,32 @@ export class SubstrateApi implements _SubstrateApi {
 
       return getSubstrateConnectProvider(apiUrl.replace('light://substrate-connect/', ''));
     } else {
-      this.useLightClient = true;
+      this.useLightClient = true; // todo: ?
 
-      return new WsProvider(apiUrl, API_AUTO_CONNECT_MS, {}, API_CONNECT_TIMEOUT);
+      return new PapiWsProvider(apiUrl, API_AUTO_CONNECT_MS, {}, API_CONNECT_TIMEOUT);
+    }
+  }
+
+  private createDeDotProvider (apiUrl: string): DedotProvider {
+    if (apiUrl.startsWith('light://')) {
+      const client = smoldot.start();
+      const specLink = apiUrl.replace('light://substrate-connect/', '');
+      const [relayName, paraName] = specLink.split('/');
+
+      if (!paraName) {
+        const relayChain = client.addChain({ chainSpec: relayChainSpecs[relayName] });
+
+        return new SmoldotProvider(relayChain);
+      }
+
+      const paraChain = client.addChain({ chainSpec: paraChainSpecs[specLink] });
+
+      return new SmoldotProvider(paraChain);
+    } else {
+      return new DedotWsProvider({
+        endpoint: apiUrl,
+        maxRetryAttempts: 0
+      });
     }
   }
 
@@ -152,12 +200,47 @@ export class SubstrateApi implements _SubstrateApi {
       api = new ApiPromise(apiOption);
     }
 
-    api.on('ready', this.onReady.bind(this));
     api.on('connected', this.onConnect.bind(this));
+    api.on('ready', this.onReady.bind(this));
     api.on('disconnected', this.onDisconnect.bind(this));
     api.on('error', this.onError.bind(this));
 
     return api;
+  }
+
+  private createClient (apiUrl: string, chainSlug?: string) { // todo: chainSlug is required
+    // todo: re-check metadata, typesBundle, registry,
+    const provider = this.createDeDotProvider(apiUrl);
+    const client: ISubstrateClient<DedotSubstrateApi[RpcVersion]> = chainSlug && legacyChains.includes(chainSlug)
+      ? new LegacyClient({ provider, throwOnUnknownApi: false })
+      : new DedotClient({ provider, throwOnUnknownApi: false });
+
+    client.on('connected', () => console.log(`Dedot: On successfully ${apiUrl}`));
+    client.on('ready', () => {
+      this.handleClientReady.resolve(this);
+      console.log(`Dedot: On ready ${apiUrl}`);
+    });
+    client.on('disconnected', () => {
+      this.handleClientReady = createPromiseHandler<_SubstrateApi>();
+      console.log(`Dedot: On disconnect ${apiUrl}`);
+    });
+    client.on('error', () => console.log(`Dedot: On error ${apiUrl}`));
+
+    client.connect()
+      .then(() => console.log(`Dedot: Init connect or update url ${apiUrl}`))
+      .catch(() => {
+        console.log(`Dedot: Disconnected from ${apiUrl}`);
+        this.stopListenClientEvent(client);
+      });
+
+    return client;
+  }
+
+  private stopListenClientEvent (client: ISubstrateClient<DedotSubstrateApi[RpcVersion]>) {
+    client.off('connected');
+    client.off('ready');
+    client.off('disconnected');
+    client.off('error');
   }
 
   constructor (chainSlug: string, apiUrl: string, { externalApiPromise, metadata, providerName }: _ApiOptions = {}) {
@@ -167,16 +250,22 @@ export class SubstrateApi implements _SubstrateApi {
     this.registry = new TypeRegistry();
     this.metadata = metadata;
     this.provider = this.createProvider(apiUrl);
+    this.client = this.createClient(apiUrl, chainSlug);
     this.api = this.createApi(this.provider, externalApiPromise);
 
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
+    this.handleClientReady = createPromiseHandler<_SubstrateApi>();
   }
 
   get isReady (): Promise<_SubstrateApi> {
     return this.handleApiReady.promise;
   }
 
-  async updateApiUrl (apiUrl: string) {
+  get isClientReady (): Promise<_SubstrateApi> {
+    return this.handleClientReady.promise;
+  }
+
+  async updateApiUrl (apiUrl: string, chainSlug?: string) {
     if (this.apiUrl === apiUrl) {
       return;
     }
@@ -184,6 +273,12 @@ export class SubstrateApi implements _SubstrateApi {
     // Disconnect with old provider
     await this.disconnect();
     this.isApiReadyOnce = false;
+
+    this.client.off('ready', () => console.log(`Dedot: Off ready ${apiUrl}`));
+    this.client.off('connected', () => console.log(`Dedot: Off connected ${apiUrl}`));
+    this.client.off('disconnected', () => console.log(`Dedot: Off disconnected ${apiUrl}`));
+    this.client.off('error', () => console.log(`Dedot: Off error ${apiUrl}`));
+
     this.api.off('ready', this.onReady.bind(this));
     this.api.off('connected', this.onConnect.bind(this));
     this.api.off('disconnected', this.onDisconnect.bind(this));
@@ -191,6 +286,7 @@ export class SubstrateApi implements _SubstrateApi {
 
     // Create new provider and api
     this.apiUrl = apiUrl;
+    this.client = this.createClient(apiUrl, chainSlug);
     this.provider = this.createProvider(apiUrl);
     this.api = this.createApi(this.provider);
   }
@@ -201,6 +297,13 @@ export class SubstrateApi implements _SubstrateApi {
       _callbackUpdateMetadata?.(this);
     } else {
       this.updateConnectionStatus(_ChainConnectionStatus.CONNECTING);
+
+      this.client.connect()
+        .then(() => console.log(`Dedot: Reconnect url: ${this.apiUrl}`))
+        .catch(() => {
+          console.log(`Dedot: Disconnected from ${this.apiUrl}`);
+          this.stopListenClientEvent(this.client);
+        });
 
       this.api.connect()
         .then(() => {
@@ -214,7 +317,10 @@ export class SubstrateApi implements _SubstrateApi {
 
   async disconnect () {
     try {
-      await this.api.disconnect();
+      await Promise.all([
+        this.client.disconnect(),
+        this.api.disconnect()
+      ]);
     } catch (e) {
       console.error(e);
     }
@@ -226,6 +332,7 @@ export class SubstrateApi implements _SubstrateApi {
     await this.disconnect();
     this.connect();
     await this.handleApiReady.promise;
+    await this.handleClientReady.promise;
   }
 
   destroy () {
@@ -247,7 +354,7 @@ export class SubstrateApi implements _SubstrateApi {
   onConnect (): void {
     this.updateConnectionStatus(_ChainConnectionStatus.CONNECTED);
     this.substrateRetry = 0;
-    console.log(`Connected to ${this.chainSlug || ''} at ${this.apiUrl}`);
+    console.log(`PJS: Connected to ${this.chainSlug || ''} at ${this.apiUrl}`);
 
     if (this.isApiReadyOnce) {
       this.handleApiReady.resolve(this);
@@ -257,7 +364,7 @@ export class SubstrateApi implements _SubstrateApi {
 
   onDisconnect (): void {
     this.isApiReady = false;
-    console.log(`Disconnected from ${this.chainSlug} at ${this.apiUrl}`);
+    console.log(`PJS: Disconnected from ${this.chainSlug} at ${this.apiUrl}`);
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
     this.substrateRetry += 1;
@@ -270,7 +377,7 @@ export class SubstrateApi implements _SubstrateApi {
   }
 
   onError (e: Error): void {
-    console.warn(`${this.chainSlug} connection got error`, e);
+    console.warn(`PJS: ${this.chainSlug} connection got error`, e);
   }
 
   async fillApiInfo (): Promise<void> {

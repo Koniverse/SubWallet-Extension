@@ -112,7 +112,6 @@ export const SUBSCAN_BALANCE_CHAIN_MAP: Record<string, string> = {
   picasso: 'picasso',
   quartz: 'quartz',
   unique_network: 'unique',
-  genshiro: 'genshiro',
   zeitgeist: 'zeitgeist',
   sakura: 'sakura',
   shadow: 'shadow',

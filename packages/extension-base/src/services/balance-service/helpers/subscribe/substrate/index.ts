@@ -21,12 +21,12 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
-import { timer } from 'rxjs';
+import { AnyFunc, GenericStorageQuery, RpcVersion } from 'dedot/types';
+import { Observable, timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
 import { subscribeERC20Interval } from '../evm';
-import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
@@ -53,7 +53,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
     substrateApi
   };
 
-  if (!_BALANCE_CHAIN_GROUP.kintsugi.includes(chain) && !_BALANCE_CHAIN_GROUP.genshiro.includes(chain) && !_BALANCE_CHAIN_GROUP.equilibrium_parachain.includes(chain)) {
+  if (!_BALANCE_CHAIN_GROUP.kintsugi.includes(chain)) {
     unsubNativeToken = await subscribeWithSystemAccountPallet(substrateParams);
   }
 
@@ -67,11 +67,6 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
       });
     } else if (_BALANCE_CHAIN_GROUP.statemine.includes(chain)) {
       unsubLocalToken = await subscribeAssetsAccountPallet(substrateParams);
-    } else if (_BALANCE_CHAIN_GROUP.genshiro.includes(chain) || _BALANCE_CHAIN_GROUP.equilibrium_parachain.includes(chain)) {
-      unsubLocalToken = await subscribeEquilibriumTokenBalance({
-        ...substrateParams,
-        includeNativeToken: true
-      });
     } else if (_BALANCE_CHAIN_GROUP.centrifuge.includes(chain)) {
       unsubLocalToken = await subscribeOrmlTokensPallet(substrateParams);
     }
@@ -608,8 +603,7 @@ const gdotSlug = 'hydradx_main-LOCAL-GDOT';
 
 async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
-    const _balanceInfo = await substrateApi.api.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address);
-    const balanceInfo = _balanceInfo.toPrimitive() as OrmlTokensAccountData;
+    const balanceInfo = await substrateApi.client.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address) as OrmlTokensAccountData;
 
     const transferableBalance = _getTokensPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
     const totalLockedFromTransfer = _getTokensPalletLocked(balanceInfo);
@@ -623,3 +617,25 @@ async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[
     } as unknown as BalanceItem;
   }));
 }
+
+export const createObservable = <F extends AnyFunc>(func: GenericStorageQuery<RpcVersion, F>, ...args: Parameters<F>): Observable<ReturnType<F>> => {
+  return new Observable<ReturnType<F>>((_subscriber) => {
+    let unsub: (() => Promise<void>) | undefined;
+
+    func(...args, (value: ReturnType<F>) => {
+      if (!_subscriber.closed) {
+        _subscriber.next(value);
+      } else {
+        unsub?.().catch((e) => _subscriber.error(e));
+      }
+    }).then((_unsub) => {
+      if (!_subscriber.closed) {
+        unsub = _unsub;
+      }
+    }).catch((err) => _subscriber.error(err));
+
+    return () => {
+      unsub?.().catch((e) => _subscriber.error(e));
+    };
+  });
+};
