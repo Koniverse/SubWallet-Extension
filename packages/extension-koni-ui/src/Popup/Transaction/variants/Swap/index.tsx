@@ -1388,7 +1388,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`)
       .then((rawResp) => {
         if (!rawResp.ok) {
-          throw new Error(`HTTP error! status: ${rawResp.status}`); // todo: test
+          throw new Error(`HTTP error! status: ${rawResp.status}`);
         }
 
         return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string}>;
@@ -1415,7 +1415,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   return (
     <PageWrapper
       className={CN(className)}
-      resolve={dataContext.awaitStores(['swap', 'price'])} // todo: check swap
+      resolve={dataContext.awaitStores(['price'])}
     >
       <Component
         pairMap={pairMap}
