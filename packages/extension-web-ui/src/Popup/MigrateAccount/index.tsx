@@ -48,10 +48,15 @@ function Component ({ className = '' }: Props) {
 
   const accountProxies = useSelector((root: RootState) => root.accountState.accountProxies);
 
-  const onClosePasswordModal = useCallback(() => {
+  const closePasswordModal = useCallback(() => {
     inactiveModal(enterPasswordModalId);
     setIsPasswordModalOpen(false);
   }, [inactiveModal]);
+
+  const onClosePasswordModal = useCallback(() => {
+    closePasswordModal();
+    goHome(); // UX: go home if user click close on Enter password modal
+  }, [closePasswordModal, goHome]);
 
   const onOpenPasswordModal = useCallback(() => {
     setIsPasswordModalOpen(true);
@@ -103,8 +108,8 @@ function Component ({ className = '' }: Props) {
       setCurrentScreenView(ScreenView.SUMMARY);
     }
 
-    onClosePasswordModal();
-  }, [onClosePasswordModal]);
+    closePasswordModal();
+  }, [closePasswordModal]);
 
   const onApproveSoloAccountMigration = useCallback(async (request: RequestMigrateSoloAccount) => {
     try {
@@ -128,8 +133,12 @@ function Component ({ className = '' }: Props) {
   }, [goHome]);
 
   useEffect(() => {
-    setTitle(t('Migrate to unified account'));
-  }, [setTitle, t]);
+    if (currentScreenView === ScreenView.SUMMARY) {
+      setTitle(t('Finish'));
+    } else {
+      setTitle(t('Migrate to unified account'));
+    }
+  }, [currentScreenView, setTitle, t]);
 
   useEffect(() => {
     setWebBaseClassName(appendSuffixToClasses(className, '-web-base-container'));
