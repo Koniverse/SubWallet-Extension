@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
-import {_getAssetNetuid} from "@subwallet/extension-base/services/chain-service/utils";
+import { _getAssetNetuid } from '@subwallet/extension-base/services/chain-service/utils';
 
 export const filterAssetsByChainAndType = (chainAssetMap: Record<string, _ChainAsset>, chain: string, assetTypes: _AssetType[]): Record<string, _ChainAsset> => {
   const result: Record<string, _ChainAsset> = {};

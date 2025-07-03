@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { isProductionMode } from '@subwallet/extension-base/constants';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 
 import { isArray } from '@polkadot/util';
@@ -14,6 +15,15 @@ interface GeckoItem {
   symbol: string
 }
 
+interface DerivativeTokenPrice {
+  id: string;
+  origin_id: string;
+  origin_price: number;
+  rate: number;
+  derived_price: number;
+  cached_at: number;
+}
+
 interface ExchangeRateItem {
   result: string,
   time_last_update_unix: number,
@@ -24,8 +34,11 @@ interface ExchangeRateItem {
   conversion_rates: Record<string, number>
 }
 const DEFAULT_CURRENCY = 'USD';
+const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
 
 let useBackupApi = false;
+
+const apiCacheDomain = isProductionMode ? 'https://api-cache.subwallet.app' : 'https://api-cache-dev.subwallet.app';
 
 export const getExchangeRateMap = async (): Promise<Record<CurrencyType, ExchangeRateJSON>> => {
   let response: Response | undefined;
@@ -63,11 +76,54 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
   }
 };
 
+const fetchDerivativeTokenSlugs = async () => {
+  try {
+    const response = await fetch(`${apiCacheDomain}/api/price/derivative-list`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data: unknown = await response.json();
+    const apiSlugs: string[] = Array.isArray(data) && data.every((item) => typeof item === 'string')
+      ? (data as string[])
+      : [];
+
+    return new Set(apiSlugs.length > 0 ? apiSlugs : DERIVATIVE_TOKEN_SLUG_LIST);
+  } catch (error) {
+    console.error('Error fetching derivative token slugs from API:', error);
+
+    return new Set(DERIVATIVE_TOKEN_SLUG_LIST);
+  }
+};
+
 export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType = 'USD'): Promise<Omit<PriceJson, 'exchangeRateMap'>> => {
   const idStr = Array.from(priceIds).join(',');
   let response: Response | undefined;
 
   try {
+    const derivativePriceMap: Record<string, number> = {};
+    let derivativeApiError = false;
+
+    try {
+      const responseDerivativeTokens = await fetch(`${apiCacheDomain}/api/price/derivative-get`);
+      const generateDerivativePriceRaw = await responseDerivativeTokens?.json() as unknown || [];
+
+      if (Array.isArray(generateDerivativePriceRaw)) {
+        generateDerivativePriceRaw.forEach((token: DerivativeTokenPrice) => {
+          if (token.id) {
+            derivativePriceMap[token.id] = token.derived_price;
+          }
+        });
+      } else {
+        console.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
+        derivativeApiError = true;
+      }
+    } catch (error) {
+      console.error('Error fetching derivative API:', error);
+      derivativeApiError = true;
+    }
+
     if (!useBackupApi) {
       try {
         response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.toLowerCase()}&per_page=250&ids=${idStr}`);
@@ -105,6 +161,19 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       priceMap[val.id] = currentPrice;
       price24hMap[val.id] = price24h;
     });
+
+    const derivativeTokenSlugs = await fetchDerivativeTokenSlugs();
+
+    // TODO: The API for derivatives does not provide a 24-hour price change value.
+    if (derivativeApiError) {
+      derivativeTokenSlugs.forEach((slug) => {
+        priceMap[slug] = 0;
+      });
+    } else {
+      Object.entries(derivativePriceMap).forEach(([slug, derivedPrice]) => {
+        priceMap[slug] = derivedPrice;
+      });
+    }
 
     return {
       currency,
