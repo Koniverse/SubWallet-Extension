@@ -349,9 +349,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const handleCancel = useCallback(() => {
     onCancelSelectValidator();
 
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   }, [onCancelSelectValidator, onCancel]);
 
   useEffect(() => {

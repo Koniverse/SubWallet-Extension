@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, EARNING_CHANGE_VALIDATOR_MODAL, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -20,7 +20,7 @@ import { useLocalStorage } from 'usehooks-ts';
 
 interface Props extends ThemeProps {
   title?: string,
-  transactionType?: string
+  transactionType?: ExtrinsicType
   children?: React.ReactNode;
   modalContent?: boolean;
   modalId?: string;
@@ -29,11 +29,11 @@ interface Props extends ThemeProps {
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ children, className, modalContent, modalId }: Props) {
+function Component ({ children, className, modalContent, modalId, transactionType: transactionTypeProps }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const dataContext = useContext(DataContext);
 
@@ -47,8 +47,8 @@ function Component ({ children, className, modalContent, modalId }: Props) {
     const pathName = location.pathname;
     const action = pathName.split('/')[2] || '';
 
-    if (checkActive(EARNING_CHANGE_VALIDATOR_MODAL)) {
-      return ExtrinsicType.CHANGE_EARNING_VALIDATOR;
+    if (transactionTypeProps) {
+      return transactionTypeProps;
     }
 
     switch (action) {
@@ -74,7 +74,7 @@ function Component ({ children, className, modalContent, modalId }: Props) {
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
     }
-  }, [checkActive, location.pathname]);
+  }, [location.pathname, transactionTypeProps]);
 
   const storageKey = useMemo((): string => detectTransactionPersistKey(transactionType), [transactionType]);
 
@@ -148,6 +148,13 @@ function Component ({ children, className, modalContent, modalId }: Props) {
     if (storageKey === CLAIM_BRIDGE_TRANSACTION) {
       return {
         ...DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CHANGE_VALIDATOR_TRANSACTION) {
+      return {
+        ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
         fromAccountProxy
       };
     }

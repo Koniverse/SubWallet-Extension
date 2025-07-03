@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { CANCEL_UN_STAKE_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, CURRENT_PAGE, EARN_TRANSACTION, NFT_TRANSACTION, STAKE_TRANSACTION, SWAP_TRANSACTION, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, CURRENT_PAGE, EARN_TRANSACTION, NFT_TRANSACTION, STAKE_TRANSACTION, SWAP_TRANSACTION, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 
 import { removeStorage } from '../common';
 
@@ -18,7 +18,6 @@ export const detectTransactionPersistKey = (type?: ExtrinsicType): string => {
     case ExtrinsicType.STAKING_JOIN_POOL:
       return STAKE_TRANSACTION;
     case ExtrinsicType.JOIN_YIELD_POOL:
-    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
       return EARN_TRANSACTION;
     case ExtrinsicType.STAKING_UNBOND:
     case ExtrinsicType.STAKING_LEAVE_POOL:
@@ -30,6 +29,8 @@ export const detectTransactionPersistKey = (type?: ExtrinsicType): string => {
       return WITHDRAW_TRANSACTION;
     case ExtrinsicType.STAKING_CLAIM_REWARD:
       return CLAIM_REWARD_TRANSACTION;
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
+      return CHANGE_VALIDATOR_TRANSACTION;
     case ExtrinsicType.SWAP:
       return SWAP_TRANSACTION;
     case ExtrinsicType.CLAIM_BRIDGE:

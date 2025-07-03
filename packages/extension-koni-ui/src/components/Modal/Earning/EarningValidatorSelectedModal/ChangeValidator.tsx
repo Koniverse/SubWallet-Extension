@@ -348,9 +348,7 @@ const Component = (props: Props) => {
   const handleCancel = useCallback(() => {
     onCancelSelectValidator();
 
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   }, [onCancelSelectValidator, onCancel]);
 
   useEffect(() => {

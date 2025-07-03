@@ -1,18 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { NominationInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { DEFAULT_EARN_PARAMS, EARN_TRANSACTION, EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { CHANGE_VALIDATOR_TRANSACTION, DEFAULT_CHANGE_VALIDATOR_PARAMS, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
 import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { store } from '@subwallet/extension-koni-ui/stores';
-import { EarnParams, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { ChangeValidatorParams, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
@@ -41,12 +42,14 @@ const Component = (props: Props) => {
   const { addresses, chain, className = '', compound, from
     , modalId, nominations, onChange, readOnly, slug, title = 'Your validators' } = props;
 
+  const EARNING_CHANGE_VALIDATOR_MODAL = `${modalId}-base`;
+
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
   const [targetLoading, setTargetLoading] = useState(false);
   const [isChangeValidatorModalVisible, setIsChangeValidatorModalVisible] = useState<boolean>(false);
 
-  const [, setStorage] = useLocalStorage<EarnParams>(EARN_TRANSACTION, DEFAULT_EARN_PARAMS);
+  const [, setStorage] = useLocalStorage<ChangeValidatorParams>(CHANGE_VALIDATOR_TRANSACTION, DEFAULT_CHANGE_VALIDATOR_PARAMS);
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { currentAccountProxy } = useSelector((state) => state.accountState);
@@ -100,14 +103,14 @@ const Component = (props: Props) => {
       activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
 
       setStorage({
-        ...DEFAULT_EARN_PARAMS,
+        ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
         slug: poolInfo.slug,
         from: from,
         chain: chain,
         fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
     },
-    [activeModal, chain, currentAccountProxy, from, inactiveModal, modalId, poolInfo.slug, setStorage]
+    [EARNING_CHANGE_VALIDATOR_MODAL, activeModal, chain, currentAccountProxy, from, inactiveModal, modalId, poolInfo.slug, setStorage]
   );
 
   const onCancel = useCallback(() => {
@@ -231,6 +234,7 @@ const Component = (props: Props) => {
         <Transaction
           modalContent={true}
           modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+          transactionType={ExtrinsicType.CHANGE_EARNING_VALIDATOR}
         >
           {isBittensorChain
             ? (

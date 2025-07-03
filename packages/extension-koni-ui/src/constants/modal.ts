@@ -93,7 +93,6 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
 export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
-export const EARNING_CHANGE_VALIDATOR_MODAL = 'earning-change-validator-modal';
 
 export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
 export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';
