@@ -14,6 +14,7 @@ import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, BTC_DUST_AMOUNT, LATEST_
 import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmMinAmountToMythos, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { ALLOWED_PATH } from '@subwallet/extension-base/defaults';
 import { getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
@@ -345,7 +346,7 @@ export default class KoniExtension {
   }
 
   private async subscribeInputAddressData (request: RequestInputAccountSubscribe, id: string, port: chrome.runtime.Port): Promise<ResponseInputAccountSubscribe> {
-    const { chain, data, token } = request;
+    const { actionType, chain, data, token } = request;
 
     const cb = createSubscription<'pri(accounts.subscribeAccountsInputAddress)'>(id, port);
 
@@ -359,8 +360,14 @@ export default class KoniExtension {
       const accountProxiesFiltered = accountProxies.filter((accountProxy) => {
         const signMode = accountProxy.accounts[0]?.signMode;
 
-        if (tokenInfo && signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
-          return isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+          if (actionType === ActionType.SEND_NFT) {
+            return false;
+          }
+
+          if (tokenInfo) {
+            return isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
+          }
         }
 
         return true;

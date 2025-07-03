@@ -4,6 +4,7 @@
 import type { BaseSelectRef } from 'rc-select';
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AnalyzeAddress, AnalyzedGroup, ResponseInputAccountSubscribe } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, reformatAddress } from '@subwallet/extension-base/utils';
@@ -42,6 +43,7 @@ type AutoCompleteGroupItem = {
 interface Props extends BasicInputWrapper, ThemeProps {
   chainSlug?: string;
   tokenSlug?: string;
+  actionType?: ActionType;
   showAddressBook?: boolean;
   showScanner?: boolean;
   labelStyle?: 'horizontal' | 'vertical';
@@ -72,7 +74,7 @@ function getInputValueFromGraftedValue (graftedValue: string) {
 //  - Rename to AddressInput, after this component is done
 
 function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.ReactElement<Props> {
-  const { chainSlug, className = '', disabled, dropdownHeight = 240, id,
+  const { actionType, chainSlug, className = '', disabled, dropdownHeight = 240, id,
     label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly, saveAddress,
     showAddressBook, showScanner, status, statusHelp, tokenSlug, value } = props;
   const { t } = useTranslation();
@@ -423,7 +425,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       subscribeAccountsInputAddress({
         token: tokenSlug,
         data: inputValue,
-        chain: chainSlug
+        chain: chainSlug,
+        actionType: actionType
       }, handler).then(handler).catch(console.error);
     }
 
@@ -434,7 +437,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         cancelSubscription(id).catch(console.log);
       }
     };
-  }, [chainSlug, inputValue, tokenSlug]);
+  }, [actionType, chainSlug, inputValue, tokenSlug]);
 
   return (
     <>
@@ -569,6 +572,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         showAddressBook &&
         (
           <AddressBookModal
+            actionType={actionType}
             chainSlug={chainSlug}
             id={addressBookId}
             onSelect={onSelectAddressBook}

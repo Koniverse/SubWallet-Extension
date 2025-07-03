@@ -1,10 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ActionType } from '@subwallet/extension-base/core/types';
+
 export interface RequestInputAccountSubscribe {
   data: string;
   chain: string;
   token?: string;
+  actionType?: ActionType
 }
 
 export enum AnalyzedGroup {

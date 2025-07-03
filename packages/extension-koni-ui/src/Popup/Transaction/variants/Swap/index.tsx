@@ -1254,6 +1254,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 statusHelpAsTooltip={true}
               >
                 <AddressInputNew
+                  actionType={ActionType.SWAP}
                   chainSlug={destChainValue}
                   dropdownHeight={isNotShowAccountSelector ? 227 : 167}
                   label={`${t('To')}:`}

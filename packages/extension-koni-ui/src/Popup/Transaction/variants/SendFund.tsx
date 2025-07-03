@@ -199,6 +199,21 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     return _asset ? assetRegistry[_asset] : undefined;
   }, [isFirstRender, defaultData.asset, assetValue, assetRegistry]);
 
+  // `destAssetInfo` is the asset sent to the recipient address. For regular transactions,
+  // the received asset is the same as the sent asset. For XCM transactions,
+  // need to check the `xcmRefMap` channel to get the correct destination asset.
+  const destAssetInfo = useMemo(() => {
+    if (chainValue === destChainValue) {
+      return assetInfo;
+    }
+
+    const destChainXCMAsset = Object.values(xcmRefMap).find(
+      (xcm) => xcm.destChain === destChainValue && xcm.srcChain === chainValue && xcm.path === 'XCM'
+    );
+
+    return destChainXCMAsset ? assetRegistry[destChainXCMAsset.destAsset] : assetInfo;
+  }, [assetInfo, assetRegistry, chainValue, destChainValue, xcmRefMap]);
+
   const decimals = useMemo(() => {
     return currentChainAsset ? _getAssetDecimals(currentChainAsset) : 0;
   }, [currentChainAsset]);
@@ -375,14 +390,14 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
-      assetInfo,
+      assetInfo: destAssetInfo,
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SEND_FUND,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetInfo, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
+  }, [accounts, autoFormatValue, chainInfoMap, destAssetInfo, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
     const maxTransfer = transferInfo?.maxTransferable || '0';
@@ -1029,6 +1044,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             validateTrigger={false}
           >
             <AddressInputNew
+              actionType={ActionType.SEND_FUND}
               chainSlug={destChainValue}
               disabled={disabledToAddressInput}
               dropdownHeight={isNotShowAccountSelector ? 317 : 257}
@@ -1040,7 +1056,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
-              tokenSlug={assetValue}
+              tokenSlug={destAssetInfo?.slug}
             />
           </Form.Item>
 
