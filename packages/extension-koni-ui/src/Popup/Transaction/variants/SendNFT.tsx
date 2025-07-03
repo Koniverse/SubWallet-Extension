@@ -44,6 +44,7 @@ const DEFAULT_ITEM: NftItem = {
 const hiddenFields: Array<keyof SendNftParams> = ['from', 'chain', 'asset', 'itemId', 'collectionId', 'fromAccountProxy'];
 const validateFields: Array<keyof SendNftParams> = ['to'];
 
+// Todo: Recheck send NFT with Ledger in each ecosystem
 const Component: React.FC = () => {
   useSetCurrentPage('/transaction/send-nft');
   const { t } = useTranslation();
