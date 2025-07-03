@@ -88,7 +88,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{t('I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature')}</Checkbox>
+        >{('I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}

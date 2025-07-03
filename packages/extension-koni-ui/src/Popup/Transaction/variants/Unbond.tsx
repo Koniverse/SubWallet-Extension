@@ -591,7 +591,7 @@ const Component: React.FC = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Fast unstake')}</span>
+              <span className={'__option-label'}>{('Fast unstake')}</span>
             </Checkbox>
           </Form.Item>
 
