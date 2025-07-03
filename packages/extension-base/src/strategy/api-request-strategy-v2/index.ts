@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
+import { BASE_MINUTE_INTERVAL } from '@subwallet/extension-base/constants';
+import { Md5 } from 'ts-md5';
 
-import { ApiRequest, ApiRequestContext, ApiRequestStrategy } from './types';
+import { ApiRequestContext } from '../api-request-strategy/types';
+import { ApiRequestStrategyV2, ApiRequestV2 } from './types';
 
-export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
+export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
   private nextId = 0;
+  private groupId = 0;
   private isRunning = false;
-  private requestMap: Record<number, ApiRequest<any>> = {};
+  private requestMap: Record<number, ApiRequestV2<any>> = {};
   private context: ApiRequestContext;
   private processInterval: NodeJS.Timeout | undefined = undefined;
+  private canceledGroupIds: Set<number> = new Set();
+  private cacheMap: Map<string, unknown> = new Map<string, unknown>();
 
   private getId () {
     return this.nextId++;
@@ -20,18 +26,33 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
     this.context = context;
   }
 
-  addRequest<T> (run: ApiRequest<T>['run'], ordinal: number) {
+  public getGroupId (): number {
+    return this.groupId++;
+  }
+
+  public createKeyHash (keys: Array<string | number>): string {
+    return Md5.hashStr(JSON.stringify([this.constructor.name, ...keys]));
+  }
+
+  addRequest<T> (run: ApiRequestV2<T>['run'], ordinal: number, _groupId?: number, keyHash?: string) {
     const newId = this.getId();
+    const groupId = _groupId ?? this.getGroupId();
+
+    if (this.canceledGroupIds.has(groupId)) {
+      return Promise.reject(new SWError('CANCELED', 'Request has been canceled'));
+    }
 
     return new Promise<T>((resolve, reject) => {
       this.requestMap[newId] = {
+        cacheKey: keyHash,
+        groupId,
         id: newId,
-        status: 'pending',
-        retry: -1,
         ordinal,
-        run,
+        reject,
         resolve,
-        reject
+        retry: -1,
+        run,
+        status: 'pending'
       };
 
       if (!this.isRunning) {
@@ -58,6 +79,8 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
         return;
       }
 
+      console.log('[ApiRequestStrategyV2] Processing requests...', remainingRequests.map((r) => r.groupId));
+
       // Get first this.limit requests base on id
       const requests = remainingRequests
         .filter((request) => request.status !== 'running')
@@ -68,8 +91,33 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
       // Start requests
       requests.forEach((request) => {
         request.status = 'running';
+
+        if (request.cacheKey) {
+          if (this.cacheMap.has(request.cacheKey)) {
+            const resp = this.cacheMap.get(request.cacheKey);
+
+            request.resolve(resp);
+
+            console.log('[ApiRequestStrategyV2] Cache hit for request', request.id, 'with cache key', request.cacheKey);
+
+            delete this.requestMap[request.id];
+
+            return;
+          }
+        }
+
         request.run().then((rs) => {
           request.resolve(rs);
+
+          if (request.cacheKey) {
+            this.cacheMap.set(request.cacheKey, rs);
+
+            setTimeout(() => {
+              if (request.cacheKey) {
+                this.cacheMap.delete(request.cacheKey);
+              }
+            }, BASE_MINUTE_INTERVAL);
+          }
 
           delete this.requestMap[request.id];
         }).catch((e: Error) => {
@@ -98,6 +146,20 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
   stop () {
     clearInterval(this.processInterval);
     this.processInterval = undefined;
+  }
+
+  cancelGroupRequest (groupId: number): void {
+    Object.values(this.requestMap).forEach((request) => {
+      if (request.groupId === groupId) {
+        request.reject(new SWError('CANCELED', 'Request has been canceled'));
+      }
+
+      this.canceledGroupIds.add(groupId);
+    });
+
+    this.requestMap = Object.fromEntries(
+      Object.entries(this.requestMap).filter(([_, request]) => request.groupId !== groupId)
+    );
   }
 
   setContext (context: ApiRequestContext): void {
