@@ -20,18 +20,17 @@ type Props = ThemeProps & {
   inputAsset?: _ChainAsset;
   maxValidator?: number;
   totalValidator?: number;
-  addresses?: string[],
-  modalId?: string
+  addresses?: string[]
 };
 
-function Component ({ addresses, className, compound, modalId, poolInfo }: Props) {
+function Component ({ addresses, className, compound, poolInfo }: Props) {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
 
   const onClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    activeModal(modalId || EARNING_SELECTED_VALIDATOR_MODAL);
-  }, [activeModal, modalId]);
+    activeModal(EARNING_SELECTED_VALIDATOR_MODAL);
+  }, [activeModal]);
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
 
@@ -72,7 +71,7 @@ function Component ({ addresses, className, compound, modalId, poolInfo }: Props
         compound={compound}
         disabled={false}
         from={compound.address}
-        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
+        modalId={EARNING_SELECTED_VALIDATOR_MODAL}
         nominations={compound.nominations}
         slug={poolInfo.slug}
         title={title}

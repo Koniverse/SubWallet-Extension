@@ -750,7 +750,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, maxAmount, originValidator, selectedValidators: targetValidators, subnetData } = data;
 
     if (!subnetData || !originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
@@ -773,8 +773,9 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
-    if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+    // Avoid remaining amount too low -> can't do anything with that amount
+    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Remaining amount too low')));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);

@@ -106,6 +106,7 @@ export type SubmitChangeValidatorStaking = SubmitBittensorChangeValidatorStaking
 
 export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeStaking {
   originValidator: string;
+  maxAmount: string;
   isMovePartialStake: boolean;
   metadata: {
     subnetSymbol: string;

@@ -86,7 +86,7 @@ const Component = (props: Props) => {
   const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
 
   const { t } = useTranslation();
-  const { activeModal, checkActive, inactiveAll } = useContext(ModalContext);
+  const { activeModal, checkActive } = useContext(ModalContext);
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -242,17 +242,13 @@ const Component = (props: Props) => {
 
     setTimeout(() => {
       changeEarningValidator(submitData)
-        .then((res) => {
-          onSuccess(res);
-          inactiveAll();
-        })
+        .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setSubmitLoading(false);
-          onCancelSelectValidator();
         });
     }, 300);
-  }, [poolInfo.slug, from, onError, onSuccess, inactiveAll, onCancelSelectValidator]);
+  }, [poolInfo.slug, from, onError, onSuccess]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

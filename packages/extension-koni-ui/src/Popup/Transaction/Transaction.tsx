@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
 import { CANCEL_UN_STAKE_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { TransactionContext } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
+import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
@@ -19,14 +19,19 @@ import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 interface Props extends ThemeProps {
-  title: string,
-  transactionType: string
+  title?: string,
+  transactionType?: string
+  children?: React.ReactNode;
+  modalContent?: boolean;
+  modalId?: string;
+  fromAddress?: string // incase no data from local storage
+  originChain?: string // incase no data from local storage
 }
 
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ className }: Props) {
+function Component ({ children, className, fromAddress, modalContent, modalId, originChain }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -216,9 +221,9 @@ function Component ({ className }: Props) {
   // Navigate to finish page
   const onDone = useCallback(
     (extrinsicHash: string) => {
-      navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
+      navigate(`/transaction-done/${fromAddress || from}/${originChain || chain}/${extrinsicHash}`, { replace: true });
     },
-    [from, chain, navigate]
+    [navigate, fromAddress, from, originChain, chain]
   );
 
   const openRecheckChainConnectionModal = useCallback((chainName: string) => {
@@ -273,6 +278,58 @@ function Component ({ className }: Props) {
     doFunction();
   }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy, storageKey]);
 
+  const contextValues = useMemo<TransactionContextProps>(() => ({
+    defaultData,
+    needPersistData,
+    persistData: setStorage,
+    onDone,
+    setSubHeaderRightButtons,
+    setCustomScreenTitle,
+    goBack,
+    setBackProps,
+    closeAlert,
+    openAlert,
+    openRecheckChainConnectionModal,
+    closeRecheckChainConnectionModal,
+    modalId,
+    setIsDisableHeader
+  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+
+  const recheckChainConnectionModalNode = (
+    <>
+      <RecheckChainConnectionModal
+        modalId={recheckChainConnectionModalId}
+        onCancel={closeRecheckChainConnectionModal}
+        onClickConfirm={onClickConfirmOnRecheckChainConnectionModal}
+      />
+
+      {
+        !!alertProps && (
+          <AlertModal
+            modalId={alertModalId}
+            {...alertProps}
+          />
+        )
+      }
+    </>
+  );
+
+  if (modalContent) {
+    return (
+      <>
+        <TransactionContext.Provider value={contextValues}>
+          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+            <div className={CN(className, 'transaction-wrapper __modal-content')}>
+              {children}
+            </div>
+          </PageWrapper>
+        </TransactionContext.Provider>
+
+        {recheckChainConnectionModalNode}
+      </>
+    );
+  }
+
   return (
     <>
       <Layout.Home
@@ -280,22 +337,7 @@ function Component ({ className }: Props) {
         showFaderIcon
         showTabBar={false}
       >
-        <TransactionContext.Provider value={{
-          defaultData,
-          needPersistData,
-          persistData: setStorage,
-          onDone,
-          setSubHeaderRightButtons,
-          setIsDisableHeader,
-          setCustomScreenTitle,
-          goBack,
-          setBackProps,
-          closeAlert,
-          openAlert,
-          openRecheckChainConnectionModal,
-          closeRecheckChainConnectionModal
-        }}
-        >
+        <TransactionContext.Provider value={contextValues}>
           <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
             <div
               className={CN(className, 'transaction-wrapper')}

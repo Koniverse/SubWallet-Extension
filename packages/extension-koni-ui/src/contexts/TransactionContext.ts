@@ -6,13 +6,14 @@ import { ButtonProps } from '@subwallet/react-ui';
 import React, { Dispatch, SetStateAction } from 'react';
 
 export interface TransactionContextProps {
+  modalId?: string;
   defaultData: TransactionFormBaseProps;
   persistData: Dispatch<SetStateAction<TransactionFormBaseProps>>;
   needPersistData: boolean;
   onDone: (extrinsicHash: string) => void;
   setSubHeaderRightButtons: Dispatch<SetStateAction<ButtonProps[] | undefined>>;
   setCustomScreenTitle: Dispatch<SetStateAction<string | undefined>>;
-  setIsDisableHeader: Dispatch<SetStateAction<boolean | undefined>>;
+  setIsDisableHeader?: Dispatch<SetStateAction<boolean | undefined>>;
   goBack: () => void;
   setBackProps: Dispatch<SetStateAction<{
     disabled: boolean,

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
@@ -20,7 +21,7 @@ import { BaseTransactionConfirmationProps } from './Base';
 
 type Props = BaseTransactionConfirmationProps;
 
-const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-10)}`;
+const truncateAddress = (addr?: string) => addr ? `${addr.slice(0, 6)}...${addr.slice(-10)}` : '-';
 
 type ValidatorGroupProps = {
   addresses: string[];
@@ -34,7 +35,9 @@ type ValidatorGroupProps = {
   maxValidator?: number
 };
 
-const ValidatorAddress = ({ addresses, className, label, title }: ValidatorGroupProps) => (
+type ValidatorAddressProps = Pick<ValidatorGroupProps, 'addresses' | 'className' | 'label' | 'title'>;
+
+const ValidatorAddress = ({ addresses, className, label, title }: ValidatorAddressProps) => (
   <MetaInfo.Default
     className={CN('__validator-address', className)}
     label={label || title}
@@ -49,7 +52,7 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
 
   const onClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    activeModal(modalId || EARNING_SELECTED_VALIDATOR_MODAL);
+    activeModal(modalId);
   }, [activeModal, modalId]);
 
   const totalValidatorSelected = maxValidator
@@ -81,7 +84,7 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
         compound={compound}
         disabled={false}
         from={compound.address}
-        modalId={modalId || EARNING_SELECTED_VALIDATOR_MODAL}
+        modalId={modalId}
         nominations={compound.nominations}
         readOnly={true}
         slug={poolInfo.slug}
@@ -91,19 +94,19 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
   );
 };
 
-const ValidatorGroup = (props: ValidatorGroupProps) => {
-  const { total } = props;
+// const ValidatorGroup = (props: ValidatorGroupProps) => {
+//   const { total } = props;
 
-  if (total === 0) {
-    return null;
-  }
+//   if (total === 0) {
+//     return null;
+//   }
 
-  if (total === 1) {
-    return <ValidatorAddress {...props} />;
-  }
+//   if (total === 1) {
+//     return <ValidatorAddress {...props} />;
+//   }
 
-  return <ValidatorGroupModal {...props} />;
-};
+//   return <ValidatorGroupModal {...props} />;
+// };
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
@@ -117,21 +120,21 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
-  const { deselectedAddresses, deselectedCount, newValidatorAddresses, newlySelectedAddresses, newlySelectedCount, totalSelectedCount } = useMemo(() => {
+  const { deselectedAddresses, newValidatorAddresses, totalSelectedCount } = useMemo(() => {
     const oldValidatorAddresses = compound?.nominations?.map((item) => item.validatorAddress) || [];
     const newValidatorAddresses = data.selectedValidators.map((v) => v.address);
 
     const totalSelectedCount = newValidatorAddresses.length;
 
     const deselectedAddresses = oldValidatorAddresses.filter((addr) => !newValidatorAddresses.includes(addr));
-    const newlySelectedAddresses = newValidatorAddresses.filter((addr) => !oldValidatorAddresses.includes(addr));
+    // const newlySelectedAddresses = newValidatorAddresses.filter((addr) => !oldValidatorAddresses.includes(addr));
 
     return {
       totalSelectedCount,
-      deselectedCount: deselectedAddresses.length,
-      newlySelectedCount: newlySelectedAddresses.length,
+      // deselectedCount: deselectedAddresses.length,
+      // newlySelectedCount: newlySelectedAddresses.length,
       deselectedAddresses,
-      newlySelectedAddresses,
+      // newlySelectedAddresses,
       newValidatorAddresses
     };
   }, [compound?.nominations, data.selectedValidators]);
@@ -173,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
             value={transaction.estimateFee?.value || 0}
           />
           {(compound && !isBittensorChain) && (
-            <ValidatorGroup
+            <ValidatorGroupModal
               addresses={newValidatorAddresses}
               compound={compound}
               maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
@@ -186,33 +189,33 @@ const Component: React.FC<Props> = (props: Props) => {
         </MetaInfo>
       </MetaInfo>
 
-      {compound && isBittensorChain && (
-        <MetaInfo
-          className='nomination-wrapper'
-          hasBackgroundWrapper
-        >
-          <ValidatorAddress
-            addresses={deselectedAddresses}
-            className='deselected'
-            compound={compound}
-            label='From validator'
-            modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-deselected`}
-            poolInfo={poolInfo}
-            title='Deselected validators'
-            total={deselectedCount}
-          />
+      {isBittensorChain && (
+        <>
+          <MetaInfo
+            className='nomination-wrapper'
+            hasBackgroundWrapper
+          >
+            <ValidatorAddress
+              addresses={deselectedAddresses}
+              className='deselected'
+              label='From validator'
+              title='Deselected validators'
+            />
 
-          <ValidatorAddress
-            addresses={newlySelectedAddresses}
-            className='newly-selected'
-            compound={compound}
-            label='To validator'
-            modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-newly`}
-            poolInfo={poolInfo}
-            title='Newly selected validators'
-            total={newlySelectedCount}
+            <ValidatorAddress
+              addresses={newValidatorAddresses}
+              className='newly-selected'
+              label='To validator'
+              title='Newly selected validators'
+            />
+          </MetaInfo>
+          <AlertBox
+            className={'alert-box'}
+            description={t('An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete')}
+            title={t('TAO unstaking fee')}
+            type='info'
           />
-        </MetaInfo>
+        </>
       )}
     </div>
   );
@@ -224,6 +227,7 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       background: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
       marginTop: token.marginSM,
+      marginBottom: token.marginSM,
       whiteSpace: 'nowrap'
     },
 

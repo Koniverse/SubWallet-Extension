@@ -548,7 +548,7 @@ export enum ExtrinsicType {
   STAKING_CANCEL_UNSTAKE = 'staking.cancel_unstake',
 
   JOIN_YIELD_POOL = 'earn.join_pool', // TODO: review this
-  CHANGE_EARNING_VALIDATOR = 'earn.change_validator',
+  CHANGE_EARNING_VALIDATOR = 'earn.nominate',
 
   MINT_VDOT = 'earn.mint_vdot',
   MINT_LDOT = 'earn.mint_ldot',

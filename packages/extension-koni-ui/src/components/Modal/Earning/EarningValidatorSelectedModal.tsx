@@ -10,6 +10,7 @@ import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/compon
 import { EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
+import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
@@ -207,33 +208,42 @@ const Component = (props: Props) => {
           validatorItem={viewDetailItem}
         />
       )}
-      {isBittensorChain
-        ? (
-          <ChangeBittensorValidator
-            chain={poolInfo.chain}
-            disabled={false}
-            from={from}
-            items={items}
-            loading={targetLoading}
-            modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-            nominations={nominations}
-            setForceFetchValidator={setForceFetchValidator}
-            slug={poolInfo.slug}
-          />
-        )
-        : (
-          <ChangeValidator
-            chain={poolInfo.chain}
-            disabled={false}
-            from={from}
-            items={items}
-            loading={targetLoading}
-            modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-            nominations={nominations}
-            setForceFetchValidator={setForceFetchValidator}
-            slug={poolInfo.slug}
-          />
-        )}
+      {!readOnly && (
+        <Transaction
+          fromAddress={from}
+          modalContent={true}
+          modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+          originChain={poolInfo.chain}
+        >
+          {isBittensorChain
+            ? (
+              <ChangeBittensorValidator
+                chain={poolInfo.chain}
+                disabled={false}
+                from={from}
+                items={items}
+                loading={targetLoading}
+                modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+                nominations={nominations}
+                setForceFetchValidator={setForceFetchValidator}
+                slug={poolInfo.slug}
+              />
+            )
+            : (
+              <ChangeValidator
+                chain={poolInfo.chain}
+                disabled={false}
+                from={from}
+                items={items}
+                loading={targetLoading}
+                modalId={EARNING_CHANGE_VALIDATOR_MODAL}
+                nominations={nominations}
+                setForceFetchValidator={setForceFetchValidator}
+                slug={poolInfo.slug}
+              />
+            )}
+        </Transaction>
+      )}
     </>
   );
 };

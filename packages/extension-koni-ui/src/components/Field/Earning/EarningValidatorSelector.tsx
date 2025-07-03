@@ -78,7 +78,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { chain, className = '', defaultValue, from
     , id = defaultModalId, isSingleSelect: _isSingleSelect = false,
     loading, onChange, setForceFetchValidator
-    , slug, value, originValidator } = props;
+    , slug, value, originValidator, label } = props;
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -407,7 +407,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         chain={chain}
         disabled={!chain || !from}
         identPrefix={networkPrefix}
-        label={t('Select') + ' ' + t(handleValidatorLabel)}
+        label={label || t('Select') + ' ' + t(handleValidatorLabel)}
         loading={loading}
         onClick={onActiveValidatorSelector}
         value={value || ''}

@@ -1,13 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -15,7 +17,7 @@ import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAd
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, Info } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
+import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -53,7 +55,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const { t } = useTranslation();
   const notify = useNotification();
-  const { inactiveAll } = useContext(ModalContext);
+  const { checkActive } = useContext(ModalContext);
+  const isActive = checkActive(modalId);
+
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
@@ -238,6 +243,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setIsChangeData(true);
       }
 
+      if (originValidator) {
+        form.setFieldsValue({
+          target: undefined
+        });
+      }
+
       if ((from || originValidator || target) && (amountChange || defaultData.value)) {
         form.validateFields(['value']).finally(noop);
       }
@@ -261,26 +272,24 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     (values: ChangeValidatorParams) => {
       const { originValidator, value } = values;
 
-      if (isShowAmountChange && ((new BigN(value)).gt(bondedValue))) {
+      if (isShowAmountChange && new BigN(value).gt(bondedValue)) {
         notifyTooHighAmount();
 
         return;
       }
 
-      setSubmitLoading(true);
+      const isMovePartialStake = new BigN(value).lt(bondedValue);
 
-      const isMovePartialStake = (new BigN(value)).lt(bondedValue);
-
-      const submitData: SubmitBittensorChangeValidatorStaking = {
+      const baseData = {
         slug: poolInfo.slug,
         address: from,
-        amount: isShowAmountChange ? value : bondedValue,
         selectedValidators: poolTargets,
-        originValidator: originValidator,
+        originValidator,
         metadata: {
           subnetSymbol: symbol as string
         },
-        isMovePartialStake: isMovePartialStake,
+        isMovePartialStake,
+        maxAmount: bondedValue,
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
@@ -289,20 +298,61 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         })
       };
 
-      setTimeout(() => {
+      const send = (amount: string) => {
+        setSubmitLoading(true);
+
+        const submitData: SubmitBittensorChangeValidatorStaking = {
+          ...baseData,
+          amount
+        };
+
         changeEarningValidator(submitData)
-          .then((res) => {
-            onSuccess(res);
-            inactiveAll();
-          })
-          .catch(onError)
-          .finally(() => {
+          .then(onSuccess)
+          .catch((error: TransactionError) => {
+            if (
+              error.message.includes('Remaining amount too low')
+            ) {
+              openAlert({
+                type: NotificationType.WARNING,
+                title: t('Amount too low'),
+                content: error.message,
+                okButton: {
+                  text: t('Transfer Max'),
+                  onClick: () => {
+                    closeAlert();
+                    send(bondedValue);
+                  }
+                },
+                cancelButton: {
+                  text: t('Cancel'),
+                  onClick: () => {
+                    closeAlert();
+                    setSubmitLoading(false);
+                  }
+                }
+              });
+            } else {
+              onError(error);
+              setSubmitLoading(false);
+            }
+          }).finally(() => {
             setSubmitLoading(false);
           });
-      }, 300);
+      };
+
+      send(isShowAmountChange ? value : bondedValue);
     },
-    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, netuid, symbol, notifyTooHighAmount, onError, onSuccess, inactiveAll]
+    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, symbol, netuid, notifyTooHighAmount, onSuccess, openAlert, t, closeAlert, onError]
   );
+
+  useEffect(() => {
+    if (!isActive) {
+      form.resetFields();
+      setIsChangeData(false);
+      setAmountChange(false);
+      setIsShowAmountChange(false);
+    }
+  }, [isActive, form]);
 
   const onPreCheck = usePreCheckAction(from);
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
@@ -311,7 +361,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   return (
     <SwModal
-      className={`${className}`}
+      className={`${className} modal-full`}
       closeIcon={<Icon
         phosphorIcon={CaretLeft}
         size='md'
@@ -414,7 +464,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             </div>
           </Tooltip>
           <div className='__item-right-part'>
-            <Switch onClick={showAmountChangeInput} />
+            <Switch
+              checked={isShowAmountChange}
+              onClick={showAmountChangeInput}
+            />
           </div>
         </div>
 
@@ -458,12 +511,17 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG,
-      marginBottom: token.margin
+      paddingBottom: token.paddingLG
     },
 
     '.ant-sw-modal-body': {
       padding: '0px 16px'
+    },
+
+    '.ant-sw-modal-footer': {
+      margin: 0,
+      borderTop: 0,
+      marginBottom: token.margin
     },
 
     '.__amount-part': {

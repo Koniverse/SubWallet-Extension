@@ -13,7 +13,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -33,7 +33,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   processing: Spinner,
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
-  swap: ArrowsLeftRight
+  swap: ArrowsLeftRight,
+  nominate: Pencil
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -58,7 +59,7 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
   }
 
   if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
-    return IconMap.claim_reward;
+    return IconMap.nominate;
   }
 
   if (item.type === ExtrinsicType.SWAP) {
@@ -299,7 +300,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake'),
     [ExtrinsicType.STAKING_BOND]: t('Stake'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake'),
-    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Change validator'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Nominate'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw'),
@@ -345,7 +346,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake transaction'),
     [ExtrinsicType.STAKING_BOND]: t('Stake transaction'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake transaction'),
-    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Change validator'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Stake transaction'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward transaction'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw transaction'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw transaction'),

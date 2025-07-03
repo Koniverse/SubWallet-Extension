@@ -158,7 +158,8 @@ export class BittensorCache {
 
       const rawData = await resp.json() as ValidatorAprResponse;
 
-      return rawData;
+      // Some subnets not return data, ensure the structure is consistent by returning an empty array
+      return Array.isArray(rawData.data) ? rawData : { data: [] };
     } catch (error) {
       console.error(error);
 
@@ -261,7 +262,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           type: this.type,
           metadata: {
             ...this.metadataInfo,
-            description: this.getDescription()
+            description: this.getDescription(formatNumber(BNminDelegatorStake, _getAssetDecimals(this.nativeToken)))
           },
           statistic: {
             assetEarning: [
@@ -669,7 +670,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, originValidator, selectedValidators: targetValidators } = data;
+    const { amount, maxAmount, originValidator, selectedValidators: targetValidators } = data;
 
     if (!originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
@@ -689,8 +690,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
 
-    if (new BigN(amount).lt(bnMinUnstake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
+    // Avoid remaining amount too low -> can't do anything with that amount
+    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Remaining amount too low')));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);
