@@ -11,7 +11,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
+import { getAssetsUrl, getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -36,6 +36,16 @@ interface DepositAddressResponse {
   channelOpeningFeeNative: string;
 }
 
+interface ChainFlipAsset {
+  id: string,
+  direction: string,
+  ticker: string,
+  network: string,
+  decimals: number,
+  minimalAmount: number,
+  minimalAmountNative: string,
+}
+
 interface ChainFlipMetadata {
   srcChain: string;
   destChain: string;
@@ -46,6 +56,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
   private baseUrl: string;
+  private assetsUrl: string;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
@@ -58,6 +69,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     this.isTestnet = isTestnet;
     this.providerSlug = isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET;
     this.baseUrl = getChainflipSwap(isTestnet);
+    this.assetsUrl = getAssetsUrl(isTestnet);
   }
 
   get chainService () {
@@ -114,15 +126,24 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       throw new Error('Metadata for Chainflip not found');
     }
 
+    const assetsResponse = await fetch(this.assetsUrl);
+    const _allAssets = await assetsResponse.json() as { assets: ChainFlipAsset[] };
+    const allAssets = _allAssets.assets;
+
+    const sourceAsset = allAssets.find((asset) => asset.network === processMetadata.srcChain && asset.ticker === fromAssetId);
+    const destinationAsset = allAssets.find((asset) => asset.network === processMetadata.destChain && asset.ticker === toAssetId);
+
+    if (!sourceAsset || !destinationAsset) {
+      throw new Error('Error get Chainflip data');
+    }
+
     const depositParams = {
-      sourceChain: processMetadata.srcChain,
       destinationAddress: receiver,
-      destinationAsset: toAssetId,
-      destinationChain: processMetadata.destChain,
+      destinationAsset: destinationAsset.id,
+      sourceAsset: sourceAsset.id,
       minimumPrice: minReceive, // minimum accepted price for swaps through the channel
       refundAddress: address, // address to which assets are refunded
-      retryDurationInBlocks: '100', // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
-      sourceAsset: fromAssetId
+      retryDurationInBlocks: '100' // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
     };
 
     const url = `${this.baseUrl}&${new URLSearchParams(depositParams).toString()}`;

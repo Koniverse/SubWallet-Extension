@@ -2,7 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountProxyExtra, AccountProxyStoreData, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
+import {
+  AccountChainType,
+  AccountProxyExtra,
+  AccountProxyStoreData,
+  KeyringPairs$JsonV2,
+  ModifyPairStoreData,
+  RequestAccountBatchExportV2,
+  RequestBatchJsonGetAccountInfo,
+  RequestBatchRestoreV2,
+  RequestJsonGetAccountInfo,
+  RequestJsonRestoreV2,
+  ResponseAccountBatchExportV2,
+  ResponseBatchJsonGetAccountInfo,
+  ResponseJsonGetAccountInfo
+} from '@subwallet/extension-base/types';
 import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
@@ -66,6 +80,10 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const nameExists = this.state.checkNameExists(name as string);
         // Note: Show accountName of account exists to support user to know which account is existed
         const accountName = accountExists ? accountExists.name : account.name || account.address;
+
+        if (![AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(account.chainType)) {
+          throw new Error('Invalid JSON file');
+        }
 
         const proxy: AccountProxyExtra = {
           id: address,
@@ -155,6 +173,8 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const result = Object.values(accountProxyMap).map((proxy): AccountProxyExtra => {
           const rs: AccountProxyExtra = {
             ...proxy,
+            accounts: proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(acc.chainType)),
+            chainTypes: proxy.chainTypes.filter(cType => [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(cType)),
             isExistAccount: false,
             isExistName: false
           };
@@ -215,7 +235,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           })
         );
 
-        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.map((account) => account.address));
+        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(acc.chainType)).map((account) => account.address));
         const proxyIds = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.id);
 
         if (!addresses.length) {
