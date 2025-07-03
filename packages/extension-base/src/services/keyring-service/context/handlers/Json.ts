@@ -80,6 +80,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           isExistAccount: !!accountExists,
           isExistName: nameExists
         };
+        console.log('proxy', proxy);
 
         return {
           accountProxy: proxy
@@ -155,6 +156,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const result = Object.values(accountProxyMap).map((proxy): AccountProxyExtra => {
           const rs: AccountProxyExtra = {
             ...proxy,
+            chainTypes: proxy.chainTypes.filter(i => i !== 'cardano'), // change after update cardano for mobile
             isExistAccount: false,
             isExistName: false
           };
@@ -215,7 +217,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           })
         );
 
-        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.map((account) => account.address));
+        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.filter((account) => account.chainType !== 'cardano').map((account) => account.address));
         const proxyIds = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.id);
 
         if (!addresses.length) {
