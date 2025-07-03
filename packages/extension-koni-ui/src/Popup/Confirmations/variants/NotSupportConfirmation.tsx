@@ -4,7 +4,6 @@
 import { ConfirmationResult } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase } from '@subwallet/extension-base/background/types';
 import { AccountJson } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
 import { NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountTitleByAddress } from '@subwallet/extension-koni-ui/hooks';
@@ -81,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span className='highlight' />
               )
             }}
-            i18nKey={detectTranslate('Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.')}
+            i18nKey={('Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.')}
             values={{ accountTitle }}
           />
         </div>

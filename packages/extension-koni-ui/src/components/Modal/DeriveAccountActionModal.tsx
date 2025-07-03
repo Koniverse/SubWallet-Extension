@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxyType, DerivePathInfo } from '@subwallet/extension-base/types';
-import { addLazy, detectTranslate, getAccountChainTypeFromKeypairType } from '@subwallet/extension-base/utils';
+import { addLazy, getAccountChainTypeFromKeypairType } from '@subwallet/extension-base/utils';
 import { DERIVE_ACCOUNT_ACTION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useCompleteCreateAccount, useGetAccountProxyById, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
@@ -275,7 +275,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 components={{
                   highlight: <span className='account-name' />
                 }}
-                i18nKey={detectTranslate('You are creating a derived account from account <highlight>{{accountName}}</highlight>. Customize the derivation path and name the account as you wish')}
+                i18nKey={('You are creating a derived account from account <highlight>{{accountName}}</highlight>. Customize the derivation path and name the account as you wish')}
                 values={{ accountName: accountProxy.name }}
               />
             </div>

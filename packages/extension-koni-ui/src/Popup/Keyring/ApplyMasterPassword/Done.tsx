@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountJson } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import AccountItemWithName from '@subwallet/extension-koni-ui/components/Account/Item/AccountItemWithName';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { PageIcon } from '@subwallet/react-ui';
@@ -54,7 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <div className='and-more'>
               <Trans
                 components={{ highlight: <span className='highlight' /> }}
-                i18nKey={detectTranslate('And other <highlight>{{number}}</highlight> accounts')}
+                i18nKey={('And other <highlight>{{number}}</highlight> accounts')}
                 values={{ number: String(accounts.length - 2).padStart(2, '0') }}
               />
             </div>

@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { pingUnifiedAccountMigrationDone } from '@subwallet/extension-koni-ui/messaging';
 import { ResultAccountProxyItem, ResultAccountProxyItemType } from '@subwallet/extension-koni-ui/Popup/MigrateAccount/SummaryView/ResultAccountProxyItem';
@@ -109,7 +108,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('All eligible accounts have been migrated. Review <guide>our guide</guide> to learn more about migration eligibility & process')}
+                  i18nKey={('All eligible accounts have been migrated. Review <guide>our guide</guide> to learn more about migration eligibility & process')}
                 />
               </div>
             )
@@ -131,7 +130,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified accounts</highlight>')}
+                          i18nKey={('You have successfully migrated to <br/> <highlight>{{number}} unified accounts</highlight>')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -145,7 +144,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified account</highlight>')}
+                          i18nKey={('You have successfully migrated to <br/> <highlight>{{number}} unified account</highlight>')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )

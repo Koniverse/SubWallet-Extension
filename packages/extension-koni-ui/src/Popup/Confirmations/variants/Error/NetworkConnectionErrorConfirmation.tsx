@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationResult, ConfirmationsQueueItem, ErrorNetworkConnection } from '@subwallet/extension-base/background/KoniTypes';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, ConfirmationGeneralInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { completeConfirmation } from '@subwallet/extension-koni-ui/messaging';
@@ -102,7 +101,7 @@ function Component ({ className, request, type }: Props) {
               className={CN(className, 'alert-box')}
               description={ <Trans
                 components={error.components}
-                i18nKey={detectTranslate(error.message)}
+                i18nKey={(error.message)}
               />}
               title={error.name}
               type={'error'}

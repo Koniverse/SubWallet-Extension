@@ -1,27 +1,27 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolType } from '@subwallet/extension-base/types';
-import { balanceFormatter, detectTranslate, formatNumber } from '@subwallet/extension-base/utils';
-import { InstructionItem } from '@subwallet/extension-koni-ui/components';
-import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
-import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
-import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getBannerButtonIcon, getEarningTimeText, isAccountAll } from '@subwallet/extension-koni-ui/utils';
-import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
-import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
+import {NotificationType} from '@subwallet/extension-base/background/KoniTypes';
+import {ALL_ACCOUNT_KEY} from '@subwallet/extension-base/constants';
+import {getValidatorLabel} from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import {_isChainInfoCompatibleWithAccountInfo} from '@subwallet/extension-base/services/chain-service/utils';
+import {_STAKING_CHAIN_GROUP} from '@subwallet/extension-base/services/earning-service/constants';
+import {calculateReward} from '@subwallet/extension-base/services/earning-service/utils';
+import {YieldPoolType} from '@subwallet/extension-base/types';
+import {balanceFormatter, formatNumber} from '@subwallet/extension-base/utils';
+import {InstructionItem} from '@subwallet/extension-koni-ui/components';
+import {getInputValuesFromString} from '@subwallet/extension-koni-ui/components/Field/AmountInput';
+import {EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL} from '@subwallet/extension-koni-ui/constants';
+import {useSelector} from '@subwallet/extension-koni-ui/hooks';
+import {earlyValidateJoin} from '@subwallet/extension-koni-ui/messaging';
+import {AlertDialogProps, PhosphorIcon, ThemeProps} from '@subwallet/extension-koni-ui/types';
+import {getBannerButtonIcon, getEarningTimeText, isAccountAll} from '@subwallet/extension-koni-ui/utils';
+import {BackgroundIcon, Button, Icon, ModalContext, SwModal} from '@subwallet/react-ui';
+import {getAlphaColor} from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
-import { CaretCircleLeft, CaretDown, CheckCircle, PlusCircle, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import {CaretCircleLeft, CaretDown, CheckCircle, PlusCircle, XCircle} from 'phosphor-react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {Trans, useTranslation} from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps{
@@ -529,7 +529,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
+            i18nKey={('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
           />
         </div>
 

@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
-import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
+import { _isRuntimeUpdated } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY } from '@subwallet/extension-koni-ui/constants';
 import { InjectContext } from '@subwallet/extension-koni-ui/contexts/InjectContext';
@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate("{{networkName}} network's metadata is out of date, which may cause the transaction to fail. Update metadata using <highlight>this guide</highlight> or approve transaction at your own risk")}
+            i18nKey={("{{networkName}} network's metadata is out of date, which may cause the transaction to fail. Update metadata using <highlight>this guide</highlight> or approve transaction at your own risk")}
             values={{ networkName }}
           />),
         okButton: {
@@ -181,7 +181,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate("{{networkName}} network's metadata is out of date. Update metadata using <highlight>this guide</highlight> and try again")}
+                i18nKey={("{{networkName}} network's metadata is out of date. Update metadata using <highlight>this guide</highlight> and try again")}
                 values={{ networkName }}
               />
             )
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('To sign this transaction, open “Polkadot” app on Ledger, hit Refresh and Approve again. For a better experience, re-attach your Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={('To sign this transaction, open “Polkadot” app on Ledger, hit Refresh and Approve again. For a better experience, re-attach your Polkadot new account using <highlight>this guide</highlight>')}
                   />
                 )
               };
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={('To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>')}
                     values={{ networkName }}
                   />
                 )

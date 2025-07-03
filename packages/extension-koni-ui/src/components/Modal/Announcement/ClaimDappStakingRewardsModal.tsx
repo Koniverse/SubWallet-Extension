@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { CLAIM_DAPP_STAKING_REWARDS, CLAIM_DAPP_STAKING_REWARDS_MODAL, DEFAULT_CLAIM_DAPP_STAKING_REWARDS_STATE } from '@subwallet/extension-koni-ui/constants';
 import { ClaimDAppStakingRewardsState, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
@@ -105,7 +104,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('<highlight>Astar dApp staking V3</highlight> is launching in early February. Make sure to claim any ASTR rewards before the launch or they will be lost.')}
+            i18nKey={('<highlight>Astar dApp staking V3</highlight> is launching in early February. Make sure to claim any ASTR rewards before the launch or they will be lost.')}
           />
         </div>
       </SwModal>

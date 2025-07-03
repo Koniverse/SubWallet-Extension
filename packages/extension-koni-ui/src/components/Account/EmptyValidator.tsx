@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, PageIcon } from '@subwallet/react-ui';
@@ -62,7 +61,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('Please <highlight>reload</highlight>')}
+                  i18nKey={('Please <highlight>reload</highlight>')}
                 />
               </div>
             </div>

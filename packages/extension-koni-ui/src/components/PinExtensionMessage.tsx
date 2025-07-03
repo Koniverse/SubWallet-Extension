@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LanguageType } from '@subwallet/extension-base/background/KoniTypes';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon as SwIcon, Image, SwIconProps } from '@subwallet/react-ui';
@@ -59,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
               <Icon phosphorIcon={PushPinSimple} />
             )
           }}
-          i18nKey={detectTranslate('Click <extension/> select SubWallet and then <pin/>')}
+          i18nKey={('Click <extension/> select SubWallet and then <pin/>')}
         />
       </div>
     </div>
