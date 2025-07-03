@@ -2023,9 +2023,9 @@ export default class KoniState {
     this.eventService.emit('general.start', true);
 
     // Complete starting
-    starting.resolve();
     this.waitStarting = null;
     this.generalStatus = ServiceStatus.STARTED;
+    starting.resolve();
   }
 
   private async _startFull () {
