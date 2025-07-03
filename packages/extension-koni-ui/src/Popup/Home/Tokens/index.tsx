@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
@@ -57,7 +56,6 @@ const Component = (): React.ReactElement => {
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token');
   const allowedChains = useGetChainSlugsByAccount();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
-  const swapPairs = useSelector((state: RootState) => state.swap.swapPairs);
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
@@ -65,25 +63,6 @@ const Component = (): React.ReactElement => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
   const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const isEnableSwapButton = useMemo(() => {
-    return Object.keys(fromAndToTokenMap).some((tokenSlug) => {
-      return allowedChains.includes(_getOriginChainOfAsset(tokenSlug));
-    });
-  }, [allowedChains, fromAndToTokenMap]);
 
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
@@ -331,10 +310,11 @@ const Component = (): React.ReactElement => {
         ref={topBlockRef}
       >
         <UpperBlock
+          className={'__upper-block'}
           isPriceDecrease={isTotalBalanceDecrease}
           isShrink={isShrink}
           isSupportBuyTokens={isSupportBuyTokens}
-          isSupportSwap={isEnableSwapButton}
+          isSupportSwap={true}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
           onOpenSendFund={onOpenSendFund}
@@ -480,7 +460,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingTop: 210
+      paddingTop: 206
     },
 
     '.__scroll-container': {
@@ -492,27 +472,44 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       backgroundColor: token.colorBgDefault,
       position: 'absolute',
       paddingTop: '32px',
-      height: 210,
+      height: 206,
       zIndex: 10,
       top: 0,
       left: 0,
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
       transition: 'opacity, padding-top 0.27s ease',
 
-      '&.-is-shrink': {
-        height: 104
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
+        display: 'block',
+        zIndex: 1
       },
 
-      '&.-decrease': {
+      '&.-decrease:before': {
         backgroundImage: extendToken.tokensScreenDangerBackgroundColor
+      },
+
+      '&.-is-shrink': {
+        height: 104,
+
+        '&:before': {
+          height: 80
+        }
       }
     },
 
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scroll-footer': {

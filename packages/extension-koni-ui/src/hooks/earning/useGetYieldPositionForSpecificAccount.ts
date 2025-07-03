@@ -34,13 +34,24 @@ const useGetYieldPositionForSpecificAccount = (address?: string): YieldPositionI
     };
 
     for (const info of yieldPositions) {
-      if (chainsByAccountType.includes(info.chain) && poolInfoMap[info.slug]) {
-        const isValid = checkAddress(info);
-        const haveStake = new BigN(info.totalStake).gt(0);
+      if (!chainsByAccountType.includes(info.chain)) {
+        continue;
+      }
 
-        if (isValid && haveStake) {
-          infoSpecificList.push(info);
-        }
+      if (!poolInfoMap[info.slug]) {
+        continue;
+      }
+
+      const haveStake = new BigN(info.totalStake).gt(0);
+
+      if (!haveStake) {
+        continue;
+      }
+
+      const isValid = checkAddress(info);
+
+      if (isValid) {
+        infoSpecificList.push(info);
       }
     }
 

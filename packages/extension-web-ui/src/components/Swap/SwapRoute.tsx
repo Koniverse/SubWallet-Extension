@@ -3,7 +3,7 @@
 
 import { SwapRoute as SwapRouteType } from '@subwallet/extension-base/types/swap';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
-import { ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
+import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
@@ -13,12 +13,18 @@ type Props = ThemeProps & {
   swapRoute: SwapRouteType;
 }
 
+type SwapRouteItem = {
+  originChain: string;
+  slug: string;
+  symbol: string;
+}
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, swapRoute } = props;
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
 
   const getSwapRoute = useMemo(() => {
-    const results: TokenSelectorItemType[] = [];
+    const results: SwapRouteItem[] = [];
 
     swapRoute.path.forEach((slug) => {
       const asset = assetRegistryMap[slug];
@@ -27,8 +33,7 @@ const Component: React.FC<Props> = (props: Props) => {
         results.push({
           originChain: asset.originChain,
           slug,
-          symbol: asset.symbol,
-          name: asset.name
+          symbol: asset.symbol
         });
       }
     });

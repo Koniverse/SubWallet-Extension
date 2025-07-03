@@ -5,3 +5,4 @@ export { default as BaseDetailModal } from './BaseDetailModal';
 
 export * from './Evm';
 export * from './Substrate';
+export * from './Cardano';

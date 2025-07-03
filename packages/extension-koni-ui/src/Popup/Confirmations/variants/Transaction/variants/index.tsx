@@ -19,3 +19,4 @@ export { default as TokenApproveConfirmation } from './TokenApprove';
 export { default as SwapTransactionConfirmation } from './Swap';
 
 export * from './TransferBlock';
+export * from './Process';

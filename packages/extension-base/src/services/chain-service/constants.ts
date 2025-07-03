@@ -33,11 +33,13 @@ export const _BALANCE_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'interlay', 'kintsugi_test', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
-  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'moonbeam', 'moonbase', 'moonriver', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain'],
+  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
-  supportBridged: ['rococo_assethub', 'statemint', 'statemine']
+  supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
+  bittensor: ['bittensor', 'bittensor_testnet'],
+  moonbeam: ['moonbeam', 'moonriver', 'moonbase']
 };
 
 export const _BALANCE_TOKEN_GROUP = {
@@ -104,7 +106,9 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   polkadex: 24,
   avail_mainnet: 24,
   cere: 24,
-  analog_timechain: 12
+  analog_timechain: 12,
+  muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
+  mythos: 24
 };
 
 export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
@@ -136,7 +140,9 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   enjin_relaychain: 6,
   availTuringTest: 20,
   avail_mainnet: 20,
-  dentnet: 3
+  dentnet: 3,
+  muse_testnet: 6,
+  mythos: 6
 };
 
 export const _PARACHAIN_INFLATION_DISTRIBUTION: Record<string, Record<string, number>> = {
@@ -234,13 +240,13 @@ export const _TRANSFER_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   // crab: ['crab', 'pangolin'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
-  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot'],
+  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
   centrifuge: ['centrifuge'],
-  disable_transfer: ['invarch', 'crab', 'pangolin']
+  disable_transfer: ['crab', 'pangolin']
 };
 
 export const _BALANCE_PARSING_CHAIN_GROUP = {
@@ -256,12 +262,11 @@ export const _DEFAULT_MANTA_ZK_CHAIN = 'calamari';
 // XCM------------------------------------------------------------------------------------------------------------------
 
 export const _XCM_CHAIN_GROUP = {
-  polkadotXcm: ['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos'],
+  polkadotXcm: ['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos', 'westend_assethub'],
   polkadotXcmSpecialCases: ['astar', 'shiden'],
-  xcmPallet: ['polkadot', 'kusama', 'rococo']
+  xcmPallet: ['polkadot', 'kusama', 'rococo', 'westend']
   // default is xTokens pallet
 };
-export const SUFFICIENT_CHAIN = ['astar', 'calamari', 'parallel', 'darwinia2', 'crabParachain', 'pangolin', 'statemint', 'moonriver', 'shiden', 'moonbeam', 'statemine', 'liberland', 'dentnet', 'phala', 'crust', 'dbcchain', 'rococo_assethub'];
 
 export const _XCM_TYPE = {
   RP: `${_SubstrateChainType.RELAYCHAIN}-${_SubstrateChainType.PARACHAIN}`, // DMP

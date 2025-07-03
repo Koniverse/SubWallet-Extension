@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { YieldPoolInfo } from '@subwallet/extension-base/types';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-web-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-web-ui/utils';
@@ -16,16 +17,19 @@ import styled, { useTheme } from 'styled-components';
 type Props = ThemeProps & {
   nominationInfo: NominationInfo;
   isSelected?: boolean;
+  poolInfo: YieldPoolInfo
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isSelected, nominationInfo } = props;
+  const { className, isSelected, nominationInfo, poolInfo } = props;
   const { chain } = nominationInfo;
 
   const { token } = useTheme() as Theme;
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
+
+  const subnetSymbol = poolInfo.metadata.subnetData?.subnetSymbol;
 
   return (
     <div
@@ -53,7 +57,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span>
                   &nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;
                 </span>
-                <span>{symbol}</span>
+                <span>{ subnetSymbol || symbol }</span>
               </div>
             </div>
           </>
