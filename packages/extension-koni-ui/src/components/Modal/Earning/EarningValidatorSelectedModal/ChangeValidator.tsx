@@ -36,6 +36,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   onClickLightningButton?: (e: SyntheticEvent) => void;
   isSingleSelect?: boolean;
   setForceFetchValidator: (val: boolean) => void;
+  onCancel?: VoidFunction,
 }
 
 enum SortKey {
@@ -78,7 +79,7 @@ const Component = (props: Props) => {
   const { chain, className = '', from
     , isSingleSelect: _isSingleSelect = false,
     items, modalId, nominations
-    , onChange, setForceFetchValidator, slug } = props;
+    , onCancel, onChange, setForceFetchValidator, slug } = props;
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
@@ -344,6 +345,14 @@ const Component = (props: Props) => {
     );
   }, []);
 
+  const handleCancel = useCallback(() => {
+    onCancelSelectValidator();
+
+    if (onCancel) {
+      onCancel();
+    }
+  }, [onCancelSelectValidator, onCancel]);
+
   useEffect(() => {
     const selected = changeValidators
       .map((key) => {
@@ -401,7 +410,7 @@ const Component = (props: Props) => {
           </Button>
         )}
         id={modalId}
-        onCancel={onCancelSelectValidator}
+        onCancel={handleCancel}
         rightIconProps={{
           icon: (
             <Badge

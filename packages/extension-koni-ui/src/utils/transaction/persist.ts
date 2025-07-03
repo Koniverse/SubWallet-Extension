@@ -18,6 +18,7 @@ export const detectTransactionPersistKey = (type?: ExtrinsicType): string => {
     case ExtrinsicType.STAKING_JOIN_POOL:
       return STAKE_TRANSACTION;
     case ExtrinsicType.JOIN_YIELD_POOL:
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
       return EARN_TRANSACTION;
     case ExtrinsicType.STAKING_UNBOND:
     case ExtrinsicType.STAKING_LEAVE_POOL:

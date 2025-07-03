@@ -31,4 +31,4 @@ export const MANTA_MIN_DELEGATION = 500;
 
 export const CHANNEL_ID = 7;
 
-export const _SUPPORT_CHANGE_VALIDATOR_CHAIN = ['polkadot', 'kusama'];
+export const _SUPPORT_CHANGE_VALIDATOR_CHAIN = ['polkadot', 'kusama', 'alephTest'];

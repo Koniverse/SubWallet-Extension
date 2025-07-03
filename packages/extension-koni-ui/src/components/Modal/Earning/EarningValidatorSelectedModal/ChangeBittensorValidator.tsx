@@ -21,10 +21,10 @@ import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContex
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { AccountItemWithName } from '../Account';
-import AmountInput from '../Field/AmountInput';
-import EarningValidatorSelector from '../Field/Earning/EarningValidatorSelector';
-import NominationSelector from '../Field/NominationSelector';
+import { AccountItemWithName } from '../../../Account';
+import AmountInput from '../../../Field/AmountInput';
+import EarningValidatorSelector from '../../../Field/Earning/EarningValidatorSelector';
+import NominationSelector from '../../../Field/NominationSelector';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -37,17 +37,17 @@ interface Props extends ThemeProps, BasicInputWrapper {
   onClickLightningButton?: (e: SyntheticEvent) => void;
   isSingleSelect?: boolean;
   setForceFetchValidator: (val: boolean) => void;
+  onCancel?: VoidFunction,
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { chain, className = '', from, isSingleSelect: _isSingleSelect = false,
-    modalId, nominations, onChange, setForceFetchValidator, slug } = props;
+    modalId, nominations, onCancel, onChange, setForceFetchValidator, slug } = props;
 
   const [amountChange, setAmountChange] = useState(false);
   const [isChangeData, setIsChangeData] = useState(false);
   const [isShowAmountChange, setIsShowAmountChange] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-
   const { accounts } = useSelector((state) => state.accountState);
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { poolTargetsMap } = useSelector((state) => state.earning);
@@ -344,6 +344,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     },
     [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, symbol, netuid, notifyTooHighAmount, onSuccess, openAlert, t, closeAlert, onError]
   );
+  const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
+
+  const handleCancel = useCallback(() => {
+    onCancelSelectValidator();
+
+    if (onCancel) {
+      onCancel();
+    }
+  }, [onCancelSelectValidator, onCancel]);
 
   useEffect(() => {
     if (!isActive) {
@@ -355,7 +364,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [isActive, form]);
 
   const onPreCheck = usePreCheckAction(from);
-  const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
   useExcludeModal(modalId);
 
@@ -381,7 +389,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         </Button>
       }
       id={modalId}
-      onCancel={onCancelSelectValidator}
+      onCancel={handleCancel}
       title={t('Change validator')}
     >
       <Form

@@ -7,20 +7,23 @@ import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_EARN_PARAMS, EARN_TRANSACTION, EARNING_CHANGE_VALIDATOR_MODAL, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
 import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { store } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { EarnParams, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { Book, CaretLeft } from 'phosphor-react';
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
-import { ChangeBittensorValidator, ChangeValidator } from '../../Earning';
+import ChangeBittensorValidator from './ChangeBittensorValidator';
+import ChangeValidator from './ChangeValidator';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -41,9 +44,12 @@ const Component = (props: Props) => {
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
   const [targetLoading, setTargetLoading] = useState(false);
+  const [isChangeValidatorModalVisible, setIsChangeValidatorModalVisible] = useState<boolean>(false);
 
+  const [, setStorage] = useLocalStorage<EarnParams>(EARN_TRANSACTION, DEFAULT_EARN_PARAMS);
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
 
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const { poolInfoMap } = useSelector((state) => state.earning);
@@ -90,10 +96,23 @@ const Component = (props: Props) => {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       inactiveModal(modalId);
+      setIsChangeValidatorModalVisible(true);
       activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
+
+      setStorage({
+        ...DEFAULT_EARN_PARAMS,
+        slug: poolInfo.slug,
+        from: from,
+        chain: chain,
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
+      });
     },
-    [activeModal, inactiveModal, modalId]
+    [activeModal, chain, currentAccountProxy, from, inactiveModal, modalId, poolInfo.slug, setStorage]
   );
+
+  const onCancel = useCallback(() => {
+    setIsChangeValidatorModalVisible(false);
+  }, []);
 
   const onClickMore = useCallback((item: ValidatorDataType) => {
     return (e: SyntheticEvent) => {
@@ -208,12 +227,10 @@ const Component = (props: Props) => {
           validatorItem={viewDetailItem}
         />
       )}
-      {!readOnly && (
+      {!readOnly && isChangeValidatorModalVisible && (
         <Transaction
-          fromAddress={from}
           modalContent={true}
           modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-          originChain={poolInfo.chain}
         >
           {isBittensorChain
             ? (
@@ -225,6 +242,7 @@ const Component = (props: Props) => {
                 loading={targetLoading}
                 modalId={EARNING_CHANGE_VALIDATOR_MODAL}
                 nominations={nominations}
+                onCancel={onCancel}
                 setForceFetchValidator={setForceFetchValidator}
                 slug={poolInfo.slug}
               />
@@ -238,6 +256,7 @@ const Component = (props: Props) => {
                 loading={targetLoading}
                 modalId={EARNING_CHANGE_VALIDATOR_MODAL}
                 nominations={nominations}
+                onCancel={onCancel}
                 setForceFetchValidator={setForceFetchValidator}
                 slug={poolInfo.slug}
               />
