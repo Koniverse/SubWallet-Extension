@@ -78,7 +78,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: false,
       icon: Leaf,
       key: 'new-seed-phrase',
-      label: t('Create with a new seed phrase'),
+      label: t('ui.Modal.Account.Create.createWithNewSeedPhrase'),
       onClick: () => {
         inactiveModal(modalId);
         setSelectedMnemonicType('general');
@@ -90,7 +90,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: disableDerive,
       icon: ShareNetwork,
       key: 'derive-account',
-      label: t('Derive from an existing account'),
+      label: t('ui.Modal.Account.Create.deriveFromExistingAccount'),
       onClick: () => {
         inactiveModal(modalId);
         activeModal(DERIVE_ACCOUNT_LIST_MODAL);

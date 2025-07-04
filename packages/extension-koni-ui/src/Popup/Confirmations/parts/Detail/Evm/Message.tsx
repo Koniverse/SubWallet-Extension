@@ -147,21 +147,21 @@ const Component: React.FC<Props> = (props: Props) => {
       case 'eth_signTypedData_v3':
       case 'eth_signTypedData_v4':
         return (
-          <MetaInfo.Data label={t('Raw data')}>
+          <MetaInfo.Data label={t('ui.Confirmations.Detail.Evm.Message.rawData')}>
             {renderData(rawData, true)}
           </MetaInfo.Data>
         );
       case 'eth_signTypedData_v1':
       case 'eth_signTypedData':
         return (
-          <MetaInfo.Data label={t('Raw data')}>
+          <MetaInfo.Data label={t('ui.Confirmations.Detail.Evm.Message.rawData')}>
             {handlerRenderV1(rawData as unknown as SignTypedDataObjectV1[])}
           </MetaInfo.Data>
         );
       default:
         return (
           <MetaInfo.Data
-            label={t('Message')}
+            label={t('ui.Confirmations.Detail.Evm.Message.message')}
           >
             {renderData(rawData)}
           </MetaInfo.Data>
@@ -175,7 +175,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           signMethod && (
             <MetaInfo.DisplayType
-              label={t('Sign method')}
+              label={t('ui.Confirmations.Detail.Evm.Message.signMethod')}
               typeName={signMethod}
             />
           )

@@ -172,7 +172,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
           }
           onClick={onConfirmButton}
         >
-          {t('Confirm')}
+          {t('ui.Modal.TonWalletContractSelector.confirm')}
         </Button>
       }
       id={tonWalletContractSelectorModalId}
@@ -183,14 +183,14 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
     >
       <div>
         <div className={'sub-title'}>
-          {t('TON wallets have ')}
+          {t('ui.Modal.TonWalletContractSelector.tonWalletsHave')}
           <a
             href={TON_WALLET_CONTRACT_TYPES_URL}
             rel='noreferrer'
             style={{ textDecoration: 'underline' }}
             target={'_blank'}
           >multiple versions</a>
-          {t(', each with its own wallet address and balance. Select a version with the address you want to get')}
+          {t('ui.Modal.TonWalletContractSelector.tonWalletVersionInfo')}
         </div>
         <SwList
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}

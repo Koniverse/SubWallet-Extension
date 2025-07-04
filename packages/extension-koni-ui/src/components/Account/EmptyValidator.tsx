@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, PageIcon } from '@subwallet/react-ui';
@@ -27,7 +26,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
       direction: 'vertical',
       duration: 1.8,
       closable: false,
-      message: t('Reloading')
+      message: t('ui.Account.EmptyValidator.reloading')
     });
     onClickReload(true);
   }, [notify, onClickReload, t]);
@@ -43,7 +42,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
         }}
       />
       <div className='message'>
-        {t('No results found')}
+        {t('ui.Account.EmptyValidator.noResultsFound')}
       </div>
       {
         isDataEmpty
@@ -62,14 +61,14 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('Please <highlight>reload</highlight>')}
+                  i18nKey={('Please <highlight>reload</highlight>')}
                 />
               </div>
             </div>
           )
           : (
             <div className='description'>
-              {t('Please change your search criteria try again')}
+              {t('ui.Account.EmptyValidator.changeSearchCriteria')}
             </div>
           )
       }

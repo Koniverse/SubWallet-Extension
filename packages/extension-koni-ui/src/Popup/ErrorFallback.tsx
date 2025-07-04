@@ -45,7 +45,7 @@ function Component ({ className = '' }: Props) {
         <SwHeader
           className={'error-fallback-header'}
         >
-          {t('Unknown error')}
+          {t('ui.ErrorFallback.unknownError')}
         </SwHeader>
         <div className={'__body-area'}>
           <PageIcon
@@ -54,9 +54,9 @@ function Component ({ className = '' }: Props) {
               phosphorIcon: Robot
             }}
           />
-          <div className={'__title'}>{t('Oops, an error occurred!')}</div>
+          <div className={'__title'}>{t('ui.ErrorFallback.oopsAnErrorOccurred')}</div>
           <div className={'__content'}>
-            <span>{t('Something went wrong. Help us fix the problem by sending a report anonymously!')}</span>
+            <span>{t('ui.ErrorFallback.somethingWentWrongSendReport')}</span>
           </div>
         </div>
 
@@ -73,7 +73,7 @@ function Component ({ className = '' }: Props) {
             loading={isUploading}
             onClick={uploadCrashLog}
           >
-            {t('Send report')}
+            {t('ui.ErrorFallback.sendReport')}
           </Button>
           <Button
             block={true}
@@ -88,7 +88,7 @@ function Component ({ className = '' }: Props) {
             onClick={goHome}
             schema={'secondary'}
           >
-            {t('Back to home')}
+            {t('ui.ErrorFallback.backToHome')}
           </Button>
         </div>
       </div>

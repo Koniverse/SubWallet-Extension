@@ -98,7 +98,7 @@ function Component (
             )}
             onClick={onChangeShowBalance}
             size='xs'
-            tooltip={isShowBalance ? t('Hide balance') : t('Show balance')}
+            tooltip={isShowBalance ? t('ui.Tokens.UpperBlock.hideBalance') : t('ui.Tokens.UpperBlock.showBalance')}
             type='ghost'
           />
           <Number
@@ -133,7 +133,7 @@ function Component (
             loading={reloading}
             onClick={reloadBalance}
             size='xs'
-            tooltip={t('Refresh balance')}
+            tooltip={t('ui.Tokens.UpperBlock.refreshBalance')}
             type='ghost'
           />
         </div>
@@ -150,7 +150,7 @@ function Component (
           onClick={onOpenReceive}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('Get address')}
+          tooltip={t('ui.Tokens.UpperBlock.getAddress')}
         />
         <div className={'__button-space'} />
         <Button
@@ -164,7 +164,7 @@ function Component (
           onClick={onOpenSendFund}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('Send tokens')}
+          tooltip={t('ui.Tokens.UpperBlock.sendTokens')}
         />
         <div className={'__button-space'} />
         <Button
@@ -179,7 +179,7 @@ function Component (
           onClick={onOpenSwap}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('Swap')}
+          tooltip={t('ui.Tokens.UpperBlock.swap')}
         />
         <div className={CN('__button-space', { hidden: isShrink })} />
         <Button
@@ -195,7 +195,7 @@ function Component (
           onClick={onOpenBuyTokens}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('Buy token')}
+          tooltip={t('ui.Tokens.UpperBlock.buyToken')}
         />
       </ActionButtonsContainer>
     </div>

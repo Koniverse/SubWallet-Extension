@@ -103,7 +103,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         items={items}
         label={label}
         onSelect={onSelect}
-        placeholder={placeholder || t('Select account')}
+        placeholder={placeholder || t('ui.Field.AccountSelector.selectAccount')}
         prefix={
           <Avatar
             identPrefix={addressPrefix}
@@ -120,7 +120,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         searchPlaceholder={t<string>('Account name')}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={label || placeholder || t('Select account')}
+        title={label || placeholder || t('ui.Field.AccountSelector.selectAccount')}
       />
     </>
   );

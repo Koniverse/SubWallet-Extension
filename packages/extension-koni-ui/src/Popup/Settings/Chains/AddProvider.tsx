@@ -136,19 +136,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('Added a provider successfully')
+            message: t('ui.Settings.Chains.AddProvider.addedProviderSuccessfully')
           });
           navigate(-1);
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.Settings.Chains.AddProvider.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('ui.Settings.Chains.AddProvider.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [chainInfo.providers, chainInfo.slug, form, navigate, showNotification, t]);
@@ -160,13 +160,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleErrorMessage = useCallback((errorCode: _CHAIN_VALIDATION_ERROR) => {
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('Cannot connect to this provider');
+        return t('ui.Settings.Chains.AddProvider.cannotConnectToProvider');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('This provider has already been added');
+        return t('ui.Settings.Chains.AddProvider.providerAlreadyAdded');
       case _CHAIN_VALIDATION_ERROR.PROVIDER_NOT_SAME_CHAIN:
-        return t('This provider is not for this network');
+        return t('ui.Settings.Chains.AddProvider.providerNotForThisNetwork');
       default:
-        return t('Error validating this provider');
+        return t('ui.Settings.Chains.AddProvider.errorValidatingProvider');
     }
   }, [t]);
 
@@ -231,11 +231,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           })
           .catch(() => {
             setIsValidating(false);
-            reject(new Error(t('Error validating this provider')));
-            setProviderValidation({ status: 'error', message: t('Error validating this provider') });
+            reject(new Error(t('ui.Settings.Chains.AddProvider.errorValidatingProvider')));
+            setProviderValidation({ status: 'error', message: t('ui.Settings.Chains.AddProvider.errorValidatingProvider') });
           });
       } else {
-        reject(new Error(t('Provider URL is not valid')));
+        reject(new Error(t('ui.Settings.Chains.AddProvider.providerUrlNotValid')));
         setProviderValidation({ status: '' });
         setIsShowConnectionStatus(false);
       }
@@ -250,7 +250,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <Layout.Base
         leftFooterButton={{
           onClick: onCancel,
-          children: t('Cancel')
+          children: t('ui.Settings.Chains.AddProvider.cancel')
         }}
         onBack={onBack}
         rightFooterButton={{
@@ -258,7 +258,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           disabled: isSubmitDisabled(),
           loading: loading,
           onClick: onSubmit,
-          children: t('Save')
+          children: t('ui.Settings.Chains.AddProvider.save')
         }}
         showBackButton={true}
         showSubHeader={true}
@@ -274,7 +274,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       >
         <div className={'add_provider__container'}>
           <div className='description'>
-            {t('Currently support WSS provider for Substrate networks and HTTP provider for EVM network')}
+            {t('ui.Settings.Chains.AddProvider.providerSupportInfo')}
           </div>
           <Form
             form={form}
@@ -289,7 +289,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               >
                 <Input
                   disabled={isValidating}
-                  placeholder={t('Provider URL')}
+                  placeholder={t('ui.Settings.Chains.AddProvider.providerUrl')}
                   prefix={<Icon
                     customSize={'24px'}
                     iconColor={token['gray-4']}
@@ -306,7 +306,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Form.Item name={'name'}>
                     <Input
                       disabled={true}
-                      placeholder={t('Network name')}
+                      placeholder={t('ui.Settings.Chains.AddProvider.networkName')}
                       prefix={(
                         <Icon
                           customSize={'24px'}
@@ -316,7 +316,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                           weight={'bold'}
                         />
                       )}
-                      tooltip={t('Network name')}
+                      tooltip={t('ui.Settings.Chains.AddProvider.networkName')}
                       tooltipPlacement='topLeft'
                       value={chainInfo.name}
                     />
@@ -329,8 +329,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   >
                     <Input
                       disabled={true}
-                      placeholder={t('Symbol')}
-                      tooltip={t('Symbol')}
+                      placeholder={t('ui.Settings.Chains.AddProvider.symbol')}
+                      tooltip={t('ui.Settings.Chains.AddProvider.symbol')}
                       tooltipPlacement='topLeft'
                       value={chainInfo.slug}
                     />
@@ -341,8 +341,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <Form.Item name={'chainType'}>
                 <Input
                   disabled={true}
-                  placeholder={t('Network type')}
-                  tooltip={t('Network type')}
+                  placeholder={t('ui.Settings.Chains.AddProvider.networkType')}
+                  tooltip={t('ui.Settings.Chains.AddProvider.networkType')}
                   tooltipPlacement='topLeft'
                   value={chainInfo.slug}
                 />

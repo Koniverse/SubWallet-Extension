@@ -78,7 +78,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         id={modalId}
         maskClosable={true}
         onCancel={onBack}
-        title={t('Select account')}
+        title={t('ui.Modal.Account.DeriveList.selectAccount')}
       >
         <SwList.Section
           displayRow={true}

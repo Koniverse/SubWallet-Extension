@@ -63,7 +63,7 @@ const Component: React.FC<Props> = (props: Props) => {
               !_isRelatedToAstar && !!maxApy && (
                 <div className='__item-upto'>
                   <div className='__item-upto-label'>
-                    {t('Up to')}:
+                    {t('ui.Earning.OptionItem.upTo')}:
                   </div>
                   <div className='__item-upto-value'>
                     <Number
@@ -79,7 +79,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className='__item-line-2'>
             <div className='__item-available-balance'>
               <div className='__item-available-balance-label'>
-                {t('Available')}:
+                {t('ui.Earning.OptionItem.available')}:
               </div>
               <div className={'__item-available-balance-value'}>
                 <Number
@@ -93,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
             {
               !_isRelatedToAstar && !!maxApy && (
                 <div className='__item-time'>
-                  {t('per year')}
+                  {t('ui.Earning.OptionItem.perYear')}
                 </div>
               )
             }
@@ -105,7 +105,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           _isRelatedToAstar && (
             <div className={'__visit-dapp'}>
-              {t('View on dApp')}
+              {t('ui.Earning.OptionItem.viewOnDapp')}
             </div>
           )
         }

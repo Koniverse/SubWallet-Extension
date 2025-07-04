@@ -96,11 +96,11 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('Token Details'),
+        label: t('ui.Tokens.DetailModal.tokenDetailsTitle'),
         value: ViewValue.OVERVIEW
       },
       {
-        label: t('Account Details'),
+        label: t('ui.Tokens.DetailModal.accountDetailsTitle'),
         value: ViewValue.DETAIL
       }
     ];
@@ -119,8 +119,8 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     const lockedValue = balanceInfo?.locked.value ?? new BigN(0);
 
     return [
-      createItem('transferable', t('Transferable'), transferableValue),
-      createItem('locked', t('Locked'), lockedValue)
+      createItem('transferable', t('ui.Tokens.DetailModal.transferable'), transferableValue),
+      createItem('locked', t('ui.Tokens.DetailModal.locked'), lockedValue)
     ];
   }, [balanceInfo?.free.value, balanceInfo?.locked.value, currentTokenInfo?.symbol, t]);
 
@@ -208,7 +208,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       className={CN(className, { 'fix-height': isAllAccount })}
       id={id}
       onCancel={onCancel}
-      title={(isAllAccount && isBitcoinChain) ? t('Account Details') : t('Token details')}
+      title={(isAllAccount && isBitcoinChain) ? t('ui.Tokens.DetailModal.accountDetailsTitle') : t('ui.Tokens.DetailModal.tokenDetails')}
     >
       <Form
         form={form}
@@ -274,10 +274,10 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                         onClick: onCancel,
                         size: 'xs',
                         shape: 'circle',
-                        children: t('Back to home')
+                        children: t('ui.Tokens.DetailModal.backToHome')
                       }}
                       className='__empty-list'
-                      emptyMessage={t('Switch to another token to see account balance')}
+                      emptyMessage={t('ui.Tokens.DetailModal.switchTokenToSeeBalance')}
                       emptyTitle={t('No account with {{symbol}} balance found', {
                         replace: {
                           symbol: symbol

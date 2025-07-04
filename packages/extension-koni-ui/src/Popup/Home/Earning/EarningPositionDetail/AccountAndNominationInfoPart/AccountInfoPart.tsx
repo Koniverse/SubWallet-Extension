@@ -149,7 +149,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ? [
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
-            label: t('Derivative token balance'),
+            label: t('ui.Earning.PositionDetail.AccountInfoPart.derivativeTokenBalance'),
             value: item.subnetData?.originalTotalStake || '',
             decimals: inputAsset?.decimals || 0,
             suffix: item.subnetData?.subnetSymbol
@@ -164,7 +164,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           : [
             metaInfoNumber('Total stake', new BigN(item.totalStake)),
             {
-              label: t('Derivative token balance'),
+              label: t('ui.Earning.PositionDetail.AccountInfoPart.derivativeTokenBalance'),
               value: item.activeStake,
               decimals: deriveAsset?.decimals || 0,
               suffix: deriveAsset?.symbol
@@ -188,7 +188,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               <MetaInfo.Account
                 address={item.address}
                 chainSlug={poolInfo.chain}
-                label={t('Account')}
+                label={t('ui.Earning.PositionDetail.AccountInfoPart.account')}
                 networkPrefix={networkPrefix}
               />
             )
@@ -203,7 +203,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             )}
 
           <MetaInfo.Default
-            label={t('Staking type')}
+            label={t('ui.Earning.PositionDetail.AccountInfoPart.stakingType')}
             valueColorSchema={earningTagType.color as InfoItemBase['valueColorSchema']}
           >
             {earningTagType.label}
@@ -230,7 +230,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   type={'ghost'}
                 >
                   <div className={'__nomination-button-label'}>
-                    {t('Nomination info')}
+                    {t('ui.Earning.PositionDetail.AccountInfoPart.nominationInfo')}
                   </div>
 
                   <Icon
@@ -254,7 +254,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           '-horizontal-mode': isAllAccount,
           '-has-one-item': list.length === 1
         })}
-        title={t('Account info')}
+        title={t('ui.Earning.PositionDetail.AccountInfoPart.accountInfo')}
       >
 
         {isAllAccount && list.length > 1

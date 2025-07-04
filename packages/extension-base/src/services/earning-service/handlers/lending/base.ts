@@ -47,7 +47,7 @@ export default abstract class BaseLendingPoolHandler extends BaseSpecialStakingP
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0'))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.service.earning.lending.amountMustBeGreaterThanZero'))];
     }
 
     if (bnAmount.lt(minUnstake)) {

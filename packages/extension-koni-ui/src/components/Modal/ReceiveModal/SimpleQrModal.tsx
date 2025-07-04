@@ -27,7 +27,7 @@ interface Props extends ThemeProps {
 const Component: React.FC<Props> = ({ address, className, id: modalId, onBack }: Props) => {
   const { t } = useTranslation();
   const notify = useNotification();
-  const onClickCopyBtn = useCallback(() => notify({ message: t('Copied to clipboard') }), [notify, t]);
+  const onClickCopyBtn = useCallback(() => notify({ message: t('ui.Modal.Receive.SimpleQr.copiedToClipboard') }), [notify, t]);
   const isEvmAddress = isEthereumAddress(address);
 
   return (
@@ -71,7 +71,7 @@ const Component: React.FC<Props> = ({ address, className, id: modalId, onBack }:
                 }
                 onClick={onClickCopyBtn}
                 size='xs'
-                tooltip={t('Copy address')}
+                tooltip={t('ui.Modal.Receive.SimpleQr.copyAddress')}
                 type='ghost'
               />
             </CopyToClipboard>

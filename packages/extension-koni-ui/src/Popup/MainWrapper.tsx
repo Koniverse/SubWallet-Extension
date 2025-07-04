@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { StepStatus } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, BackgroundExpandView } from '@subwallet/extension-koni-ui/components';
 import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -63,7 +62,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('Transaction is in progress. Go to <highlight>Notifications</highlight> to view progress and keep SubWallet open until the transaction is completed')}
+                  i18nKey={('Transaction is in progress. Go to <highlight>Notifications</highlight> to view progress and keep SubWallet open until the transaction is completed')}
                 />
               )}
               title={'Do not close SubWallet!'}

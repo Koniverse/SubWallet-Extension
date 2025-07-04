@@ -137,7 +137,7 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
       <MetaInfo.Account
         address={address}
         className={'account-info-item'}
-        label={t('From')}
+        label={t('ui.Confirmations.Detail.Substrate.Extrinsic.from')}
         name={accountName}
         networkPrefix={chain?.ss58Format ?? chainInfo?.substrateInfo?.addressPrefix}
       />
@@ -159,7 +159,7 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
       )}
       {renderMethod(method, decoded, t)}
       <MetaInfo.Data
-        label={t('Lifetime')}
+        label={t('ui.Confirmations.Detail.Substrate.Extrinsic.lifetime')}
       >
         {mortalityAsString(era, blockNumber, t)}
       </MetaInfo.Data>

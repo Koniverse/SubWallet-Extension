@@ -55,7 +55,7 @@ const Component: React.FC<Props> = (props: Props) => {
             size='xs'
             type='ghost'
           >
-            {t('Help')}
+            {t('ui.BackgroundExpandView.help')}
           </Button>
         </div>
         {

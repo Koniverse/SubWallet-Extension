@@ -14,12 +14,12 @@ export enum DeriveErrorType {
 }
 
 const DEFAULT_DATA: Record<DeriveErrorType, { message: string, code: number | undefined }> = {
-  [DeriveErrorType.INVALID_DERIVATION_PATH]: { message: detectTranslate('Invalid derivation path'), code: 1001 },
-  [DeriveErrorType.INVALID_DERIVATION_TYPE]: { message: detectTranslate('Derivation path not supported'), code: 1002 },
-  [DeriveErrorType.ROOT_ACCOUNT_NOT_FOUND]: { message: detectTranslate('Account not found'), code: 1003 },
-  [DeriveErrorType.INVALID_ACCOUNT_TYPE]: { message: detectTranslate('Invalid account type'), code: 1004 },
-  [DeriveErrorType.MAX_DERIVATION_DEPTH]: { message: detectTranslate('Derivation path not supported'), code: 1005 },
-  [DeriveErrorType.MIN_DERIVATION_DEPTH]: { message: detectTranslate('Derivation path not supported'), code: 1006 }
+  [DeriveErrorType.INVALID_DERIVATION_PATH]: { message: detectTranslate('bg.type.error.account.derive.invalidDerivationPath'), code: 1001 },
+  [DeriveErrorType.INVALID_DERIVATION_TYPE]: { message: detectTranslate('bg.type.error.account.derive.derivationPathNotSupported'), code: 1002 },
+  [DeriveErrorType.ROOT_ACCOUNT_NOT_FOUND]: { message: detectTranslate('bg.type.error.account.derive.accountNotFound'), code: 1003 },
+  [DeriveErrorType.INVALID_ACCOUNT_TYPE]: { message: detectTranslate('bg.type.error.account.derive.invalidAccountType'), code: 1004 },
+  [DeriveErrorType.MAX_DERIVATION_DEPTH]: { message: detectTranslate('bg.type.error.account.derive.derivationPathNotSupported'), code: 1005 },
+  [DeriveErrorType.MIN_DERIVATION_DEPTH]: { message: detectTranslate('bg.type.error.account.derive.derivationPathNotSupported'), code: 1006 }
 };
 
 export class SWDeriveError extends SWError {

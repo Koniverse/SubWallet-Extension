@@ -47,22 +47,22 @@ const Component: React.FC<Props> = (props: Props) => {
   const noAccountTitle = useMemo(() => {
     switch (accountType) {
       case AccountChainType.SUBSTRATE:
-        return t('No available Substrate account');
+        return t('ui.WalletConnect.AccountSelect.noAvailableSubstrateAccount');
       case AccountChainType.ETHEREUM:
-        return t('No available EVM account');
+        return t('ui.WalletConnect.AccountSelect.noAvailableEvmAccount');
       default:
-        return t('No available account');
+        return t('ui.WalletConnect.AccountSelect.noAvailableAccount');
     }
   }, [accountType, t]);
 
   const noAccountDescription = useMemo(() => {
     switch (accountType) {
       case AccountChainType.SUBSTRATE:
-        return t("You don't have any Substrate account to connect. Please create one or skip this step by hitting Cancel.");
+        return t('ui.WalletConnect.AccountSelect.noSubstrateAccountToConnect');
       case AccountChainType.ETHEREUM:
-        return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+        return t('ui.WalletConnect.AccountSelect.noEvmAccountToConnect');
       default:
-        return t("You don't have any account to connect. Please create one or skip this step by hitting Cancel.");
+        return t('ui.WalletConnect.AccountSelect.noAccountToConnect');
     }
   }, [accountType, t]);
 
@@ -145,7 +145,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   )}
                   id={id}
                   onCancel={onCloseModal}
-                  title={t('Select account')}
+                  title={t('ui.WalletConnect.AccountSelect.selectAccount')}
                 >
                   <SwList.Section
                     className='account-list'
@@ -192,7 +192,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   })}
                 </div>
                 <div className={CN(className, 'additional-content')}>
-                  {t('Make sure you trust this site before connecting')}
+                  {t('ui.WalletConnect.AccountSelect.trustSiteBeforeConnecting')}
                 </div>
               </>
             )

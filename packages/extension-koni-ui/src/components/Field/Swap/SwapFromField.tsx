@@ -90,7 +90,7 @@ const Component = (props: Props) => {
           size='xs'
           type='ghost'
         >
-          <span className='max-btn-text'>{t('Max')}</span>
+          <span className='max-btn-text'>{t('ui.Swap.SwapFromField.max')}</span>
         </Button>
       </div>
       <div className='__input-container'>

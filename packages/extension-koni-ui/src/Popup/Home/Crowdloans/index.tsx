@@ -42,10 +42,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('crowdloan');
 
   const filterOptions = useMemo(() => [
-    { label: t('Polkadot parachain'), value: FilterValue.POLKADOT_PARACHAIN },
-    { label: t('Kusama parachain'), value: FilterValue.KUSAMA_PARACHAIN },
-    { label: t('Won'), value: FilterValue.WON },
-    { label: t('In auction'), value: FilterValue.IN_AUCTION }
+    { label: t('ui.Crowdloans.polkadotParachain'), value: FilterValue.POLKADOT_PARACHAIN },
+    { label: t('ui.Crowdloans.kusamaParachain'), value: FilterValue.KUSAMA_PARACHAIN },
+    { label: t('ui.Crowdloans.won'), value: FilterValue.WON },
+    { label: t('ui.Crowdloans.inAuction'), value: FilterValue.IN_AUCTION }
   ], [t]);
 
   const filterFunction = useMemo<(item: _CrowdloanItemType) => boolean>(() => {
@@ -113,8 +113,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     () => {
       return (
         <EmptyList
-          emptyMessage={t('Your crowdloans will show up here')}
-          emptyTitle={t('No crowdloans found')}
+          emptyMessage={t('ui.Crowdloans.yourCrowdloansWillShowUpHere')}
+          emptyTitle={t('ui.Crowdloans.noCrowdloansFound')}
           phosphorIcon={Rocket}
         />
       );
@@ -135,7 +135,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     >
       <Layout.WithSubHeaderOnly
         onBack={goBackToSettingList}
-        title={t('Crowdloans')}
+        title={t('ui.Crowdloans.crowdloans')}
       >
         <div className='content-container'>
           {!!banners.length && (
@@ -163,14 +163,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           />
         </div>
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.Crowdloans.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.Crowdloans.filter')}
         />
       </Layout.WithSubHeaderOnly>
     </PageWrapper>

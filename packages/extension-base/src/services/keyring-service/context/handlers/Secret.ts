@@ -31,7 +31,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
 
         if (exists) {
           if (exists.type === type) {
-            return [{ code: AccountExternalErrorCode.INVALID_ADDRESS, message: t('Account exists') }];
+            return [{ code: AccountExternalErrorCode.INVALID_ADDRESS, message: t('bg.keyring.handler.Secret.accountExists') }];
           }
         }
       } catch (e) {
@@ -41,7 +41,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       const nameExists = this.state.checkNameExists(name);
 
       if (nameExists) {
-        throw Error(t('Account name already exists'));
+        throw Error(t('bg.keyring.handler.Secret.accountNameAlreadyExists'));
       }
 
       const meta: KeyringPair$Meta = {
@@ -115,7 +115,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       rs.keyTypes = types;
     } else {
       rs.autoAddPrefix = false;
-      assert(false, t('Invalid private key'));
+      assert(false, t('bg.keyring.handler.Secret.invalidPrivateKey'));
     }
 
     const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
@@ -164,7 +164,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       if (!keyringPair) {
         return {
           success: false,
-          errors: [{ code: AccountExternalErrorCode.KEYRING_ERROR, message: t('Cannot create account') }]
+          errors: [{ code: AccountExternalErrorCode.KEYRING_ERROR, message: t('bg.keyring.handler.Secret.cannotCreateAccount') }]
         };
       }
 

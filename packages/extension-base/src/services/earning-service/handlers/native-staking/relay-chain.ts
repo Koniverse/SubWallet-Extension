@@ -737,7 +737,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.service.earning.nativeStakingRelay.amountMustBeGreaterThanZero')));
     }
 
     const bnActiveStake = new BN(poolPosition.activeStake);

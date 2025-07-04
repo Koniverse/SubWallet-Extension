@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationResult, ConfirmationsQueueItem, ErrorNetworkConnection } from '@subwallet/extension-base/background/KoniTypes';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, ConfirmationGeneralInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { completeConfirmation } from '@subwallet/extension-koni-ui/messaging';
@@ -73,7 +72,7 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Transaction request')}
+          {t('ui.Confirmations.Error.NetworkConnection.transactionRequest')}
         </div>
         {/* <div className='description'> */}
         {/*  {t('You are approving a request with the following account')} */}
@@ -82,7 +81,7 @@ function Component ({ className, request, type }: Props) {
           {account && <MetaInfo.Account
             address={account.address}
             className={'account-info-item'}
-            label={t('Account')}
+            label={t('ui.Confirmations.Error.NetworkConnection.account')}
             name={account.name}
           />}
           { networkKey
@@ -102,7 +101,7 @@ function Component ({ className, request, type }: Props) {
               className={CN(className, 'alert-box')}
               description={ <Trans
                 components={error.components}
-                i18nKey={detectTranslate(error.message)}
+                i18nKey={(error.message)}
               />}
               title={error.name}
               type={'error'}
@@ -115,7 +114,7 @@ function Component ({ className, request, type }: Props) {
           onClick={onCancel}
           schema={'primary'}
         >
-          {t('I understand')}
+          {t('ui.Confirmations.Error.NetworkConnection.iUnderstand')}
         </Button>
       </div>
     </>

@@ -42,13 +42,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('Cannot connect to this provider');
+        return t('ui.Confirmations.AddNetwork.cannotConnectToProvider');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('This provider has already been added');
+        return t('ui.Confirmations.AddNetwork.providerAlreadyAdded');
       case _CHAIN_VALIDATION_ERROR.EXISTED_CHAIN:
-        return t('This chain has already been added');
+        return t('ui.Confirmations.AddNetwork.chainAlreadyAdded');
       default:
-        return t('Error validating this provider');
+        return t('ui.Confirmations.AddNetwork.errorValidatingProvider');
     }
   }, [t]);
 
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={16}>
             <Field
               content={chainEditInfo.name || ''}
-              placeholder={t('Network name')}
+              placeholder={t('ui.Confirmations.AddNetwork.networkName')}
               prefix={(
                 <Icon
                   customSize={'24px'}
@@ -139,7 +139,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={8}>
             <Field
               content={chainEditInfo.symbol || ''}
-              placeholder={t('Symbol')}
+              placeholder={t('ui.Confirmations.AddNetwork.symbol')}
               tooltip={t<string>('Symbol')}
               tooltipPlacement='topLeft'
             />
@@ -149,7 +149,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={12}>
             <Field
               content={chainSpec?.decimals || 0}
-              placeholder={t('Decimals')}
+              placeholder={t('ui.Confirmations.AddNetwork.decimals')}
               tooltip={t<string>('Decimals')}
               tooltipPlacement='topLeft'
             />
@@ -157,7 +157,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={12}>
             <Field
               content={chainSpec?.evmChainId || 0}
-              placeholder={t('Chain ID')}
+              placeholder={t('ui.Confirmations.AddNetwork.chainId')}
               tooltip={t<string>('Chain ID')}
               tooltipPlacement='topLeft'
             />
@@ -165,26 +165,26 @@ const Component: React.FC<Props> = (props: Props) => {
         </Row>
         <Field
           content={chainEditInfo.chainType}
-          placeholder={t('Network type')}
+          placeholder={t('ui.Confirmations.AddNetwork.networkType')}
           tooltip={t<string>('Network type')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.blockExplorer}
-          placeholder={t('Block explorer')}
+          placeholder={t('ui.Confirmations.AddNetwork.blockExplorer')}
           tooltip={t<string>('Block explorer')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.crowdloanUrl}
-          placeholder={t('Crowdloan URL')}
+          placeholder={t('ui.Confirmations.AddNetwork.crowdloanUrl')}
           tooltip={t<string>('Crowdloan URL')}
           tooltipPlacement='topLeft'
         />
       </div>
       <div className='confirmation-footer'>
         {mode === 'update' && (<div className={'warning-message'}>
-          {t('The network already exists')}
+          {t('ui.Confirmations.AddNetwork.networkAlreadyExists')}
         </div>)}
         <Button
           disabled={loading}
@@ -197,7 +197,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.Confirmations.AddNetwork.cancel')}
         </Button>
         <Button
           disabled={mode === 'update' || unconfirmed || !!providerError}
@@ -210,7 +210,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('Approve')}
+          {t('ui.Confirmations.AddNetwork.approve')}
         </Button>
       </div>
     </>

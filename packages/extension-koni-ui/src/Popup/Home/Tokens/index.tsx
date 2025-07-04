@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenGroupBalanceItem';
@@ -213,7 +212,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -243,7 +242,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -331,7 +330,7 @@ const Component = (): React.ReactElement => {
           isZkModeSyncing && (
             <SwAlert
               className={classNames('zk-mode-alert-area')}
-              description={t('This may take a few minutes. Please keep the app open')}
+              description={t('ui.Tokens.refreshBalanceInfo')}
               title={t('Zk mode is syncing: {{percent}}%', { replace: { percent: zkModeSyncProgress || '0' } })}
               type={'warning'}
             />
@@ -351,9 +350,9 @@ const Component = (): React.ReactElement => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  i18nKey={("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
                 />}
-                title={t('Change wallet address & version')}
+                title={t('ui.Tokens.changeWalletAddressAndVersion')}
                 type={'warning'}
               />
               <AccountSelectorModal
@@ -403,8 +402,8 @@ const Component = (): React.ReactElement => {
           !tokenGroupBalanceItems.length && (
             <EmptyList
               className={'__empty-list'}
-              emptyMessage={t('Try searching or importing one')}
-              emptyTitle={t('No tokens found')}
+              emptyMessage={t('ui.Tokens.trySearchingOrImporting')}
+              emptyTitle={t('ui.Tokens.noTokensFound')}
               phosphorIcon={Coins}
             />
           )
@@ -416,7 +415,7 @@ const Component = (): React.ReactElement => {
             size={'xs'}
             type={'ghost'}
           >
-            {t('Manage tokens')}
+            {t('ui.Tokens.manageTokens')}
           </Button>
         </div>
       </div>

@@ -26,14 +26,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
     if (item.fundStatus === _FundStatus.WON) {
       if (item.unlockTime < Date.now()) {
-        label = t('Dissolved on');
+        label = t('ui.Crowdloan.Item.dissolvedOn');
       } else {
-        label = t('Locked until');
+        label = t('ui.Crowdloan.Item.lockedUntil');
       }
     } else if (item.fundStatus === _FundStatus.IN_AUCTION) {
-      label = t('Crowdloan ends on');
+      label = t('ui.Crowdloan.Item.crowdloanEndsOn');
     } else {
-      label = t('Refunded on');
+      label = t('ui.Crowdloan.Item.refundedOn');
     }
 
     return `${label} ${date}`;

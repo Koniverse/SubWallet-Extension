@@ -69,10 +69,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Signature required')}
+          {t('ui.Confirmations.BitcoinSignPsbt.signatureRequired')}
         </div>
         <div className='description'>
-          {t('You are approving a request with the following account')}
+          {t('ui.Confirmations.BitcoinSignPsbt.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -87,7 +87,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.Confirmations.BitcoinSignPsbt.viewDetails')}
           </Button>
         </div>}
       </div>
@@ -98,13 +98,13 @@ function Component ({ className, request, type }: Props) {
       />
       <BaseDetailModal
         className={CN(className, 'transaction-detail-modal')}
-        title={t('PSBT details')}
+        title={t('ui.Confirmations.BitcoinSignPsbt.psbtDetails')}
       >
         <MetaInfo>
-          <MetaInfo.Data label={t('Input')}>
+          <MetaInfo.Data label={t('ui.Confirmations.BitcoinSignPsbt.input')}>
             {renderAccountTransactionDetail(txInput)}
           </MetaInfo.Data>
-          <MetaInfo.Data label={t('Output')}>
+          <MetaInfo.Data label={t('ui.Confirmations.BitcoinSignPsbt.output')}>
             {renderAccountTransactionDetail(txOutput)}
           </MetaInfo.Data>
 

@@ -56,11 +56,11 @@ const Component: React.FC<Props> = (props: Props) => {
       <>
         <MetaInfo.Chain
           chain={data.chain}
-          label={t('Network')}
+          label={t('ui.History.Detail.Header.network')}
         />
         <MetaInfo.Account
           address={data.from}
-          label={t('From account')}
+          label={t('ui.History.Detail.Header.fromAccount')}
           name={data.fromName}
           networkPrefix={chainInfoMap[data.chain]?.substrateInfo?.addressPrefix}
         />
@@ -72,7 +72,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       {data.to && <MetaInfo.Chain
         chain={data.chain}
-        label={t('Network')}
+        label={t('ui.History.Detail.Header.network')}
       />}
 
       <MetaInfo.Transfer

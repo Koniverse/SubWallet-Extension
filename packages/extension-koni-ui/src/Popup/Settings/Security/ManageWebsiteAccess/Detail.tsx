@@ -132,8 +132,8 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your accounts will appear here.')}
-        emptyTitle={t('No account found')}
+        emptyMessage={t('ui.Settings.Security.WebsiteAccessDetail.yourAccountsWillAppearHere')}
+        emptyTitle={t('ui.Settings.Security.WebsiteAccessDetail.noAccountFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );

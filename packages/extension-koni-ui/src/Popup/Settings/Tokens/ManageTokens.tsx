@@ -66,9 +66,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [assetSettingMap, selectedFilters]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('Enabled tokens'), value: FilterValue.ENABLED },
-    { label: t('Disabled tokens'), value: FilterValue.DISABLED },
-    { label: t('Custom tokens'), value: FilterValue.CUSTOM }
+    { label: t('ui.Settings.Tokens.Manage.enabledTokens'), value: FilterValue.ENABLED },
+    { label: t('ui.Settings.Tokens.Manage.disabledTokens'), value: FilterValue.DISABLED },
+    { label: t('ui.Settings.Tokens.Manage.customTokens'), value: FilterValue.CUSTOM }
   ]), [t]);
 
   const searchToken = useCallback((token: _ChainAsset, searchText: string) => {

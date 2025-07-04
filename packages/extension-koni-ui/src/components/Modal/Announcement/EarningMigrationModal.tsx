@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EARNING_MIGRATION_ANNOUNCEMENT, EARNING_MIGRATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
@@ -55,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               schema={'secondary'}
             >
-              {t('Dismiss')}
+              {t('ui.Modal.Announcement.EarningMigration.dismiss')}
             </Button>
             <Button
               block={true}
@@ -69,13 +68,13 @@ const Component: React.FC<Props> = (props: Props) => {
               }
               onClick={onEarnNow}
             >
-              {t('Earn now')}
+              {t('ui.Modal.Announcement.EarningMigration.earnNow')}
             </Button>
           </div>
         }
         id={modalId}
         onCancel={onCloseModal}
-        title={t('Introducing Earning feature')}
+        title={t('ui.Modal.Announcement.EarningMigration.introducingEarningFeature')}
       >
         <div className={'page-icon-astar-modal'}>
           <PageIcon
@@ -93,7 +92,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <strong />
               )
             }}
-            i18nKey={detectTranslate('SubWallet\'s <highlight>Staking</highlight> feature has been updated to become <highlight>Earning</highlight> feature. Now, you can earn yield with native staking, liquid staking, lending, and staking dApp on SubWallet.')}
+            i18nKey={('SubWallet\'s <highlight>Staking</highlight> feature has been updated to become <highlight>Earning</highlight> feature. Now, you can earn yield with native staking, liquid staking, lending, and staking dApp on SubWallet.')}
           />
         </div>
       </SwModal>

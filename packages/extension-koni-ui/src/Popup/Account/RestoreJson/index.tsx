@@ -167,7 +167,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (exitedAccount.length) {
       exitedAccount.unshift({
         id: 'existed_accounts',
-        groupLabel: t('Existed account')
+        groupLabel: t('ui.Account.RestoreJson.existedAccount')
       });
 
       result.push(...exitedAccount);
@@ -194,7 +194,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const json = JSON.parse(u8aToString(Uint8Array.from(Buffer.from(bytes)))) as KeyringPair$Json | KeyringPairs$Json;
 
         if (!isValidJsonFile(json)) {
-          throw new Error(t('Invalid JSON file'));
+          throw new Error(t('ui.Account.RestoreJson.invalidJsonFile'));
         }
 
         if (JSON.stringify(jsonFile) !== JSON.stringify(json)) {
@@ -315,18 +315,18 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       closable: true,
       content:
         <div>
-          {t(' You have accounts with the same name. We have added numbers to these account names to differentiate them. You can change account names later using ')}
+          {t('ui.Account.RestoreJson.duplicateAccountNameNumberedInfo')}
           <a
             className={'__modal-user-guide'}
             href={CHANGE_ACCOUNT_NAME}
             target='__blank'
           >
-            {t('this guide')}
+            {t('ui.Account.RestoreJson.thisGuide')}
           </a>
         </div>,
-      title: t('Duplicate account name'),
+      title: t('ui.Account.RestoreJson.duplicateAccountName'),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.Account.RestoreJson.iUnderstand'),
         icon: CheckCircle,
         iconWeight: 'fill',
         onClick: () => {
@@ -416,7 +416,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
     if (!value) {
       setPasswordValidateState({
-        message: t('Password is required'),
+        message: t('ui.Account.RestoreJson.passwordIsRequired'),
         status: 'error'
       });
     } else {
@@ -428,12 +428,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const footerContent = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('Unlock file');
+      return t('ui.Account.RestoreJson.unlockFile');
     } else {
       if (accountProxiesSelected.length === 0) {
-        return t('Import account');
+        return t('ui.Account.RestoreJson.importAccount');
       } else if (accountProxiesSelected.length === 1) {
-        return t('Import 1 account');
+        return t('ui.Account.RestoreJson.importOneAccount');
       } else {
         return t(`Import ${accountProxiesSelected.length} accounts`);
       }
@@ -442,9 +442,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const titlePage = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('Import from JSON file');
+      return t('ui.Account.RestoreJson.importFromJsonFile');
     } else {
-      return t('Import account');
+      return t('ui.Account.RestoreJson.importAccount');
     }
   }, [stepState, t]);
 
@@ -491,14 +491,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           <div className='description'>
             {stepState === StepState.SELECT_ACCOUNT_IMPORT && passwordValidateState.status === 'success'
               ? t('Select the account(s) you\'d like to import')
-              : t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+              : t('ui.Account.RestoreJson.dragAndDropPolkadotJsJson')}
           </div>
 
           {
             stepState === StepState.SELECT_ACCOUNT_IMPORT && showNoValidAccountAlert && <AlertBox
               className={'waning-alert-box'}
-              description={t('All accounts found in this file already exist in SubWallet')}
-              title={t('Unable to import')}
+              description={t('ui.Account.RestoreJson.allAccountsInFileExist')}
+              title={t('ui.Account.RestoreJson.unableToImport')}
               type='warning'
             />
           }
@@ -519,10 +519,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   accept={'application/json'}
                   className='file-selector'
                   disabled={fileValidating}
-                  hint={t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+                  hint={t('ui.Account.RestoreJson.dragAndDropPolkadotJsJson')}
                   onChange={onChangeFile}
                   statusHelp={fileValidateState.message}
-                  title={t('Import by JSON file')}
+                  title={t('ui.Account.RestoreJson.importByJsonFile')}
                 />
               </Form.Item>
             }
@@ -533,12 +533,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   validateStatus={passwordValidateState.status}
                 >
                   <div className='input-label'>
-                    {t('Please enter the password you have used when creating your Polkadot.{js} account')}
+                    {t('ui.Account.RestoreJson.enterPolkadotJsPassword')}
                   </div>
                   <Input.Password
                     id={`${formName}_${passwordField}`}
                     onChange={onChangePassword}
-                    placeholder={t('Password')}
+                    placeholder={t('ui.Account.RestoreJson.password')}
                     statusHelp={passwordValidateState.message}
                     type='password'
                     value={password}

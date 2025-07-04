@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import React from 'react';
@@ -34,11 +33,11 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('This network has 2 address formats. SubWallet automatically transforms Legacy formats into New format without affecting your transfer. <highlight>Learn more</highlight>')}
+              i18nKey={('This network has 2 address formats. SubWallet automatically transforms Legacy formats into New format without affecting your transfer. <highlight>Learn more</highlight>')}
             />
           </>
         }
-        title={t('New address format')}
+        title={t('ui.AlertBoxInstant.newAddressFormat')}
         type={'info'}
       />
     );

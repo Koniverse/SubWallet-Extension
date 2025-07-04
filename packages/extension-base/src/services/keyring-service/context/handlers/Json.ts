@@ -89,7 +89,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -127,7 +127,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         reject(error);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -177,7 +177,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -222,7 +222,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           if (_exists) {
             throw new Error(t('Account already exists under the name {{name}}', { replace: { name: _exists.name || _exists.address || '' } }));
           } else {
-            throw new Error(t('No accounts found to import'));
+            throw new Error(t('bg.keyring.handler.Json.noAccountsFoundToImport'));
           }
         }
 
@@ -298,7 +298,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((error as Error).message);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -309,7 +309,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     try {
       if (proxyIds && !proxyIds.length) {
-        throw new Error(t('No accounts found to export'));
+        throw new Error(t('bg.keyring.handler.Json.noAccountsFoundToExport'));
       }
 
       const _accountProxy = this.state.value.accountProxy;
@@ -333,7 +333,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
       const error = e as Error;
 
       if (error.message === 'Invalid master password') {
-        throw new Error(t('Incorrect password'));
+        throw new Error(t('bg.keyring.handler.Json.incorrectPassword'));
       } else {
         throw error;
       }

@@ -57,7 +57,7 @@ const Component: FC<Props> = (props: Props) => {
                 className={'__chain-logo-group'}
               />
               <div className='__steps-label'>
-                {`${chains.length} ${t('steps')}`}
+                {`${chains.length} ${t('ui.TransactionProcess.Preview.steps')}`}
               </div>
             </>
           )

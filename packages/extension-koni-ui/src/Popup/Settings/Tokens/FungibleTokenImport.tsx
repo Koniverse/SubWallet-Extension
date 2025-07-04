@@ -135,11 +135,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   setLoading(false);
 
                   if (validationResult.isExist) {
-                    reject(new Error(t('Existed token')));
+                    reject(new Error(t('ui.Settings.Tokens.ImportFungible.existedToken')));
                   }
 
                   if (validationResult.contractError) {
-                    reject(new Error(t('Error validating this token')));
+                    reject(new Error(t('ui.Settings.Tokens.ImportFungible.errorValidatingToken')));
                   }
 
                   if (!validationResult.isExist && !validationResult.contractError) {
@@ -154,10 +154,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 })
                 .catch(() => {
                   setLoading(false);
-                  reject(new Error(t('Error validating this token')));
+                  reject(new Error(t('ui.Settings.Tokens.ImportFungible.errorValidatingToken')));
                 });
             } else {
-              reject(t('Invalid contract address'));
+              reject(t('ui.Settings.Tokens.ImportFungible.invalidContractAddress'));
             }
           });
         }
@@ -182,11 +182,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 setLoading(false);
 
                 if (validationResult.isExist) {
-                  reject(new Error(t('Existed token')));
+                  reject(new Error(t('ui.Settings.Tokens.ImportFungible.existedToken')));
                 }
 
                 if (validationResult.contractError) {
-                  reject(new Error(t('Invalid asset ID')));
+                  reject(new Error(t('ui.Settings.Tokens.ImportFungible.invalidAssetId')));
                 }
 
                 if (!validationResult.isExist && !validationResult.contractError) {
@@ -201,7 +201,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               })
               .catch(() => {
                 setLoading(false);
-                reject(new Error(t('Error validating this token')));
+                reject(new Error(t('ui.Settings.Tokens.ImportFungible.errorValidatingToken')));
               });
           });
         }
@@ -277,18 +277,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       .then((result) => {
         if (result) {
           showNotification({
-            message: t('Imported token successfully')
+            message: t('ui.Settings.Tokens.ImportFungible.importedTokenSuccessfully')
           });
           goBack();
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.Settings.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('ui.Settings.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
         });
       })
       .finally(() => {
@@ -319,18 +319,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         .then((result) => {
           if (result) {
             showNotification({
-              message: t('Imported token successfully')
+              message: t('ui.Settings.Tokens.ImportFungible.importedTokenSuccessfully')
             });
             goBack();
           } else {
             showNotification({
-              message: t('An error occurred, please try again')
+              message: t('ui.Settings.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.Settings.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
           });
         })
         .finally(() => {
@@ -376,7 +376,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading,
           onClick: form.submit,
-          children: t('Import token')
+          children: t('ui.Settings.Tokens.ImportFungible.importToken')
         }}
         title={t<string>('Import token')}
       >
@@ -397,8 +397,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 id='import-nft-select-chain'
                 items={chains}
                 label={t<string>('Network')}
-                placeholder={t('Select network')}
-                title={t('Select network')}
+                placeholder={t('ui.Settings.Tokens.ImportFungible.selectNetwork')}
+                title={t('ui.Settings.Tokens.ImportFungible.selectNetwork')}
               />
             </Form.Item>
 
@@ -409,8 +409,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 disabled={!selectedChain}
                 items={tokenTypeOptions}
-                placeholder={t('Select token type')}
-                title={t('Select token type')}
+                placeholder={t('ui.Settings.Tokens.ImportFungible.selectTokenType')}
+                title={t('ui.Settings.Tokens.ImportFungible.selectTokenType')}
               />
             </Form.Item>
 
@@ -426,7 +426,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <AddressInput
                       addressPrefix={chainNetworkPrefix}
                       disabled={!selectedTokenType}
-                      label={isSelectGearToken ? t('Program ID') : t('Contract address')}
+                      label={isSelectGearToken ? t('ui.Settings.Tokens.ImportFungible.programId') : t('ui.Settings.Tokens.ImportFungible.contractAddress')}
                       showScanner={true}
                     />
                   </Form.Item>
@@ -438,8 +438,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 >
                   <AddressInput
                     disabled={!selectedTokenType}
-                    label={t('Asset ID')}
-                    placeholder={t('Please type or paste an asset ID')}
+                    label={t('ui.Settings.Tokens.ImportFungible.assetId')}
+                    placeholder={t('ui.Settings.Tokens.ImportFungible.typeOrPasteAssetId')}
                     showScanner={true}
                   />
                 </Form.Item>
@@ -457,7 +457,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     content={symbol}
                     placeholder={t<string>('Symbol')}
                     prefix={tokenDecimalsPrefix()}
-                    tooltip={t('Symbol')}
+                    tooltip={t('ui.Settings.Tokens.ImportFungible.symbol')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>
@@ -469,7 +469,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Field
                     content={decimals === -1 ? '' : decimals}
                     placeholder={t<string>('Decimals')}
-                    tooltip={t('Decimals')}
+                    tooltip={t('ui.Settings.Tokens.ImportFungible.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>
@@ -481,7 +481,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               rules={[
                 {
                   required: true,
-                  message: t('Token name is required')
+                  message: t('ui.Settings.Tokens.ImportFungible.tokenNameIsRequired')
                 }
               ]}
               statusHelpAsTooltip={true}
@@ -489,7 +489,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <Field
                 content={tokenName}
                 placeholder={t<string>('Token name')}
-                tooltip={t('Token name')}
+                tooltip={t('ui.Settings.Tokens.ImportFungible.tokenName')}
                 tooltipPlacement={'topLeft'}
               />
             </Form.Item>
@@ -500,8 +500,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <Input
                 disabled={fieldDisabled}
-                placeholder={t('Price ID')}
-                tooltip={t('Price ID')}
+                placeholder={t('ui.Settings.Tokens.ImportFungible.priceId')}
+                tooltip={t('ui.Settings.Tokens.ImportFungible.priceId')}
               />
             </Form.Item>
           </Form>

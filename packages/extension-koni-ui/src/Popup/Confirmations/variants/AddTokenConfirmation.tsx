@@ -115,7 +115,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           }
           status={contractError ? 'error' : slug ? 'warning' : ''}
-          statusHelp={contractError ? t('The token contract is invalid.') : slug ? t('The token already exists.') : ''}
+          statusHelp={contractError ? t('ui.Confirmations.AddToken.tokenContractInvalid') : slug ? t('ui.Confirmations.AddToken.tokenAlreadyExists') : ''}
           suffix={contractSuffix}
         />
         <Row gutter={token.margin}>
@@ -161,7 +161,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.Confirmations.AddToken.cancel')}
         </Button>
         <Button
           disabled={!!slug || !validated || contractError}
@@ -174,7 +174,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('Approve')}
+          {t('ui.Confirmations.AddToken.approve')}
         </Button>
       </div>
     </>

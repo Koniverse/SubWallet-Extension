@@ -89,7 +89,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
 
           const onCreateHandleError = (setter: Dispatch<SetStateAction<AmountData>>) => {
             return (e: Error) => {
-              !cancel && setError(t('Unable to get balance. Please re-enable the network'));
+              !cancel && setError(t('ui.hook.balance.useGetBalance.unableToGetBalanceReEnableNetwork'));
               !cancel && setter(DEFAULT_BALANCE);
               console.error(e);
             };

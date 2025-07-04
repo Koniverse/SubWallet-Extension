@@ -93,12 +93,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return [
       {
         desc: false,
-        label: t('Lowest total member'),
+        label: t('ui.Field.Earning.PoolSelector.lowestTotalMember'),
         value: SortKey.MEMBER
       },
       {
         desc: true,
-        label: t('Highest total staked'),
+        label: t('ui.Field.Earning.PoolSelector.highestTotalStaked'),
         value: SortKey.TOTAL_POOLED
       }
     ];
@@ -106,19 +106,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Open'),
+      label: t('ui.Field.Earning.PoolSelector.open'),
       value: 'Open'
     },
     {
-      label: t('Locked'),
+      label: t('ui.Field.Earning.PoolSelector.locked'),
       value: 'Locked'
     },
     {
-      label: t('Destroying'),
+      label: t('ui.Field.Earning.PoolSelector.destroying'),
       value: 'Destroying'
     },
     {
-      label: t('Blocked'),
+      label: t('ui.Field.Earning.PoolSelector.blocked'),
       value: 'Blocked'
     }
   ]), [t]);
@@ -274,7 +274,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <Tooltip
             key={item.id}
             placement={'top'}
-            title={t('This pool has reached the maximum number of members. Select another to continue')}
+            title={t('ui.Field.Earning.PoolSelector.poolMaxMembers')}
           >
             <div
               className={'__pool-item-wrapper'}
@@ -295,7 +295,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               <Tooltip
                 key={item.id}
                 placement={'top'}
-                title={t('This pool is blocked. Select another to continue')}
+                title={t('ui.Field.Earning.PoolSelector.poolIsBlocked')}
               >
                 <div
                   className={'__pool-item-wrapper'}
@@ -422,7 +422,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         loading={loading}
         onClickActionBtn={onClickActionBtn}
         onSelect={_onSelectItem}
-        placeholder={placeholder || t('Select pool')}
+        placeholder={placeholder || t('ui.Field.Earning.PoolSelector.selectPool')}
         prefix={(
           <Avatar
             identPrefix={networkPrefix}
@@ -474,7 +474,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               />
             </div>
           )}
-        title={t('Select pool')}
+        title={t('ui.Field.Earning.PoolSelector.selectPool')}
       />
 
       <FilterModal

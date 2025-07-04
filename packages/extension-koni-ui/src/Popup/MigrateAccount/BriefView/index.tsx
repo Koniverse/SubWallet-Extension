@@ -74,7 +74,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
           {
             !isForcedMigration
               ? contentData.title
-              : t('Migration incomplete!')
+              : t('ui.MigrateAccount.BriefView.migrationIncomplete')
           }
         </div>
       </div>
@@ -102,10 +102,10 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               </div>
               <div className={'__forced-migration-content'}>
                 <div className='__content-line'>
-                  {t('Account migration is not yet complete. If this process remains incomplete, you will not be able to perform any action on SubWallet extension.')}
+                  {t('ui.MigrateAccount.BriefView.migrationIncompleteWarning')}
                 </div>
                 <div className='__content-line'>
-                  {t('Make sure to complete the migration to avoid any potential issues with your accounts. Hit “Continue” to resume and complete the process. ')}
+                  {t('ui.MigrateAccount.BriefView.completeMigrationToAvoidIssues')}
                 </div>
               </div>
             </>
@@ -128,7 +128,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 onClick={onDismiss}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('ui.MigrateAccount.BriefView.cancel')}
               </Button>
               <Button
                 block={true}
@@ -140,7 +140,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 )}
                 onClick={onMigrateNow}
               >
-                {t('Migrate now')}
+                {t('ui.MigrateAccount.BriefView.migrateNow')}
               </Button>
             </>
           )
@@ -152,7 +152,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               block={true}
               onClick={onMigrateNow}
             >
-              {t('Continue')}
+              {t('ui.MigrateAccount.BriefView.continue')}
             </Button>
           )
         }

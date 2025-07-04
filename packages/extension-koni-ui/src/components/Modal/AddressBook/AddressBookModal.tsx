@@ -69,15 +69,15 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Your wallet'),
+      label: t('ui.Modal.AddressBook.Selector.yourWallet'),
       value: AnalyzedGroup.WALLET
     },
     {
-      label: t('Saved contacts'),
+      label: t('ui.Modal.AddressBook.Selector.savedContacts'),
       value: AnalyzedGroup.CONTACT
     },
     {
-      label: t('Recent'),
+      label: t('ui.Modal.AddressBook.Selector.recent'),
       value: AnalyzedGroup.RECENT
     }
   ]), [t]);
@@ -187,13 +187,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AnalyzedGroup.WALLET:
-        groupLabel = t('Your wallet');
+        groupLabel = t('ui.Modal.AddressBook.Selector.yourWallet');
         break;
       case AnalyzedGroup.CONTACT:
-        groupLabel = t('Saved contacts');
+        groupLabel = t('ui.Modal.AddressBook.Selector.savedContacts');
         break;
       case AnalyzedGroup.RECENT:
-        groupLabel = t('Recent');
+        groupLabel = t('ui.Modal.AddressBook.Selector.recent');
         break;
     }
 
@@ -233,7 +233,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={CN(className)}
         id={id}
         onCancel={onClose}
-        title={t('Address book')}
+        title={t('ui.Modal.AddressBook.Selector.addressBook')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -271,7 +271,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter address')}
+        title={t('ui.Modal.AddressBook.Selector.filterAddress')}
       />
     </>
   );

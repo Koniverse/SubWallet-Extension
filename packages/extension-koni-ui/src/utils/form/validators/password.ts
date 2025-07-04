@@ -34,7 +34,7 @@ export const renderBasePasswordRules = (fieldName: string, t: TFunction): FormRu
 
 export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFunction): FormRule[] => {
   return [
-    ...renderBasePasswordRules(t('Confirm password'), t),
+    ...renderBasePasswordRules(t('ui.util.validator.password.confirmPassword'), t),
     ({ getFieldValue }) => ({
       validator: (_, value) => {
         const password = getFieldValue(passwordFieldName) as string;
@@ -43,7 +43,7 @@ export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFu
           return Promise.resolve();
         }
 
-        return Promise.reject(new Error(t('Confirm password do not match!')));
+        return Promise.reject(new Error(t('ui.util.validator.password.confirmPasswordDoNotMatch')));
       }
     })
   ];

@@ -138,7 +138,7 @@ const useGetTransactionProcessStepText = () => {
     }
 
     if (processStep.type === SwapStepType.PERMIT) {
-      return t('Sign message to authorize provider');
+      return t('ui.hook.transaction.useGetTxStepText.signMessageToAuthorizeProvider');
     }
 
     if (([
@@ -158,13 +158,13 @@ const useGetTransactionProcessStepText = () => {
           const asset = assetRegistry[brief.token];
 
           const earnMethodMap: Record<string, string> = {
-            [`${YieldPoolType.NOMINATION_POOL}`]: t('Nomination pool'),
-            [`${YieldPoolType.NATIVE_STAKING}`]: t('Direct nomination'),
-            [`${YieldPoolType.LIQUID_STAKING}`]: t('Liquid staking'),
-            [`${YieldPoolType.LENDING}`]: t('Lending'),
-            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('Parachain staking'),
-            [`${YieldPoolType.SINGLE_FARMING}`]: t('Single farming'),
-            [`${YieldPoolType.SUBNET_STAKING}`]: t('Subnet staking')
+            [`${YieldPoolType.NOMINATION_POOL}`]: t('ui.hook.transaction.useGetTxStepText.nominationPool'),
+            [`${YieldPoolType.NATIVE_STAKING}`]: t('ui.hook.transaction.useGetTxStepText.directNomination'),
+            [`${YieldPoolType.LIQUID_STAKING}`]: t('ui.hook.transaction.useGetTxStepText.liquidStaking'),
+            [`${YieldPoolType.LENDING}`]: t('ui.hook.transaction.useGetTxStepText.lending'),
+            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('ui.hook.transaction.useGetTxStepText.parachainStaking'),
+            [`${YieldPoolType.SINGLE_FARMING}`]: t('ui.hook.transaction.useGetTxStepText.singleFarming'),
+            [`${YieldPoolType.SUBNET_STAKING}`]: t('ui.hook.transaction.useGetTxStepText.subnetStaking')
           };
 
           return {

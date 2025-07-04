@@ -47,14 +47,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Dismiss')}
+          {t('ui.Modal.RemindUpgradeFirefox.dismiss')}
         </Button>
 
         <Button
           block={true}
           onClick={goUserGuide}
         >
-          {t('Review guide')}
+          {t('ui.Modal.RemindUpgradeFirefox.reviewGuide')}
         </Button>
       </>
     );
@@ -69,7 +69,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         id={RemindUpdateFireFoxVersionModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Pay attention!')}
+        title={t('ui.Modal.RemindUpgradeFirefox.payAttentionExclamation')}
       >
         <div className={'__modal-content'}>
           <PageIcon

@@ -118,14 +118,14 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
     (item: UnstakingInfo) => {
       if (!poolInfo.metadata.availableMethod.withdraw) {
         return (
-          <div className={'__withdraw-time-label'}>{t('Automatic withdrawal')}</div>
+          <div className={'__withdraw-time-label'}>{t('ui.Earning.PositionDetail.WithdrawInfo.automaticWithdrawal')}</div>
         );
       } else {
         if (item.targetTimestampMs === undefined && item.waitingTime === undefined) {
           if (item.chain === 'acala') {
             return (
               <>
-                <div className={'__withdraw-time-label'}>{t('Available for withdrawal')}</div>
+                <div className={'__withdraw-time-label'}>{t('ui.Earning.PositionDetail.WithdrawInfo.availableForWithdrawal')}</div>
                 {item.status === UnstakingStatus.CLAIMABLE && (
                   <Icon
                     iconColor={token.colorSecondary}
@@ -140,7 +140,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
 
           return (
             <>
-              <div className={'__withdraw-time-label'}>{t('Waiting for withdrawal')}</div>
+              <div className={'__withdraw-time-label'}>{t('ui.Earning.PositionDetail.WithdrawInfo.waitingForWithdrawal')}</div>
               {item.status === UnstakingStatus.CLAIMABLE && (
                 <Icon
                   iconColor={token.colorSecondary}
@@ -191,7 +191,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
     >
       <CollapsiblePanel
         className={'__collapsible-panel'}
-        title={t('Withdraw info')}
+        title={t('ui.Earning.PositionDetail.WithdrawInfo.withdrawInfo')}
       >
         <MetaInfo
           labelColorScheme='gray'
@@ -227,7 +227,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               size='xs'
               type='ghost'
             >
-              {t('Cancel unstaking')}
+              {t('ui.Earning.PositionDetail.WithdrawInfo.cancelUnstaking')}
             </Button>
           </div>
         )}
@@ -251,7 +251,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               onClick={onWithDraw}
               size='xs'
             >
-              {t('Withdraw')}
+              {t('ui.Earning.PositionDetail.WithdrawInfo.withdraw')}
             </Button>
           </div>
         </>

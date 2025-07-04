@@ -25,7 +25,7 @@ export default function useHandleTonAccountWarning (): HookType {
     if (accountType === 'ton') {
       alertModal.open({
         closable: false,
-        title: t('Incompatible seed phrase'),
+        title: t('ui.hook.account.useHandleTonWarning.incompatibleSeedPhrase'),
         type: NotificationType.WARNING,
         content: (
           <>
@@ -35,7 +35,7 @@ export default function useHandleTonAccountWarning (): HookType {
           </>
         ),
         okButton: {
-          text: t('Get address'),
+          text: t('ui.hook.account.useHandleTonWarning.getAddress'),
           onClick: () => {
             alertModal.close();
             processFunction();
@@ -43,7 +43,7 @@ export default function useHandleTonAccountWarning (): HookType {
           schema: 'primary'
         },
         cancelButton: {
-          text: t('Create new'),
+          text: t('ui.hook.account.useHandleTonWarning.createNew'),
           onClick: () => {
             setSelectedMnemonicType('ton');
             setConfirmedTermSeedPhrase((prevState: string | SeedPhraseTermStorage) => {

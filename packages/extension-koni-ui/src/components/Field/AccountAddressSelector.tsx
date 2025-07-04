@@ -96,7 +96,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           })}
           content={fieldContent}
           label={label}
-          placeholder={placeholder || t('Select account')}
+          placeholder={placeholder || t('ui.Field.AccountAddressSelector.selectAccount')}
           statusHelp={statusHelp}
           suffix={fieldSuffix}
           tooltip={tooltip}

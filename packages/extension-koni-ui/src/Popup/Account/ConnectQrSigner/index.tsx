@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
-import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountNameModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import CloseIcon from '@subwallet/extension-koni-ui/components/Icon/CloseIcon';
 import DualLogo from '@subwallet/extension-koni-ui/components/Logo/DualLogo';
@@ -70,7 +70,7 @@ const Component: React.FC<Props> = (props: Props) => {
       for (const account of accounts) {
         // todo: Recheck this logic with master account
         if (isSameAddress(account.address, scannedAccount.content)) {
-          return Promise.reject(new Error(t('Account already exists')));
+          return Promise.reject(new Error(t('ui.Account.ConnectQrSigner.accountAlreadyExists')));
         }
       }
     }
@@ -145,7 +145,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={onBack}
         rightFooterButton={{
-          children: loading ? t('Creating') : t('Scan QR code'),
+          children: loading ? t('ui.Account.ConnectQrSigner.creating') : t('ui.Account.ConnectQrSigner.scanQrCode'),
           icon: FooterIcon,
           onClick: openCamera,
           loading: loading
@@ -193,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('{{deviceName}} will provide you with a QR code to scan. Read <highlight>this instruction</highlight>, for more details.')}
+              i18nKey={('{{deviceName}} will provide you with a QR code to scan. Read <highlight>this instruction</highlight>, for more details.')}
               values={{ deviceName }}
             />
           </div>

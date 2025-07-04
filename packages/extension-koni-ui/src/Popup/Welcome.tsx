@@ -33,25 +33,25 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const [_isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
   const items = useMemo((): WelcomeButtonItem[] => [
     {
-      description: t('Create a new account with SubWallet'),
+      description: t('ui.Welcome.createNewAccountWithSubWallet'),
       icon: PlusCircle,
       id: CREATE_ACCOUNT_MODAL,
       schema: 'primary',
-      title: t('Create a new account')
+      title: t('ui.Welcome.createNewAccount')
     },
     {
-      description: t('Import an existing account'),
+      description: t('ui.Welcome.importExistingAccount'),
       icon: FileArrowDown,
       id: IMPORT_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Import an account')
+      title: t('ui.Welcome.importAccount')
     },
     {
-      description: t('Attach an account without private key'),
+      description: t('ui.Welcome.attachAccountWithoutPrivateKey'),
       icon: Swatches,
       id: ATTACH_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Attach an account')
+      title: t('ui.Welcome.attachAccount')
     }
   ], [t]);
 

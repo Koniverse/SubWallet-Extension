@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
-import { createPromiseHandler, detectTranslate } from '@subwallet/extension-base/utils';
+import { createPromiseHandler } from '@subwallet/extension-base/utils';
 import DefaultLogosMap, { IconMap } from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountNameModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import CloseIcon from '@subwallet/extension-koni-ui/components/Icon/CloseIcon';
@@ -166,7 +166,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={onBack}
         rightFooterButton={{
-          children: loading ? t('Creating') : t('Scan QR'),
+          children: loading ? t('ui.Account.ImportQrCode.creating') : t('ui.Account.ImportQrCode.scanQr'),
           icon: FooterIcon,
           onClick: onScan,
           loading: loading
@@ -177,11 +177,11 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goHome
           }
         ]}
-        title={t('Import by QR code')}
+        title={t('ui.Account.ImportQrCode.importByQrCode')}
       >
         <div className={CN('container')}>
           <div className='sub-title'>
-            {t("Make sure that you have granted SubWallet the access to your device's camera")}
+            {t('ui.Account.ImportQrCode.grantCameraAccess')}
           </div>
           <div className='logo'>
             <DualLogo
@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate('Click the "Scan QR" button, or read <highlight>this instruction</highlight>, for more details')}
+                i18nKey={('Click the "Scan QR" button, or read <highlight>this instruction</highlight>, for more details')}
               />
             </div>
           </div>
@@ -246,7 +246,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onError={onError}
             onSuccess={onSuccess}
             overlay={validateState.message && (<QrScannerErrorNotice message={validateState.message} />)}
-            title={t('Scan QR')}
+            title={t('ui.Account.ImportQrCode.scanQr')}
           />
         </div>
       </Layout.WithSubHeaderOnly>

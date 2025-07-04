@@ -42,11 +42,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('EVM networks'), value: FilterValue.EVM },
-    { label: t('Substrate networks'), value: FilterValue.SUBSTRATE },
-    { label: t('Custom networks'), value: FilterValue.CUSTOM },
-    { label: t('Enabled networks'), value: FilterValue.ENABLED },
-    { label: t('Disabled networks'), value: FilterValue.DISABLED }
+    { label: t('ui.Settings.Chains.Manage.evmNetworks'), value: FilterValue.EVM },
+    { label: t('ui.Settings.Chains.Manage.substrateNetworks'), value: FilterValue.SUBSTRATE },
+    { label: t('ui.Settings.Chains.Manage.customNetworks'), value: FilterValue.CUSTOM },
+    { label: t('ui.Settings.Chains.Manage.enabledNetworks'), value: FilterValue.ENABLED },
+    { label: t('ui.Settings.Chains.Manage.disabledNetworks'), value: FilterValue.DISABLED }
   ]), [t]);
 
   const filterFunction = useMemo<(item: ChainInfoWithState) => boolean>(() => {

@@ -10,11 +10,11 @@ import { TransactionError } from '../errors/TransactionError';
 
 const defaultWarningMap: Record<TransactionWarningType, { message: string, code?: number }> = {
   [BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT]: {
-    message: detectTranslate('Insufficient balance to cover existential deposit. Please decrease the transaction amount or increase your current balance'),
+    message: detectTranslate('bg.warning.Transaction.insufficientBalanceForExistentialDeposit'),
     code: undefined
   },
   [BasicTxWarningCode.IS_BOUNCEABLE_ADDRESS]: {
-    message: detectTranslate('We are not supporting for bounceable address. The send mode is work as non-bounceable address.'),
+    message: detectTranslate('bg.warning.Transaction.bounceableAddressNotSupported'),
     code: undefined
   }
 };

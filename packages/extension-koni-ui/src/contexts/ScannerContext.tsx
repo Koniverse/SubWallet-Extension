@@ -116,7 +116,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     // concatenate all the parts into one binary blob
     let concatMultipartData = multipartData.reduce((acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
       if (part === null) {
-        throw new Error(t('Incomplete. Please continue scanning'));
+        throw new Error(t('ui.context.Scanner.incompleteContinueScanning'));
       }
 
       const c = new Uint8Array(acc.length + part.length);
@@ -153,7 +153,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
 
     if (currentFrame === 0 && (partDataAsBytes[0] === new Uint8Array([0x00])[0] || partDataAsBytes[0] === new Uint8Array([0x7b])[0])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
-      throw new Error(t('Failed to decrypt data'));
+      throw new Error(t('ui.context.Scanner.failedToDecryptData'));
     }
 
     if (completedFramesCount < totalFrameCount) {
@@ -290,7 +290,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
 
     if (isSubstrateMessageParsedData(signRequest)) {
       if (signRequest.data.crypto !== 'sr25519') {
-        throw new Error(t('SubWallet only supports accounts using sr25519 crypto'));
+        throw new Error(t('ui.context.Scanner.sr25519CryptoOnly'));
       }
 
       isHash = signRequest.isHash;
@@ -306,7 +306,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     const sender = findAccountByAddress(accounts, address);
 
     if (!sender) {
-      throw new Error(t('Unable to find account'));
+      throw new Error(t('ui.context.Scanner.unableToFindAccount'));
     }
 
     const qrInfo: MessageQRInfo = {
@@ -335,10 +335,10 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         case 'signData':
           return _setDataToSign(unsignedData);
         default:
-          throw new Error(t('Invalid QR code'));
+          throw new Error(t('ui.context.Scanner.invalidQrCode'));
       }
     } else {
-      throw new Error(t('Invalid QR code'));
+      throw new Error(t('ui.context.Scanner.invalidQrCode'));
     }
   }, [t, _setDataToSign, _setTXRequest]);
 
@@ -359,11 +359,11 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     }
 
     if (!sender) {
-      throw new Error(t('Failed to sign. Sender account not found'));
+      throw new Error(t('ui.context.Scanner.failedToSignSenderNotFound'));
     }
 
     if (!type) {
-      throw new Error(t('Failed to sign. Unable to detect type'));
+      throw new Error(t('ui.context.Scanner.failedToSignUnableToDetectType'));
     }
 
     const signData = async (): Promise<string> => {
@@ -379,7 +379,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         } else if (isHash) {
           signable = dataToSign;
         } else {
-          throw new Error(t('Failed to sign. Invalid message type'));
+          throw new Error(t('ui.context.Scanner.failedToSignInvalidMessageType'));
         }
 
         const { signature } = await qrSignEvm({
@@ -400,7 +400,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         } else if (isAscii(dataToSign) || isHash) {
           signable = dataToSign;
         } else {
-          throw new Error(t('Failed to sign. Invalid message type'));
+          throw new Error(t('ui.context.Scanner.failedToSignInvalidMessageType'));
         }
 
         try {

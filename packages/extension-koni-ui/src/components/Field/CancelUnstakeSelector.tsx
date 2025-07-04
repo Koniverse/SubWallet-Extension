@@ -102,7 +102,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={t('Select request')}
+        title={t('ui.Field.CancelUnstakeSelector.selectRequest')}
       />
     </>
   );

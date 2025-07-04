@@ -86,11 +86,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const seedValidator = useCallback((rule: FormRule, value: string) => {
     return new Promise<void>((resolve, reject) => {
       if (!value) {
-        reject(new Error(t('This field is required')));
+        reject(new Error(t('ui.Account.ImportSeedPhrase.thisFieldIsRequired')));
       }
 
       if (!words.includes(value)) {
-        reject(new Error(t('Invalid word')));
+        reject(new Error(t('ui.Account.ImportSeedPhrase.invalidWord')));
       }
 
       resolve();
@@ -113,7 +113,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const phraseNumber = parseInt(_phraseNumber);
 
     if (![12, 15, 18, 21, 24].includes(seedKeys.length)) {
-      throw Error(t('Mnemonic needs to contain 12, 15, 18, 21, 24 words'));
+      throw Error(t('ui.Account.ImportSeedPhrase.mnemonicWordCountError'));
     }
 
     const seeds: string[] = [];
@@ -123,7 +123,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
 
     if (seeds.some((value) => !value)) {
-      throw Error(t('Mnemonic needs to contain 12, 15, 18, 21, 24 words'));
+      throw Error(t('ui.Account.ImportSeedPhrase.mnemonicWordCountError'));
     }
 
     const seed = seeds.join(' ');
@@ -138,21 +138,21 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             if (response.mnemonicTypes === 'general') {
               alertModal.open({
                 closable: false,
-                title: t('Incompatible seed phrase'),
+                title: t('ui.Account.ImportSeedPhrase.incompatibleSeedPhrase'),
                 type: NotificationType.WARNING,
                 content: (
                   <>
                     <div>
-                      {t('This seed phrase generates a unified account that can be used on multiple ecosystems in SubWallet including TON.')}
+                      {t('ui.Account.ImportSeedPhrase.unifiedSeedPhraseInfo')}
                     </div>
                     <br />
                     <div>
-                      {t('Note that you can’t import this seed phrase into TON-native wallets as this seed phrase is incompatible with TON-native wallets.')}
+                      {t('ui.Account.ImportSeedPhrase.tonIncompatibleSeedPhraseWarning')}
                     </div>
                   </>
                 ),
                 cancelButton: {
-                  text: t('Go back'),
+                  text: t('ui.Account.ImportSeedPhrase.goBack'),
                   icon: XCircle,
                   iconWeight: 'fill',
                   onClick: () => {
@@ -162,7 +162,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   schema: 'secondary'
                 },
                 okButton: {
-                  text: t('Import'),
+                  text: t('ui.Account.ImportSeedPhrase.import'),
                   icon: CheckCircle,
                   iconWeight: 'fill',
                   onClick: () => {
@@ -239,7 +239,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={onBack}
         rightFooterButton={{
-          children: t('Import account'),
+          children: t('ui.Account.ImportSeedPhrase.importAccount'),
           icon: FooterIcon,
           onClick: form.submit,
           disabled: disabled,
@@ -255,7 +255,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       >
         <div className='container'>
           <div className='description'>
-            {t('To import an existing account, please enter seed phrase.')}
+            {t('ui.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
           </div>
           <Form
             className='form-container form-space-xs'
@@ -290,7 +290,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   size='xs'
                   type='ghost'
                 >
-                  {showSeed ? t('Hide seed phrase') : t('Show seed phrase')}
+                  {showSeed ? t('ui.Account.ImportSeedPhrase.hideSeedPhrase') : t('ui.Account.ImportSeedPhrase.showSeedPhrase')}
                 </Button>
               </div>
               <div className='seed-container'>

@@ -148,8 +148,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         content:
           (<>
             <div className={CN(className, 'earning-alert-content')}>
-              <span>{t('You’re dual staking via both direct nomination and nomination pool, which')}&nbsp;</span>
-              <span className={'__info-highlight'}>{t('will not be supported')}&nbsp;</span>
+              <span>{t('ui.Earning.Entry.Positions.dualStakingWarning')}&nbsp;</span>
+              <span className={'__info-highlight'}>{t('ui.Earning.Entry.Positions.willNotBeSupported')}&nbsp;</span>
               <span>{t(`in the upcoming ${originChain} runtime upgrade. Read more to learn about the upgrade, and`)}&nbsp;</span>
               <a
                 href={'https://docs.subwallet.app/main/mobile-app-user-guide/manage-staking/unstake'}
@@ -158,13 +158,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
                 target={'_blank'}
               >{(`unstake your ${symbol}`)}
               </a>&nbsp;
-              <span>{t('from one of the methods to avoid issues')}</span>
+              <span>{t('ui.Earning.Entry.Positions.fromOneMethodToAvoidIssues')}</span>
             </div>
 
           </>),
         title: t(`Unstake your ${symbol} now!`),
         okButton: {
-          text: t('Read update'),
+          text: t('ui.Earning.Entry.Positions.readUpdate'),
           onClick: () => {
             learnMore();
             setAnnouncement('confirmed');
@@ -172,7 +172,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           }
         },
         cancelButton: {
-          text: t('Dismiss'),
+          text: t('ui.Earning.Entry.Positions.dismiss'),
           onClick: () => {
             closeAlert();
             setAnnouncement('confirmed');
@@ -187,13 +187,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   }, [items]);
 
   const filterOptions = [
-    { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('Lending'), value: YieldPoolType.LENDING },
-    { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.Earning.Entry.Positions.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.Earning.Entry.Positions.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.Earning.Entry.Positions.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.Earning.Entry.Positions.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.Earning.Entry.Positions.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.Earning.Entry.Positions.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('ui.Earning.Entry.Positions.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
   ];
 
   const filterFunction = useMemo<(item: ExtraYieldPositionInfo) => boolean>(() => {
@@ -206,15 +206,15 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     return () => {
       if (isRelatedToAstar(item.slug)) {
         openAlert({
-          title: t('Enter Astar portal'),
-          content: t('Navigate to Astar portal to view and manage your stake in Astar dApp staking v3'),
+          title: t('ui.Earning.Entry.Positions.enterAstarPortal'),
+          content: t('ui.Earning.Entry.Positions.navigateToAstarPortal'),
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.Earning.Entry.Positions.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('Enter Astar portal'),
+            text: t('ui.Earning.Entry.Positions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -254,7 +254,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
               size={'xs'}
               type={'ghost'}
             >
-              {t('Explore earning options')}
+              {t('ui.Earning.Entry.Positions.exploreEarningOptions')}
             </Button>
           </div>}
         </React.Fragment>
@@ -277,10 +277,10 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           },
           size: 'xs',
           shape: 'circle',
-          children: t('Explore earning options')
+          children: t('ui.Earning.Entry.Positions.exploreEarningOptions')
         }}
-        emptyMessage={t('Change your search or explore other earning options')}
-        emptyTitle={t('No earning position found')}
+        emptyMessage={t('ui.Earning.Entry.Positions.changeSearchOrExplore')}
+        emptyTitle={t('ui.Earning.Entry.Positions.noEarningPositionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -377,14 +377,14 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           showActionBtn
         />
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.Earning.Entry.Positions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.Earning.Entry.Positions.filter')}
         />
       </Layout.Base>
 

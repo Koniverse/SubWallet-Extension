@@ -51,7 +51,7 @@ const Component: React.FC<Props> = (props: Props) => {
       id={id}
       networks={showNetworks}
       subTitle={t('{{number}} networks selected', { replace: { number: networkNumber } })}
-      title={t('Selected networks')}
+      title={t('ui.WalletConnect.NetworkSelected.selectedNetworks')}
     />
   );
 };

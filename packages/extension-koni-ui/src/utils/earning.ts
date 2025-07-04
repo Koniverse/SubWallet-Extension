@@ -127,6 +127,6 @@ export const getEarningTimeText = (hours?: number) => {
 
     return [time, unit].join(' ');
   } else {
-    return detectTranslate('unknown time');
+    return detectTranslate('ui.util.earning.unknownTime');
   }
 };

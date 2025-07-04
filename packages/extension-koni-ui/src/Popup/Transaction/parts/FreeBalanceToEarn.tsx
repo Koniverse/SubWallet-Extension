@@ -105,7 +105,7 @@ const PartComponent: React.FC<PartProps> = (props: PartProps) => {
     <>
       {
         !first && (
-          <span className={'__name'}>&nbsp;{t('and')}&nbsp;</span>
+          <span className={'__name'}>&nbsp;{t('ui.Transaction.part.FreeBalanceToEarn.and')}&nbsp;</span>
         )
       }
       {
@@ -200,7 +200,7 @@ const Component = (props: Props) => {
         hidden: hidden
       })}
       >
-        {t('Select account to view available balance')}
+        {t('ui.Transaction.part.FreeBalanceToEarn.selectAccountToViewBalance')}
       </Typography.Paragraph>
     );
   }
@@ -220,7 +220,7 @@ const Component = (props: Props) => {
             '-hoverable': !!label
           })}
           >
-            {label || t('Sender available balance')}
+            {label || t('ui.Transaction.part.FreeBalanceToEarn.senderAvailableBalance')}
 
             {
               !!labelTooltip && (

@@ -63,13 +63,13 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       items={items}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('Phrase number')}
+      placeholder={placeholder || t('ui.Field.PhraseNumberSelector.phraseNumber')}
       renderItem={renderItem}
       renderSelected={renderSelected}
       renderWhenEmpty={renderEmpty}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || label || placeholder || t('Select type')}
+      title={title || label || placeholder || t('ui.Field.PhraseNumberSelector.selectType')}
       tooltip={tooltip}
     />
   );

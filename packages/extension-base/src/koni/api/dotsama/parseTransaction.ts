@@ -85,7 +85,7 @@ export const parseSubstrateTransaction = (data: string, apiPromise: ApiPromise):
     } catch (e) {
       return {
         ...baseInfo,
-        message: t('Unable to decode the information'),
+        message: t('bg.api.dotsama.parseTransaction.unableToDecodeInformation'),
         method: _method
       };
     }

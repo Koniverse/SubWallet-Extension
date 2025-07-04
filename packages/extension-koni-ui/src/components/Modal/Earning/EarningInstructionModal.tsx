@@ -8,7 +8,7 @@ import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { balanceFormatter, detectTranslate, formatNumber } from '@subwallet/extension-base/utils';
+import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
 import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -441,11 +441,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.Modal.Earning.Instruction.payAttentionExclamation'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -529,7 +529,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
+            i18nKey={('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
           />
         </div>
 
@@ -556,7 +556,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={closeModal}
           schema={'secondary'}
         >
-          {isShowStakeMoreButton ? t('Back') : t('Close')}
+          {isShowStakeMoreButton ? t('ui.Modal.Earning.Instruction.back') : t('ui.Modal.Earning.Instruction.close')}
         </Button>
 
         {isShowStakeMoreButton && (
