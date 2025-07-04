@@ -56,17 +56,17 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
           if (result) {
             goBack();
             showNotification({
-              message: t('Deleted token successfully')
+              message: t('ui.Settings.Tokens.TokenDetail.deletedTokenSuccessfully')
             });
           } else {
             showNotification({
-              message: t('Deleted token unsuccessfully')
+              message: t('ui.Settings.Tokens.TokenDetail.deletedTokenUnsuccessfully')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('Deleted token unsuccessfully')
+            message: t('ui.Settings.Tokens.TokenDetail.deletedTokenUnsuccessfully')
           });
         });
     }).catch(console.log);
@@ -115,7 +115,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
     navigator.clipboard.writeText(contractAddress).then().catch(console.error);
 
     showNotification({
-      message: t('Copied to clipboard')
+      message: t('ui.Settings.Tokens.TokenDetail.copiedToClipboard')
     });
   }, [showNotification, t, tokenInfo]);
 
@@ -158,14 +158,14 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         } else {
           setLoading(false);
           showNotification({
-            message: t('Error')
+            message: t('ui.Settings.Tokens.TokenDetail.error')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('Error')
+          message: t('ui.Settings.Tokens.TokenDetail.error')
         });
       });
   }, [goBack, priceId, showNotification, t, tokenInfo]);
@@ -178,7 +178,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
     return _isCustomAsset(tokenInfo.slug)
       ? {
         onClick: goBackToSettingList,
-        children: t('Cancel')
+        children: t('ui.Settings.Tokens.TokenDetail.cancel')
       }
       : undefined;
   }, [goBackToSettingList, tokenInfo.slug, t]);
@@ -196,7 +196,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         ),
         loading,
         onClick: onSubmit,
-        children: t('Save')
+        children: t('ui.Settings.Tokens.TokenDetail.save')
       }
       : undefined;
   }, [isSubmitDisabled, loading, onSubmit, t, tokenInfo.slug]);
@@ -253,7 +253,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Symbol')}
+                  title={t('ui.Settings.Tokens.TokenDetail.symbol')}
                 >
                   <div>
                     <Field
@@ -272,7 +272,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Token name')}
+                  title={t('ui.Settings.Tokens.TokenDetail.tokenName')}
                 >
                   <div>
                     <Field
@@ -287,13 +287,13 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Price ID')}
+                  title={t('ui.Settings.Tokens.TokenDetail.priceId')}
                 >
                   <div>
                     <Input
                       disabled={!_isCustomAsset(tokenInfo.slug)}
                       onChange={onChangePriceId}
-                      placeholder={t('Price ID')}
+                      placeholder={t('ui.Settings.Tokens.TokenDetail.priceId')}
                       value={priceId}
                     />
                   </div>
@@ -302,7 +302,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Decimals')}
+                  title={t('ui.Settings.Tokens.TokenDetail.decimals')}
                 >
                   <div>
                     <Field

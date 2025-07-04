@@ -69,7 +69,7 @@ function Component (
           size={'xs'}
           type={'ghost'}
         />
-        <div className={'__token-display'}>{t('Token')}: {symbol}</div>
+        <div className={'__token-display'}>{t('ui.Tokens.DetailUpperBlock.token')}: {symbol}</div>
       </div>
 
       <div className='__middle-part'>
@@ -93,7 +93,7 @@ function Component (
             onClick={onOpenReceive}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={t('Get address')}
+            tooltip={t('ui.Tokens.DetailUpperBlock.getAddress')}
           />
           <div className={'__button-space'} />
           <Button
@@ -107,7 +107,7 @@ function Component (
             onClick={onOpenSendFund}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={t('Send tokens')}
+            tooltip={t('ui.Tokens.DetailUpperBlock.sendTokens')}
           />
           <div className={'__button-space'} />
           <Button
@@ -122,7 +122,7 @@ function Component (
             onClick={onOpenSwap}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={t('Swap')}
+            tooltip={t('ui.Tokens.DetailUpperBlock.swap')}
           />
           <div className={CN('__button-space', { hidden: isShrink })} />
           <Button
@@ -138,13 +138,13 @@ function Component (
             onClick={onOpenBuyTokens}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={t('Buy token')}
+            tooltip={t('ui.Tokens.DetailUpperBlock.buyToken')}
           />
         </ActionButtonsContainer>
 
         <div className={'__your-balance-container'}>
           <div className='__your-balance-label'>
-            {t('Your balance')}
+            {t('ui.Tokens.DetailUpperBlock.yourBalance')}
           </div>
 
           <Tooltip

@@ -122,7 +122,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('QR signer account')
+        groupLabel: t('ui.Modal.ReceiveNew.AccountSelector.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
@@ -131,7 +131,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('Watch-only account')
+        groupLabel: t('ui.Modal.ReceiveNew.AccountSelector.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -140,7 +140,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('Ledger account')
+        groupLabel: t('ui.Modal.ReceiveNew.AccountSelector.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -149,7 +149,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('ui.Modal.ReceiveNew.AccountSelector.injectedAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -158,7 +158,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('Unknown account')
+        groupLabel: t('ui.Modal.ReceiveNew.AccountSelector.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -201,7 +201,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
           onClick: onCancel
         }
         : undefined}
-      title={t('Select account')}
+      title={t('ui.Modal.ReceiveNew.AccountSelector.selectAccount')}
     >
       <Search
         autoFocus={true}

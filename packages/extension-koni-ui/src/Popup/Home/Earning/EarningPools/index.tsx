@@ -57,13 +57,13 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const filterOptions = useMemo(() => [
-    { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('Lending'), value: YieldPoolType.LENDING },
-    { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.Earning.Pools.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.Earning.Pools.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.Earning.Pools.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.Earning.Pools.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.Earning.Pools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.Earning.Pools.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('ui.Earning.Pools.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
   ], [t]);
 
   const positionSlugs = useMemo(() => {
@@ -266,8 +266,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Change your search and try again')}
-        emptyTitle={t('No earning option found')}
+        emptyMessage={t('ui.Earning.Pools.changeYourSearchAndTryAgain')}
+        emptyTitle={t('ui.Earning.Pools.noEarningOptionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -334,14 +334,14 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           showActionBtn
         />
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.Earning.Pools.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.Earning.Pools.filter')}
         />
       </Layout.Base>
     </ChainConnectionWrapper>

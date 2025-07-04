@@ -103,7 +103,7 @@ const Component: React.FC<Props> = (props: Props) => {
       setInfo(undefined);
 
       if (!suri) {
-        reject(t('Derive path is required'));
+        reject(t('ui.Modal.DeriveAccountAction.derivePathIsRequired'));
       }
 
       addLazy('validateDerivationPath', () => {
@@ -131,7 +131,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const accountNameValidator = useCallback(async (validate: RuleObject, value: string) => {
     return new Promise<void>((resolve, reject) => {
       if (!value) {
-        reject(t('Account name is required'));
+        reject(t('ui.Modal.DeriveAccountAction.accountNameRequired'));
 
         return;
       }
@@ -139,13 +139,13 @@ const Component: React.FC<Props> = (props: Props) => {
       validateAccountName({ name: value })
         .then((rs) => {
           if (!rs.isValid) {
-            reject(t('Account name already in use'));
+            reject(t('ui.Modal.DeriveAccountAction.accountNameInUse'));
           } else {
             resolve();
           }
         })
         .catch(() => {
-          reject(t('Account name invalid'));
+          reject(t('ui.Modal.DeriveAccountAction.accountNameInvalid'));
         });
     });
   }, [t]);
@@ -190,17 +190,17 @@ const Component: React.FC<Props> = (props: Props) => {
     if (_info.depth === 2 && alertTypes.includes(_info.type)) {
       openAlert({
         type: NotificationType.WARNING,
-        content: t('This derived account can only be used in SubWallet and won’t be compatible with other wallets. Do you still want to continue?'),
-        title: t('Incompatible account'),
+        content: t('ui.Modal.DeriveAccountAction.incompatibleDerivedAccountWarning'),
+        title: t('ui.Modal.DeriveAccountAction.incompatibleAccount'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.Modal.DeriveAccountAction.continue'),
           onClick: () => {
             closeAlert();
             _doSubmit();
           }
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.Modal.DeriveAccountAction.cancel'),
           onClick: closeAlert
         }
       });
@@ -258,7 +258,7 @@ const Component: React.FC<Props> = (props: Props) => {
       closeIcon={modalCloseButton}
       id={modalId}
       onCancel={closeModal}
-      title={t('Create derived account')}
+      title={t('ui.Modal.DeriveAccountAction.createDerivedAccount')}
     >
       <div className='body-container'>
         <Form
@@ -292,9 +292,9 @@ const Component: React.FC<Props> = (props: Props) => {
           >
             <Input
               // id={passwordInputId}
-              label={t('Derivation path')}
+              label={t('ui.Modal.DeriveAccountAction.derivationPath')}
               onChange={onSuriChange}
-              placeholder={t('Derivation path')}
+              placeholder={t('ui.Modal.DeriveAccountAction.derivationPath')}
             />
           </Form.Item>
           <div className='account-name-info'>
@@ -321,9 +321,9 @@ const Component: React.FC<Props> = (props: Props) => {
             >
               <Input
                 // id={passwordInputId}
-                label={t('Account name')}
+                label={t('ui.Modal.DeriveAccountAction.accountName')}
                 onChange={onAccountNameChange}
-                placeholder={t('Account name')}
+                placeholder={t('ui.Modal.DeriveAccountAction.accountName')}
                 suffix={(
                   <div className='__item-chain-types'>
                     <AccountChainTypeLogos chainTypes={chainTypes} />
@@ -347,7 +347,7 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               loading={loading}
             >
-              {t('Create account')}
+              {t('ui.Modal.DeriveAccountAction.createAccount')}
             </Button>
           </Form.Item>
         </Form>

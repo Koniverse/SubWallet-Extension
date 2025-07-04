@@ -109,7 +109,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           size='xs'
           type='ghost'
         >
-          <span className='max-btn-text'>{t('Max')}</span>
+          <span className='max-btn-text'>{t('ui.Field.AmountInput.max')}</span>
         </Button>
       )
       : (
@@ -245,7 +245,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       onKeyUp={onKeyUp}
       onPaste={onPaste}
       // onCopy={onPaste}
-      placeholder={props.placeholder || t('Amount')}
+      placeholder={props.placeholder || t('ui.Field.AmountInput.amount')}
       readOnly={props.readOnly}
       ref={inputRef}
       statusHelp={statusHelp}

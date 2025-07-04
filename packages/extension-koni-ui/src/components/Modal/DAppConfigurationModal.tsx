@@ -39,7 +39,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
         key: isAllowed ? 'block' : 'unblock',
         icon: isAllowed ? ShieldSlash : ShieldCheck,
         iconBackgroundColor: isAllowed ? token.colorError : token.colorSuccess,
-        title: isAllowed ? t('Block this site') : t('Unblock this site'),
+        title: isAllowed ? t('ui.Modal.DAppConfiguration.blockThisSite') : t('ui.Modal.DAppConfiguration.unblockThisSite'),
         onClick: () => {
           toggleAuthorization(authInfo.id)
             .then(({ list }) => {
@@ -53,7 +53,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
         key: 'forget-site',
         icon: X,
         iconBackgroundColor: token.colorWarning,
-        title: t('Forget this site'),
+        title: t('ui.Modal.DAppConfiguration.forgetThisSite'),
         onClick: () => {
           forgetSite(authInfo.id, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -67,7 +67,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'disconnect-all',
           icon: Plugs,
           iconBackgroundColor: token['gray-3'],
-          title: t('Disconnect all accounts'),
+          title: t('ui.Modal.DAppConfiguration.disconnectAllAccounts'),
           onClick: () => {
             changeAuthorization(false, authInfo.id, updateAuthUrls).catch(console.error);
             onCloseActionModal();
@@ -77,7 +77,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'connect-all',
           icon: PlugsConnected,
           iconBackgroundColor: token['green-6'],
-          title: t('Connect all accounts'),
+          title: t('ui.Modal.DAppConfiguration.connectAllAccounts'),
           onClick: () => {
             changeAuthorization(true, authInfo.id, updateAuthUrls).catch(console.error);
             onCloseActionModal();
@@ -90,7 +90,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'switch-network',
           icon: ArrowsLeftRight,
           iconBackgroundColor: token['geekblue-6'],
-          title: t('Switch network'),
+          title: t('ui.Modal.DAppConfiguration.switchNetwork'),
           onClick: () => {
             switchNetworkAuthorizeModal.open(
               {
@@ -115,7 +115,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
       className={`${className} action-modal`}
       id={modalId}
       onCancel={onCloseActionModal}
-      title={t('dApp configuration')}
+      title={t('ui.Modal.DAppConfiguration.dappConfiguration')}
     />
   );
 }

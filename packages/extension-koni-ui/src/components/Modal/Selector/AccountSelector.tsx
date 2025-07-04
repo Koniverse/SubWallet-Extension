@@ -248,7 +248,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
           onClick: onCancel
         }
         : undefined}
-      title={t('Select account')}
+      title={t('ui.Modal.Selector.Account.selectAccount')}
     >
       <Search
         autoFocus={true}

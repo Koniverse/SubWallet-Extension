@@ -136,7 +136,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           _isRelatedToAstar && (
             <div className={'__visit-dapp'}>
-              {t('View on dApp')}
+              {t('ui.Earning.PositionItem.viewOnDapp')}
             </div>
           )
         }

@@ -27,7 +27,7 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
 
 export function getWaitingTime (waitingTime: number, status: UnstakingStatus, t: TFunction) {
   if (status === UnstakingStatus.CLAIMABLE) {
-    return t('Available for withdrawal');
+    return t('ui.Transaction.helper.stakingHandler.availableForWithdrawal');
   } else {
     const waitingTimeInMs = waitingTime * 60 * 60 * 1000;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment

@@ -36,12 +36,12 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
     if (waitingTime !== undefined) {
       remainingTimestampMs = waitingTime * 60 * 60 * 1000;
     } else {
-      return t('Automatic withdrawal');
+      return t('ui.Transaction.helper.earningHandler.automaticWithdrawal');
     }
   }
 
   if (remainingTimestampMs <= 0) {
-    return t('Available for withdrawal');
+    return t('ui.Transaction.helper.earningHandler.availableForWithdrawal');
   } else {
     const remainingTimeHr = remainingTimestampMs / 1000 / 60 / 60;
 

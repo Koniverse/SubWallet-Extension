@@ -35,7 +35,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const renderChainSelected = useCallback((item: LedgerItemType) => {
     if (loading) {
       return (
-        <div className={'__loading-text'}>{t('Loading ...')}</div>
+        <div className={'__loading-text'}>{t('ui.Field.LedgerChainSelector.loadingEllipsis')}</div>
       );
     }
 
@@ -125,7 +125,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       label={label}
       loading={loading}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select chain')}
+      placeholder={placeholder || t('ui.Field.LedgerChainSelector.selectChain')}
       prefix={value !== '' && chainLogo}
       renderItem={renderItem}
       renderSelected={renderChainSelected}
@@ -135,7 +135,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       searchPlaceholder={t<string>('Network name')}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || label || placeholder || t('Select network')}
+      title={title || label || placeholder || t('ui.Field.LedgerChainSelector.selectNetwork')}
       tooltip={tooltip}
     />
   );

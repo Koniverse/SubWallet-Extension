@@ -266,7 +266,7 @@ export class BalanceService implements StoppableServiceInterface {
       setTimeout(() => {
         if (hasError) {
           unsub?.();
-          reject(new Error(t('Failed to get balance. Please check your internet connection or change your network endpoint')));
+          reject(new Error(t('bg.service.balance.failedToGetBalance')));
         }
       }, 9999);
     });

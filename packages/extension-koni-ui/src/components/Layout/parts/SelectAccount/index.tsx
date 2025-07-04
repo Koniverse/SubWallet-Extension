@@ -169,18 +169,18 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         if (isAllAccount) {
           return t('Connected {{connected}}/{{canConnect}}', { replace: { connected, canConnect } });
         } else {
-          return t('Connected');
+          return t('ui.Layout.SelectAccount.connected');
         }
 
       case ConnectionStatement.DISCONNECTED:
-        return t('Disconnected');
+        return t('ui.Layout.SelectAccount.disconnected');
 
       case ConnectionStatement.BLOCKED:
-        return t('Blocked');
+        return t('ui.Layout.SelectAccount.blocked');
 
       case ConnectionStatement.NOT_CONNECTED:
       default:
-        return t('Not connected');
+        return t('ui.Layout.SelectAccount.notConnected');
     }
   }, [canConnect, connected, connectionState, isAllAccount, t]);
 

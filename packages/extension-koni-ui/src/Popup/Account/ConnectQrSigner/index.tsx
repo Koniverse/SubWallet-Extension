@@ -70,7 +70,7 @@ const Component: React.FC<Props> = (props: Props) => {
       for (const account of accounts) {
         // todo: Recheck this logic with master account
         if (isSameAddress(account.address, scannedAccount.content)) {
-          return Promise.reject(new Error(t('Account already exists')));
+          return Promise.reject(new Error(t('ui.Account.ConnectQrSigner.accountAlreadyExists')));
         }
       }
     }
@@ -145,7 +145,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={onBack}
         rightFooterButton={{
-          children: loading ? t('Creating') : t('Scan QR code'),
+          children: loading ? t('ui.Account.ConnectQrSigner.creating') : t('ui.Account.ConnectQrSigner.scanQrCode'),
           icon: FooterIcon,
           onClick: openCamera,
           loading: loading

@@ -470,7 +470,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       if (maxString !== '0') {
         processValidation.message = t('Amount must be equal or less than {{number}}', { replace: { number: maxString } });
       } else {
-        processValidation.message = t('You need balance greater than 0 to continue');
+        processValidation.message = t('bg.service.earning.specialHandler.balanceGreaterThanZeroRequired');
       }
 
       return [new TransactionError(YieldValidationStatus.NOT_ENOUGH_BALANCE, processValidation.message, processValidation)];

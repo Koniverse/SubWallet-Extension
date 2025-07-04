@@ -196,7 +196,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       const processFunction = () => {
         copyToClipboard(item.address || '');
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.AccountProxy.list.ChainAddress.copiedToClipboard')
         });
       };
 

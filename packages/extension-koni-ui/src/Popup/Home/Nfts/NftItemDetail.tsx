@@ -70,7 +70,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       if (owner?.isReadOnly) {
         notify({
-          message: t('The NFT owner is a watch-only account, you cannot send the NFT with it'),
+          message: t('ui.Nfts.ItemDetail.nftOwnerIsWatchOnly'),
           type: 'info',
           duration: 3
         });
@@ -308,7 +308,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             />}
             onClick={onClickSend}
           >
-            <span className={'nft_item_detail__send_text'}>{t('Send')}</span>
+            <span className={'nft_item_detail__send_text'}>{t('ui.Nfts.ItemDetail.send')}</span>
           </Button>
         </div>
 

@@ -98,8 +98,8 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('Mainnet'), value: FilterOptionType.MAIN_NETWORK },
-    { label: t('Testnet'), value: FilterOptionType.TEST_NETWORK }
+    { label: t('ui.Earning.Entry.Options.mainnet'), value: FilterOptionType.MAIN_NETWORK },
+    { label: t('ui.Earning.Entry.Options.testnet'), value: FilterOptionType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -177,15 +177,15 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
     return () => {
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('Enter Astar portal'),
-          content: t('Navigate to Astar portal to view and manage your stake in Astar dApp staking v3'),
+          title: t('ui.Earning.Entry.Options.enterAstarPortal'),
+          content: t('ui.Earning.Entry.Options.navigateToAstarPortal'),
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.Earning.Entry.Options.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('Enter Astar portal'),
+            text: t('ui.Earning.Entry.Options.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -317,8 +317,8 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No earning option found')}
-        emptyTitle={t('Change your search and try again')}
+        emptyMessage={t('ui.Earning.Entry.Options.noEarningOptionFound')}
+        emptyTitle={t('ui.Earning.Entry.Options.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -387,14 +387,14 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
           showActionBtn
         />
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.Earning.Entry.Options.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.Earning.Entry.Options.filter')}
         />
       </Layout.Base>
     </ChainConnectionWrapper>

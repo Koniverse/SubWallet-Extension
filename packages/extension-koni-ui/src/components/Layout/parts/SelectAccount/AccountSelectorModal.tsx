@@ -148,7 +148,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('QR signer account')
+        groupLabel: t('ui.Layout.SelectAccount.Modal.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
@@ -157,7 +157,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('Watch-only account')
+        groupLabel: t('ui.Layout.SelectAccount.Modal.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -166,7 +166,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('Ledger account')
+        groupLabel: t('ui.Layout.SelectAccount.Modal.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -175,7 +175,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('ui.Layout.SelectAccount.Modal.injectedAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -184,7 +184,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('Unknown account')
+        groupLabel: t('ui.Layout.SelectAccount.Modal.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -350,7 +350,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: () => {
         navigate('/settings/account-settings');
       },
-      tooltip: t('Account settings'),
+      tooltip: t('ui.Layout.SelectAccount.Modal.accountSettings'),
       tooltipPlacement: 'topRight'
     };
   }, [navigate, t]);
@@ -374,7 +374,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           destroyTooltipOnHide={true}
           overlayClassName={CN('__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('Export and back up accounts')}
+          title={t('ui.Layout.SelectAccount.Modal.exportAndBackUpAccounts')}
         >
           <div>
             <Icon
@@ -417,7 +417,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightIconProps={rightIconProps}
         title={(
           <>
-            {t('Select account')}
+            {t('ui.Layout.SelectAccount.Modal.selectAccount')}
 
             {isPopupMode && (
               <Button

@@ -9,19 +9,19 @@ import { t } from 'i18next';
 // Todo: finish this map in the future
 const defaultErrorMap: Record<BalanceErrorType, { message: string, code?: number }> = {
   [BalanceErrorType.NETWORK_ERROR]: {
-    message: detectTranslate('Network is inactive. Please enable network'),
+    message: detectTranslate('bg.error.Balance.networkInactiveEnable'),
     code: undefined
   },
   [BalanceErrorType.TOKEN_ERROR]: {
-    message: detectTranslate('Token is not supported'),
+    message: detectTranslate('bg.error.Balance.tokenNotSupported'),
     code: undefined
   },
   [BalanceErrorType.TIMEOUT]: {
-    message: detectTranslate('Unable to get balance. Please re-enable the network'),
+    message: detectTranslate('bg.error.Balance.unableToGetBalanceReEnableNetwork'),
     code: undefined
   },
   [BalanceErrorType.GET_BALANCE_ERROR]: {
-    message: detectTranslate('Unable to get balance. Please re-enable the network'),
+    message: detectTranslate('bg.error.Balance.unableToGetBalanceReEnableNetwork'),
     code: undefined
   }
 };

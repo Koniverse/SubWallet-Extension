@@ -10,11 +10,11 @@ export const validWalletConnectUri = (data: string, t: TFunction): string | null
     const { topic, version } = parameters;
 
     if (version === 1) {
-      return t('Failed to connect. Please use Wallet Connect v2 on dApp');
+      return t('ui.util.scanner.walletConnect.failToConnectUseWcV2');
     }
 
     if (data.startsWith('wc:') && !topic) {
-      return t('Invalid URI');
+      return t('ui.util.scanner.walletConnect.invalidUri');
     }
   } catch (e) {
     console.error({ error: e });

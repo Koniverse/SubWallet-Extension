@@ -28,20 +28,20 @@ export function useSelectValidators (modalId: string, chain: string, maxCount: n
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('You can only choose {{number}} dApp');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseOneDapp');
         case 'Collator':
-          return detectTranslate('You can only choose {{number}} collator');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseOneCollator');
         case 'Validator':
-          return detectTranslate('You can only choose {{number}} validator');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseOneValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('You can only choose {{number}} dApps');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseNumberDapps');
         case 'Collator':
-          return detectTranslate('You can only choose {{number}} collators');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseNumberCollators');
         case 'Validator':
-          return detectTranslate('You can only choose {{number}} validators');
+          return detectTranslate('ui.hook.modal.useSelectValidators.canOnlyChooseNumberValidators');
       }
     }
   }, [chain, fewValidators]);

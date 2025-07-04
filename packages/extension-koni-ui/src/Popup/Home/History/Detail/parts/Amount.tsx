@@ -41,18 +41,18 @@ const Component: React.FC<Props> = (props: Props) => {
     switch (transactionType) {
       case ExtrinsicType.STAKING_BOND:
       case ExtrinsicType.STAKING_JOIN_POOL:
-        return t('Staking value');
+        return t('ui.History.Detail.Amount.stakingValue');
       case ExtrinsicType.STAKING_WITHDRAW:
       case ExtrinsicType.STAKING_POOL_WITHDRAW:
-        return t('Withdraw value');
+        return t('ui.History.Detail.Amount.withdrawValue');
       case ExtrinsicType.STAKING_UNBOND:
-        return t('Unstake value');
+        return t('ui.History.Detail.Amount.unstakeValue');
       case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
-        return t('Cancel unstake value');
+        return t('ui.History.Detail.Amount.cancelUnstakeValue');
       case ExtrinsicType.CROWDLOAN:
-        return t('Contribute balance');
+        return t('ui.History.Detail.Amount.contributeBalance');
       default:
-        return t('Amount');
+        return t('ui.History.Detail.Amount.amount');
     }
   }, [t, transactionType]);
 
@@ -126,14 +126,14 @@ const Component: React.FC<Props> = (props: Props) => {
       {isMint && amountDerivative && (
         <MetaInfo.Number
           decimals={0}
-          label={t('Estimated receivables')}
+          label={t('ui.History.Detail.Amount.estimatedReceivables')}
           suffix={derivativeSymbol}
           value={amountDerivative}
         />
       )}
       {data.additionalInfo && isNft && (
         <MetaInfo.Default
-          label={t('Collection Name')}
+          label={t('ui.History.Detail.Amount.collectionName')}
         >
           {(data.additionalInfo as TransactionAdditionalInfo[ExtrinsicType.SEND_NFT]).collectionName}
         </MetaInfo.Default>

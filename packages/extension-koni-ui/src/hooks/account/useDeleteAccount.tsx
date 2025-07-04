@@ -15,11 +15,11 @@ const useDeleteAccount = () => {
   const modalProps: SwModalFuncProps = useMemo(() => {
     return {
       closable: true,
-      content: t('You will no longer be able to access this account via this extension'),
+      content: t('ui.hook.account.useDeleteAccount.removeAccountAccessWarning'),
       id: modalId,
-      okText: t('Remove'),
-      subTitle: t('Remove this account?'),
-      title: t('Confirmation'),
+      okText: t('ui.hook.account.useDeleteAccount.remove'),
+      subTitle: t('ui.hook.account.useDeleteAccount.removeThisAccount'),
+      title: t('ui.hook.account.useDeleteAccount.confirmation'),
       type: 'error'
     };
   }, [t]);

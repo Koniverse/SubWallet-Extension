@@ -52,14 +52,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.Confirmations.Transaction.Bond.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.Confirmations.Transaction.Bond.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -67,8 +67,8 @@ const Component: React.FC<Props> = (props: Props) => {
       {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
-          title={t('TAO staking fee')}
+          description={t('ui.Confirmations.Transaction.Bond.taoStakingFeeInfo')}
+          title={t('ui.Confirmations.Transaction.Bond.taoStakingFee')}
           type='info'
         />
       )}

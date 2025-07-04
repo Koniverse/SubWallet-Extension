@@ -93,7 +93,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setReformatAddress('');
           setIsHideAccountNameInput(true);
 
-          return Promise.reject(t('Account already exists'));
+          return Promise.reject(t('ui.Account.AttachReadOnly.accountAlreadyExists'));
         }
       }
     } else {
@@ -101,7 +101,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       setIsHideAccountNameInput(true);
 
       if (value !== '') {
-        return Promise.reject(t('Invalid address'));
+        return Promise.reject(t('ui.Account.AttachReadOnly.invalidAddress'));
       }
     }
 
@@ -116,10 +116,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.Account.AttachReadOnly.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.Account.AttachReadOnly.accountNameInvalid'));
       }
     }
 
@@ -149,7 +149,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               } else if (error.message.toLowerCase().includes('account name already exists')) {
                 errorNameInputs.push(error.message);
               } else {
-                errorAddressInputs.push(t('Invalid address'));
+                errorAddressInputs.push(t('ui.Account.AttachReadOnly.invalidAddress'));
               }
             });
 
@@ -185,7 +185,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={onBack}
         rightFooterButton={{
-          children: t('Attach watch-only account'),
+          children: t('ui.Account.AttachReadOnly.attachWatchOnlyAccount'),
           icon: FooterIcon,
           disabled: isDisable,
           onClick: onSubmit,
@@ -201,7 +201,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       >
         <div className={CN('container')}>
           <div className='description'>
-            {t('Track the activity of any wallet without a private key')}
+            {t('ui.Account.AttachReadOnly.trackWalletActivity')}
           </div>
           <div className='page-icon'>
             <PageIcon
@@ -224,7 +224,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               name={fieldName}
               rules={[
                 {
-                  message: t('Account address is required'),
+                  message: t('ui.Account.AttachReadOnly.accountAddressRequired'),
                   required: true
                 },
                 {
@@ -235,7 +235,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               <AddressInput
                 id={modalId}
-                placeholder={t('Please type or paste account address')}
+                placeholder={t('ui.Account.AttachReadOnly.typeOrPasteAccountAddress')}
                 showScanner={true}
               />
             </Form.Item>
@@ -245,7 +245,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               hidden={isHideAccountNameInput}
               name={'name'}
               rules={[{
-                message: t('Account name is required'),
+                message: t('ui.Account.AttachReadOnly.accountNameRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -259,8 +259,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Input
                 className='__account-name-input'
                 disabled={loading}
-                label={t('Account name')}
-                placeholder={t('Enter the account name')}
+                label={t('ui.Account.AttachReadOnly.accountName')}
+                placeholder={t('ui.Account.AttachReadOnly.enterAccountName')}
               />
             </Form.Item>
           </Form>

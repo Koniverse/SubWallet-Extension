@@ -32,24 +32,24 @@ export function validateTransferRequest (tokenInfo: _ChainAsset, from: _Address,
 
   if (!transferAll) {
     if (value === undefined) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Transfer amount is required')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.transferAmountRequired')));
     }
   }
 
   if (!tokenInfo) {
-    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found token from registry')));
+    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.tokenNotFoundInRegistry')));
   }
 
   if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenEvmSmartContract(tokenInfo) && _getContractAddressOfToken(tokenInfo).length === 0) {
-    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found ERC20 address for this token')));
+    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.erc20AddressNotFound')));
   }
 
   if (isTonAddress(from) && isTonAddress(to) && _isTokenTonSmartContract(tokenInfo) && _getContractAddressOfToken(tokenInfo).length === 0) {
-    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found TEP74 address for this token')));
+    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.tep74AddressNotFound')));
   }
 
   if (isCardanoAddress(from) && isCardanoAddress(to) && _isCIP26Token(tokenInfo) && getCardanoAssetId(tokenInfo).length === 0) {
-    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found policy id of this token')));
+    errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.policyIdNotFound')));
   }
 
   return errors;
@@ -142,7 +142,7 @@ export function validateXcmTransferRequest (destTokenInfo: _ChainAsset | undefin
   const keypair = keyring.getPair(sender);
 
   if (!destTokenInfo) {
-    errors.push(new TransactionError(TransferTxErrorType.INVALID_TOKEN, t('Not found token from registry')));
+    errors.push(new TransactionError(TransferTxErrorType.INVALID_TOKEN, t('bg.validation.transfer.tokenNotFoundInRegistry')));
   }
 
   return [errors, keypair];
@@ -330,7 +330,7 @@ export function checkSupportForAction (validationResponse: SWTransactionResponse
   const blockedActionsList = Object.values(blockedActionsMap).flat();
 
   if (blockedActionsList.includes(currentAction)) {
-    validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature under maintenance. Try again later')));
+    validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.validation.transfer.featureUnderMaintenance')));
   }
 }
 
@@ -340,7 +340,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
 
   if (!transaction) {
     if (extrinsicType === ExtrinsicType.SEND_NFT) {
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('This feature is not yet available for this NFT')));
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.validation.transfer.featureNotAvailableForNft')));
     } else {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
@@ -451,19 +451,19 @@ export function checkSigningAccountForTransaction (validationResponse: SWTransac
   const pair = keyring.getPair(address);
 
   if (!pair) {
-    validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Unable to find account')));
+    validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.validation.transfer.unableToFindAccount')));
   } else {
     const accountJson = pairToAccount(pair, chainInfoMap);
 
     if (!accountJson.transactionActions.includes(extrinsicType)) { // check if the account can sign the transaction type
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('This feature is not available with this account')));
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.featureNotAvailableForAccount')));
     } else if (accountJson.specialChain && accountJson.specialChain !== chain) { // check if the account can only be used on a specific chain (for ledger legacy)
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('This feature is not available with this account')));
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.featureNotAvailableForAccount')));
     } else {
       const compatibleMap = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER].includes(accountJson.signMode) ? LEDGER_SIGNING_COMPATIBLE_MAP : SIGNING_COMPATIBLE_MAP;
 
       if (!compatibleMap[chainType].includes(accountJson.chainType)) { // check if the account chain type is compatible with the transaction chain type
-        validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('This feature is not available with this account')));
+        validationResponse.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.validation.transfer.featureNotAvailableForAccount')));
       }
     }
   }

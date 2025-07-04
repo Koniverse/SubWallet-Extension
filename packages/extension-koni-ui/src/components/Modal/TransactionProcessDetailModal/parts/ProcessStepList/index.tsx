@@ -34,7 +34,7 @@ const Component: FC<Props> = (props: Props) => {
     <div
       className={className}
     >
-      <div className='__heading'>{t('Transaction process')}</div>
+      <div className='__heading'>{t('ui.Modal.TxProcessDetail.StepList.transactionProcess')}</div>
 
       <div className='__step-list-container'>
         {

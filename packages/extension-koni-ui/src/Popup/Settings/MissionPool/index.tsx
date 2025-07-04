@@ -52,19 +52,19 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.Settings.MissionPool.all'),
         value: MissionTab.ALL
       },
       {
-        label: t('Defi'),
+        label: t('ui.Settings.MissionPool.defi'),
         value: MissionTab.DEFI
       },
       {
-        label: t('Meme'),
+        label: t('ui.Settings.MissionPool.meme'),
         value: MissionTab.MEME
       },
       {
-        label: t('Gaming'),
+        label: t('ui.Settings.MissionPool.gaming'),
         value: MissionTab.GAMING
       }
     ];
@@ -175,8 +175,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No mission found')}
-        emptyTitle={t('Your missions will show up here')}
+        emptyMessage={t('ui.Settings.MissionPool.noMissionFound')}
+        emptyTitle={t('ui.Settings.MissionPool.yourMissionsWillShowUpHere')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -212,7 +212,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-item'}
           onClickActionBtn={onClickActionBtn}
           onSearch={handleSearch}
-          placeholder={t('Campaign name...')}
+          placeholder={t('ui.Settings.MissionPool.campaignNamePlaceholder')}
           searchValue={searchInput}
           showActionBtn
         />
@@ -239,14 +239,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         />
       </div>
       <FilterModal
-        applyFilterButtonTitle={t('Apply filter')}
+        applyFilterButtonTitle={t('ui.Settings.MissionPool.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('ui.Settings.MissionPool.filter')}
       />
       <MissionDetailModal data={currentSelectItem} />
     </Layout.Base>

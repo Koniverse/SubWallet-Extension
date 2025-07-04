@@ -98,11 +98,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Saved contacts'),
+      label: t('ui.Settings.AddressBook.savedContacts'),
       value: AccountGroup.CONTACT
     },
     {
-      label: t('Recent'),
+      label: t('ui.Settings.AddressBook.recent'),
       value: AccountGroup.RECENT
     }
   ]), [t]);
@@ -136,10 +136,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AccountGroup.CONTACT:
-        groupLabel = t('Saved contacts');
+        groupLabel = t('ui.Settings.AddressBook.savedContacts');
         break;
       case AccountGroup.RECENT:
-        groupLabel = t('Recent');
+        groupLabel = t('ui.Settings.AddressBook.recent');
         break;
     }
 
@@ -196,7 +196,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={goBack}
         subHeaderIcons={subHeaderIcons}
-        title={t('Manage address book')}
+        title={t('ui.Settings.AddressBook.manageAddressBook')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -235,7 +235,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.Settings.AddressBook.filter')}
         />
         <AddContactModal />
         {selectedItem && <EditContactModal addressJson={selectedItem} />}

@@ -113,7 +113,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
     inactiveModal(tonWalletContractSelectorModalId);
   }, [inactiveModal]);
 
-  const onClickCopyButton = useCallback(() => notify({ message: t('Copied to clipboard') }), [notify, t]);
+  const onClickCopyButton = useCallback(() => notify({ message: t('ui.Modal.Global.AddressQr.copiedToClipboard') }), [notify, t]);
 
   const tonWalletContactSelectorButtonProps = useMemo<ButtonProps>(() => {
     return {
@@ -124,7 +124,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
       ),
       type: 'ghost',
       onClick: onChangeTonWalletContact,
-      tooltip: t('Click to change wallet address'),
+      tooltip: t('ui.Modal.Global.AddressQr.clickToChangeWalletAddress'),
       tooltipPlacement: 'topRight'
     };
   }, [onChangeTonWalletContact, t]);
@@ -159,7 +159,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                 />
               }
               onClick={handleClickViewOnExplorer}
-            >{t('View on explorer')}</Button>
+            >{t('ui.Modal.Global.AddressQr.viewOnExplorer')}</Button>
           )
           : (
             <Button
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               }
               onClick={onGoHome}
               schema={'secondary'}
-            >{t('Back to home')}</Button>
+            >{t('ui.Modal.Global.AddressQr.backToHome')}</Button>
           )}
         id={modalId}
         onCancel={onBack || onCancel}
@@ -278,7 +278,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                   }
                   onClick={onClickCopyButton}
                   size='xs'
-                  tooltip={t('Copy address')}
+                  tooltip={t('ui.Modal.Global.AddressQr.copyAddress')}
                   type='ghost'
                 />
               </CopyToClipboard>

@@ -216,7 +216,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         )}
         id={id}
         onCancel={onBack}
-        title={t('Export account')}
+        title={t('ui.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}

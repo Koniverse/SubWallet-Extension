@@ -135,7 +135,7 @@ const Component: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (isOpenAlert) {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.Confirmations.Sign.Substrate.payAttentionExclamation'),
         type: NotificationType.WARNING,
         content: (
           <Trans
@@ -152,7 +152,7 @@ const Component: React.FC<Props> = (props: Props) => {
             values={{ networkName }}
           />),
         okButton: {
-          text: t('I understand'),
+          text: t('ui.Confirmations.Sign.Substrate.iUnderstand'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: closeAlert
@@ -169,7 +169,7 @@ const Component: React.FC<Props> = (props: Props) => {
         if (requireMetadata) {
           return {
             type: 'error',
-            title: t('Error!'),
+            title: t('ui.Confirmations.Sign.Substrate.errorExclamation'),
             description: (
               <Trans
                 components={{
@@ -192,8 +192,8 @@ const Component: React.FC<Props> = (props: Props) => {
           if (requireMetadata && isMissingData && !addExtraData) {
             return {
               type: 'error',
-              title: t('Error!'),
-              description: t('Unable to sign this transaction on Ledger because the dApp is out of date')
+              title: t('ui.Confirmations.Sign.Substrate.errorExclamation'),
+              description: t('ui.Confirmations.Sign.Substrate.unableToSignLedgerDappOutOfDate')
             };
           }
 
@@ -203,7 +203,7 @@ const Component: React.FC<Props> = (props: Props) => {
             if (NotNeedMigrationGens.includes(gens)) {
               return {
                 type: 'info',
-                title: t('Helpful tip'),
+                title: t('ui.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
             } else {
               return {
                 type: 'info',
-                title: t('Helpful tip'),
+                title: t('ui.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -245,7 +245,7 @@ const Component: React.FC<Props> = (props: Props) => {
           if (signMode === AccountSignMode.GENERIC_LEDGER) {
             return {
               type: 'error',
-              title: t('Error!'),
+              title: t('ui.Confirmations.Sign.Substrate.errorExclamation'),
               description: t('Unable to sign this transaction on Ledger because the {{networkName}} network is out of date', { replace: { networkName } })
             };
           }
@@ -433,7 +433,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('Transaction expired'),
+          message: t('ui.Confirmations.Sign.Substrate.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -523,7 +523,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.Confirmations.Sign.Substrate.cancel')}
         </Button>
         <Button
           disabled={showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
@@ -538,10 +538,10 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           {
             !isLedger
-              ? t('Approve')
+              ? t('ui.Confirmations.Sign.Substrate.approve')
               : !isLedgerConnected
-                ? t('Refresh')
-                : t('Approve')
+                ? t('ui.Confirmations.Sign.Substrate.refresh')
+                : t('ui.Confirmations.Sign.Substrate.approve')
           }
         </Button>
         {

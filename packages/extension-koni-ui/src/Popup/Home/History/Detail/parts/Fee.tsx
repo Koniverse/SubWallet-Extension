@@ -32,7 +32,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <>
         <MetaInfo.Number
           decimals={fee?.decimals || undefined}
-          label={t('Origin Chain fee')}
+          label={t('ui.History.Detail.Fee.originChainFee')}
           suffix={fee?.symbol || undefined}
           value={fee?.value || '0'}
         />
@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <MetaInfo.Number
       decimals={fee?.decimals || undefined}
-      label={t('Network fee')}
+      label={t('ui.History.Detail.Fee.networkFee')}
       suffix={fee?.symbol || undefined}
       value={fee?.value || '0'}
     />

@@ -32,10 +32,10 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </div>
       <div className='title'>
-        {t('All done!')}
+        {t('ui.Keyring.ApplyMasterPassword.Done.allDone')}
       </div>
       <div className='description'>
-        {t('You have successfully updated master password to all accounts')}
+        {t('ui.Keyring.ApplyMasterPassword.Done.masterPasswordUpdatedForAllAccounts')}
       </div>
       <div className='account-container'>
         {accounts.slice(0, 2).map((account) => (

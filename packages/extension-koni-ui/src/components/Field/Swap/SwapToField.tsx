@@ -56,7 +56,7 @@ const Component = (props: Props) => {
   return (
     <div className={CN(className, 'swap-to-field')}>
       <div className={'__label-wrapper'}>
-        <div className='__label'>{label || t('To')}</div>
+        <div className='__label'>{label || t('ui.Swap.SwapToField.to')}</div>
       </div>
       <div className='__input-container'>
         <div className={'__token-selector-wrapper'}>

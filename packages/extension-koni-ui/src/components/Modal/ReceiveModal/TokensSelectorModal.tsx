@@ -151,7 +151,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       className={`${className} chain-selector-modal`}
       id={modalId}
       onCancel={onCancel}
-      title={t('Select token')}
+      title={t('ui.Modal.Receive.TokensSelector.selectToken')}
     >
       <SwList.Section
         enableSearchInput={true}

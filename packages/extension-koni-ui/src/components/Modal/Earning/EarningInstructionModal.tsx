@@ -441,11 +441,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.Modal.Earning.Instruction.payAttentionExclamation'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -556,7 +556,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={closeModal}
           schema={'secondary'}
         >
-          {isShowStakeMoreButton ? t('Back') : t('Close')}
+          {isShowStakeMoreButton ? t('ui.Modal.Earning.Instruction.back') : t('ui.Modal.Earning.Instruction.close')}
         </Button>
 
         {isShowStakeMoreButton && (

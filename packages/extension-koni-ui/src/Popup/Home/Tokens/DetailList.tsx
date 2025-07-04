@@ -310,7 +310,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -352,7 +352,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -540,7 +540,7 @@ function Component (): React.ReactElement {
                   }}
                   i18nKey={("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
                 />}
-                title={t('Change wallet address & version')}
+                title={t('ui.Tokens.DetailList.changeWalletAddressAndVersion')}
                 type={'warning'}
               />
               {!!filteredAccountList.length && (

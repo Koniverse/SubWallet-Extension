@@ -40,30 +40,30 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
     };
 
     if (type === AccountProxyType.ALL_ACCOUNT) {
-      result.label = t('All account');
+      result.label = t('ui.AccountProxy.TypeTag.allAccount');
       result.icon.phosphorIcon = CirclesThreePlus;
     } else if (type === AccountProxyType.SOLO) {
       result.color = 'blue';
-      result.label = t('Solo account');
+      result.label = t('ui.AccountProxy.TypeTag.soloAccount');
       result.icon.phosphorIcon = GitCommit;
     } else if (type === AccountProxyType.UNIFIED) {
       result.color = 'success';
-      result.label = t('Unified account');
+      result.label = t('ui.AccountProxy.TypeTag.unifiedAccount');
       result.icon.phosphorIcon = Strategy;
     } else if (type === AccountProxyType.QR) {
-      result.label = t('QR signer account');
+      result.label = t('ui.AccountProxy.TypeTag.qrSignerAccount');
       result.icon.phosphorIcon = QrCode;
     } else if (type === AccountProxyType.LEDGER) {
-      result.label = t('Ledger account');
+      result.label = t('ui.AccountProxy.TypeTag.ledgerAccount');
       result.icon.phosphorIcon = Swatches;
     } else if (type === AccountProxyType.READ_ONLY) {
-      result.label = t('Watch-only account');
+      result.label = t('ui.AccountProxy.TypeTag.watchOnlyAccount');
       result.icon.phosphorIcon = Eye;
     } else if (type === AccountProxyType.INJECTED) {
-      result.label = t('injected account');
+      result.label = t('ui.AccountProxy.TypeTag.injectedAccount');
       result.icon.phosphorIcon = Needle;
     } else if (type === AccountProxyType.UNKNOWN) {
-      result.label = t('Unknown account');
+      result.label = t('ui.AccountProxy.TypeTag.unknownAccount');
       result.icon.phosphorIcon = Question;
     }
 

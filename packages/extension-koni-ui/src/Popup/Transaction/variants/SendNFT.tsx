@@ -230,8 +230,8 @@ const Component: React.FC = () => {
             <AddressInputNew
               chainSlug={chain}
               dropdownHeight={227}
-              label={t('Send to')}
-              placeholder={t('Account address')}
+              label={t('ui.Transaction.SendNFT.sendTo')}
+              placeholder={t('ui.Transaction.SendNFT.accountAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -242,7 +242,7 @@ const Component: React.FC = () => {
             <ChainSelector
               disabled={true}
               items={chainInfo ? [{ name: chainInfo.name, slug: chainInfo.slug }] : []}
-              label={t('Network')}
+              label={t('ui.Transaction.SendNFT.network')}
               value={collectionInfo.chain}
             />
           </Form.Item>
@@ -251,7 +251,7 @@ const Component: React.FC = () => {
         <FreeBalance
           address={from}
           chain={chain}
-          label={t('Sender transferable balance')}
+          label={t('ui.Transaction.SendNFT.senderTransferableBalance')}
           onBalanceReady={setIsBalanceReady}
         />
       </TransactionContent>
@@ -269,7 +269,7 @@ const Component: React.FC = () => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.SEND_NFT)}
         >
-          {t('Next')}
+          {t('ui.Transaction.SendNFT.next')}
         </Button>
       </TransactionFooter>
     </>

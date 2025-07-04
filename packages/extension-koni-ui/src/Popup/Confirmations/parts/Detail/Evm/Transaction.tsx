@@ -75,14 +75,14 @@ const Component: React.FC<Props> = (props: Props) => {
       <>
         <MetaInfo.Default
           className='method-name'
-          label={t('Method')}
+          label={t('ui.Confirmations.Detail.Evm.Transaction.method')}
           labelAlign='top'
         >
           {data.methodName}
         </MetaInfo.Default>
         <MetaInfo.Data
           className='arg-container'
-          label={t('Arguments')}
+          label={t('ui.Confirmations.Detail.Evm.Transaction.arguments')}
         >
           {
             data.args.map((value) => handlerRenderArg(value, ''))
@@ -117,10 +117,10 @@ const Component: React.FC<Props> = (props: Props) => {
           '-no-account-name-item': !recipient?.name || !accountName
         })}
         recipientAddress={recipient?.address || request.to || ''}
-        recipientLabel={t('To')}
+        recipientLabel={t('ui.Confirmations.Detail.Evm.Transaction.to')}
         recipientName={recipient?.name || ''}
         senderAddress={address}
-        senderLabel={t('From')}
+        senderLabel={t('ui.Confirmations.Detail.Evm.Transaction.from')}
         senderName={accountName || ''}
       />
       {
@@ -128,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
         (
           <MetaInfo.Number
             decimals={chainInfo?.evmInfo?.decimals}
-            label={t('Amount')}
+            label={t('ui.Confirmations.Detail.Evm.Transaction.amount')}
             suffix={chainInfo?.evmInfo?.symbol}
             value={amount}
           />
@@ -136,7 +136,7 @@ const Component: React.FC<Props> = (props: Props) => {
       }
       <MetaInfo.Number
         decimals={chainInfo?.evmInfo?.decimals}
-        label={t('Estimate gas')}
+        label={t('ui.Confirmations.Detail.Evm.Transaction.estimateGas')}
         suffix={chainInfo?.evmInfo?.symbol}
         value={request.estimateGas}
       />
@@ -144,7 +144,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {
         (request.data && request.data !== '0x') &&
           (
-            <MetaInfo.Data label={t('Hex data')}>
+            <MetaInfo.Data label={t('ui.Confirmations.Detail.Evm.Transaction.hexData')}>
               <details>
                 <summary>{request.data}</summary>
               </details>

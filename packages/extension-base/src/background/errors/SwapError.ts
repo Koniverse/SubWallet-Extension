@@ -7,52 +7,52 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 
 const defaultErrorMap: Record<SwapErrorType, { message: string, code?: number }> = {
   ERROR_FETCHING_QUOTE: {
-    message: detectTranslate('No swap quote found. Change your network endpoint or adjust amount and try again'),
+    message: detectTranslate('bg.error.Swap.noSwapQuoteFound'),
     code: undefined
   },
   NOT_MEET_MIN_SWAP: {
-    message: detectTranslate('Amount too low. Increase your amount and try again'),
+    message: detectTranslate('bg.error.Swap.amountTooLow'),
     code: undefined
   },
   QUOTE_TIMEOUT: {
-    message: detectTranslate('Quote timeout'),
+    message: detectTranslate('bg.error.Swap.quoteTimeout'),
     code: undefined
   },
   UNKNOWN: {
-    message: detectTranslate('Undefined error. Check your Internet connection or contact support'),
+    message: detectTranslate('bg.error.Swap.undefinedErrorCheckConnection'),
     code: undefined
   },
   ASSET_NOT_SUPPORTED: {
-    message: detectTranslate('This swap pair is not supported'),
+    message: detectTranslate('bg.error.Swap.swapPairNotSupported'),
     code: undefined
   },
   INVALID_RECIPIENT: {
-    message: detectTranslate('Invalid recipient'),
+    message: detectTranslate('bg.error.Swap.invalidRecipient'),
     code: undefined
   },
   SWAP_EXCEED_ALLOWANCE: {
-    message: detectTranslate('You cannot swap all your balance. Lower your amount and try again'),
+    message: detectTranslate('bg.error.Swap.cannotSwapAllBalance'),
     code: undefined
   },
   SWAP_NOT_ENOUGH_BALANCE: {
-    message: detectTranslate('You must deposit more funds to swap'),
+    message: detectTranslate('bg.error.Swap.depositMoreFundsToSwap'),
     code: undefined
   },
   NOT_ENOUGH_LIQUIDITY: {
-    message: detectTranslate('Insufficient liquidity to complete the swap. Lower your amount and try again'),
+    message: detectTranslate('bg.error.Swap.insufficientLiquidity'),
     code: undefined
   },
   AMOUNT_CANNOT_BE_ZERO: {
-    message: detectTranslate('Amount must be greater than 0'),
+    message: detectTranslate('bg.error.Swap.amountMustBeGreaterThanZero'),
     code: undefined
   },
   MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT: {
-    message: detectTranslate('Insufficient liquidity to complete the swap. Lower your amount and try again'),
+    message: detectTranslate('bg.error.Swap.insufficientLiquidity'),
     code: undefined
   },
   NOT_MEET_MIN_EXPECTED: {
     // TODO: update message
-    message: detectTranslate('Unable to process this swap at the moment. Try again later'),
+    message: detectTranslate('bg.error.Swap.unableToProcessSwap'),
     code: undefined
   }
 };

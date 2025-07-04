@@ -69,7 +69,7 @@ export default abstract class BaseLiquidStakingPoolHandler extends BaseSpecialSt
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0'))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.service.earning.liquidStaking.amountMustBeGreaterThanZero'))];
     }
 
     if (bnAmount.lt(minUnstake)) {

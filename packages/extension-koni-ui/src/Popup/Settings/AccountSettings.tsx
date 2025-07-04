@@ -78,7 +78,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: Strategy,
           leftIconBgColor: token.colorPrimary,
           rightIcon: CaretRight,
-          title: t('Migrate to unified account'),
+          title: t('ui.Settings.Account.migrateToUnifiedAccount'),
           onClick: () => {
             navigate('/migrate-account');
           }
@@ -88,7 +88,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: CornersOut,
           leftIconBgColor: token['volcano-6'],
           rightIcon: CaretRight,
-          title: t('Split unified account'),
+          title: t('ui.Settings.Account.splitUnifiedAccount'),
           onClick: () => {
             notify({
               message: 'Coming soon!'
@@ -103,7 +103,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <PageWrapper className={`account-settings ${className}`}>
       <Layout.WithSubHeaderOnly
         onBack={goBack}
-        title={t('Account settings')}
+        title={t('ui.Settings.Account.accountSettings')}
       >
         <div className={'__scroll-container'}>
           {

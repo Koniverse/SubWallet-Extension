@@ -317,7 +317,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             console.error(e);
 
             notify({
-              message: t('Create buy order fail')
+              message: t('ui.BuyTokens.createBuyOrderFail')
             });
           }
         })
@@ -399,7 +399,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Buy token')}
+          title={t('ui.BuyTokens.buyToken')}
         />
         <div className={'__scroll-container'}>
           <div className='__buy-icon-wrapper'>
@@ -428,8 +428,8 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 <ServiceSelector
                   disabled={!selectedTokenSlug}
                   items={serviceItems}
-                  placeholder={t('Select supplier')}
-                  title={t('Select supplier')}
+                  placeholder={t('ui.BuyTokens.selectSupplier')}
+                  title={t('ui.BuyTokens.selectSupplier')}
                 />
               </Form.Item>
             </div>
@@ -442,14 +442,14 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             >
               <AccountAddressSelector
                 items={accountAddressItems}
-                label={`${t('To')}:`}
+                label={`${t('ui.BuyTokens.to')}:`}
                 labelStyle={'horizontal'}
               />
             </Form.Item>
           </Form>
 
           <div className={'common-text __note'}>
-            {t('You will be directed to the chosen supplier to complete this transaction')}
+            {t('ui.BuyTokens.directedToSupplierToComplete')}
           </div>
         </div>
 
@@ -465,7 +465,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             loading={loading}
             onClick={onClickNext}
           >
-            {t('Buy now')}
+            {t('ui.BuyTokens.buyNow')}
           </Button>
         </div>
         <SwModal
@@ -483,7 +483,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 onClick={onReject}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('ui.BuyTokens.cancel')}
               </Button>
               <Button
                 block={true}
@@ -495,13 +495,13 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 )}
                 onClick={onApprove}
               >
-                {t('Agree')}
+                {t('ui.BuyTokens.agree')}
               </Button>
             </>
           )}
           id={modalId}
           onCancel={onReject}
-          title={t('Disclaimer')}
+          title={t('ui.BuyTokens.disclaimer')}
         >
           <Trans
             components={{

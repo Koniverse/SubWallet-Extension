@@ -100,7 +100,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
     if (!accountProxies[proxyId]) {
       const pair = keyring.getPair(proxyId);
 
-      assert(pair, t('Unable to find account'));
+      assert(pair, t('bg.keyring.handler.Modify.unableToFindAccount'));
 
       keyring.saveAccountMeta(pair, { ...pair.meta, name });
     } else {
@@ -113,7 +113,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
       for (const address of addresses) {
         const pair = keyring.getPair(address);
 
-        assert(pair, t('Unable to find account'));
+        assert(pair, t('bg.keyring.handler.Modify.unableToFindAccount'));
 
         keyring.saveAccountMeta(pair, { ...pair.meta, name });
       }
@@ -277,7 +277,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
     const childPairs = pairs.filter((pair) => pair.meta.parentAddress === oldAddress);
 
     for (const childPair of childPairs) {
-      assert(pair, t('Unable to find account'));
+      assert(pair, t('bg.keyring.handler.Modify.unableToFindAccount'));
 
       keyring.saveAccountMeta(childPair, { ...childPair.meta, parentAddress: newAddress });
     }

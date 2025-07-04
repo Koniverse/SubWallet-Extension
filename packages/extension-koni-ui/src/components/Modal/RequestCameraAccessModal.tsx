@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <SwModal
       id={modalId}
       onCancel={closeModal}
-      title={t('Cannot scan')}
+      title={t('ui.Modal.RequestCameraAccess.cannotScan')}
       wrapClassName={CN(className)}
     >
       <div className='body-container'>
@@ -48,11 +48,11 @@ const Component: React.FC<Props> = (props: Props) => {
             size='sm'
           />
           <div className='title'>
-            {t('Your camera is not available')}
+            {t('ui.Modal.RequestCameraAccess.cameraNotAvailable')}
           </div>
         </div>
         <div className='description'>
-          {t('Please allow camera access to continue')}
+          {t('ui.Modal.RequestCameraAccess.allowCameraAccessToContinue')}
         </div>
         <Button
           block={true}
@@ -63,7 +63,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onClick}
         >
-          {t('Go to Setting')}
+          {t('ui.Modal.RequestCameraAccess.goToSetting')}
         </Button>
       </div>
     </SwModal>

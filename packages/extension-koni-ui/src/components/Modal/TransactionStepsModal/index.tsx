@@ -29,14 +29,14 @@ const Component: FC<Props> = (props: Props) => {
 
   const modalTitle = useMemo(() => {
     if (type === ProcessType.SWAP) {
-      return t('Swap process');
+      return t('ui.Modal.TransactionSteps.swapProcess');
     }
 
     if (type === ProcessType.EARNING) {
-      return t('Stake process');
+      return t('ui.Modal.TransactionSteps.stakeProcess');
     }
 
-    return t('Process');
+    return t('ui.Modal.TransactionSteps.process');
   }, [t, type]);
 
   const ItemComponent = variant === 'standard' ? TransactionProcessStepItem : TransactionProcessStepSimpleItem;
@@ -50,7 +50,7 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('Close')}
+          {t('ui.Modal.TransactionSteps.close')}
         </Button>
       )}
       id={modalId}

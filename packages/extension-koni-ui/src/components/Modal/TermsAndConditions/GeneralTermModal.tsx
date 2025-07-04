@@ -64,7 +64,7 @@ const Component = ({ className, onOk }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('Terms of Use')}
+      title={t('ui.Modal.Terms.General.termsOfUseTitle')}
     >
       <div
         className={'term-body'}
@@ -102,9 +102,9 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('Continue')}
+            {t('ui.Modal.Terms.General.continue')}
           </Button>
-          <span className={'term-footer-annotation'}>{t('Scroll to read all sections')}</span>
+          <span className={'term-footer-annotation'}>{t('ui.Modal.Terms.General.scrollToReadAll')}</span>
         </div>
 
       </div>

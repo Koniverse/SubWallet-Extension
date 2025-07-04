@@ -37,7 +37,7 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
             />
           </>
         }
-        title={t('New address format')}
+        title={t('ui.AlertBoxInstant.newAddressFormat')}
         type={'info'}
       />
     );

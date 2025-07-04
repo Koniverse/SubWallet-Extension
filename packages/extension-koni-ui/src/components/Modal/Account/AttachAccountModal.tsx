@@ -89,28 +89,28 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       backgroundColor: token['orange-7'],
       icon: Swatches,
       key: 'connect-ledger',
-      label: t('Connect a Ledger device'),
+      label: t('ui.Modal.Account.Attach.connectLedgerDevice'),
       onClick: onClickLedger
     },
     {
       backgroundColor: token['magenta-7'],
       icon: QrCode,
       key: 'connect-polkadot-vault',
-      label: t('Connect a Polkadot Vault account'),
+      label: t('ui.Modal.Account.Attach.connectPolkadotVaultAccount'),
       onClick: onClickItem('accounts/connect-polkadot-vault')
     },
     {
       backgroundColor: token['blue-7'],
       icon: DeviceTabletCamera,
       key: 'connect-keystone',
-      label: t('Connect a Keystone device'),
+      label: t('ui.Modal.Account.Attach.connectKeystoneDevice'),
       onClick: onClickItem('accounts/connect-keystone')
     },
     {
       backgroundColor: token['green-7'],
       icon: Eye,
       key: 'attach-read-only',
-      label: t('Attach a watch-only account'),
+      label: t('ui.Modal.Account.Attach.attachWatchOnlyAccount'),
       onClick: onClickItem('accounts/attach-read-only')
     }
   ]), [t, token, onClickItem, onClickLedger]);

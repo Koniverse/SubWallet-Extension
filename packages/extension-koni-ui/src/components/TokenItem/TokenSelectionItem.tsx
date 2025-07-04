@@ -48,7 +48,7 @@ const Component = (props: Props) => {
     onPreCopy?.()
       .then(() => {
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.TokenItem.Selection.copiedToClipboard')
         });
         copyToClipboard(formattedAddress);
         onClickCopyBtn && onClickCopyBtn();
@@ -60,7 +60,7 @@ const Component = (props: Props) => {
     e.stopPropagation();
 
     notify({
-      message: t('Copied to clipboard')
+      message: t('ui.TokenItem.Selection.copiedToClipboard')
     });
     onClickCopyBtn && onClickCopyBtn();
   }, [notify, onClickCopyBtn, t]);
@@ -108,7 +108,7 @@ const Component = (props: Props) => {
                       }
                       onClick={_onClickCopyBtnAsync}
                       size='xs'
-                      tooltip={t('Copy address')}
+                      tooltip={t('ui.TokenItem.Selection.copyAddress')}
                       type='ghost'
                     />
                   )
@@ -123,7 +123,7 @@ const Component = (props: Props) => {
                         }
                         onClick={_onCLickCopyBtn}
                         size='xs'
-                        tooltip={t('Copy address')}
+                        tooltip={t('ui.TokenItem.Selection.copyAddress')}
                         type='ghost'
                       />
                     </CopyToClipboard>
@@ -139,7 +139,7 @@ const Component = (props: Props) => {
                 }
                 onClick={onClickQrBtn}
                 size='xs'
-                tooltip={t('Show QR code')}
+                tooltip={t('ui.TokenItem.Selection.showQrCode')}
                 type='ghost'
               />
             </>

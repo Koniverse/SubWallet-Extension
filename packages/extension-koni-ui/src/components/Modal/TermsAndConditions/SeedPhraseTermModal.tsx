@@ -44,8 +44,8 @@ const Component = ({ className }: Props) => {
   const ListTermSeedPhrase: Record<TermSeedPhrase, string> = useMemo(() => ({
     [TermSeedPhrase.TERM_1]: t('SubWallet doesn\'t keep any copy of your seed phrase and other backup methods such as JSON file or private key.'),
     [TermSeedPhrase.TERM_2]: t('SubWallet can\'t help you recover your account once your seed phrase, JSON file or private key is lost.'),
-    [TermSeedPhrase.TERM_3]: t('You must write down your seed phrase in the correct order. It is recommended that you store it in a secure offline location.'),
-    [TermSeedPhrase.TERM_4]: t('You are NOT recommended to download and store your seed phrase in a digital device.')
+    [TermSeedPhrase.TERM_3]: t('ui.Modal.Terms.SeedPhrase.writeSeedPhraseInOrder'),
+    [TermSeedPhrase.TERM_4]: t('ui.Modal.Terms.SeedPhrase.doNotStoreSeedDigitally')
   }), [t]);
 
   const ListTermItem: TermSeedPhrase[] = useMemo(() => [TermSeedPhrase.TERM_1, TermSeedPhrase.TERM_2, TermSeedPhrase.TERM_3, TermSeedPhrase.TERM_4], []);
@@ -100,8 +100,8 @@ const Component = ({ className }: Props) => {
 
   const subTitle = useMemo(() => {
     return useDefaultContent
-      ? t('Tap on all checkboxes to confirm you understand the importance of your seed phrase')
-      : t('This seed phrase creates a unified account that can be used for Polkadot, Ethereum, TON, Cardano & Bitcoin ecosystems. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.');
+      ? t('ui.Modal.Terms.SeedPhrase.confirmSeedPhraseImportance')
+      : t('ui.Modal.Terms.SeedPhrase.seedPhraseAccount');
   }, [useDefaultContent, t]);
 
   return (
@@ -109,7 +109,7 @@ const Component = ({ className }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('Keep your seed phrase safe')}
+      title={t('ui.Modal.Terms.SeedPhrase.keepYourSeedPhraseSafe')}
     >
       <div
         className={'term-body'}
@@ -142,7 +142,7 @@ const Component = ({ className }: Props) => {
           )}
           onClick={onConfirm}
         >
-          {t('Continue')}
+          {t('ui.Modal.Terms.SeedPhrase.continue')}
         </Button>
       </div>
     </SwModal>

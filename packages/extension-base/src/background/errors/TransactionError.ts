@@ -10,51 +10,51 @@ import { SWError } from './SWError';
 // Todo: finish this map in the future
 const defaultErrorMap = {
   NOT_ENOUGH_BALANCE: {
-    message: detectTranslate('Insufficient balance'),
+    message: detectTranslate('bg.error.Transaction.insufficientBalance'),
     code: undefined
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.error.Transaction.networkIsDisconnected'),
     code: undefined
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.error.Transaction.undefinedErrorContactSupport'),
     code: undefined
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.error.Transaction.undefinedErrorContactSupport'),
     code: undefined
   },
   DUPLICATE_TRANSACTION: {
-    message: detectTranslate('Another transaction is in queue. Please try again later'),
+    message: detectTranslate('bg.error.Transaction.transactionInQueue'),
     code: undefined
   },
   UNABLE_TO_SIGN: {
-    message: detectTranslate('Unable to sign'),
+    message: detectTranslate('bg.error.Transaction.unableToSign'),
     code: undefined
   },
   USER_REJECT_REQUEST: {
-    message: detectTranslate('Rejected by user'),
+    message: detectTranslate('bg.error.Transaction.rejectedByUser'),
     code: undefined
   },
   UNABLE_TO_SEND: {
-    message: detectTranslate('Unable to send'),
+    message: detectTranslate('bg.error.Transaction.unableToSend'),
     code: undefined
   },
   SEND_TRANSACTION_FAILED: {
-    message: detectTranslate('Send transaction failed'),
+    message: detectTranslate('bg.error.Transaction.sendTransactionFailed'),
     code: undefined
   },
   NOT_ENOUGH_EXISTENTIAL_DEPOSIT: {
-    message: detectTranslate('Insufficient balance to cover existential deposit. Please decrease the transaction amount or increase your current balance'),
+    message: detectTranslate('bg.error.Transaction.insufficientBalanceForExistentialDeposit'),
     code: undefined
   },
   [BasicTxErrorType.UNSUPPORTED]: {
-    message: detectTranslate('This feature is not available with this token'),
+    message: detectTranslate('bg.error.Transaction.featureNotAvailableForToken'),
     code: undefined
   },
   [BasicTxErrorType.TIMEOUT]: {
-    message: detectTranslate('Transaction timeout'),
+    message: detectTranslate('bg.error.Transaction.transactionTimeout'),
     code: undefined
   },
   [StakingTxErrorType.NOT_ENOUGH_MIN_STAKE]: {
@@ -70,39 +70,39 @@ const defaultErrorMap = {
     code: undefined
   },
   [StakingTxErrorType.INVALID_ACTIVE_STAKE]: {
-    message: detectTranslate('Invalid. If you unstake this amount your active stake would fall below minimum active threshold'),
+    message: detectTranslate('bg.error.Transaction.invalidUnstakeBelowMinimum'),
     code: undefined
   },
   [StakingTxErrorType.EXCEED_MAX_UNSTAKING]: {
-    message: detectTranslate('You reached the maximum number of unstake requests'),
+    message: detectTranslate('bg.error.Transaction.maxUnstakeRequestsReached'),
     code: undefined
   },
   [StakingTxErrorType.INACTIVE_NOMINATION_POOL]: {
-    message: detectTranslate('Invalid. Inactive nomination pool'),
+    message: detectTranslate('bg.error.Transaction.invalidInactiveNominationPool'),
     code: undefined
   },
   [StakingTxErrorType.CAN_NOT_GET_METADATA]: {
-    message: detectTranslate('Unable to fetch staking data. Re-enable current network and try again'),
+    message: detectTranslate('bg.error.Transaction.unableToFetchStakingData'),
     code: undefined
   },
   [TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT]: {
-    message: detectTranslate('Receiver is not enough existential deposit'),
+    message: detectTranslate('bg.error.Transaction.receiverNotEnoughExistentialDeposit'),
     code: undefined
   },
   [YieldValidationStatus.NOT_ENOUGH_FEE]: {
-    message: detectTranslate('Insufficient balance'),
+    message: detectTranslate('bg.error.Transaction.insufficientBalance'),
     code: undefined
   },
   [YieldValidationStatus.NOT_ENOUGH_MIN_JOIN_POOL]: {
-    message: detectTranslate('Not enough min earning amount'),
+    message: detectTranslate('bg.error.Transaction.notEnoughMinEarningAmount'),
     code: undefined
   },
   [SwapErrorType.QUOTE_TIMEOUT]: {
-    message: detectTranslate('Quote timeout'),
+    message: detectTranslate('bg.error.Transaction.quoteTimeout'),
     code: undefined
   },
   [SwapErrorType.INVALID_RECIPIENT]: {
-    message: detectTranslate('Invalid recipient'),
+    message: detectTranslate('bg.error.Transaction.invalidRecipient'),
     code: undefined
   }
 } as Record<TransactionErrorType, { message: string, code?: number }>;

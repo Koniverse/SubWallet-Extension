@@ -26,7 +26,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
       direction: 'vertical',
       duration: 1.8,
       closable: false,
-      message: t('Reloading')
+      message: t('ui.Account.EmptyValidator.reloading')
     });
     onClickReload(true);
   }, [notify, onClickReload, t]);
@@ -42,7 +42,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
         }}
       />
       <div className='message'>
-        {t('No results found')}
+        {t('ui.Account.EmptyValidator.noResultsFound')}
       </div>
       {
         isDataEmpty
@@ -68,7 +68,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
           )
           : (
             <div className='description'>
-              {t('Please change your search criteria try again')}
+              {t('ui.Account.EmptyValidator.changeSearchCriteria')}
             </div>
           )
       }

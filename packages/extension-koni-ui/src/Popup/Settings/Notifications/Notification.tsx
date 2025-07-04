@@ -93,15 +93,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.Settings.Notifications.Notification.all'),
         value: NotificationTab.ALL
       },
       {
-        label: t('Unread'),
+        label: t('ui.Settings.Notifications.Notification.unread'),
         value: NotificationTab.UNREAD
       },
       {
-        label: t('Read'),
+        label: t('ui.Settings.Notifications.Notification.read'),
         value: NotificationTab.READ
       }
     ];
@@ -240,11 +240,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('ui.Settings.Notifications.Notification.enableNetworkToWithdraw')
+      : detectTranslate('ui.Settings.Notifications.Notification.enableNetworkToClaim');
 
     openAlert({
-      title: t('Enable network'),
+      title: t('ui.Settings.Notifications.Notification.enableNetwork'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -253,12 +253,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         icon: XCircle,
         onClick: closeAlert,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('ui.Settings.Notifications.Notification.cancel')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('ui.Settings.Notifications.Notification.enable')
       }
     });
   }, [closeAlert, openAlert, t, updateAlertProps, chainInfoMap]);
@@ -269,7 +269,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       type: NotificationType.INFO,
       content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.Settings.Notifications.Notification.iUnderstand'),
         onClick: closeAlert,
         icon: CheckCircle
       }
@@ -463,8 +463,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('ui.Settings.Notifications.Notification.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.Settings.Notifications.Notification.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -483,10 +483,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('ui.Settings.Notifications.Notification.enableNotifications')
         }}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('ui.Settings.Notifications.Notification.enableNotificationsPrompt')}
+        emptyTitle={t('ui.Settings.Notifications.Notification.notificationsAreDisabled')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -558,7 +558,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('Notifications')}
+        title={t('ui.Settings.Notifications.Notification.notifications')}
       />
 
       <div className={'tool-area'}>
@@ -580,7 +580,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           size='xs'
           type='ghost'
         >
-          {t('Mark all as read')}
+          {t('ui.Settings.Notifications.Notification.markAllAsRead')}
         </Button>
       </div>
 

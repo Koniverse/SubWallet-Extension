@@ -32,14 +32,14 @@ function Component ({ chainInfo, className = '', navigate, showDetailNavigation 
 
           if (!result) {
             showNotification({
-              message: t('Error'),
+              message: t('ui.ChainItemFooter.error'),
               type: 'error'
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('Error'),
+            message: t('ui.ChainItemFooter.error'),
             type: 'error'
           });
           setLoading(false);

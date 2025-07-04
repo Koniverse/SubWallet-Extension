@@ -345,7 +345,7 @@ const Component = () => {
           type: NotificationType.ERROR,
           content: t(balanceDisplayInfo.message, { replace: { minJoinPool, symbol, chain } }),
           okButton: {
-            text: t('I understand'),
+            text: t('ui.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -359,11 +359,11 @@ const Component = () => {
         return;
       } else if (insufficientXCMMessages.some((v) => error.message.includes(v))) {
         openAlert({
-          title: t('Insufficient balance'),
+          title: t('ui.Transaction.Earn.insufficientBalance'),
           type: NotificationType.ERROR,
           content: error.message,
           okButton: {
-            text: t('I understand'),
+            text: t('ui.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -595,16 +595,16 @@ const Component = () => {
               {t(`You're currently staking ${symbol} via direct nomination. Due to ${originChain}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)`)}
             </div>
           </>),
-        title: t('Continue staking?'),
+        title: t('ui.Transaction.Earn.continueStaking'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.Transaction.Earn.continue'),
           onClick: () => {
             closeAlert();
             transactionBlockProcess();
           }
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.Transaction.Earn.cancel'),
           onClick: closeAlert
         }
       });
@@ -731,7 +731,7 @@ const Component = () => {
       <>
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Subnet')}
+          label={t('ui.Transaction.Earn.subnet')}
         >
           <div className='__subnet-wrapper'>
             <Logo
@@ -755,13 +755,13 @@ const Component = () => {
             <MetaInfo.Number
               className='__label-bottom'
               decimals={assetDecimals}
-              label={t('Expected alpha amount')}
+              label={t('ui.Transaction.Earn.expectedAlphaAmount')}
               suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
               value={BigN(amountValue).multipliedBy(1 / earningRate)}
             />
             <MetaInfo.Default
               className='__label-bottom'
-              label={t('Conversion rate')}
+              label={t('ui.Transaction.Earn.conversionRate')}
             >
               <div className='__subnet-rate'>
                 <span
@@ -788,7 +788,7 @@ const Component = () => {
               title={'Transaction will not be executed if the price changes more than this slippage'}
             >
               <div className={'__max-slippage'}>
-                <div className='__label-bottom'>{t('Slippage')}</div>
+                <div className='__label-bottom'>{t('ui.Transaction.Earn.slippage')}</div>
                 <Icon
                   className='__label-bottom'
                   customSize={'16px'}
@@ -887,7 +887,7 @@ const Component = () => {
               <MetaInfo.Number
                 decimals={0}
                 key={item.slug}
-                label={t("You'll receive")}
+                label={t('ui.Transaction.Earn.youllReceive')}
                 suffix={_getAssetSymbol(derivativeAssetInfo)}
                 value={value / item.exchangeRate}
               />
@@ -897,7 +897,7 @@ const Component = () => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={assetDecimals}
-            label={t('Minimum active stake')}
+            label={t('ui.Transaction.Earn.minimumActiveStake')}
             suffix={assetSymbol}
             value={minJoinPool || 0}
           />
@@ -907,7 +907,7 @@ const Component = () => {
           ? (
             <MetaInfo.Chain
               chain={chainValue}
-              label={t('Network')}
+              label={t('ui.Transaction.Earn.network')}
             />
           )
           : (renderSubnetStaking())
@@ -916,7 +916,7 @@ const Component = () => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={0}
-            label={t('Estimated fee')}
+            label={t('ui.Transaction.Earn.estimatedFee')}
             prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
             value={estimatedFee}
@@ -972,16 +972,16 @@ const Component = () => {
       goBack();
     } else {
       openAlert({
-        title: t('Cancel earning process?'),
+        title: t('ui.Transaction.Earn.cancelEarningProcess'),
         type: NotificationType.WARNING,
-        content: t('Going back will cancel the current earning process. Do you wish to cancel?'),
+        content: t('ui.Transaction.Earn.confirmCancelEarningProcess'),
         okButton: {
-          text: t('Cancel earning'),
+          text: t('ui.Transaction.Earn.cancelEarning'),
           onClick: goBack,
           schema: 'warning'
         },
         cancelButton: {
-          text: t('Not now'),
+          text: t('ui.Transaction.Earn.notNow'),
           onClick: closeAlert
         }
       });
@@ -1063,13 +1063,13 @@ const Component = () => {
         if (!isConnectingChainSuccess) {
           setIsLoadingChainConnection(false);
           openAlert({
-            title: t('Connection lost'),
+            title: t('ui.Transaction.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
               ? t(`${poolChainName} network or ${altChainName} network has lost connection. Re-enable the network and try again`)
               : t(`${poolChainName} network has lost connection. Re-enable the network and try again`),
             okButton: {
-              text: t('I understand'),
+              text: t('ui.Transaction.Earn.iUnderstand'),
               onClick: closeAlert,
               icon: CheckCircle
             }
@@ -1294,7 +1294,7 @@ const Component = () => {
                   <FreeBalanceToEarn
                     address={fromValue}
                     hidden={submitStepType !== YieldStepType.XCM}
-                    label={`${t('Available balance')}`}
+                    label={`${t('ui.Transaction.Earn.availableBalance')}`}
                     onBalanceReady={setIsBalanceReady}
                     tokens={balanceTokens}
                   />
@@ -1304,7 +1304,7 @@ const Component = () => {
                     chain={poolInfo.chain}
                     hidden={[YieldStepType.XCM].includes(submitStepType)}
                     isSubscribe={true}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('ui.Transaction.Earn.availableBalance')}:`}
                     tokenSlug={inputAsset.slug}
                   />
                 </div>
@@ -1338,7 +1338,7 @@ const Component = () => {
                       defaultValue={defaultData.target}
                       disabled={submitLoading}
                       from={fromValue}
-                      label={t('Pool')}
+                      label={t('ui.Transaction.Earn.pool')}
                       loading={targetLoading}
                       setForceFetchValidator={setForceFetchValidator}
                       slug={slug}
@@ -1394,7 +1394,7 @@ const Component = () => {
                 loading={submitLoading}
                 onClick={onPreCheck(form.submit, exType)}
               >
-                {t('Stake')}
+                {t('ui.Transaction.Earn.stake')}
               </Button>
             </TransactionFooter>
           </>

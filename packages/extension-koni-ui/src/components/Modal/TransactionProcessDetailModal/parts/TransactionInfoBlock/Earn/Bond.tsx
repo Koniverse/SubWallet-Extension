@@ -69,7 +69,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.Modal.TxProcessDetail.InfoBlock.Earn.Bond.amount')}
           suffix={symbol}
           value={data.amount}
         />

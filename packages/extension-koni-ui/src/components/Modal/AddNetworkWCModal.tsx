@@ -45,14 +45,14 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.Modal.AddNetworkWC.cancel')}
         </Button>
 
         <Button
           block={true}
           onClick={addNetwork}
         >
-          {t('Add network')}
+          {t('ui.Modal.AddNetworkWC.addNetwork')}
         </Button>
       </>
     );
@@ -67,7 +67,7 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
         id={AddNetworkWCModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Add network to connect')}
+        title={t('ui.Modal.AddNetworkWC.addNetworkToConnect')}
       >
         <div className={'__modal-content'}>
           <PageIcon

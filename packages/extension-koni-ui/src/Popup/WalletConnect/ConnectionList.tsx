@@ -68,8 +68,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your dApps will show up here')}
-        emptyTitle={t('No dApps found')}
+        emptyMessage={t('ui.WalletConnect.ConnectionList.yourDappsWillShowUpHere')}
+        emptyTitle={t('ui.WalletConnect.ConnectionList.noDappsFound')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -98,7 +98,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <Layout.WithSubHeaderOnly
       onBack={goBack}
       rightFooterButton={{
-        children: t('New connection'),
+        children: t('ui.WalletConnect.ConnectionList.newConnection'),
         onClick: onAdd,
         icon: (
           <Icon
@@ -112,7 +112,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )
       }}
-      title={t('WalletConnect')}
+      title={t('ui.WalletConnect.ConnectionList.walletConnect')}
     >
       <PageWrapper
         className={CN(className)}

@@ -172,7 +172,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-left-part'>
               <div className='__field-label'>
-                {t('Estimated fee')}:
+                {t('ui.Field.FeeEditor.estimatedFee')}:
               </div>
 
               <div>
@@ -215,7 +215,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     loading={isLoadingToken}
                     onClick={isEditButton ? onClickEdit : undefined}
                     size='xs'
-                    tooltip={isEditButton ? undefined : t('Coming soon!')}
+                    tooltip={isEditButton ? undefined : t('ui.Field.FeeEditor.comingSoon')}
                     type='ghost'
                   />
                 </div>

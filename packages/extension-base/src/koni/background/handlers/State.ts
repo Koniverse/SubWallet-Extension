@@ -1160,7 +1160,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+            throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
@@ -1340,7 +1340,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new CardanoProviderError(CardanoProviderErrorType.SIGN_DATA_DECLINED);
@@ -1361,7 +1361,7 @@ export default class KoniState {
     const authInfo = authInfoMap[stripUrl(url)];
 
     if (!authInfo) {
-      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, t('Not found auth info'));
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, t('bg.handler.State.notFoundAuthInfo'));
     }
 
     let requireKeyHashes: string[] = [];
@@ -1423,7 +1423,7 @@ export default class KoniState {
 
       if (isSameAddress(currentAddress, address)) {
         if (!validateAddressNetwork(address, currentCardanoNetwork)) {
-          throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, t('Current network is changed'));
+          throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, t('bg.handler.State.currentNetworkIsChanged'));
         }
 
         transactionValue = transactionValue.checked_add(amount);
@@ -1433,13 +1433,13 @@ export default class KoniState {
 
       // Check if address is valid with current network
       if (!validateAddressNetwork(address, currentCardanoNetwork)) {
-        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with input address'));
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('bg.handler.State.networkNotMatchInputAddress'));
       }
     }
 
     for (const address in addressOutputMap) {
       if (!validateAddressNetwork(address, currentCardanoNetwork)) {
-        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with output address'));
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('bg.handler.State.networkNotMatchOutputAddress'));
       }
 
       if (!addressInputAmountMap[address] && !addressOutputMap[address].is_zero()) {
@@ -1497,7 +1497,7 @@ export default class KoniState {
     });
 
     if (!needOwnerKeyHash) {
-      throw new CardanoProviderError(CardanoProviderErrorType.PROOF_GENERATION_FAILED, t('Not found owner key hash'));
+      throw new CardanoProviderError(CardanoProviderErrorType.PROOF_GENERATION_FAILED, t('bg.handler.State.notFoundOwnerKeyHash'));
     }
 
     if (needForeignKeyHash && !partialSign) {
@@ -1522,7 +1522,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED);
@@ -1577,7 +1577,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
@@ -1651,7 +1651,7 @@ export default class KoniState {
     }, [] as PsbtTransactionArg[]);
 
     if (new BigN(totalBalance.value).lt(inputAmount)) {
-      payloadAfterValidated.errors = [{ message: t('Insufficient balance'), name: t('Unable to sign transaction') }];
+      payloadAfterValidated.errors = [{ message: t('bg.handler.State.insufficientBalance'), name: t('bg.handler.State.unableToSignTransaction') }];
     }
 
     const psbtOutputData = psbtGenerate.txOutputs.map((output) => {
@@ -1694,7 +1694,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
@@ -1734,7 +1734,7 @@ export default class KoniState {
           if (payload) {
             return payload;
           } else {
-            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('bg.handler.State.notFoundSignature'));
           }
         } else {
           throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);

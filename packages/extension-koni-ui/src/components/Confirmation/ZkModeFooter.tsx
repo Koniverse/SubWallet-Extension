@@ -71,12 +71,12 @@ const Component: React.FC<Props> = (props: Props) => {
         onFieldsChange={onUpdate}
         onFinish={onSubmit}
       >
-        <div className={'zk_confirmation_modal__input_label'}>{t('Enter password to confirm')}</div>
+        <div className={'zk_confirmation_modal__input_label'}>{t('ui.Confirmation.ZkModeFooter.enterPasswordToConfirm')}</div>
         <Form.Item
           name={'password'}
           rules={[
             {
-              message: t('Password is required'),
+              message: t('ui.Confirmation.ZkModeFooter.passwordIsRequired'),
               required: true
             }
           ]}
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Input.Password
             containerClassName='password-input'
             id={passwordInputId}
-            placeholder={t('Password')}
+            placeholder={t('ui.Confirmation.ZkModeFooter.password')}
           />
         </Form.Item>
       </Form>
@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onClickCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.Confirmation.ZkModeFooter.cancel')}
         </Button>
 
         <Button
@@ -117,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={form.submit}
         >
-          {t('Enable')}
+          {t('ui.Confirmation.ZkModeFooter.enable')}
         </Button>
       </div>
     </div>

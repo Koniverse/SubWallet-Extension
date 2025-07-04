@@ -221,7 +221,7 @@ export const parseEvmRlp = async (data: string, networkMap: Record<string, _Chai
   const tx: QrTransaction | null = createTransactionFromRLP(data);
 
   if (!tx) {
-    throw new Error(t('Failed to decode data. Please use a valid QR code'));
+    throw new Error(t('bg.util.eth.parseTransaction.failedToDecodeQr'));
   }
 
   const result: ResponseQrParseRLP = {

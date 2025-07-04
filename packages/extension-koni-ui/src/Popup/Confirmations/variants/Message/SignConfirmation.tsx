@@ -62,10 +62,10 @@ function Component ({ className, request }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Signature request')}
+          {t('ui.Confirmations.Message.Sign.signatureRequest')}
         </div>
         <div className='description'>
-          {t('You are approving a request with the following account')}
+          {t('ui.Confirmations.Message.Sign.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -80,7 +80,7 @@ function Component ({ className, request }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.Confirmations.Message.Sign.viewDetails')}
           </Button>
         </div>
       </div>
@@ -90,7 +90,7 @@ function Component ({ className, request }: Props) {
         request={request.request}
       />
       <BaseDetailModal
-        title={isMessage ? t('Message details') : t('Transaction details')}
+        title={isMessage ? t('ui.Confirmations.Message.Sign.messageDetails') : t('ui.Confirmations.Message.Sign.transactionDetails')}
       >
         {isMessage
           ? (

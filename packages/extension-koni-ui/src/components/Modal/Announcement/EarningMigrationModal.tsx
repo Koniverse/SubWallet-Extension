@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               schema={'secondary'}
             >
-              {t('Dismiss')}
+              {t('ui.Modal.Announcement.EarningMigration.dismiss')}
             </Button>
             <Button
               block={true}
@@ -68,13 +68,13 @@ const Component: React.FC<Props> = (props: Props) => {
               }
               onClick={onEarnNow}
             >
-              {t('Earn now')}
+              {t('ui.Modal.Announcement.EarningMigration.earnNow')}
             </Button>
           </div>
         }
         id={modalId}
         onCancel={onCloseModal}
-        title={t('Introducing Earning feature')}
+        title={t('ui.Modal.Announcement.EarningMigration.introducingEarningFeature')}
       >
         <div className={'page-icon-astar-modal'}>
           <PageIcon

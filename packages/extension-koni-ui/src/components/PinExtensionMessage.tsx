@@ -47,7 +47,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='message-content'>
-          {t('Pin SubWallet to toolbar for easier access')}
+          {t('ui.PinExtensionMessage.pinSubWalletToToolbar')}
         </div>
       </div>
       <div className='message-sub-content'>

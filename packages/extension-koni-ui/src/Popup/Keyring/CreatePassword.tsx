@@ -60,11 +60,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const notification = useNotification();
 
-  const passwordRules = useMemo(() => renderBasePasswordRules(t('Password'), t), [t]);
+  const passwordRules = useMemo(() => renderBasePasswordRules(t('ui.Keyring.CreatePassword.password'), t), [t]);
   const confirmPasswordRules = useMemo(() => renderBaseConfirmPasswordRules(FormFieldName.PASSWORD, t), [t]);
   const checkBoxValidator = useCallback((rule: RuleObject, value: boolean): Promise<void> => {
     if (!value) {
-      return Promise.reject(new Error(t('CheckBox is required')));
+      return Promise.reject(new Error(t('ui.Keyring.CreatePassword.checkboxIsRequired')));
     }
 
     return Promise.resolve();
@@ -141,7 +141,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
         rightFooterButton={{
-          children: t('Continue'),
+          children: t('ui.Keyring.CreatePassword.continue'),
           onClick: form.submit,
           loading: loading,
           disabled: isDisabled,
@@ -153,11 +153,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: openModal
           }
         ]}
-        title={t('Create a password')}
+        title={t('ui.Keyring.CreatePassword.createAPassword')}
       >
         <div className='body-container'>
           <div className='notify'>
-            {t('This password can only unlock your SubWallet on this browser')}
+            {t('ui.Keyring.CreatePassword.passwordForThisBrowserOnly')}
           </div>
           <Form
             form={form}
@@ -177,7 +177,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               <Input.Password
                 onChange={onChangePassword}
-                placeholder={t('Enter password')}
+                placeholder={t('ui.Keyring.CreatePassword.enterPassword')}
                 type='password'
               />
             </Form.Item>
@@ -187,13 +187,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               statusHelpAsTooltip={true}
             >
               <Input.Password
-                placeholder={t('Confirm password')}
+                placeholder={t('ui.Keyring.CreatePassword.confirmPassword')}
                 type='password'
               />
             </Form.Item>
             <Form.Item>
               <div className={'annotation'}>
-                {t('Passwords should be at least 8 characters in length, including letters and numbers')}
+                {t('ui.Keyring.CreatePassword.passwordRequirements')}
               </div>
             </Form.Item>
             <Form.Item
@@ -231,17 +231,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             rightIconProps={{
               icon: <InfoIcon />
             }}
-            title={t('Instructions')}
+            title={t('ui.Keyring.CreatePassword.instructions')}
             wrapClassName={className}
           >
             <div className='instruction-container'>
               <AlertBox
-                description={t('For your wallet protection, SubWallet locks your wallet after 15 minutes of inactivity. You will need this password to unlock it.')}
-                title={t('Why do I need to enter a password?')}
+                description={t('ui.Keyring.CreatePassword.walletAutoLockInfo')}
+                title={t('ui.Keyring.CreatePassword.whyNeedPassword')}
               />
               <AlertBox
-                description={t('The password is stored securely on your device. We will not be able to recover it for you, so make sure you remember it!')}
-                title={t('Can I recover a password?')}
+                description={t('ui.Keyring.CreatePassword.passwordNotRecoverable')}
+                title={t('ui.Keyring.CreatePassword.canRecoverPassword')}
               />
             </div>
           </SwModal>

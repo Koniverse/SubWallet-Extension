@@ -7,19 +7,19 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 
 const defaultErrorMap: Record<ProviderErrorType, { message: string, code?: number }> = {
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.error.Provider.networkIsDisconnected'),
     code: undefined
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.error.Provider.undefinedErrorContactSupport'),
     code: undefined
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.error.Provider.undefinedErrorContactSupport'),
     code: undefined
   },
   USER_REJECT: {
-    message: detectTranslate('Rejected by user'),
+    message: detectTranslate('bg.error.Provider.rejectedByUser'),
     code: undefined
   }
 };

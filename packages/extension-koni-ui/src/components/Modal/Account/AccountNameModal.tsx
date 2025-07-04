@@ -44,10 +44,10 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.Modal.Account.Name.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.Modal.Account.Name.accountNameInvalid'));
       }
     }
 
@@ -107,7 +107,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             name={'name'}
             rules={[
               {
-                message: t('Account name is required'),
+                message: t('ui.Modal.Account.Name.accountNameRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -120,8 +120,8 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             <Input
               className='__account-name-input'
               disabled={isLoading}
-              label={t('Account name')}
-              placeholder={t('Enter the account name')}
+              label={t('ui.Modal.Account.Name.accountName')}
+              placeholder={t('ui.Modal.Account.Name.enterAccountName')}
             />
           </Form.Item>
         </div>
@@ -140,7 +140,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
           loading={isLoading}
           onClick={form.submit}
         >
-          {t('Confirm')}
+          {t('ui.Modal.Account.Name.confirm')}
         </Button>
       </div>
     </SwModal>

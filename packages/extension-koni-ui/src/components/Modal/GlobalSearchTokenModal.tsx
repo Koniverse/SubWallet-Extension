@@ -109,7 +109,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
       destroyOnClose={true}
       id={id}
       onCancel={onPressCancel}
-      title={t('Select token')}
+      title={t('ui.Modal.GlobalSearchToken.selectToken')}
     >
       <Search
         autoFocus={true}

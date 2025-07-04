@@ -32,7 +32,7 @@ const Component: React.FC<Props> = (props: Props) => {
       closable={false}
       id={modalId}
       maskClosable={false}
-      title={t('Create master password')}
+      title={t('ui.Modal.RequestCreatePassword.createMasterPassword')}
       wrapClassName={CN(className)}
     >
       <div className='body-container'>
@@ -46,7 +46,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='description'>
-          {t('Your master password is the password that allows access to multiple accounts. Once a master password is confirmed, you will not need to manually type your password with every transaction.')}
+          {t('ui.Modal.RequestCreatePassword.masterPasswordInfo')}
         </div>
         <Button
           block={true}
@@ -58,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onClick}
         >
-          {t('Create master password')}
+          {t('ui.Modal.RequestCreatePassword.createMasterPassword')}
         </Button>
       </div>
     </SwModal>

@@ -46,7 +46,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         onClick={openCreateAccount}
         schema='secondary'
       >
-        {t('Create a new account')}
+        {t('ui.Layout.SelectAccount.Footer.createNewAccount')}
       </Button>
       <Button
         className='btn-min-width'
@@ -58,7 +58,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openImportAccount}
         schema='secondary'
-        tooltip={t('Import account')}
+        tooltip={t('ui.Layout.SelectAccount.Footer.importAccount')}
       />
       <Button
         className='btn-min-width'
@@ -70,7 +70,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openAttachAccount}
         schema='secondary'
-        tooltip={t('Attach account')}
+        tooltip={t('ui.Layout.SelectAccount.Footer.attachAccount')}
       />
     </div>
   );

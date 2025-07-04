@@ -7,95 +7,95 @@ import { StatusType } from '@subwallet/extension-koni-ui/Popup/Home/History/Deta
 import { CheckCircle, ClockCounterClockwise, PaperPlaneTilt, ProhibitInset, Queue, Spinner, StopCircle } from 'phosphor-react';
 
 export const TxTypeNameMap: Record<ExtrinsicType, string> = {
-  [ExtrinsicType.TRANSFER_BALANCE]: detectTranslate('Transfer'),
-  [ExtrinsicType.TRANSFER_TOKEN]: detectTranslate('Transfer'),
-  [ExtrinsicType.TRANSFER_XCM]: detectTranslate('Transfer'),
-  [ExtrinsicType.SEND_NFT]: detectTranslate('NFT transaction'),
-  [ExtrinsicType.CROWDLOAN]: detectTranslate('Crowdloan contribution'),
-  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('Join pool'),
-  [ExtrinsicType.STAKING_BOND]: detectTranslate('Stake'),
-  [ExtrinsicType.MINT_VDOT]: detectTranslate('Mint vDOT'),
-  [ExtrinsicType.MINT_VMANTA]: detectTranslate('Mint vMANTA'),
-  [ExtrinsicType.MINT_LDOT]: detectTranslate('Mint LDOT'),
-  [ExtrinsicType.MINT_SDOT]: detectTranslate('Mint sDOT'),
-  [ExtrinsicType.MINT_QDOT]: detectTranslate('Mint qDOT'),
-  [ExtrinsicType.MINT_STDOT]: detectTranslate('Mint stDOT'),
-  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('Unstake'),
-  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('Unstake'),
-  [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('Join pool'),
-  [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('Unstake vDOT'),
-  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('Unstake vMANTA'),
-  [ExtrinsicType.UNSTAKE_LDOT]: detectTranslate('Unstake LDOT'),
-  [ExtrinsicType.UNSTAKE_SDOT]: detectTranslate('Unstake sDOT'),
-  [ExtrinsicType.UNSTAKE_STDOT]: detectTranslate('Unstake stDOT'),
-  [ExtrinsicType.UNSTAKE_QDOT]: detectTranslate('Unstake qDOT'),
-  [ExtrinsicType.REDEEM_VDOT]: detectTranslate('Redeem vDOT'),
-  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('Redeem vMANTA'),
-  [ExtrinsicType.REDEEM_LDOT]: detectTranslate('Redeem LDOT'),
-  [ExtrinsicType.REDEEM_SDOT]: detectTranslate('Redeem sDOT'),
-  [ExtrinsicType.REDEEM_QDOT]: detectTranslate('Redeem qDOT'),
-  [ExtrinsicType.REDEEM_STDOT]: detectTranslate('Redeem stDOT'),
-  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('Withdraw'),
-  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('Stake compound'),
-  [ExtrinsicType.STAKING_CLAIM_REWARD]: detectTranslate('Claim reward'),
-  [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('Cancel unstake'),
-  [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('Withdraw'),
-  [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('Cancel compound'),
-  [ExtrinsicType.EVM_EXECUTE]: detectTranslate('EVM Execute'),
-  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('Token approve'),
-  [ExtrinsicType.SWAP]: detectTranslate('Swap'),
-  [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('Claim token'),
-  [ExtrinsicType.UNKNOWN]: detectTranslate('Unknown')
+  [ExtrinsicType.TRANSFER_BALANCE]: detectTranslate('ui.constant.history.transfer'),
+  [ExtrinsicType.TRANSFER_TOKEN]: detectTranslate('ui.constant.history.transfer'),
+  [ExtrinsicType.TRANSFER_XCM]: detectTranslate('ui.constant.history.transfer'),
+  [ExtrinsicType.SEND_NFT]: detectTranslate('ui.constant.history.nftTransaction'),
+  [ExtrinsicType.CROWDLOAN]: detectTranslate('ui.constant.history.crowdloanContribution'),
+  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('ui.constant.history.joinPool'),
+  [ExtrinsicType.STAKING_BOND]: detectTranslate('ui.constant.history.stake'),
+  [ExtrinsicType.MINT_VDOT]: detectTranslate('ui.constant.history.mintVDot'),
+  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.constant.history.mintVManta'),
+  [ExtrinsicType.MINT_LDOT]: detectTranslate('ui.constant.history.mintLDot'),
+  [ExtrinsicType.MINT_SDOT]: detectTranslate('ui.constant.history.mintSDot'),
+  [ExtrinsicType.MINT_QDOT]: detectTranslate('ui.constant.history.mintQDot'),
+  [ExtrinsicType.MINT_STDOT]: detectTranslate('ui.constant.history.mintStDot'),
+  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.constant.history.unstake'),
+  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.constant.history.unstake'),
+  [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.constant.history.joinPool'),
+  [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.constant.history.unstakeVDot'),
+  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.constant.history.unstakeVManta'),
+  [ExtrinsicType.UNSTAKE_LDOT]: detectTranslate('ui.constant.history.unstakeLDot'),
+  [ExtrinsicType.UNSTAKE_SDOT]: detectTranslate('ui.constant.history.unstakeSDot'),
+  [ExtrinsicType.UNSTAKE_STDOT]: detectTranslate('ui.constant.history.unstakeStDot'),
+  [ExtrinsicType.UNSTAKE_QDOT]: detectTranslate('ui.constant.history.unstakeQDot'),
+  [ExtrinsicType.REDEEM_VDOT]: detectTranslate('ui.constant.history.redeemVDot'),
+  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.constant.history.redeemVManta'),
+  [ExtrinsicType.REDEEM_LDOT]: detectTranslate('ui.constant.history.redeemLDot'),
+  [ExtrinsicType.REDEEM_SDOT]: detectTranslate('ui.constant.history.redeemSDot'),
+  [ExtrinsicType.REDEEM_QDOT]: detectTranslate('ui.constant.history.redeemQDot'),
+  [ExtrinsicType.REDEEM_STDOT]: detectTranslate('ui.constant.history.redeemStDot'),
+  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.constant.history.withdraw'),
+  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('ui.constant.history.stakeCompound'),
+  [ExtrinsicType.STAKING_CLAIM_REWARD]: detectTranslate('ui.constant.history.claimReward'),
+  [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.constant.history.cancelUnstake'),
+  [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.constant.history.withdraw'),
+  [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('ui.constant.history.cancelCompound'),
+  [ExtrinsicType.EVM_EXECUTE]: detectTranslate('ui.constant.history.evmExecute'),
+  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.constant.history.tokenApprove'),
+  [ExtrinsicType.SWAP]: detectTranslate('ui.constant.history.swap'),
+  [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.constant.history.claimToken'),
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.constant.history.unknown')
 };
 
 export const StakingTypeNameMap: Record<string, string> = {
-  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('Stake'),
-  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('Unstake'),
-  [ExtrinsicType.STAKING_BOND]: detectTranslate('Stake'),
-  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('Unstake'),
-  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('Withdraw'),
-  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('Compounding')
+  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('ui.constant.history.stake'),
+  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.constant.history.unstake'),
+  [ExtrinsicType.STAKING_BOND]: detectTranslate('ui.constant.history.stake'),
+  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.constant.history.unstake'),
+  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.constant.history.withdraw'),
+  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('ui.constant.history.compounding')
 };
 
 export const HistoryStatusMap: Record<ExtrinsicStatus, StatusType> = {
   [ExtrinsicStatus.SUCCESS]: {
     schema: 'success',
     icon: CheckCircle,
-    name: detectTranslate('Completed')
+    name: detectTranslate('ui.constant.history.completed')
   },
   [ExtrinsicStatus.FAIL]: {
     schema: 'danger',
     icon: ProhibitInset,
-    name: detectTranslate('Failed')
+    name: detectTranslate('ui.constant.history.failed')
   },
   [ExtrinsicStatus.QUEUED]: {
     schema: 'light',
     icon: Queue,
-    name: detectTranslate('Queued')
+    name: detectTranslate('ui.constant.history.queued')
   },
   [ExtrinsicStatus.SUBMITTING]: {
     schema: 'gold',
     icon: PaperPlaneTilt,
-    name: detectTranslate('Submitting')
+    name: detectTranslate('ui.constant.history.submitting')
   },
   [ExtrinsicStatus.PROCESSING]: {
     schema: 'gold',
     icon: Spinner,
-    name: detectTranslate('Processing')
+    name: detectTranslate('ui.constant.history.processing')
   },
   [ExtrinsicStatus.CANCELLED]: {
     schema: 'gray',
     icon: StopCircle,
-    name: detectTranslate('Cancelled')
+    name: detectTranslate('ui.constant.history.cancelled')
   },
   [ExtrinsicStatus.UNKNOWN]: {
     schema: 'gray',
     icon: StopCircle,
-    name: detectTranslate('Unknown')
+    name: detectTranslate('ui.constant.history.unknown')
   },
   [ExtrinsicStatus.TIMEOUT]: {
     schema: 'gold',
     icon: ClockCounterClockwise,
-    name: detectTranslate('Time-out')
+    name: detectTranslate('ui.constant.history.timeOut')
   }
 };

@@ -185,13 +185,13 @@ const Component: React.FC = () => {
         <MetaInfo.Number
           className='__label-bottom'
           decimals={decimals}
-          label={t('Expected TAO to receive')}
+          label={t('ui.Transaction.Unbond.expectedTaoToReceive')}
           suffix={bondedAsset?.symbol || ''}
           value={BigNumber(amountValue).multipliedBy(earningRate)}
         />
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Conversion rate')}
+          label={t('ui.Transaction.Unbond.conversionRate')}
         >
           <div className='__subnet-rate'>
             <span
@@ -278,7 +278,7 @@ const Component: React.FC = () => {
 
       return getEarningTimeText(time);
     } else {
-      return t('unknown time');
+      return t('ui.Transaction.Unbond.unknownTime');
     }
   }, [poolInfo.statistic, t]);
 
@@ -454,7 +454,7 @@ const Component: React.FC = () => {
 
   useEffect(() => {
     if (poolType === YieldPoolType.LENDING) {
-      setCustomScreenTitle(t('Withdraw'));
+      setCustomScreenTitle(t('ui.Transaction.Unbond.withdraw'));
     }
 
     return () => {
@@ -529,14 +529,14 @@ const Component: React.FC = () => {
               disabled={!isAllAccount}
               doFilter={false}
               externalAccounts={accountList}
-              label={poolInfo.type === YieldPoolType.LENDING ? t('Withdraw from account') : t('Unstake from account')}
+              label={poolInfo.type === YieldPoolType.LENDING ? t('ui.Transaction.Unbond.withdrawFromAccount') : t('ui.Transaction.Unbond.unstakeFromAccount')}
             />
           </Form.Item>
           <FreeBalance
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.Transaction.Unbond.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
 
@@ -638,8 +638,8 @@ const Component: React.FC = () => {
                   )
                   : (
                     <AlertBox
-                      description={t('You can withdraw your supplied funds immediately')}
-                      title={t('Withdraw')}
+                      description={t('ui.Transaction.Unbond.withdrawSuppliedFundsImmediately')}
+                      title={t('ui.Transaction.Unbond.withdraw')}
                       type={'info'}
                     />
                   )
@@ -648,8 +648,8 @@ const Component: React.FC = () => {
                 <AlertBox
                   description={poolChain === 'bifrost_dot'
                     ? t(`In this mode, ${symbol} will be directly exchanged for ${altSymbol} at the market price without waiting for the unstaking period`)
-                    : t('With fast unstake, you will receive your funds immediately with a higher fee')}
-                  title={t('Fast unstake')}
+                    : t('ui.Transaction.Unbond.fastUnstakeInfo')}
+                  title={t('ui.Transaction.Unbond.fastUnstake')}
                   type={'info'}
                 />
               )}
@@ -669,7 +669,7 @@ const Component: React.FC = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, exType)}
         >
-          {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+          {poolInfo.type === YieldPoolType.LENDING ? t('ui.Transaction.Unbond.withdraw') : t('ui.Transaction.Unbond.unstake')}
         </Button>
       </TransactionFooter>
     </>

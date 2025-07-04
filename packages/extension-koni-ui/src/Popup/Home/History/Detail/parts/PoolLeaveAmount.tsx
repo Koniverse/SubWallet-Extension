@@ -35,14 +35,14 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       <MetaInfo.Number
         decimals={amount?.decimals || undefined}
-        label={t('Amount')}
+        label={t('ui.History.Detail.PoolLeaveAmount.amount')}
         suffix={amount?.symbol || undefined}
         value={amountValue}
       />
       {!isLending && (
         <MetaInfo.Number
           decimals={additionalInfo.decimals}
-          label={t('Estimated receivables')}
+          label={t('ui.History.Detail.PoolLeaveAmount.estimatedReceivables')}
           suffix={additionalInfo.symbol}
           value={estimatedValue}
         />
@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {additionalInfo.isFast && (
         <MetaInfo.Number
           decimals={additionalInfo.decimals}
-          label={t('Minimum receivables')}
+          label={t('ui.History.Detail.PoolLeaveAmount.minimumReceivables')}
           suffix={additionalInfo.symbol}
           value={minReceiveValue}
         />

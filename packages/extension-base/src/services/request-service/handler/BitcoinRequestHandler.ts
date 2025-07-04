@@ -392,7 +392,7 @@ export default class BitcoinRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('Unable to proceed. Please try again'), type, id);
+        this.#logger.error(t('bg.service.request.BitcoinHandler.unableToProceed'), type, id);
         throw new Error('Unable to proceed. Please try again');
       }
 

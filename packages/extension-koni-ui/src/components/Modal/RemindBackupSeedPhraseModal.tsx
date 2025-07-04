@@ -83,14 +83,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('I’ve backed up')}
+          {t('ui.Modal.RemindBackupSeedPhrase.iveBackedUp')}
         </Button>
 
         <Button
           block={true}
           onClick={onExport}
         >
-          {t('Back up now')}
+          {t('ui.Modal.RemindBackupSeedPhrase.backUpNow')}
         </Button>
       </>
     );
@@ -105,7 +105,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         id={RemindBackupSeedPhraseModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Back up your seed phrase!')}
+        title={t('ui.Modal.RemindBackupSeedPhrase.backUpYourSeedPhrase')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -116,13 +116,13 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t(' Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with')}
+            {t('ui.Modal.RemindBackupSeedPhrase.seedPhraseLostWarning')}
             <a
               className={'__modal-user-guide'}
               href={`${USER_GUIDE_URL}${DomainUserGuide}`}
               target='__blank'
             >
-              {t('our user guide.')}
+              {t('ui.Modal.RemindBackupSeedPhrase.ourUserGuide')}
             </a>
           </div>
         </div>

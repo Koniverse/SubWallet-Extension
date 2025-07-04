@@ -89,7 +89,7 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
       destroyOnClose={true}
       id={modalId}
       onCancel={onPressCancel}
-      title={t('Select token')}
+      title={t('ui.Modal.ReceiveNew.TokenSelector.selectToken')}
     >
       <Search
         autoFocus={true}

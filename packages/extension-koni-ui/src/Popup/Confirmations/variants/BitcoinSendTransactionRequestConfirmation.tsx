@@ -150,33 +150,33 @@ function Component ({ className, request, type }: Props) {
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Account
             address={address}
-            label={t('From account')}
+            label={t('ui.Confirmations.BitcoinSendTransaction.fromAccount')}
             name={account?.name}
           />
           <MetaInfo.Account
             address={recipient?.address || toValue || ''}
             className='to-account'
-            label={t('To account')}
+            label={t('ui.Confirmations.BitcoinSendTransaction.toAccount')}
             name={recipient?.name}
           />
 
           <MetaInfo.Chain
             chain={chainValue}
-            label={t('Network')}
+            label={t('ui.Confirmations.BitcoinSendTransaction.network')}
           />
         </MetaInfo>
 
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Number
             decimals={assetInfo?.decimals || 0}
-            label={t('Amount')}
+            label={t('ui.Confirmations.BitcoinSendTransaction.amount')}
             suffix={assetInfo?.symbol || ''}
             value={amount}
           />
 
           <MetaInfo.Default
             className='__fee-editor'
-            label={t('Estimated fee')}
+            label={t('ui.Confirmations.BitcoinSendTransaction.estimatedFee')}
           >
             {isFetchingInfo || !transferInfo
               ? (

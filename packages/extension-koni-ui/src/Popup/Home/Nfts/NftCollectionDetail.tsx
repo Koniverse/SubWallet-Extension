@@ -93,8 +93,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const emptyNft = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your NFT collectible will appear here!')}
-        emptyTitle={t('No NFT collectible')}
+        emptyMessage={t('ui.Nfts.CollectionDetail.yourNftCollectibleWillAppearHere')}
+        emptyTitle={t('ui.Nfts.CollectionDetail.noNftCollectible')}
         phosphorIcon={Image}
       />
     );
@@ -108,11 +108,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             if (result) {
               goBack();
               showNotification({
-                message: t('Deleted NFT collection successfully')
+                message: t('ui.Nfts.CollectionDetail.deletedNftCollectionSuccessfully')
               });
             } else {
               showNotification({
-                message: t('Deleted NFT collection unsuccessfully')
+                message: t('ui.Nfts.CollectionDetail.deletedNftCollectionUnsuccessfully')
               });
             }
           })

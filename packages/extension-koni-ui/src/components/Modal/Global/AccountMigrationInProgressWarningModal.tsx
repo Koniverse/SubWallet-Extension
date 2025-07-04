@@ -41,13 +41,13 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               onClick={onClickActionButton}
             >
-              {t('Reload view')}
+              {t('ui.Modal.Global.AccountMigrationWarning.reloadView')}
             </Button>
           </>
         }
         id={modalId}
         maskClosable={false}
-        title={t('Migration in progress')}
+        title={t('ui.Modal.Global.AccountMigrationWarning.migrationInProgress')}
         zIndex={1000000}
       >
         <div className='__modal-content'>

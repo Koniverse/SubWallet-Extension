@@ -282,7 +282,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={firstStep ? onBack : onPreviousStep}
         rightFooterButton={{
-          children: t('Connect Ledger device'),
+          children: t('ui.Account.ConnectLedger.connectLedgerDevice'),
           icon: FooterIcon,
           disabled: !isConnected || (!firstStep && !(selectedAccounts.length > 0)),
           onClick: firstStep ? onNextStep : onSubmit,
@@ -294,16 +294,16 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goUserGuide
           }
         ]}
-        title={t('Connect Ledger device')}
+        title={t('ui.Account.ConnectLedger.connectLedgerDevice')}
       >
         <div className={CN('container')}>
           <div className='sub-title'>
-            {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
+            {t('ui.Account.ConnectLedger.unlockLedgerInstruction')}
             <a
               href={CONNECT_LEDGER_USER_GUIDE_URL}
               target='__blank'
             >
-              {t('here')}
+              {t('ui.Account.ConnectLedger.here')}
             </a>
           </div>
           {
@@ -335,9 +335,9 @@ const Component: React.FC<Props> = (props: Props) => {
                 <LedgerChainSelector
                   className={'select-ledger-app'}
                   items={networks}
-                  label={t('Select Ledger app')}
+                  label={t('ui.Account.ConnectLedger.selectLedgerApp')}
                   onChange={onChainChange}
-                  placeholder={t('Select Ledger app')}
+                  placeholder={t('ui.Account.ConnectLedger.selectLedgerApp')}
                   value={chain}
                 />
                 {
@@ -345,10 +345,10 @@ const Component: React.FC<Props> = (props: Props) => {
                     className={'ledger-chain-migrate-select'}
                     id={'migrate-chain-select-modal-id'}
                     items={networkMigrates}
-                    label={t('Select network')}
+                    label={t('ui.Account.ConnectLedger.selectNetwork')}
                     messageTooltip={'To use this network, choose Polkadot Ledger app'}
                     onChange={onMigrateChainChange}
-                    placeholder={t('Select network')}
+                    placeholder={t('ui.Account.ConnectLedger.selectNetwork')}
                     value={chainMigrateMode}
                   />
                 }
@@ -370,11 +370,11 @@ const Component: React.FC<Props> = (props: Props) => {
                   <div className='ledger-button-content'>
                     <span className='ledger-info-text'>
                       {isConnected
-                        ? t('Device found')
+                        ? t('ui.Account.ConnectLedger.deviceFound')
                         : warning || error || (
                           ledger
-                            ? t('Loading')
-                            : t('Searching Ledger device')
+                            ? t('ui.Account.ConnectLedger.loading')
+                            : t('ui.Account.ConnectLedger.searchingLedgerDevice')
                         )
                       }
                     </span>

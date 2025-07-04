@@ -192,7 +192,7 @@ const Component = (props: Props) => {
 
   const filterSearchBox = useMemo(() => {
     return {
-      placeholder: t('Search network')
+      placeholder: t('ui.Swap.TokenSelector.searchNetwork')
     };
   }, [t]);
 
@@ -209,7 +209,7 @@ const Component = (props: Props) => {
             !selectedItem
               ? (
                 <div className={'__placeholder-text'}>
-                  {placeholder || t('Select token')}
+                  {placeholder || t('ui.Swap.TokenSelector.selectToken')}
                 </div>
               )
               : (
@@ -241,7 +241,7 @@ const Component = (props: Props) => {
         destroyOnClose={true}
         id={modalId}
         onCancel={onCloseModal}
-        title={label || t('Select token')}
+        title={label || t('ui.Swap.TokenSelector.selectToken')}
       >
         <Search
           actionBtnIcon={(

@@ -57,7 +57,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   const getAccountListModalTriggerLabel = () => {
     if (resultAccountProxies.length === 3) {
-      return t('And 1 other');
+      return t('ui.MigrateAccount.SummaryView.andOneOther');
     }
 
     return t('And {{number}} others', { replace: { number: resultAccountProxies.length - 2 } });
@@ -77,7 +77,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
       })}
       >
         <div className='__header-area'>
-          {t('Finish')}
+          {t('ui.MigrateAccount.SummaryView.finish')}
         </div>
 
         <div className='__body-area'>
@@ -92,7 +92,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
           </div>
 
           <div className='__content-title'>
-            {t('All done!')}
+            {t('ui.MigrateAccount.SummaryView.allDone')}
           </div>
 
           {
@@ -195,7 +195,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
             }
             onClick={onClickFinish}
           >
-            {hasAnyAccountToMigrate ? t('Finish') : t('Back to home')}
+            {hasAnyAccountToMigrate ? t('ui.MigrateAccount.SummaryView.finish') : t('ui.MigrateAccount.SummaryView.backToHome')}
           </Button>
         </div>
       </div>

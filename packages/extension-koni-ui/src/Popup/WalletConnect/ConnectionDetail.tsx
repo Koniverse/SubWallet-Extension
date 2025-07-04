@@ -63,7 +63,7 @@ const Component: React.FC<ComponentProps> = (props) => {
 
   const modalProps = useMemo((): Partial<SwModalFuncProps> => ({
     id: disconnectModalId,
-    okText: t('Disconnect'),
+    okText: t('ui.WalletConnect.ConnectionDetail.disconnect'),
     okButtonProps: {
       icon: (
         <Icon
@@ -72,9 +72,9 @@ const Component: React.FC<ComponentProps> = (props) => {
         />
       )
     },
-    content: t('Once you disconnect, you will no longer see this connection on SubWallet and on your DApp.'),
-    subTitle: t('Are you sure you want to disconnect?'),
-    title: t('Disconnect'),
+    content: t('ui.WalletConnect.ConnectionDetail.disconnectWarning'),
+    subTitle: t('ui.WalletConnect.ConnectionDetail.areYouSureToDisconnect'),
+    title: t('ui.WalletConnect.ConnectionDetail.disconnect'),
     type: 'error',
     closable: true
   }), [t]);
@@ -92,7 +92,7 @@ const Component: React.FC<ComponentProps> = (props) => {
             console.log(e);
             notification({
               type: 'error',
-              message: t('Fail to disconnect')
+              message: t('ui.WalletConnect.ConnectionDetail.failToDisconnect')
             });
           });
       })
@@ -132,8 +132,8 @@ const Component: React.FC<ComponentProps> = (props) => {
   const renderAccountEmpty = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your accounts will appear here.')}
-        emptyTitle={t('No account found')}
+        emptyMessage={t('ui.WalletConnect.ConnectionDetail.yourAccountsWillAppearHere')}
+        emptyTitle={t('ui.WalletConnect.ConnectionDetail.noAccountFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );
@@ -165,12 +165,12 @@ const Component: React.FC<ComponentProps> = (props) => {
             weight='fill'
           />
         ),
-        children: t('Disconnect'),
+        children: t('ui.WalletConnect.ConnectionDetail.disconnect'),
         schema: 'danger',
         loading: loading,
         onClick: onDisconnect
       }}
-      title={t('WalletConnect')}
+      title={t('ui.WalletConnect.ConnectionDetail.walletConnect')}
     >
       <div className='body-container'>
         <MetaInfo
@@ -178,7 +178,7 @@ const Component: React.FC<ComponentProps> = (props) => {
         >
           <MetaInfo.Default
             className='dapp-info-container'
-            label={t('DApp')}
+            label={t('ui.WalletConnect.ConnectionDetail.dApp')}
           >
             <div className='dapp-info-content'>
               <Image
@@ -192,7 +192,7 @@ const Component: React.FC<ComponentProps> = (props) => {
           </MetaInfo.Default>
           <MetaInfo.Default
             className='network-container'
-            label={t('Network')}
+            label={t('ui.WalletConnect.ConnectionDetail.network')}
           >
             <div
               className='network-content'
@@ -224,7 +224,7 @@ const Component: React.FC<ComponentProps> = (props) => {
           className={CN(className, 'network-modal')}
           id={networkModalId}
           onCancel={closeNetworkModal}
-          title={t('Connected network')}
+          title={t('ui.WalletConnect.ConnectionDetail.connectedNetwork')}
         >
           <SwList.Section
             className='network-list'
