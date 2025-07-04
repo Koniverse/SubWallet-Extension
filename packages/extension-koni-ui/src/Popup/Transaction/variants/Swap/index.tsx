@@ -1385,21 +1385,45 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }, [goHome, targetAccountProxy]);
 
   useEffect(() => {
-    fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`, { signal: controller.signal })
       .then((rawResp) => {
+        clearTimeout(timeout);
+
         if (!rawResp.ok) {
           throw new Error(`HTTP error! status: ${rawResp.status}`);
         }
 
-        return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string}>;
+        return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string }>;
       })
       .then((resp) => {
-        setPairMap(resp.data);
+        // simple validate
+        if (
+          resp && typeof resp === 'object' &&
+          resp.data && typeof resp.data === 'object' &&
+          !Array.isArray(resp.data)
+        ) {
+          setPairMap(resp.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
+
         setLoading(false);
       })
       .catch((error: Error) => {
-        console.error(`Error while fetching swap destinations: ${error.message}`);
+        if (error.name === 'AbortError') {
+          console.error('Fetch timeout after 10 seconds');
+        } else {
+          console.error(`Error while fetching swap destinations: ${error.message}`);
+        }
       });
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
 
   if (!targetAccountProxy) {
