@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { ValidatorInfo, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
@@ -129,4 +130,42 @@ export const getEarningTimeText = (hours?: number) => {
   } else {
     return detectTranslate('unknown time');
   }
+};
+
+export const getExtrinsicTypeByPoolInfo = (pool: YieldPoolInfo): string => {
+  const { chain, slug, type } = pool;
+
+  if (type === YieldPoolType.NOMINATION_POOL || type === YieldPoolType.NATIVE_STAKING) {
+    return ExtrinsicType.STAKING_BOND;
+  }
+
+  if (type === YieldPoolType.LIQUID_STAKING) {
+    if (chain === 'moonbeam') {
+      return ExtrinsicType.MINT_STDOT;
+    }
+
+    if (chain === 'bifrost_dot') {
+      if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+        return ExtrinsicType.MINT_VMANTA;
+      }
+
+      return ExtrinsicType.MINT_VDOT;
+    }
+
+    if (chain === 'parallel') {
+      return ExtrinsicType.MINT_SDOT;
+    }
+
+    if (chain === 'acala') {
+      return ExtrinsicType.MINT_LDOT;
+    }
+  }
+
+  if (type === YieldPoolType.LENDING) {
+    if (chain === 'interlay') {
+      return ExtrinsicType.MINT_QDOT;
+    }
+  }
+
+  return ExtrinsicType.STAKING_BOND;
 };

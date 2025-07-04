@@ -76,7 +76,7 @@ function Component (): React.ReactElement {
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token_detail', tokenGroupSlug);
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
@@ -146,7 +146,7 @@ function Component (): React.ReactElement {
     const result: BuyTokenInfo[] = [];
 
     Object.values(tokens).forEach((item) => {
-      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug)) {
+      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug) || excludedTokens.includes(item.slug)) {
         return;
       }
 
@@ -154,7 +154,7 @@ function Component (): React.ReactElement {
     });
 
     return result;
-  }, [allowedChains, tokenGroupMap, tokenGroupSlug, tokens]);
+  }, [allowedChains, excludedTokens, tokenGroupMap, tokenGroupSlug, tokens]);
 
   const tokenBalanceValue = useMemo<SwNumberProps['value']>(() => {
     if (tokenGroupSlug) {
@@ -205,6 +205,10 @@ function Component (): React.ReactElement {
       return currentAccountProxy && checkValidAcc(currentAccountProxy);
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
+
+  const isSupportSendFund = useMemo(() => {
+    return !excludedTokens.length || tokenBalanceItems.some(({ slug }) => !excludedTokens.includes(slug));
+  }, [excludedTokens, tokenBalanceItems]);
 
   const isReadonlyAccount = useMemo(() => {
     return currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
@@ -493,6 +497,7 @@ function Component (): React.ReactElement {
           isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
+          isSupportSendFund={isSupportSendFund}
           isSupportSwap={true}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}

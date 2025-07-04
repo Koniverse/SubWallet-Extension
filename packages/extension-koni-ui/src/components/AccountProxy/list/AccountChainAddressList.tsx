@@ -6,9 +6,9 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetAccountChainAddresses, useGetBitcoinAccounts, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountChainAddresses, useGetBitcoinAccounts, useHandleLedgerAccountWarning, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress, AccountInfoType, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
+import { copyToClipboard, runMultiWarningHandleModal } from '@subwallet/extension-koni-ui/utils';
 import { isBitcoinAddress } from '@subwallet/keyring';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
@@ -35,6 +35,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const getBitcoinAccounts = useGetBitcoinAccounts();
   const notify = useNotification();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
+  const onHandleLedgerAccountWarning = useHandleLedgerAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
@@ -179,14 +180,13 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }
       }
 
-      onHandleTonAccountWarning(item.accountType, () => {
-        onHandleLedgerGenericAccountWarning({
-          accountProxy: accountProxy,
-          chainSlug: item.slug
-        }, processFunction);
-      });
+      runMultiWarningHandleModal([
+        [onHandleTonAccountWarning, item.accountType],
+        [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug: item.slug }],
+        [onHandleLedgerAccountWarning, { accountProxy, targetSlug: item.slug, context: 'useNetwork' }]
+      ], processFunction);
     };
-  }, [accountProxy, addressQrModal, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
+  }, [accountProxy, addressQrModal, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, isInModal, modalProps, onHandleLedgerAccountWarning, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const onCopyAddress = useCallback((item: AccountChainAddress) => {
     return () => {
@@ -218,14 +218,13 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }
       }
 
-      onHandleTonAccountWarning(item.accountType, () => {
-        onHandleLedgerGenericAccountWarning({
-          accountProxy: accountProxy,
-          chainSlug: item.slug
-        }, processFunction);
-      });
+      runMultiWarningHandleModal([
+        [onHandleTonAccountWarning, item.accountType],
+        [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug: item.slug }],
+        [onHandleLedgerAccountWarning, { accountProxy, targetSlug: item.slug, context: 'useNetwork' }]
+      ], processFunction);
     };
-  }, [accountProxy, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
+  }, [accountProxy, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, notify, onHandleLedgerAccountWarning, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
 
   const onClickInfoButton = useCallback((item: AccountChainAddress) => {
     return () => {
