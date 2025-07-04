@@ -3,6 +3,7 @@
 
 import * as csl from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
+import { ErrorValidation } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoTxJson, CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoAssetMetadata, getAdaBelongUtxo, getCardanoTxFee, splitCardanoId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _CardanoApi } from '@subwallet/extension-base/services/chain-service/types';
@@ -28,7 +29,8 @@ export interface CardanoTransactionConfig {
   transferAll: boolean,
   cardanoTtlOffset: number,
   estimateCardanoFee: string,
-  cardanoPayload: string // hex unsigned tx
+  cardanoPayload: string, // hex unsigned tx
+  errors?: ErrorValidation[]
 }
 
 export async function createCardanoTransaction (params: CardanoTransactionConfigProps): Promise<[CardanoTransactionConfig | null, string]> {
