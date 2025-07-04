@@ -47,7 +47,13 @@ export class EVMLedger extends BaseLedger<EthApp> {
       const hex = hexStripPrefix(u8aToHex(message));
       const path = this.serializePath(accountOffset, addressOffset, accountOptions);
 
-      const { r, s, v } = await this.wrapError(app.signTransaction(path, hex));
+      // Important when calling `eth.signTransaction`:
+      // Some smart contracts are not yet supported by Ledger (no plugin available).
+      // In these cases, Ledger can fall back to "blind signing" if allowed.
+      // However, if the `resolution` parameter is missing or incorrectly passed
+      // (e.g., `undefined` instead of explicitly `null`), Ledger may reject the transaction
+      // with errors like `0x6a80` or "Invalid data".
+      const { r, s, v } = await this.wrapError(app.signTransaction(path, hex, null));
 
       const hexR = r.length % 2 === 1 ? `0${r}` : r;
       const hexS = s.length % 2 === 1 ? `0${s}` : s;
