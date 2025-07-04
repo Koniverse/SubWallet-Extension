@@ -44,12 +44,12 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
 
   const transactionType = useMemo((): ExtrinsicType => {
-    const pathName = location.pathname;
-    const action = pathName.split('/')[2] || '';
-
     if (transactionTypeProps) {
       return transactionTypeProps;
     }
+
+    const pathName = location.pathname;
+    const action = pathName.split('/')[2] || '';
 
     switch (action) {
       case 'earn':

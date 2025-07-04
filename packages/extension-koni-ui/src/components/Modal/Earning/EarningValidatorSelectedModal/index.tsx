@@ -42,7 +42,7 @@ const Component = (props: Props) => {
   const { addresses, chain, className = '', compound, from
     , modalId, nominations, onChange, readOnly, slug, title = 'Your validators' } = props;
 
-  const EARNING_CHANGE_VALIDATOR_MODAL = `${modalId}-base`;
+  const EARNING_CHANGE_VALIDATOR_MODAL = `${modalId}-change-validator`;
 
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [forceFetchValidator, setForceFetchValidator] = useState(false);
@@ -97,11 +97,6 @@ const Component = (props: Props) => {
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
-      e.stopPropagation();
-      inactiveModal(modalId);
-      setIsChangeValidatorModalVisible(true);
-      activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
-
       setStorage({
         ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
         slug: poolInfo.slug,
@@ -109,6 +104,11 @@ const Component = (props: Props) => {
         chain: chain,
         fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
       });
+
+      e.stopPropagation();
+      inactiveModal(modalId);
+      setIsChangeValidatorModalVisible(true);
+      activeModal(EARNING_CHANGE_VALIDATOR_MODAL);
     },
     [EARNING_CHANGE_VALIDATOR_MODAL, activeModal, chain, currentAccountProxy, from, inactiveModal, modalId, poolInfo.slug, setStorage]
   );
