@@ -112,7 +112,7 @@
     "@subwallet/react-ui": "5.1.2-b79",
     "@subwallet/ui-keyring": "^0.1.12",
     "@types/bn.js": "^5.1.6",
-    "@zondax/ledger-substrate": "1.0.1",
+    "@zondax/ledger-substrate": "1.1.2",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^29.3.1",
     "bitcoinjs-lib": "6.1.5",
