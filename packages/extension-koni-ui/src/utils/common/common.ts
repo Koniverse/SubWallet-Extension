@@ -37,3 +37,19 @@ export function shuffle<T = any> (array: T[]) {
 export const getLogoByNetworkKey = (networkKey: string, defaultLogo = 'default'): string => {
   return ChainLogoMap[networkKey] || ChainLogoMap[defaultLogo] || ChainLogoMap.default;
 };
+
+type WarningHandler<P> = (param: P, next: VoidFunction) => void;
+
+// Use this function to run multi warning handlers modal
+export function runMultiWarningHandleModal<
+  THandlers extends readonly [WarningHandler<any>, any][]
+> (
+  handlers: [...THandlers],
+  onComplete: VoidFunction
+): void {
+  const chain = handlers
+    .map(([fn, param]) => (next: VoidFunction) => () => fn(param, next))
+    .reduceRight((next, wrap) => wrap(next), onComplete);
+
+  chain();
+}

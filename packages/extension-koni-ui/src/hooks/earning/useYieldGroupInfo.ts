@@ -3,24 +3,54 @@
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
+import { getExtrinsicTypeByPoolInfo } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
   const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const { tokenGroupMap } = useTokenGroup(allowedChains, excludedTokens);
   const { tokenBalanceMap } = useAccountBalance(tokenGroupMap, true);
+
+  const extrinsicTypeSupported = useMemo(() => {
+    if (!currentAccountProxy) {
+      return null;
+    }
+
+    const transactionActionsSet = new Set<string>();
+
+    if (isAccountAll(currentAccountProxy.id)) {
+      accountProxies.forEach((proxy) => {
+        proxy.accounts?.forEach(({ transactionActions }) => {
+          transactionActions?.forEach((action) => transactionActionsSet.add(action));
+        });
+      });
+    } else {
+      currentAccountProxy.accounts.forEach(({ transactionActions }) => {
+        transactionActions?.forEach((action) => transactionActionsSet.add(action));
+      });
+    }
+
+    return Array.from(transactionActionsSet);
+  }, [accountProxies, currentAccountProxy]);
 
   return useMemo(() => {
     const result: Record<string, YieldGroupInfo> = {};
 
     for (const pool of Object.values(poolInfoMap)) {
       const chain = pool.chain;
+      const extrinsicType = getExtrinsicTypeByPoolInfo(pool);
+
+      if (extrinsicTypeSupported && !extrinsicTypeSupported.includes(extrinsicType)) {
+        continue;
+      }
 
       if (allowedChains.includes(chain)) {
         const group = pool.group;
@@ -120,7 +150,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     }
 
     return Object.values(result);
-  }, [assetRegistry, chainInfoMap, allowedChains, excludedTokens, multiChainAssetMap, poolInfoMap, tokenBalanceMap]);
+  }, [poolInfoMap, extrinsicTypeSupported, allowedChains, chainInfoMap, tokenBalanceMap, multiChainAssetMap, assetRegistry, excludedTokens]);
 };
 
 export default useYieldGroupInfo;
