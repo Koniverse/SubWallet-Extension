@@ -16,7 +16,7 @@ function getChainSlugsByAccountProxySingle (accountProxySingle: AccountProxy, ch
   const slugSet = new Set<string>();
 
   for (const chainInfo of Object.values(chainInfoMap)) {
-    if (accountProxySingle.accounts.some((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account.chainType, account.type))) {
+    if (accountProxySingle.accounts.some((account) => _isChainInfoCompatibleWithAccountInfo(chainInfo, account))) {
       slugSet.add(chainInfo.slug);
     }
   }
