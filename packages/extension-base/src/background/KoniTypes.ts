@@ -39,6 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
+import { _DelegateInfo, _ReferendumInfo, DelegateRequest, GetAbstainTotalRequest, GetLockedBalanceRequest, LockedDetail, RemoveVoteRequest, SplitAbstainVoteRequest, StandardVoteRequest, Tracks, UndelegateRequest, UnlockBalanceRequest } from '../services/open-gov/interface';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -576,6 +577,9 @@ export enum ExtrinsicType {
   CLAIM_BRIDGE = 'claim.claim_bridge',
 
   // SET_FEE_TOKEN = 'set_fee-token',
+  VOTE = 'gov.vote',
+  DELEGATE = 'gov.delegate',
+  UNLOCK = 'gov.unlock',
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -632,6 +636,9 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
+  [ExtrinsicType.VOTE]: any, // TODO: avoid any
+  [ExtrinsicType.DELEGATE]: any, // TODO: avoid any
+  [ExtrinsicType.UNLOCK]: any, // TODO: avoid any
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }
@@ -2737,6 +2744,21 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+
+  /* Gov */
+  'pri(openGov.fetchReferendums)': [string, _ReferendumInfo[]];
+  'pri(openGov.getAbstainTotal)': [GetAbstainTotalRequest, string];
+  'pri(openGov.standardVote)': [StandardVoteRequest, SWTransactionResponse];
+  'pri(openGov.splitAbstainVote)': [SplitAbstainVoteRequest, SWTransactionResponse];
+  'pri(openGov.removeVote)': [RemoveVoteRequest, SWTransactionResponse];
+
+  'pri(openGov.fetchDelegates)': [string, _DelegateInfo[]];
+  'pri(openGov.delegate)': [DelegateRequest, SWTransactionResponse];
+  'pri(openGov.undelegate)': [UndelegateRequest, SWTransactionResponse];
+  'pri(openGov.editDelegate)': [DelegateRequest, SWTransactionResponse];
+  'pri(openGov.getLockedBalance)': [GetLockedBalanceRequest, LockedDetail[]];
+  'pri(openGov.unlockBalance)': [UnlockBalanceRequest, SWTransactionResponse];
+  'pri(openGov.getTracks)': [string, Tracks[]];
 }
 
 export interface ApplicationMetadataType {

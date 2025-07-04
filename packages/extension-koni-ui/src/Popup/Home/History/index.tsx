@@ -13,7 +13,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Alien, Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, FlyingSaucer, LockKeyOpen, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -33,7 +33,10 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   processing: Spinner,
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
-  swap: ArrowsLeftRight
+  swap: ArrowsLeftRight,
+  vote: Alien,
+  delegate: FlyingSaucer,
+  unlock: LockKeyOpen
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -63,6 +66,18 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (isTypeStaking(item.type)) {
     return IconMap.staking;
+  }
+
+  if (item.type === ExtrinsicType.VOTE) {
+    return IconMap.vote;
+  }
+
+  if (item.type === ExtrinsicType.DELEGATE) {
+    return IconMap.delegate;
+  }
+
+  if (item.type === ExtrinsicType.UNLOCK) {
+    return IconMap.unlock;
   }
 
   return IconMap.default;
@@ -324,6 +339,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve'),
     [ExtrinsicType.SWAP]: t('Swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
+    [ExtrinsicType.VOTE]: t('Vote'),
+    [ExtrinsicType.DELEGATE]: t('Delegate'),
+    [ExtrinsicType.UNLOCK]: t('Unlock'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
@@ -369,6 +387,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve transaction'),
     [ExtrinsicType.SWAP]: t('Swap transaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
+    [ExtrinsicType.VOTE]: t('Vote transaction'),
+    [ExtrinsicType.DELEGATE]: t('Delegate transaction'),
+    [ExtrinsicType.UNLOCK]: t('Unlock transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 
