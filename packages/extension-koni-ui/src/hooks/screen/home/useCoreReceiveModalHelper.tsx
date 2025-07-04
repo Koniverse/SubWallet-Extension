@@ -337,14 +337,34 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    const handleShowQrModal = (chain: string) => {
-      const chainInfo = chainInfoMap[chain];
+    const handleShowQrModal = (chainSlug: string, tokenSlug: string) => {
+      const chainInfo = chainInfoMap[chainSlug];
 
       if (!chainInfo) {
         return;
       }
 
-      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chain);
+      const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
+
+      if (isBitcoinChain) {
+        const accountTokenAddressList = getBitcoinAccounts(chainSlug, tokenSlug, chainInfo, currentAccountProxy.accounts);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        } else if (accountTokenAddressList.length === 1) {
+          openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        }
+
+        return;
+      }
+
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
 
       for (const accountJson of currentAccountProxy.accounts) {
         const reformatedAddress = getReformatAddress(accountJson, chainInfo);
@@ -361,11 +381,11 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
           setSelectedAccountAddressItem(accountAddressItem);
 
           if (isPolkadotUnifiedChain) {
-            openAddressFormatModal(chainInfo.name, reformatedAddress, chain, () => {
+            openAddressFormatModal(chainInfo.name, reformatedAddress, chainSlug, () => {
               setSelectedAccountAddressItem(undefined);
             });
           } else {
-            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chain, () => {
+            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, () => {
               setSelectedAccountAddressItem(undefined);
             }, false);
           }
@@ -391,7 +411,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
       // current account is not All, just do show QR logic
 
-      handleShowQrModal(specificSelectedTokenInfo.chainSlug);
+      handleShowQrModal(specificSelectedTokenInfo.chainSlug, specificSelectedTokenInfo.tokenSlug);
 
       return;
     }
@@ -407,13 +427,13 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         return;
       }
 
-      handleShowQrModal(tokenSelectorItems[0].originChain);
+      handleShowQrModal(tokenSelectorItems[0].originChain, tokenSelectorItems[0].slug);
 
       return;
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getBitcoinAccounts, getReformatAddress, inactiveModal, isAllAccount, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {
