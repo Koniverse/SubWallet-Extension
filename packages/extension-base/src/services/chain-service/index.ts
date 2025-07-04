@@ -7,6 +7,7 @@ import { _AssetRef, _AssetRefPath, _AssetType, _CardanoInfo, _ChainAsset, _Chain
 import { AssetSetting, CardanoPaginate, MetadataItem, SufficientChainsDetails, TokenPriorityDetails, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoUtxosItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { _DEFAULT_ACTIVE_CHAINS, _ZK_ASSET_PREFIX, LATEST_CHAIN_DATA_FETCHING_INTERVAL } from '@subwallet/extension-base/services/chain-service/constants';
+import { BitcoinChainHandler } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/BitcoinChainHandler';
 import { CardanoChainHandler } from '@subwallet/extension-base/services/chain-service/handler/CardanoChainHandler';
 import { EvmChainHandler } from '@subwallet/extension-base/services/chain-service/handler/EvmChainHandler';
 import { MantaPrivateHandler } from '@subwallet/extension-base/services/chain-service/handler/manta/MantaPrivateHandler';
@@ -14,7 +15,7 @@ import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-
 import { TonChainHandler } from '@subwallet/extension-base/services/chain-service/handler/TonChainHandler';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainBitcoinCompatible, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureBitcoinChain, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request-service/helper';
@@ -33,9 +34,10 @@ import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
 const filterChainInfoMap = (data: Record<string, _ChainInfo>, ignoredChains: string[]): Record<string, _ChainInfo> => {
   return Object.fromEntries(
     Object.entries(data)
-      .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
+      .filter(([slug, info]) => !ignoredChains.includes(slug))
   );
 };
+// .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
 
 const ignoredList = [
   'bevm',
@@ -59,7 +61,15 @@ const ignoredList = [
 export const filterAssetInfoMap = (chainInfo: Record<string, _ChainInfo>, assets: Record<string, _ChainAsset>, addedChains?: string[]): Record<string, _ChainAsset> => {
   return Object.fromEntries(
     Object.entries(assets)
-      .filter(([, info]) => chainInfo[info.originChain] || addedChains?.includes(info.originChain))
+      .filter(([, info]) => {
+        const isBitcoinChain = chainInfo?.[info.originChain] && _isChainBitcoinCompatible(chainInfo[info.originChain]);
+
+        if (isBitcoinChain) {
+          return ![_AssetType.RUNE, _AssetType.BRC20].includes(info.assetType);
+        }
+
+        return chainInfo[info.originChain] || addedChains?.includes(info.originChain);
+      })
   );
 };
 
@@ -78,6 +88,7 @@ export class ChainService {
 
   private substrateChainHandler: SubstrateChainHandler;
   private evmChainHandler: EvmChainHandler;
+  private bitcoinChainHandler: BitcoinChainHandler;
   private tonChainHandler: TonChainHandler;
   private cardanoChainHandler: CardanoChainHandler;
   private mantaChainHandler: MantaPrivateHandler | undefined;
@@ -127,6 +138,7 @@ export class ChainService {
     this.evmChainHandler = new EvmChainHandler(this);
     this.tonChainHandler = new TonChainHandler(this);
     this.cardanoChainHandler = new CardanoChainHandler(this);
+    this.bitcoinChainHandler = new BitcoinChainHandler(this);
 
     this.logger = createLogger('chain-service');
   }
@@ -218,6 +230,14 @@ export class ChainService {
 
   public getSubstrateApiMap () {
     return this.substrateChainHandler.getSubstrateApiMap();
+  }
+
+  public getBitcoinApi (slug: string) {
+    return this.bitcoinChainHandler.getApiByChain(slug);
+  }
+
+  public getBitcoinApiMap () {
+    return this.bitcoinChainHandler.getApiMap();
   }
 
   public getTonApi (slug: string) {
@@ -1048,6 +1068,12 @@ export class ChainService {
 
       this.cardanoChainHandler.setCardanoApi(chainInfo.slug, chainApi);
     }
+
+    if (chainInfo.bitcoinInfo !== null && chainInfo.bitcoinInfo !== undefined) {
+      const chainApi = await this.bitcoinChainHandler.initApi(chainInfo.slug, endpoint, { providerName, onUpdateStatus });
+
+      this.bitcoinChainHandler.setApi(chainInfo.slug, chainApi);
+    }
   }
 
   private destroyApiForChain (chainInfo: _ChainInfo) {
@@ -1065,6 +1091,10 @@ export class ChainService {
 
     if (chainInfo.cardanoInfo !== null) {
       this.cardanoChainHandler.destroyCardanoApi(chainInfo.slug);
+    }
+
+    if (chainInfo.bitcoinInfo !== null && chainInfo.bitcoinInfo !== undefined) {
+      this.bitcoinChainHandler.destroyApi(chainInfo.slug);
     }
   }
 
@@ -1251,6 +1281,10 @@ export class ChainService {
 
   private async fetchLatestSufficientChains () {
     return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
+  }
+
+  public async fetchAhMapChain () {
+    return await fetchStaticData<Record<string, string>>('asset-hub-staking-map');
   }
 
   private async initChains () {
@@ -2033,7 +2067,8 @@ export class ChainService {
       this.substrateChainHandler.sleep(),
       this.evmChainHandler.sleep(),
       this.tonChainHandler.sleep(),
-      this.cardanoChainHandler.sleep()
+      this.cardanoChainHandler.sleep(),
+      this.bitcoinChainHandler.sleep()
     ]);
 
     this.stopCheckLatestChainData();
@@ -2044,7 +2079,8 @@ export class ChainService {
       this.substrateChainHandler.wakeUp(),
       this.evmChainHandler.wakeUp(),
       this.tonChainHandler.wakeUp(),
-      this.cardanoChainHandler.wakeUp()
+      this.cardanoChainHandler.wakeUp(),
+      this.bitcoinChainHandler.wakeUp()
     ]);
 
     this.checkLatestData();

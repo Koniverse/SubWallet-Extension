@@ -23,6 +23,7 @@ import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
 import MigrateImportedToken from './MigrateImportedToken';
 import MigrateNetworkSettings from './MigrateNetworkSettings';
+import MigrateNewUnifiedAccount from './MigrateNewUnifiedAccount';
 import MigrateTokenDecimals from './MigrateTokenDecimals';
 import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
@@ -65,7 +66,8 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.3.6-01': MigrateTransactionHistoryBridge,
   '1.3.10-01': ClearMetadataDatabase,
   '1.3.26-01': DisableZeroBalanceTokens,
-  [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos
+  [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos,
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
+  '1.3.42-01': MigrateNewUnifiedAccount
 };

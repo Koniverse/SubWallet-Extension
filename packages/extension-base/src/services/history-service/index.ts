@@ -5,8 +5,9 @@ import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionHistoryItem, XCMT
 import { CRON_RECOVER_HISTORY_INTERVAL } from '@subwallet/extension-base/constants';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { parseBitcoinTransferData } from '@subwallet/extension-base/services/history-service/bitcoin-history';
 import { historyRecover, HistoryRecoverStatus } from '@subwallet/extension-base/services/history-service/helpers/recoverHistoryStatus';
 import { getExtrinsicParserKey } from '@subwallet/extension-base/services/history-service/helpers/subscan-extrinsic-parser-helper';
 import { parseSubscanExtrinsicData, parseSubscanTransferData } from '@subwallet/extension-base/services/history-service/subscan-history';
@@ -179,16 +180,43 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     });
   }
 
+  // Only 1 address is passed in
+  private async fetchBitcoinTransactionHistory (chain: string, addresses: string[]) {
+    const chainInfo = this.chainService.getChainInfoByKey(chain);
+    const chainState = this.chainService.getChainStateByKey(chain);
+
+    if (!chainState.active) {
+      return;
+    }
+
+    const bitcoinApi = this.chainService.getBitcoinApi(chain);
+    const allParsedItems: TransactionHistoryItem[] = [];
+
+    for (const address of addresses) {
+      const transferItems = await bitcoinApi.api.getAddressTransaction(address);
+
+      const parsedItems = transferItems.map((item, index) => {
+        const parsedItem = parseBitcoinTransferData(address, item, chainInfo);
+
+        return { ...parsedItem, apiTxIndex: index };
+      });
+
+      allParsedItems.push(...parsedItems);
+    }
+
+    await this.addHistoryItems(allParsedItems);
+  }
+
   subscribeHistories (chain: string, proxyId: string, cb: (items: TransactionHistoryItem[]) => void) {
     const addresses = this.keyringService.context.getDecodedAddresses(proxyId, false);
+    const chainInfo = this.chainService.getChainInfoByKey(chain);
     const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
     const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
+    const bitcoinAddresses = getAddressesByChainType(addresses, [ChainType.BITCOIN], chainInfo);
 
     const subscription = this.historySubject.subscribe((items) => {
       cb(items.filter(filterHistoryItemByAddressAndChain(chain, addresses)));
     });
-
-    const chainInfo = this.chainService.getChainInfoByKey(chain);
 
     if (_isChainSubstrateCompatible(chainInfo)) {
       if (_isChainEvmCompatible(chainInfo)) {
@@ -196,6 +224,10 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       } else {
         this.fetchSubscanTransactionHistory(chain, substrateAddresses);
       }
+    } else if (_isChainBitcoinCompatible(chainInfo)) {
+      this.fetchBitcoinTransactionHistory(chain, bitcoinAddresses).catch((e) => {
+        console.log('fetchBitcoinTransactionHistory Error', e);
+      });
     }
 
     return {
@@ -235,7 +267,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         (item_) => item_.extrinsicHash === item.extrinsicHash && item.chain === item_.chain && item.address === item_.address);
 
       if (needUpdateItem) {
-        updateRecords.push({ ...needUpdateItem, status: item.status });
+        updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex });
 
         return;
       }
@@ -308,6 +340,9 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       switch (recoverResult.status) {
         case HistoryRecoverStatus.API_INACTIVE:
           break;
+        case HistoryRecoverStatus.TX_PENDING:
+          delete this.#needRecoveryHistories[currentExtrinsicHash];
+          break;
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
@@ -354,7 +389,13 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
 
     histories
       .filter((history) => {
-        return [ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status);
+        if ([ExtrinsicStatus.PROCESSING, ExtrinsicStatus.SUBMITTING].includes(history.status)) {
+          return true;
+        } else if (history.status === ExtrinsicStatus.SUCCESS && history.chainType === 'bitcoin') {
+          return !history.blockTime;
+        }
+
+        return false;
       })
       .filter((history) => {
         if (history.type === ExtrinsicType.TRANSFER_XCM) {
