@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.46
+Build date: Jul 04, 2025.
+
+Features & Update:
+- Update ledger-substrate-js library (#4365)
+- Upgrading certain technical issues of the EVM provider (#2871)
+- Support Asset Hub migration (#3710)
+
+
 ## 1.3.45
 Build date: Jul 01, 2025.
 
