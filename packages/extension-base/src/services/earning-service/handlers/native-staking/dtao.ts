@@ -10,7 +10,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -750,7 +750,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, maxAmount, originValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, metadata, maxAmount, originValidator, selectedValidators: targetValidators, subnetData } = data;
 
     if (!subnetData || !originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
@@ -774,8 +774,12 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
     // Avoid remaining amount too low -> can't do anything with that amount
+    if (new BigN(maxAmount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+    }
+
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Remaining amount too low')));
+      return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);

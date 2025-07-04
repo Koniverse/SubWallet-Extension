@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -691,8 +691,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
 
     // Avoid remaining amount too low -> can't do anything with that amount
+    if (new BigN(maxAmount).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
+    }
+
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Remaining amount too low')));
+      return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);

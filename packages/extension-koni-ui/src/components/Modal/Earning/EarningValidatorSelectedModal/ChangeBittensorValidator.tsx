@@ -310,7 +310,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           .then(onSuccess)
           .catch((error: TransactionError) => {
             if (
-              error.message.includes('Remaining amount too low')
+              error.message.includes('Remaining amount too low')  // TODO
             ) {
               openAlert({
                 type: NotificationType.WARNING,
