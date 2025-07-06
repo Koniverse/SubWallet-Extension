@@ -234,7 +234,7 @@ const getByAssetRegistryWithAssetIdPallet = async (asset: _ChainAsset, api: ApiP
 export const getLocalAssetInfo = async (chain: string, asset: _ChainAsset, api: ApiPromise): Promise<AssetSpec> => {
   if (['astar', 'shiden', 'shibuya', 'statemint', 'statemine', 'moonbeam', 'moonbase', 'moonriver', 'parallel', 'pangolin', 'darwinia2', 'crabParachain'].includes(chain)) {
     return getByAssetPallet(asset, api);
-  } else if (['pioneer', 'bitcountry'].includes(chain)) {
+  } else if (['pioneer'].includes(chain)) {
     return getByAssetManagerWithChainInfoPallet(asset, api);
   } else if (['acala', 'karura', 'acala_testnet'].includes(chain)) {
     return getByAssetRegistryWithChainInfoPallet(asset, api);

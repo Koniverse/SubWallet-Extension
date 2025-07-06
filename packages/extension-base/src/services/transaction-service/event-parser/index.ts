@@ -35,20 +35,6 @@ export function parseXcmEventLogs (historyItem: Partial<TransactionHistoryItem>,
 export function parseTransferEventLogs (historyItem: Partial<TransactionHistoryItem>, eventLogs: EventRecord[], chain: string, sendingTokenInfo: _ChainAsset, chainInfo: _ChainInfo) {
   for (let index = 0; index < eventLogs.length; index++) {
     const record = eventLogs[index];
-
-    if (['genshiro_testnet', 'genshiro', 'equilibrium_parachain'].includes(chain) && sendingTokenInfo) {
-      if (record.event.section === 'transactionPayment' &&
-        record.event.method.toLowerCase() === 'transactionfeepaid') {
-        if (record.event.data[1]?.toString()) {
-          historyItem.fee = {
-            value: record.event.data[1]?.toString() || '0',
-            symbol: sendingTokenInfo.symbol,
-            decimals: _getAssetDecimals(sendingTokenInfo)
-          };
-        }
-      }
-    }
-
     const { decimals: nativeDecimals, symbol: nativeSymbol } = _getChainNativeTokenBasicInfo(chainInfo);
 
     if (record.event.section === 'balances' &&

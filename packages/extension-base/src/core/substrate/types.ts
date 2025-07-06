@@ -28,9 +28,9 @@ export type FrameSystemAccountInfoV1 = {
 export type FrameSystemAccountInfo = FrameSystemAccountInfoV1 | FrameSystemAccountInfoV2;
 
 export type OrmlTokensAccountData = {
-  free: number,
-  reserved: number,
-  frozen: number
+  free: number | bigint,
+  reserved: number | bigint,
+  frozen: number | bigint
 }
 
 export type PalletAssetsAssetAccountWithStatus = {

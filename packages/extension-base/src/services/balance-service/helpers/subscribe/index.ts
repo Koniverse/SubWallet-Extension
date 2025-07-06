@@ -141,7 +141,10 @@ export function subscribeBalance (
       );
     }
 
-    const substrateApi = await substrateApiMap[chainSlug].isReady;
+    const [substrateApi] = await Promise.all([
+      substrateApiMap[chainSlug].isReady,
+      substrateApiMap[chainSlug].isClientReady
+    ]);
 
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
