@@ -4,7 +4,7 @@
 import { AccountChainType, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { getExcludedTokensForLedgerEvm, getExcludedTokensForSubstrateEcdsa, getSignModeByAccountProxy, hasOnlySpecificLedgerAccountProxyType } from '@subwallet/extension-koni-ui/utils';
+import { checkIfAllAccountsAreSpecificLedgerTypes, getExcludedTokensForLedgerEvm, getExcludedTokensForSubstrateEcdsa, getSignModeByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { useCallback } from 'react';
 
 // This hook retrieves a list of excluded tokens based on the provided chain list and account proxy.
@@ -24,7 +24,7 @@ const useGetExcludedTokens = () => {
     }
 
     if (isAccountAll(targetAccountProxy.id)) {
-      const { hasOnlyLedgerEvm, hasOnlyLedgerSubstrateEcdsa } = hasOnlySpecificLedgerAccountProxyType(accountProxies);
+      const { hasOnlyLedgerEvm, hasOnlyLedgerSubstrateEcdsa } = checkIfAllAccountsAreSpecificLedgerTypes(accountProxies);
 
       if (hasOnlyLedgerSubstrateEcdsa) {
         return getExcludedTokensForSubstrateEcdsa(chainAssetList, chainList, chainInfoMap);

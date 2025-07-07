@@ -36,7 +36,7 @@ export const isSubstrateEcdsaAccountProxy = (accountProxy: AccountProxy) => {
 };
 
 // This function checks if the account proxies only contain Ledger Substrate ECDSA or Ledger EVM accounts
-export const hasOnlySpecificLedgerAccountProxyType = (accountProxies: AccountProxy[]) => {
+export const checkIfAllAccountsAreSpecificLedgerTypes = (accountProxies: AccountProxy[]) => {
   const noAllAccountProxy = accountProxies.filter((accountProxy) => !isAccountAll(accountProxy.id));
 
   let hasOnlyLedgerSubstrateEcdsa = true;
