@@ -211,8 +211,8 @@ const Component: React.FC<Props> = (props: Props) => {
           </MetaInfo>
           <AlertBox
             className={'alert-box'}
-            description={t('An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete')}
-            title={t('TAO unstaking fee')}
+            description={t('A fee equivalent of 0.00005 TAO will be deducted from your stake amount on the new validator once the transaction is complete')}
+            title={t('Validator change fee')}
             type='info'
           />
         </>

@@ -690,13 +690,15 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
 
-    // Avoid remaining amount too low -> can't do anything with that amount
     if (new BigN(maxAmount).lt(bnMinUnstake)) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
     }
 
+    // Avoid remaining amount too low -> can't do anything with that amount
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
-      return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW));
+      return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
+        t(`Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit "Move all" to move all ${formatNumber(maxAmount, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to the new validator, or "Cancel" and lower the amount, then try again`
+        )));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);

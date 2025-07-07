@@ -311,13 +311,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         (changeEarningValidator(submitData))
           .then(onSuccess)
           .catch((error: TransactionError) => {
-            if (error.message.includes('Remaining amount too low')) {
+            if (error.message.includes('remaining')) {
               openAlert({
                 type: NotificationType.WARNING,
-                title: t('Amount too low'),
+                title: t('Pay attention!'),
                 content: error.message,
                 okButton: {
-                  text: t('Transfer Max'),
+                  text: t('Move all'),
                   onClick: () => {
                     closeAlert();
                     send(bondedValue);
