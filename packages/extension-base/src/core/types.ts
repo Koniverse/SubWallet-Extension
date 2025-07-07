@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountJson } from '@subwallet/extension-base/types';
 
-export type LedgerMustCheckType = 'polkadot' | 'migration' | 'unnecessary';
+export type LedgerMustCheckType = 'polkadot' | 'migration' | 'polkadot_ecdsa' | 'unnecessary';
 
 export enum ValidationCondition {
   IS_NOT_NULL = 'IS_NOT_NULL',
@@ -27,9 +27,10 @@ export enum ActionType {
 export interface ValidateRecipientParams {
   srcChain: string,
   destChainInfo: _ChainInfo,
+  assetInfo?: _ChainAsset,
   fromAddress: string,
   toAddress: string,
-  account: AccountJson | null,
+  account: AccountJson | null, // If the recipient address exists in the wallet, then `account` is the information of that address.
   actionType: ActionType,
   autoFormatValue?: boolean,
   allowLedgerGenerics: string[]
