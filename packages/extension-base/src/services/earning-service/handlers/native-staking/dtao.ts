@@ -773,12 +773,14 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
-    if (new BigN(maxAmount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+    const bnMinUnstake = formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken));
+
+    if (new BigN(maxAmount).lt(bnMinUnstake)) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
     }
 
     // Avoid remaining amount too low -> can't do anything with that amount
-    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
+    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
       return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
         t(`Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit "Move all" to move all ${formatNumber(maxAmount, _getAssetDecimals(this.nativeToken))} ${metadata?.subnetSymbol || ''} to the new validator, or "Cancel" and lower the amount, then try again`
         )));
