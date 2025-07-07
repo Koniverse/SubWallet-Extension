@@ -15,13 +15,17 @@
     "packages/*"
   ],
   "bin": {
+    "i18n-mapping-generator": "scripts/i18n/i18n-mapping-generator.mjs",
+    "i18n-text-replacer": "scripts/i18n/i18n-text-replacer.mjs",
+    "i18n-update-translation-files": "scripts/i18n/i18n-update-translation-files.mjs",
     "koni-ci-build-dev": "./scripts/koni-ci-build-dev.mjs",
     "koni-ci-build-i18n": "./scripts/koni-ci-build-i18n.mjs",
     "koni-ci-build-webapp": "./scripts/koni-ci-build-webapp.mjs",
     "koni-ci-ghact-build": "./scripts/koni-ci-ghact-build.mjs",
     "koni-ci-mv3-firefox": "./scripts/koni-ci-mv3-firefox.mjs",
     "koni-ci-webapp-update-build-number": "./scripts/koni-ci-webapp-update-build-number.mjs",
-    "koni-dev-build-ts": "./scripts/koni-dev-build-ts.mjs"
+    "koni-dev-build-ts": "./scripts/koni-dev-build-ts.mjs",
+    "koni-dev-lint-changes": "./scripts/lint-changes.mjs"
   },
   "scripts": {
     "build": "koni-dev-build-ts && yarn build:zip && yarn build:rollup",
@@ -42,6 +46,9 @@
     "lint": "polkadot-dev-run-lint",
     "lint:changes": "git diff --name-only | grep -E '.(js|ts|tsx)$' | xargs eslint --fix",
     "postinstall": "polkadot-dev-yarn-only && patch-package",
+    "i18n:generate-mapping": "i18n-mapping-generator",
+    "i18n:replace-text": "i18n-text-replacer",
+    "i18n:update-trans-files": "i18n-update-translation-files",
     "start": "yarn watch",
     "test": "polkadot-dev-run-test --detectOpenHandles --testPathIgnorePatterns='/node_modules/|.*/ignore-.*\\.(test|spec)\\..*'",
     "test:one": "polkadot-dev-run-test --detectOpenHandles",
@@ -68,7 +75,8 @@
     "loglevel": "^1.8.1",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vinyl-fs": "^4.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
@@ -77,11 +85,13 @@
     "@types/jest": "^29.5.0",
     "axios": "^1.6.2",
     "discord-webhook-node": "^1.1.8",
+    "glob": "^11.0.3",
     "i18next-scanner": "^4.0.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
+    "replace-in-file": "^8.3.0",
     "sinon-chrome": "^3.0.1"
   },
   "resolutions": {
