@@ -54,7 +54,7 @@ type WarningHandler<P> = (param: P, next: VoidFunction) => void;
  *                            sequence.
  * @param {VoidFunction} onComplete - A callback function to be called when all handlers have been executed.
  */
-export function runNestedWarningHandlersModal<
+export function runNestedWarningModalHandlers<
   THandlers extends readonly [WarningHandler<any>, any][]
 > (
   handlers: [...THandlers],
