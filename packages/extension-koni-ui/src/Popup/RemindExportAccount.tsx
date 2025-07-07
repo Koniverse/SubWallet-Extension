@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
           {t('ui.RemindExportAccount.backUpYourAccounts')}
         </div>
         <div className='description'>
-          {t('If you lose your seed phrases/private keys/JSON backup files/QR backup codes, your accounts can\'t be recovered and your assets are lost. Learn how to back up your accounts to secure your assets now.')}
+          {t('ui.RemindExportAccount.backupToSecureAssetsWarning')}
         </div>
       </div>
     </Layout.WithSubHeaderOnly>

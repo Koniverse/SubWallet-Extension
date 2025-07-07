@@ -30,7 +30,7 @@ export default function useHandleTonAccountWarning (): HookType {
         content: (
           <>
             <div>
-              {t('This address\'s seed phrase is not compatible with TON-native wallets. Continue using this address or create a new account that can be used on both SubWallet and TON-native wallets')}
+              {t('ui.hook.account.useHandleTonWarning.tonIncompatibleSeedPhraseAction')}
             </div>
           </>
         ),

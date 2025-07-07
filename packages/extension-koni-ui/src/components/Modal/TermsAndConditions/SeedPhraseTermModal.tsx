@@ -42,8 +42,8 @@ const Component = ({ className }: Props) => {
   const { token } = useTheme() as Theme;
 
   const ListTermSeedPhrase: Record<TermSeedPhrase, string> = useMemo(() => ({
-    [TermSeedPhrase.TERM_1]: t('SubWallet doesn\'t keep any copy of your seed phrase and other backup methods such as JSON file or private key.'),
-    [TermSeedPhrase.TERM_2]: t('SubWallet can\'t help you recover your account once your seed phrase, JSON file or private key is lost.'),
+    [TermSeedPhrase.TERM_1]: t('ui.Modal.Terms.SeedPhrase.subwalletDoesNotKeepSeed'),
+    [TermSeedPhrase.TERM_2]: t('ui.Modal.Terms.SeedPhrase.subwalletCannotRecoverAccount'),
     [TermSeedPhrase.TERM_3]: t('ui.Modal.Terms.SeedPhrase.writeSeedPhraseInOrder'),
     [TermSeedPhrase.TERM_4]: t('ui.Modal.Terms.SeedPhrase.doNotStoreSeedDigitally')
   }), [t]);

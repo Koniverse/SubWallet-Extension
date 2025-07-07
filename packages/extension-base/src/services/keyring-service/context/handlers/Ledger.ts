@@ -74,7 +74,7 @@ export class AccountLedgerHandler extends AccountBaseHandler {
     const addresses: string[] = [];
 
     if (!accounts.length) {
-      throw new Error(t('Can\'t find an account. Please try again'));
+      throw new Error(t('bg.keyring.handler.Ledger.cantFindAccountTryAgain'));
     }
 
     const exists = this.state.checkAddressExists(accounts.map((account) => account.address));

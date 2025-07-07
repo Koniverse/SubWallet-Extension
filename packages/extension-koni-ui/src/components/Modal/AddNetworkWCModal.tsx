@@ -78,7 +78,7 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
             }}
           />
           <div className='__modal-description'>
-            {t(' The network you\'re connecting to is not yet supported on SubWallet. Add the network first, then connect with WalletConnect again.')}
+            {t('ui.Modal.AddNetworkWC.unsupportedNetworkAddFirst')}
           </div>
         </div>
       </SwModal>

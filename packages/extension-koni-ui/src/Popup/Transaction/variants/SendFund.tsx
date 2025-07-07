@@ -379,7 +379,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
-      return Promise.reject(t('You don\'t have enough tokens to proceed'));
+      return Promise.reject(t('ui.Transaction.SendFund.notEnoughTokensToProceed'));
     }
 
     if ((new BigN(amount)).eq(new BigN(0))) {

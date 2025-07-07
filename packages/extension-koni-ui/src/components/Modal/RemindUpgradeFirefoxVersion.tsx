@@ -80,7 +80,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t(' You\'re using an old version of Firefox, which no longer supports automatic dApp access and phishing detection. Review our user guide to learn how to update Firefox to version 127.0 or manually enable dApp access. ')}
+            {t('ui.Modal.RemindUpgradeFirefox.oldFirefoxVersionWarning')}
           </div>
         </div>
       </SwModal>

@@ -490,7 +490,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         <div className={CN('container')}>
           <div className='description'>
             {stepState === StepState.SELECT_ACCOUNT_IMPORT && passwordValidateState.status === 'success'
-              ? t('Select the account(s) you\'d like to import')
+              ? t('ui.Account.RestoreJson.selectAccountsToImport')
               : t('ui.Account.RestoreJson.dragAndDropPolkadotJsJson')}
           </div>
 
