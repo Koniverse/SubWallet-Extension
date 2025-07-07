@@ -3,7 +3,7 @@
 
 import { YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
@@ -12,7 +12,7 @@ const useGetYieldPositionForSpecificAccount = (address?: string): YieldPositionI
   const yieldPositions = useSelector((state) => state.earning.yieldPositions);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
   const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
-  const chainsByAccountType = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo(() => {
     const infoSpecificList: YieldPositionInfo[] = [];
@@ -34,7 +34,7 @@ const useGetYieldPositionForSpecificAccount = (address?: string): YieldPositionI
     };
 
     for (const info of yieldPositions) {
-      if (!chainsByAccountType.includes(info.chain)) {
+      if (!allowedChains.includes(info.chain) || excludedTokens.includes(info.balanceToken)) {
         continue;
       }
 
@@ -56,7 +56,7 @@ const useGetYieldPositionForSpecificAccount = (address?: string): YieldPositionI
     }
 
     return infoSpecificList;
-  }, [address, chainsByAccountType, currentAccountProxy?.accounts, isAllAccount, poolInfoMap, yieldPositions]);
+  }, [address, allowedChains, currentAccountProxy?.accounts, excludedTokens, isAllAccount, poolInfoMap, yieldPositions]);
 };
 
 export default useGetYieldPositionForSpecificAccount;

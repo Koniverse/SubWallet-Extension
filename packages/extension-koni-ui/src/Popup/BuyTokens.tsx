@@ -3,17 +3,17 @@
 
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
-import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
+import { AccountProxy, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
+import { detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -79,7 +79,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
   const checkAsset = useAssetChecker();
-  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const getReformatAddress = useCoreCreateReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
@@ -194,6 +194,10 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
         return;
       }
 
+      if (excludedTokens.includes(item.slug)) {
+        return;
+      }
+
       if (!currentSymbol || (item.slug === currentSymbol || item.symbol === currentSymbol)) {
         result.push(convertToItem(item));
       }
@@ -202,17 +206,20 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     sortTokensByBalanceInSelector(result, priorityTokens);
 
     return result;
-  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, getAccountTokenBalance, priorityTokens, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, excludedTokens, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
     const chainInfo = chainSlug ? chainInfoMap[chainSlug] : undefined;
+    const tokenInfo = selectedTokenSlug ? assetRegistry[selectedTokenSlug] : undefined;
 
-    if (!chainInfo) {
+    if (!chainInfo || !tokenInfo) {
       return [];
     }
+
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
 
     const result: AccountAddressItemType[] = [];
 
@@ -238,6 +245,12 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           return;
         }
 
+        const signMode = getSignModeByAccountProxy(ap);
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
+          return;
+        }
+
         updateResult(ap);
       });
     } else {
@@ -245,7 +258,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
+  }, [accountProxies, assetRegistry, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
     if (selectedService && selectedTokenSlug && selectedAddress) {

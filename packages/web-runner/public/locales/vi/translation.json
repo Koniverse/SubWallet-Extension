@@ -1561,5 +1561,15 @@
   "No available Bitcoin account": "",
   "You don't have any Cardano account to connect. Please create one or skip this step by hitting Cancel.": "",
   "You don't have any Bitcoin account to connect. Please create one or skip this step by hitting Cancel.": "",
-  "PSBT details": ""
+  "PSBT details": "",
+  "The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again": "",
+  "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ": "",
+  "click here": "",
+  "SubWallet doesn’t support exporting Ledger accounts": "",
+  "Ledger - Polkadot (EVM) account": "",
+  "Polkadot account": "",
+  "Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem": "",
+  "Ethereum account": "",
+  "Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem": "",
+  "To use this network, choose Polkadot Ledger app": ""
 }
