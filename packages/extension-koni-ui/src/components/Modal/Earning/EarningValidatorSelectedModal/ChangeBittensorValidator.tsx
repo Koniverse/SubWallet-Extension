@@ -14,7 +14,7 @@ import { useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, useP
 import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon, InputRef, Logo, ModalContext, Switch, SwModal, Tooltip, useExcludeModal, Number } from '@subwallet/react-ui';
+import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, Info } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -300,7 +300,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         })
       };
 
-      const send = (amount: string) => {
+      const send = (amount: string): void => {
         setSubmitLoading(true);
 
         const submitData: SubmitBittensorChangeValidatorStaking = {
@@ -308,12 +308,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           amount
         };
 
-        changeEarningValidator(submitData)
+        (changeEarningValidator(submitData))
           .then(onSuccess)
           .catch((error: TransactionError) => {
-            if (
-              error.message.includes('Remaining amount too low')  // TODO
-            ) {
+            if (error.message.includes('Remaining amount too low')) {
               openAlert({
                 type: NotificationType.WARNING,
                 title: t('Amount too low'),
@@ -337,14 +335,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               onError(error);
               setSubmitLoading(false);
             }
-          }).finally(() => {
+          })
+          .finally(() => {
             setSubmitLoading(false);
           });
       };
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [isShowAmountChange, bondedValue, poolInfo.slug, from, poolTargets, symbol, netuid, notifyTooHighAmount, onSuccess, openAlert, t, closeAlert, onError]
+    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
@@ -369,7 +368,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       })
       .catch((error) => {
         console.error('Error fetching earning rate:', error);
-      })
+      });
   });
 
   useEffect(() => {
@@ -519,12 +518,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             <div className={'minimum-stake__label'}>
               {t('Minimum active stake')}
             </div>
-              <Number
-                className='minimum-stake__value'
-                decimal={decimals}
-                suffix={symbol}
-                value={BigN(poolInfo.statistic?.earningThreshold.join || 0).multipliedBy(1 / earningRate)}
-              />
+            <Number
+              className='minimum-stake__value'
+              decimal={decimals}
+              suffix={symbol}
+              value={BigN(poolInfo.statistic?.earningThreshold.join || 0).multipliedBy(1 / earningRate)}
+            />
           </div>
         </>
         )}

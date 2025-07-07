@@ -14,6 +14,7 @@ import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, BTC_DUST_AMOUNT, LATEST_
 import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmMinAmountToMythos, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { ALLOWED_PATH } from '@subwallet/extension-base/defaults';
 import { getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
@@ -62,7 +63,7 @@ import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/e
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
-import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -345,16 +346,34 @@ export default class KoniExtension {
   }
 
   private async subscribeInputAddressData (request: RequestInputAccountSubscribe, id: string, port: chrome.runtime.Port): Promise<ResponseInputAccountSubscribe> {
-    const { chain, data } = request;
+    const { actionType, chain, data, token } = request;
 
     const cb = createSubscription<'pri(accounts.subscribeAccountsInputAddress)'>(id, port);
 
-    const combineFunction = async (chainInfoMap: Record<string, _ChainInfo>, accountProxyMap: AccountProxyMap, _contacts: SubjectInfo): Promise<ResponseInputAccountSubscribe> => {
+    const combineFunction = async (chainInfoMap: Record<string, _ChainInfo>, tokenInfoMap: Record<string, _ChainAsset>, accountProxyMap: AccountProxyMap, _contacts: SubjectInfo): Promise<ResponseInputAccountSubscribe> => {
       const accountProxies = Object.values(accountProxyMap);
       const contacts = transformAddresses(_contacts);
       const chainInfo = chainInfoMap[chain];
+      const tokenInfo = tokenInfoMap[token || ''];
       const substrateApi = this.#koniState.chainService.getSubstrateApi(chain);
-      const rs = await _analyzeAddress(data, accountProxies, contacts, chainInfo, substrateApi);
+
+      const accountProxiesFiltered = accountProxies.filter((accountProxy) => {
+        const signMode = accountProxy.accounts[0]?.signMode;
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+          if (actionType === ActionType.SEND_NFT) {
+            return false;
+          }
+
+          if (tokenInfo) {
+            return isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
+          }
+        }
+
+        return true;
+      });
+
+      const rs = await _analyzeAddress(data, accountProxiesFiltered, contacts, chainInfo, substrateApi);
 
       return {
         id,
@@ -365,9 +384,10 @@ export default class KoniExtension {
     const accountObservable = this.#koniState.keyringService.context.observable.accounts;
     const contactObservable = this.#koniState.keyringService.context.observable.contacts;
     const chainInfoMapObservable = this.#koniState.chainService.subscribeChainInfoMap().asObservable();
+    const tokenInfoMapObservable = this.#koniState.chainService.subscribeAssetRegistry().asObservable();
 
-    const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts }) => {
-      combineFunction(chainInfoMap, accountProxies, contacts)
+    const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, tokenInfoMap: tokenInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts, tokenInfoMap }) => {
+      combineFunction(chainInfoMap, tokenInfoMap, accountProxies, contacts)
         .then((rs) => cb(rs))
         .catch(console.error);
     });
@@ -383,8 +403,9 @@ export default class KoniExtension {
     const accountProxyMap = this.#koniState.keyringService.context.value.accounts;
     const contacts = this.#koniState.keyringService.context.value.contacts;
     const chainInfoMap = this.#koniState.chainService.getChainInfoMap();
+    const tokenInfoMap = this.#koniState.chainService.getAssetRegistry();
 
-    return combineFunction(chainInfoMap, accountProxyMap, contacts);
+    return combineFunction(chainInfoMap, tokenInfoMap, accountProxyMap, contacts);
   }
 
   /**
@@ -1423,6 +1444,8 @@ export default class KoniExtension {
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNativeToken && tokenPayFeeSlug === tokenSlug;
     const isCustomTokenPayFeeAssetHub = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain);
     const isCustomTokenPayFeeHydration = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain);
+    const pairFrom = keyring.getPair(from);
+    const isSubstrateECDSATransaction = pairFrom.meta.isSubstrateECDSA;
 
     const extrinsicType = isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN;
     let chainType = ChainType.SUBSTRATE;
@@ -1435,7 +1458,7 @@ export default class KoniExtension {
     const transferTokenAvailable = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug, extrinsicType });
 
     try {
-      if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenTransferredByEvm(transferTokenInfo)) {
+      if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenTransferredByEvm(transferTokenInfo) && !isSubstrateECDSATransaction) {
         chainType = ChainType.EVM;
         const txVal: string = transferAll ? transferTokenAvailable.value : (value || '0');
         const evmApi = this.#koniState.getEvmApi(chain);

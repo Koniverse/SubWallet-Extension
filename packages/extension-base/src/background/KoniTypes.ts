@@ -856,6 +856,7 @@ export interface CreateHardwareAccountItem {
   isEthereum: boolean;
   isGeneric: boolean;
   isLedgerRecovery?: boolean;
+  isSubstrateECDSA?: boolean;
 }
 
 export interface RequestAccountCreateHardwareV2 extends CreateHardwareAccountItem {
@@ -1572,8 +1573,13 @@ export interface LedgerNetwork {
   slip44: number;
 }
 
+export const enum POLKADOT_LEDGER_SCHEME {
+  ED25519 = 'ed25519',
+  ECDSA = 'ecdsa',
+}
+
 export interface MigrationLedgerNetwork extends Omit<LedgerNetwork, 'isGeneric' | 'isEthereum' | 'isDevMode' | 'icon' > {
-  ss58_addr_type: number
+  ss58_addr_type: number;
 }
 
 /// Qr Sign
