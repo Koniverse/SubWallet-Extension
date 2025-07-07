@@ -363,16 +363,13 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const tokenTypes = includeNativeToken ? [_AssetType.NATIVE, _AssetType.LOCAL] : [_AssetType.LOCAL];
   const tokenMap = filterAssetsByChainAndType(assetMap, chainInfo.slug, tokenTypes);
 
-  // Hotfix balance for gdot
-
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
-    // Hotfix balance for gdot
     if (tokenInfo.metadata?.isGigaToken) {
       return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
         const getGigaTokenBalance = async () => {
-          const gdotBalances = await queryGigaTokenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
+          const gigaTokenBalances = await queryGigaTokenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
 
-          callback(gdotBalances);
+          callback(gigaTokenBalances);
         };
 
         getGigaTokenBalance().catch(console.error);
@@ -602,8 +599,6 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
     clearInterval(interval);
   };
 };
-
-// Hot fix for gdot balance
 
 async function queryGigaTokenBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
