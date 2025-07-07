@@ -88,7 +88,7 @@ function Component ({ className, request, type }: Props) {
             ? (
               <MetaInfo.Chain
                 chain={networkKey}
-                label={t<string>('Network')}
+                label={t<string>('ui.Confirmations.Error.NetworkConnection.network')}
               />)
             : <></>}
         </MetaInfo>

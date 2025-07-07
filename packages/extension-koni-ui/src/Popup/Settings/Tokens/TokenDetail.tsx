@@ -40,13 +40,13 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const [loading, setLoading] = useState(false);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete token'),
+    title: t<string>('ui.Settings.Tokens.TokenDetail.deleteToken'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this token'),
-    content: t<string>('Confirm delete this token'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.Settings.Tokens.TokenDetail.aboutToDeleteToken'),
+    content: t<string>('ui.Settings.Tokens.TokenDetail.confirmDeleteToken'),
+    okText: t<string>('ui.Settings.Tokens.TokenDetail.remove')
   });
 
   const handleDeleteToken = useCallback(() => {
@@ -213,7 +213,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Token detail')}
+        title={t<string>('ui.Settings.Tokens.TokenDetail.tokenDetail')}
       >
         <div className={'token_detail__container'}>
           <div className={'token_detail__header_container'}>
@@ -233,16 +233,16 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             {
               _isSmartContractToken(tokenInfo) && <Field
                 content={contractAddressInfo()}
-                label={t<string>('Contract address')}
-                placeholder={t<string>('Contract address')}
+                label={t<string>('ui.Settings.Tokens.TokenDetail.contractAddress')}
+                placeholder={t<string>('ui.Settings.Tokens.TokenDetail.contractAddress')}
                 prefix={contractAddressIcon()}
                 suffix={contractAddressSuffix()}
               />
             }
             <Field
               content={originChainInfo.name}
-              label={t<string>('Network')}
-              placeholder={t<string>('Network')}
+              label={t<string>('ui.Settings.Tokens.TokenDetail.network')}
+              placeholder={t<string>('ui.Settings.Tokens.TokenDetail.network')}
               prefix={<Logo
                 network={originChainInfo.slug}
                 size={20}
@@ -258,7 +258,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
                   <div>
                     <Field
                       content={tokenInfo.symbol}
-                      placeholder={t<string>('Symbol')}
+                      placeholder={t<string>('ui.Settings.Tokens.TokenDetail.symbol')}
                       prefix={(
                         <Logo
                           size={20}
@@ -277,7 +277,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
                   <div>
                     <Field
                       content={tokenInfo.name}
-                      placeholder={t<string>('Token name')}
+                      placeholder={t<string>('ui.Settings.Tokens.TokenDetail.tokenName')}
                     />
                   </div>
                 </Tooltip>
@@ -307,7 +307,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
                   <div>
                     <Field
                       content={tokenInfo.decimals}
-                      placeholder={t<string>('Decimals')}
+                      placeholder={t<string>('ui.Settings.Tokens.TokenDetail.decimals')}
                     />
                   </div>
                 </Tooltip>

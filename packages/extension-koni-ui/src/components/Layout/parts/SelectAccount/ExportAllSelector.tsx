@@ -229,7 +229,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </SwModal>

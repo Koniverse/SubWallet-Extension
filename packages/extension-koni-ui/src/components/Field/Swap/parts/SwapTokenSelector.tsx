@@ -261,7 +261,7 @@ const Component = (props: Props) => {
           className={'__search-box'}
           onClickActionBtn={openFilter}
           onSearch={handleSearch}
-          placeholder={t<string>('Enter token name or network name')}
+          placeholder={t<string>('ui.Swap.TokenSelector.enterTokenOrNetworkName')}
           searchValue={currentSearchText}
           showActionBtn
         />

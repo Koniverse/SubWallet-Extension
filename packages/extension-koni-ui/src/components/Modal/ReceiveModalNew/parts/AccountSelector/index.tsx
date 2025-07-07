@@ -207,7 +207,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter your account name or address')}
+        placeholder={t<string>('ui.Modal.ReceiveNew.AccountSelector.enterYourAccountNameOrAddress')}
         searchValue={searchValue}
       />
       <SwList

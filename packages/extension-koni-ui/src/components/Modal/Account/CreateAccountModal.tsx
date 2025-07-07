@@ -109,7 +109,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         icon: <CloseIcon />,
         onClick: onCancel
       }}
-      title={t<string>('Create a new account')}
+      title={t<string>('ui.Modal.Account.Create.createNewAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

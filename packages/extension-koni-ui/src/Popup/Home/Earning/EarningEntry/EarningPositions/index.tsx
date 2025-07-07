@@ -351,7 +351,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('Your earning positions')}
+        title={t<string>('ui.Earning.Entry.Positions.yourEarningPositions')}
       >
         {!!banners.length && (
           <div className={'earning-banner-wrapper'}>
@@ -373,7 +373,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.Earning.Entry.Positions.searchToken')}
           showActionBtn
         />
         <FilterModal

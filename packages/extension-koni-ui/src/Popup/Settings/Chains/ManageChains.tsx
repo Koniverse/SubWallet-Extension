@@ -147,7 +147,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage networks')}
+        title={t<string>('ui.Settings.Chains.Manage.manageNetworks')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -168,7 +168,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search network')}
+          searchPlaceholder={t<string>('ui.Settings.Chains.Manage.searchNetwork')}
           showActionBtn
         />
 

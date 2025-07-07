@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainEditInfo.providers[chainEditInfo.currentProvider]}
-          placeholder={t<string>('Provider URL')}
+          placeholder={t<string>('ui.Confirmations.AddNetwork.providerUrl')}
           prefix={(
             <Icon
               customSize={'24px'}
@@ -115,7 +115,7 @@ const Component: React.FC<Props> = (props: Props) => {
           status={providerError ? 'error' : ''}
           statusHelp={handleErrorMessage(providerError)}
           suffix={providerSuffix}
-          tooltip={t<string>('Provider URL')}
+          tooltip={t<string>('ui.Confirmations.AddNetwork.providerUrl')}
           tooltipPlacement='topLeft'
         />
         <Row gutter={token.paddingSM}>
@@ -132,7 +132,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight={'bold'}
                 />
               )}
-              tooltip={t<string>('Network name')}
+              tooltip={t<string>('ui.Confirmations.AddNetwork.networkName')}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -140,7 +140,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <Field
               content={chainEditInfo.symbol || ''}
               placeholder={t('ui.Confirmations.AddNetwork.symbol')}
-              tooltip={t<string>('Symbol')}
+              tooltip={t<string>('ui.Confirmations.AddNetwork.symbol')}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -150,7 +150,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <Field
               content={chainSpec?.decimals || 0}
               placeholder={t('ui.Confirmations.AddNetwork.decimals')}
-              tooltip={t<string>('Decimals')}
+              tooltip={t<string>('ui.Confirmations.AddNetwork.decimals')}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -158,7 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <Field
               content={chainSpec?.evmChainId || 0}
               placeholder={t('ui.Confirmations.AddNetwork.chainId')}
-              tooltip={t<string>('Chain ID')}
+              tooltip={t<string>('ui.Confirmations.AddNetwork.chainId')}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -166,19 +166,19 @@ const Component: React.FC<Props> = (props: Props) => {
         <Field
           content={chainEditInfo.chainType}
           placeholder={t('ui.Confirmations.AddNetwork.networkType')}
-          tooltip={t<string>('Network type')}
+          tooltip={t<string>('ui.Confirmations.AddNetwork.networkType')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.blockExplorer}
           placeholder={t('ui.Confirmations.AddNetwork.blockExplorer')}
-          tooltip={t<string>('Block explorer')}
+          tooltip={t<string>('ui.Confirmations.AddNetwork.blockExplorer')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.crowdloanUrl}
           placeholder={t('ui.Confirmations.AddNetwork.crowdloanUrl')}
-          tooltip={t<string>('Crowdloan URL')}
+          tooltip={t<string>('ui.Confirmations.AddNetwork.crowdloanUrl')}
           tooltipPlacement='topLeft'
         />
       </div>

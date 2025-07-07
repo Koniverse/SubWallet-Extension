@@ -259,7 +259,7 @@ const Component: React.FC<Props> = (props: Props) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.Modal.AddressBook.Selector.accountName')}
           showActionBtn={true}
         />
       </SwModal>

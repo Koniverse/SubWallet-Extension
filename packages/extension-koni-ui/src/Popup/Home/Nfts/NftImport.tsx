@@ -268,7 +268,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick: form.submit,
           children: t('ui.Nfts.Import.import')
         }}
-        title={t<string>('Import NFT')}
+        title={t<string>('ui.Nfts.Import.importNft')}
       >
         <div className={'nft_import__container'}>
           <Form
@@ -289,7 +289,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <ChainSelector
                 items={chains}
-                label={t<string>('Network')}
+                label={t<string>('ui.Nfts.Import.network')}
                 placeholder={t('ui.Nfts.Import.selectNetwork')}
                 title={t('ui.Nfts.Import.selectNetwork')}
               />
@@ -302,7 +302,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 disabled={!selectedChain}
                 items={nftTypeOptions}
-                label={t<string>('Type')}
+                label={t<string>('ui.Nfts.Import.type')}
                 placeholder={t('ui.Nfts.Import.selectNftType')}
                 title={t('ui.Nfts.Import.selectNftType')}
               />
@@ -316,7 +316,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <AddressInput
                 addressPrefix={chainNetworkPrefix}
                 disabled={!selectedNftType}
-                label={t<string>('Contract address')}
+                label={t<string>('ui.Nfts.Import.contractAddress')}
                 placeholder={t('ui.Nfts.Import.enterOrPasteAddress')}
                 showScanner={true}
               />
@@ -330,7 +330,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <Input
                 disabled={nameDisabled}
-                label={t<string>('NFT collection name')}
+                label={t<string>('ui.Nfts.Import.nftCollectionName')}
               />
             </Form.Item>
           </Form>

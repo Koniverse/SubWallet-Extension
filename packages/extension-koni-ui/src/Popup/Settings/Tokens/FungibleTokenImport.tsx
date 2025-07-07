@@ -378,7 +378,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick: form.submit,
           children: t('ui.Settings.Tokens.ImportFungible.importToken')
         }}
-        title={t<string>('Import token')}
+        title={t<string>('ui.Settings.Tokens.ImportFungible.importToken')}
       >
         <div className={'import_token__container'}>
           <Form
@@ -396,7 +396,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 id='import-nft-select-chain'
                 items={chains}
-                label={t<string>('Network')}
+                label={t<string>('ui.Settings.Tokens.ImportFungible.network')}
                 placeholder={t('ui.Settings.Tokens.ImportFungible.selectNetwork')}
                 title={t('ui.Settings.Tokens.ImportFungible.selectNetwork')}
               />
@@ -455,7 +455,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 >
                   <Field
                     content={symbol}
-                    placeholder={t<string>('Symbol')}
+                    placeholder={t<string>('ui.Settings.Tokens.ImportFungible.symbol')}
                     prefix={tokenDecimalsPrefix()}
                     tooltip={t('ui.Settings.Tokens.ImportFungible.symbol')}
                     tooltipPlacement={'topLeft'}
@@ -468,7 +468,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 >
                   <Field
                     content={decimals === -1 ? '' : decimals}
-                    placeholder={t<string>('Decimals')}
+                    placeholder={t<string>('ui.Settings.Tokens.ImportFungible.decimals')}
                     tooltip={t('ui.Settings.Tokens.ImportFungible.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
@@ -488,7 +488,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <Field
                 content={tokenName}
-                placeholder={t<string>('Token name')}
+                placeholder={t<string>('ui.Settings.Tokens.ImportFungible.tokenName')}
                 tooltip={t('ui.Settings.Tokens.ImportFungible.tokenName')}
                 tooltipPlacement={'topLeft'}
               />

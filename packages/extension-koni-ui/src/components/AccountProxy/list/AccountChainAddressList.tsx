@@ -324,7 +324,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       renderWhenEmpty={emptyList}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter network name or address')}
+      searchPlaceholder={t<string>('ui.AccountProxy.list.ChainAddress.enterNetworkNameOrAddress')}
     />
   );
 }

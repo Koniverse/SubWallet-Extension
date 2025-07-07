@@ -235,7 +235,7 @@ const Component: React.FC<ComponentProps> = (props) => {
             renderWhenEmpty={renderNetworkEmpty}
             rowGap='var(--row-gap)'
             searchFunction={searchFunction}
-            searchPlaceholder={t<string>('Network name')}
+            searchPlaceholder={t<string>('ui.WalletConnect.ConnectionDetail.networkName')}
           />
         </SwModal>
       </div>

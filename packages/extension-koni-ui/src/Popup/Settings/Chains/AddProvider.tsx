@@ -270,7 +270,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         subHeaderPaddingVertical={true}
-        title={t<string>('Add new provider')}
+        title={t<string>('ui.Settings.Chains.AddProvider.addNewProvider')}
       >
         <div className={'add_provider__container'}>
           <div className='description'>

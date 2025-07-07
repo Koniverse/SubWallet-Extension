@@ -57,7 +57,7 @@ const decodeMethod = (data: string, chain: Chain, specVersion: BN): Decoded => {
 const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): React.ReactNode => {
   if (!args || !method) {
     return (
-      <MetaInfo.Data label={t<string>('Method data')}>
+      <MetaInfo.Data label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.methodData')}>
         {data}
       </MetaInfo.Data>
     );
@@ -65,7 +65,7 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
 
   return (
     <div className='method-container'>
-      <MetaInfo.Data label={t<string>('Method')}>
+      <MetaInfo.Data label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.method')}>
         <details>
           <summary>
             {method.section}.{method.method}{method.meta ? `(${method.meta.args.map(({ name }) => name).join(', ')})` : ''}
@@ -75,7 +75,7 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
       </MetaInfo.Data>
       {
         method.meta && (
-          <MetaInfo.Data label={t<string>('Info')}>
+          <MetaInfo.Data label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.info')}>
             <details>
               <summary>{method.meta.docs.map((d) => d.toString().trim()).join(' ')}</summary>
             </details>
@@ -88,7 +88,7 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
 
 const mortalityAsString = (era: ExtrinsicEra, hexBlockNumber: string, t: TFunction): string => {
   if (era.isImmortalEra) {
-    return t<string>('immortal');
+    return t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.immortal');
   }
 
   const blockNumber = bnToBn(hexBlockNumber);
@@ -123,12 +123,12 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
           ? (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t<string>('Network')}
+              label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.network')}
             />
           )
           : (
             <MetaInfo.Default
-              label={t<string>('GenesisHash')}
+              label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.genesisHash')}
             >
               {toShort(genesisHash, 10, 10)}
             </MetaInfo.Default>
@@ -142,17 +142,17 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
         networkPrefix={chain?.ss58Format ?? chainInfo?.substrateInfo?.addressPrefix}
       />
       <MetaInfo.Number
-        label={t<string>('Version')}
+        label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.version')}
         value={specVersion.toNumber()}
       />
       <MetaInfo.Number
-        label={t<string>('Nonce')}
+        label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.nonce')}
         value={formatNumber(nonce)}
       />
       {!tip.isEmpty && (
         <MetaInfo.Number
           decimals={chainInfo?.substrateInfo?.decimals || 0}
-          label={t<string>('Tip')}
+          label={t<string>('ui.Confirmations.Detail.Substrate.Extrinsic.tip')}
           suffix={chainInfo?.substrateInfo?.symbol}
           value={tip.toPrimitive() as string | number}
         />

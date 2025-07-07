@@ -163,7 +163,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Your collections')}
+        title={t<string>('ui.Nfts.Collections.yourCollections')}
       >
         <>
           {!!banners.length && (
@@ -187,7 +187,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             renderWhenEmpty={emptyNft}
             searchFunction={searchCollection}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('Search collection name')}
+            searchPlaceholder={t<string>('ui.Nfts.Collections.searchCollectionName')}
           />
         </>
       </Layout.Base>

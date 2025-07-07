@@ -189,7 +189,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
         }
         title={(
           <>
-            {t<string>('Your address')}
+            {t<string>('ui.Modal.Global.AddressQr.yourAddress')}
             {onBack && isRelatedToTon && (
               <Button
                 {...tonWalletContactSelectorButtonProps}

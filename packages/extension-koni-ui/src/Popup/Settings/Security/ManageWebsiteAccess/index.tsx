@@ -254,7 +254,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         renderWhenEmpty={renderEmptyList}
         searchFunction={searchFunc}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search or enter a website')}
+        searchPlaceholder={t<string>('ui.Settings.Security.ManageWebsiteAccess.searchOrEnterWebsite')}
         showActionBtn
       />
 

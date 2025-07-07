@@ -251,7 +251,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('Import from seed phrase')}
+        title={t<string>('ui.Account.ImportSeedPhrase.importFromSeedPhrase')}
       >
         <div className='container'>
           <div className='description'>

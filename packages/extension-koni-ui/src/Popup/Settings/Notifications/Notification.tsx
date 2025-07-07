@@ -592,7 +592,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('ui.Settings.Notifications.Notification.searchNotification')}
                 searchValue={currentSearchText}
               />
               {loading

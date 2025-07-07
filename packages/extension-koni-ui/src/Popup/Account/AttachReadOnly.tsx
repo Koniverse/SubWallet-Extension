@@ -197,7 +197,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('Attach watch-only account')}
+        title={t<string>('ui.Account.AttachReadOnly.attachWatchOnlyAccount')}
       >
         <div className={CN('container')}>
           <div className='description'>

@@ -126,7 +126,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         icon: <CloseIcon />,
         onClick: onCancel
       }}
-      title={t<string>('Import account')}
+      title={t<string>('ui.Modal.Account.Import.importAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

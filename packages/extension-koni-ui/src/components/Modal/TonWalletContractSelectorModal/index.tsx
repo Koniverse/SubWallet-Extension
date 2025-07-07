@@ -179,7 +179,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, closeIcon =
       maskClosable={isShowBackButton}
       onCancel={onBack}
       rightIconProps={rightIconProps}
-      title={t<string>('Wallet address & version')}
+      title={t<string>('ui.Modal.TonWalletContractSelector.walletAddressAndVersion')}
     >
       <div>
         <div className={'sub-title'}>

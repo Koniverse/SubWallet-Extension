@@ -166,7 +166,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           renderWhenEmpty={renderEmptyList}
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search account')}
+          searchPlaceholder={t<string>('ui.Settings.Security.WebsiteAccessDetail.searchAccount')}
         />
 
         <DAppConfigurationModal

@@ -38,15 +38,15 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('Unsupported network'),
+    title: t<string>('ui.Modal.Receive.TokensSelector.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('Do you still want to get the address?'),
-    okText: t<string>('Get address'),
+    subTitle: t<string>('ui.Modal.Receive.TokensSelector.confirmGetAddress'),
+    okText: t<string>('ui.Modal.Receive.TokensSelector.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('Cancel'),
+      children: t<string>('ui.Modal.Receive.TokensSelector.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -161,7 +161,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search token')}
+        searchPlaceholder={t<string>('ui.Modal.Receive.TokensSelector.searchToken')}
       />
     </SwModal>
   );

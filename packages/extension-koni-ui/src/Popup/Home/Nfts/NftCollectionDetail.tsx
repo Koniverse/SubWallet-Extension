@@ -48,13 +48,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const originAssetInfo = useGetChainAssetInfo(collectionInfo.originAsset);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete NFT'),
+    title: t<string>('ui.Nfts.CollectionDetail.deleteNft'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this NFT collection'),
-    content: t<string>('Confirm delete this NFT collection'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.Nfts.CollectionDetail.aboutToDeleteNftCollection'),
+    content: t<string>('ui.Nfts.CollectionDetail.confirmDeleteNftCollection'),
+    okText: t<string>('ui.Nfts.CollectionDetail.remove')
   });
 
   const searchNft = useCallback((nftItem: NftItem, searchText: string) => {
@@ -165,7 +165,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={emptyNft}
           searchFunction={searchNft}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search NFT name or ID')}
+          searchPlaceholder={t<string>('ui.Nfts.CollectionDetail.searchNftNameOrId')}
         />
       </Layout.Base>
     </PageWrapper>

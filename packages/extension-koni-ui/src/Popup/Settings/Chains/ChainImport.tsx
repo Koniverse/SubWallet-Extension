@@ -342,7 +342,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick: handleClickSubheaderButton
           }
         ]}
-        title={t<string>('Import network')}
+        title={t<string>('ui.Settings.Chains.ChainImport.importNetwork')}
       >
         <div className={'chain_import__container'}>
           <div className={'chain_import__header_info'}>

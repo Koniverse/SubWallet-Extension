@@ -434,7 +434,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-box'}
           key={searchInputRenderKey}
           onSearch={handleSearch}
-          placeholder={t<string>('Account name')}
+          placeholder={t<string>('ui.Layout.SelectAccount.Modal.accountName')}
           searchValue={searchValue}
         />
         <SwList

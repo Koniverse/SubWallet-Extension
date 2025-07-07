@@ -125,7 +125,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Network name')}
+      searchPlaceholder={t<string>('ui.Field.ChainSelector.networkName')}
       selected={value || ''}
       statusHelp={statusHelp}
       title={title || label || placeholder || t('ui.Field.ChainSelector.selectNetwork')}

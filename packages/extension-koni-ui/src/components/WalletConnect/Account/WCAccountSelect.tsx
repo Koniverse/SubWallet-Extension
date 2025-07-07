@@ -157,7 +157,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     rowGap='var(--row-gap)'
                     searchFunction={searchAccountFunction}
                     searchMinCharactersCount={2}
-                    searchPlaceholder={t<string>('Search account')}
+                    searchPlaceholder={t<string>('ui.WalletConnect.AccountSelect.searchAccount')}
                   />
                 </SwModal>
               </>

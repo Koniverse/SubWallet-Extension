@@ -77,7 +77,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       id={modalId}
       maskClosable={false}
       onCancel={onCancel}
-      title={t<string>('Account name')}
+      title={t<string>('ui.Modal.Account.Name.accountName')}
     >
       <div className={'__brief'}>
         {t('Enter a name for your account.\n You can edit this later.')}

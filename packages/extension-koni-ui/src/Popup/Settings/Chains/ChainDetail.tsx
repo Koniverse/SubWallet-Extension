@@ -38,13 +38,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
   const [form] = Form.useForm<ChainDetailForm>();
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete network'),
+    title: t<string>('ui.Settings.Chains.Detail.deleteNetwork'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this network'),
-    content: t<string>('Confirm delete this network'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.Settings.Chains.Detail.aboutToDeleteNetwork'),
+    content: t<string>('ui.Settings.Chains.Detail.confirmDeleteNetwork'),
+    okText: t<string>('ui.Settings.Chains.Detail.remove')
   });
 
   const [isChanged, setIsChanged] = useState(false);
@@ -323,7 +323,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Network detail')}
+        title={t<string>('ui.Settings.Chains.Detail.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form

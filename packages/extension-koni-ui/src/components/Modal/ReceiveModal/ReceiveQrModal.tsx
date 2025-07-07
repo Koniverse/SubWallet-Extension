@@ -87,7 +87,7 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
       rightIconProps={{
         icon: <InfoIcon />
       }}
-      title={t<string>('Your address')}
+      title={t<string>('ui.Modal.Receive.Qr.yourAddress')}
     >
       <>
         <div className='receive-qr-code-wrapper'>

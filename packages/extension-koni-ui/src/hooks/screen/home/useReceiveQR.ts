@@ -82,15 +82,15 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('Unsupported network'),
+    title: t<string>('ui.hook.screen.useReceiveQR.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('Do you still want to get the address?'),
-    okText: t<string>('Get address'),
+    subTitle: t<string>('ui.hook.screen.useReceiveQR.confirmGetAddress'),
+    okText: t<string>('ui.hook.screen.useReceiveQR.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('Cancel'),
+      children: t<string>('ui.hook.screen.useReceiveQR.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'

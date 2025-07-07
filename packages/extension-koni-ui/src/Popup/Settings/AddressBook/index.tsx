@@ -224,7 +224,7 @@ const Component: React.FC<Props> = (props: Props) => {
           rowGap='var(--row-gap)'
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.Settings.AddressBook.accountName')}
           showActionBtn={true}
         />
         <FilterModal

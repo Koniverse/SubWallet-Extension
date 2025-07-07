@@ -125,7 +125,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage tokens')}
+        title={t<string>('ui.Settings.Tokens.Manage.manageTokens')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -149,7 +149,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.Settings.Tokens.Manage.searchToken')}
           showActionBtn={true}
         />
 

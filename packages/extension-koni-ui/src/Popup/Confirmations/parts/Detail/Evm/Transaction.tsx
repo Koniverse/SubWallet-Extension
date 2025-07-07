@@ -99,13 +99,13 @@ const Component: React.FC<Props> = (props: Props) => {
           ? (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t<string>('Network')}
+              label={t<string>('ui.Confirmations.Detail.Evm.Transaction.network')}
             />
           )
           : chainId !== undefined
             ? (
               <MetaInfo.Default
-                label={t<string>('Chain id')}
+                label={t<string>('ui.Confirmations.Detail.Evm.Transaction.chainId')}
               >
                 {chainId}
               </MetaInfo.Default>

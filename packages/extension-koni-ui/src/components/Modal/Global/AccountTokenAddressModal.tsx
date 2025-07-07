@@ -107,7 +107,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           onClick: onCancel
         }
         : undefined}
-      title={t<string>('Select address type')}
+      title={t<string>('ui.Modal.Global.AccountTokenAddress.selectAddressType')}
     >
       <div>
         {/* TODO: Move this description content into a prop passed to the component */}

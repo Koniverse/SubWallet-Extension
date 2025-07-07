@@ -200,7 +200,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('Import from private key')}
+        title={t<string>('ui.Account.ImportPrivateKey.importFromPrivateKey')}
       >
         <div className='container'>
           <div className='description'>

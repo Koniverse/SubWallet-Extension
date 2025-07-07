@@ -330,7 +330,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.Earning.Pools.searchToken')}
           showActionBtn
         />
         <FilterModal

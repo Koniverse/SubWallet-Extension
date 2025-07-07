@@ -448,7 +448,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         }}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search validator')}
+        searchPlaceholder={t<string>('ui.Field.Earning.PoolSelector.searchValidator')}
         selected={value || ''}
         showActionBtn
         statusHelp={statusHelp}

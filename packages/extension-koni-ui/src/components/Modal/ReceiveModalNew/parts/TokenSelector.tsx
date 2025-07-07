@@ -95,7 +95,7 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter token name or network name')}
+        placeholder={t<string>('ui.Modal.ReceiveNew.TokenSelector.enterTokenOrNetworkName')}
         searchValue={currentSearchText}
       />
       <SwList

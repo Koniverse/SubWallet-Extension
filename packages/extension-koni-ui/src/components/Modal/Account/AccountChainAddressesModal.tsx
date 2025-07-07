@@ -49,7 +49,7 @@ const Component: React.FC<Props> = ({ accountProxy, className, onBack, onCancel 
           onClick: onCancel
         }
         : undefined}
-      title={t<string>('Select address')}
+      title={t<string>('ui.Modal.Account.ChainAddresses.selectAddress')}
     >
       <AccountChainAddressList
         accountProxy={accountProxy}

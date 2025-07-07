@@ -189,7 +189,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       subHeaderBackground={'transparent'}
       subHeaderCenter={false}
       subHeaderPaddingVertical={true}
-      title={t<string>('Mission Pools')}
+      title={t<string>('ui.Settings.MissionPool.missionPools')}
     >
       <div className={'__tool-area'}>
         {!!banners.length && (
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Campaign name...')}
+          searchPlaceholder={t<string>('ui.Settings.MissionPool.campaignNamePlaceholder')}
           showActionBtn
         />
       </div>

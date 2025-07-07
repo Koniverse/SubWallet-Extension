@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainInfoMap[originChain].name}
-          label={t<string>('Network')}
+          label={t<string>('ui.Confirmations.AddToken.network')}
           prefix={(
             <Image
               height={token.fontSizeXL}
@@ -101,11 +101,11 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <Field
           content={type}
-          tooltip={t<string>('Token type')}
+          tooltip={t<string>('ui.Confirmations.AddToken.tokenType')}
         />
         <Field
           content={toShort(contractAddress)}
-          label={t<string>('Contract address')}
+          label={t<string>('ui.Confirmations.AddToken.contractAddress')}
           prefix={
             <SwAvatar
               identPrefix={42}
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={12}>
             <Field
               content={symbol}
-              placeholder={t<string>('Symbol')}
+              placeholder={t<string>('ui.Confirmations.AddToken.symbol')}
               prefix={
                 <SwAvatar
                   identPrefix={42}
@@ -131,22 +131,22 @@ const Component: React.FC<Props> = (props: Props) => {
                   value={contractAddress}
                 />
               }
-              tooltip={t<string>('Symbol')}
+              tooltip={t<string>('ui.Confirmations.AddToken.symbol')}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={decimals === -1 ? '' : decimals}
-              placeholder={t<string>('Decimals')}
-              tooltip={t<string>('Decimals')}
+              placeholder={t<string>('ui.Confirmations.AddToken.decimals')}
+              tooltip={t<string>('ui.Confirmations.AddToken.decimals')}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={name}
-          tooltip={t<string>('Token name')}
+          tooltip={t<string>('ui.Confirmations.AddToken.tokenName')}
         />
       </div>
       <div className='confirmation-footer'>

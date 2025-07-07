@@ -188,9 +188,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (step) {
       case 'Introduction':
-        return t<string>('Apply master password');
+        return t<string>('ui.Keyring.ApplyMasterPassword.applyMasterPassword');
       case 'Done':
-        return t<string>('Successful');
+        return t<string>('ui.Keyring.ApplyMasterPassword.successful');
       case 'Migrate':
         return `${String(migrated + 1).padStart(2, '0')}/${String(canMigrate.length).padStart(2, '0')}`;
       default:

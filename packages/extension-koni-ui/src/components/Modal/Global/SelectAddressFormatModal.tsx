@@ -137,7 +137,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
         }
         : undefined
       }
-      title={t<string>('Select address format')}
+      title={t<string>('ui.Modal.Global.SelectAddressFormat.selectAddressFormat')}
     >
       <div>
         <div className={'sub-title'}>

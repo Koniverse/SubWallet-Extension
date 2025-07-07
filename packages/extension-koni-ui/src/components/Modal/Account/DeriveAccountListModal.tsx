@@ -89,7 +89,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           renderWhenEmpty={renderEmpty}
           rowGap='var(--row-gap)'
           searchFunction={searchAccountProxyFunction}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.Modal.Account.DeriveList.accountName')}
         />
       </SwModal>
     </>

@@ -93,7 +93,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const subHeaderRightButton: ButtonProps[] = [
     {
-      children: t<string>('Send'),
+      children: t<string>('ui.Nfts.ItemDetail.send'),
       onClick: onClickSend
     }
   ];
@@ -219,7 +219,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           </div>
 
           <div className={'nft_item_detail__info_container'}>
-            <div className={'nft_item_detail__section_title'}>{t<string>('NFT details')}</div>
+            <div className={'nft_item_detail__section_title'}>{t<string>('ui.Nfts.ItemDetail.nftDetails')}</div>
             {
               nftItem.description && (
                 <div
@@ -237,7 +237,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type='phosphor'
                       weight={'fill'}
                     />
-                    <div>{t<string>('Description')}</div>
+                    <div>{t<string>('ui.Nfts.ItemDetail.description')}</div>
                   </div>
                 </div>
               )
@@ -245,26 +245,26 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
             <Field
               content={collectionInfo.collectionName || collectionInfo.collectionId}
-              label={t<string>('NFT collection name')}
+              label={t<string>('ui.Nfts.ItemDetail.nftCollectionName')}
               suffix={nftItem.externalUrl && externalInfoIcon('collection')}
             />
 
             <Field
               content={ownerInfo()}
-              label={t<string>('Owned by')}
+              label={t<string>('ui.Nfts.ItemDetail.ownedBy')}
               prefix={nftItem.owner && ownerPrefix()}
               suffix={externalInfoIcon('account')}
             />
 
             <Field
               content={originChainInfo.name}
-              label={t<string>('Network')}
+              label={t<string>('ui.Nfts.ItemDetail.network')}
               prefix={originChainLogo()}
             />
           </div>
 
           <div className={'nft_item_detail__prop_section'}>
-            <div className={'nft_item_detail__section_title'}>{t<string>('Properties')}</div>
+            <div className={'nft_item_detail__section_title'}>{t<string>('ui.Nfts.ItemDetail.properties')}</div>
             <div className={'nft_item_detail__atts_container'}>
               <Field
                 className={'nft_item_detail__id_field'}
@@ -317,7 +317,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('Description')}
+          title={t<string>('ui.Nfts.ItemDetail.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>

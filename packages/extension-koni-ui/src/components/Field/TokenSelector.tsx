@@ -144,7 +144,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter token name or network name')}
+      searchPlaceholder={t<string>('ui.Field.TokenSelector.enterTokenOrNetworkName')}
       selected={value || ''}
       statusHelp={statusHelp}
       title={label || placeholder || t('ui.Field.TokenSelector.selectToken')}

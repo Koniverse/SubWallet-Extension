@@ -128,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
           rowGap='var(--row-gap)'
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search or enter a website')}
+          searchPlaceholder={t<string>('ui.WalletConnect.ConnectionList.searchOrEnterWebsite')}
         />
       </PageWrapper>
     </Layout.WithSubHeaderOnly>
