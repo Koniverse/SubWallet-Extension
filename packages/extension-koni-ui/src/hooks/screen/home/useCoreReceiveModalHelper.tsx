@@ -11,7 +11,7 @@ import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcl
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
-import { runMultiWarningHandleModal } from '@subwallet/extension-koni-ui/utils';
+import { runNestedWarningHandlersModal } from '@subwallet/extension-koni-ui/utils';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -77,7 +77,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
     const accountProxy = accountProxies.find((ap) => ap.id === accountProxyId);
 
-    runMultiWarningHandleModal([
+    runNestedWarningHandlersModal([
       [onHandleTonAccountWarning, accountType],
       [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug }],
       [onHandleLedgerAccountWarning, { accountProxy, targetSlug: tokenSlug, context: 'useToken' }]
@@ -358,7 +358,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
             setSelectedAccountAddressItem(undefined);
           });
         } else if (accountTokenAddressList.length === 1) {
-          openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+          openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, tokenSlug, () => {
             inactiveModal(tokenSelectorModalId);
             setSelectedAccountAddressItem(undefined);
           });
@@ -436,7 +436,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, excludedTokens, getBitcoinAccounts, getReformatAddress, inactiveModal, isAllAccount, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getBitcoinAccounts, getReformatAddress, inactiveModal, isAllAccount, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

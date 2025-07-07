@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { ValidatorInfo, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
@@ -132,7 +132,13 @@ export const getEarningTimeText = (hours?: number) => {
   }
 };
 
-export const getExtrinsicTypeByPoolInfo = (pool: YieldPoolInfo): string => {
+interface PoolInfoToGetExtrinsicType {
+  chain: string;
+  slug: string;
+  type: string;
+}
+
+export const getExtrinsicTypeByPoolInfo = (pool: PoolInfoToGetExtrinsicType): ExtrinsicType => {
   const { chain, slug, type } = pool;
 
   if (type === YieldPoolType.NOMINATION_POOL || type === YieldPoolType.NATIVE_STAKING) {
