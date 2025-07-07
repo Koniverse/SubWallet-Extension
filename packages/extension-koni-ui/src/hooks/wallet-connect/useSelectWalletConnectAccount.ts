@@ -4,7 +4,7 @@
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { WALLET_CONNECT_SUPPORT_NAMESPACES } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountChainType, AccountJson } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountSignMode } from '@subwallet/extension-base/types';
 import { isSameAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { WalletConnectChainInfo } from '@subwallet/extension-koni-ui/types';
 import { chainsToWalletConnectChainInfos, isAccountAll, reformatAddress } from '@subwallet/extension-koni-ui/utils';
@@ -28,7 +28,7 @@ const useSelectWalletConnectAccount = (params: ProposalTypes.Struct) => {
   const { accounts } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
 
-  const noAllAccount = useMemo(() => accounts.filter(({ address }) => !isAccountAll(address)), [accounts]);
+  const noAllAccount = useMemo(() => accounts.filter(({ address, signMode }) => !isAccountAll(address) && signMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER), [accounts]);
 
   const accountTypeMap = useMemo(() => {
     const availableNamespaces: Record<string, string[]> = {};

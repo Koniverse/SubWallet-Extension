@@ -798,8 +798,18 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.staking.withdrawUnbonded.meta.args.length === 1) {
-      const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
-      const slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      let slashingSpanCount: string | number;
+
+      if (chainApi.api.query.staking.nominatorSlashInEra) {
+        const currentEra = await chainApi.api.query.staking.currentEra();
+        const slashingSpans = (await chainApi.api.query.staking.nominatorSlashInEra(currentEra.toPrimitive(), address)).toPrimitive() as number;
+
+        slashingSpanCount = slashingSpans !== null ? slashingSpans.toString() : '0';
+      } else {
+        const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
+
+        slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      }
 
       return chainApi.api.tx.staking.withdrawUnbonded(slashingSpanCount);
     } else {
