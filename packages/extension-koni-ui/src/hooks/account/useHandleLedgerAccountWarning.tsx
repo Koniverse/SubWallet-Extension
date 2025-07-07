@@ -36,58 +36,52 @@ export default function useHandleLedgerAccountWarning (): HookType {
     }
 
     const isTokenContext = context === 'useToken';
-    let isNeedShowAlert = false;
-    let targetSymbol = '';
+    const isNeedShowAlert = (() => {
+      const signMode = getSignModeByAccountProxy(accountProxy);
 
-    const signMode = getSignModeByAccountProxy(accountProxy);
+      if (isTokenContext) {
+        const tokenInfo = assetRegistry[targetSlug];
 
-    if (isTokenContext) {
-      const tokenInfo = assetRegistry[targetSlug];
+        if (!tokenInfo) {
+          return false;
+        }
 
-      if (!tokenInfo) {
-        processFunction();
+        const originChain = chainInfoMap[tokenInfo.originChain];
 
-        return;
-      }
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && tokenInfo) {
+          if (_isSubstrateEvmCompatibleChain(originChain) && !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, originChain)) {
+            return true;
+          }
+        }
 
-      const originChain = chainInfoMap[tokenInfo.originChain];
+        if (signMode === AccountSignMode.GENERIC_LEDGER && accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
+          if (_isChainEvmCompatible(originChain) && !_isChainCompatibleLedgerEvm(originChain)) {
+            return true;
+          }
+        }
+      } else {
+        const chainInfo = chainInfoMap[targetSlug];
 
-      targetSymbol = tokenInfo.symbol;
+        if (!chainInfo) {
+          return false;
+        }
 
-      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && tokenInfo) {
-        if (_isSubstrateEvmCompatibleChain(originChain) && !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, originChain)) {
-          isNeedShowAlert = true;
+        if (signMode === AccountSignMode.GENERIC_LEDGER && accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
+          if (_isChainEvmCompatible(chainInfo) && !_isChainCompatibleLedgerEvm(chainInfo)) {
+            return true;
+          }
+        }
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && _isSubstrateEvmCompatibleChain(chainInfo)) {
+          return true;
         }
       }
 
-      if (signMode === AccountSignMode.GENERIC_LEDGER && accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
-        if (_isChainEvmCompatible(originChain) && !_isChainCompatibleLedgerEvm(originChain)) {
-          isNeedShowAlert = true;
-        }
-      }
-    } else {
-      const chainInfo = chainInfoMap[targetSlug];
-
-      if (!chainInfo) {
-        processFunction();
-
-        return;
-      }
-
-      targetSymbol = chainInfo.name;
-
-      if (signMode === AccountSignMode.GENERIC_LEDGER && accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
-        if (_isChainEvmCompatible(chainInfo) && !_isChainCompatibleLedgerEvm(chainInfo)) {
-          isNeedShowAlert = true;
-        }
-      }
-
-      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && _isSubstrateEvmCompatibleChain(chainInfo)) {
-        isNeedShowAlert = true;
-      }
-    }
+      return false;
+    })();
 
     if (isNeedShowAlert) {
+      const targetSymbol = isTokenContext ? assetRegistry[targetSlug]?.symbol : '';
       const title = isTokenContext ? t('Unsupported token') : t('Pay attention!');
       const subtitle = t('Do you still want to get the address?');
       const contentMessage = isTokenContext

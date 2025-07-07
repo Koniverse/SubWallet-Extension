@@ -40,8 +40,21 @@ export const getLogoByNetworkKey = (networkKey: string, defaultLogo = 'default')
 
 type WarningHandler<P> = (param: P, next: VoidFunction) => void;
 
-// Use this function to run multi warning handlers modal
-export function runMultiWarningHandleModal<
+/**
+ * Executes a series of warning handler functions in a nested chain of modals.
+ *
+ * Logic:
+ * - This function takes an array of warning handlers and parameters, and chains them together to run sequentially.
+ * - Each handler function is wrapped in a closure that ensures it runs after the previous handler completes.
+ * - The handlers are processed in reverse order using `reduceRight`, so the last handler in the array runs first.
+ * - After all handlers are executed, the provided `onComplete` callback is triggered.
+ *
+ * @param {Array} handlers - An array of tuples, where each tuple contains a warning handler function
+ *                            and its associated parameter. These handlers will be executed in a nested
+ *                            sequence.
+ * @param {VoidFunction} onComplete - A callback function to be called when all handlers have been executed.
+ */
+export function runNestedWarningHandlersModal<
   THandlers extends readonly [WarningHandler<any>, any][]
 > (
   handlers: [...THandlers],

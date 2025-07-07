@@ -42,6 +42,10 @@ export function getExcludedTokensForSubstrateEcdsa (chainAssets: _ChainAsset[], 
     .map((chainAsset) => chainAsset.slug);
 }
 
+/**
+ * The purpose of this function is to exclude tokens from non-EVM chains
+ * and those with a chain ID smaller than 1, for example: Mythos, Muse,... .
+ */
 export function getExcludedTokensForLedgerEvm (chainAssets: _ChainAsset[], chainSlugList: string[], chainInfoMap: Record<string, _ChainInfo>): string[] {
   const chainListAllowed = new Set(
     chainSlugList.filter((slug) => !_isChainCompatibleLedgerEvm(chainInfoMap[slug]))
