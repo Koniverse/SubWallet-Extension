@@ -367,7 +367,7 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
     // Hotfix balance for gdot
-    if (gigaTokenSlug.includes(tokenInfo.slug)) {
+    if (tokenInfo.metadata?.isGigaToken) {
       return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
         const getGigaTokenBalance = async () => {
           const gdotBalances = await queryGigaTokenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
@@ -604,8 +604,6 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
 };
 
 // Hot fix for gdot balance
-
-const gigaTokenSlug = ['hydradx_main-LOCAL-GDOT', 'hydradx_main-LOCAL-GETH'];
 
 async function queryGigaTokenBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
