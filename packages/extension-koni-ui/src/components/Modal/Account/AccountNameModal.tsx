@@ -80,7 +80,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       title={t<string>('ui.Modal.Account.Name.accountName')}
     >
       <div className={'__brief'}>
-        {t('Enter a name for your account.\n You can edit this later.')}
+        {t('ui.Modal.Account.Name.enterAccountNameInfo')}
       </div>
 
       <Form

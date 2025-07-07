@@ -21,7 +21,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <NetworkItem
       className={className}
       key={item.slug}
-      name={item.chainInfo?.name || t('Unknown network')}
+      name={item.chainInfo?.name || t('ui.WalletConnect.Network.WCNetworkItem.unknownNetwork')}
       networkKey={item.slug}
       networkMainLogoShape='squircle'
       networkMainLogoSize={28}
