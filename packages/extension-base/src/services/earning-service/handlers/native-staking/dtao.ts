@@ -750,7 +750,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   /* Change validator */
   override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
     const chainApi = await this.substrateApi.isReady;
-    const { amount, metadata, maxAmount, originValidator, selectedValidators: targetValidators, subnetData } = data;
+    const { amount, maxAmount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
 
     if (!subnetData || !originValidator) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
