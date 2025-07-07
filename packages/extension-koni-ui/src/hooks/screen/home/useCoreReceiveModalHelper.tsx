@@ -340,10 +340,30 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    const handleShowQrModal = ({ chainSlug, tokenSlug }: SelectedTokenInfo) => {
+    const handleShowQrModal = (chainSlug: string, tokenSlug: string) => {
       const chainInfo = chainInfoMap[chainSlug];
 
       if (!chainInfo) {
+        return;
+      }
+
+      const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
+
+      if (isBitcoinChain) {
+        const accountTokenAddressList = getBitcoinAccounts(chainSlug, tokenSlug, chainInfo, currentAccountProxy.accounts);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        } else if (accountTokenAddressList.length === 1) {
+          openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        }
+
         return;
       }
 
@@ -394,7 +414,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
       // current account is not All, just do show QR logic
 
-      handleShowQrModal(specificSelectedTokenInfo);
+      handleShowQrModal(specificSelectedTokenInfo.chainSlug, specificSelectedTokenInfo.tokenSlug);
 
       return;
     }
@@ -410,13 +430,13 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         return;
       }
 
-      handleShowQrModal({ tokenSlug: tokenSelectorItems[0].slug, chainSlug: tokenSelectorItems[0].originChain });
+      handleShowQrModal(tokenSelectorItems[0].originChain, tokenSelectorItems[0].slug);
 
       return;
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, excludedTokens, getBitcoinAccounts, getReformatAddress, inactiveModal, isAllAccount, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {
