@@ -107,9 +107,7 @@ function scanSourceForTranslations(config) {
         reject(err);
       })
       .on('end', () => {
-        console.log('Translations Map:', [...translations]);
         if (translations.size > 0) {
-          console.log(`Scanned ${translations.size} unique translations`);
           resolve(translations);
         } else {
           reject(new Error('No translations found'));

@@ -26406,6 +26406,7 @@ __metadata:
     typescript: ^4.5.4
     vinyl-fs: ^4.0.2
   bin:
+    i18n-combined-data: scripts/i18n/i18n-combined.mjs
     i18n-mapping-generator: scripts/i18n/i18n-mapping-generator.mjs
     i18n-text-replacer: scripts/i18n/i18n-text-replacer.mjs
     i18n-update-translation-files: scripts/i18n/i18n-update-translation-files.mjs
