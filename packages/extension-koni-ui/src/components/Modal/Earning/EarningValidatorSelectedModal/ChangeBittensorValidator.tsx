@@ -587,7 +587,8 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
     },
 
     '.staked-balance__info': {
-      fontSize: token.fontSizeHeading6,
+      fontSize: token.fontSize,
+      lineHeight: token.lineHeight,
       color: token['gray-4'],
       marginTop: token.marginXXS
     },
@@ -611,7 +612,8 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
     },
 
     '.minimum-stake__info': {
-      fontSize: token.fontSizeHeading6,
+      fontSize: token.fontSize,
+      lineHeight: token.lineHeight,
       display: 'flex',
       justifyContent: 'space-between'
     },

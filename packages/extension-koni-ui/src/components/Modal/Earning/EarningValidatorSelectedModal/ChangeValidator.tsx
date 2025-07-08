@@ -155,7 +155,6 @@ const Component = (props: Props) => {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const fewValidators = changeValidators.length > 1;
-  const handleValidatorLabel = 'validators';
 
   const applyLabel = useMemo(() => {
     if (!fewValidators) {
@@ -303,10 +302,10 @@ const Component = (props: Props) => {
       <EmptyValidator
         isDataEmpty={items.length === 0}
         onClickReload={setForceFetchValidator}
-        validatorTitle={t(handleValidatorLabel)}
+        validatorTitle={t('Validators')}
       />
     );
-  }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
+  }, [items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
@@ -428,7 +427,7 @@ const Component = (props: Props) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select') + ' ' + t(handleValidatorLabel)}
+        title={t('Select validators')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -441,7 +440,7 @@ const Component = (props: Props) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
+          searchPlaceholder={t<string>('Search validator')}
           // showActionBtn
         />
       </SwModal>
