@@ -1,13 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
+import { AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
+import { getSignModeByAccountProxy, isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { Badge, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -24,6 +26,8 @@ interface Props extends ThemeProps {
   value?: string;
   id: string;
   chainSlug?: string;
+  tokenSlug?: string;
+  actionType?: ActionType;
   onSelect: (val: string, item: AnalyzeAddress) => void;
 }
 
@@ -47,7 +51,7 @@ const getGroupPriority = (item: AnalyzeAddress): number => {
 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { chainSlug, className, id, onSelect, value = '' } = props;
+  const { actionType, chainSlug, className, id, onSelect, tokenSlug = '', value = '' } = props;
 
   const { t } = useTranslation();
 
@@ -60,6 +64,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const chainInfo = useChainInfo(chainSlug);
 
   const getReformatAddress = useCoreCreateReformatAddress();
+
+  const getExcludedTokenByAccountProxy = useGetExcludedTokens();
 
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 
@@ -103,7 +109,10 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, getAccountChainTypeForAddress(acc.address), getKeypairTypeByAddress(acc.address))) {
+      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, {
+        chainType: getAccountChainTypeForAddress(acc.address),
+        type: getKeypairTypeByAddress(acc.address)
+      })) {
         result.push({
           displayName: acc.name,
           formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),
@@ -119,6 +128,19 @@ const Component: React.FC<Props> = (props: Props) => {
       }
 
       // todo: recheck with ledger
+      const excludedTokens = getExcludedTokenByAccountProxy([chainInfo.slug], ap);
+
+      if (excludedTokens.includes(tokenSlug)) {
+        return;
+      }
+
+      if (actionType === ActionType.SEND_NFT) {
+        const signMode = getSignModeByAccountProxy(ap);
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+          return;
+        }
+      }
 
       ap.accounts.forEach((acc) => {
         const formatedAddress = getReformatAddress(acc, chainInfo);
@@ -140,7 +162,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return result
       .sort(sortFuncAnalyzeAddress)
       .sort((a, b) => getGroupPriority(b) - getGroupPriority(a));
-  }, [accountProxies, chainInfo, chainSlug, contacts, getReformatAddress, recent, selectedFilters]);
+  }, [accountProxies, actionType, chainInfo, chainSlug, contacts, getExcludedTokenByAccountProxy, getReformatAddress, recent, selectedFilters, tokenSlug]);
 
   const searchFunction = useCallback((item: AnalyzeAddress, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
