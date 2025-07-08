@@ -1,6 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { packageInfo } from '@subwallet/extension-base';
+import { ChainListVersion } from '@subwallet/extension-base/services/chain-service/utils';
+import { TARGET_ENV } from '@subwallet/extension-base/utils';
+
 import { SubWalletResponse } from '../sdk';
 
 // todo: use interface from @subwallet/extension-base/types
@@ -196,22 +200,21 @@ export class SwapApi {
     }
   }
 
-  async findAvailablePath (_availablePathRequest: SwapRequestV2) {
-    const url = `${this.baseUrl}/swap/find-available-path`;
-
-    // hotfix todo: remove later
-    const availablePathRequest = {
-      ..._availablePathRequest,
-      evmBridgeSwapVersion: true
+  async findAvailablePath (availablePathRequest: SwapRequestV2) {
+    const url = `${this.baseUrl}/swap/find-available-path-v2`;
+    const headers = {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+      'sw-app-version': packageInfo.version,
+      'sw-chain-list-version': ChainListVersion,
+      'sw-platform': TARGET_ENV,
+      'sw-timestamp': new Date().toISOString()
     };
 
     try {
       const rawResponse = await fetch(url, {
         method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({ availablePathRequest })
       });
 
