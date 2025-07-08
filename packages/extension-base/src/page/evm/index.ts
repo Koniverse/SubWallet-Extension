@@ -1,138 +1,77 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SendRequest } from '@subwallet/extension-base/page/types';
 import type { EvmProvider } from '@subwallet/extension-inject/types';
+import type { JsonRpcRequest, JsonRpcResponse, JsonRpcSuccess } from 'json-rpc-engine';
+import type { RequestArguments } from 'web3-core';
 
 import SafeEventEmitter from '@metamask/safe-event-emitter';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
-import { SendRequest } from '@subwallet/extension-base/page/types';
-import { JsonRpcRequest, JsonRpcResponse, JsonRpcSuccess } from 'json-rpc-engine';
-import { RequestArguments } from 'web3-core';
 
 interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
   method: 'net_version';
 }
 
-let subscribeFlag = false;
+export interface SubWalletEvmProvider extends EvmProvider, SafeEventEmitter {
+  enable(): Promise<string[]>;
+  request<T>(args: RequestArguments): Promise<T>;
+  send<T>(method: string, params?: T[]): Promise<JsonRpcResponse<T>>;
+  send<T>(payload: JsonRpcRequest<unknown>, callback: (error: Error | null, result?: JsonRpcResponse<T>) => void): void;
+  send<T>(payload: SendSyncJsonRpcRequest): JsonRpcResponse<T>;
+  sendAsync<T>(
+    payload: JsonRpcRequest<T>,
+    callback: (error: Error | null, result?: JsonRpcResponse<T>) => void
+  ): void;
+  on(eventName: string | symbol, listener: (...args: any[]) => void): this;
+  once(eventName: string | symbol, listener: (...args: any[]) => void): this;
+}
 
-export default class SubWalletEvmProvider extends SafeEventEmitter implements EvmProvider {
-  public readonly isSubWallet = true;
-  public readonly isMetaMask = false;
-  public readonly version;
-  protected sendMessage: SendRequest;
-  protected _connected = false;
+export function createSubWalletEvmProvider (sendMessage: SendRequest, version: string): SubWalletEvmProvider {
+  const emitter = new SafeEventEmitter();
+  let connected = true;
+  let subscribeFlag = false;
+  const provider = Object.assign(emitter, {
+    isSubWallet: true,
+    isMetaMask: false,
+    version
+  }) as SubWalletEvmProvider;
 
-  constructor (sendMessage: SendRequest, version: string) {
-    super();
-    this.version = version;
-    this.sendMessage = sendMessage;
-    this._connected = true;
-  }
-
-  get connected () {
-    return this._connected;
-  }
-
-  public isConnected () {
-    return this._connected;
-  }
-
-  protected subscribeExtensionEvents () {
+  function subscribeExtensionEvents () {
     if (subscribeFlag) {
       return;
     }
 
-    this.sendMessage('evm(events.subscribe)', null, ({ payload, type }) => {
-      if (['connect', 'disconnect', 'accountsChanged', 'chainChanged', 'message', 'data', 'reconnect', 'error'].includes(type)) {
+    sendMessage('evm(events.subscribe)', null, ({ payload, type }) => {
+      if ([
+        'connect', 'disconnect', 'accountsChanged', 'chainChanged',
+        'message', 'data', 'reconnect', 'error'
+      ].includes(type)) {
         if (type === 'connect') {
-          this._connected = true;
+          connected = true;
         } else if (type === 'disconnect') {
-          this._connected = false;
+          connected = false;
         }
 
         const finalType = type === 'data' ? 'message' : type;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        this.emit(finalType, payload);
+        emitter.emit(finalType, payload);
       } else {
         console.warn('Can not handle event', type, payload);
       }
-    })
-      .then((done) => {
-        subscribeFlag = true;
-      })
-      .catch(() => {
-        subscribeFlag = false;
-      });
-
-    subscribeFlag = true;
+    }).then(() => {
+      subscribeFlag = true;
+    }).catch(() => {
+      subscribeFlag = false;
+    });
   }
 
-  public async enable () {
-    return this.request<string[]>({ method: 'eth_requestAccounts' });
-  }
-
-  public override on (eventName: string | symbol, listener: (...args: any[]) => void): this {
-    this.subscribeExtensionEvents();
-    super.on(eventName, listener);
-
-    return this;
-  }
-
-  public override once (eventName: string | symbol, listener: (...args: any[]) => void): this {
-    this.subscribeExtensionEvents();
-    super.once(eventName, listener);
-
-    return this;
-  }
-
-  request<T> ({ method, params }: RequestArguments): Promise<T> {
-    // if (!this._isEnable) {
-    //   if (method === 'eth_accounts') {
-    //     return this.request<T>({ method: 'eth_requestAccounts' });
-    //   }
-    // }
-
-    // Subscribe events
-    switch (method) {
-      case 'eth_requestAccounts':
-        return new Promise((resolve, reject) => {
-          const origin = document.title !== '' ? document.title : window.location.hostname;
-
-          this.sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes: ['evm'] })
-            .then(() => {
-              // Return account list
-              this.request<string[]>({ method: 'eth_accounts' })
-                .then((accounts) => {
-                  // @ts-ignore
-                  resolve(accounts);
-                }).catch((e: EvmProviderError) => {
-                  reject(e);
-                });
-            }).catch((e: EvmProviderError) => {
-              reject(e);
-            });
-        });
-      default:
-        return new Promise((resolve, reject) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          this.sendMessage('evm(request)', { params, method })
-            .then((result) => {
-              resolve(result as T);
-            })
-            .catch((e: EvmProviderError) => {
-              reject(e);
-            });
-        });
-    }
-  }
-
-  private _sendSync (payload: JsonRpcRequest<unknown>): JsonRpcResponse<unknown> {
+  const _sendSync = (payload: JsonRpcRequest<unknown>): JsonRpcResponse<unknown> => {
     let result: JsonRpcSuccess<unknown>['result'];
 
     switch (payload.method) {
       case 'net_version':
-        result = this.version ? `SubWallet v${this.version}` : null;
+        result = version ? `SubWallet v${version}` : null;
         break;
       default:
         throw new Error(`Not support ${payload.method}`);
@@ -143,38 +82,69 @@ export default class SubWalletEvmProvider extends SafeEventEmitter implements Ev
       jsonrpc: payload.jsonrpc,
       result
     };
-  }
+  };
 
-  send<T> (method: string, params?: T[]): Promise<JsonRpcResponse<T>>;
-  send<T> (payload: JsonRpcRequest<unknown>, callback: (error: Error | null, result?: JsonRpcResponse<T>) => void): void;
-  send<T> (payload: SendSyncJsonRpcRequest): JsonRpcResponse<T>;
-  send (methodOrPayload: unknown, callbackOrArgs?: unknown): unknown {
-    if (
-      typeof methodOrPayload === 'string' &&
-      (!callbackOrArgs || Array.isArray(callbackOrArgs))
-    ) {
-      return this.request({ method: methodOrPayload, params: callbackOrArgs });
-    } else if (
-      methodOrPayload &&
-      typeof methodOrPayload === 'object' &&
-      typeof callbackOrArgs === 'function'
-    ) {
-      return this.request(methodOrPayload as JsonRpcRequest<unknown>).then((rs) => {
-        (callbackOrArgs as (...args: unknown[]) => void)(rs);
+  provider.isConnected = () => connected;
+
+  provider.request = <T>(arg: RequestArguments): Promise<T> => {
+    if (arg.method === 'eth_requestAccounts') {
+      const origin = document.title || window.location.hostname;
+
+      return sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes: ['evm'] })
+        .then(() => provider.request<T>({ method: 'eth_accounts' }));
+    }
+
+    return sendMessage('evm(request)', arg) as Promise<T>;
+  };
+
+  provider.send = (methodOrPayload: unknown, callbackOrArgs?: unknown): any => {
+    if (typeof methodOrPayload === 'string' && (!callbackOrArgs || Array.isArray(callbackOrArgs))) {
+      return provider.request({ method: methodOrPayload, params: callbackOrArgs });
+    } else if (typeof methodOrPayload === 'object' && typeof callbackOrArgs === 'function') {
+      return provider.request(methodOrPayload as RequestArguments).then((result) => {
+        callbackOrArgs(null, result);
       });
     }
 
-    return this._sendSync(methodOrPayload as SendSyncJsonRpcRequest);
-  }
+    return _sendSync(methodOrPayload as JsonRpcRequest<unknown>);
+  };
 
-  sendAsync<T> (payload: JsonRpcRequest<T>, callback: (error: (Error | null), result?: JsonRpcResponse<T>) => void): void {
-    this.request<T>(payload)
+  provider.enable = async () => {
+    const accounts = await provider.request<string[]>({ method: 'eth_requestAccounts' });
+
+    connected = accounts.length > 0;
+
+    return accounts;
+  };
+
+  provider.sendAsync = (payload, callback) => {
+    provider.request(payload)
       .then((result) => {
-        // @ts-ignore
-        callback(null, { result });
+        callback(null, {
+          id: payload.id,
+          jsonrpc: payload.jsonrpc,
+          // @ts-ignore
+          result
+        });
       })
       .catch((e: EvmProviderError) => {
         callback(e);
       });
-  }
+  };
+
+  provider.on = (eventName, listener) => {
+    subscribeExtensionEvents();
+    SafeEventEmitter.prototype.on.call(emitter, eventName, listener);
+
+    return provider;
+  };
+
+  provider.once = (eventName, listener) => {
+    subscribeExtensionEvents();
+    SafeEventEmitter.prototype.once.call(emitter, eventName, listener);
+
+    return provider;
+  };
+
+  return provider;
 }

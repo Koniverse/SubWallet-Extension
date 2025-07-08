@@ -4,7 +4,7 @@
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AbstractYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
@@ -12,7 +12,7 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
   const poolInfoMap = useSelector((state) => state.earning.poolInfoMap);
   const yieldPositions = useSelector((state) => state.earning.yieldPositions);
   const { currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
-  const chainsByAccountType = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo(() => {
     const result: YieldPositionInfo[] = [];
@@ -29,9 +29,15 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
       const rs: YieldPositionInfo[] = [];
 
       for (const info of yieldPositions) {
-        const isChainValid = chainsByAccountType.includes(info.chain);
+        const isChainValid = allowedChains.includes(info.chain);
 
         if (!isChainValid) {
+          continue;
+        }
+
+        const isExcludedToken = excludedTokens.includes(info.balanceToken);
+
+        if (isExcludedToken) {
           continue;
         }
 
@@ -61,7 +67,7 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
     const raw: Record<string, YieldPositionInfo[]> = {};
 
     for (const info of yieldPositions) {
-      if (chainsByAccountType.includes(info.chain) && poolInfoMap[info.slug]) {
+      if (allowedChains.includes(info.chain) && poolInfoMap[info.slug]) {
         const haveStake = new BigN(info.totalStake).gt(0);
 
         if (haveStake) {
@@ -141,7 +147,7 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
     }
 
     return result;
-  }, [currentAccountProxy, isAllAccount, yieldPositions, chainsByAccountType, poolInfoMap]);
+  }, [currentAccountProxy, isAllAccount, yieldPositions, allowedChains, excludedTokens, poolInfoMap]);
 };
 
 export default useGroupYieldPosition;

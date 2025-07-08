@@ -16,7 +16,7 @@ const transformBitcoinAccounts = (
 ): AccountTokenAddress[] => {
   return accounts
     .filter(
-      (acc) => _isChainInfoCompatibleWithAccountInfo(chainInfo, AccountChainType.BITCOIN, acc.type)
+      ({ type }) => _isChainInfoCompatibleWithAccountInfo(chainInfo, { chainType: AccountChainType.BITCOIN, type })
     )
     .map((item) => ({
       accountInfo: item,

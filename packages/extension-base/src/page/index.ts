@@ -7,7 +7,7 @@ import { ProviderError } from '@subwallet/extension-base/background/errors/Provi
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
 import SubWalletBitcoinProvider from '@subwallet/extension-base/page/bitcoin';
 import SubWalletCardanoProvider from '@subwallet/extension-base/page/cardano';
-import SubWalletEvmProvider from '@subwallet/extension-base/page/evm';
+import { createSubWalletEvmProvider } from '@subwallet/extension-base/page/evm';
 import Injected from '@subwallet/extension-base/page/substrate';
 import { AuthRequestOption, BitcoinProvider, CardanoProvider, EvmProvider } from '@subwallet/extension-inject/types';
 
@@ -59,8 +59,9 @@ export function sendMessage<TMessageType extends MessageTypes> (message: TMessag
 
 export async function enable (origin: string, opt?: AuthRequestOption): Promise<Injected> {
   const accountAuthTypes: AccountAuthType[] = opt?.accountAuthType === 'both' ? ['substrate', 'evm'] : [opt?.accountAuthType || 'substrate'];
+  const canConnectSubstrateEcdsa = accountAuthTypes.includes('evm');
 
-  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes });
+  await sendMessage('pub(authorize.tabV2)', { origin, accountAuthTypes, canConnectSubstrateEcdsa });
 
   return new Injected(sendMessage);
 }
@@ -89,7 +90,7 @@ export function handleResponse<TMessageType extends MessageTypes> (data: Transpo
 }
 
 export function initEvmProvider (version: string): EvmProvider {
-  return new SubWalletEvmProvider(sendMessage, version);
+  return createSubWalletEvmProvider(sendMessage, version);
 }
 
 export function initCardanoProvider (): CardanoProvider {

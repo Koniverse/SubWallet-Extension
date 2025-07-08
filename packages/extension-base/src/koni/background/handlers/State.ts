@@ -48,7 +48,7 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, isSameAddress, reformatAddress, stripUrl, TARGET_ENV, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, TARGET_ENV, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
@@ -335,6 +335,9 @@ export default class KoniState {
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
     });
+
+    // init sails
+    await sailsCache.init();
 
     // Mark app is ready
     this.eventService.emit('general.init', true);
