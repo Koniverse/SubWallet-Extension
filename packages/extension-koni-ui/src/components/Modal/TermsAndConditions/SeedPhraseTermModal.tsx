@@ -129,7 +129,7 @@ const Component = ({ className }: Props) => {
           checked={isCheckDontShow}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{('Don’t show again')}</Checkbox>
+        >{t('ui.Modal.Terms.SeedPhrase.dontShowAgain')}</Checkbox>
         <Button
           block={true}
           className={'term-footer-button'}

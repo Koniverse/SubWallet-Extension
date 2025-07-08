@@ -88,7 +88,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{('I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature')}</Checkbox>
+        >{t('ui.Modal.Terms.General.agreeToTermsOfUse')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}

@@ -103,7 +103,7 @@ const Component = ({ className, onOk }: Props) => {
           className={'__content-footer-checkbox'}
           onChange={onCheckedInput}
         >
-          {('I understand the associated risk and will act under caution')}
+          {t('ui.Modal.Swap.Terms.understandAssociatedRisk')}
         </Checkbox>
         <div className={'__content-footer-button-group'}>
           <Button
