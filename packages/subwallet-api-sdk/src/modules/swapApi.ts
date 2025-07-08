@@ -1,10 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { packageInfo } from '@subwallet/extension-base';
-import { ChainListVersion } from '@subwallet/extension-base/services/chain-service/utils';
-import { TARGET_ENV } from '@subwallet/extension-base/utils';
-
 import { SubWalletResponse } from '../sdk';
 
 // todo: use interface from @subwallet/extension-base/types
@@ -141,9 +137,11 @@ export interface SwapPath {
 
 export class SwapApi {
   private baseUrl: string;
+  private headers: Record<string, string>;
 
-  constructor (baseUrl: string) {
+  constructor (baseUrl: string, headers: Record<string, string>) {
     this.baseUrl = baseUrl;
+    this.headers = headers;
   }
 
   async fetchSwapQuoteData (quoteRequest: SwapRequest): Promise<QuoteAskResponse[]> {
@@ -152,10 +150,7 @@ export class SwapApi {
     try {
       const rawResponse = await fetch(url, {
         method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers: this.headers,
         body: JSON.stringify({ quoteRequest })
       });
 
@@ -177,10 +172,7 @@ export class SwapApi {
     try {
       const rawResponse = await fetch(url, {
         method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers: this.headers,
         body: JSON.stringify({ hydrationRateRequest })
       });
 
@@ -202,19 +194,11 @@ export class SwapApi {
 
   async findAvailablePath (availablePathRequest: SwapRequestV2) {
     const url = `${this.baseUrl}/swap/find-available-path-v2`;
-    const headers = {
-      accept: 'application/json',
-      'Content-Type': 'application/json',
-      'sw-app-version': packageInfo.version,
-      'sw-chain-list-version': ChainListVersion,
-      'sw-platform': TARGET_ENV,
-      'sw-timestamp': new Date().toISOString()
-    };
 
     try {
       const rawResponse = await fetch(url, {
         method: 'POST',
-        headers,
+        headers: this.headers,
         body: JSON.stringify({ availablePathRequest })
       });
 

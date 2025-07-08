@@ -24,9 +24,10 @@ export interface SubWalletResponse<T> {
   message: string
 }
 
-export interface SubWalletApiUrl {
+export interface SubWalletApiInitRequest {
   url: string;
   priceHistoryUrl: string;
+  headers: Record<string, string>;
 }
 
 export class SubWalletApiSdk {
@@ -36,13 +37,15 @@ export class SubWalletApiSdk {
   public xcmApi: XcmApi | undefined;
   public balanceDetectionApi: BalanceDetectionApi | undefined;
   public priceHistoryApi: PriceHistoryApi | undefined;
+  public headers: Record<string, string> | undefined;
 
-  public init ({ priceHistoryUrl, url }: SubWalletApiUrl) {
+  public init ({ headers, priceHistoryUrl, url }: SubWalletApiInitRequest) {
     this.baseUrl = url;
-    this.swapApi = new SwapApi(url);
+    this.swapApi = new SwapApi(url, headers);
     this.xcmApi = new XcmApi(url);
     this.balanceDetectionApi = new BalanceDetectionApi(url);
     this.priceHistoryApi = new PriceHistoryApi(priceHistoryUrl);
+    this.headers = headers;
   }
 
   async fetchUnsignedPayload (params: BuildCardanoTxParams): Promise<string> {
