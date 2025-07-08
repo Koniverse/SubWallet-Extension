@@ -54,54 +54,58 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     return new Promise((resolve) => resolve(noop));
   }
 
+  abstract checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>>;
+
   async getPoolRewardHistory (useAddresses: string[], callBack: (rs: EarningRewardHistoryItem) => void): Promise<VoidFunction> {
     let cancel = false;
     const haveSubscanService = this.state.subscanService.checkSupportedSubscanChain(this.chain);
     const requestGroupId = this.state.subscanService.getGroupId();
 
     if (haveSubscanService) {
-      for (const address of useAddresses) {
-        if (cancel) {
-          break;
-        }
-
-        const positionInfo = await this.getPoolPosition(address);
-
-        if (!positionInfo || positionInfo.totalStake === '0') {
-          continue;
-        }
-
-        this.state.subscanService.getRewardHistoryList(requestGroupId, this.chain, address)
-          .then((rs) => {
-            const items = rs?.list;
-
+      this.checkAccountHaveStake(useAddresses)
+        .then((activeAddresses) => {
+          for (const address of useAddresses) {
             if (cancel) {
-              return;
+              break;
             }
 
-            if (items) {
-              for (const item of items) {
-                const now = new Date();
-                const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
-                const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
-
-                const data: EarningRewardHistoryItem = {
-                  slug: this.slug,
-                  type: this.type,
-                  chain: this.chain,
-                  address: address,
-                  group: this.group,
-                  blockTimestamp: timeStamp,
-                  amount: item.amount,
-                  eventIndex: item.event_index
-                };
-
-                callBack(data);
-              }
+            if (!activeAddresses.includes(address)) {
+              continue;
             }
-          })
-          .catch(console.error);
-      }
+
+            this.state.subscanService.getRewardHistoryList(requestGroupId, this.chain, address)
+              .then((rs) => {
+                const items = rs?.list;
+
+                if (cancel) {
+                  return;
+                }
+
+                if (items) {
+                  for (const item of items) {
+                    const now = new Date();
+                    const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
+                    const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
+
+                    const data: EarningRewardHistoryItem = {
+                      slug: this.slug,
+                      type: this.type,
+                      chain: this.chain,
+                      address: address,
+                      group: this.group,
+                      blockTimestamp: timeStamp,
+                      amount: item.amount,
+                      eventIndex: item.event_index
+                    };
+
+                    callBack(data);
+                  }
+                }
+              })
+              .catch(console.error);
+          }
+        })
+        .catch(console.error);
     }
 
     return Promise.resolve(() => {
