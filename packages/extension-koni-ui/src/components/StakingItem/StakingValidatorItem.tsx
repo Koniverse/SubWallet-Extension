@@ -49,7 +49,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <SwAvatar
             identPrefix={prefixAddress}
             isShowSubIcon={validatorInfo.isVerified}
-            size={40}
+            size={32}
             subIcon={<BackgroundIcon
               backgroundColor={token.colorSuccess}
               phosphorIcon={CheckCircle}
@@ -130,7 +130,10 @@ const StakingValidatorItem = styled(Component)<Props>(({ theme: { token } }: Pro
     },
 
     '.validator-item-content': {
-      borderRadius: token.borderRadiusLG
+      borderRadius: token.borderRadiusLG,
+      paddingBottom: '0px',
+      paddingTop: '0px',
+      minHeight: '58px'
     },
 
     '.middle-item__name-wrapper': {

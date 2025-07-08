@@ -9,7 +9,7 @@ import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/Empt
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { CHANGE_VALIDATOR_TRANSACTION, DEFAULT_CHANGE_VALIDATOR_PARAMS, VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useChainChecker, useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useFetchChainState, useGetPoolTargetList, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
 import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { store } from '@subwallet/extension-koni-ui/stores';
@@ -153,8 +153,6 @@ const Component = (props: Props) => {
     );
   }, [networkPrefix, onClickMore]);
 
-  const checkChain = useChainChecker();
-
   useEffect(() => {
     let unmount = false;
 
@@ -179,10 +177,6 @@ const Component = (props: Props) => {
       unmount = true;
     };
   }, [chainState?.active, forceFetchValidator, slug, poolInfo.chain, compound?.address]);
-
-  useEffect(() => {
-    chain && checkChain(chain);
-  }, [chain, checkChain]);
 
   useExcludeModal(modalId);
 
@@ -282,7 +276,7 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ th
     },
 
     '.__pool-item-wrapper': {
-      marginBottom: token.marginXS
+      marginBottom: token.marginXXS
     },
 
     '.ant-sw-modal-body': {

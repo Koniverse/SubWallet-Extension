@@ -13,7 +13,7 @@ import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/Filte
 import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/SortingModal';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
@@ -155,7 +155,7 @@ const Component = (props: Props) => {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const fewValidators = changeValidators.length > 1;
-  const handleValidatorLabel = 'Validator';
+  const handleValidatorLabel = 'validators';
 
   const applyLabel = useMemo(() => {
     if (!fewValidators) {
@@ -379,6 +379,12 @@ const Component = (props: Props) => {
     }
   }, [isActive, onResetFilter]);
 
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    chain && checkChain(chain);
+  }, [chain, checkChain]);
+
   useExcludeModal(modalId);
 
   return (
@@ -470,6 +476,10 @@ const Component = (props: Props) => {
 
 const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingSM
+    },
+
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
       paddingBottom: token.paddingLG
@@ -492,7 +502,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
     },
 
     '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXS
+      marginBottom: token.marginXXS
     }
   };
 });

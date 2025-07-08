@@ -502,6 +502,11 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
       paddingTop: token.paddingXS,
       paddingBottom: token.paddingLG
     },
+
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingSM
+    },
+
     '.__pool-item-wrapper': {
       marginBottom: token.marginXS
     },
@@ -520,7 +525,7 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
     },
 
     '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXS
+      marginBottom: token.marginXXS
     }
   };
 });

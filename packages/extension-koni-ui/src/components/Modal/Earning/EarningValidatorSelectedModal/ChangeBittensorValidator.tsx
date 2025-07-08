@@ -10,7 +10,7 @@ import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
@@ -209,7 +209,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const renderSubnetStaking = useCallback(() => {
     return (
-
       <MetaInfo.Default
         className='__label-bottom'
         label={t('Subnet')}
@@ -380,6 +379,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     }
   }, [isActive, form]);
 
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    chain && checkChain(chain);
+  }, [chain, checkChain]);
+
   const onPreCheck = usePreCheckAction(from);
 
   useExcludeModal(modalId);
@@ -421,7 +426,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <AccountItemWithName
             accountName={account?.name}
             address={from}
-            avatarSize={24}
+            avatarSize={20}
           />
           <div className={'staked-balance__info'}>
             <span>
@@ -459,10 +464,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           />
         </Form.Item>
 
-        <MetaInfo>
+        <MetaInfo className='custom-label'>
           {!isSubnetStaking
             ? (
-
               <MetaInfo.Chain
                 chain={chain}
                 label={t('Network')}
@@ -496,36 +500,37 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           </div>
         </div>
 
-        {isShowAmountChange && (<>
-          <Form.Item
-            name={'value'}
-            statusHelpAsTooltip={true}
-          >
-            <AmountInput
-              decimals={decimals}
-              maxValue={bondedValue}
-              prefix={ <Logo
-                className='__item-logo'
-                isShowSubLogo={false}
-                network={networkKey}
-                shape='squircle'
-                size={24}
-              />}
-              showMaxButton={true}
-            />
-          </Form.Item>
-          <div className={'minimum-stake__info'}>
-            <div className={'minimum-stake__label'}>
-              {t('Minimum active stake')}
+        {isShowAmountChange && (
+          <div className='__amount-input'>
+            <Form.Item
+              name={'value'}
+              statusHelpAsTooltip={true}
+            >
+              <AmountInput
+                decimals={decimals}
+                maxValue={bondedValue}
+                prefix={ <Logo
+                  className='__item-logo'
+                  isShowSubLogo={false}
+                  network={networkKey}
+                  shape='squircle'
+                  size={28}
+                />}
+                showMaxButton={true}
+              />
+            </Form.Item>
+            <div className={'minimum-stake__info'}>
+              <div className={'minimum-stake__label'}>
+                {t('Minimum active stake')}
+              </div>
+              <Number
+                className='minimum-stake__value'
+                decimal={decimals}
+                suffix={symbol}
+                value={BigN(poolInfo.statistic?.earningThreshold.join || 0).multipliedBy(1 / earningRate)}
+              />
             </div>
-            <Number
-              className='minimum-stake__value'
-              decimal={decimals}
-              suffix={symbol}
-              value={BigN(poolInfo.statistic?.earningThreshold.join || 0).multipliedBy(1 / earningRate)}
-            />
           </div>
-        </>
         )}
       </Form>
     </SwModal>
@@ -553,17 +558,36 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '10px 12px',
+      padding: '0px 12px',
       borderRadius: token.borderRadiusLG,
       backgroundColor: token.colorBgSecondary,
-      marginBottom: token.sizeSM,
       marginTop: token.sizeSM,
-      fontSize: token.fontSizeHeading6
+      fontSize: token.fontSizeHeading6,
+      minHeight: '53px'
+    },
+
+    '.ant-account-item': {
+      minHeight: '48px'
+    },
+
+    '.account-item-content-wrapper': {
+      fontWeight: 500
+    },
+
+    '.__amount-input': {
+      marginTop: token.sizeSM
+    },
+
+    '.ant-input-wrapper': {
+      minHeight: '52px'
+    },
+
+    '.ant-switch': {
+      minWidth: '52px'
     },
 
     '.staked-balance__info': {
       fontSize: token.fontSizeHeading6,
-      lineHeight: token.lineHeightSM,
       color: token['gray-4'],
       marginTop: token.marginXXS
     },
@@ -575,9 +599,19 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
       minWidth: 0
     },
 
+    '.custom-label .__label': {
+      color: token.colorTextLight3
+    },
+
+    '.__subnet-wrapper .chain-name': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXS,
+      minWidth: 0
+    },
+
     '.minimum-stake__info': {
       fontSize: token.fontSizeHeading6,
-      lineHeight: token.lineHeightSM,
       display: 'flex',
       justifyContent: 'space-between'
     },
@@ -590,7 +624,9 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
       display: 'flex',
       alignItems: 'center',
       gap: 4,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      fontWeight: 600,
+      color: token.colorWhite
     }
   };
 });

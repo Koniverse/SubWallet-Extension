@@ -136,7 +136,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )
             : undefined
         }
-        title={t('Select') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
+        title={t('Select a') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
       />
     </>
   );
@@ -162,6 +162,10 @@ const NominationSelector = styled(forwardRef(Component))<Props>(({ theme: { toke
         color: token.colorTextLight4,
         paddingLeft: token.sizeXXS
       }
+    },
+
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingSM
     },
 
     '.ant-select-modal-input-wrapper': {

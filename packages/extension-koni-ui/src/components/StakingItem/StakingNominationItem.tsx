@@ -42,7 +42,7 @@ const Component: React.FC<Props> = (props: Props) => {
         leftItem={
           <SwAvatar
             identPrefix={networkPrefix}
-            size={40}
+            size={32}
             value={nominationInfo.validatorAddress}
           />
         }
@@ -119,7 +119,10 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
     background: token.colorBgSecondary,
 
     '.validator-item-content': {
-      borderRadius: token.borderRadiusLG
+      borderRadius: token.borderRadiusLG,
+      paddingBottom: '0px',
+      paddingTop: '0px',
+      minHeight: '58px'
     },
 
     '.ant-web3-block-middle-item': {
