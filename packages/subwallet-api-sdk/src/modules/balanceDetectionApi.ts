@@ -4,10 +4,12 @@
 import { SWApiResponse } from '@subwallet/subwallet-api-sdk/types';
 
 export class BalanceDetectionApi {
-  private baseUrl: string;
+  private readonly baseUrl: string;
+  private readonly headers: Record<string, string>;
 
-  constructor (baseUrl: string) {
+  constructor (baseUrl: string, headers: Record<string, string>) {
     this.baseUrl = baseUrl;
+    this.headers = headers;
   }
 
   async getEvmTokenBalanceSlug (address: string): Promise<string[]> {
@@ -16,9 +18,7 @@ export class BalanceDetectionApi {
     try {
       const rawResponse = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: this.headers
       });
 
       const response = await rawResponse.json() as SWApiResponse<string[]>;

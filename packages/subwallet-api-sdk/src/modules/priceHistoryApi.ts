@@ -15,10 +15,12 @@ interface HistoryTokenPriceJSON {
 }
 
 export class PriceHistoryApi {
-  private baseUrl: string;
+  private readonly baseUrl: string;
+  private readonly headers: Record<string, string>;
 
-  constructor (baseUrl: string) {
+  constructor (baseUrl: string, headers: Record<string, string>) {
     this.baseUrl = baseUrl;
+    this.headers = headers;
   }
 
   async getPriceHistory (token: string, type: Timeframe): Promise<HistoryTokenPriceJSON> {
@@ -27,9 +29,7 @@ export class PriceHistoryApi {
     try {
       const rawResponse = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: this.headers
       });
 
       const response = await rawResponse.json() as SWApiResponse<HistoryTokenPriceJSON>;

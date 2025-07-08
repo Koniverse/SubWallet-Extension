@@ -20,10 +20,12 @@ interface XcmApiResponse {
 }
 
 export class XcmApi {
-  private baseUrl: string;
+  private readonly baseUrl: string;
+  private readonly headers: Record<string, string>;
 
-  constructor (baseUrl: string) {
+  constructor (baseUrl: string, headers: Record<string, string>) {
     this.baseUrl = baseUrl;
+    this.headers = headers;
   }
 
   async fetchXcmData (address: string, from: string, to: string, recipient: string, value: string): Promise<XcmApiResponse> {
@@ -40,10 +42,7 @@ export class XcmApi {
     try {
       const rawResponse = await fetch(url, {
         method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers: this.headers,
         body: JSON.stringify({ XcmRequest: xcmRequest })
       });
 

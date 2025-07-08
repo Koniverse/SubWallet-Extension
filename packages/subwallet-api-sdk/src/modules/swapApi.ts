@@ -136,8 +136,8 @@ export interface SwapPath {
 }
 
 export class SwapApi {
-  private baseUrl: string;
-  private headers: Record<string, string>;
+  private readonly baseUrl: string;
+  private readonly headers: Record<string, string>;
 
   constructor (baseUrl: string, headers: Record<string, string>) {
     this.baseUrl = baseUrl;
