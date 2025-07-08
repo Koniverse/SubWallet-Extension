@@ -139,7 +139,7 @@ export class SwapApi {
   private baseUrl: string;
 
   constructor (baseUrl: string) {
-    this.baseUrl = 'https://be-dev-03.subwallet.app/api';
+    this.baseUrl = baseUrl;
   }
 
   async fetchSwapQuoteData (quoteRequest: SwapRequest): Promise<QuoteAskResponse[]> {
