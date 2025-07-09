@@ -8,7 +8,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
-import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { addLazy, fetchStaticData, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -114,6 +114,7 @@ const Component = () => {
   // const [checkMintLoading, setCheckMintLoading] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(true);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
+  const [multiStakingTypesChains, setMultiStakingTypesChains] = useState<string[]>([]);
 
   const chainState = useFetchChainState(poolInfo?.chain || '');
 
@@ -149,10 +150,9 @@ const Component = () => {
     const hasNativeStaking = (chain: string) => specificList.some((item) => item.chain === chain && item.type === YieldPoolType.NATIVE_STAKING);
     const hasNominationPool = (chain: string) => specificList.some((item) => item.chain === chain && item.type === YieldPoolType.NOMINATION_POOL);
 
-    const chains = ['polkadot', 'kusama'];
     let chainStakingInBoth;
 
-    for (const chain of chains) {
+    for (const chain of multiStakingTypesChains) {
       if (hasNativeStaking(chain) && hasNominationPool(chain) && [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolType) && chain === chainValue) {
         chainStakingInBoth = chain;
         break;
@@ -163,7 +163,7 @@ const Component = () => {
     }
 
     return chainStakingInBoth;
-  }, [specificList, poolType, chainValue]);
+  }, [specificList, multiStakingTypesChains, poolType, chainValue]);
 
   const balanceTokens = useMemo(() => {
     const result: Array<{ chain: string; token: string }> = [];
@@ -1209,6 +1209,12 @@ const Component = () => {
       activeModal(instructionModalId);
     }
   }, [activeModal, compound, screenLoading]);
+
+  useEffect(() => {
+    fetchStaticData<{chains: string[]}>('multi-staking-types-chains').then((data) => {
+      setMultiStakingTypesChains(data.chains);
+    }).catch(console.error);
+  }, []);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
     return [
