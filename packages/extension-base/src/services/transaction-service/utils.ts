@@ -55,6 +55,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '';
   }
 
+  if (explorerLink.includes('devnet-explorer.mosaicchain.io')) {
+    return 'accounts';
+  }
+
   return 'address';
 }
 
@@ -73,6 +77,10 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
 
   if (['gen6_public'].includes(chainInfo.slug)) {
     return '#/extrinsics';
+  }
+
+  if (['mosaicTest'].includes(chainInfo.slug)) {
+    return 'transactions';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
