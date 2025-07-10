@@ -43,8 +43,7 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui',
-  'subwallet-api-sdk'
+  'extension-koni-ui'
 ];
 
 const polkadotDevOptions = require('@polkadot/dev/config/babel-config-webpack.cjs');

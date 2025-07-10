@@ -7,7 +7,7 @@ import { ErrorValidation } from '@subwallet/extension-base/background/KoniTypes'
 import { CardanoTxJson, CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoAssetMetadata, getAdaBelongUtxo, getCardanoTxFee, splitCardanoId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _CardanoApi } from '@subwallet/extension-base/services/chain-service/types';
-import { subwalletApiSdk } from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 export interface CardanoTransactionConfigProps {
   tokenInfo: _ChainAsset;
@@ -44,15 +44,16 @@ export async function createCardanoTransaction (params: CardanoTransactionConfig
     throw new Error('Missing token policy id metadata');
   }
 
-  const payload = await subwalletApiSdk.fetchUnsignedPayload({
-    tokenDecimals: params.tokenInfo.decimals || 0,
-    nativeTokenSymbol: params.nativeTokenInfo.symbol,
-    cardanoId,
-    from: params.from,
-    to: params.to,
-    value: params.value,
-    cardanoTtlOffset: params.cardanoTtlOffset
+  const payload = await subwalletApiSdk.cardanoApi?.fetchUnsignedPayload({
+    sender: from,
+    receiver: to,
+    unit: cardanoId,
+    quantity: value
   });
+
+  if (!payload) {
+    throw new Error('Build cardano payload failed!');
+  }
 
   console.log('Build cardano payload successfully!', payload);
 

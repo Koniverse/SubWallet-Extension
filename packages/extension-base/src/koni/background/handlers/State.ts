@@ -21,7 +21,7 @@ import { ChainOnlineService } from '@subwallet/extension-base/services/chain-onl
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _PREDEFINED_SINGLE_MODES } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest } from '@subwallet/extension-base/services/chain-service/types';
-import { _getEvmChainId, _getSubstrateGenesisHash, _getTokenOnChainAssetId, _isAssetFungibleToken, _isChainEnabled, _isChainTestNet, _parseMetadataForSmartContractAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getEvmChainId, _getSubstrateGenesisHash, _getTokenOnChainAssetId, _isAssetFungibleToken, _isChainEnabled, _isChainTestNet, _parseMetadataForSmartContractAsset, ChainListVersion } from '@subwallet/extension-base/services/chain-service/utils';
 import EarningService from '@subwallet/extension-base/services/earning-service/service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
@@ -47,12 +47,12 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, TARGET_ENV, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
@@ -150,10 +150,16 @@ export default class KoniState {
   private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
-    // Init subwallet api sdk
-    subwalletApiSdk.init({
-      url: BACKEND_API_URL,
-      priceHistoryUrl: BACKEND_PRICE_HISTORY_URL
+    // todo: appVersion packageInfo.version
+    subwalletApiSdk.updateConfig({
+      baseUrl: BACKEND_API_URL,
+      platform: TARGET_ENV,
+      chainListVersion: ChainListVersion
+    });
+
+    // Custom the price history API with other different base URL
+    subwalletApiSdk.priceHistoryApi.updateConfig({
+      baseUrl: BACKEND_PRICE_HISTORY_URL
     });
 
     this.providers = providers;
