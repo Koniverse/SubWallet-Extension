@@ -1041,7 +1041,7 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
 
       payload_.errorPosition = 'ui';
       payload_.confirmationType = 'bitcoinSendTransactionRequestAfterConfirmation';
-      const [message, name] = [t('Enable {{chain}} network on the extension and try again', { replace: { chain: chainInfo.name } }), t('bg.validation.request.networkNotEnabled')];
+      const [message, name] = [t('bg.validation.request.enableChainOnExtension', { replace: { chain: chainInfo.name } }), t('bg.validation.request.networkNotEnabled')];
       const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
 
       console.error(error);

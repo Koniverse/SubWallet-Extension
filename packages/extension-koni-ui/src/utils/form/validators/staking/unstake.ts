@@ -21,15 +21,15 @@ export const validateUnStakeValue = (min: number | string | BigN, max: number | 
       const val = new BigN(value);
 
       if (val.gt(maxValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal or less than {{maxString}}', { replace: { name, maxString } })));
+        return Promise.reject(new Error(t('ui.util.validator.staking.unstake.nameMaxLength', { replace: { name, maxString } })));
       }
 
       if (val.lte(BN_ZERO)) {
-        return Promise.reject(new Error(t('{{name}} must be greater than 0', { replace: { name } })));
+        return Promise.reject(new Error(t('ui.util.validator.staking.unstake.nameGreaterThanZero', { replace: { name } })));
       }
 
       if (middleValue.lt(BN_ZERO) && !val.eq(maxValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal {{maxString}}', { replace: { name, maxString } })));
+        return Promise.reject(new Error(t('ui.util.validator.staking.unstake.nameEqualLength', { replace: { name, maxString } })));
       }
 
       if (val.gt(middleValue) && val.lt(maxValue)) {

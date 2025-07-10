@@ -167,7 +167,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       // eslint-disable-next-line padding-line-between-statements, no-fallthrough
       case ConnectionStatement.PARTIAL_CONNECTED:
         if (isAllAccount) {
-          return t('Connected {{connected}}/{{canConnect}}', { replace: { connected, canConnect } });
+          return t('ui.Layout.SelectAccount.connectedStatus', { replace: { connected, canConnect } });
         } else {
           return t('ui.Layout.SelectAccount.connected');
         }

@@ -75,7 +75,7 @@ export default abstract class BaseLiquidStakingPoolHandler extends BaseSpecialSt
     if (bnAmount.lt(minUnstake)) {
       const minUnstakeStr = formatNumber(minUnstake.toString(), derivativeTokenInfo.decimals || 0);
 
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_UNSTAKE, t('You need to unstake at least {{amount}} {{token}}', { replace: { amount: minUnstakeStr, token: derivativeTokenInfo.symbol } })));
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_UNSTAKE, t('bg.service.earning.liquidStaking.unstakeMinimumAmount', { replace: { amount: minUnstakeStr, token: derivativeTokenInfo.symbol } })));
     }
 
     if (!fastLeave) {
@@ -84,7 +84,7 @@ export default abstract class BaseLiquidStakingPoolHandler extends BaseSpecialSt
       }
 
       if (poolPosition.unstakings.length > maxUnstakeRequest) {
-        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstakeRequest } })));
+        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.service.earning.liquidStaking.maxUnstakeTimes', { replace: { number: maxUnstakeRequest } })));
       }
     }
 

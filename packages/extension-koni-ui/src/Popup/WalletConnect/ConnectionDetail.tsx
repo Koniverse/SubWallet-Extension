@@ -121,7 +121,7 @@ const Component: React.FC<ComponentProps> = (props) => {
     return (
       <NetworkItem
         key={item.slug}
-        name={item.chainInfo?.name || t('Unknown network ({{slug}})', { replace: { slug: item.slug } })}
+        name={item.chainInfo?.name || t('ui.WalletConnect.ConnectionDetail.unknownNetwork', { replace: { slug: item.slug } })}
         networkKey={item.slug}
         networkMainLogoShape='squircle'
         networkMainLogoSize={28}
@@ -200,7 +200,7 @@ const Component: React.FC<ComponentProps> = (props) => {
             >
               <WCNetworkAvatarGroup networks={chains} />
               <div className='network-name'>
-                {t('{{number}} network(s)', { replace: { number: chains.length } })}
+                {t('ui.WalletConnect.ConnectionDetail.numberNetworks', { replace: { number: chains.length } })}
               </div>
               <Icon
                 phosphorIcon={Info}
@@ -211,7 +211,7 @@ const Component: React.FC<ComponentProps> = (props) => {
           </MetaInfo.Default>
         </MetaInfo>
         <div className='total-account'>
-          {t('{{number}} account connected', { replace: { number: accountProxyItems.length } })}
+          {t('ui.WalletConnect.ConnectionDetail.numberAccountConnected', { replace: { number: accountProxyItems.length } })}
         </div>
         <SwList.Section
           className='account-list'

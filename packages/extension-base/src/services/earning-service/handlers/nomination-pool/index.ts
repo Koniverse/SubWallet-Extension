@@ -635,7 +635,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.service.earning.nominationPool.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);

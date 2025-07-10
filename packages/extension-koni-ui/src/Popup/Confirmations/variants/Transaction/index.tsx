@@ -183,7 +183,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
-            description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: network?.name } })}
+            description={t('ui.Confirmations.Transaction.highGasFeeWarning', { replace: { networkName: network?.name } })}
             title={t('ui.Confirmations.Transaction.payAttentionExclamation')}
             type='warning'
           />

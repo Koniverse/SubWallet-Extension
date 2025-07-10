@@ -120,7 +120,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     return rs;
   }
@@ -171,7 +171,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       const _address = keyringPair.address;
       const exists = this.state.checkAddressExists([_address]);
 
-      assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+      assert(!exists, t('bg.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
       const nameExists = this.state.checkNameExists(name);
 
@@ -262,7 +262,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       const exists = this.state.checkAddressExists([response.address]);
 
       if (exists) {
-        response.errorMessage = t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } });
+        response.errorMessage = t('bg.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } });
         response.isValid = false;
       }
     }

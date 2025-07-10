@@ -54,7 +54,7 @@ function Component ({ className, request }: Props) {
             {t('ui.Confirmations.Metadata.metadataOutOfDate')}
           </Typography.Title>
           <Typography.Paragraph className='text-tertiary'>
-            {t('Approving this update will sync your metadata for {{chainName}} chain from {{dAppUrl}}', { replace: { dAppUrl: request.url, chainName: chain } })}
+            {t('ui.Confirmations.Metadata.approveMetadataUpdate', { replace: { dAppUrl: request.url, chainName: chain } })}
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
             <span className='__prop-label text-tertiary text-right'>{t('ui.Confirmations.Metadata.symbol')}</span> <span>{tokenSymbol}</span>

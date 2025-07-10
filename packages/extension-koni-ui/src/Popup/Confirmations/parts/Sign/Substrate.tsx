@@ -246,7 +246,7 @@ const Component: React.FC<Props> = (props: Props) => {
             return {
               type: 'error',
               title: t('ui.Confirmations.Sign.Substrate.errorExclamation'),
-              description: t('Unable to sign this transaction on Ledger because the {{networkName}} network is out of date', { replace: { networkName } })
+              description: t('ui.Confirmations.Sign.Substrate.unableToSignLedgerNetworkOutOfDate', { replace: { networkName } })
             };
           }
         }

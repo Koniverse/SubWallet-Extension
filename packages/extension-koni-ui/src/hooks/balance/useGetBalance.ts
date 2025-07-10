@@ -147,7 +147,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
           !cancel && setNativeTokenBalance(DEFAULT_BALANCE);
           !cancel && setTokenBalance(DEFAULT_BALANCE);
           !cancel && setIsLoading(false);
-          !cancel && setError(t('Please enable {{tokenNames}} on {{chain}}', { tokenNames: tokenNames.join(', '), chain: chainInfo?.name }));
+          !cancel && setError(t('ui.hook.balance.useGetBalance.pleaseEnableTokensOnChain', { tokenNames: tokenNames.join(', '), chain: chainInfo?.name }));
         }
       }, 600);
     }

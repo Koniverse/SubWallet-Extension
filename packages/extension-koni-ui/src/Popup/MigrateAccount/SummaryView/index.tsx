@@ -60,7 +60,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
       return t('ui.MigrateAccount.SummaryView.andOneOther');
     }
 
-    return t('And {{number}} others', { replace: { number: resultAccountProxies.length - 2 } });
+    return t('ui.MigrateAccount.SummaryView.andNumberOthers', { replace: { number: resultAccountProxies.length - 2 } });
   };
 
   const hasAnyAccountToMigrate = !!resultAccountProxies.length;

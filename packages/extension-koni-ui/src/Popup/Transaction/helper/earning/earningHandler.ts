@@ -15,12 +15,12 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
       if (unstakingPeriod < 1) {
         const minutes = unstakingPeriod * 60;
 
-        return t('{{time}} minutes', { replace: { time: minutes } });
+        return t('ui.Transaction.helper.earningHandler.timeMinutes', { replace: { time: minutes } });
       }
 
-      return t('{{time}} hours', { replace: { time: unstakingPeriod } });
+      return t('ui.Transaction.helper.earningHandler.timeHours', { replace: { time: unstakingPeriod } });
     } else {
-      return t('{{time}} days', { replace: { time: days } });
+      return t('ui.Transaction.helper.earningHandler.timeDays', { replace: { time: days } });
     }
   }
 
@@ -75,7 +75,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
       return segment;
     }).join(' ');
 
-    return t('Withdrawable in {{time}}', { replace: { time: formattedWaitingTime } });
+    return t('ui.Transaction.helper.earningHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
 }
 

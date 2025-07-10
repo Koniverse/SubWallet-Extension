@@ -389,7 +389,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     if ((new BigN(amount)).gt(new BigN(maxTransfer))) {
       const maxString = formatBalance(maxTransfer, decimals);
 
-      return Promise.reject(t('Amount must be equal or less than {{number}}', { replace: { number: maxString } }));
+      return Promise.reject(t('ui.Transaction.SendFund.amountMaxError', { replace: { number: maxString } }));
     }
 
     return Promise.resolve();

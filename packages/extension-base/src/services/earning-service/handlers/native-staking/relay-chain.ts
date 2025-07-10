@@ -750,7 +750,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.service.earning.nativeStakingRelay.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);

@@ -140,7 +140,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       )}
                       onClick={_onApply}
                     >
-                      {t('Apply {{number}} account{{s}}', { replace: { number: selectedAccounts.length, s: selectedAccounts.length > 1 ? 's' : '' } })}
+                      {t('ui.WalletConnect.AccountSelect.applyNumberAccounts', { replace: { number: selectedAccounts.length, s: selectedAccounts.length > 1 ? 's' : '' } })}
                     </Button>
                   )}
                   id={id}

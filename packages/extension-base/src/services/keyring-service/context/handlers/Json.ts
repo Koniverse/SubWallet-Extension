@@ -102,7 +102,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const _pair = keyring.createFromJson(file);
         const exists = this.state.checkAddressExists([_pair.address]);
 
-        assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || _pair.address } }));
+        assert(!exists, t('bg.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
 
         keyring.restoreAccount(file, password, withMasterPassword);
 
@@ -220,7 +220,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
         if (!addresses.length) {
           if (_exists) {
-            throw new Error(t('Account already exists under the name {{name}}', { replace: { name: _exists.name || _exists.address || '' } }));
+            throw new Error(t('bg.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: _exists.name || _exists.address || '' } }));
           } else {
             throw new Error(t('bg.keyring.handler.Json.noAccountsFoundToImport'));
           }

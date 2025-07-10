@@ -1260,7 +1260,7 @@ export default class TransactionService {
     this.state.notificationService.notify({
       type: NotificationType.SUCCESS,
       title: t('bg.service.transaction.transactionCompleted'),
-      message: t('Transaction {{info}} completed', { replace: { info } }),
+      message: t('bg.service.transaction.transactionInfoCompleted', { replace: { info } }),
       action: { url: this.getTransactionLink(id) },
       notifyViaBrowser: true
     });
@@ -1288,7 +1288,7 @@ export default class TransactionService {
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
         title: t('bg.service.transaction.transactionFailed'),
-        message: t('Transaction {{info}} failed', { replace: { info } }),
+        message: t('bg.service.transaction.transactionInfoFailed', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });
@@ -1316,7 +1316,7 @@ export default class TransactionService {
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
         title: t('bg.service.transaction.transactionTimedOut'),
-        message: t('Transaction {{info}} timed out', { replace: { info } }),
+        message: t('bg.service.transaction.transactionInfoTimedOut', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });

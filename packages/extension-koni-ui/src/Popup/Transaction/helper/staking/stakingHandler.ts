@@ -16,9 +16,9 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
     const days = unstakingPeriod / 24;
 
     if (days < 1) {
-      return t('{{time}} hours', { replace: { time: unstakingPeriod } });
+      return t('ui.Transaction.helper.stakingHandler.timeHours', { replace: { time: unstakingPeriod } });
     } else {
-      return t('{{time}} days', { replace: { time: days } });
+      return t('ui.Transaction.helper.stakingHandler.timeDays', { replace: { time: days } });
     }
   }
 
@@ -50,7 +50,7 @@ export function getWaitingTime (waitingTime: number, status: UnstakingStatus, t:
       } // TODO: should not be shorten
     }) as string;
 
-    return t('Withdrawable in {{time}}', { replace: { time: formattedWaitingTime } });
+    return t('ui.Transaction.helper.stakingHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
 }
 

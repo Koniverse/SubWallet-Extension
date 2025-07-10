@@ -82,7 +82,7 @@ export function additionalValidateTransferForRecipient (
 
     const error = new TransactionError(
       TransferTxErrorType.NOT_ENOUGH_VALUE,
-      t('You must transfer at least {{amount}} {{symbol}} to keep the recipient account alive. Increase amount and try again', { replace: { amount: minXCMStr, symbol: sendingTokenInfo.symbol } })
+      t('bg.validation.transfer.transferMinimumToKeepAccountAlive', { replace: { amount: minXCMStr, symbol: sendingTokenInfo.symbol } })
     );
 
     errors.push(error);
@@ -100,7 +100,7 @@ export function additionalValidateTransferForRecipient (
 
       const error = new TransactionError(
         TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT,
-        t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: balanceKeepAlive, nativeSymbol: nativeTokenInfo.symbol, localSymbol: sendingTokenInfo.symbol } })
+        t('bg.validation.transfer.recipientBalanceTooLow', { replace: { amount: balanceKeepAlive, nativeSymbol: nativeTokenInfo.symbol, localSymbol: sendingTokenInfo.symbol } })
       );
 
       errors.push(error);
@@ -113,7 +113,7 @@ export function additionalValidateTransferForRecipient (
 
       const error = new TransactionError(
         TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT,
-        t('You must transfer at least {{amount}} {{symbol}} to avoid losing funds on the recipient account. Increase amount and try again', { replace: { amount: atLeastStr, symbol: sendingTokenInfo.symbol } })
+        t('bg.validation.transfer.transferMinimumToAvoidFundLoss', { replace: { amount: atLeastStr, symbol: sendingTokenInfo.symbol } })
       );
 
       errors.push(error);
@@ -127,7 +127,7 @@ export function additionalValidateTransferForRecipient (
 
     const error = new TransactionError(
       TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT,
-      t('You must transfer at least {{amount}} {{symbol}} to keep the recipient account alive. Increase amount and try again', { replace: { amount: atLeastStr, symbol: sendingTokenInfo.symbol } })
+      t('bg.validation.transfer.transferMinimumToKeepAccountAlive', { replace: { amount: atLeastStr, symbol: sendingTokenInfo.symbol } })
     );
 
     errors.push(error);

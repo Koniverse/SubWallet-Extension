@@ -265,9 +265,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const showWarningModal = useCallback((action: string) => {
     openAlert({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('ui.Settings.Notifications.Notification.youveActionTokens', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('ui.Settings.Notifications.Notification.alreadyActionedTokens', { replace: { action: action } }),
       okButton: {
         text: t('ui.Settings.Notifications.Notification.iUnderstand'),
         onClick: closeAlert,

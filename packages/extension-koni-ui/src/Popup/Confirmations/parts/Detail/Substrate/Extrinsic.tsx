@@ -94,7 +94,7 @@ const mortalityAsString = (era: ExtrinsicEra, hexBlockNumber: string, t: TFuncti
   const blockNumber = bnToBn(hexBlockNumber);
   const mortal = era.asMortalEra;
 
-  return t<string>('mortal, valid from {{birth}} to {{death}}', {
+  return t('ui.Confirmations.Detail.Substrate.Extrinsic.mortalValidFromTo', {
     replace: {
       birth: formatNumber(mortal.birth(blockNumber)),
       death: formatNumber(mortal.death(blockNumber))

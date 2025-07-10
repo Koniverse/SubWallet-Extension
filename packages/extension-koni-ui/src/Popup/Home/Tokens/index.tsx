@@ -331,7 +331,7 @@ const Component = (): React.ReactElement => {
             <SwAlert
               className={classNames('zk-mode-alert-area')}
               description={t('ui.Tokens.refreshBalanceInfo')}
-              title={t('Zk mode is syncing: {{percent}}%', { replace: { percent: zkModeSyncProgress || '0' } })}
+              title={t('ui.Tokens.zkModeSyncing', { replace: { percent: zkModeSyncProgress || '0' } })}
               type={'warning'}
             />
           )

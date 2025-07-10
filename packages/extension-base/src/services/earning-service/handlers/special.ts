@@ -395,9 +395,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const altNetworkName = _getAssetName(altInputTokenInfo);
       const currentValue = formatNumber(bnInputTokenBalance.toString(), inputTokenDecimal);
 
-      processValidation.message = t(
-        'You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.',
-        {
+      processValidation.message = t('bg.service.earning.specialHandler.maximumInputExceeded', {
           replace: {
             symbol,
             maxValue,
@@ -468,7 +466,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const maxString = formatNumber(bnInputTokenBalance.toString(), inputTokenInfo.decimals || 0);
 
       if (maxString !== '0') {
-        processValidation.message = t('Amount must be equal or less than {{number}}', { replace: { number: maxString } });
+        processValidation.message = t('bg.service.earning.specialHandler.amountMaxError', { replace: { number: maxString } });
       } else {
         processValidation.message = t('bg.service.earning.specialHandler.balanceGreaterThanZeroRequired');
       }

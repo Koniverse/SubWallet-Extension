@@ -21,7 +21,7 @@ export default function useChainChecker () {
     if (connectingChain && chainStatusMap[connectingChain]?.connectionStatus === _ChainConnectionStatus.CONNECTED) {
       const chainInfo = chainInfoMap[connectingChain];
 
-      notify({ message: t('Chain {{name}} is connected', { replace: { name: chainInfo?.name } }), type: NotificationType.SUCCESS, duration: 3 });
+      notify({ message: t('ui.hook.chain.useChainChecker.chainIsConnected', { replace: { name: chainInfo?.name } }), type: NotificationType.SUCCESS, duration: 3 });
       setConnectingChain(null);
     }
   }, [connectingChain, chainInfoMap, chainStateMap, notify, t, chainStatusMap]);
@@ -33,14 +33,14 @@ export default function useChainChecker () {
 
     if (chainState) {
       if (!chainState.active) {
-        const message = t('{{name}} is not ready to use, do you want to turn it on?', { replace: { name: chainInfo?.name } });
+        const message = t('ui.hook.chain.useChainChecker.confirmTurnOnFeature', { replace: { name: chainInfo?.name } });
 
         const _onEnabled = () => {
           enableChain(chain, false).then(() => {
             const chainInfo = chainInfoMap[chain];
 
             setConnectingChain(chain);
-            notify({ message: t('Chain {{name}} is connecting', { replace: { name: chainInfo?.name } }), duration: 1.5, type: 'warning' });
+            notify({ message: t('ui.hook.chain.useChainChecker.chainIsConnecting', { replace: { name: chainInfo?.name } }), duration: 1.5, type: 'warning' });
           }).catch(console.error);
         };
 
@@ -60,7 +60,7 @@ export default function useChainChecker () {
           btn
         });
       } else if (chainStatus?.connectionStatus === _ChainConnectionStatus.DISCONNECTED) {
-        const message = t('Chain {{name}} is disconnected', { replace: { name: chainInfo?.name } });
+        const message = t('ui.hook.chain.useChainChecker.chainIsDisconnected', { replace: { name: chainInfo?.name } });
 
         notify({
           message,

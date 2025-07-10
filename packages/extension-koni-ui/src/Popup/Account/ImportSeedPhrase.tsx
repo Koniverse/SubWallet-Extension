@@ -62,7 +62,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const checkUnlock = useUnlockChecker();
 
   const phraseNumberItems = useMemo(() => phraseNumberOptions.map((value) => ({
-    label: t('{{number}} words', { replace: { number: value } }),
+    label: t('ui.Account.ImportSeedPhrase.numberWords', { replace: { number: value } }),
     value: `${value}`
   })), [t]);
 

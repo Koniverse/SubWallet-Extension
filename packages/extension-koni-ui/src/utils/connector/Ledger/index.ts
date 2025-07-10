@@ -36,12 +36,12 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     if (isSigning) {
       return {
         status: 'error',
-        message: t('Unable to sign. Open “{{network}}” on Ledger, refresh and approve again', { replace: { network: network } })
+        message: t('ui.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
       };
     } else {
       return {
         status: 'error',
-        message: t('Open "{{network}}" on Ledger to connect', { replace: { network: network } })
+        message: t('ui.util.connector.Ledger.openLedgerAppToConnect', { replace: { network: network } })
       };
     }
   }
@@ -50,7 +50,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     if (!isGetAddress) {
       return {
         status: 'error',
-        message: t('Unable to sign. Open “{{network}}” on Ledger, refresh and approve again', { replace: { network: network } })
+        message: t('ui.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
       };
     }
   }
@@ -100,7 +100,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   if (message.includes('Txn version not supported')) {
     return {
       status: 'error',
-      message: t('"{{network}}" is out of date. Please update your device with Ledger Live', { replace: { network: network } })
+      message: t('ui.util.connector.Ledger.ledgerAppOutOfDate', { replace: { network: network } })
     };
   }
 

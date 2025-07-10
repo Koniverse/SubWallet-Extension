@@ -763,13 +763,13 @@ export default class KoniExtension {
     const typeInfoKey = typeInfoMap[authSwitchNetworkType];
 
     if (!typeInfoKey || !chainInfo[typeInfoKey]) {
-      throw new Error(t('Network {{networkKey}} is not {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+      throw new Error(t('bg.handler.Extension.networkNotAuthType', { replace: { networkKey, authSwitchNetworkType } }));
     }
 
     const authUrl = authUrls[url];
 
     if (!authUrl) {
-      throw new Error(t('Not found {{url}} in auth list', { replace: { url } }));
+      throw new Error(t('bg.handler.Extension.urlNotFoundInAuthList', { replace: { url } }));
     }
 
     if (chainInfo && !_isChainEnabled(chainState)) {
@@ -777,7 +777,7 @@ export default class KoniExtension {
     }
 
     if (!authUrl.accountAuthTypes.includes(authSwitchNetworkType)) {
-      throw new Error(t('Network {{networkKey}} is not supported by {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+      throw new Error(t('bg.handler.Extension.networkNotSupportedByAuthType', { replace: { networkKey, authSwitchNetworkType } }));
     }
 
     authUrl.currentNetworkMap[authSwitchNetworkType] = networkKey;
@@ -2920,7 +2920,7 @@ export default class KoniExtension {
     const chainStakingMetadata = await this.#koniState.getStakingMetadataByChain(chain, StakingType.NOMINATED);
 
     if (!chainStakingMetadata) {
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo.name } });
+      const errMessage = t('bg.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);
@@ -3028,7 +3028,7 @@ export default class KoniExtension {
     const chainStakingMetadata = await this.#koniState.getStakingMetadataByChain(chain, StakingType.NOMINATED);
 
     if (!chainStakingMetadata) {
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo.name } });
+      const errMessage = t('bg.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);
@@ -3062,7 +3062,7 @@ export default class KoniExtension {
 
     if (!chainStakingMetadata || !nominatorMetadata) {
       const chainInfo = this.#koniState.getChainInfo(chain);
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo?.name } });
+      const errMessage = t('bg.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo?.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);

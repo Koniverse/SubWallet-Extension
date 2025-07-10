@@ -355,7 +355,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     }
 
     if (!_isChainEnabled(senderNetworkState)) {
-      throw new Error(t('Inactive network. Please enable {{networkName}} on this device and try again', { replace: { networkName: senderNetwork.name?.replace(' Relay Chain', '') } }));
+      throw new Error(t('ui.context.Scanner.enableInactiveNetwork', { replace: { networkName: senderNetwork.name?.replace(' Relay Chain', '') } }));
     }
 
     if (!sender) {

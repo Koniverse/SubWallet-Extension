@@ -53,7 +53,7 @@ export function validateRelayUnbondingCondition (amount: string, chainStakingMet
   }
 
   if (nominatorMetadata.unstakings.length > chainStakingMetadata.maxWithdrawalRequestPerValidator) {
-    errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: chainStakingMetadata.maxWithdrawalRequestPerValidator } })));
+    errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.api.staking.bonding.relayChain.maxUnstakeTimes', { replace: { number: chainStakingMetadata.maxWithdrawalRequestPerValidator } })));
   }
 
   return errors;

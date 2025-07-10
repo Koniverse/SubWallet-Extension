@@ -207,14 +207,14 @@ export class BalanceService implements StoppableServiceInterface {
     const chainState = this.state.chainService.getChainStateByKey(chain);
 
     if (!chainInfo || !chainState || !chainState.active) {
-      return Promise.reject(new BalanceError(BalanceErrorType.NETWORK_ERROR, t('{{chain}} is inactive. Please enable network', { replace: { chain: chainInfo.name } })));
+      return Promise.reject(new BalanceError(BalanceErrorType.NETWORK_ERROR, t('bg.service.balance.chainInactiveEnableNetwork', { replace: { chain: chainInfo.name } })));
     }
 
     const tSlug = tokenSlug || _getChainNativeTokenSlug(chainInfo);
     const tokenInfo = this.state.chainService.getAssetBySlug(tSlug);
 
     if (!tokenInfo) {
-      return Promise.reject(new BalanceError(BalanceErrorType.TOKEN_ERROR, t('Transfer is currently not available for this token: {{tSlug}}', { replace: { slug: tSlug } })));
+      return Promise.reject(new BalanceError(BalanceErrorType.TOKEN_ERROR, t('bg.service.balance.transferNotAvailableForToken', { replace: { slug: tSlug } })));
     }
 
     return new Promise((resolve, reject) => {

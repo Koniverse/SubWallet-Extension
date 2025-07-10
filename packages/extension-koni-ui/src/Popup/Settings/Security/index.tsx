@@ -73,7 +73,7 @@ const Component: React.FC<Props> = (props: Props) => {
     if (value > 0) {
       return {
         value: value,
-        label: t('{{time}} minutes', { replace: { time: value } })
+        label: t('ui.Settings.Security.timeMinutes', { replace: { time: value } })
       };
     } else if (value < 0) {
       return {

@@ -278,7 +278,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                       }}
                       className='__empty-list'
                       emptyMessage={t('ui.Tokens.DetailModal.switchTokenToSeeBalance')}
-                      emptyTitle={t('No account with {{symbol}} balance found', {
+                      emptyTitle={t('ui.Tokens.DetailModal.noAccountWithSymbolBalance', {
                         replace: {
                           symbol: symbol
                         }

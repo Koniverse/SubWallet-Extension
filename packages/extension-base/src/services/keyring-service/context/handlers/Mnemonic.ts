@@ -51,7 +51,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       assert(isHex(phrase, 256), t('bg.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
     } else {
       // sadly isHex detects as string, so we need a cast here
-      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('Seed phrase needs to contain {{x}} words', { replace: { x: SEED_LENGTHS.join(', ') } }));
+      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('bg.keyring.handler.Mnemonic.seedPhraseWordCount', { replace: { x: SEED_LENGTHS.join(', ') } }));
 
       try {
         assert(mnemonicValidate(phrase), t('bg.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
@@ -78,7 +78,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     return rs;
   }
@@ -126,7 +126,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(addressDict));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     // Upsert account group first, to avoid combine latest have no account group data.
     if (proxyId) {

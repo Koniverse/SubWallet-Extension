@@ -216,7 +216,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5);
 
       if (baseGasFee && value && new BigN(value).lte(minFee)) {
-        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minFee, 9, (s) => s) } }));
+        return Promise.reject(t('ui.Field.FeeEditor.Modal.maxFeePerGasMinGwei', { replace: { min: formatNumber(minFee, 9, (s) => s) } }));
       }
 
       if ((new BigN(value)).lte(BN_ZERO)) {

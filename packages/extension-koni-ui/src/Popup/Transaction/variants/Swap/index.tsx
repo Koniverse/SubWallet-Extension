@@ -207,7 +207,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const chainSlug = _getAssetOriginChain(chainAsset);
     const chainName = _getChainName(chainInfoMap[chainSlug]);
 
-    return t('{{symbol}} on {{chainName}} is not supported for swapping. Select another token and try again', { replace: {
+    return t('ui.Transaction.Swap.tokenNotSupportedForSwap', { replace: {
       symbol: _getAssetSymbol(chainAsset),
       chainName
     } });

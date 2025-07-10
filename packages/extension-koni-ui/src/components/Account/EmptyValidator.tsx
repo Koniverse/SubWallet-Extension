@@ -49,7 +49,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
           ? (
             <div className={'data-empty-msg'}>
               <div className='description'>
-                {t('Reload to fetch {{value}} information', { replace: { value: validatorTitle } })}
+                {t('ui.Account.EmptyValidator.reloadToFetchInfo', { replace: { value: validatorTitle } })}
               </div>
               <div className={'description'}>
                 <Trans

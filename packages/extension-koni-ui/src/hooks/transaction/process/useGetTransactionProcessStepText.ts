@@ -46,7 +46,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Transfer {{tokenValue}} {{tokenSymbol}} from {{chainName}} to {{destChainName}}', {
+      return t('ui.hook.transaction.useGetTxStepText.transferTokenFromTo', {
         replace: {
           ...analysisMetadata()
         }
@@ -84,7 +84,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Swap {{fromTokenValue}} {{fromTokenSymbol}} on {{fromChainName}} for {{toTokenValue}} {{toTokenSymbol}} on {{toChainName}}', {
+      return t('ui.hook.transaction.useGetTxStepText.swapTokenFromTo', {
         replace: {
           ...analysisMetadata()
         }
@@ -123,14 +123,14 @@ const useGetTransactionProcessStepText = () => {
        * So simple check with this type is enough
        * */
       if (processStep.type === CommonStepType.TOKEN_APPROVAL) {
-        return t('Approve {{tokenSymbol}} on {{chainName}} for swap', {
+        return t('ui.hook.transaction.useGetTxStepText.approveTokenForSwap', {
           replace: {
             ...analysisMetadata()
           }
         });
       }
 
-      return t('Approve {{tokenSymbol}} on {{chainName}} for transfer', {
+      return t('ui.hook.transaction.useGetTxStepText.approveTokenForTransfer', {
         replace: {
           ...analysisMetadata()
         }
@@ -183,7 +183,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Stake {{tokenValue}} {{tokenSymbol}} via {{earnMethod}}', {
+      return t('ui.hook.transaction.useGetTxStepText.stakeTokenViaMethod', {
         replace: {
           ...analysisMetadata()
         }

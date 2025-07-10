@@ -89,7 +89,7 @@ function Component ({ className, request, type }: Props) {
         {!!transaction?.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
-            description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: chainInfo?.name } })}
+            description={t('ui.Confirmations.EvmTransaction.highGasFeeWarning', { replace: { networkName: chainInfo?.name } })}
             title={t('ui.Confirmations.EvmTransaction.payAttentionExclamation')}
             type='warning'
           />

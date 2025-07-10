@@ -594,7 +594,7 @@ export default class KoniState {
       authUrls[shortenUrl].currentNetworkMap.evm = networkKey;
       this.setAuthorize(authUrls);
     } else {
-      throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('Not found {{shortenUrl}} in auth list', { replace: { shortenUrl } }));
+      throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('bg.handler.State.shortUrlNotFoundInAuthList', { replace: { shortenUrl } }));
     }
   }
 

@@ -317,7 +317,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('{{symbol}} earning options', { replace: { symbol: symbol } })}
+        title={t('ui.Earning.Pools.symbolEarningOptions', { replace: { symbol: symbol } })}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
