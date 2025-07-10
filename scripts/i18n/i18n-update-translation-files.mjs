@@ -2,97 +2,92 @@
 import fs from 'fs';
 import path from 'path';
 
-// --- ĐỊNH NGHĨA CÁC ĐƯỜNG DẪN ---
-const languages = ['en', 'vi', 'ja', 'zh', 'ru'];
-const translationFiles = languages.map(lng => `packages/extension-koni/public/locales/${lng}/translation.json`);
-const backupOutputFilePath = 'packages/extension-koni/public/locales/backup-combined-data.json';
+// --- CONFIGURATION ---
+const LANGUAGES = ['en', 'vi', 'ja', 'zh', 'ru'];
+const LOCALES_DIR = 'packages/extension-koni/public/locales';
+const SCRIPT_GEN_DIR = path.join(LOCALES_DIR, 'script-gen');
+const COMBINED_DATA_FILE = path.join(SCRIPT_GEN_DIR, 'combined-data.json');
 
-// --- CÁC HÀM TIỆN ÍCH ---
-function loadTranslations(langFile) {
+// --- HELPER FUNCTIONS ---
+function loadJsonFile(filePath) {
   try {
-    if (!fs.existsSync(langFile)) {
-      console.warn(`File dịch không tồn tại: ${langFile}. Sẽ tạo file mới.`);
-      const dir = path.dirname(langFile);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      return {};
-    }
-    return JSON.parse(fs.readFileSync(langFile, 'utf-8'));
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   } catch (error) {
-    console.error(`Lỗi khi đọc ${langFile}:`, error);
-    return {};
+    console.error(`❌ Error reading ${filePath}:`, error.message);
+    return null;
   }
 }
 
-function updateTranslationFile(langFile, newTranslations) {
+function saveJsonFile(filePath, data) {
   try {
-    fs.writeFileSync(langFile, JSON.stringify(newTranslations, null, 2), 'utf-8');
-    console.log(`   - Cập nhật thành công file: ${path.basename(langFile)}`);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    console.log(`✅ Saved: ${filePath}`);
   } catch (error) {
-    console.error(`Lỗi khi ghi file ${langFile}:`, error);
+    console.error(`❌ Error saving ${filePath}:`, error.message);
   }
 }
 
-// --- HÀM CHÍNH ---
-function main() {
-  console.log('--- SCRIPT 2: CẬP NHẬT CÁC FILE DỊCH ---');
+// --- MAIN FUNCTION ---
+async function updateTranslationFiles() {
+  console.log('🔄 Starting translation files update...');
 
-  // BƯỚC 1: ĐỌC FILE KẾT HỢP
-  console.log(`\nBƯỚC 1: Đang đọc file dữ liệu kết hợp từ ${backupOutputFilePath}...`);
-  if (!fs.existsSync(backupOutputFilePath)) {
-    console.error(`[LỖI] File "${backupOutputFilePath}" không tồn tại. Vui lòng chạy script 'generate-mappings.js' trước.`);
+  // 1. Load combined data
+  const combinedData = loadJsonFile(COMBINED_DATA_FILE);
+  if (!combinedData) {
+    console.error('❌ Failed to load combined data file');
     process.exit(1);
   }
-  const combinedMapping = JSON.parse(fs.readFileSync(backupOutputFilePath, 'utf-8'));
 
-  // BƯỚC 2: LẶP QUA TỪNG NGÔN NGỮ ĐỂ CẬP NHẬT
-  console.log('\nBƯỚC 2: Bắt đầu cập nhật các file dịch...');
-  for (const langFile of translationFiles) {
-    console.log(`\n--- Đang xử lý ngôn ngữ: (${langFile}) ---`);
+  // 2. Create set of all converted keys (ONLY keys that were converted)
+  const convertedTexts = new Set(Object.keys(combinedData));
 
-    const existingTranslations = loadTranslations(langFile);
-    const newTranslations = { ...existingTranslations };
+  // 3. Process each language
+  LANGUAGES.forEach(lng => {
+    const langFile = path.join(LOCALES_DIR, lng, 'translation.json');
+    const existingTranslations = loadJsonFile(langFile) || {};
+    const newTranslations = {...existingTranslations};
 
-    for (const [originalText, mappings] of Object.entries(combinedMapping)) {
-      // Bỏ qua key rỗng để đảm bảo an toàn
-      if (!originalText) continue;
+    let addedCount = 0;
+    let updatedCount = 0;
+    let removedCount = 0;
 
-      let translationValue;
-      if (langFile.includes('/en/')) {
-        translationValue = originalText;
-      } else {
-        const translatedValue = existingTranslations[originalText];
-        if (translatedValue && translatedValue.trim() !== '') {
-          translationValue = translatedValue;
-        } else {
-          translationValue = originalText; // Fallback về tiếng Anh
-          // In ra cảnh báo để người dịch biết chuỗi nào cần bổ sung
-          if (existingTranslations.hasOwnProperty(originalText)) {
-            console.log(`   - Key "${originalText}" có bản dịch rỗng, tạm dùng tiếng Anh.`);
-          }
+    // Process each entry in combined data
+    Object.values(combinedData).forEach(entry => {
+      entry.locations.forEach(location => {
+        const translationKey = location.key;
+        const translationValue = entry.translations[lng] || entry.translations.en || entry.translations[Object.keys(entry.translations)[0]];
+
+        if (!newTranslations[translationKey]) {
+          newTranslations[translationKey] = translationValue;
+          addedCount++;
+        } else if (newTranslations[translationKey] !== translationValue) {
+          newTranslations[translationKey] = translationValue;
+          updatedCount++;
         }
+      });
+    });
+
+    // ONLY remove old keys that have been converted
+    Object.keys(existingTranslations).forEach(key => {
+      if (convertedTexts.has(key)) {
+        delete newTranslations[key];
+        removedCount++;
       }
+    });
 
-      // Gán giá trị dịch đã được xác định cho tất cả các key có cấu trúc mới
-      for (const mapping of mappings) {
-        const newKey = mapping.key;
-        newTranslations[newKey] = translationValue;
-      }
+    // Save language file
+    saveJsonFile(langFile, newTranslations);
+    console.log(`🌍 ${lng.toUpperCase()}:`);
+    console.log(`   - Added: ${addedCount}`);
+    console.log(`   - Updated: ${updatedCount}`);
+    console.log(`   - Removed: ${removedCount}`);
+    console.log(`   - Total keys: ${Object.keys(newTranslations).length}`);
+  });
 
-      if (existingTranslations.hasOwnProperty(originalText)) {
-        delete newTranslations[originalText];
-      }
-
-      // Sau khi đã gán cho key mới, xóa key cũ (nếu có) khỏi bản sao
-      if (existingTranslations.hasOwnProperty(originalText)) {
-        console.log(`===== Deleted text ${originalText} ======`)
-        delete newTranslations[originalText];
-      }
-    }
-
-    updateTranslationFile(langFile, newTranslations);
-  }
-
-  console.log('\n--- SCRIPT 2 HOÀN TẤT ---');
+  console.log('🎉 Successfully updated all translation files!');
 }
 
-main();
+updateTranslationFiles().catch(error => {
+  console.error('❌ Process failed:', error);
+  process.exit(1);
+});

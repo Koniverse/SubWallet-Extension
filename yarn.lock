@@ -12066,6 +12066,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk@npm:^5.3.0":
+  version: 5.4.1
+  resolution: "chalk@npm:5.4.1"
+  checksum: 0c656f30b782fed4d99198825c0860158901f449a6b12b818b0aabad27ec970389e7e8767d0e00762175b23620c812e70c4fd92c0210e55fc2d993638b74e86e
+  languageName: node
+  linkType: hard
+
 "changelog-parser@npm:^2.0.0":
   version: 2.8.1
   resolution: "changelog-parser@npm:2.8.1"
@@ -15676,6 +15683,15 @@ __metadata:
   version: 1.0.16
   resolution: "fastest-levenshtein@npm:1.0.16"
   checksum: a78d44285c9e2ae2c25f3ef0f8a73f332c1247b7ea7fb4a191e6bb51aa6ee1ef0dfb3ed113616dcdc7023e18e35a8db41f61c8d88988e877cf510df8edafbc71
+  languageName: node
+  linkType: hard
+
+"fastq@npm:^1.13.0":
+  version: 1.19.1
+  resolution: "fastq@npm:1.19.1"
+  dependencies:
+    reusify: ^1.0.4
+  checksum: 7691d1794fb84ad0ec2a185f10e00f0e1713b894e2c9c4d42f0bc0ba5f8c00e6e655a202074ca0b91b9c3d977aab7c30c41a8dc069fb5368576ac0054870a0e6
   languageName: node
   linkType: hard
 
@@ -22614,6 +22630,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"normalize-path@npm:3.0.0, normalize-path@npm:^3.0.0, normalize-path@npm:~3.0.0":
+  version: 3.0.0
+  resolution: "normalize-path@npm:3.0.0"
+  checksum: 88eeb4da891e10b1318c4b2476b6e2ecbeb5ff97d946815ffea7794c31a89017c70d7f34b3c2ebf23ef4e9fc9fb99f7dffe36da22011b5b5c6ffa34f4873ec20
+  languageName: node
+  linkType: hard
+
 "normalize-path@npm:^2.1.1":
   version: 2.1.1
   resolution: "normalize-path@npm:2.1.1"
@@ -27939,6 +27962,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"teex@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "teex@npm:1.0.1"
+  dependencies:
+    streamx: ^2.12.5
+  checksum: 36bf7ce8bb5eb428ad7b14b695ee7fb0a02f09c1a9d8181cc42531208543a920b299d711bf78dad4ff9bcf36ac437ae8e138053734746076e3e0e7d6d76eef64
+  languageName: node
+  linkType: hard
+
 "temp@npm:~0.4.0":
   version: 0.4.0
   resolution: "temp@npm:0.4.0"
@@ -29460,6 +29492,28 @@ __metadata:
     vinyl: ^2.0.0
     vinyl-sourcemap: ^1.1.0
   checksum: 948366325994e13e331bc559ac38d10bff9469eeb227e627cc903cb7580c73779158c7b25dd7ac416df2fc261cdd5341896e680c086de693de71420ccbdb9cd5
+  languageName: node
+  linkType: hard
+
+"vinyl-fs@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "vinyl-fs@npm:4.0.2"
+  dependencies:
+    fs-mkdirp-stream: ^2.0.1
+    glob-stream: ^8.0.3
+    graceful-fs: ^4.2.11
+    iconv-lite: ^0.6.3
+    is-valid-glob: ^1.0.0
+    lead: ^4.0.0
+    normalize-path: 3.0.0
+    resolve-options: ^2.0.0
+    stream-composer: ^1.0.2
+    streamx: ^2.14.0
+    to-through: ^3.0.0
+    value-or-function: ^4.0.0
+    vinyl: ^3.0.1
+    vinyl-sourcemap: ^2.0.0
+  checksum: e5a7da6c30ca89e522fbb31df1220c11ca1f1a46d249384d49c0a448d2c18ac49eed858109471f9836aa5c7953ea0233b6db67834398172530bdd318792789c9
   languageName: node
   linkType: hard
 

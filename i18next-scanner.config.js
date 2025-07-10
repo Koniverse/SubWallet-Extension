@@ -20,25 +20,6 @@ function getPackageRelativePath(fullPath) {
 
 const translations = new Map();
 
-function transform (file, enc, done) {
-  const { ext } = path.parse(file.path);
-
-  if (ext === '.tsx') {
-    const content = fs.readFileSync(file.path, enc);
-
-    const { outputText } = typescript.transpileModule(content, {
-      compilerOptions: {
-        target: 'es2018'
-      },
-      fileName: path.basename(file.path)
-    });
-
-    this.parser.parseFuncFromString(outputText);
-  }
-
-  done();
-}
-
 function customTransform(file, enc, done) {
   const { ext } = path.parse(file.path);
   if (['.ts', '.tsx'].includes(ext)) {
@@ -61,12 +42,12 @@ function customTransform(file, enc, done) {
           .trim();
 
         // Bước 2: Kiểm tra namespace
-        const isNamespaced = /^(ui|bg|common|i18nExtend)\.[a-z]+(\.[a-z0-9]+)*$/i.test(cleanKey);
+        const isNamespaced = /^(ui|bg)\.[a-z]+(\.[a-z0-9]+)*$/i.test(cleanKey);
 
         // Bước 3: Kiểm tra dynamic key (${...}, {{...}})
-        const isDynamic = /(\$\{|{{|}})/.test(key);
+        // const isDynamic = /(\$\{|{{|}})/.test(key);
 
-        return isNamespaced || isDynamic;
+        return isNamespaced;
       };
 
       // Parse functions t, detectTranslate
@@ -80,7 +61,8 @@ function customTransform(file, enc, done) {
       });
 
       // Parse <Trans> component
-      this.parser.parseTransFromString(outputText, (key) => {
+      this.parser.parseTransFromString(outputText, { component: 'Trans', i18nKey: 'i18nKey' }, (key) => {
+        console.log(`Found Trans i18nKey: ${key} in ${file.path}`); // Log key và file
         if (!isTranslatedKey(key)) {
           if (!translations.has(key)) {
             translations.set(key, []);
@@ -95,7 +77,6 @@ function customTransform(file, enc, done) {
 
   done();
 }
-
 
 function scanSourceForTranslations(config) {
   return new Promise((resolve, reject) => {
@@ -143,13 +124,12 @@ module.exports = {
       jsonIndent: 2,
       lineEnding: '\n',
       loadPath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
-      savePath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json'
     },
     trans: {
-      component: 'Trans'
+      component: 'Trans',
+      i18nKey: 'i18nKey',
     }
   },
   output: './',
-  transform,
   scanSourceForTranslations
 };

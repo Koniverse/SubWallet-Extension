@@ -4,8 +4,9 @@ import path from 'path';
 import { replaceInFile } from 'replace-in-file';
 
 // Configurable paths
-const OUTPUT_FILE_PATH = 'packages/extension-koni/public/locales/backup-combined-data.json';
-
+const LOCALES_DIR = 'packages/extension-koni/public/locales';
+const SCRIPT_GEN_DIR = path.join(LOCALES_DIR, 'script-gen');
+const outputFilePath = path.join(SCRIPT_GEN_DIR, 'combined-data.json');
 /**
  * Load combined translation data from file
  * @param {string} filePath - Path to translation file
@@ -28,20 +29,74 @@ function loadCombinedData(filePath) {
   }
 }
 
+// function escapeForRegex(text) {
+//   return text
+//     .replace(/\n/g, '\\n')
+//     .replace(/'/g, '\\\'')     // escape dấu nháy đơn
+//     .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');  // escape ký tự đặc biệt khác
+// }
+
 function escapeForRegex(text) {
   return text
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     .replace(/\n/g, '\\n')
-    .replace(/'/g, '\\\'')     // escape dấu nháy đơn
-    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');  // escape ký tự đặc biệt khác
+    .replace(/'/g, '\\\'')
+    .replace(/"/g, '\\"')
+    .replace(/`/g, '\\`');
 }
 
 
+function convertDataFormat(newData) {
+  const oldFormat = {};
+  for (const [text, data] of Object.entries(newData)) {
+    oldFormat[text] = data.locations;
+  }
+  return oldFormat;
+}
+
+function extractVariables(template) {
+  const matches = template.match(/\{\{\w+\}\}/g) || [];
+  return matches.map(v => v.replace(/\{\{|\}\}/g, ''));
+}
+
+function generateReplacementPatterns(originalText, key) {
+  const escapedText = escapeForRegex(originalText);
+  const variables = extractVariables(originalText);
+  const patterns = [];
+
+  // 1. Basic t() function
+  patterns.push({
+    regex: new RegExp(`t\\(['"]${escapedText}['"]\\)`, 'g'),
+    replacement: `t('${key}')`
+  });
+
+  // 2. t() with type parameter
+  patterns.push({
+    regex: new RegExp(`t<\\w+>\\(['"]${escapedText}['"]\\)`, 'g'),
+    replacement: `t<string>('${key}')`
+  });
+
+  // 3. detectTranslate()
+  patterns.push({
+    regex: new RegExp(`detectTranslate\\(['"]${escapedText}['"]\\)`, 'g'),
+    replacement: `detectTranslate('${key}')`
+  });
+
+  patterns.push({
+    regex: new RegExp(`t\\(['"\`]${escapedText}['"\`],\\s*(\\{[\\s\\S]*?\\})\\)`, 'g'),
+    replacement: `t('${key}', $1)`
+  });
+
+  return patterns;
+}
 /**
  * Replace i18n texts with mapped keys
- * @param {Object} keyMappings - { "original text": [{ filepath: "...", key: "ns.key" }] }
+ * @param newDataFormat
  * @param {Object} options - { dryRun: boolean, verbose: boolean }
  */
-async function replaceTextInCode(keyMappings, options = { dryRun: false, verbose: false }) {
+async function replaceTextInCode(newDataFormat, options = { dryRun: false, verbose: false }) {
+  const keyMappings = convertDataFormat(newDataFormat);
+  console.log('============== keyMappings =================', keyMappings);
   const replacements = [];
   const processedFiles = new Set();
 
@@ -66,24 +121,12 @@ async function replaceTextInCode(keyMappings, options = { dryRun: false, verbose
 
       const fileRule = replacements.find(r => r.files === filepath);
 
-      // Add rules for different syntax patterns
-      const patterns = [
-        // t('text')
-        {
-          regex: new RegExp(`t\\(['"]${escapedText}['"]\\)`, 'g'),
-          replacement: `t('${key}')`
-        },
-        // t<string>('text')
-        {
-          regex: new RegExp(`t<\\w+>\\(['"]${escapedText}['"]\\)`, 'g'),
-          replacement: `t<string>('${key}')`
-        },
-        // detectTranslate('text')
-        {
-          regex: new RegExp(`detectTranslate\\(['"]${escapedText}['"]\\)`, 'g'),
-          replacement: `detectTranslate('${key}')`
-        }
-      ];
+      const patterns = generateReplacementPatterns(text, key);
+
+      // Debug log patterns
+      console.log(`Patterns for "${text}":`);
+      patterns.forEach(p => console.log(`  From: ${p.regex.source}\n  To: ${p.replacement}`));
+
 
       patterns.forEach(({ regex, replacement }) => {
         fileRule.from.push(regex);
@@ -133,10 +176,10 @@ async function replaceTextInCode(keyMappings, options = { dryRun: false, verbose
 async function main() {
   try {
     // Load translation mappings
-    const combinedData = loadCombinedData(OUTPUT_FILE_PATH);
+    const combinedData = loadCombinedData(outputFilePath);
 
     if (Object.keys(combinedData).length === 0) {
-      console.error('No translation mappings found in', OUTPUT_FILE_PATH);
+      console.error('No translation mappings found in', outputFilePath);
       process.exit(1);
     }
 
