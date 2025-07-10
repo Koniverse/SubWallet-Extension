@@ -364,6 +364,26 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.staking?.ledger?.multi?.(useAddresses);
+
+    if (ledgers) {
+      for (let i = 0; i < useAddresses.length; i++) {
+        const address = useAddresses[i];
+        const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
+
+        if (_ledger.total > 0) {
+          result.push(address);
+        }
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */

@@ -245,6 +245,46 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+    const ledgers = await substrateApi.api.query.parachainStaking?.delegatorState?.multi?.(useAddresses);
+    const _unstakingStates = await substrateApi.api.query.parachainStaking?.unstaking?.multi?.(useAddresses);
+
+    if (!ledgers || !_unstakingStates) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const _delegatorState = ledgers[i];
+      let delegatorState: ParachainStakingStakeOption[] = [];
+      const unstakingInfo = _unstakingStates[i].toPrimitive() as unknown as Record<string, number>;
+
+      if (_STAKING_CHAIN_GROUP.krest_network.includes(this.chain)) {
+        const krestDelegatorState = _delegatorState.toPrimitive() as unknown as KrestDelegateState;
+
+        const delegates = krestDelegatorState?.delegations as unknown as ParachainStakingStakeOption[];
+
+        if (delegates) {
+          delegatorState = delegatorState.concat(delegates);
+        }
+      } else {
+        const delegate = _delegatorState.toPrimitive() as unknown as ParachainStakingStakeOption;
+
+        if (delegate) {
+          delegatorState.push(delegate);
+        }
+      }
+
+      if (delegatorState.length || (unstakingInfo && Object.keys(unstakingInfo).length)) {
+        result.push(owner);
+      }
+    }
+
+    return Promise.resolve(result);
+  }
+
   async subscribePoolPosition (useAddresses: string[], resultCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;

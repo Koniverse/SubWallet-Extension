@@ -845,6 +845,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   earningsRewardHistoryInterval: NodeJS.Timer | undefined;
 
+  private unSubFetchEarningRewardHistory: VoidFunction | undefined;
+
   runSubscribeEarningRewardHistoryInterval () {
     this.runUnsubscribeEarningRewardHistoryInterval();
     const addresses = this.state.keyringService.context.getDecodedAddresses();
@@ -853,20 +855,45 @@ export default class EarningService implements StoppableServiceInterface, Persis
       return;
     }
 
-    this.fetchPoolRewardHistory(addresses, (result: EarningRewardHistoryItem) => {
-      this.updateEarningRewardHistory(result);
-    }).catch(console.error);
+    let cancel = false;
+    let unsub: VoidFunction | undefined;
 
-    this.earningsRewardHistoryInterval = setInterval(() => {
+    this.unSubFetchEarningRewardHistory = () => {
+      if (!cancel) {
+        unsub?.();
+        cancel = true;
+      }
+    };
+
+    const fetchData = () => {
       this.fetchPoolRewardHistory(addresses, (result: EarningRewardHistoryItem) => {
+        if (cancel) {
+          return;
+        }
+
         this.updateEarningRewardHistory(result);
-      }).catch(console.error);
-    }, CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL);
+      })
+        .then((_unsub) => {
+          if (!cancel) {
+            unsub?.();
+
+            unsub = _unsub;
+          }
+        })
+        .catch(console.error);
+    };
+
+    if (!cancel) {
+      fetchData();
+    }
+
+    this.earningsRewardHistoryInterval = setInterval(fetchData, CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL);
   }
 
   runUnsubscribeEarningRewardHistoryInterval () {
     removeLazy('updateEarningRewardHistory');
     this.earningRewardHistoryQueue = [];
+    this.unSubFetchEarningRewardHistory?.();
     this.earningsRewardHistoryInterval && clearInterval(this.earningsRewardHistoryInterval);
   }
 
