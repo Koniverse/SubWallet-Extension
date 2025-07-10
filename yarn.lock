@@ -6757,7 +6757,6 @@ __metadata:
     "@subwallet/extension-inject": ^1.3.46-0
     "@subwallet/extension-mocks": ^1.3.46-0
     "@subwallet/keyring": ^0.1.12
-    "@subwallet/subwallet-api-sdk": ^1.3.46-0
     "@subwallet/ui-keyring": ^0.1.12
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
@@ -7208,16 +7207,6 @@ __metadata:
     react: ">=16.9.0"
     react-dom: ">=16.9.0"
   checksum: ceff0237b3f27641b0f070684ca66267c19c8952e7f40679648a98ee0590036bf764c936afda1e57c07499914d4bc929299d39c15c66e47bab53737c8ae65818
-  languageName: node
-  linkType: hard
-
-"@subwallet/subwallet-api-sdk@npm:^1.3.46-0":
-  version: 1.3.46-0
-  resolution: "@subwallet/subwallet-api-sdk@npm:1.3.46-0"
-  dependencies:
-    "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.107
-  checksum: 79578ca12bd25eceda6c88501a76a961b90e8f1adc7ee0b412deaeb3fa7c78068b82209e7d7c1332aa6229024d122ec304d0d771437aba96cdeb2d8753228b1f
   languageName: node
   linkType: hard
 
