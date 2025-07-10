@@ -5,9 +5,8 @@ import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extensi
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, LoadingScreen, ReceiveModal, TokenBalance, TokenItem } from '@subwallet/extension-web-ui/components';
+import { AccountSelectorModal, AlertBox, LoadingScreen, ReceiveModal } from '@subwallet/extension-web-ui/components';
 import PageWrapper from '@subwallet/extension-web-ui/components/Layout/PageWrapper';
-import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenBalanceDetailItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenBalanceDetailItem';
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SHOW_BANNER_TOKEN_GROUPS, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
@@ -34,7 +33,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import DetailTable from './DetailTable';
+import { DetailListDesktopContent } from './DetailListDesktopContent';
 
 type Props = ThemeProps;
 
@@ -523,10 +522,6 @@ function Component (): React.ReactElement {
     setDetailTitle?.(detailTitle);
   }, [detailTitle, setDetailTitle]);
 
-  const onClickRow = useCallback((item: TokenBalanceItemType) => {
-    return onClickItem(item)();
-  }, [onClickItem]);
-
   const isShowBanner = useMemo(() => {
     return SHOW_BANNER_TOKEN_GROUPS.some((item) => {
       return tokenGroupSlug && (item === tokenGroupSlug || tokenGroupMap[item]?.includes(tokenGroupSlug));
@@ -586,97 +581,36 @@ function Component (): React.ReactElement {
               symbol={symbol}
             />
           </div>
+
+          <div
+            className={'__scroll-container'}
+          >
+            {
+              tokenBalanceItems.map((item) => (
+                <TokenBalanceDetailItem
+                  key={item.slug}
+                  {...item}
+                  onClick={onClickItem(item)}
+                />
+              ))
+            }
+          </div>
         </>
       )}
 
-      {!tokenBalanceItems.length
-        ? (
-          <NoContent pageType={PAGE_TYPE.TOKEN} />
+      {
+        isWebUI && (
+          <DetailListDesktopContent
+            isChartSupported={isChartSupported}
+            onClickItem={onClickItem}
+            priceId={priceId}
+            tokenBalanceItems={tokenBalanceItems}
+            tokenBalanceValue={tokenBalanceValue}
+            tokenGroupSlug={tokenGroupSlug}
+          />
         )
-        : !isWebUI
-          ? (
-            <div
-              className={'__scroll-container'}
-            >
-              {
-                tokenBalanceItems.map((item) => (
-                  <TokenBalanceDetailItem
-                    key={item.slug}
-                    {...item}
-                    onClick={onClickItem(item)}
-                  />
-                ))
-              }
-            </div>
-          )
-          : (
-            <DetailTable
-              className={'__table'}
-              columns={[
-                {
-                  title: 'Token name',
-                  dataIndex: 'name',
-                  key: 'name',
-                  render: (_, row) => {
-                    return (
-                      <TokenItem
-                        chain={row.chain}
-                        logoKey={row.logoKey}
-                        slug={row.slug}
-                        subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
-                        symbol={row.symbol}
-                        tokenGroupSlug={tokenGroupSlug}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Transferable',
-                  dataIndex: 'percentage',
-                  key: 'percentage',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.free.convertedValue}
-                        symbol={row.symbol}
-                        value={row.free.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Locked',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.locked.convertedValue}
-                        symbol={row.symbol}
-                        value={row.locked.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Balance',
-                  dataIndex: 'balance',
-                  key: 'balance',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.total.convertedValue}
-                        symbol={row.symbol}
-                        value={row.total.value}
-                      />
-                    );
-                  }
-                }
-              ]}
-              dataSource={tokenBalanceItems}
-              onClick={onClickRow}
-            />
-          )}
+      }
+
       {isShowBanner &&
         <Banner
           className={'__banner-area'}
@@ -738,14 +672,6 @@ function Component (): React.ReactElement {
 const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, token } }: ThemeProps) => {
   return ({
     overflow: 'hidden',
-
-    '.__table': {
-      flex: 1,
-
-      '.ant-table-row': {
-        cursor: 'pointer'
-      }
-    },
 
     '.token-detail-container': {
       minHeight: '100%',
@@ -828,12 +754,14 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       display: 'none'
     },
 
-    '.token-balance-detail-item, .ton-solo-acc-alert-area': {
+    '.token-balance-detail-item, .token-detail-banner-wrapper, .ton-solo-acc-alert-area': {
       marginBottom: token.sizeXS
     },
+
     '.__banner-area': {
       marginTop: 24
     },
+
     '@media (max-width: 991px)': {
       '.token-detail-container': {
         overflow: 'auto',
