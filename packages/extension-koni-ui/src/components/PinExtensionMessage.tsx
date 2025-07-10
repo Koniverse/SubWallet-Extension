@@ -58,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
               <Icon phosphorIcon={PushPinSimple} />
             )
           }}
-          i18nKey={('Click <extension/> select SubWallet and then <pin/>')}
+          i18nKey={('ui.PinExtensionMessage.pinExtensionInstruction')}
         />
       </div>
     </div>

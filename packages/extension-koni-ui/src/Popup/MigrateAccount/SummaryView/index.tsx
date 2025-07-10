@@ -108,7 +108,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       />
                     )
                   }}
-                  i18nKey={('All eligible accounts have been migrated. Review <guide>our guide</guide> to learn more about migration eligibility & process')}
+                  i18nKey={('ui.MigrateAccount.SummaryView.migrationCompleteReviewGuide')}
                 />
               </div>
             )
@@ -130,7 +130,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={('You have successfully migrated to <br/> <highlight>{{number}} unified accounts</highlight>')}
+                          i18nKey={('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccounts')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -144,7 +144,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={('You have successfully migrated to <br/> <highlight>{{number}} unified account</highlight>')}
+                          i18nKey={('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccount')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )

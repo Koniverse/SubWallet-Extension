@@ -513,31 +513,31 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
               ),
               termUrl: (
                 <LinkUrl
-                  content={('Terms of Service')}
+                  content={t('ui.BuyTokens.termsOfService')}
                   url={termUrl}
                 />
               ),
               policyUrl: (
                 <LinkUrl
-                  content={('Privacy Policy')}
+                  content={t('ui.BuyTokens.privacyPolicy')}
                   url={policyUrl}
                 />
               ),
               contactUrl: (
                 <LinkUrl
-                  content={('support site')}
+                  content={t('ui.BuyTokens.supportSite')}
                   url={contactUrl}
                 />
               )
             }}
-            i18nKey={('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
+            i18nKey={('ui.BuyTokens.leavingSubwalletDisclaimer')}
             values={{
               service: serviceName
             }}
           />
           <br />
           <Trans
-            i18nKey={('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
+            i18nKey={('ui.BuyTokens.regionalTokenWarning')}
             values={{
               service: serviceName,
               action: ('buying')

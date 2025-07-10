@@ -193,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={('{{deviceName}} will provide you with a QR code to scan. Read <highlight>this instruction</highlight>, for more details.')}
+              i18nKey={('ui.Account.ConnectQrSigner.qrCodeInstruction')}
               values={{ deviceName }}
             />
           </div>

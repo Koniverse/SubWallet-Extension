@@ -33,7 +33,7 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={('This network has 2 address formats. SubWallet automatically transforms Legacy formats into New format without affecting your transfer. <highlight>Learn more</highlight>')}
+              i18nKey={('ui.AlertBoxInstant.dualAddressFormatInfo')}
             />
           </>
         }

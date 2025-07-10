@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={('Click the "Scan QR" button, or read <highlight>this instruction</highlight>, for more details')}
+                i18nKey={('ui.Account.ImportQrCode.scanQrInstruction')}
               />
             </div>
           </div>

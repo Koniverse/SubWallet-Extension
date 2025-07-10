@@ -529,7 +529,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
+            i18nKey={('ui.Modal.Earning.Instruction.readFaqForStakingInfo')}
           />
         </div>
 

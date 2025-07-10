@@ -3,7 +3,7 @@
 
 import { StepStatus } from '@subwallet/extension-base/types';
 import { AlertBox, BackgroundExpandView } from '@subwallet/extension-koni-ui/components';
-import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
+import {useExtensionDisplayModes, useTranslation} from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useCallback, useMemo } from 'react';
@@ -21,6 +21,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const aliveProcessMap = useSelector((state: RootState) => state.requestState.aliveProcess);
   const { isExpanseMode } = useExtensionDisplayModes();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const processIds = useMemo(() => {
     const aliveProcesses = Object.values(aliveProcessMap).filter((p) => ![StepStatus.QUEUED].includes(p.status));
@@ -62,10 +63,10 @@ const Component: React.FC<Props> = (props: Props) => {
                       />
                     )
                   }}
-                  i18nKey={('Transaction is in progress. Go to <highlight>Notifications</highlight> to view progress and keep SubWallet open until the transaction is completed')}
+                  i18nKey={('ui.MainWrapper.viewTransactionProgressInNotifications')}
                 />
               )}
-              title={'Do not close SubWallet!'}
+              title={t('ui.MainWrapper.doNotCloseSubWallet')}
               type={'warning'}
             />
           </div>

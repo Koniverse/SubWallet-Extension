@@ -53,7 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <div className='and-more'>
               <Trans
                 components={{ highlight: <span className='highlight' /> }}
-                i18nKey={('And other <highlight>{{number}}</highlight> accounts')}
+                i18nKey={('ui.Keyring.ApplyMasterPassword.Done.andOtherNumberAccounts')}
                 values={{ number: String(accounts.length - 2).padStart(2, '0') }}
               />
             </div>

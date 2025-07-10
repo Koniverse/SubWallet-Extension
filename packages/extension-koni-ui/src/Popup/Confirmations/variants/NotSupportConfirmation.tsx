@@ -80,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span className='highlight' />
               )
             }}
-            i18nKey={('Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.')}
+            i18nKey={('ui.Confirmations.NotSupport.featureNotAvailableForAccountType')}
             values={{ accountTitle }}
           />
         </div>

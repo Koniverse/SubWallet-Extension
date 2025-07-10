@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={("{{networkName}} network's metadata is out of date, which may cause the transaction to fail. Update metadata using <highlight>this guide</highlight> or approve transaction at your own risk")}
+            i18nKey={('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
             values={{ networkName }}
           />),
         okButton: {
@@ -181,7 +181,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={("{{networkName}} network's metadata is out of date. Update metadata using <highlight>this guide</highlight> and try again")}
+                i18nKey={('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateAndRetry')}
                 values={{ networkName }}
               />
             )
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={('To sign this transaction, open “Polkadot” app on Ledger, hit Refresh and Approve again. For a better experience, re-attach your Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={('ui.Confirmations.Sign.Substrate.ledgerSignWithPolkadotApp')}
                   />
                 )
               };
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={('To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={('ui.Confirmations.Sign.Substrate.ledgerSignWithMigrationApp')}
                     values={{ networkName }}
                   />
                 )

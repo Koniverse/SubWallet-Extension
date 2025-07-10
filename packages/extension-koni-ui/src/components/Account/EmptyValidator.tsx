@@ -61,7 +61,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
                       />
                     )
                   }}
-                  i18nKey={('Please <highlight>reload</highlight>')}
+                  i18nKey={('ui.Account.EmptyValidator.pleaseReload')}
                 />
               </div>
             </div>

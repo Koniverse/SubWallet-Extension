@@ -92,7 +92,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <strong />
               )
             }}
-            i18nKey={('SubWallet\'s <highlight>Staking</highlight> feature has been updated to become <highlight>Earning</highlight> feature. Now, you can earn yield with native staking, liquid staking, lending, and staking dApp on SubWallet.')}
+            i18nKey={('ui.Modal.Announcement.EarningMigration.stakingToEarningFeatureUpdate')}
           />
         </div>
       </SwModal>

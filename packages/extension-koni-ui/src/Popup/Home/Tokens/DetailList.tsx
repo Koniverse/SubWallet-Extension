@@ -538,7 +538,7 @@ function Component (): React.ReactElement {
                       />
                     )
                   }}
-                  i18nKey={("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  i18nKey={('ui.Tokens.DetailList.tonWalletVersionInfo')}
                 />}
                 title={t('ui.Tokens.DetailList.changeWalletAddressAndVersion')}
                 type={'warning'}

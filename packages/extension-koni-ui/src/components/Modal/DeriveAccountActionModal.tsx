@@ -275,7 +275,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 components={{
                   highlight: <span className='account-name' />
                 }}
-                i18nKey={('You are creating a derived account from account <highlight>{{accountName}}</highlight>. Customize the derivation path and name the account as you wish')}
+                i18nKey={('ui.Modal.DeriveAccountAction.creatingDerivedAccountInstruction')}
                 values={{ accountName: accountProxy.name }}
               />
             </div>
