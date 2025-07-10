@@ -3,7 +3,6 @@
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { packageInfo } from '@subwallet/extension-base';
 import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
@@ -52,8 +51,8 @@ import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stri
 import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
@@ -151,20 +150,17 @@ export default class KoniState {
   private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
-    // Init subwallet api sdk
-    subwalletApiSdk.init({
-      url: BACKEND_API_URL,
-      priceHistoryUrl: BACKEND_PRICE_HISTORY_URL,
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
-        'sw-app-version': packageInfo.version,
-        'sw-chain-list-version': ChainListVersion,
-        'sw-platform': TARGET_ENV,
-        'sw-timestamp': new Date().toISOString()
-      }
-    }
-    );
+    // todo: appVersion packageInfo.version
+    subwalletApiSdk.updateConfig({
+      baseUrl: BACKEND_API_URL,
+      platform: TARGET_ENV,
+      chainListVersion: ChainListVersion
+    });
+
+    // Custom the price history API with other different base URL
+    subwalletApiSdk.priceHistoryApi.updateConfig({
+      baseUrl: BACKEND_PRICE_HISTORY_URL
+    });
 
     this.providers = providers;
 

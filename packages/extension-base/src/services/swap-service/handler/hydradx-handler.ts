@@ -15,7 +15,7 @@ import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStep
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { SwapQuote } from '@subwallet/subwallet-api-sdk/modules/swapApi';
 import BigN from 'bignumber.js';
 

@@ -6,7 +6,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -171,6 +171,6 @@ export async function getHydrationRate (address: string, hdx: _ChainAsset, desTo
     const hdxDecimal = _getAssetDecimals(hdx);
     const desTokenDecimal = _getAssetDecimals(desToken);
 
-    return new BigN(quoteRate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
+    return new BigN(quoteRate.rate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
   }
 }

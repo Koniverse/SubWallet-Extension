@@ -4,7 +4,7 @@
 import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { isProductionMode } from '@subwallet/extension-base/constants';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
-import { subwalletApiSdk } from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 import { isArray } from '@polkadot/util';
 
