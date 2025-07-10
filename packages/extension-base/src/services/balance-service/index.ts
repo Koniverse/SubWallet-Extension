@@ -15,8 +15,8 @@ import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
-import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import keyring from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
