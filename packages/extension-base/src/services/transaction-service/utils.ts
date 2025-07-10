@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { ExtrinsicDataTypeMap, ExtrinsicsDataResponse, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getBlockExplorerFromChain, _isChainTestNet, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
 import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
-import { SWApiResponse } from '@subwallet/subwallet-api-sdk/types';
 
 import { hexAddPrefix, isHex, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
@@ -80,24 +79,24 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
   return 'extrinsic';
 }
 
-export function getTransactionId (value: string): Promise<string> {
-  const query = `
-    query ExtrinsicQuery {
-      extrinsics(where: {hash_eq: ${value}}, limit: 1) {
-        id
-      }
-    }`;
-
-  const apiUrl = 'https://archive-explorer.truth-network.io/graphql';
-
-  return fetch(apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  })
-    .then((response) => response.json())
-    .then((result: SWApiResponse<ExtrinsicsDataResponse>) => result.data.extrinsics[0].id);
-}
+// export function getTransactionId (value: string): Promise<string> {
+//   const query = `
+//     query ExtrinsicQuery {
+//       extrinsics(where: {hash_eq: ${value}}, limit: 1) {
+//         id
+//       }
+//     }`;
+//
+//   const apiUrl = 'https://archive-explorer.truth-network.io/graphql';
+//
+//   return fetch(apiUrl, {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ query })
+//   })
+//     .then((response) => response.json())
+//     .then((result: SWApiResponse<ExtrinsicsDataResponse>) => result.data.extrinsics[0].id);
+// }
 
 export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'account' | 'tx'): string | undefined {
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
@@ -146,7 +145,5 @@ export function getChainflipExplorerLink (data: ChainflipSwapTxData, chainInfo: 
 }
 
 export function getSimpleSwapExplorerLink (data: SimpleSwapTxData) {
-  const simpleswapDomain = SIMPLE_SWAP_EXPLORER;
-
-  return `${simpleswapDomain}/exchange?id=${data.id}`;
+  return `${SIMPLE_SWAP_EXPLORER}/exchange?id=${data.id}`;
 }
