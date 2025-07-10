@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getYieldAvailableActionsByPosition, getYieldAvailableActionsByType, YieldAction } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
@@ -127,8 +126,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return false;
   }, [poolInfo.chain, poolInfo.type]);
 
-  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolInfo.chain), [poolInfo.chain]);
-
   const getButtons = useCallback((compact?: boolean): ButtonOptionProps[] => {
     const result: ButtonOptionProps[] = [];
 
@@ -138,7 +135,8 @@ const Component: React.FC<Props> = (props: Props) => {
         return;
       }
 
-      if (item === YieldAction.CANCEL_UNSTAKE && isMythosStaking) {
+      // TODO: May need to rewrite logic of getYieldAvailableActionsByPosition, then this condition can be removed
+      if (item === YieldAction.CANCEL_UNSTAKE && !poolInfo.metadata.availableMethod.cancelUnstake) {
         return;
       }
 
@@ -196,7 +194,7 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     return result;
-  }, [actionListByChain, availableActionsByMetadata, isChainUnsupported, isMythosStaking, onClickButton, onClickCancelUnStakeButton, onClickClaimButton, onClickStakeButton, onClickUnStakeButton, onClickWithdrawButton, poolInfo.type, t]);
+  }, [actionListByChain, availableActionsByMetadata, isChainUnsupported, onClickButton, onClickCancelUnStakeButton, onClickClaimButton, onClickStakeButton, onClickUnStakeButton, onClickWithdrawButton, poolInfo.metadata.availableMethod.cancelUnstake, poolInfo.type, t]);
 
   const shortName = useMemo(() => {
     return positionInfo.subnetData?.subnetShortName || poolInfo.metadata.shortName;

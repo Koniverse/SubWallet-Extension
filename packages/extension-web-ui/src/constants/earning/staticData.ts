@@ -263,10 +263,10 @@ export const UNSTAKE_BIFROST_ALERT_DATA = UNSTAKE_ALERT_DATA.map((item, index) =
         : item.description
 }));
 
-export const UNSTAKE_BITTENSOR_ALERT_DATA = UNSTAKE_ALERT_DATA.map((item, index) => ({
+export const UNSTAKE_BITTENSOR_ALERT_DATA = UNSTAKE_ALERT_DATA.filter((_, index) => index === 2).map((item) => ({
   ...item,
-  title: index === 2 ? 'Instant withdrawal' : item.title,
-  description: index === 2
-    ? 'Once unstaked, the funds will be instantly withdrawn to your account'
-    : item.description
+  title: 'Automatic withdrawal',
+  description: 'Once unstaked, the funds will be automatically withdrawn to your account',
+  icon: 'Coins',
+  iconColor: '#e6dc25'
 }));
