@@ -684,7 +684,12 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const { amount } = data;
 
     if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards', {
+        replace: {
+          amount: formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken)),
+          symbol: _getAssetSymbol(this.nativeToken)
+        }
+      }))];
     }
 
     return baseErrors;
@@ -729,7 +734,13 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
     if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formattedMinUnstake.toString()} ${poolInfo.metadata.subnetData?.subnetSymbol || ''}`))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount too low. You need to unstake at least {{amount}} {{symbol}}', {
+        replace: {
+          amount: formattedMinUnstake.toString(),
+          symbol: poolInfo.metadata.subnetData?.subnetSymbol || ''
+        }
+      }
+      ))];
     }
 
     return baseErrors;
