@@ -205,7 +205,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         if (this.useOnlineCacheOnly) {
           activePositions.forEach((item) => {
             if (
-              item.type === YieldPoolType.NATIVE_STAKING
+              this.handlers[item.slug]?.canOverrideIdentity
             ) {
               const hasValidatorIdentity = item.nominations.some((validator) => !!validator.validatorIdentity);
 
