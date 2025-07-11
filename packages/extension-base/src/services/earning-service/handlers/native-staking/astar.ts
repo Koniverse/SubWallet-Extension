@@ -47,13 +47,14 @@ export function getAstarWithdrawable (yieldPosition: YieldPositionInfo): Unstaki
 }
 
 export default class AstarNativeStakingPoolHandler extends BaseParaNativeStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   /* Subscribe pool info */

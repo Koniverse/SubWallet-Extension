@@ -8,7 +8,8 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { ModalContext, Number, SwModal } from '@subwallet/react-ui';
+import { Icon, ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-ui';
+import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -26,12 +27,12 @@ function Component (props: Props): React.ReactElement<Props> {
     decimals,
     expectedReturn: earningEstimated = '',
     identity: validatorName = '',
+    isMissingInfo,
     minBond: minStake,
     nominatorCount,
     otherStake,
     ownStake,
-    symbol,
-    totalStake } = validatorItem;
+    symbol, totalStake } = validatorItem;
   const { t } = useTranslation();
 
   const { inactiveModal } = useContext(ModalContext);
@@ -45,6 +46,11 @@ function Component (props: Props): React.ReactElement<Props> {
   const isParaChain = useMemo(() => {
     return _STAKING_CHAIN_GROUP.para.includes(chain) || _STAKING_CHAIN_GROUP.amplitude.includes(chain);
   }, [chain]);
+
+  const isBittensorChain = useMemo(() => {
+    return chain === 'bittensor' || chain === 'bittensor_testnet';
+  }, [chain]);
+
   const title = useMemo(() => {
     const label = getValidatorLabel(chain);
 
@@ -105,58 +111,82 @@ function Component (props: Props): React.ReactElement<Props> {
         {/*  statusName={StakingStatusUi[status].name} */}
         {/*  valueColorSchema={StakingStatusUi[status].schema} */}
         {/* /> */}
+        {!isMissingInfo
+          ? (
+            <>
+              <MetaInfo.Number
+                decimals={decimals}
+                label={t('Minimum stake required')}
+                suffix={symbol}
+                value={minStake}
+                valueColorSchema={'even-odd'}
+              />
 
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('Minimum stake required')}
-          suffix={symbol}
-          value={minStake}
-          valueColorSchema={'even-odd'}
-        />
+              {totalStake !== '0' && (
+                <MetaInfo.Number
+                  decimals={decimals}
+                  label={isBittensorChain ? t('Total stake weight') : t('Total stake')}
+                  suffix={symbol}
+                  value={totalStake}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
 
-        {
-          totalStake !== '0' && <MetaInfo.Number
-            decimals={decimals}
-            label={t('Total stake')}
-            suffix={symbol}
-            value={totalStake}
-            valueColorSchema={'even-odd'}
-          />
+              <MetaInfo.Number
+                decimals={decimals}
+                label={
+                  isBittensorChain
+                    ? (
+                      <Tooltip
+                        placement='topLeft'
+                        title={t('Calculated as 18% of the root stake')}
+                      >
+                        <span className={'__tooltip-label'}>
+                          {t('Root weight')}
+                          <Icon phosphorIcon={Info} />
+                        </span>
+                      </Tooltip>
+                    )
+                    : t('Own stake')
+                }
+                suffix={symbol}
+                value={ownStake}
+                valueColorSchema='even-odd'
+              />
+
+              {otherStake !== '0' && (
+                <MetaInfo.Number
+                  decimals={decimals}
+                  label={isBittensorChain ? t('Subnet stake') : t('Stake from others')}
+                  suffix={symbol}
+                  value={otherStake}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
+
+              {earningEstimated > 0 && earningEstimated !== '' && (
+                <MetaInfo.Number
+                  label={t('Estimated APY')}
+                  suffix={'%'}
+                  value={earningEstimated}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
+
+              <MetaInfo.Number
+                label={t('Commission')}
+                suffix={'%'}
+                value={commission}
+                valueColorSchema={'even-odd'}
+              />
+            </>
+          )
+          : <MetaInfo.Default
+            label={t('Commission')}
+          >
+          N/A
+          </MetaInfo.Default>
         }
-
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('Own stake')}
-          suffix={symbol}
-          value={ownStake}
-          valueColorSchema={'even-odd'}
-        />
-
-        {
-          otherStake !== '0' && <MetaInfo.Number
-            decimals={decimals}
-            label={t('Stake from others')}
-            suffix={symbol}
-            value={otherStake}
-            valueColorSchema={'even-odd'}
-          />
-        }
-
-        {
-          earningEstimated > 0 && earningEstimated !== '' && <MetaInfo.Number
-            label={t('Estimated APY')}
-            suffix={'%'}
-            value={earningEstimated}
-            valueColorSchema={'even-odd'}
-          />
-        }
-
-        <MetaInfo.Number
-          label={t('Commission')}
-          suffix={'%'}
-          value={commission}
-          valueColorSchema={'even-odd'}
-        />
 
         {!maxPoolMembersValue && (isParaChain || isRelayChain) &&
           <MetaInfo.Number
@@ -192,6 +222,12 @@ const EarningValidatorDetailModal = styled(Component)<Props>(({ theme: { token }
   return ({
     '.__maximum-validator .__value': {
       display: 'flex'
+    },
+    '.__tooltip-label': {
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+      gap: token.sizeXXS
     }
   });
 });
