@@ -72,6 +72,24 @@ export const getSignMode = (account: AccountJson | null | undefined): AccountSig
   }
 };
 
+export const getTransactionActionsByAccountProxy = (accountProxy: AccountProxy, accountProxies: AccountProxy[] = []): string[] => {
+  const transactionActionsSet = new Set<string>();
+
+  if (isAccountAll(accountProxy.id)) {
+    accountProxies.forEach((proxy) => {
+      proxy.accounts?.forEach(({ transactionActions }) => {
+        transactionActions?.forEach((action) => transactionActionsSet.add(action));
+      });
+    });
+  } else {
+    accountProxy.accounts.forEach(({ transactionActions }) => {
+      transactionActions?.forEach((action) => transactionActionsSet.add(action));
+    });
+  }
+
+  return Array.from(transactionActionsSet);
+};
+
 export const accountCanSign = (signMode: AccountSignMode): boolean => {
   return MODE_CAN_SIGN.includes(signMode);
 };

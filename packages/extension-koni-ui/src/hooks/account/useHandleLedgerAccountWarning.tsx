@@ -83,10 +83,10 @@ export default function useHandleLedgerAccountWarning (): HookType {
     if (isNeedShowAlert) {
       const targetSymbol = isTokenContext ? assetRegistry[targetSlug]?.symbol : '';
       const title = isTokenContext ? t('Unsupported token') : t('Pay attention!');
-      const subtitle = t('Do you still want to get the address?');
+      const subtitle = isTokenContext ? t('Do you still want to get the address?') : undefined;
       const contentMessage = isTokenContext
         ? t('Your account is not compatible with {{symbol}} token. Transferring {{symbol}} to this account will result in tokens getting stuck (i.e., can’t be transferred out or staked)', { replace: { symbol: targetSymbol } })
-        : t(' This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be transferred out or staked)');
+        : t(' This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be sent out or staked)');
 
       const content = (<div>{contentMessage}</div>);
 

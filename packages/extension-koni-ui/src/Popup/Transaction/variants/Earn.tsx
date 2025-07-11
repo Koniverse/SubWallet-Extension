@@ -4,11 +4,11 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
-import { _getAssetDecimals, _getAssetSymbol, _isChainCompatibleLedgerEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
-import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -24,7 +24,7 @@ import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYie
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getExtrinsicTypeByPoolInfo, getSignModeByAccountProxy, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -288,26 +288,11 @@ const Component = () => {
       return [];
     }
 
-    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(inputAsset, chainInfo);
-    const isIgnoreEvmLedger = !_isChainCompatibleLedgerEvm(chainInfo);
-
     const result: AccountAddressItemType[] = [];
 
     accountProxies.forEach((ap) => {
       if (!(!fromAccountProxy || ap.id === fromAccountProxy)) {
         return;
-      }
-
-      const signMode = getSignModeByAccountProxy(ap);
-
-      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
-        return;
-      }
-
-      if (signMode === AccountSignMode.GENERIC_LEDGER) {
-        if (ap.chainTypes.includes(AccountChainType.ETHEREUM) && isIgnoreEvmLedger) {
-          return;
-        }
       }
 
       ap.accounts.forEach((a) => {
@@ -326,7 +311,7 @@ const Component = () => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, inputAsset, poolChain]);
+  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change

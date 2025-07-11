@@ -3,11 +3,10 @@
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
-import { getExtrinsicTypeByPoolInfo } from '@subwallet/extension-koni-ui/utils';
+import { getExtrinsicTypeByPoolInfo, getTransactionActionsByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { useMemo } from 'react';
 
 const useYieldGroupInfo = (): YieldGroupInfo[] => {
@@ -24,21 +23,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
       return null;
     }
 
-    const transactionActionsSet = new Set<string>();
-
-    if (isAccountAll(currentAccountProxy.id)) {
-      accountProxies.forEach((proxy) => {
-        proxy.accounts?.forEach(({ transactionActions }) => {
-          transactionActions?.forEach((action) => transactionActionsSet.add(action));
-        });
-      });
-    } else {
-      currentAccountProxy.accounts.forEach(({ transactionActions }) => {
-        transactionActions?.forEach((action) => transactionActionsSet.add(action));
-      });
-    }
-
-    return Array.from(transactionActionsSet);
+    return getTransactionActionsByAccountProxy(currentAccountProxy, accountProxies);
   }, [accountProxies, currentAccountProxy]);
 
   return useMemo(() => {
