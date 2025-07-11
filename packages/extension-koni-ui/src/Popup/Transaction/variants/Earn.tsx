@@ -5,6 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { _MULTI_STAKING_TYPES_DEFAULT_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
@@ -1211,9 +1212,19 @@ const Component = () => {
   }, [activeModal, compound, screenLoading]);
 
   useEffect(() => {
-    fetchStaticData<{chains: string[]}>('multi-staking-types-chains').then((data) => {
-      setMultiStakingTypesChains(data.chains);
-    }).catch(console.error);
+    const fallbackChains = _MULTI_STAKING_TYPES_DEFAULT_CHAINS;
+
+    Promise.race([
+      fetchStaticData<{ chains: string[] }>('multi-staking-types-chains').then((res) => res.chains),
+      new Promise<string[]>((resolve) => {
+        setTimeout(() => resolve(fallbackChains), 1000);
+      })
+    ])
+      .then(setMultiStakingTypesChains)
+      .catch((e) => {
+        console.error(e);
+        setMultiStakingTypesChains(fallbackChains);
+      });
   }, []);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {

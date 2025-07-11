@@ -3,6 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _MULTI_STAKING_TYPES_DEFAULT_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { fetchStaticData, isAccountAll } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
@@ -343,9 +344,19 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   );
 
   useEffect(() => {
-    fetchStaticData<{chains: string[]}>('multi-staking-types-chains').then((data) => {
-      setMultiStakingTypesChains(data.chains);
-    }).catch(console.error);
+    const fallbackChains = _MULTI_STAKING_TYPES_DEFAULT_CHAINS;
+
+    Promise.race([
+      fetchStaticData<{ chains: string[] }>('multi-staking-types-chains').then((res) => res.chains),
+      new Promise<string[]>((resolve) => {
+        setTimeout(() => resolve(fallbackChains), 1000);
+      })
+    ])
+      .then(setMultiStakingTypesChains)
+      .catch((e) => {
+        console.error(e);
+        setMultiStakingTypesChains(fallbackChains);
+      });
   }, []);
 
   return (
