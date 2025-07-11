@@ -37,3 +37,5 @@ export function shuffle<T = any> (array: T[]) {
 export const getLogoByNetworkKey = (networkKey: string, defaultLogo = 'default'): string => {
   return ChainLogoMap[networkKey] || ChainLogoMap[defaultLogo] || ChainLogoMap.default;
 };
+
+export const delay = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));

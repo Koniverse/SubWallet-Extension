@@ -5,6 +5,7 @@ import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/e
 import { SESSION_TIMEOUT } from '@subwallet/extension-base/services/keyring-service/context/handlers/Migration';
 import { pingSession } from '@subwallet/extension-web-ui/messaging/migrate-unified-account';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { delay } from '@subwallet/extension-web-ui/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -53,11 +54,16 @@ function Component ({ onApprove, onCompleteMigrationProcess, sessionId, soloAcco
       return;
     }
 
+    // this for flush UI
+    await delay(100);
+
     await onApprove({
       soloAccounts,
       sessionId,
       accountName
     });
+
+    await delay(500);
 
     performNextProcess();
   }, [onApprove, performNextProcess, sessionId]);
