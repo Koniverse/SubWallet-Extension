@@ -1,16 +1,16 @@
-    3094	AnhMTV                        	Release version 1.3.46
+    3099	AnhMTV                        	
     2671	Nam Phạm                      	disable block explorer for truth network
-    2587	S2kael                        	[Issue-4187] Feat: Update UI stake
+    2594	S2kael                        	[Issue-4448] Feat: Change logic check active stake
      871	bluezdot                      	chores: update content
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
      465	Jaco                          	0.42.5 (#969)
      459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     291	tunghp2002                    	[Feat] Rollback subwallet api and rename api
-     271	lw                            	[Issue-4486] fix: Temporarily hardcode to disable "Advanced address conversion" to prevent errors
+     294	tunghp2002                    	[Issue-4443] Refactor code
+     273	lw                            	
+     193	PDTnhah                       	[Issue-4458] Extension - Update chainlist stable v0.2.108
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
-     185	PDTnhah                       	[Issue-465][Chainlist] Remove more inactive networks in the Polkadot ecosystem
      185	quangdo                       	
      170	lw-cdm                        	
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
