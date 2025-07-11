@@ -4,6 +4,7 @@
 import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { BACKEND_API_URL } from '@subwallet/extension-base/constants';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
@@ -15,7 +16,7 @@ import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, P
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -24,6 +25,7 @@ import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndE
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
+import EmptySwapPairs from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
@@ -48,7 +50,23 @@ type WrapperProps = ThemeProps;
 
 type ComponentProps = {
   targetAccountProxy: AccountProxy;
+  pairMap: Record<string, string[]>;
+  forceSkipDefaultToken: boolean;
+  swappableSlugsSet: Set<string>;
 };
+
+/**
+ * INIT: Init status.
+ * READY: In case defaultSlug does not exist or is supported (present in swappableSlugsSet or multiAssetSlugSet).
+ * NOT_SUPPORT: In case defaultSlug is not supported in swappableSlugsSet or multiAssetSlugSet.
+ * SKIP: In case the user reloads while in NOT_SUPPORT state.
+ */
+enum SupportDefaultTokenStatus {
+  INIT = 'INIT',
+  NOT_SUPPORT = 'NOT_SUPPORT',
+  SKIP = 'SKIP',
+  READY = 'READY'
+}
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
 
@@ -103,7 +121,7 @@ function getTokenSelectorItem (
 
 // todo: recheck validation logic, especially recipientAddress
 
-const Component = ({ targetAccountProxy }: ComponentProps) => {
+const Component = ({ forceSkipDefaultToken, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
@@ -148,7 +166,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
 
-  const { defaultSlug } = defaultData;
+  const defaultSlug = forceSkipDefaultToken ? '' : defaultData.defaultSlug;
   const onIdle = useCallback(() => {
     !hasInternalConfirmations && !!confirmedTerm && showQuoteArea && setRequestUserInteractToContinue(true);
   }, [confirmedTerm, hasInternalConfirmations, showQuoteArea]);
@@ -316,21 +334,24 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       const slug = item.slug;
       const assetInfo = assetRegistryMap[slug];
 
-      if (!assetInfo || !isTokenCompatibleWithTargetAccountProxy(slug)) {
+      if (!swappableSlugsSet.has(slug) || !assetInfo || !isTokenCompatibleWithTargetAccountProxy(slug)) {
         return false;
       }
 
+      // todo: improve by checking once and returning the list
       if (!defaultSlug) {
         return true;
       }
 
       return defaultSlug === slug || _getMultiChainAsset(assetInfo) === defaultSlug;
     });
-  }, [assetRegistryMap, defaultSlug, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
+  }, [assetRegistryMap, defaultSlug, swappableSlugsSet, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
 
   const toTokenItems = useMemo(() => {
-    return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
-  }, [fromTokenSlugValue, tokenSelectorItems]);
+    const destinationsSet = new Set(pairMap[fromTokenSlugValue] || []);
+
+    return tokenSelectorItems.filter((item) => destinationsSet.has(item.slug));
+  }, [fromTokenSlugValue, tokenSelectorItems, pairMap]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -1364,6 +1385,11 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { defaultData } = useTransactionContext<SwapParams>();
   const { goHome } = useDefaultNavigate();
   const accountProxies = useSelector((state) => state.accountState.accountProxies);
+  const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
+  const [pairMap, setPairMap] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<boolean>(false);
+  const [defaultSlugSupportStatus, setDefaultSlugSupportStatus] = useState<SupportDefaultTokenStatus>(SupportDefaultTokenStatus.INIT);
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1375,11 +1401,95 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     });
   }, [accountProxies, defaultData.fromAccountProxy]);
 
+  const swappableSlugsSet: Set<string> = useMemo(() => new Set(Object.keys(pairMap).filter((key) => pairMap[key].length !== 0)), [pairMap]);
+  const multiAssetSlugSet = useMemo(() => {
+    const result = new Set<string>();
+
+    swappableSlugsSet.forEach((slug) => {
+      result.add(_getMultiChainAsset(assetRegistryMap[slug]));
+    });
+
+    if (result.has('')) {
+      result.delete('');
+    }
+
+    return result;
+  }, [swappableSlugsSet, assetRegistryMap]);
+
+  const fetchDestinationsMap = useCallback(() => {
+    setLoading(true);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`, { signal: controller.signal })
+      .then((rawResp) => {
+        clearTimeout(timeout);
+
+        if (!rawResp.ok) {
+          throw new Error(`HTTP error! status: ${rawResp.status}`);
+        }
+
+        return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string }>;
+      })
+      .then((resp) => {
+        // simple validate
+        if (!resp || typeof resp !== 'object' || !resp.data || typeof resp.data !== 'object') {
+          throw new Error('Invalid response format');
+        }
+
+        setPairMap(resp.data);
+        setFetchError(false);
+        setLoading(false);
+      })
+      .catch((error: Error) => {
+        error.name === 'AbortError' ? console.error('Timout fetching swap destinations') : console.error(`Error while fetching swap destinations: ${error.message}`);
+
+        setFetchError(true);
+        setLoading(false);
+      });
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, []);
+
+  const handleReloadNotSupportDefault = useCallback(() => {
+    setDefaultSlugSupportStatus(SupportDefaultTokenStatus.SKIP);
+  }, []);
+
   useEffect(() => {
     if (!targetAccountProxy) {
       goHome();
     }
   }, [goHome, targetAccountProxy]);
+
+  useEffect(() => {
+    fetchDestinationsMap();
+  }, [fetchDestinationsMap]);
+
+  useEffect(() => {
+    const defaultSlug = defaultData.defaultSlug;
+
+    if (!defaultSlug) {
+      setDefaultSlugSupportStatus(SupportDefaultTokenStatus.READY);
+
+      return;
+    }
+
+    if (loading) { // wait to get swappableSlugsSet
+      return;
+    }
+
+    // default token slug is supported and default token group is supported
+    if (swappableSlugsSet.has(defaultSlug) || multiAssetSlugSet.has(defaultSlug)) {
+      setDefaultSlugSupportStatus(SupportDefaultTokenStatus.READY);
+
+      return;
+    }
+
+    setDefaultSlugSupportStatus(SupportDefaultTokenStatus.NOT_SUPPORT);
+  }, [defaultData.defaultSlug, multiAssetSlugSet, swappableSlugsSet, loading]);
 
   if (!targetAccountProxy) {
     return (
@@ -1387,14 +1497,41 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     );
   }
 
-  return (
-    <PageWrapper
-      className={CN(className)}
-      resolve={dataContext.awaitStores(['swap', 'price'])}
-    >
-      <Component targetAccountProxy={targetAccountProxy} />
-    </PageWrapper>
-  );
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (fetchError) {
+    return (
+      <EmptySwapPairs
+        onClickReload={fetchDestinationsMap}
+      />
+    );
+  }
+
+  if (defaultSlugSupportStatus === SupportDefaultTokenStatus.NOT_SUPPORT) {
+    return (
+      <EmptySwapPairs
+        onClickReload={handleReloadNotSupportDefault}
+      />
+    );
+  } else if (defaultSlugSupportStatus === SupportDefaultTokenStatus.SKIP || defaultSlugSupportStatus === SupportDefaultTokenStatus.READY) {
+    return (
+      <PageWrapper
+        className={CN(className)}
+        resolve={dataContext.awaitStores(['price'])}
+      >
+        <Component
+          forceSkipDefaultToken={defaultSlugSupportStatus === SupportDefaultTokenStatus.SKIP}
+          pairMap={pairMap}
+          swappableSlugsSet={swappableSlugsSet}
+          targetAccountProxy={targetAccountProxy}
+        />
+      </PageWrapper>
+    );
+  } else {
+    return <LoadingScreen />;
+  }
 };
 
 const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
