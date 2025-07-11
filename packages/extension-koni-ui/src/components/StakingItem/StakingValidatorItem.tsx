@@ -74,7 +74,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
             <div className={'middle-item__info'}>
               <span className={'middle-item__commission'}>
-                {t('Commission')}: {validatorInfo.commission}%
+                {t('Commission')}: {validatorInfo.isMissingInfo ? 'N/A' : `${validatorInfo.commission}%`}
               </span>
               {
                 apy !== '0' && (

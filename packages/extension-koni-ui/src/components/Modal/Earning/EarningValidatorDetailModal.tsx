@@ -27,12 +27,12 @@ function Component (props: Props): React.ReactElement<Props> {
     decimals,
     expectedReturn: earningEstimated = '',
     identity: validatorName = '',
+    isMissingInfo,
     minBond: minStake,
     nominatorCount,
     otherStake,
     ownStake,
-    symbol,
-    totalStake } = validatorItem;
+    symbol, totalStake } = validatorItem;
   const { t } = useTranslation();
 
   const { inactiveModal } = useContext(ModalContext);
@@ -111,73 +111,82 @@ function Component (props: Props): React.ReactElement<Props> {
         {/*  statusName={StakingStatusUi[status].name} */}
         {/*  valueColorSchema={StakingStatusUi[status].schema} */}
         {/* /> */}
+        {!isMissingInfo
+          ? (
+            <>
+              <MetaInfo.Number
+                decimals={decimals}
+                label={t('Minimum stake required')}
+                suffix={symbol}
+                value={minStake}
+                valueColorSchema={'even-odd'}
+              />
 
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('Minimum stake required')}
-          suffix={symbol}
-          value={minStake}
-          valueColorSchema={'even-odd'}
-        />
+              {totalStake !== '0' && (
+                <MetaInfo.Number
+                  decimals={decimals}
+                  label={isBittensorChain ? t('Total stake weight') : t('Total stake')}
+                  suffix={symbol}
+                  value={totalStake}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
 
-        {
-          totalStake !== '0' &&
-            <MetaInfo.Number
-              decimals={decimals}
-              label={isBittensorChain ? t('Total stake weight') : t('Total stake')}
-              suffix={symbol}
-              value={totalStake}
-              valueColorSchema={'even-odd'}
-            />
+              <MetaInfo.Number
+                decimals={decimals}
+                label={
+                  isBittensorChain
+                    ? (
+                      <Tooltip
+                        placement='topLeft'
+                        title={t('Calculated as 18% of the root stake')}
+                      >
+                        <span className={'__tooltip-label'}>
+                          {t('Root weight')}
+                          <Icon phosphorIcon={Info} />
+                        </span>
+                      </Tooltip>
+                    )
+                    : t('Own stake')
+                }
+                suffix={symbol}
+                value={ownStake}
+                valueColorSchema='even-odd'
+              />
+
+              {otherStake !== '0' && (
+                <MetaInfo.Number
+                  decimals={decimals}
+                  label={isBittensorChain ? t('Subnet stake') : t('Stake from others')}
+                  suffix={symbol}
+                  value={otherStake}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
+
+              {earningEstimated > 0 && earningEstimated !== '' && (
+                <MetaInfo.Number
+                  label={t('Estimated APY')}
+                  suffix={'%'}
+                  value={earningEstimated}
+                  valueColorSchema={'even-odd'}
+                />
+              )}
+
+              <MetaInfo.Number
+                label={t('Commission')}
+                suffix={'%'}
+                value={commission}
+                valueColorSchema={'even-odd'}
+              />
+            </>
+          )
+          : <MetaInfo.Default
+            label={t('Commission')}
+          >
+          N/A
+          </MetaInfo.Default>
         }
-
-        <MetaInfo.Number
-          decimals={decimals}
-          label={
-            isBittensorChain
-              ? (
-                <Tooltip
-                  placement='topLeft'
-                  title={t('Calculated as 18% of the root stake')}
-                >
-                  <span className={'__tooltip-label'}>
-                    {t('Root weight')}
-                    <Icon phosphorIcon={Info} />
-                  </span>
-                </Tooltip>
-              )
-              : t('Own stake')
-          }
-          suffix={symbol}
-          value={ownStake}
-          valueColorSchema='even-odd'
-        />
-
-        {
-          otherStake !== '0' && <MetaInfo.Number
-            decimals={decimals}
-            label={isBittensorChain ? t('Subnet stake') : t('Stake from others')}
-            suffix={symbol}
-            value={otherStake}
-            valueColorSchema={'even-odd'}
-          />
-        }
-
-        {
-          earningEstimated > 0 && earningEstimated !== '' && <MetaInfo.Number
-            label={t('Estimated APY')}
-            suffix={'%'}
-            value={earningEstimated}
-            valueColorSchema={'even-odd'}
-          />
-        }
-
-        <MetaInfo.Number
-          label={t('Commission')}
-          suffix={'%'}
-          value={commission}
-          valueColorSchema={'even-odd'}
-        />
 
         {!maxPoolMembersValue && (isParaChain || isRelayChain) &&
           <MetaInfo.Number

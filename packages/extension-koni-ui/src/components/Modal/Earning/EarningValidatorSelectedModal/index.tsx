@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { NominationInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -65,6 +66,11 @@ const Component = (props: Props) => {
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
   const items = useGetPoolTargetList(slug) as ValidatorDataType[];
 
+  const { assetRegistry } = useSelector((state) => state.assetRegistry);
+  const assetInfo = assetRegistry[poolInfo.metadata.inputAsset];
+  const decimals = _getAssetDecimals(assetInfo);
+  const symbol = _getAssetSymbol(assetInfo);
+
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) {
       return poolInfo.maxPoolMembers;
@@ -75,15 +81,53 @@ const Component = (props: Props) => {
 
   const resultList = useMemo(() => {
     if (addresses && addresses.length > 0) {
-      return items.filter((item) => addresses.includes(item.address.trim()));
+      return items
+        .filter((item) => addresses.includes(item.address.trim()))
+        .map((item) => ({
+          ...item,
+          hasFullInfo: true
+        }));
     }
 
-    const nominatedValidatorAddresses = nominations.map((n) => n.validatorAddress);
+    const itemMap = new Map(items.map((item) => [item.address.trim(), item]));
 
-    const list = items.filter((item) => nominatedValidatorAddresses.includes(item.address.trim()));
+    const result: ValidatorDataType[] = [];
 
-    return list;
-  }, [items, nominations, addresses]);
+    for (const nomination of nominations) {
+      const address = nomination.validatorAddress.trim();
+      const item = itemMap.get(address);
+
+      if (item) {
+        result.push({
+          ...item
+        });
+      } else {
+        result.push({
+          address,
+          chain: nomination.chain,
+          totalStake: '0',
+          ownStake: '0',
+          otherStake: '0',
+          minBond: '0',
+          nominatorCount: 0,
+          commission: 0,
+          expectedReturn: undefined,
+          blocked: false,
+          identity: nomination.validatorIdentity || '',
+          isVerified: false,
+          icon: undefined,
+          isCrowded: false,
+          eraRewardPoint: undefined,
+          topQuartile: false,
+          symbol: symbol,
+          decimals: decimals,
+          isMissingInfo: true
+        });
+      }
+    }
+
+    return result;
+  }, [items, nominations, addresses, symbol, decimals]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chain);
