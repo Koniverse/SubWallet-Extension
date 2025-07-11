@@ -204,8 +204,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
         if (this.useOnlineCacheOnly) {
           activePositions.forEach((item) => {
+            const handler = this.getPoolHandler(item.slug);
+
             if (
-              this.handlers[item.slug]?.canOverrideIdentity
+              handler?.canOverrideIdentity
             ) {
               const hasValidatorIdentity = item.nominations.some((validator) => !!validator.validatorIdentity);
 
