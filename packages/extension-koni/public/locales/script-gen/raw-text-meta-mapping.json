@@ -1,14 +1,285 @@
 {
-  "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.": {
+  "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.": {
     "locations": [
-      "packages/extension-koni-ui/src/Popup/BuyTokens.tsx"
+      "packages/extension-base/src/core/logic-validation/index.ts"
     ],
     "translations": {
-      "en": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-      "ja": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-      "vi": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-      "zh": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-      "ru": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>."
+      "en": "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.": {
+    "locations": [
+      "packages/extension-base/src/core/logic-validation/index.ts"
+    ],
+    "translations": {
+      "en": "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Feature under maintenance on {{chainInfoName}} network. Try again later": {
+    "locations": [
+      "packages/extension-base/src/core/logic-validation/transfer.ts"
+    ],
+    "translations": {
+      "en": "Feature under maintenance on {{chainInfoName}} network. Try again later",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Import {{accountProxiesSelected}} accounts": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx"
+    ],
+    "translations": {
+      "en": "Import {{accountProxiesSelected}} accounts",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx"
+    ],
+    "translations": {
+      "en": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx"
+    ],
+    "translations": {
+      "en": "{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{poolChainName}} network has lost connection. Re-enable the network and try again": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx"
+    ],
+    "translations": {
+      "en": "{{poolChainName}} network has lost connection. Re-enable the network and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/SendFund.tsx"
+    ],
+    "translations": {
+      "en": "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Select {{handleValidatorLabel}}": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx"
+    ],
+    "translations": {
+      "en": "Select {{handleValidatorLabel}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx"
+    ],
+    "translations": {
+      "en": "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again": {
+    "locations": [
+      "packages/extension-base/src/services/swap-service/handler/base-handler.ts"
+    ],
+    "translations": {
+      "en": "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swapping via {{provider}} can take up to {{getWaitingTime}} minutes. Make sure you review all information carefully before submitting.": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Swap.tsx",
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Swap.tsx",
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Swap.tsx"
+    ],
+    "translations": {
+      "en": "Swapping via {{provider}} can take up to {{getWaitingTime}} minutes. Make sure you review all information carefully before submitting.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx"
+    ],
+    "translations": {
+      "en": "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Export {{getNumberAccount}} accounts": {
+    "locations": [
+      "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx"
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} accounts",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Export {{getNumberAccount}} account": {
+    "locations": [
+      "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx"
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} account",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards": {
+    "locations": [
+      "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+      "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts"
+    ],
+    "translations": {
+      "en": "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount too low. You need to unstake at least {{amount}} {{symbol}}": {
+    "locations": [
+      "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+      "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts"
+    ],
+    "translations": {
+      "en": "Amount too low. You need to unstake at least {{amount}} {{symbol}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{number}} selected {{validatorLabel}}": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Earn/Bond.tsx",
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Bond.tsx",
+      "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/Bond.tsx",
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/Bond.tsx"
+    ],
+    "translations": {
+      "en": "{{number}} selected {{validatorLabel}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx"
+    ],
+    "translations": {
+      "en": "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx"
+    ],
+    "translations": {
+      "en": "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx"
+    ],
+    "translations": {
+      "en": "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Unstake your {{tokenSymbol}} now!": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx"
+    ],
+    "translations": {
+      "en": "Unstake your {{tokenSymbol}} now!",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Estimated fee": {
+    "locations": [
+      "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/JoinPool.tsx"
+    ],
+    "translations": {
+      "en": "Estimated fee",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
     }
   }
 }

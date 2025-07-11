@@ -1,3 +1,25 @@
 [
-  "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>."
+  "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.",
+  "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.",
+  "Feature under maintenance on {{chainInfoName}} network. Try again later",
+  "Import {{accountProxiesSelected}} accounts",
+  "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
+  "{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again",
+  "{{poolChainName}} network has lost connection. Re-enable the network and try again",
+  "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)",
+  "Select {{handleValidatorLabel}}",
+  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period",
+  "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again",
+  "Swapping via {{provider}} can take up to {{getWaitingTime}} minutes. Make sure you review all information carefully before submitting.",
+  "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
+  "Export {{getNumberAccount}} accounts",
+  "Export {{getNumberAccount}} account",
+  "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards",
+  "Amount too low. You need to unstake at least {{amount}} {{symbol}}",
+  "{{number}} selected {{validatorLabel}}",
+  "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+  "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+  "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.",
+  "Unstake your {{tokenSymbol}} now!",
+  "Estimated fee"
 ]

@@ -1,3 +1,23 @@
 [
-  "packages/extension-koni-ui/src/Popup/BuyTokens.tsx"
+  "packages/extension-base/src/core/logic-validation/index.ts",
+  "packages/extension-base/src/core/logic-validation/transfer.ts",
+  "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
+  "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+  "packages/extension-koni-ui/src/Popup/Transaction/variants/SendFund.tsx",
+  "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx",
+  "packages/extension-base/src/services/swap-service/handler/base-handler.ts",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Swap.tsx",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Swap.tsx",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Swap.tsx",
+  "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
+  "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+  "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+  "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Earn/Bond.tsx",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Bond.tsx",
+  "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/Bond.tsx",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/Bond.tsx",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx",
+  "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
+  "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/JoinPool.tsx"
 ]

@@ -367,5 +367,8 @@
   "packages/extension-koni-ui/src/Popup/Confirmations/parts/Detail/Substrate/Message.tsx": "ui.Confirmations.Detail.Substrate.Message",
   "packages/extension-koni-ui/src/Popup/Confirmations/parts/Qr/ScanSignature/index.tsx": "ui.Confirmations.Qr.ScanSignature",
   "packages/extension-koni-ui/src/Popup/Home/History/Detail/parts/Layout.tsx": "ui.History.Detail.Layout",
-  "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/ProcessStepList/index.tsx": "ui.Modal.TxProcessDetail.StepList"
+  "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/ProcessStepList/index.tsx": "ui.Modal.TxProcessDetail.StepList",
+  "packages/extension-base/src/core/logic-validation/index.ts": "bg.validation",
+  "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts": "bg.service.earning.nativeStaking.dtao",
+  "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts": "bg.service.earning.nativeStaking.tao"
 }

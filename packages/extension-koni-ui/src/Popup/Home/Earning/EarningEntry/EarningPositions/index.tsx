@@ -161,13 +161,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
                   ),
                   highlight: <span className='__info-highlight' />
                 }}
-                i18nKey={t('You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.')}
+                i18nKey={t('ui.Earning.Entry.Positions.dualStakingNotSupportedWarning')}
                 values={{ originChain, symbol }}
               />
             </div>
 
           </>),
-        title: t('Unstake your {{tokenSymbol}} now!', { replace: { tokenSymbol: symbol } }),
+        title: t('ui.Earning.Entry.Positions.unstakeYourTokenNow', { replace: { tokenSymbol: symbol } }),
         okButton: {
           text: t('ui.Earning.Entry.Positions.readUpdate'),
           onClick: () => {

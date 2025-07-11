@@ -684,7 +684,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const { amount } = data;
 
     if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards', {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.service.earning.nativeStaking.dtao.insufficientStakeToEarn', {
         replace: {
           amount: formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken)),
           symbol: _getAssetSymbol(this.nativeToken)

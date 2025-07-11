@@ -37,8 +37,8 @@ const Component: React.FC<Props> = (props: Props) => {
         title: t('ui.Confirmations.Transaction.ClaimReward.payAttentionExclamation'),
         type: NotificationType.WARNING,
         content: (isRewardLtFee
-          ? t('The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?')
-          : t('The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?')
+          ? t('ui.Confirmations.Transaction.ClaimReward.rewardsSmallerThanFeeWarning')
+          : t('ui.Confirmations.Transaction.ClaimReward.rewardsEqualToFeeWarning')
 
         ),
         okButton: {

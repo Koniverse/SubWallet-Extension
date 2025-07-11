@@ -154,7 +154,7 @@ export function checkSupportForFeature (validationResponse: SWTransactionRespons
   const currentFeature = `${extrinsicType}___${chain}`;
 
   if (blockedFeaturesList.includes(currentFeature)) {
-    validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature under maintenance on {{chainInfoName}} network. Try again later', { replace: { chainInfoName: chainInfo.name } })));
+    validationResponse.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.validation.transfer.featureUnderMaintenanceOnNetwork', { replace: { chainInfoName: chainInfo.name } })));
   }
 }
 

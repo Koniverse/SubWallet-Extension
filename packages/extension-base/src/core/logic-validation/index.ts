@@ -17,15 +17,15 @@ export * from './transfer';
 export function validateSpendingAndFeePayment (spendingToken: _ChainAsset, feeToken: _ChainAsset, bnSpendingAmount: BigN, bnFromTokenBalance: BigN, bnFeeAmount: BigN, bnFeeTokenBalance: BigN): TransactionError[] {
   if (spendingToken.slug === feeToken.slug) {
     if (bnFromTokenBalance.lte(bnSpendingAmount.plus(bnFeeAmount).plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
-      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
   } else {
     if (bnFromTokenBalance.lte(bnSpendingAmount.plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
-      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
 
     if (bnFeeTokenBalance.lte(bnFeeAmount.plus(_isNativeToken(feeToken) ? '0' : _getTokenMinAmount(feeToken)))) {
-      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('Insufficient balance. Deposit {{feeTokenSymbol}} and try again.', { replace: { feeTokenSymbol: feeToken.symbol } }))];
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.validation.insufficientFeeTokenBalance', { replace: { feeTokenSymbol: feeToken.symbol } }))];
     }
   }
 
