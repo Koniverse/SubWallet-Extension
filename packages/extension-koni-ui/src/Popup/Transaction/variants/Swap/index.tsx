@@ -51,6 +51,7 @@ type WrapperProps = ThemeProps;
 type ComponentProps = {
   targetAccountProxy: AccountProxy;
   pairMap: Record<string, string[]>;
+  onClickReload: () => void;
 };
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
@@ -106,7 +107,7 @@ function getTokenSelectorItem (
 
 // todo: recheck validation logic, especially recipientAddress
 
-const Component = ({ pairMap, targetAccountProxy }: ComponentProps) => {
+const Component = ({ pairMap, targetAccountProxy, onClickReload }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
@@ -323,6 +324,7 @@ const Component = ({ pairMap, targetAccountProxy }: ComponentProps) => {
         return false;
       }
 
+      // todo: improve by checking once and returning the list
       if (!defaultSlug) {
         return true;
       }
@@ -1124,6 +1126,14 @@ const Component = ({ pairMap, targetAccountProxy }: ComponentProps) => {
     }
   }, [isChainConnected, notify, swapError, swapError?.message, t]);
 
+  if (fromTokenItems.length <= 0) {
+    return (
+      <EmptySwapPairs
+        onClickReload={onClickReload}
+      />
+    );
+  }
+
   return (
     <>
       <>
@@ -1454,6 +1464,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       <Component
         pairMap={pairMap}
         targetAccountProxy={targetAccountProxy}
+        onClickReload={fetchDestinationsMap}
       />
     </PageWrapper>
   );
