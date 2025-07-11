@@ -435,7 +435,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       } else if (accountProxiesSelected.length === 1) {
         return t('ui.Account.RestoreJson.importOneAccount');
       } else {
-        return t(`Import ${accountProxiesSelected.length} accounts`);
+        return t('Import {{accountProxiesSelected}} accounts', { replace: { accountProxiesSelected: accountProxiesSelected.length } });
       }
     }
   }, [accountProxiesSelected.length, stepState, t]);

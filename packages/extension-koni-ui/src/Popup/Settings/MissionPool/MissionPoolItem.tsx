@@ -71,6 +71,7 @@ function Component (props: Props): React.ReactElement<Props> {
             phosphorIcon={icon}
             weight={iconWeight}
           />
+          // TODO:-I18N Research how to support dynamic variables in i18n
           {t(`${name}`)}
         </Tag>
         {
@@ -85,6 +86,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 phosphorIcon={missionIcon}
                 weight={missionIconWeight}
               />
+              // TODO:-I18N Research how to support dynamic variables in i18n
               {t(`${missionName}`)}
             </Tag>
           )

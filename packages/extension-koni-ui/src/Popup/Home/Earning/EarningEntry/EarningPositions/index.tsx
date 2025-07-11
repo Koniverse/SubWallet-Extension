@@ -19,6 +19,7 @@ import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsClockwise, FadersHorizontal, Plus, PlusCircle, Vault } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -148,21 +149,25 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         content:
           (<>
             <div className={CN(className, 'earning-alert-content')}>
-              <span>{t('ui.Earning.Entry.Positions.dualStakingWarning')}&nbsp;</span>
-              <span className={'__info-highlight'}>{t('ui.Earning.Entry.Positions.willNotBeSupported')}&nbsp;</span>
-              <span>{t(`in the upcoming ${originChain} runtime upgrade. Read more to learn about the upgrade, and`)}&nbsp;</span>
-              <a
-                href={'https://docs.subwallet.app/main/mobile-app-user-guide/manage-staking/unstake'}
-                rel='noreferrer'
-                style={{ textDecoration: 'underline' }}
-                target={'_blank'}
-              >{(`unstake your ${symbol}`)}
-              </a>&nbsp;
-              <span>{t('ui.Earning.Entry.Positions.fromOneMethodToAvoidIssues')}</span>
+              <Trans
+                components={{
+                  openlink: (
+                    <a
+                      href='https://docs.subwallet.app/main/mobile-app-user-guide/manage-staking/unstake'
+                      rel='noopener noreferrer'
+                      style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                      target='_blank'
+                    ></a>
+                  ),
+                  highlight: <span className='__info-highlight' />
+                }}
+                i18nKey={t('You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.')}
+                values={{ originChain, symbol }}
+              />
             </div>
 
           </>),
-        title: t(`Unstake your ${symbol} now!`),
+        title: t('Unstake your {{tokenSymbol}} now!', { replace: { tokenSymbol: symbol } }),
         okButton: {
           text: t('ui.Earning.Entry.Positions.readUpdate'),
           onClick: () => {

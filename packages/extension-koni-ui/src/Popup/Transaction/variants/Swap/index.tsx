@@ -668,7 +668,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         title: isHighPriceImpact ? t('ui.Transaction.Swap.highPriceImpact') : t('ui.Transaction.Swap.payAttentionExclamation'),
         type: NotificationType.WARNING,
         content: isHighPriceImpact && metadata.priceImpact
-          ? t(`Swapping this amount will result in a -${metadata.priceImpact}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk`)
+          ? t('Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk', { replace: { priceImpact: metadata.priceImpact } })
           : t('ui.Transaction.Swap.lowLiquidityWarning'),
         okButton: {
           text: t('ui.Transaction.Swap.continue'),

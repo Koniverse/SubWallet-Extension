@@ -592,7 +592,7 @@ const Component = () => {
         content:
           (<>
             <div className={'earning-alert-content'}>
-              {t(`You're currently staking ${symbol} via direct nomination. Due to ${originChain}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)`)}
+              {t("You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)", { replace: { symbol: symbol, originChain: originChain } })}
             </div>
           </>),
         title: t('ui.Transaction.Earn.continueStaking'),
@@ -1066,8 +1066,8 @@ const Component = () => {
             title: t('ui.Transaction.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
-              ? t(`${poolChainName} network or ${altChainName} network has lost connection. Re-enable the network and try again`)
-              : t(`${poolChainName} network has lost connection. Re-enable the network and try again`),
+              ? t('{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again', { replace: { poolChainName: poolChainName, altChainName: altChainName } })
+              : t('{{poolChainName}} network has lost connection. Re-enable the network and try again', { replace: { poolChainName: poolChainName } }),
             okButton: {
               text: t('ui.Transaction.Earn.iUnderstand'),
               onClick: closeAlert,
