@@ -7,23 +7,21 @@ import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_EARNING_REWARD_HISTOR
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { _getChainSubstrateTokenSymbol, _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, NATIVE_STAKING_IDENTITY_UPDATE_SLUGS, STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
 import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
-import { EarningImpactResult } from './handlers/native-staking/dtao';
-import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, EnergyNativeStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
+import { EarningSlippageResult } from './handlers/native-staking/dtao';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
-type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
-
-export const fetchPoolsData = async () => {
+const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
 
   return fetchData.data;
@@ -38,7 +36,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
   private earningRewardSubject: BehaviorSubject<EarningRewardJson> = new BehaviorSubject<EarningRewardJson>({ ready: false, data: {} });
   private earningRewardHistorySubject: BehaviorSubject<Record<string, EarningRewardHistoryItem>> = new BehaviorSubject<Record<string, EarningRewardHistoryItem>>({});
   private minAmountPercentSubject: BehaviorSubject<Record<string, number>> = new BehaviorSubject<Record<string, number>>({});
-  private poolTargetsFetchingCached: BehaviorSubject<PoolTargetsFetchingCached> = new BehaviorSubject<PoolTargetsFetchingCached>({});
+  private poolTargetsFetchingCached: Record<string, { poolTargets: Record<string, YieldPoolTarget>, lastUpdated: number }> = {};
 
   // earning
   public readonly yieldPoolInfoSubject = new BehaviorSubject<Record<string, YieldPoolInfo>>({});
@@ -48,8 +46,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
   private dbService: DatabaseService;
   private eventService: EventService;
   private useOnlineCacheOnly = true;
-  private validatorInfoCachingInterval: NodeJS.Timeout | undefined;
   private inactivePoolReady: PromiseHandler<void> = createPromiseHandler();
+  private isCaching = false;
 
   constructor (state: KoniState) {
     this.state = state;
@@ -118,10 +116,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
       if (_STAKING_CHAIN_GROUP.mythos.includes(chain)) {
         handlers.push(new MythosNativeStakingPoolHandler(this.state, chain));
-      }
-
-      if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
-        handlers.push(new EnergyNativeStakingPoolHandler(this.state, chain));
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {
@@ -196,34 +190,36 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.loadData();
 
     // Pin list with value from map
-    combineLatest({
-      poolTarget: this.poolTargetsFetchingCached,
-      yieldPositionInfo: this.yieldPositionSubject
-    }).subscribe({
-      next: ({ poolTarget, yieldPositionInfo }) => {
+    this.yieldPositionSubject.subscribe({
+      next: (data) => {
         const activeMap = this.state.getActiveChainInfoMap();
-        const activePositions = Object.values(yieldPositionInfo).filter((item) => {
+        const activePositions = Object.values(data).filter((item) => {
           return !!activeMap[item.chain] && !this.inactivePoolSlug.has(item.slug);
         });
 
         if (this.useOnlineCacheOnly) {
           activePositions.forEach((item) => {
-            const handler = this.getPoolHandler(item.slug);
-
             if (
-              handler?.canOverrideIdentity
+              NATIVE_STAKING_IDENTITY_UPDATE_SLUGS.includes(item.slug) &&
+              !activeMap[STAKING_IDENTITY_API_SLUG[item.chain]]
             ) {
-              const hasValidatorIdentity = item.nominations.some((validator) => !!validator.validatorIdentity);
+              const cachedData = this.poolTargetsFetchingCached[item.slug];
+              const validatorTargetList = cachedData?.poolTargets as Record<string, ValidatorInfo>;
 
-              if (!hasValidatorIdentity) {
-                const validatorTargetRecord = poolTarget[item.slug] as Record<string, ValidatorInfo>;
+              if (cachedData?.lastUpdated && cachedData.lastUpdated <= Date.now() - CRON_REFRESH_EARNING_TARGETS && !this.isCaching) {
+                this.isCaching = true;
+                this.getPoolTargetsCached(item.slug)
+                  .catch(console.error)
+                  .finally(() => {
+                    this.isCaching = false;
+                  });
+              }
 
-                if (validatorTargetRecord && Object.keys(validatorTargetRecord).length) {
-                  item.nominations = item.nominations.map((validator) => ({
-                    ...validator,
-                    validatorIdentity: validatorTargetRecord[validator.validatorAddress]?.identity || validator.validatorIdentity
-                  }));
-                }
+              if (validatorTargetList && Object.keys(validatorTargetList).length) {
+                item.nominations = item.nominations.map((validator) => ({
+                  ...validator,
+                  validatorIdentity: validatorTargetList[validator.validatorAddress]?.identity || validator.validatorIdentity
+                }));
               }
             }
           });
@@ -238,6 +234,21 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.start();
 
     this.handleActions();
+
+    // cache identities of validators in native staking
+    if (this.useOnlineCacheOnly && !this.isCaching) {
+      this.isCaching = true;
+
+      try {
+        await Promise.all(
+          NATIVE_STAKING_IDENTITY_UPDATE_SLUGS.map(this.getPoolTargetsCached.bind(this))
+        );
+      } catch (e) {
+        console.error('Error fetching validator identities:', e);
+      }
+
+      this.isCaching = false;
+    }
   }
 
   private delayReloadTimeout: NodeJS.Timeout | undefined;
@@ -338,11 +349,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
     // Start subscribe pools' reward history
     this.runSubscribeEarningRewardHistoryInterval();
 
-    // cache identities of validators in native staking
-    if (this.useOnlineCacheOnly && !this.validatorInfoCachingInterval) {
-      this.runIntervalGetPoolTargets().catch(console.error);
-    }
-
     // Update promise handler
     this.startPromiseHandler.resolve();
     this.stopPromiseHandler = createPromiseHandler();
@@ -374,12 +380,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     // Stop subscribe pools' reward history
     this.runUnsubscribeEarningRewardHistoryInterval();
-
-    // clear interval cache identities of validators in native staking
-    if (this.useOnlineCacheOnly && this.validatorInfoCachingInterval) {
-      clearInterval(this.validatorInfoCachingInterval);
-      this.validatorInfoCachingInterval = undefined;
-    }
 
     // Update promise handler
     this.stopPromiseHandler.resolve();
@@ -446,11 +446,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     for (const handler of Object.values(this.handlers)) {
       // Force subscribe onchain data
-      const forceSubscribe =
-      handler.type === YieldPoolType.LIQUID_STAKING ||
-      handler.type === YieldPoolType.LENDING ||
-      // Skip subscribing for subnet staking handlers because subnet staking slugs are not included in the online cache (only slugs with netuid are cached)
-      (!onlineData[handler.slug] && handler.type !== YieldPoolType.SUBNET_STAKING);
+      const forceSubscribe = handler.type === YieldPoolType.LIQUID_STAKING || handler.type === YieldPoolType.LENDING || !onlineData[handler.slug];
 
       if (!this.useOnlineCacheOnly || forceSubscribe) {
         handler.subscribePoolInfo(callback)
@@ -535,17 +531,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
 
     Object.values(onlineData).forEach((item) => {
-      const handler = this.getPoolHandler(item.slug);
-
-      if (!handler) {
-        return;
-      }
-
-      const updatedItem = structuredClone(item);
-
-      updatedItem.metadata.availableMethod = handler.availableMethod;
-
-      this.updateYieldPoolInfo(updatedItem);
+      this.updateYieldPoolInfo(item);
     });
 
     return onlineData;
@@ -973,86 +959,36 @@ export default class EarningService implements StoppableServiceInterface, Persis
       targets = await fetchStaticCache(`earning/targets/${slug}.json`, []);
     }
 
+    if (targets.length) {
+      this.poolTargetsFetchingCached[slug] = {
+        poolTargets: targets.reduce<Record<string, YieldPoolTarget>>((record, target) => ({
+          ...record,
+          [target.address]: target
+        }), {}),
+        lastUpdated: Date.now()
+      };
+    }
+
     const handler = this.getPoolHandler(slug);
 
     if (!targets.length && handler) {
       await this.eventService.waitChainReady;
-
-      const isSubnet = slug.match(/subnet_(\d+)/);
-
-      if (isSubnet) {
-        const subnet = Number(isSubnet[1]);
-
-        targets = await handler.getPoolTargets(subnet);
-      } else {
-        targets = await handler.getPoolTargets();
-      }
+      targets = await handler.getPoolTargets();
     }
 
     return targets;
   }
 
-  public async getPoolTargetsToCached (slug: string): Promise<Record<string, YieldPoolTarget>> {
-    try {
-      const poolTargets = await this.getPoolTargets(slug);
+  public async getPoolTargetsCached (slug: string): Promise<Record<string, YieldPoolTarget>> {
+    const cachedData = this.poolTargetsFetchingCached[slug];
 
-      if (poolTargets.length) {
-        const newData = poolTargets.reduce<Record<string, YieldPoolTarget>>((record, target) => {
-          record[target.address] = target;
+    if (!cachedData || cachedData.lastUpdated <= Date.now() - CRON_REFRESH_EARNING_TARGETS) {
+      await this.getPoolTargets(slug);
 
-          return record;
-        }, {});
-
-        return { ...newData };
-      }
-    } catch (e) {
-      console.error(e);
+      return this.poolTargetsFetchingCached[slug]?.poolTargets || {};
     }
 
-    const prevValueCached = this.poolTargetsFetchingCached.getValue();
-
-    return { ...prevValueCached[slug] };
-  }
-
-  private async runIntervalGetPoolTargets (): Promise<void> {
-    let poolInfosSubjectValue = { ...this.yieldPoolInfoSubject.getValue() };
-
-    if (!Object.keys(poolInfosSubjectValue).length) {
-      try {
-        poolInfosSubjectValue = await fetchPoolsData();
-      } catch (e) {
-        console.log('Error fetching pools data:', e);
-      }
-    }
-
-    const poolNeedUpdateIdentityValidators = Object.values(poolInfosSubjectValue)
-      .reduce<string[]>((list, pool) => {
-      if (pool.type === YieldPoolType.NATIVE_STAKING && STAKING_IDENTITY_API_SLUG[pool.chain]) {
-        list.push(pool.slug);
-      }
-
-      return list;
-    }, []);
-
-    const updatePoolTarget = () => {
-      Promise.all(poolNeedUpdateIdentityValidators.map((slug) =>
-        this.getPoolTargetsToCached(slug)
-      )).then((data) => {
-        const poolTargetsFetchingCached = this.poolTargetsFetchingCached.getValue();
-
-        data.forEach((targets, index) => {
-          const slug = poolNeedUpdateIdentityValidators[index];
-
-          poolTargetsFetchingCached[slug] = targets;
-        });
-
-        this.poolTargetsFetchingCached.next(poolTargetsFetchingCached);
-      }).catch(console.error);
-    };
-
-    updatePoolTarget();
-
-    this.validatorInfoCachingInterval = setInterval(updatePoolTarget, CRON_REFRESH_EARNING_TARGETS);
+    return cachedData.poolTargets;
   }
 
   /* Get pool's targets */
@@ -1191,28 +1127,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
   }
 
-  public async yieldGetEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
+  public async yieldGetEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
     await this.eventService.waitChainReady;
 
     const { slug } = params;
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.getEarningImpact(params);
-    } else {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
-    }
-  }
-
-  public async handleYieldChangeValidator (params: SubmitChangeValidatorStaking): Promise<TransactionData> {
-    await this.eventService.waitChainReady;
-
-    const { slug } = params;
-
-    const handler = this.getPoolHandler(slug);
-
-    if (handler) {
-      return handler.handleChangeEarningValidator(params);
+      return handler.getEarningSlippage(params);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
