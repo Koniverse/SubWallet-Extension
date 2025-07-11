@@ -84,8 +84,7 @@ const Component = (props: Props) => {
       return items
         .filter((item) => addresses.includes(item.address.trim()))
         .map((item) => ({
-          ...item,
-          hasFullInfo: true
+          ...item
         }));
     }
 
