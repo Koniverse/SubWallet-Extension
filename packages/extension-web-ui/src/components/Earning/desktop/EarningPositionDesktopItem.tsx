@@ -4,6 +4,7 @@
 import { getYieldAvailableActionsByPosition, getYieldAvailableActionsByType, YieldAction } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-web-ui/components';
 import EarningTypeTag from '@subwallet/extension-web-ui/components/Earning/EarningTypeTag';
 import NetworkTag from '@subwallet/extension-web-ui/components/NetworkTag';
@@ -134,6 +135,11 @@ const Component: React.FC<Props> = (props: Props) => {
         return;
       }
 
+      // TODO: May need to rewrite logic of getYieldAvailableActionsByPosition, then this condition can be removed
+      if (item === YieldAction.CANCEL_UNSTAKE && !poolInfo.metadata.availableMethod.cancelUnstake) {
+        return;
+      }
+
       const temp: ButtonOptionProps = {
         disable: !availableActionsByMetadata.includes(item),
         key: item,
@@ -188,20 +194,38 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     return result;
-  }, [actionListByChain, availableActionsByMetadata, isChainUnsupported, onClickButton, onClickCancelUnStakeButton, onClickClaimButton, onClickStakeButton, onClickUnStakeButton, onClickWithdrawButton, poolInfo.type, t]);
+  }, [actionListByChain, availableActionsByMetadata, isChainUnsupported, onClickButton, onClickCancelUnStakeButton, onClickClaimButton, onClickStakeButton, onClickUnStakeButton, onClickWithdrawButton, poolInfo.metadata.availableMethod.cancelUnstake, poolInfo.type, t]);
+
+  const shortName = useMemo(() => {
+    return positionInfo.subnetData?.subnetShortName || poolInfo.metadata.shortName;
+  }, [poolInfo.metadata.shortName, positionInfo.subnetData?.subnetShortName]);
+
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
+  const subnetLogoNetwork = `subnet-${poolInfo.metadata.subnetData?.netuid || 0}`;
 
   return (
     <div
       className={CN(className)}
       onClick={onClickItem}
     >
-      <Logo
-        className='__item-logo'
-        isShowSubLogo={true}
-        size={64}
-        subNetwork={poolInfo.metadata.logo || poolInfo.chain}
-        token={positionInfo.balanceToken.toLowerCase()}
-      />
+      {!isSubnetStaking || !DefaultLogosMap[subnetLogoNetwork]
+        ? (
+          <Logo
+            className='__item-logo'
+            isShowSubLogo={true}
+            size={64}
+            subNetwork={poolInfo.metadata.logo || poolInfo.chain}
+            token={positionInfo.balanceToken.toLowerCase()}
+          />
+        )
+        : (
+          <Logo
+            className='__item-logo'
+            isShowSubLogo={false}
+            network={subnetLogoNetwork}
+            size={64}
+          />
+        )}
 
       <div className='__item-lines-container'>
         <div className='__item-line-1 __item-line-common'>
@@ -210,7 +234,7 @@ const Component: React.FC<Props> = (props: Props) => {
               <span>{positionInfo.asset.symbol}</span>
               <span className={'__item-token-name'}>
               &nbsp;(
-                <span className={'__name'}>{poolInfo.metadata.shortName}</span>
+                <span className={'__name'}>{shortName}</span>
               )
               </span>
             </div>

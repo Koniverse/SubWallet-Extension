@@ -1,5 +1,278 @@
 # CHANGELOG
 
+## 1.3.41
+Build date: Jun 11, 2025.
+
+Features & Update:
+- Support Asset Hub Testnet swap for Chainflip (#4265)
+- Exposed API Key in SubWallet Chrome Extension
+- Moving BlockFrost interaction Logic to the Backend (#4368)
+- Update UI Connect dApp screen (#4377)
+
+Bug fixed:
+- Fixed bug show Moonbeam local token balance (#4413)
+- Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416)
+- Fixed bug Error page when use marketing campaign (#4403)
+- Fixed bug navigating actions in Earning feature (#4441)
+
+
+## 1.3.40
+Build date: May 30, 2025.
+
+Features & Update:
+- Update chain-list stable v0.2.105 (#4273),
+- Update SimpleSwap API
+- Update Paraspell's fee calculation API (#4314),
+
+Bug fixed:
+- Fixed bug Wrong Price Impact When Swapping on PAH (#4241)
+
+
+## 1.3.39
+Build date: May 26, 2025.
+
+Bug fixed:
+- Fix bug error page when connect with dApp (#4401)
+
+
+## 1.3.38
+Build date: May 23, 2025.
+
+Features & Update:
+- Support Bridge-Swap process for cross-chain swap on EVM (#4321)
+- Update UI to clearly display fees (#4347)
+
+Bug fixed:
+- Fixed bug related to feedback from Cardano Foundation (#4352)
+
+
+## 1.3.37
+Build date: May 23, 2025.
+
+Features & Update:
+- Update fee for UniSwap (#4385)
+- Update Wallet Connector Libraries (#4353)
+- Turn off the update manifest v3 popup (#4023)
+
+Bug fixed:
+- Fixed bug when connects to Remix (#4330)
+
+
+## 1.3.36
+Build date: May 16, 2025.
+
+Features & Update:
+- Support KyberSwap Aggregator (#4144)
+- Support UniswapX Dutch Swap (#4293)
+- Review Uniswap fee (#4088)
+
+
+## 1.3.35
+Build date: May 09, 2025.
+
+Features & Update:
+- Refactor Across bridge (#4282)
+- Review extrinsic status subscription (#4240)
+- Update content in-app for swap (#4259)
+
+Bug fixed:
+- Fixed bug Cannot sign transaction when chain connection not be initialized (#4300)
+- Fixed bug connecting to Aleph Zero EVM dapp (#4320)
+- Fixed bug related to price chart for derivation token (#4332, #4344)
+
+
+## 1.3.34
+Build date: May 05, 2025.
+
+Features & Update:
+- Support extension side panel (#4091)
+- Update padding for the time frame selector for price chart
+
+
+## 1.3.33
+Build date: Apr 30, 2025.
+
+Features & Update:
+- Support price chart (#4122, #4266)
+- Update link for "Contact support" (#4324)
+
+
+## 1.3.32
+Build date: Apr 26, 2025.
+
+Features & Update:
+- Support CIP-30 on Cardano (#4100)
+- Support swap-bridge for EVM chains (#4220)
+- Swap support and direct cross-chain swap on more EVM chains (#4219)
+- Change TAO's position in Earning options (#4290)
+- Update features related to middleware services (#4312)
+- Update chain-list
+
+Bug fixed:
+- Fixed bug when stake for subnet (#4287)
+
+
+## 1.3.31
+Build date: Apr 18, 2025.
+
+Features & Update:
+- Improve token enabling (#3960)
+- Update XCM feature:
+  - Estimate delivery fee when XCM (#4133)
+  - Dry run XCM (#4134)
+  - Improve validate recipient when make XCM transfer (#4233)
+- Support Across bridge (#3918, #4299)
+- Update chain-list stable v0.2.103 (#4163)
+- Support GIGADOT token for Hydration (#4283)
+
+
+Bug fixed:
+- Fixed XCM bugs:
+  - Fixed bug XCM USDT: PAH -> ASTR (#3606)
+  - Fixed bug XCM for Acala (#3725)
+  - Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903)
+
+## 1.3.30
+Build date: Apr 14, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain Round 2 (#4114):
+  - Improve swap feature (#4069)
+  - Improve Select provider in Swap feature (#3933)
+  - Optimize swap pair selection (#3902)
+  - Update New UI for Swap quote (#4204)
+  - Recheck swap quote with asset hub (#4113)
+- Support custom slippage for TAO subnet staking (#4145)
+- Add APY information for TAO and dTao staking (#4217)
+
+
+Bug fixed:
+- Fixed enforcing the minimum miner tip 1 wei (#2393)
+- Fixed UX for swap cross-chain Round 2 (#4114)
+  - Error when swap on hydration (#3993)
+  - Fixed bug Cannot read properties of undefined (reading 'destinationTokenInfo') when open the old Notification details (#4195)
+  - Fixed bug Error page when perform sign permit from Uniswap (#4248)
+
+
+## 1.3.29
+Build date: Apr 08, 2025.
+
+Features & Update:
+- Support auto detect balance for EVM (#2836)
+- Sort token by balance (#2339)
+- Update for Meld on-ramp (#4198)
+- Add validate sufficient token for XCM transfer (#3895)
+
+Bug fixed:
+- Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
+
+
+## 1.3.28
+Build date: Apr 02, 2025.
+
+Features & Update:
+- Show value of derivative token relative to the origin tokens (#4081)
+- Add dTAO token (#4151)
+- Display dTAO balance like another token (#4150)
+
+Bug fixed:
+- Fixed bug related to subnet staking feature (#4140)
+- Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
+
+## 1.3.27
+Build date: Mar 29, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain round 1 (#4090)
+- Update chainlist stable version 0.2.102 (#4058)
+- Update API key for blockfrost on Cardano (#4164)
+
+Bug fixed:
+- Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
+
+
+## 1.3.26
+Build date: Mar 27, 2025.
+
+Bug fixed:
+- Fixed bug show balance for Polimec (#4058)
+- Fixed bug View explorer for Bittensor (#4058)
+
+
+## 1.3.25
+Build date: Mar 24, 2025.
+
+Features & Update:
+- Support dTAO staking (#4036)
+- Integrate Meld All in One Wizard (#4085)
+
+Bug fixed:
+- Fixed bug integrating Wagmi into SubWallet (#4086)
+
+
+## 1.3.24
+Build date: Mar 18, 2025.
+
+Features & Update:
+- Auto update metadata for substrate chain (#4037)
+- Allow customizing fee for substrate/evm transactions (#3658)
+- Support custom fee token when sending token on Hydration (#4045)
+
+Bug fixed:
+- Fixed bug Can't reset data when search on select token popup (#3786)
+
+
+## 1.3.23
+Build date: Mar 05, 2025.
+
+Features & Update:
+- Support Uniswap (#3977)
+- Support Cardano (#3816, #3924, #3925, #3942)
+- Support Migrate account feature (#3926, #4016)
+- Unified address format integration (#3864)
+
+Bug fixed:
+- Fix Bug when unstaking vDOT, vMANTA (#4054)
+
+## 1.3.22
+Build date: Mar 04, 2025.
+
+Features & Update:
+- Support staking for Mythos (#3984)
+
+
+## 1.3.21
+Build date: Feb 28, 2025.
+
+Features & Update:
+- Allow signing once for multiple transactions (#3901)
+- Update chain-list stable v0.2.99 (#4007)
+
+
+## 1.3.20
+Build date: Feb 24, 2025.
+
+Features & Update:
+- Support transferring VARCH on InvArch Network
+
+Bug fixed:
+- Fixed bug Unable to estimate fee when signing for dApp (#4050)
+
+
+## 1.3.19
+Build date: Feb 21, 2025.
+
+Bug fixed:
+- Fixed bug related to custom token to paid fee
+
+
+## 1.3.18
+Build date: Feb 20, 2025.
+
+Features & Update:
+- Support paying fee with non-native tokens on Asset Hub (#3590)
+
+
 ## 1.3.17
 Build date: Feb 18, 2025.
 

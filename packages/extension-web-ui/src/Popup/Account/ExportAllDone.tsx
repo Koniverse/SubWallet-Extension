@@ -44,6 +44,7 @@ const Component: React.FC<Props> = (props: Props) => {
           icon: FinishIcon,
           onClick: goHome
         }}
+        showSubHeader={!isWebUI}
         subHeaderIcons={[
           {
             icon: <CloseIcon />,

@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SubnetYieldPositionInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { Avatar, BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { EARNING_NOMINATION_MODAL } from '@subwallet/extension-web-ui/constants';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -23,6 +23,7 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
   const { t } = useTranslation();
 
   const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(item?.chain || ''), [item?.chain]);
+  const symbol = (item as SubnetYieldPositionInfo)?.subnetData?.subnetSymbol || inputAsset?.symbol || '';
 
   return (
     <BaseModal
@@ -58,7 +59,7 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
                       </div>
                     </>
                   )}
-                  suffix={inputAsset?.symbol}
+                  suffix={symbol}
                   value={nomination.activeStake}
                   valueColorSchema='even-odd'
                 />

@@ -26,3 +26,4 @@ export * from './service-base';
 export * from './swap';
 export * from './transaction';
 export * from './yield';
+export * from './setting';

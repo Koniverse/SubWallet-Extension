@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { CurrentAccountInfo } from '@subwallet/extension-base/types';
 
 export interface EventRegistry {
@@ -37,13 +37,13 @@ export interface EventRegistry {
   'asset.online.ready': [boolean]; // Update latest asset done
   'asset.updateState': [string]; // token slug
 
-  'transaction.done': [SWTransaction];
-  'transaction.failed': [SWTransaction | undefined];
-  'transaction.timeout': [SWTransaction | undefined];
+  'transaction.done': [SWTransactionBase];
+  'transaction.failed': [SWTransactionBase | undefined];
+  'transaction.timeout': [SWTransactionBase | undefined];
   'transaction.submitStaking': [string];
-  'transaction.transferNft': [SWTransaction | undefined];
+  'transaction.transferNft': [SWTransactionBase | undefined];
   'mantaPay.initSync': [string | undefined]; // zkAddress
-  'mantaPay.submitTransaction': [SWTransaction | undefined];
+  'mantaPay.submitTransaction': [SWTransactionBase | undefined];
   'mantaPay.enable': [string];
 
   'migration.done': [boolean];

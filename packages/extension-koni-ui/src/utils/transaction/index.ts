@@ -5,3 +5,4 @@ export * from './detectType';
 export * from './persist';
 export * from './stake';
 export * from './formValue';
+export * from './statusStep';

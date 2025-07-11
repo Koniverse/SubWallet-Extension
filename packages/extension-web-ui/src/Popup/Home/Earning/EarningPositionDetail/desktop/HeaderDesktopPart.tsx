@@ -27,6 +27,8 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
   const { t } = useTranslation();
   const { currencyData } = useSelector((state: RootState) => state.price);
 
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+
   const totalApy = useMemo((): number | undefined => {
     return (
       poolInfo.statistic?.totalApy ||
@@ -50,9 +52,19 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
 
       return (
         <div className={'__unstaking-period-value-wrapper'}>
+
+          {
+            isSubnetStaking && (
+              <div className={'__unstaking-period-value-prefix'}>
+                {t('Up to')}
+              </div>
+            )
+          }
+
           <div className={'__unstaking-period-value'}>
             {days < 1 ? unstakePeriod : days}
           </div>
+
           <div className={'__unstaking-period-value-suffix'}>
             {days < 1 ? t('hours') : t('days')}
           </div>
@@ -65,7 +77,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
         </div>
       );
     }
-  }, [t, unstakePeriod]);
+  }, [isSubnetStaking, t, unstakePeriod]);
 
   return (
     <div className={CN(className, '__header-desktop-part-container')}>
@@ -220,11 +232,15 @@ const HeaderDesktopPart = styled(Component)<Props>(({ theme: { token } }: Props)
     color: token.colorWhite
   },
 
-  '.__unstaking-period-value-suffix': {
+  '.__unstaking-period-value-prefix, .__unstaking-period-value-suffix': {
     fontSize: token.fontSizeHeading3,
     lineHeight: token.lineHeightHeading3,
     color: token.colorTextLight4,
     fontWeight: token.fontWeightStrong
+  },
+
+  '.__unstaking-period-value-prefix': {
+    paddingRight: token.paddingXXS
   },
 
   '.__block-divider': {

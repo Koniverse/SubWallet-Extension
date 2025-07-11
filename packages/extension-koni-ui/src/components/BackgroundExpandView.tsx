@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useIsPopup } from '@subwallet/extension-koni-ui/hooks';
+import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA, openInNewTab } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
@@ -24,7 +24,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const location = useLocation();
 
-  const isPopup = useIsPopup();
+  const { isExpanseMode } = useExtensionDisplayModes();
 
   const isShowFooter = useMemo(() => {
     const pathName = location.pathname;
@@ -38,7 +38,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return ['/create-done'].includes(pathName);
   }, [location.pathname]);
 
-  if (isPopup) {
+  if (!isExpanseMode) {
     return null;
   }
 
@@ -84,7 +84,7 @@ const BackgroundExpandView = styled(Component)<Props>(({ theme: { token } }: Pro
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: -1,
+    zIndex: 0,
 
     '.expand-view-header': {
       height: 331,
@@ -121,7 +121,7 @@ const BackgroundExpandView = styled(Component)<Props>(({ theme: { token } }: Pro
       left: '0',
       zIndex: -1,
 
-      '@media (max-height: 864px)': { // 600 + 2 * (52 + 40 * 2)
+      '@media (max-height: 950px)': {
         display: 'none'
       }
     }
