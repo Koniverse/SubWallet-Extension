@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { Number, SwNumberProps } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -23,7 +24,8 @@ export interface NumberInfoItem extends Omit<InfoItemBase, 'valueColorSchema'> {
   suffixNode?: React.ReactNode;
   decimalOpacity?: number,
   size?: number,
-  subFloatNumber?: boolean
+  subFloatNumber?: boolean,
+  useNumberDisplay?: boolean
 }
 
 const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
@@ -41,8 +43,11 @@ const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
     subFloatNumber,
     suffix,
     suffixNode,
+    useNumberDisplay,
     value,
     valueColorSchema = 'default' } = props;
+
+  const NumberComponent = useNumberDisplay ? NumberDisplay : Number;
 
   return (
     <div className={CN(className, '__row -type-number')}>
@@ -66,7 +71,7 @@ const Component: React.FC<NumberInfoItem> = (props: NumberInfoItem) => {
           )}
           onClick={!disableClickValue ? onClickValue : undefined}
         >
-          <Number
+          <NumberComponent
             className={`__number-item __value -schema-${valueColorSchema}`}
             customFormatter={customFormatter}
             decimal={decimals}

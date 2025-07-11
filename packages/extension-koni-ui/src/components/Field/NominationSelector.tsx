@@ -3,6 +3,7 @@
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { YieldPoolInfo } from '@subwallet/extension-base/types';
 import { StakingNominationItem } from '@subwallet/extension-koni-ui/components';
 import { Avatar } from '@subwallet/extension-koni-ui/components/Avatar';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -21,21 +22,15 @@ import { GeneralEmptyList } from '../EmptyList';
 interface Props extends ThemeProps, BasicInputWrapper {
   nominators: NominationInfo[];
   chain: string,
-  networkPrefix?: number
+  poolInfo: YieldPoolInfo
+  networkPrefix?: number;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
-const renderItem = (item: NominationInfo, isSelected: boolean) => (
-  <StakingNominationItem
-    isSelected={isSelected}
-    nominationInfo={item}
-  />
-);
-
 // todo: update filter for this component, after updating filter for SelectModal
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, networkPrefix, nominators, placeholder, statusHelp, value } = props;
+  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, networkPrefix, nominators, placeholder, poolInfo, statusHelp, value } = props;
 
   const filteredItems = useMemo(() => {
     return nominators.filter((item) => new BigN(item.activeStake).gt(0));
@@ -66,6 +61,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       );
     },
     []
+  );
+
+  const renderItem = useCallback(
+    (item: NominationInfo, isSelected: boolean) => {
+      return (
+        <StakingNominationItem
+          isSelected={isSelected}
+          nominationInfo={item}
+          poolInfo={poolInfo}
+        />
+      );
+    },
+    [poolInfo]
   );
 
   const handleValidatorLabel = useMemo(() => {

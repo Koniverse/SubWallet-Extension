@@ -5,16 +5,16 @@ import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EDIT_AUTO_LOCK_TIME_MODAL, EDIT_UNLOCK_TYPE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-koni-ui/constants/router';
-import useIsPopup from '@subwallet/extension-koni-ui/hooks/dom/useIsPopup';
+import { useExtensionDisplayModes, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
-import { saveAutoLockTime, saveCameraSetting, saveEnableChainPatrol, saveUnlockType, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { saveAllowOneSign, saveAutoLockTime, saveCameraSetting, saveEnableChainPatrol, saveUnlockType, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { isNoAccount } from '@subwallet/extension-koni-ui/utils/account/account';
 import { BackgroundIcon, Icon, ModalContext, SettingItem, Switch, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Camera, CaretRight, CheckCircle, Key, LockKeyOpen, LockLaminated, ShieldStar } from 'phosphor-react';
+import { Camera, CaretRight, CheckCircle, Key, LockKeyOpen, LockLaminated, PenNib, ShieldStar } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -29,7 +29,8 @@ enum SecurityType {
   CAMERA_ACCESS = 'camera-access',
   AUTO_LOCK = 'auto-lock',
   UNLOCK_TYPE = 'unlock-type',
-  CHAIN_PATROL_SERVICE = 'chain-patrol-service'
+  CHAIN_PATROL_SERVICE = 'chain-patrol-service',
+  SIGN_ONCE = 'sign-once'
 }
 
 interface SecurityItem {
@@ -58,12 +59,13 @@ const Component: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const canGoBack = !!location.state;
-  const isPopup = useIsPopup();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const { accounts } = useSelector((state: RootState) => state.accountState);
-  const { camera, enableChainPatrol, timeAutoLock, unlockType } = useSelector((state: RootState) => state.settings);
+  const { allowOneSign, camera, enableChainPatrol, timeAutoLock, unlockType } = useSelector((state: RootState) => state.settings);
 
   const noAccount = useMemo(() => isNoAccount(accounts), [accounts]);
 
@@ -112,6 +114,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const [loadingCamera, setLoadingCamera] = useState(false);
   const [loadingChainPatrol, setLoadingChainPatrol] = useState(false);
+  const [loadingSignOnce, setLoadingSignOnce] = useState(false);
 
   const onBack = useCallback(() => {
     if (canGoBack) {
@@ -132,7 +135,7 @@ const Component: React.FC<Props> = (props: Props) => {
       let openNewTab = false;
 
       if (!currentValue) {
-        if (isPopup) {
+        if (!isExpanseMode) {
           openNewTab = true;
         }
       }
@@ -144,6 +147,8 @@ const Component: React.FC<Props> = (props: Props) => {
               .catch((e: Error) => {
                 console.log(e);
               });
+
+            isSidePanelMode && closeSidePanel();
           }
         })
         .catch(console.error)
@@ -151,7 +156,19 @@ const Component: React.FC<Props> = (props: Props) => {
           setLoadingCamera(false);
         });
     };
-  }, [isPopup]);
+  }, [closeSidePanel, isExpanseMode, isSidePanelMode]);
+
+  const updateSignOneStatus = useCallback((currentValue: boolean) => {
+    return () => {
+      setLoadingSignOnce(true);
+
+      saveAllowOneSign(!currentValue)
+        .catch(console.error)
+        .finally(() => {
+          setLoadingSignOnce(false);
+        });
+    };
+  }, []);
 
   const updateChainPatrolEnable = useCallback((currentValue: boolean) => {
     return () => {
@@ -310,6 +327,32 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )}
             />
+            <div className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.SIGN_ONCE}`)}>
+              <div className='__item-left-part'>
+                <BackgroundIcon
+                  backgroundColor={'var(--icon-bg-color)'}
+                  phosphorIcon={PenNib}
+                  size='sm'
+                  type='phosphor'
+                  weight='fill'
+                />
+              </div>
+              <div className='__item-center-part'>
+                <div className='__item-title'>
+                  {t('Sign for multiple transactions')}
+                </div>
+                <div className='__item-description'>
+                  {t('Allow signing once for multiple transactions')}
+                </div>
+              </div>
+              <div className='__item-right-part'>
+                <Switch
+                  checked={allowOneSign}
+                  loading={loadingSignOnce}
+                  onClick={updateSignOneStatus(allowOneSign)}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <SwModal
@@ -455,7 +498,7 @@ const SecurityList = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
 
-    [`.security-type-${SecurityType.UNLOCK_TYPE}`]: {
+    [`.security-type-${SecurityType.UNLOCK_TYPE}, .security-type-${SecurityType.SIGN_ONCE}`]: {
       '--icon-bg-color': token['purple-8'],
 
       '&:hover': {
@@ -481,6 +524,41 @@ const SecurityList = styled(Component)<Props>(({ theme: { token } }: Props) => {
         '.ant-setting-item-content': {
           cursor: 'not-allowed'
         }
+      }
+    },
+
+    '.custom-security-item': {
+      display: 'flex',
+      gap: token.sizeSM,
+      alignItems: 'center',
+      padding: '10px 12px',
+      borderRadius: token.borderRadiusLG,
+      backgroundColor: token.colorBgSecondary,
+      cursor: 'pointer',
+
+      '.__item-left-part': {
+
+      },
+      '.__item-center-part': {
+
+      },
+      '.__item-right-part': {
+
+      },
+      '.__item-title': {
+        fontSize: token.fontSizeHeading5,
+        lineHeight: token.lineHeightHeading5,
+        fontWeight: token.headingFontWeight,
+        color: token.colorTextLight1
+      },
+      '.__item-description': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextLight3
+      },
+
+      '&:hover': {
+        backgroundColor: token.colorBgInput
       }
     },
 

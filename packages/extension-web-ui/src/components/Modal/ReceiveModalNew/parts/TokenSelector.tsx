@@ -7,13 +7,12 @@ import { BaseModal, TokenSelectorItem } from '@subwallet/extension-web-ui/compon
 import TokenEmptyList from '@subwallet/extension-web-ui/components/EmptyList/TokenEmptyList';
 import Search from '@subwallet/extension-web-ui/components/Search';
 import { RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-web-ui/constants';
-import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useIsModalInactive, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
-import { ModalContext, SwList } from '@subwallet/react-ui';
-import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { SwList } from '@subwallet/react-ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -29,11 +28,11 @@ const renderEmpty = () => <TokenEmptyList modalId={modalId} />;
 // todo : will move to Modal/Selector if is necessary
 function Component ({ className = '', items, onCancel, onSelectItem }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { checkActive } = useContext(ModalContext);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // @ts-ignore
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
+  const isModalInactive = useIsModalInactive(modalId);
 
   const listItems = useMemo(() => {
     const filteredList = items.filter((item) => {
@@ -65,10 +64,6 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
     return filteredList;
   }, [chainInfoMap, currentSearchText, items, priorityTokens]);
 
-  const isActive = checkActive(modalId);
-
-  const sectionRef = useRef<SwListSectionRef>(null);
-
   const handleSearch = useCallback((value: string) => {
     setCurrentSearchText(value);
   }, []);
@@ -94,12 +89,12 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
   }, [chainInfoMap, onSelect]);
 
   useEffect(() => {
-    if (!isActive) {
+    if (isModalInactive) {
       setTimeout(() => {
-        sectionRef.current?.setSearchValue('');
+        setCurrentSearchText('');
       }, 100);
     }
-  }, [isActive]);
+  }, [isModalInactive]);
 
   const onPressCancel = useCallback(() => {
     setCurrentSearchText('');

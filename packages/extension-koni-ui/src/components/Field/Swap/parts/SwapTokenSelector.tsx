@@ -1,15 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GeneralEmptyList, TokenItemType } from '@subwallet/extension-koni-ui/components';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { BackIcon, FilterModal, GeneralEmptyList, TokenSelectorItem } from '@subwallet/extension-koni-ui/components';
+import Search from '@subwallet/extension-koni-ui/components/Search';
+import { useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { Icon, Logo, SelectModal } from '@subwallet/react-ui';
-import TokenItem from '@subwallet/react-ui/es/web3-block/token-item';
-import { CheckCircle } from 'phosphor-react';
-import React, { useCallback } from 'react';
+import { Badge, Icon, Logo, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
+import CN from 'classnames';
+import { CaretDown, FadersHorizontal } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -24,6 +26,11 @@ type Props = ThemeProps & {
   value?: string;
 }
 
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
 const renderEmpty = () => <GeneralEmptyList />;
 
 const Component = (props: Props) => {
@@ -33,7 +40,108 @@ const Component = (props: Props) => {
   const { token } = useTheme() as Theme;
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const searchFunction = useCallback((item: TokenItemType, searchText: string) => {
+  const modalId = id;
+  const filterModalId = `${id}-filter-modal`;
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+
+  const [currentSearchText, setCurrentSearchText] = useState<string>('');
+  const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(filterModalId);
+
+  const handleSearch = useCallback((value: string) => {
+    setCurrentSearchText(value);
+  }, []);
+
+  const onOpenModal = useCallback(() => {
+    if (disabled) {
+      return;
+    }
+
+    activeModal(modalId);
+  }, [activeModal, disabled, modalId]);
+
+  const onCloseModal = useCallback(() => {
+    inactiveModal(modalId);
+    onResetFilter();
+    setCurrentSearchText('');
+  }, [inactiveModal, modalId, onResetFilter]);
+
+  const onClickItem = useCallback((item: TokenSelectorItemType) => {
+    return () => {
+      onSelect?.(item.slug);
+      onCloseModal();
+    };
+  }, [onCloseModal, onSelect]);
+
+  const renderItem = useCallback((item: TokenSelectorItemType) => {
+    return (
+      <TokenSelectorItem
+        balanceInfo={item.balanceInfo}
+        chainName={_getChainName(chainInfoMap[item.originChain])}
+        chainSlug={item.originChain}
+        className={CN('token-selector-item')}
+        isSelected={value === item.slug}
+        key={item.slug}
+        onClick={onClickItem(item)}
+        showBalance={true}
+        tokenSlug={item.slug}
+        tokenSymbol={item.symbol}
+      />
+    );
+  }, [chainInfoMap, onClickItem, value]);
+
+  const filterOptions: FilterOption[] = useMemo(() => {
+    const uniqueOriginChains = Array.from(new Set(items.map((item) => item.originChain)));
+
+    const result = uniqueOriginChains.map((originChain) => {
+      return {
+        label: _getChainName(chainInfoMap[originChain]),
+        value: originChain
+      };
+    });
+
+    result.sort((a, b) => {
+      const priority: Record<string, number> = {
+        polkadot: 0,
+        ethereum: 1
+      };
+
+      const aPriority = priority[a.value] ?? 2;
+      const bPriority = priority[b.value] ?? 2;
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority; // Sort by priority first
+      }
+
+      // If both have same priority (i.e., both are not polkadot/ethereum), sort by label
+      return a.label.localeCompare(b.label);
+    });
+
+    return result;
+  }, [chainInfoMap, items]);
+
+  const openFilter = useCallback(() => {
+    activeModal(filterModalId);
+  }, [activeModal, filterModalId]);
+
+  const applyFilter = useCallback(() => {
+    onApplyFilter();
+    activeModal(id);
+  }, [activeModal, id, onApplyFilter]);
+
+  const cancelFilter = useCallback(() => {
+    onCloseFilterModal();
+    activeModal(id);
+  }, [activeModal, id, onCloseFilterModal]);
+
+  const selectedItem = useMemo(() => {
+    if (!value) {
+      return undefined;
+    }
+
+    return items.find((i) => i.slug === value);
+  }, [items, value]);
+
+  const searchFunction = useCallback((item: TokenSelectorItemType, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
     const symbol = item.symbol.toLowerCase();
@@ -44,188 +152,237 @@ const Component = (props: Props) => {
     );
   }, [chainInfoMap]);
 
-  const renderTokenSelected = useCallback((item: TokenItemType) => {
-    return (
-      <div className={'__selected-item'}>
-        <Logo
-          className='token-logo'
-          isShowSubLogo={true}
-          shape='squircle'
-          size={token.sizeXL}
-          subNetwork={item.originChain}
-          token={item.slug.toLowerCase()}
-        />
-        <div className={'__item-token-info'}>
-          <span>{item.symbol}</span>
-          <span className={'__item-token-name'}>{chainInfoMap[item.originChain]?.name}</span>
-        </div>
-      </div>
-    );
-  }, [chainInfoMap, token.sizeXL]);
+  const filterFunction = useMemo<(item: TokenSelectorItemType) => boolean>(() => {
+    return (item) => {
+      if (!selectedFilters.length) {
+        return true;
+      }
 
-  const renderItem = useCallback((item: TokenItemType, selected: boolean) => {
-    return (
-      <TokenItem
-        className={'token-item'}
-        isShowSubLogo={true}
-        middleItem={(
-          <div className='token-info-container'>
-            <div className='token-info'>
-              <span>{item.symbol}</span>
-              {
-                item.name && (
-                  <span className='__token-name'>
-                    &nbsp;(
-                    <span className='name'>{item.name}</span>
-                    )
-                  </span>
-                )
-              }
-            </div>
-            <div className='token-original-chain'>
-              {chainInfoMap[item.originChain]?.name || item.originChain}
-            </div>
-          </div>
-        )}
-        name={item.symbol}
-        networkMainLogoShape='squircle'
-        networkMainLogoSize={40}
-        networkSubLogoShape='circle'
-        rightItem={
-          selected &&
-          (
-            <div className={'__check-icon'}>
+      for (const filter of selectedFilters) {
+        if (item.originChain === filter) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+  }, [selectedFilters]);
+
+  const hasAnyFilterValue = !!selectedFilters.length;
+
+  const listItems = useMemo(() => {
+    let result = items;
+
+    if (selectedItem) {
+      result = result.filter((i) => i.slug !== selectedItem.slug);
+
+      result.unshift(selectedItem);
+    }
+
+    const needToFilter = !!currentSearchText || hasAnyFilterValue;
+
+    if (needToFilter) {
+      result = result.filter((i) => {
+        return (!hasAnyFilterValue || filterFunction(i)) && (!currentSearchText || searchFunction(i, currentSearchText));
+      });
+    }
+
+    return result;
+  }, [items, selectedItem, currentSearchText, hasAnyFilterValue, filterFunction, searchFunction]);
+
+  const filterSearchBox = useMemo(() => {
+    return {
+      placeholder: t('Search network')
+    };
+  }, [t]);
+
+  return (
+    <>
+      <div
+        className={CN(className, '-modal-trigger', {
+          '-disabled': disabled
+        })}
+        onClick={onOpenModal}
+      >
+        <div className='__modal-trigger-content'>
+          {
+            !selectedItem
+              ? (
+                <div className={'__placeholder-text'}>
+                  {placeholder || t('Select token')}
+                </div>
+              )
+              : (
+                <div className={'__selected-item'}>
+                  <Logo
+                    className='__token-logo'
+                    isShowSubLogo={true}
+                    shape='squircle'
+                    size={token.sizeXL}
+                    subNetwork={selectedItem.originChain}
+                    token={selectedItem.slug.toLowerCase()}
+                  />
+                  <div className={'__item-token-info'}>
+                    <span className={'__item-token-symbol'}>{selectedItem.symbol}</span>
+                    <span className={'__item-token-name'}>{chainInfoMap[selectedItem.originChain]?.name}</span>
+                  </div>
+                </div>
+              )
+          }
+        </div>
+        <Icon
+          className={'__caret-icon'}
+          customSize={'16px'}
+          phosphorIcon={CaretDown}
+        />
+      </div>
+      <SwModal
+        className={CN(className, '-modal-container')}
+        destroyOnClose={true}
+        id={modalId}
+        onCancel={onCloseModal}
+        title={label || t('Select token')}
+      >
+        <Search
+          actionBtnIcon={(
+            <Badge
+              className={'g-filter-badge'}
+              dot={hasAnyFilterValue}
+            >
               <Icon
-                customSize={'20px'}
-                iconColor={token.colorSuccess}
-                phosphorIcon={CheckCircle}
+                phosphorIcon={FadersHorizontal}
+                size='sm'
                 type='phosphor'
                 weight='fill'
               />
-            </div>
-          )
-        }
-        subName=''
-        subNetworkKey={item.originChain}
-        symbol={item.slug.toLowerCase()}
-      />
-    );
-  }, [chainInfoMap, token.colorSuccess]);
+            </Badge>
+          )}
+          autoFocus={true}
+          className={'__search-box'}
+          onClickActionBtn={openFilter}
+          onSearch={handleSearch}
+          placeholder={t<string>('Enter token name or network name')}
+          searchValue={currentSearchText}
+          showActionBtn
+        />
+        <SwList
+          className={'__list-container'}
+          list={listItems}
+          renderItem={renderItem}
+          renderWhenEmpty={renderEmpty}
+          searchableMinCharactersCount={2}
+        />
+      </SwModal>
 
-  return (
-    <SelectModal
-      className={`${className} token-selector-modal`}
-      disabled={disabled}
-      id={id}
-      inputClassName={`${className} token-selector-input`}
-      itemKey={'slug'}
-      items={items}
-      label={label}
-      onSelect={onSelect}
-      placeholder={placeholder || t('Select token')}
-      renderItem={renderItem}
-      renderSelected={renderTokenSelected}
-      renderWhenEmpty={renderEmpty}
-      searchFunction={searchFunction}
-      searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter token name or network name')}
-      selected={value || ''}
-      title={label || placeholder || t('Select token')}
-    />
+      <FilterModal
+        closeIcon={<BackIcon />}
+        id={filterModalId}
+        onApplyFilter={applyFilter}
+        onCancel={cancelFilter}
+        onChangeOption={onChangeFilterOption}
+        optionSelectionMap={filterSelectionMap}
+        options={filterOptions}
+        searchBox={filterSearchBox}
+      />
+    </>
   );
 };
 
 const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    '&.ant-select-modal-input-container .ant-select-modal-input-wrapper': {
-      paddingLeft: 12,
-      paddingRight: 12
-    },
-
-    '&.chain-selector-input .__selected-item': {
-      color: token.colorText,
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-      textWrap: 'nowrap',
-      whiteSpace: 'nowrap'
-    },
-    '.__selected-item': {
-      display: 'flex',
-      gap: 8
-    },
-    '.__item-token-info': {
-      display: 'flex',
-      flexDirection: 'column',
-      color: token.colorWhite,
-      overflow: 'hidden'
-    },
-    '.__item-token-name': {
-      color: token.colorTextTertiary,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
-    },
-    '.__token-selector-wrapper .ant-select-modal-input-suffix': {
-      color: token.colorWhite
-    },
-
-    // TODO: delete this when fix component in ui-base
-    '.token-item .ant-network-item-sub-name': {
-      display: 'none'
-    },
-
-    '.token-logo': {
-      bottom: 0,
-      right: 0,
+    '&.-modal-trigger': {
       display: 'flex',
       alignItems: 'center',
-      margin: '6px 0',
+      cursor: 'pointer',
 
-      '.-sub-logo': {
-        '.ant-image': {
-          display: 'flex'
-        }
-      }
-    },
+      '.__modal-trigger-content': {
+        flex: 1,
+        overflow: 'hidden'
+      },
 
-    '.ant-network-item-content': {
-      padding: token.paddingSM
-    },
+      '.__placeholder-text': {
 
-    '.token-item .__check-icon': {
-      display: 'flex',
-      width: 40,
-      justifyContent: 'center'
-    },
+      },
 
-    '.token-info': {
-      display: 'flex',
-      flexDirection: 'row',
-      overflow: 'hidden',
-
-      fontSize: token.fontSizeHeading5,
-      lineHeight: token.lineHeightHeading5,
-      fontWeight: token.fontWeightStrong,
-      color: token.colorWhite,
-
-      '.__token-name': {
-        color: token.colorTextTertiary,
+      '.__selected-item': {
         display: 'flex',
-        flexDirection: 'row',
-        overflow: 'hidden',
+        alignItems: 'center',
+        gap: 8
+      },
 
-        '.name': {
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          whiteSpace: 'nowrap'
-        }
+      '.__item-token-info': {
+        display: 'flex',
+        flexDirection: 'column',
+        color: token.colorWhite,
+        overflow: 'hidden'
+      },
+
+      '.__item-token-symbol': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      },
+
+      '.__item-token-name': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextTertiary,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      },
+
+      '.__caret-icon': {
+        minWidth: 32,
+        height: 32,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+
+      '&:-disabled': {
+        cursor: 'not-allowed'
       }
     },
 
-    '.token-original-chain': {
-      fontSize: token.fontSizeSM,
-      lineHeight: token.lineHeightSM,
-      color: token.colorTextDescription
+    '&.-modal-container': {
+      '.ant-sw-modal-content': {
+        height: '100vh',
+        paddingBottom: 0
+      },
+
+      '.ant-sw-modal-body': {
+        overflow: 'auto',
+        display: 'flex',
+        flex: 1,
+        flexDirection: 'column',
+        paddingBottom: 0
+      },
+
+      '.ant-sw-list-section': {
+        flex: 1
+      },
+
+      '.ant-sw-list': {
+        paddingBottom: 0
+      },
+
+      '.__search-box': {
+        marginBottom: token.marginXS
+      },
+
+      '.__list-container': {
+        flex: 1,
+        overflow: 'auto',
+        paddingBottom: token.padding
+      },
+
+      '.token-selector-item + .token-selector-item': {
+        marginTop: token.marginXS
+      }
     }
   });
 });

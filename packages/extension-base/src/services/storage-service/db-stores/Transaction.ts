@@ -16,6 +16,7 @@ export default class TransactionStore extends BaseStoreWithAddressAndChain<ITran
     return this.table.where('address').equals(address).toArray();
   }
 
+  // TODO: This query is not exactly correct. It makes a lot of wrong assumptions, need to be fixed.
   public async queryHistory (query?: HistoryQuery) {
     if (!query?.address && !query?.chain) {
       return this.table.toArray();

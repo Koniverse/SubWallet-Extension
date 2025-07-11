@@ -3,10 +3,12 @@
 
 import { TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { Vec } from '@polkadot/types';
 import { EventRecord } from '@polkadot/types/interfaces';
+import { isHex } from '@polkadot/util';
 
 export enum HistoryRecoverStatus {
   SUCCESS = 'SUCCESS',
@@ -40,7 +42,7 @@ const substrateRecover = async (history: TransactionHistoryItem, chainService: C
       const api = _api.api;
 
       if (!blockHash) {
-        if (!nonce || !startBlock) {
+        if (nonce === undefined || startBlock === undefined) {
           console.log(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
 
           return { status: HistoryRecoverStatus.LACK_INFO };
@@ -52,7 +54,7 @@ const substrateRecover = async (history: TransactionHistoryItem, chainService: C
           const blockHash = (await api.rpc.chain.getBlockHash(startBlock + i)).toHex();
           const block = await api.rpc.chain.getBlock(blockHash);
 
-          const extrinsics = block.block.extrinsics;
+          const extrinsics = block.block.extrinsics.toArray();
           let index: number | undefined;
 
           for (const [idx, extrinsic] of Object.entries(extrinsics)) {
@@ -143,15 +145,33 @@ const evmRecover = async (history: TransactionHistoryItem, chainService: ChainSe
     const evmApi = chainService.getEvmApi(chain);
 
     if (evmApi) {
-      const _api = await evmApi.isReady;
+      const _api = await Promise.race([
+        evmApi.isReady,
+        new Promise<_EvmApi>((resolve, reject) => {
+          const createTimeout = (callback: () => void) => {
+            setTimeout(callback, 10000);
+          };
+
+          createTimeout(() => {
+            const api = chainService.getEvmApi(chain);
+
+            Promise.race([
+              api.isReady,
+              new Promise<_EvmApi>((resolve, reject) => createTimeout(() => reject(new Error('Timeout'))))
+            ])
+              .then(resolve)
+              .catch(reject);
+          });
+        })]
+      );
       const api = _api.api;
 
-      if (extrinsicHash) {
+      if (extrinsicHash && isHex(extrinsicHash)) {
         const transactionReceipt = await api.eth.getTransactionReceipt(extrinsicHash);
 
         return { ...result, status: transactionReceipt.status ? HistoryRecoverStatus.SUCCESS : HistoryRecoverStatus.FAILED };
       } else {
-        if (!nonce || !startBlock) {
+        if (nonce === undefined || startBlock === undefined) {
           console.log(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
 
           return { ...result, status: HistoryRecoverStatus.LACK_INFO };

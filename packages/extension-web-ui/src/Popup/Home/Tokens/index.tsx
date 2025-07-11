@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, EmptyList, PageWrapper, ReceiveModal, TokenBalance, TokenItem, TokenPrice } from '@subwallet/extension-web-ui/components';
@@ -29,7 +28,7 @@ import { Coins, FadersHorizontal, SlidersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -70,32 +69,12 @@ const Component = (): React.ReactElement => {
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const allowedChains = useGetChainSlugsByAccount();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
-  const swapPairs = useSelector((state: RootState) => state.swap.swapPairs);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const isEnableSwapButton = useMemo(() => {
-    return Object.keys(fromAndToTokenMap).some((tokenSlug) => {
-      return allowedChains.includes(_getOriginChainOfAsset(tokenSlug));
-    });
-  }, [allowedChains, fromAndToTokenMap]);
 
   const outletContext: {
     searchInput: string,
@@ -212,6 +191,9 @@ const Component = (): React.ReactElement => {
       accountActions: item.accountActions
     }));
   }, [accountProxies]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openBuyTokens = searchParams.get('openBuyTokens') || '';
 
   const onCloseAccountSelector = useCallback(() => {
     setIsShowTonWarning(false);
@@ -385,6 +367,13 @@ const Component = (): React.ReactElement => {
   }, [setSearchPlaceholder, setShowSearchInput, t]);
 
   useEffect(() => {
+    if (openBuyTokens === 'true' && isSupportBuyTokens && !isWebUI) {
+      searchParams.delete('openBuyTokens');
+      onOpenBuyTokens();
+    }
+  }, [openBuyTokens, onOpenBuyTokens, searchParams, navigate, setSearchParams, isSupportBuyTokens, isWebUI]);
+
+  useEffect(() => {
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -513,10 +502,11 @@ const Component = (): React.ReactElement => {
           ref={topBlockRef}
         >
           <UpperBlock
+            className={'__upper-block'}
             isPriceDecrease={isTotalBalanceDecrease}
             isShrink={isShrink}
             isSupportBuyTokens={isSupportBuyTokens}
-            isSupportSwap={isEnableSwapButton}
+            isSupportSwap={true}
             onOpenBuyTokens={onOpenBuyTokens}
             onOpenReceive={onOpenReceive}
             onOpenSendFund={onOpenSendFund}
@@ -634,6 +624,11 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       }
     },
 
+    '.link': {
+      color: token.colorLink,
+      cursor: 'pointer'
+    },
+
     'td.__percentage-col': {
       verticalAlign: 'top',
 
@@ -663,7 +658,7 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingTop: 210
+      paddingTop: 206
     },
 
     '.__scroll-container': {
@@ -675,27 +670,48 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       backgroundColor: token.colorBgDefault,
       position: 'absolute',
       paddingTop: '32px',
-      height: 210,
+      height: 206,
       zIndex: 10,
       top: 0,
       left: 0,
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
       transition: 'opacity, padding-top 0.27s ease',
 
-      '&.-is-shrink': {
-        height: 104
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
+        display: 'block',
+        zIndex: 1
       },
 
-      '&.-decrease': {
+      '&.-decrease:before': {
         backgroundImage: extendToken.tokensScreenDangerBackgroundColor
+      },
+
+      '&.-is-shrink': {
+        height: 104,
+
+        '&:before': {
+          height: 80
+        }
       }
     },
 
+    '.ton-solo-acc-alert-area': {
+      marginBottom: token.marginXS
+    },
+
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scroll-footer': {

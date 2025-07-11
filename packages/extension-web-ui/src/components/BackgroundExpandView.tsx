@@ -29,8 +29,6 @@ const Component: React.FC<Props> = (props: Props) => {
   const isShowFooter = useMemo(() => {
     const pathName = location.pathname;
 
-    console.log(pathName);
-
     return !['/create-done'].includes(pathName);
   }, [location.pathname]);
 
@@ -86,7 +84,7 @@ const BackgroundExpandView = styled(Component)<Props>(({ theme: { token } }: Pro
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: -1,
+    zIndex: 0,
 
     '.expand-view-header': {
       height: 331,
@@ -123,7 +121,7 @@ const BackgroundExpandView = styled(Component)<Props>(({ theme: { token } }: Pro
       left: '0',
       zIndex: -1,
 
-      '@media (max-height: 864px)': { // 600 + 2 * (52 + 40 * 2)
+      '@media (max-height: 950px)': {
         display: 'none'
       }
     }
