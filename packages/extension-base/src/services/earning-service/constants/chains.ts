@@ -37,8 +37,3 @@ export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   polkadot: 'polkadot_people',
   kusama: 'peopleKusama'
 };
-
-export const NATIVE_STAKING_IDENTITY_UPDATE_SLUGS: string[] = [
-  'DOT___native_staking___polkadot',
-  'KSM___native_staking___kusama'
-];
