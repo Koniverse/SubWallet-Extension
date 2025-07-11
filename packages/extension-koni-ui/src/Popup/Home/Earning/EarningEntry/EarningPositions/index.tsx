@@ -3,8 +3,9 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _MULTI_STAKING_TYPES_DEFAULT_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
+import { fetchStaticData, isAccountAll } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
 import { EarningPositionItem } from '@subwallet/extension-koni-ui/components/Earning';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
@@ -18,7 +19,7 @@ import { Button, ButtonProps, Icon, ModalContext, SwList } from '@subwallet/reac
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsClockwise, FadersHorizontal, Plus, PlusCircle, Vault } from 'phosphor-react';
-import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -56,6 +57,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('earning');
   const [announcement, setAnnouncement] = useLocalStorage(EARNING_WARNING_ANNOUNCEMENT, 'nonConfirmed');
 
+  const [multiStakingTypesChains, setMultiStakingTypesChains] = useState<string[]>([]);
+
   const items: ExtraYieldPositionInfo[] = useMemo(() => {
     if (!earningPositions.length) {
       return [];
@@ -91,13 +94,11 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
       return null;
     }
 
-    const chains = ['polkadot', 'kusama'];
-
     const findChainWithStaking = (list: YieldPositionInfo[]) => {
       const hasNativeStaking = (chain: string) => list.some((item) => item.chain === chain && item.type === YieldPoolType.NATIVE_STAKING);
       const hasNominationPool = (chain: string) => list.some((item) => item.chain === chain && item.type === YieldPoolType.NOMINATION_POOL);
 
-      for (const chain of chains) {
+      for (const chain of multiStakingTypesChains) {
         if (hasNativeStaking(chain) && hasNominationPool(chain)) {
           return chain;
         }
@@ -124,7 +125,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     }
 
     return null;
-  }, [accounts, currentAccountProxy, specificList]);
+  }, [accounts, currentAccountProxy, multiStakingTypesChains, specificList]);
 
   const learnMore = useCallback(() => {
     window.open('https://support.polkadot.network/support/solutions/articles/65000188140-changes-for-nomination-pool-members-and-opengov-participation');
@@ -341,6 +342,22 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     },
     [activeModal]
   );
+
+  useEffect(() => {
+    const fallbackChains = _MULTI_STAKING_TYPES_DEFAULT_CHAINS;
+
+    Promise.race([
+      fetchStaticData<{ chains: string[] }>('multi-staking-types-chains').then((res) => res.chains),
+      new Promise<string[]>((resolve) => {
+        setTimeout(() => resolve(fallbackChains), 1000);
+      })
+    ])
+      .then(setMultiStakingTypesChains)
+      .catch((e) => {
+        console.error(e);
+        setMultiStakingTypesChains(fallbackChains);
+      });
+  }, []);
 
   return (
     <>
