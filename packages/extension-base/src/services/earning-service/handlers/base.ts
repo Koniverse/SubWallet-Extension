@@ -48,6 +48,9 @@ export default abstract class BasePoolHandler {
   /** Pool's available method */
   protected abstract readonly availableMethod: YieldPoolMethodInfo;
 
+  /** Whether the pool can override identity of validator */
+  public canOverrideIdentity = false;
+
   /**
    * @constructor
    * @param {KoniState} state - Koni state
