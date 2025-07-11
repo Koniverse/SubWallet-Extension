@@ -25,6 +25,7 @@ import { useChainConnection, useCoreCreateGetChainSlugsByAccountProxy, useCoreCr
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
+import EmptySwapPairs from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
@@ -1367,6 +1368,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const accountProxies = useSelector((state) => state.accountState.accountProxies);
   const [pairMap, setPairMap] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<boolean>(false);
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1378,13 +1380,8 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     });
   }, [accountProxies, defaultData.fromAccountProxy]);
 
-  useEffect(() => {
-    if (!targetAccountProxy) {
-      goHome();
-    }
-  }, [goHome, targetAccountProxy]);
-
-  useEffect(() => {
+  const fetchDestinationsMap = useCallback(() => {
+    setLoading(true);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
 
@@ -1400,24 +1397,19 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       })
       .then((resp) => {
         // simple validate
-        if (
-          resp && typeof resp === 'object' &&
-          resp.data && typeof resp.data === 'object' &&
-          !Array.isArray(resp.data)
-        ) {
-          setPairMap(resp.data);
-        } else {
+        if (!resp || typeof resp !== 'object' || !resp.data || typeof resp.data !== 'object') {
           throw new Error('Invalid response format');
         }
 
+        setPairMap(resp.data);
+        setFetchError(false);
         setLoading(false);
       })
       .catch((error: Error) => {
-        if (error.name === 'AbortError') {
-          console.error('Fetch timeout after 10 seconds');
-        } else {
-          console.error(`Error while fetching swap destinations: ${error.message}`);
-        }
+        error.name === 'AbortError' ? console.error('Timout fetching swap destinations') : console.error(`Error while fetching swap destinations: ${error.message}`);
+
+        setFetchError(true);
+        setLoading(false);
       });
 
     return () => {
@@ -1425,6 +1417,16 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    if (!targetAccountProxy) {
+      goHome();
+    }
+  }, [goHome, targetAccountProxy]);
+
+  useEffect(() => {
+    fetchDestinationsMap();
+  }, [fetchDestinationsMap]);
 
   if (!targetAccountProxy) {
     return (
@@ -1434,6 +1436,14 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   if (loading) {
     return <LoadingScreen />;
+  }
+
+  if (fetchError) {
+    return (
+      <EmptySwapPairs
+        onClickReload={fetchDestinationsMap}
+      />
+    );
   }
 
   return (
