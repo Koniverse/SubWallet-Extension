@@ -966,6 +966,7 @@ export default class TransactionService {
         break;
       }
 
+      // TODO: ADD VOTE
       case ExtrinsicType.MINT_STDOT:
       case ExtrinsicType.MINT_QDOT:
       case ExtrinsicType.MINT_LDOT:
