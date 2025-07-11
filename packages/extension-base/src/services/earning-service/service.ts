@@ -195,34 +195,36 @@ export default class EarningService implements StoppableServiceInterface, Persis
     combineLatest({
       poolTarget: this.poolTargetsFetchingCached,
       yieldPositionInfo: this.yieldPositionSubject
-    }).subscribe(({ poolTarget, yieldPositionInfo }) => {
-      const activeMap = this.state.getActiveChainInfoMap();
-      const activePositions = Object.values(yieldPositionInfo).filter((item) => {
-        return !!activeMap[item.chain] && !this.inactivePoolSlug.has(item.slug);
-      });
-
-      if (this.useOnlineCacheOnly) {
-        activePositions.forEach((item) => {
-          const otherGetIdentityChain = STAKING_IDENTITY_API_SLUG[item.chain];
-
-          if (
-            otherGetIdentityChain &&
-              item.type === YieldPoolType.NATIVE_STAKING &&
-              !activeMap[otherGetIdentityChain]
-          ) {
-            const validatorTargetRecord = poolTarget[item.slug] as Record<string, ValidatorInfo>;
-
-            if (validatorTargetRecord && Object.keys(validatorTargetRecord).length) {
-              item.nominations = item.nominations.map((validator) => ({
-                ...validator,
-                validatorIdentity: validatorTargetRecord[validator.validatorAddress]?.identity || validator.validatorIdentity
-              }));
-            }
-          }
+    }).subscribe({
+      next: ({ poolTarget, yieldPositionInfo }) => {
+        const activeMap = this.state.getActiveChainInfoMap();
+        const activePositions = Object.values(yieldPositionInfo).filter((item) => {
+          return !!activeMap[item.chain] && !this.inactivePoolSlug.has(item.slug);
         });
-      }
 
-      this.yieldPositionListSubject.next(Object.values(activePositions));
+        if (this.useOnlineCacheOnly) {
+          activePositions.forEach((item) => {
+            if (
+              item.type === YieldPoolType.NATIVE_STAKING
+            ) {
+              const hasValidatorIdentity = item.nominations.some((validator) => !!validator.validatorIdentity);
+
+              if (!hasValidatorIdentity) {
+                const validatorTargetRecord = poolTarget[item.slug] as Record<string, ValidatorInfo>;
+
+                if (validatorTargetRecord && Object.keys(validatorTargetRecord).length) {
+                  item.nominations = item.nominations.map((validator) => ({
+                    ...validator,
+                    validatorIdentity: validatorTargetRecord[validator.validatorAddress]?.identity || validator.validatorIdentity
+                  }));
+                }
+              }
+            }
+          });
+        }
+
+        this.yieldPositionListSubject.next(Object.values(activePositions));
+      }
     });
 
     this.status = ServiceStatus.INITIALIZED;
