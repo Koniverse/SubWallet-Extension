@@ -10,7 +10,7 @@ import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate
 import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
@@ -27,6 +27,7 @@ import { t } from 'i18next';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { createAcrossBridgeExtrinsic } from '../../balance-service/transfer/xcm';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -167,13 +168,16 @@ export class SwapBaseHandler {
       };
 
       // TODO: calculate fee for destination chain
-      const bridgeFeeByDryRun = await dryRunXcmExtrinsicV2(xcmRequest);
+      const xcmFeeInfo = await estimateXcmFee({
+        fromChainInfo: xcmRequest.originChain,
+        fromTokenInfo: xcmRequest.originTokenInfo,
+        toChainInfo: xcmRequest.destinationChain,
+        recipient: xcmRequest.recipient,
+        sender: xcmRequest.sender,
+        value: xcmRequest.sendingValue
+      });
 
-      if (!bridgeFeeByDryRun.fee) {
-        return undefined;
-      }
-
-      const estimatedBridgeFee = BigN(bridgeFeeByDryRun.fee).multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
+      const estimatedBridgeFee = BigN(xcmFeeInfo?.origin.fee || '0').multipliedBy(FEE_RATE_MULTIPLIER.medium).toFixed(0, 1);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
