@@ -5,9 +5,13 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { findAccountByAddress, getChainsByAccountAll, getChainsByAccountType, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { KeypairType } from '@subwallet/keyring/types';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+/**
+ * @deprecated Use hook `useGetChainAndExcludedTokenByCurrentAccountProxy` or 'useCoreCreateGetChainSlugsByAccountProxy' instead.
+ */
 // TODO: Recheck the usages of the address in this hook.
 export const useGetChainSlugsByAccount = (address?: string): string[] => {
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -38,6 +42,41 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
 
     return [];
   }, [accountProxies, accounts, address, currentAccountProxy]);
+
+  const accountTypes = useMemo((): KeypairType[] => {
+    const types: KeypairType[] = [];
+    const _address = address || currentAccountProxy?.id;
+
+    if (_address) {
+      if (isAccountAll(_address)) {
+        accountProxies.forEach((proxy) => {
+          if (proxy.accounts && proxy.accounts.length > 0) {
+            proxy.accounts.forEach((account) => {
+              if (account.type) {
+                types.push(account.type);
+              }
+            });
+          }
+        });
+
+        return [...new Set(types)];
+      } else {
+        const proxy = accountProxies.find((proxy) => proxy.id === _address);
+
+        if (proxy && proxy.accounts && proxy.accounts.length > 0) {
+          proxy.accounts.forEach((account) => {
+            if (account.type) {
+              types.push(account.type);
+            }
+          });
+
+          return [...new Set(types)];
+        }
+      }
+    }
+
+    return [];
+  }, [accountProxies, address, currentAccountProxy?.id]);
 
   const specialChain = useMemo((): string | undefined => {
     const _address = address || currentAccountProxy?.id;
@@ -71,9 +110,9 @@ export const useGetChainSlugsByAccount = (address?: string): string[] => {
     if (_address && isAccountAll(_address)) {
       const allAccount = accountProxies.find((proxy) => proxy.id === ALL_ACCOUNT_KEY);
 
-      return allAccount ? getChainsByAccountAll(allAccount, accountProxies, chainInfoMap) : [];
+      return allAccount ? getChainsByAccountAll(allAccount, accountProxies, chainInfoMap, accountTypes) : [];
     }
 
-    return getChainsByAccountType(chainInfoMap, chainTypes, specialChain);
-  }, [address, currentAccountProxy?.id, accountProxies, chainTypes, chainInfoMap, specialChain]);
+    return getChainsByAccountType(chainInfoMap, chainTypes, accountTypes, specialChain);
+  }, [address, currentAccountProxy?.id, accountProxies, chainInfoMap, chainTypes, specialChain, accountTypes]);
 };

@@ -5,7 +5,8 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
+import { SWTransaction, SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
+import { Psbt } from 'bitcoinjs-lib';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 
@@ -20,23 +21,28 @@ export const getValidationId = (chainType: string, chain: string): string => {
   return `${chainType}.${chain}.${Date.now()}.${++validationCount}`;
 };
 
-export const isSubstrateTransaction = (tx: SWTransaction['transaction']): tx is SubmittableExtrinsic => {
+export const isSubstrateTransaction = (tx: SWTransactionBase['transaction']): tx is SubmittableExtrinsic => {
   return !!(tx as SubmittableExtrinsic).send;
 };
 
-export const isTonTransaction = (tx: SWTransaction['transaction']): tx is TonTransactionConfig => {
+export const isTonTransaction = (tx: SWTransactionBase['transaction']): tx is TonTransactionConfig => {
   const tonTransactionConfig = tx as TonTransactionConfig;
 
   return Boolean(tonTransactionConfig.messagePayload) && tonTransactionConfig.seqno >= 0;
 };
 
-export const isCardanoTransaction = (tx: SWTransaction['transaction']): tx is CardanoTransactionConfig => {
+export const isCardanoTransaction = (tx: SWTransactionBase['transaction']): tx is CardanoTransactionConfig => {
   const cardanoTransactionConfig = tx as CardanoTransactionConfig;
 
   return cardanoTransactionConfig.cardanoPayload !== null && cardanoTransactionConfig.cardanoPayload !== undefined;
 };
 
-const typeName = (type: SWTransaction['extrinsicType']) => {
+// TODO: [Review] this function
+export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is Psbt => {
+  return 'data' in tx && Array.isArray((tx as Psbt).data.inputs);
+};
+
+const typeName = (type: SWTransactionBase['extrinsicType']) => {
   switch (type) {
     case ExtrinsicType.TRANSFER_BALANCE:
     case ExtrinsicType.TRANSFER_TOKEN:
@@ -82,6 +88,6 @@ const typeName = (type: SWTransaction['extrinsicType']) => {
   }
 };
 
-export const getBaseTransactionInfo = (transaction: SWTransaction, chainInfoMap: Record<string, _ChainInfo>) => {
+export const getBaseTransactionInfo = (transaction: SWTransactionBase, chainInfoMap: Record<string, _ChainInfo>) => {
   return `${typeName(transaction.extrinsicType)} on ${chainInfoMap[transaction.chain]?.name || 'unknown network'}`;
 };

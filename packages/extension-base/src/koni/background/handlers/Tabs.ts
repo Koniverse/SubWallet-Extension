@@ -5,11 +5,12 @@ import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
+import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddNetworkRequestExternal, AddTokenRequestExternal, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSendTransactionResult, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtResult, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
@@ -25,7 +26,8 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { Subscription } from 'rxjs';
@@ -36,7 +38,7 @@ import { JsonRpcPayload } from 'web3-core-helpers';
 import { checkIfDenied } from '@polkadot/phishing';
 import { JsonRpcResponse } from '@polkadot/rpc-provider/types';
 import { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
-import { isArray, isNumber } from '@polkadot/util';
+import { hexStripPrefix, isArray, isNumber, u8aToHex } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 interface AccountSub {
@@ -44,7 +46,7 @@ interface AccountSub {
   url: string;
 }
 
-function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[]): InjectedAccount[] {
+function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?: AuthUrlInfo, accountAuthTypes?: AccountAuthType[], isSubstrateConnector?: boolean): InjectedAccount[] {
   const accountSelected = authInfo
     ? (
       authInfo.isAllowed
@@ -56,7 +58,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     )
     : [];
 
-  const authTypeFilter = ({ type }: SingleAddress) => {
+  const authTypeFilter = ({ json, type }: SingleAddress) => {
     if (accountAuthTypes) {
       if (!type) {
         return false;
@@ -66,10 +68,29 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
         evm: EthereumKeypairTypes,
         substrate: SubstrateKeypairTypes,
         ton: TonKeypairTypes,
-        cardano: CardanoKeypairTypes
+        cardano: CardanoKeypairTypes,
+        bitcoin: BitcoinKeypairTypes
       };
 
-      return accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
+      const isValidTypes = accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
+
+      if (!isValidTypes) {
+        return false;
+      }
+
+      // This condition ensures that the resulting UTXOs from the user's transaction are not sent to addresses the wallet cannot manage.
+      if (type === 'cardano' && json.meta.isReadOnly) {
+        return false;
+      }
+
+      const canConnectSubstrateEcdsa = authInfo?.canConnectSubstrateEcdsa && isSubstrateConnector;
+
+      // If the dApp has not connected to the Substrate type yet, we do not return Substrate ECDSA accounts.
+      if (type === 'ethereum' && json.meta.isSubstrateECDSA && !canConnectSubstrateEcdsa) {
+        return false;
+      }
+
+      return true;
     } else {
       return true;
     }
@@ -305,7 +326,7 @@ export default class KoniTabs {
     return authList[shortenUrl];
   }
 
-  private async accountsListV2 (url: string, { accountAuthType, anyType }: RequestAccountList): Promise<InjectedAccount[]> {
+  private async accountsListV2 (url: string, { accountAuthType, anyType, isSubstrateConnector }: RequestAccountList): Promise<InjectedAccount[]> {
     const authInfo = await this.getAuthInfo(url);
 
     const accountAuthTypes: AccountAuthType[] = [];
@@ -330,7 +351,7 @@ export default class KoniTabs {
       }
     }
 
-    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes);
+    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes, isSubstrateConnector);
   }
 
   // TODO: Update logic
@@ -358,7 +379,7 @@ export default class KoniTabs {
 
             const accounts = this.#koniState.keyringService.context.pairs;
 
-            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes));
+            return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes, true));
           })
           .catch(console.error);
       }),
@@ -1018,12 +1039,6 @@ export default class KoniTabs {
     });
   }
 
-  public async canUseAccount (address: string, url: string) {
-    const allowedAccounts = await this.getCurrentAccount(url, 'evm');
-
-    return !!allowedAccounts.find((acc) => (acc.toLowerCase() === address.toLowerCase()));
-  }
-
   private async evmSign (id: string, url: string, { method, params }: RequestArguments) {
     const signResult = await this.#koniState.evmSign(id, url, method, params);
 
@@ -1248,8 +1263,8 @@ export default class KoniTabs {
     }
 
     return accountList.map((address) => {
-      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
-      const addressChainFormat = reformatAddress(address, +isTestnet);
+      const isMainnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(address, +isMainnet);
 
       return convertCardanoAddressToHex(addressChainFormat);
     });
@@ -1282,10 +1297,38 @@ export default class KoniTabs {
 
     const { address, network } = await this.getCurrentInformationCardanoDapp(url);
 
-    const isTestnet = network !== 'cardano_preproduction';
-    const addressChainFormat = reformatAddress(address, +isTestnet);
+    const isMainnet = network !== 'cardano_preproduction';
+    const addressChainFormat = reformatAddress(address, +isMainnet);
 
     return convertCardanoAddressToHex(addressChainFormat);
+  }
+
+  private async cardanoGetRewardAddress (id: string, url: string): Promise<string[]> {
+    const authList = await this.#koniState.getAuthList();
+    const urlStripped = stripUrl(url);
+    const authInfo = authList[urlStripped];
+
+    if (!authInfo || !authInfo.isAllowedMap) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, 'You need to connect to the wallet first');
+    }
+
+    const accountList = await this.getCurrentAccount(url, 'cardano');
+    const currentCardanoAccount = authInfo.currentAccount;
+
+    if (currentCardanoAccount !== accountList[0]) {
+      authList[urlStripped].currentAccount = accountList[0];
+
+      this.#koniState.setAuthorize(authList);
+    }
+
+    return accountList.map((address) => {
+      const pair = keyring.getPair(address);
+      const rewardAddress = pair.cardano.rewardAddress;
+      const isTestnet = authInfo?.currentNetworkMap.cardano !== 'cardano_preproduction';
+      const addressChainFormat = reformatAddress(rewardAddress, +isTestnet);
+
+      return convertCardanoAddressToHex(addressChainFormat);
+    });
   }
 
   private async cardanoGetCurrentNetworkId (id: string, url: string): Promise<number> {
@@ -1422,6 +1465,135 @@ export default class KoniTabs {
     }
   }
 
+  /// Bitcoin
+
+  public isBitcoinPublicRequest (type: string, request: RequestArguments) {
+    return (type === 'bitcoin(request)' &&
+      [
+        'getAddresses'
+      ].includes(request?.method));
+  }
+
+  async bitcoinGetAddresses (url: string): Promise<BitcoinRequestGetAddressesResult> {
+    try {
+      const isCompleted = await this.#koniState.authorizeUrlV2(url, {
+        origin: url,
+        accountAuthTypes: ['bitcoin']
+      });
+
+      const result: BitcoinRequestGetAddressesResult = [];
+
+      if (!isCompleted) {
+        return result;
+      }
+
+      const authInfo = await this.getAuthInfo(url);
+
+      if (!authInfo || !authInfo.isAllowedMap || !authInfo.isAllowed) {
+        return result;
+      }
+
+      const addressesAllowed = await this.getCurrentAccount(url, 'bitcoin');
+
+      const addressResults: BitcoinDAppAddress[] = [];
+
+      addressesAllowed.forEach((address) => {
+        const pair = keyring.getPair(address);
+
+        if (pair.meta.noPublicKey) {
+          return;
+        }
+
+        const addressInfo = getBitcoinAddressInfo(address);
+
+        const item: BitcoinDAppAddress = {
+          address,
+          type: addressInfo.type,
+          isTestnet: addressInfo.network === 'testnet'
+        };
+
+        item.derivationPath = pair.meta.derivationPath as string;
+        item.publicKey = hexStripPrefix(u8aToHex(pair.publicKey));
+
+        if (pair.publicKey.length !== 32) {
+          item.tweakedPublicKey = hexStripPrefix(u8aToHex(pair.publicKey.slice(1, 33)));
+        }
+
+        addressResults.push(item);
+      });
+
+      return addressResults;
+    } catch (e) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+    }
+  }
+
+  private async bitcoinSign (id: string, url: string, { method, params }: RequestArguments): Promise<BitcoinSignMessageResult> {
+    const signResult = await this.#koniState.bitcoinSign(id, url, method, params as BitcoinSignMessageParams);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
+
+  private async bitcoinSignPspt (id: string, url: string, { method, params }: RequestArguments): Promise<BitcoinSignPsbtResult> {
+    const psbtParams = params as BitcoinSignPsbtParams;
+
+    const signResult = await this.#koniState.bitcoinSignPspt(id, url, psbtParams);
+
+    if (signResult) {
+      return signResult;
+    } else {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, 'Failed to sign message');
+    }
+  }
+
+  private async bitcoinSendTransfer (id: string, url: string, { params }: RequestArguments): Promise<BitcoinSendTransactionResult> {
+    const transactionParams = params as BitcoinSendTransactionParams;
+    const transactionHash = await this.#koniState.bitcoinSendTransaction(id, url, transactionParams);
+
+    if (!transactionHash) {
+      throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+    }
+
+    return {
+      txid: transactionHash
+    };
+  }
+
+  private async handleBitcoinRequest (id: string, url: string, request: RequestArguments, port: chrome.runtime.Port): Promise<unknown> {
+    const { method } = request;
+
+    try {
+      switch (method) {
+        case 'getAddresses':
+          return await this.bitcoinGetAddresses(url);
+
+        case 'signMessage':
+          return await this.bitcoinSign(id, url, request);
+
+        case 'signPsbt':
+          return await this.bitcoinSignPspt(id, url, request);
+
+        case 'sendTransfer':
+          return await this.bitcoinSendTransfer(id, url, request);
+
+        default:
+          throw new Error(`Method ${method} is not supported by SubWalletBitcoin provider`);
+      }
+    } catch (e) {
+      // @ts-ignore
+      if (e.code) {
+        throw e;
+      } else {
+        console.error(e);
+        throw new BitcoinProviderError(BitcoinProviderErrorType.INTERNAL_ERROR, e?.toString());
+      }
+    }
+  }
+
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], url: string, port: chrome.runtime.Port): Promise<ResponseTypes[keyof ResponseTypes]> {
     if (type === 'pub(phishing.redirectIfDenied)') {
       return this.redirectIfPhishing(url);
@@ -1434,7 +1606,9 @@ export default class KoniTabs {
     // Wait for account ready and chain ready
     await Promise.all([this.#koniState.eventService.waitAccountReady, this.#koniState.eventService.waitChainReady]);
 
-    if (!['pub(authorize.tabV2)', 'pub(accounts.subscribeV2)'].includes(type) && !this.isEvmPublicRequest(type, request as RequestArguments)) {
+    if (!['pub(authorize.tabV2)', 'pub(accounts.subscribeV2)'].includes(type) &&
+      !this.isEvmPublicRequest(type, request as RequestArguments) &&
+     !this.isBitcoinPublicRequest(type, request as RequestArguments)) {
       await this.#koniState.ensureUrlAuthorizedV2(url)
         .catch((e: Error) => {
           if (type.startsWith('evm')) {
@@ -1503,6 +1677,8 @@ export default class KoniTabs {
         return await this.cardanoGetAccountBalance(id, url);
       case 'cardano(account.get.change.address)':
         return await this.cardanoGetChangeAddress(id, url);
+      case 'cardano(account.get.reward.address)':
+        return await this.cardanoGetRewardAddress(id, url);
       case 'cardano(account.get.collateral)':
         return await this.cardanoGetCollateral(id, url, request as RequestCardanoGetCollateral);
       case 'cardano(account.get.utxos)':
@@ -1515,6 +1691,10 @@ export default class KoniTabs {
         return await this.cardanoSignTransaction(id, url, request as RequestCardanoSignTransaction);
       case 'cardano(transaction.submit)':
         return await this.cardanoSubmitTransaction(id, url, request as string);
+
+      // Bitcoin
+      case 'bitcoin(request)':
+        return await this.handleBitcoinRequest(id, url, request as RequestArguments, port);
       default:
         throw new Error(`Unable to handle message of type ${type}`);
     }

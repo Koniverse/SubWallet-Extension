@@ -101,31 +101,35 @@ const fetchDerivativeTokenSlugs = async () => {
   }
 };
 
-export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType = 'USD'): Promise<Omit<PriceJson, 'exchangeRateMap'>> => {
+export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType = 'USD', skipDerivativePrice?: boolean): Promise<Omit<PriceJson, 'exchangeRateMap'>> => {
   const idStr = Array.from(priceIds).join(',');
   let response: Response | undefined;
 
   try {
     const derivativePriceMap: Record<string, number> = {};
+    const lastUpdatedMap: Record<string, Date> = {};
     let derivativeApiError = false;
 
-    try {
-      const responseDerivativeTokens = await fetch(`${apiCacheDomain}/api/price/derivative-get`);
-      const generateDerivativePriceRaw = await responseDerivativeTokens?.json() as unknown || [];
+    if (!skipDerivativePrice) {
+      try {
+        const responseDerivativeTokens = await fetch(`${apiCacheDomain}/api/price/derivative-get`);
+        const generateDerivativePriceRaw = await responseDerivativeTokens?.json() as unknown || [];
 
-      if (Array.isArray(generateDerivativePriceRaw)) {
-        generateDerivativePriceRaw.forEach((token: DerivativeTokenPrice) => {
-          if (token.id) {
-            derivativePriceMap[token.id] = token.derived_price;
-          }
-        });
-      } else {
-        console.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
+        if (Array.isArray(generateDerivativePriceRaw)) {
+          generateDerivativePriceRaw.forEach((token: DerivativeTokenPrice) => {
+            if (token.id) {
+              derivativePriceMap[token.id] = token.derived_price;
+              lastUpdatedMap[token.id] = new Date(token.cached_at || Date.now());
+            }
+          });
+        } else {
+          console.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
+          derivativeApiError = true;
+        }
+      } catch (error) {
+        console.error('Error fetching derivative API:', error);
         derivativeApiError = true;
       }
-    } catch (error) {
-      console.error('Error fetching derivative API:', error);
-      derivativeApiError = true;
     }
 
     if (!useBackupApi) {
@@ -157,12 +161,13 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
     const currencyData = staticData[StaticKey.CURRENCY_SYMBOL][currency || DEFAULT_CURRENCY] as CurrencyJson;
     const priceMap: Record<string, number> = {};
     const price24hMap: Record<string, number> = {};
-    const lastUpdatedMap: Record<string, Date> = {};
+    const priceCoinGeckoSupported: string[] = [];
 
     responseDataPrice.forEach((val) => {
       const currentPrice = val.current_price || 0;
       const price24h = currentPrice - (val.price_change_24h || 0);
 
+      priceCoinGeckoSupported.push(val.id);
       priceMap[val.id] = currentPrice;
       price24hMap[val.id] = price24h;
       lastUpdatedMap[val.id] = new Date(val.last_updated || val.last_updated_at || Date.now());
@@ -186,6 +191,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       currencyData,
       priceMap,
       price24hMap,
+      priceCoinGeckoSupported,
       lastUpdatedMap
     };
   } catch (e) {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DerivePathInfo, IDerivePathInfo_ } from '@subwallet/extension-base/types';
-import { KeypairType, SubstrateKeypairType } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, KeypairType, SubstrateKeypairType } from '@subwallet/keyring/types';
 
 export const validateUnifiedDerivationPath = (raw: string): DerivePathInfo | undefined => {
   const reg = /^\/\/(\d+)(\/\/\d+)?$/;
@@ -116,6 +116,76 @@ export const validateTonDerivationPath = (raw: string): IDerivePathInfo_ | undef
     return {
       depth,
       type: 'ton',
+      suri,
+      derivationPath: raw,
+      autoIndexes
+    };
+  } else {
+    return undefined;
+  }
+};
+
+export const validateBitcoinDerivationPath = (raw: string): IDerivePathInfo_ | undefined => {
+  const reg = /^m\/(44|84|86)'\/([01])'\/(\d+)'\/0\/0(\/\d+)?$/;
+
+  if (raw.match(reg)) {
+    const [, proposal, slip44, firstIndex, secondData] = raw.match(reg) as string[];
+    const first = parseInt(firstIndex, 10);
+    const autoIndexes: number[] = [first];
+
+    let depth: number;
+    let suri = `//${first}`;
+    let type: KeypairType | undefined;
+
+    if (slip44 === '0') {
+      switch (proposal) {
+        case '44':
+          type = 'bitcoin-44';
+          break;
+        case '84':
+          type = 'bitcoin-84';
+          break;
+        case '86':
+          type = 'bitcoin-86';
+          break;
+      }
+    } else if (slip44 === '1') {
+      switch (proposal) {
+        case '44':
+          type = 'bittest-44';
+          break;
+        case '84':
+          type = 'bittest-84';
+          break;
+        case '86':
+          type = 'bittest-86';
+          break;
+      }
+    }
+
+    if (!type) {
+      return undefined;
+    }
+
+    if (first === 0) {
+      depth = 0;
+    } else {
+      depth = 1;
+    }
+
+    if (secondData) {
+      const [, secondIndex] = secondData.match(/\/(\d+)/) as string[];
+
+      const second = parseInt(secondIndex, 10);
+
+      autoIndexes.push(second);
+      depth = 2;
+      suri += `//${second}`;
+    }
+
+    return {
+      depth,
+      type,
       suri,
       derivationPath: raw,
       autoIndexes
@@ -239,10 +309,18 @@ export const validateDerivationPath = (raw: string, type?: KeypairType): DeriveP
       return validateOtherSubstrateDerivationPath(raw, type);
     } else if (type === 'cardano') {
       return validateCardanoDerivationPath(raw);
+    } else if (BitcoinKeypairTypes.includes(type)) {
+      const rs = validateBitcoinDerivationPath(raw);
+
+      if (rs && rs.type === type) {
+        return rs;
+      }
+
+      return undefined;
     } else {
       return undefined;
     }
   } else {
-    return validateUnifiedDerivationPath(raw) || validateEvmDerivationPath(raw) || validateTonDerivationPath(raw) || validateSr25519DerivationPath(raw) || validateCardanoDerivationPath(raw);
+    return validateUnifiedDerivationPath(raw) || validateEvmDerivationPath(raw) || validateTonDerivationPath(raw) || validateSr25519DerivationPath(raw) || validateCardanoDerivationPath(raw) || validateBitcoinDerivationPath(raw);
   }
 };

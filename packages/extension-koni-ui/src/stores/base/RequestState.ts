@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -26,6 +26,7 @@ const initialState: RequestState = {
   evmSendTransactionRequest: {},
   evmWatchTransactionRequest: {},
   errorConnectNetwork: {},
+  submitApiRequest: {},
 
   tonSignatureRequest: {},
   tonSendTransactionRequest: {},
@@ -35,6 +36,12 @@ const initialState: RequestState = {
   cardanoSendTransactionRequest: {},
   cardanoWatchTransactionRequest: {},
   cardanoSignTransactionRequest: {},
+
+  bitcoinSendTransactionRequest: {},
+  bitcoinSignatureRequest: {},
+  bitcoinSendTransactionRequestAfterConfirmation: {},
+  bitcoinWatchTransactionRequest: {},
+  bitcoinSignPsbtRequest: {},
 
   aliveProcess: {},
 
@@ -55,6 +62,7 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'evmSendTransactionRequest',
   'evmWatchTransactionRequest',
   'errorConnectNetwork',
+  'submitApiRequest',
   'tonSignatureRequest',
   'tonSendTransactionRequest',
   'tonWatchTransactionRequest',
@@ -62,6 +70,11 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'cardanoSendTransactionRequest',
   'cardanoSignTransactionRequest',
   'tonWatchTransactionRequest',
+  'bitcoinSignatureRequest',
+  'bitcoinSignPsbtRequest',
+  'bitcoinSendTransactionRequestAfterConfirmation',
+  'bitcoinSendTransactionRequest',
+  'bitcoinWatchTransactionRequest',
   'connectWCRequest',
   'notSupportWCRequest'
 ];
@@ -80,6 +93,7 @@ const readyMap = {
   updateConfirmationRequests: false,
   updateConfirmationRequestsTon: false,
   updateConfirmationRequestCardano: false,
+  updateConfirmationRequestBitcoin: false,
   updateConnectWalletConnect: false,
   updateNotSupportWalletConnect: false
 };
@@ -149,6 +163,11 @@ const requestStateSlice = createSlice({
     updateConfirmationRequestsCardano (state, action: PayloadAction<Partial<ConfirmationsQueueCardano>>) {
       Object.assign(state, action.payload);
       readyMap.updateConfirmationRequestCardano = true;
+      computeStateSummary(state as RequestState);
+    },
+    updateConfirmationRequestsBitcoin (state, action: PayloadAction<Partial<ConfirmationsQueueBitcoin>>) {
+      Object.assign(state, action.payload);
+      readyMap.updateConfirmationRequestBitcoin = true;
       computeStateSummary(state as RequestState);
     },
     updateWCNotSupportRequests (state, { payload }: PayloadAction<Record<string, WalletConnectNotSupportRequest>>) {

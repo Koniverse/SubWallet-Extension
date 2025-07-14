@@ -5,14 +5,15 @@ import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extensi
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, CloseIcon, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { AccountSelectorModal, AlertBox, CloseIcon, LoadingScreen, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import PageWrapper from '@subwallet/extension-koni-ui/components/Layout/PageWrapper';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenBalanceDetailItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenBalanceDetailItem';
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainSlugsByAccount, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { canShowChart } from '@subwallet/extension-koni-ui/messaging';
 import { DetailModal } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailUpperBlock';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -75,13 +76,15 @@ function Component (): React.ReactElement {
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token_detail', tokenGroupSlug);
-  const allowedChains = useGetChainSlugsByAccount();
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
   const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isChartSupported, setIsChartSupported] = useState(false);
 
   const filteredAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => {
@@ -391,6 +394,33 @@ function Component (): React.ReactElement {
   }, [activeModal]);
 
   useEffect(() => {
+    let sync = true;
+
+    setIsLoading(true);
+
+    if (priceId) {
+      canShowChart(priceId).then((result) => {
+        if (sync) {
+          setIsChartSupported(result);
+          setIsLoading(false);
+        }
+      }).catch(() => {
+        if (sync) {
+          setIsChartSupported(false);
+          setIsLoading(false);
+        }
+      });
+    } else {
+      setIsChartSupported(false);
+      setIsLoading(false);
+    }
+
+    return () => {
+      sync = false;
+    };
+  }, [priceId]);
+
+  useEffect(() => {
     if (currentTokenInfo) {
       activeModal(TokenDetailModalId);
     } else {
@@ -437,10 +467,14 @@ function Component (): React.ReactElement {
     }
   }, [activeModal, isAllAccount, tonAddress]);
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div
       className={classNames('token-detail-container', {
-        '-no-chart': !priceId
+        '-no-chart': !isChartSupported
       })}
       onScroll={handleScroll}
       ref={containerRef}
@@ -456,6 +490,7 @@ function Component (): React.ReactElement {
         <DetailUpperBlock
           balanceValue={tokenBalanceValue}
           className={'__static-block'}
+          isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
           isSupportSwap={true}
