@@ -363,6 +363,26 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.staking?.ledger?.multi?.(useAddresses);
+
+    if (ledgers) {
+      for (let i = 0; i < useAddresses.length; i++) {
+        const address = useAddresses[i];
+        const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
+
+        if (_ledger.total > 0) {
+          result.push(address);
+        }
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */
@@ -798,15 +818,12 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     if (chainApi.api.tx.staking.withdrawUnbonded.meta.args.length === 1) {
       let slashingSpanCount: string | number;
 
-      if (chainApi.api.query.staking.nominatorSlashInEra) {
-        const currentEra = await chainApi.api.query.staking.currentEra();
-        const slashingSpans = (await chainApi.api.query.staking.nominatorSlashInEra(currentEra.toPrimitive(), address)).toPrimitive() as number;
-
-        slashingSpanCount = slashingSpans !== null ? slashingSpans.toString() : '0';
-      } else {
+      if (chainApi.api.query.staking.slashingSpans) {
         const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
 
         slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      } else {
+        slashingSpanCount = chainApi.api.consts.staking.historyDepth.toPrimitive();
       }
 
       return chainApi.api.tx.staking.withdrawUnbonded(slashingSpanCount);
