@@ -336,7 +336,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     // cache identities of validators in native staking
     if (this.useOnlineCacheOnly && !this.validatorInfoCachingInterval) {
-      this.runIntervalGetPoolTargets();
+      this.runIntervalGetPoolTargets().catch(console.error);
     }
 
     // Update promise handler
@@ -987,8 +987,18 @@ export default class EarningService implements StoppableServiceInterface, Persis
     return { ...prevValueCached[slug] };
   }
 
-  private runIntervalGetPoolTargets (): void {
-    const poolNeedUpdateIdentityValidators = Object.values(this.yieldPoolInfoSubject.getValue())
+  private async runIntervalGetPoolTargets (): Promise<void> {
+    let poolInfosSubjectValue = { ...this.yieldPoolInfoSubject.getValue() };
+
+    if (!Object.keys(poolInfosSubjectValue).length) {
+      try {
+        poolInfosSubjectValue = await fetchPoolsData();
+      } catch (e) {
+        console.log('Error fetching pools data:', e);
+      }
+    }
+
+    const poolNeedUpdateIdentityValidators = Object.values(poolInfosSubjectValue)
       .reduce<string[]>((list, pool) => {
       if (pool.type === YieldPoolType.NATIVE_STAKING && STAKING_IDENTITY_API_SLUG[pool.chain]) {
         list.push(pool.slug);
