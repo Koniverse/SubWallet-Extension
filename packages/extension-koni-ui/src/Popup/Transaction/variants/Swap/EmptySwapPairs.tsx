@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ActivityIndicator, PageIcon } from '@subwallet/react-ui';
+import { PageIcon } from '@subwallet/react-ui';
 import { MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -16,19 +15,10 @@ interface Props extends ThemeProps {
 
 const Component: React.FC<Props> = ({ className, onClickReload }: Props) => {
   const { t } = useTranslation();
-  const notify = useNotification();
 
   const handleReload = useCallback(() => {
-    notify({
-      icon: <ActivityIndicator size={32} />,
-      style: { top: 210 },
-      direction: 'vertical',
-      duration: 1.8,
-      closable: false,
-      message: t('Reloading')
-    });
     onClickReload();
-  }, [notify, onClickReload, t]);
+  }, [onClickReload]);
 
   return (
     <div className={className}>

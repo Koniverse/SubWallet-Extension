@@ -51,22 +51,9 @@ type WrapperProps = ThemeProps;
 type ComponentProps = {
   targetAccountProxy: AccountProxy;
   pairMap: Record<string, string[]>;
-  forceSkipDefaultToken: boolean;
+  defaultSlug: string;
   swappableSlugsSet: Set<string>;
 };
-
-/**
- * INIT: Init status.
- * READY: In case defaultSlug does not exist or is supported (present in swappableSlugsSet or multiAssetSlugSet).
- * NOT_SUPPORT: In case defaultSlug is not supported in swappableSlugsSet or multiAssetSlugSet.
- * SKIP: In case the user reloads while in NOT_SUPPORT state.
- */
-enum SupportDefaultTokenStatus {
-  INIT = 'INIT',
-  NOT_SUPPORT = 'NOT_SUPPORT',
-  SKIP = 'SKIP',
-  READY = 'READY'
-}
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
 
@@ -121,7 +108,7 @@ function getTokenSelectorItem (
 
 // todo: recheck validation logic, especially recipientAddress
 
-const Component = ({ forceSkipDefaultToken, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
+const Component = ({ defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
@@ -166,7 +153,6 @@ const Component = ({ forceSkipDefaultToken, pairMap, swappableSlugsSet, targetAc
 
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
 
-  const defaultSlug = forceSkipDefaultToken ? '' : defaultData.defaultSlug;
   const onIdle = useCallback(() => {
     !hasInternalConfirmations && !!confirmedTerm && showQuoteArea && setRequestUserInteractToContinue(true);
   }, [confirmedTerm, hasInternalConfirmations, showQuoteArea]);
@@ -348,9 +334,15 @@ const Component = ({ forceSkipDefaultToken, pairMap, swappableSlugsSet, targetAc
   }, [assetRegistryMap, defaultSlug, swappableSlugsSet, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
 
   const toTokenItems = useMemo(() => {
-    const destinationsSet = new Set(pairMap[fromTokenSlugValue] || []);
+    const destinationSlugs = pairMap[fromTokenSlugValue] || [];
 
-    return tokenSelectorItems.filter((item) => destinationsSet.has(item.slug));
+    if (destinationSlugs.length === 0) {
+      return [];
+    }
+
+    const destinationSlugSet = new Set(destinationSlugs);
+
+    return tokenSelectorItems.filter((item) => destinationSlugSet.has(item.slug));
   }, [fromTokenSlugValue, tokenSelectorItems, pairMap]);
 
   const fromAssetInfo = useMemo(() => {
@@ -1389,7 +1381,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const [pairMap, setPairMap] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
-  const [defaultSlugSupportStatus, setDefaultSlugSupportStatus] = useState<SupportDefaultTokenStatus>(SupportDefaultTokenStatus.INIT);
+  const [isSkipDefaultSlug, setIsSkipDefaultSlug] = useState<boolean>(false);
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1419,7 +1411,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const fetchDestinationsMap = useCallback(() => {
     setLoading(true);
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
     fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`, { signal: controller.signal })
       .then((rawResp) => {
@@ -1455,7 +1447,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }, []);
 
   const handleReloadNotSupportDefault = useCallback(() => {
-    setDefaultSlugSupportStatus(SupportDefaultTokenStatus.SKIP);
+    setIsSkipDefaultSlug(true);
   }, []);
 
   useEffect(() => {
@@ -1467,29 +1459,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   useEffect(() => {
     fetchDestinationsMap();
   }, [fetchDestinationsMap]);
-
-  useEffect(() => {
-    const defaultSlug = defaultData.defaultSlug;
-
-    if (!defaultSlug) {
-      setDefaultSlugSupportStatus(SupportDefaultTokenStatus.READY);
-
-      return;
-    }
-
-    if (loading) { // wait to get swappableSlugsSet
-      return;
-    }
-
-    // default token slug is supported and default token group is supported
-    if (swappableSlugsSet.has(defaultSlug) || multiAssetSlugSet.has(defaultSlug)) {
-      setDefaultSlugSupportStatus(SupportDefaultTokenStatus.READY);
-
-      return;
-    }
-
-    setDefaultSlugSupportStatus(SupportDefaultTokenStatus.NOT_SUPPORT);
-  }, [defaultData.defaultSlug, multiAssetSlugSet, swappableSlugsSet, loading]);
 
   if (!targetAccountProxy) {
     return (
@@ -1509,29 +1478,34 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     );
   }
 
-  if (defaultSlugSupportStatus === SupportDefaultTokenStatus.NOT_SUPPORT) {
+  const finalDefaultSlug = isSkipDefaultSlug ? '' : defaultData.defaultSlug;
+  const isUnsupportedDefaultSlug = (
+    finalDefaultSlug !== '' &&
+    !swappableSlugsSet.has(finalDefaultSlug) &&
+    !multiAssetSlugSet.has(finalDefaultSlug)
+  );
+
+  if (isUnsupportedDefaultSlug) {
     return (
       <EmptySwapPairs
         onClickReload={handleReloadNotSupportDefault}
       />
     );
-  } else if (defaultSlugSupportStatus === SupportDefaultTokenStatus.SKIP || defaultSlugSupportStatus === SupportDefaultTokenStatus.READY) {
-    return (
-      <PageWrapper
-        className={CN(className)}
-        resolve={dataContext.awaitStores(['price'])}
-      >
-        <Component
-          forceSkipDefaultToken={defaultSlugSupportStatus === SupportDefaultTokenStatus.SKIP}
-          pairMap={pairMap}
-          swappableSlugsSet={swappableSlugsSet}
-          targetAccountProxy={targetAccountProxy}
-        />
-      </PageWrapper>
-    );
-  } else {
-    return <LoadingScreen />;
   }
+
+  return (
+    <PageWrapper
+      className={CN(className)}
+      resolve={dataContext.awaitStores(['price'])}
+    >
+      <Component
+        defaultSlug={finalDefaultSlug}
+        pairMap={pairMap}
+        swappableSlugsSet={swappableSlugsSet}
+        targetAccountProxy={targetAccountProxy}
+      />
+    </PageWrapper>
+  );
 };
 
 const Swap = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
