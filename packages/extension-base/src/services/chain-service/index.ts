@@ -886,7 +886,7 @@ export class ChainService {
 
       if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
         if (!chainState || !chainState.manualTurnOff) {
-          await this.updateAssetSetting(assetSlug, { visible: true }, true);
+          await this.updateAssetSetting(assetSlug, { visible: true }, false);
         }
       }
     }
