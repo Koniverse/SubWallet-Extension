@@ -129,8 +129,6 @@ export class SwapService implements StoppableServiceInterface {
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
 
     console.group('Swap Logger');
-    console.log('path', path);
-    console.log('swapQuoteResponse', swapQuoteResponse);
 
     let optimalProcess;
 

@@ -10,7 +10,7 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, _isAcrossTestnetBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
@@ -33,6 +33,7 @@ import { u8aToHex } from '@polkadot/util';
 import { addressToEvm, isEthereumAddress } from '@polkadot/util-crypto';
 
 import { combineEthFee, combineSubstrateFee } from './combine';
+import {estimateXcmFee} from "@subwallet/extension-base/services/balance-service/transfer/xcm/utils";
 
 export interface CalculateMaxTransferable extends TransactionFee {
   address: string;
@@ -403,9 +404,16 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else if (feeChainType === 'substrate') {
       // Calculate fee for substrate transaction
       if (isSubstrateXcm) {
-        const estimatedFeeByDryRun = await dryRunXcmExtrinsicV2(params);
+        const xcmFeeInfo = await estimateXcmFee({
+          fromChainInfo: params.originChain,
+          fromTokenInfo: params.originTokenInfo,
+          toChainInfo: params.destinationChain,
+          recipient: params.recipient,
+          sender: params.sender,
+          value: params.sendingValue
+        });
 
-        estimatedFee = estimatedFeeByDryRun.fee || '0';
+        estimatedFee = xcmFeeInfo?.origin.fee || '0';
       } else {
         try {
           const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
