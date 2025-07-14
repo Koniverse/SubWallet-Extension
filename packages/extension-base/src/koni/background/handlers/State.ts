@@ -1,15 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationDefinitions, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
-import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import BuyService from '@subwallet/extension-base/services/buy-service';
@@ -33,6 +35,7 @@ import NotificationService from '@subwallet/extension-base/services/notification
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
+import { convertAssetToValue, convertValueToAsset, extractKeyHashesFromCollaterals, extractKeyHashesFromRequiredSigners, extractKeyHashesFromScripts, extractKeyHashesFromWithdrawals, extractKeyHashFromCertificate, getBalanceAddressMap } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/services/request-service/types';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
@@ -43,7 +46,8 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { convertCardanoHexToBech32 } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
@@ -578,10 +582,10 @@ export default class KoniState {
 
     if (authUrls[shortenUrl]) {
       if (chainInfo && !_isChainEnabled(chainState)) {
-        await this.enableChain(networkKey);
+        await this.enableChainWithPriorityAssets(networkKey);
       }
 
-      authUrls[shortenUrl].currentEvmNetworkKey = networkKey;
+      authUrls[shortenUrl].currentNetworkMap.evm = networkKey;
       this.setAuthorize(authUrls);
     } else {
       throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('Not found {{shortenUrl}} in auth list', { replace: { shortenUrl } }));
@@ -899,6 +903,14 @@ export default class KoniState {
     return this.chainService.enableChain(chainSlug);
   }
 
+  public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
+    if (enableTokens) {
+      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+    }
+
+    return this.chainService.enableChain(chainSlug);
+  }
+
   public resetDefaultChains () {
     const defaultChains = this.getDefaultNetworkKeys();
 
@@ -1111,6 +1123,7 @@ export default class KoniState {
 
     const payloadValidation: PayloadValidated = {
       address,
+      type: 'evm',
       payloadAfterValidated: payload,
       method,
       errors: [],
@@ -1177,6 +1190,7 @@ export default class KoniState {
   public async evmSendTransaction (id: string, url: string, transactionParams: EvmSendTransactionParams, networkKeyInit?: string, topic?: string): Promise<string | undefined> {
     const payloadValidation: PayloadValidated = {
       errors: [],
+      type: 'evm',
       networkKey: networkKeyInit || '',
       payloadAfterValidated: transactionParams,
       address: transactionParams.from
@@ -1194,7 +1208,7 @@ export default class KoniState {
 
     if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
       if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
-        return this.requestService.addConfirmation(id, url, confirmationType, { ...result, errors: errorsFormated }, {})
+        return this.requestService.addConfirmation(id, url, confirmationType as keyof ConfirmationDefinitions, { ...result, errors: errorsFormated }, {})
           .then(() => {
             throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
           });
@@ -1258,6 +1272,259 @@ export default class KoniState {
         reject(evmProviderError);
       });
     });
+  }
+
+  public async cardanoGetBalance (id: string, url: string, address: string): Promise<CardanoWasm.Value> {
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
+
+    let networkKey = authInfo?.currentNetworkMap.cardano;
+
+    const autoActiveChain = authInfo?.isAllowed || false;
+    const chainInfo = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
+
+    networkKey = chainInfo?.slug || 'cardano';
+    const cardanoApi = this.chainService.getCardanoApi(networkKey);
+    const networkAddress = reformatAddress(address, chainInfo?.isTestnet ? 0 : 1);
+    const balances = await cardanoApi.getBalanceMap(networkAddress);
+
+    return convertAssetToValue(balances);
+  }
+
+  public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData, currentAddress: string): Promise<ResponseCardanoSignData> {
+    const { address: addressHex, payload } = params;
+    const address = convertCardanoHexToBech32(addressHex);
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'cardano',
+      payloadAfterValidated: payload,
+      errors: [],
+      networkKey: ''
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationCardanoSignDataMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    if (!isSameAddress(address, currentAddress)) {
+      throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED);
+    }
+
+    const errorsFormated = convertErrorFormat(result.errors);
+    const payloadAfterValidated: CardanoSignatureRequest = {
+      ...result.payloadAfterValidated as CardanoSignatureRequest,
+      errors: errorsFormated,
+      id
+    };
+
+    return this.requestService.addConfirmationCardano(id, url, 'cardanoSignatureRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+          }
+        } else {
+          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_DATA_DECLINED);
+        }
+      });
+  }
+
+  // Todo: Add validate for this method
+  public async cardanoSignTx (id: string, url: string, param: RequestCardanoSignTransaction, currentAddress: string): Promise<ResponseCardanoSignTransaction> {
+    const { partialSign, tx: txHex } = param;
+    const tx = CardanoWasm.Transaction.from_hex(txHex);
+    const inputs = tx.body().inputs();
+    const outputs = tx.body().outputs();
+
+    const estimateCardanoFee = tx.body().fee().to_str();
+
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
+
+    if (!authInfo) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, t('Not found auth info'));
+    }
+
+    let requireKeyHashes: string[] = [];
+    let networkKey = authInfo?.currentNetworkMap.cardano;
+    let autoActiveChain = false;
+
+    if (authInfo?.isAllowed) {
+      autoActiveChain = true;
+    }
+
+    const currentEvmNetwork = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
+
+    networkKey = currentEvmNetwork?.slug || 'cardano';
+    const allUtxos = await this.chainService.getUtxosByAddress(currentAddress, networkKey);
+
+    const outputTransactionUnSpend = CardanoWasm.TransactionOutputs.new();
+
+    inputs.to_js_value().forEach((input) => {
+      const availableUtxo = allUtxos.find((utxo) => {
+        const txIn = utxo.input();
+
+        return txIn.transaction_id().to_hex() === input.transaction_id && txIn.index() === input.index;
+      });
+
+      if (availableUtxo) {
+        const keyHash = availableUtxo.output().address().payment_cred()?.to_keyhash()?.to_hex();
+
+        if (keyHash) {
+          requireKeyHashes.push(keyHash);
+        }
+
+        outputTransactionUnSpend.add(availableUtxo.output());
+      }
+    });
+
+    const addressInputMap = getBalanceAddressMap(outputTransactionUnSpend);
+    const addressOutputMap = getBalanceAddressMap(outputs);
+    const addressInputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
+    const addressOutputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
+    let transactionValue = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
+
+    for (const address in addressInputMap) {
+      const output = addressOutputMap[address] ?? CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
+      const input = addressInputMap[address];
+
+      const amount = input.checked_sub(output);
+
+      if (amount.is_zero()) {
+        continue;
+      }
+
+      addressInputAmountMap[address] = { values: convertValueToAsset(input) };
+      addressOutputAmountMap[address] = { values: convertValueToAsset(output) };
+
+      if (isSameAddress(currentAddress, address)) {
+        transactionValue = transactionValue.checked_add(amount);
+        addressInputAmountMap[address].isOwner = true;
+        addressOutputAmountMap[address].isOwner = true;
+      }
+    }
+
+    for (const address in addressOutputMap) {
+      if (!addressInputAmountMap[address] && !addressOutputMap[address].is_zero()) {
+        addressOutputAmountMap[address] = { values: convertValueToAsset(addressOutputMap[address]), isRecipient: true };
+      }
+    }
+
+    transactionValue = transactionValue.checked_sub(CardanoWasm.Value.new(tx.body().fee()));
+
+    const transactionBody = tx.body();
+    const getSpecificUtxo = this.chainService.getSpecificUtxo.bind(this);
+
+    requireKeyHashes.push(...extractKeyHashFromCertificate(transactionBody.certs()));
+    requireKeyHashes.push(...extractKeyHashesFromWithdrawals(transactionBody.withdrawals()));
+    requireKeyHashes.push(...extractKeyHashesFromRequiredSigners(transactionBody.required_signers()));
+    requireKeyHashes.push(...(await extractKeyHashesFromCollaterals(transactionBody.collateral(), getSpecificUtxo(networkKey))));
+    requireKeyHashes.push(...extractKeyHashesFromScripts(tx.witness_set().native_scripts()));
+
+    requireKeyHashes = [...new Set(requireKeyHashes)];
+    const addressRequireKeyTypes: CardanoKeyType[] = [];
+    const keyHashAddressMap: Record<string, CardanoKeyType> = {};
+
+    const pair = keyring.getPair(currentAddress);
+
+    if (pair) {
+      const publicKey = CardanoWasm.Bip32PublicKey.from_bytes(pair.publicKey);
+
+      const paymentPubKey = publicKey.derive(0).derive(0).to_raw_key().hash().to_hex();
+      const stakePubKey = publicKey.derive(2).derive(0).to_raw_key().hash().to_hex();
+
+      keyHashAddressMap[paymentPubKey] = 'payment';
+      keyHashAddressMap[stakePubKey] = 'stake';
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST);
+    }
+
+    const needForeignKeyHash = requireKeyHashes.some((key) => {
+      const ownKeyHash = keyHashAddressMap[key];
+
+      if (ownKeyHash) {
+        addressRequireKeyTypes.push(ownKeyHash);
+
+        return false;
+      }
+
+      return true;
+    });
+
+    const needOwnerKeyHash = requireKeyHashes.some((key) => {
+      const ownKeyHash = keyHashAddressMap[key];
+
+      if (ownKeyHash) {
+        addressRequireKeyTypes.push(ownKeyHash);
+
+        return true;
+      }
+
+      return false;
+    });
+
+    if (!needOwnerKeyHash) {
+      throw new CardanoProviderError(CardanoProviderErrorType.PROOF_GENERATION_FAILED, t('Not found owner key hash'));
+    }
+
+    if (needForeignKeyHash && !partialSign) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Not support foreign key hash yet');
+    }
+
+    const result: CardanoTransactionDappConfig = {
+      id,
+      txInputs: addressInputAmountMap,
+      txOutputs: addressOutputAmountMap,
+      addressRequireKeyTypes,
+      value: convertValueToAsset(transactionValue),
+      estimateCardanoFee,
+      from: currentAddress,
+      cardanoPayload: txHex,
+      networkKey
+    };
+
+    return this.requestService.addConfirmationCardano(id, url, 'cardanoSignTransactionRequest', result, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+          }
+        } else {
+          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED);
+        }
+      });
+  }
+
+  public async cardanoSubmitTx (id: string, url: string, txHex: string): Promise<string> {
+    const currentNetwork = this.requestService.getDAppChainInfo({
+      autoActive: true,
+      accessType: 'cardano',
+      url
+    });
+
+    const networkKey = currentNetwork?.slug || 'cardano_preproduction';
+
+    const cardanoApi = this.chainService.getCardanoApi(networkKey);
+
+    return await cardanoApi.sendCardanoTxReturnHash(txHex);
   }
 
   public getConfirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {

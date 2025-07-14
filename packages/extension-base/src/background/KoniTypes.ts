@@ -7,6 +7,7 @@ import { Resolver } from '@subwallet/extension-base/background/handlers/State';
 import { AccountAuthType, AuthorizeRequest, ConfirmationRequestBase, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeCancel, RequestAuthorizeReject, RequestAuthorizeSubscribe, RequestAuthorizeTab, RequestCurrentAccountAddress, ResponseAuthorizeList } from '@subwallet/extension-base/background/types';
 import { AppConfig, BrowserConfig, OSConfig } from '@subwallet/extension-base/constants';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
+import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
@@ -1104,7 +1105,7 @@ export interface TonSignRequest {
 }
 
 export interface CardanoSignRequest {
-  account: AccountJson;
+  address: string;
   hashPayload: string;
   canSign: boolean;
 }
@@ -1130,7 +1131,7 @@ export interface TonSignatureRequest extends TonSignRequest {
 
 export interface CardanoSignatureRequest extends CardanoSignRequest {
   id: string;
-  type: string;
+  errors?: ErrorValidation[];
   payload: unknown
 }
 
@@ -1141,9 +1142,76 @@ export interface EvmSendTransactionRequest extends TransactionConfig, EvmSignReq
   errors?: ErrorValidation[]
 }
 
+// Cardano Request Dapp Input
+export enum CardanoProviderErrorType {
+  INVALID_REQUEST = 'INVALID_REQUEST',
+  REFUSED_REQUEST = 'REFUSED_REQUEST',
+  ACCOUNT_CHANGED = 'ACCOUNT_CHANGED',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  PROOF_GENERATION_FAILED = 'PROOF_GENERATION_FAILED',
+  ADDRESS_SIGN_NOT_PK = 'ADDRESS_SIGN_NOT_PK',
+  SIGN_DATA_DECLINED = 'SIGN_DATA_DECLINED',
+  SUBMIT_TRANSACTION_REFUSED = 'SUBMIT_TRANSACTION_REFUSED',
+  SUBMIT_TRANSACTION_FAILURE = 'SUBMIT_TRANSACTION_FAILURE',
+  SIGN_TRANSACTION_DECLINED = 'SIGN_TRANSACTION_DECLINED',
+}
+
+export type Cbor = string;
+export type CardanoPaginate = {
+  page: number,
+  limit: number,
+};
+
+export interface RequestCardanoGetUtxos {
+  amount?: Cbor;
+  paginate?: CardanoPaginate;
+}
+
+export interface RequestCardanoGetCollateral {
+  amount: Cbor;
+}
+
+export interface RequestCardanoSignData {
+  address: string;
+  payload: string;
+}
+
+export interface ResponseCardanoSignData {
+  signature: Cbor,
+  key: Cbor,
+}
+
+export interface RequestCardanoSignTransaction {
+  tx: Cbor;
+  partialSign: boolean
+}
+
+export interface AddressCardanoTransactionBalance {
+  values: CardanoBalanceItem[],
+  isOwner?: boolean,
+  isRecipient?: boolean
+}
+
+export type CardanoKeyType = 'stake' | 'payment';
+export interface CardanoTransactionDappConfig {
+  txInputs: Record<string, AddressCardanoTransactionBalance>,
+  txOutputs: Record<string, AddressCardanoTransactionBalance>,
+  networkKey: string,
+  from: string,
+  addressRequireKeyTypes: CardanoKeyType[],
+  value: CardanoBalanceItem[],
+  estimateCardanoFee: string,
+  cardanoPayload: string,
+  errors?: ErrorValidation[],
+  id: string,
+}
+
+export type ResponseCardanoSignTransaction = Cbor;
+
 // TODO: add account info + dataToSign
 export type TonSendTransactionRequest = TonTransactionConfig;
 export type CardanoSendTransactionRequest = CardanoTransactionConfig;
+export type CardanoSignTransactionRequest = CardanoTransactionDappConfig;
 
 export type EvmWatchTransactionRequest = EvmSendTransactionRequest;
 export type TonWatchTransactionRequest = TonSendTransactionRequest;
@@ -1215,8 +1283,9 @@ export interface ConfirmationDefinitionsTon {
 }
 
 export interface ConfirmationDefinitionsCardano {
-  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<string>],
+  cardanoSignatureRequest: [ConfirmationsQueueItem<CardanoSignatureRequest>, ConfirmationResult<ResponseCardanoSignData>],
   cardanoSendTransactionRequest: [ConfirmationsQueueItem<CardanoSendTransactionRequest>, ConfirmationResult<string>],
+  cardanoSignTransactionRequest: [ConfirmationsQueueItem<CardanoSignTransactionRequest>, ConfirmationResult<string>],
   cardanoWatchTransactionRequest: [ConfirmationsQueueItem<CardanoWatchTransactionRequest>, ConfirmationResult<string>]
 }
 
@@ -1779,6 +1848,15 @@ export interface TokenPriorityDetails {
   token: Record<string, number>
 }
 
+// Sufficient chains
+
+export interface SufficientChainsDetails {
+  assetHubPallet: string[],
+  assetsPallet: string[],
+  foreignAssetsPallet: string[],
+  assetRegistryPallet: string[]
+}
+
 /// WalletConnect
 
 // Connect
@@ -2004,6 +2082,10 @@ export interface RequestPingSession {
   sessionId: string;
 }
 
+export interface ExtrinsicsDataResponse {
+  extrinsics: { id: string }[];
+}
+
 /* Core types */
 export type _Address = string;
 export type _BalanceMetadata = unknown;
@@ -2034,6 +2116,7 @@ export interface KoniRequestSignatures {
   'pri(chainService.upsertChain)': [_NetworkUpsertParams, boolean];
   'pri(chainService.enableChains)': [EnableMultiChainParams, boolean];
   'pri(chainService.enableChain)': [EnableChainParams, boolean];
+  'pri(chainService.enableChainWithPriorityAssets)': [EnableChainParams, boolean];
   'pri(chainService.reconnectChain)': [string, boolean];
   'pri(chainService.disableChains)': [string[], boolean];
   'pri(chainService.disableChain)': [string, boolean];
@@ -2301,6 +2384,17 @@ export interface KoniRequestSignatures {
   'evm(events.subscribe)': [RequestEvmEvents, boolean, EvmEvent];
   'evm(request)': [RequestArguments, unknown];
   'evm(provider.send)': [RequestEvmProviderSend, string | number, ResponseEvmProviderSend];
+
+  // Cardano
+  'cardano(account.get.address)': [null, string[]];
+  'cardano(account.get.balance)': [null, Cbor];
+  'cardano(account.get.change.address)': [null, string];
+  'cardano(account.get.utxos)': [RequestCardanoGetUtxos, Cbor[] | null];
+  'cardano(account.get.collateral)': [RequestCardanoGetCollateral, Cbor[] | null];
+  'cardano(network.get.current)': [null, number];
+  'cardano(data.sign)': [RequestCardanoSignData, ResponseCardanoSignData];
+  'cardano(transaction.sign)': [RequestCardanoSignTransaction, ResponseCardanoSignTransaction];
+  'cardano(transaction.submit)': [Cbor, string];
 
   // Evm Transaction
   'pri(evm.transaction.parse.input)': [RequestParseEvmContractInput, ResponseParseEvmContractInput];
