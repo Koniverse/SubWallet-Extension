@@ -46,10 +46,15 @@ const Component: React.FC<Props> = (props: Props) => {
     }));
   }, [onClickItem, selectedTimeframe, timeframeLabelMap]);
 
+  const getDropdownPopupContainer = useCallback((trigger: HTMLElement) => {
+    return (trigger.parentNode as HTMLElement) || document.body;
+  }, []);
+
   return (
     <>
       <Dropdown
         arrow={false}
+        getPopupContainer={getDropdownPopupContainer}
         menu={{ items: dropdownMenu }}
         onOpenChange={setIsDropdownOpen}
         open={isDropdownOpen}

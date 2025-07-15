@@ -164,7 +164,7 @@ export const DetailListDesktopContent = styled(Component)<ThemeProps>(({ theme: 
 
     '.__price-chart-area': {
       maxWidth: 480,
-      flex: 1,
+      flex: 1
     },
 
     '.__token-balance-area': {
@@ -179,7 +179,7 @@ export const DetailListDesktopContent = styled(Component)<ThemeProps>(({ theme: 
     '.__your-balance-container': {
       display: 'flex',
       justifyContent: 'space-between',
-      marginBottom: 24
+      marginBottom: token.margin
     },
 
     '.__your-balance-label': {
@@ -190,27 +190,32 @@ export const DetailListDesktopContent = styled(Component)<ThemeProps>(({ theme: 
     },
 
     '.__table': {
-      flex: 1,
+      marginLeft: -token.marginSM,
+      marginRight: -token.marginSM,
+
+      'tr.ant-table-row:hover > td': {
+        background: `${token.colorBgInput} !important`
+      },
 
       table: {
 
       },
 
       td: {
-        backgroundColor: 'transparent !important'
+
       },
 
       '.ant-table-row': {
         cursor: 'pointer'
       },
 
-      '.ant-table-cell.ant-table-cell.ant-table-cell': {
+      'th.ant-table-cell.ant-table-cell': {
         '&:first-child': {
-          paddingLeft: 0
+          paddingLeft: token.paddingSM
         },
 
         '&:last-child': {
-          paddingRight: 0
+          paddingRight: token.paddingSM
         }
       }
     },
