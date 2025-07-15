@@ -169,30 +169,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return [];
   }, [toTarget, poolTargetsMap, poolType, slug]);
 
-  const expandNominations = useMemo(() => {
-    const validatorList = poolTargetsMap[slug] as ValidatorInfo[];
-
-    if (!nominations || !validatorList) {
-      return nominations;
-    }
-
-    const validatorMap = validatorList.reduce<Record<string, ValidatorInfo>>((acc, val) => {
-      acc[reformatAddress(val.address)] = val;
-
-      return acc;
-    }, {});
-
-    return nominations.map((nomination) => {
-      const matched = validatorMap[reformatAddress(nomination.validatorAddress)];
-
-      return {
-        ...nomination,
-        commission: matched?.commission,
-        expectedReturn: matched?.expectedReturn
-      };
-    });
-  }, [nominations, poolTargetsMap, slug]);
-
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const isDisabled = useMemo(() =>
     !originValidator || !toTarget || (isShowAmountChange && !value),
@@ -447,7 +423,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             isChangeValidator={true}
             label={t('From')}
             networkPrefix={networkPrefix}
-            nominators={expandNominations}
+            nominators={nominations}
             poolInfo={poolInfo}
           />
         </Form.Item>
@@ -526,8 +502,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               <Number
                 className='minimum-stake__value'
                 decimal={decimals}
-                suffix={symbol}
-                value={BigN(poolInfo.statistic?.earningThreshold.join || 0).multipliedBy(1 / earningRate)}
+                suffix={ earningRate > 0 ? symbol : bondedAsset?.symbol}
+                value={
+                  earningRate > 0
+                    ? BigN(poolInfo.statistic?.earningThreshold.join || 0).div(earningRate)
+                    : BigN(poolInfo.statistic?.earningThreshold.join || 0)
+                }
               />
             </div>
           </div>
@@ -541,7 +521,7 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingSM
     },
 
     '.ant-sw-modal-body': {

@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { NominationInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
+import { StakingNominationItem, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
@@ -15,7 +15,7 @@ import { fetchPoolTarget } from '@subwallet/extension-koni-ui/messaging';
 import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { ChangeValidatorParams, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
+import { getTransactionFromAccountProxyValue, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { Book, CaretLeft } from 'phosphor-react';
@@ -160,14 +160,6 @@ const Component = (props: Props) => {
     setIsChangeValidatorModalVisible(false);
   }, []);
 
-  const onClickMore = useCallback((item: ValidatorDataType) => {
-    return (e: SyntheticEvent) => {
-      e.stopPropagation();
-      setViewDetailItem(item);
-      activeModal(VALIDATOR_DETAIL_MODAL);
-    };
-  }, [activeModal]);
-
   const renderEmpty = useCallback(() => {
     return (
       <EmptyValidator
@@ -177,6 +169,48 @@ const Component = (props: Props) => {
       />
     );
   }, [handleValidatorLabel, items, setForceFetchValidator, t]);
+
+  const expandNominations = useMemo(() => {
+    if (!nominations || !items) {
+      return nominations;
+    }
+
+    const validatorMap = items.reduce<Record<string, ValidatorDataType>>((acc, val) => {
+      acc[reformatAddress(val.address)] = val;
+
+      return acc;
+    }, {});
+
+    return nominations.map((nomination) => {
+      const matched = validatorMap[reformatAddress(nomination.validatorAddress)];
+
+      return {
+        ...nomination,
+        commission: matched?.commission,
+        expectedReturn: matched?.expectedReturn
+      };
+    });
+  }, [items, nominations]);
+
+  const renderStakedItem = useCallback((item: NominationInfo) => {
+    return (
+      <StakingNominationItem
+        className={'pool-item'}
+        isChangeValidator={true}
+        isSelected={false}
+        nominationInfo={item}
+        poolInfo={poolInfo}
+      />
+    );
+  }, [poolInfo]);
+
+  const onClickMore = useCallback((item: ValidatorDataType) => {
+    return (e: SyntheticEvent) => {
+      e.stopPropagation();
+      setViewDetailItem(item);
+      activeModal(VALIDATOR_DETAIL_MODAL);
+    };
+  }, [activeModal]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
@@ -254,8 +288,8 @@ const Component = (props: Props) => {
         title={t(title)}
       >
         <SwList
-          list={resultList}
-          renderItem={renderItem}
+          list={readOnly ? resultList : expandNominations}
+          renderItem={readOnly ? renderItem : renderStakedItem}
           renderWhenEmpty={renderEmpty}
         />
       </SwModal>
@@ -267,6 +301,7 @@ const Component = (props: Props) => {
           validatorItem={viewDetailItem}
         />
       )}
+
       {!readOnly && isChangeValidatorModalVisible && (
         <Transaction
           modalContent={true}
@@ -282,7 +317,7 @@ const Component = (props: Props) => {
                 items={items}
                 loading={targetLoading}
                 modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-                nominations={nominations}
+                nominations={expandNominations}
                 onCancel={onCancel}
                 setForceFetchValidator={setForceFetchValidator}
                 slug={poolInfo.slug}
@@ -346,7 +381,7 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ th
     '&.modal-full': {
       '.ant-sw-modal-header': {
         paddingTop: token.paddingXS,
-        paddingBottom: token.paddingLG
+        paddingBottom: token.paddingSM
       },
 
       '.ant-sw-list': {

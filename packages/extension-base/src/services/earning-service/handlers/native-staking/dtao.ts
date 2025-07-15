@@ -684,22 +684,6 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
 
-  public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
-    const baseErrors = await super.validateYieldJoin(data, path);
-
-    if (baseErrors.length > 0) {
-      return baseErrors;
-    }
-
-    const { amount } = data;
-
-    if (new BigN(amount).lt(new BigN(DEFAULT_DTAO_MINBOND))) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(DEFAULT_DTAO_MINBOND, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
-    }
-
-    return baseErrors;
-  }
-
   /* Join pool action */
 
   /* Leave pool action */

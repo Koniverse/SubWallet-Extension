@@ -8,6 +8,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, CurrencyCircleDollar } from 'phosphor-react';
 import React from 'react';
@@ -60,7 +61,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   ? (
                     <div className={'middle-item__change-validator'}>
                       <div className={'middle-item'}>
-                        {nominationInfo.commission && (
+                        {nominationInfo.commission !== undefined && (
                           <span className='middle-item__commission'>
                             <Icon
                               phosphorIcon={CurrencyCircleDollar}
@@ -74,22 +75,26 @@ const Component: React.FC<Props> = (props: Props) => {
                           <>
                             -
                             <div className='middle-item__apy'>
-                            &nbsp;APY: {nominationInfo.expectedReturn}%
+                            &nbsp;{t('APY')}: {formatBalance(nominationInfo.expectedReturn, 0)}%
                             </div>
                           </>
                         )}
                       </div>
-                      <span className={'middle-item__active-stake'}>
-                        {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
-                      </span>
+                      {new BigN(nominationInfo.activeStake).gt(0) && (
+                        <span className={'middle-item__active-stake'}>
+                          {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
+                        </span>
+                      )}
                     </div>
                   )
                   : (
-                    <div className={'middle-item__active-stake'}>
-                      <span>{t('Staked:')}</span>
-                      <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
-                      <span>{subnetSymbol || symbol}</span>
-                    </div>
+                    new BigN(nominationInfo.activeStake).gt(0) && (
+                      <div className={'middle-item__active-stake'}>
+                        <span>{t('Staked:')}</span>
+                        <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
+                        <span>{subnetSymbol || symbol}</span>
+                      </div>
+                    )
                   )
               }
             </div>
