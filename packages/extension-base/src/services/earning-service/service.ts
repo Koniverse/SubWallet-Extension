@@ -240,7 +240,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
               ExtrinsicType.TRANSFER_TOKEN,
               ExtrinsicType.TRANSFER_XCM,
               ExtrinsicType.SEND_NFT,
-              ExtrinsicType.CROWDLOAN
+              ExtrinsicType.CROWDLOAN,
+              ExtrinsicType.VOTE,
+              ExtrinsicType.DELEGATE,
+              ExtrinsicType.UNLOCK
             ];
 
             if (notRequireReloadTypes.indexOf(transactionData.extrinsicType) === -1) {

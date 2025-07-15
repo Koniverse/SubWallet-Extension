@@ -121,6 +121,16 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
       label: t('History'),
       key: 'history',
       url: '/home/history'
+    },
+    {
+      icon: {
+        type: 'phosphor',
+        phosphorIcon: Parachute,
+        weight: 'fill'
+      },
+      label: t('Governance'),
+      key: 'openGov',
+      url: '/home/openGov'
     }
   ]), [t, latestLiveMissionIds]);
 
