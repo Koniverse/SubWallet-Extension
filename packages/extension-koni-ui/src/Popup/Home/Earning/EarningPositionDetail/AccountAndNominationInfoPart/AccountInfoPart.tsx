@@ -197,7 +197,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                 className={'__meta-earning-status-item'}
                 label={renderAccount(item)}
                 statusIcon={EarningStatusUi[item.status].icon}
-                statusName={EarningStatusUi[item.status].name}
+                statusName={t(EarningStatusUi[item.status].name)}
                 valueColorSchema={EarningStatusUi[item.status].schema}
               />
             )}
