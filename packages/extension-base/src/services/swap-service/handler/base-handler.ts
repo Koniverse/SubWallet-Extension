@@ -840,13 +840,7 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', {
-        replace: {
-          amount: atLeastString,
-          symbol: _getAssetSymbol(swapToken)
-        }
-      }
-      ))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('bg.service.swap.baseHandler.swapAmountTooSmall', { replace: { amount: atLeastString, symbol: _getAssetSymbol(swapToken)} }))];
     }
 
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
