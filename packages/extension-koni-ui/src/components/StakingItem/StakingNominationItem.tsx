@@ -57,28 +57,24 @@ const Component: React.FC<Props> = (props: Props) => {
 
             <div className={'middle-item__info'}>
               {
-                isChangeValidator && (nominationInfo.commission || nominationInfo.expectedReturn)
+                isChangeValidator
                   ? (
                     <div className={'middle-item__change-validator'}>
                       <div className={'middle-item'}>
-                        {nominationInfo.commission !== undefined && (
-                          <span className='middle-item__commission'>
-                            <Icon
-                              phosphorIcon={CurrencyCircleDollar}
-                              size='xs'
-                              weight='fill'
-                            />
-                            &nbsp;: {nominationInfo.commission}%
-                          </span>
-                        )}
-                        {nominationInfo.expectedReturn && (
-                          <>
+                        <span className='middle-item__commission'>
+                          <Icon
+                            phosphorIcon={CurrencyCircleDollar}
+                            size='xs'
+                            weight='fill'
+                          />
+                            &nbsp;: {nominationInfo.commission !== undefined ? `${nominationInfo.commission}%` : 'N/A'}
+                        </span>
+                        <>
                             -
-                            <div className='middle-item__apy'>
-                            &nbsp;{t('APY')}: {formatBalance(nominationInfo.expectedReturn, 0)}%
-                            </div>
-                          </>
-                        )}
+                          <div className='middle-item__apy'>
+                            &nbsp;{t('APY')}: {nominationInfo.expectedReturn ? formatBalance(nominationInfo.expectedReturn, 0) : '0'}%
+                          </div>
+                        </>
                       </div>
                       {new BigN(nominationInfo.activeStake).gt(0) && (
                         <span className={'middle-item__active-stake'}>

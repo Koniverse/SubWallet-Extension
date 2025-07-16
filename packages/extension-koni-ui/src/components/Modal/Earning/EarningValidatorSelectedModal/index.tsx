@@ -32,6 +32,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;
   from: string;
   slug: string;
+  displayType: 'validator' | 'nomination';
   title?: string;
   nominations: NominationInfo[]
   readOnly?: boolean;
@@ -40,8 +41,8 @@ interface Props extends ThemeProps, BasicInputWrapper {
 }
 
 const Component = (props: Props) => {
-  const { addresses, chain, className = '', compound, from
-    , modalId, nominations, onChange, readOnly, slug, title = 'Your validators' } = props;
+  const { addresses, chain, className = '', compound, displayType: displayTypeProps
+    , from, modalId, nominations, onChange, readOnly, slug, title = 'Your validators' } = props;
 
   const EARNING_CHANGE_VALIDATOR_MODAL = `${modalId}-change-validator`;
 
@@ -79,7 +80,7 @@ const Component = (props: Props) => {
     return undefined;
   }, [poolInfo]);
 
-  const resultList = useMemo(() => {
+  const validatortList = useMemo(() => {
     if (addresses && addresses.length > 0) {
       return items
         .filter((item) => addresses.includes(item.address.trim()))
@@ -192,18 +193,6 @@ const Component = (props: Props) => {
     });
   }, [items, nominations]);
 
-  const renderStakedItem = useCallback((item: NominationInfo) => {
-    return (
-      <StakingNominationItem
-        className={'pool-item'}
-        isChangeValidator={true}
-        isSelected={false}
-        nominationInfo={item}
-        poolInfo={poolInfo}
-      />
-    );
-  }, [poolInfo]);
-
   const onClickMore = useCallback((item: ValidatorDataType) => {
     return (e: SyntheticEvent) => {
       e.stopPropagation();
@@ -212,23 +201,41 @@ const Component = (props: Props) => {
     };
   }, [activeModal]);
 
-  const renderItem = useCallback((item: ValidatorDataType) => {
-    const key = getValidatorKey(item.address, item.identity);
+  const renderItem = useCallback(
+    (item: ValidatorDataType | NominationInfo) => {
+      if (displayTypeProps === 'validator') {
+        const validator = item as ValidatorDataType;
+        const key = getValidatorKey(validator.address, validator.identity);
 
-    return (
-      <StakingValidatorItem
-        apy={item?.expectedReturn?.toString() || '0'}
-        className={'pool-item'}
-        isNominated={false}
-        isSelected={false}
-        key={key}
-        onClickMoreBtn={onClickMore(item)}
-        prefixAddress = {networkPrefix}
-        showUnSelectedIcon={false}
-        validatorInfo={item}
-      />
-    );
-  }, [networkPrefix, onClickMore]);
+        return (
+          <StakingValidatorItem
+            apy={validator?.expectedReturn?.toString() || '0'}
+            className='pool-item'
+            isNominated={false}
+            isSelected={false}
+            key={key}
+            onClickMoreBtn={onClickMore(validator)}
+            prefixAddress={networkPrefix}
+            showUnSelectedIcon={false}
+            validatorInfo={validator}
+          />
+        );
+      }
+
+      const nomination = item as NominationInfo;
+
+      return (
+        <StakingNominationItem
+          className='pool-item'
+          isChangeValidator={true}
+          isSelected={false}
+          nominationInfo={nomination}
+          poolInfo={poolInfo}
+        />
+      );
+    },
+    [displayTypeProps, networkPrefix, onClickMore, poolInfo]
+  );
 
   useEffect(() => {
     let unmount = false;
@@ -288,8 +295,8 @@ const Component = (props: Props) => {
         title={t(title)}
       >
         <SwList
-          list={readOnly ? resultList : expandNominations}
-          renderItem={readOnly ? renderItem : renderStakedItem}
+          list={displayTypeProps === 'validator' ? validatortList : expandNominations}
+          renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
         />
       </SwModal>

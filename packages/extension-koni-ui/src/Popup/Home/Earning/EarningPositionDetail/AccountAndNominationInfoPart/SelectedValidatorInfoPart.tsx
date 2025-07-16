@@ -70,6 +70,7 @@ function Component ({ addresses, className, compound, poolInfo }: Props) {
         chain={poolInfo.chain}
         compound={compound}
         disabled={false}
+        displayType={'nomination'}
         from={compound.address}
         modalId={EARNING_SELECTED_VALIDATOR_MODAL}
         nominations={compound.nominations}
