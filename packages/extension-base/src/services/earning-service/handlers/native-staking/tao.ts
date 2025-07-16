@@ -17,7 +17,7 @@ import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { DEFAULT_DTAO_MINBOND, TestnetBittensorDelegateInfo } from './dtao';
+import { TestnetBittensorDelegateInfo } from './dtao';
 
 export interface TaoStakeInfo {
   hotkey: string;
@@ -640,7 +640,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
     }
 
-    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+    const minDelegatorStake = (await this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
+    const bnMinUnstake = new BigN(minDelegatorStake.toString());
 
     if (new BigN(amount).lt(bnMinUnstake)) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`))];
@@ -672,14 +673,15 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
     }
 
-    const bnMinUnstake = new BigN(DEFAULT_DTAO_MINBOND);
+    const minDelegatorStake = (await this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
+    const bnMinMoveStake = new BigN(minDelegatorStake.toString());
 
-    if (new BigN(maxAmount).lt(bnMinUnstake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
+    if (new BigN(maxAmount).lt(bnMinMoveStake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formatNumber(bnMinMoveStake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)}`)));
     }
 
     // Avoid remaining amount too low -> can't do anything with that amount
-    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
+    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinMoveStake)) {
       return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
         t(`Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit "Move all" to move all ${formatNumber(maxAmount, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to the new validator, or "Cancel" and lower the amount, then try again`
         )));
