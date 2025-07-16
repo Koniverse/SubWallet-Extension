@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
-import { createPromiseHandler } from '@subwallet/extension-base/utils';
+import {createPromiseHandler, detectTranslate} from '@subwallet/extension-base/utils';
 import DefaultLogosMap, { IconMap } from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountNameModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import CloseIcon from '@subwallet/extension-koni-ui/components/Icon/CloseIcon';
@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={('ui.Account.ImportQrCode.scanQrInstruction')}
+                i18nKey={detectTranslate('ui.Account.ImportQrCode.scanQrInstruction')}
               />
             </div>
           </div>

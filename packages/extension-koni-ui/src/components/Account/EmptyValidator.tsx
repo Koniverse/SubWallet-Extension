@@ -8,6 +8,7 @@ import { MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 interface Props extends ThemeProps {
   validatorTitle: string,
@@ -61,7 +62,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
                       />
                     )
                   }}
-                  i18nKey={('ui.Account.EmptyValidator.pleaseReload')}
+                  i18nKey={detectTranslate('ui.Account.EmptyValidator.pleaseReload')}
                 />
               </div>
             </div>

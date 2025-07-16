@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
-import { _isRuntimeUpdated } from '@subwallet/extension-base/utils';
+import {_isRuntimeUpdated, detectTranslate} from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY } from '@subwallet/extension-koni-ui/constants';
 import { InjectContext } from '@subwallet/extension-koni-ui/contexts/InjectContext';
@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
+            i18nKey={detectTranslate('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
             values={{ networkName }}
           />),
         okButton: {
@@ -181,7 +181,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateAndRetry')}
+                i18nKey={detectTranslate('ui.Confirmations.Sign.Substrate.metadataOutOfDateUpdateAndRetry')}
                 values={{ networkName }}
               />
             )
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={('ui.Confirmations.Sign.Substrate.ledgerSignWithPolkadotApp')}
+                    i18nKey={detectTranslate('ui.Confirmations.Sign.Substrate.ledgerSignWithPolkadotApp')}
                   />
                 )
               };
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={('ui.Confirmations.Sign.Substrate.ledgerSignWithMigrationApp')}
+                    i18nKey={detectTranslate('ui.Confirmations.Sign.Substrate.ledgerSignWithMigrationApp')}
                     values={{ networkName }}
                   />
                 )

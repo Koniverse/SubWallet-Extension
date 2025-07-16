@@ -23,6 +23,8 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps
 
@@ -210,12 +212,20 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Checkbox
                 className={'checkbox'}
               >
-                I understand that SubWallet can’t recover the password. <a
-                  href={TERMS_OF_SERVICE_URL}
-                  rel='noreferrer'
-                  style={{ textDecoration: 'underline' }}
-                  target={'_blank'}
-                >Learn more.</a>
+                <Trans
+                  components={{
+                    highlight: (
+                      <a
+                        className='link'
+                        href={TERMS_OF_SERVICE_URL}
+                        style={{ textDecoration: 'underline' }}
+                        rel='noopener noreferrer'
+                        target='_blank'
+                      />
+                    )
+                  }}
+                  i18nKey={detectTranslate('ui.Keyring.CreatePassword.understandPasswordNotRecoverable')}
+                />
               </Checkbox>
             </Form.Item>
           </Form>

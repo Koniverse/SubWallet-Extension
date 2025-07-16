@@ -4,7 +4,7 @@
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
+import {detectTranslate, isAccountAll} from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
@@ -530,14 +530,14 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 />
               )
             }}
-            i18nKey={('ui.BuyTokens.leavingSubwalletDisclaimer')}
+            i18nKey={detectTranslate('ui.BuyTokens.leavingSubwalletDisclaimer')}
             values={{
               service: serviceName
             }}
           />
           <br />
           <Trans
-            i18nKey={('ui.BuyTokens.regionalTokenWarning')}
+            i18nKey={detectTranslate('ui.BuyTokens.regionalTokenWarning')}
             values={{
               service: serviceName,
               action: ('buying')

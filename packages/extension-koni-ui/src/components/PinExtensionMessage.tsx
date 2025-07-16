@@ -10,6 +10,7 @@ import { PushPinSimple, PuzzlePiece } from 'phosphor-react';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 
@@ -58,7 +59,7 @@ const Component: React.FC<Props> = (props: Props) => {
               <Icon phosphorIcon={PushPinSimple} />
             )
           }}
-          i18nKey={('ui.PinExtensionMessage.pinExtensionInstruction')}
+          i18nKey={detectTranslate('ui.PinExtensionMessage.pinExtensionInstruction')}
         />
       </div>
     </div>

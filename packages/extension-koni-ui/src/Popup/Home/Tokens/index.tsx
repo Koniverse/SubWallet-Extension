@@ -26,6 +26,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 
@@ -350,7 +351,7 @@ const Component = (): React.ReactElement => {
                       />
                     )
                   }}
-                  i18nKey={('ui.Tokens.tonWalletVersionInfo')}
+                  i18nKey={detectTranslate('ui.Tokens.tonWalletVersionInfo')}
                 />}
                 title={t('ui.Tokens.changeWalletAddressAndVersion')}
                 type={'warning'}

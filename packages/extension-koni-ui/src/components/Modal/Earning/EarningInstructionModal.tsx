@@ -8,7 +8,7 @@ import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
+import {balanceFormatter, detectTranslate, formatNumber} from '@subwallet/extension-base/utils';
 import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -529,7 +529,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={('ui.Modal.Earning.Instruction.readFaqForStakingInfo')}
+            i18nKey={detectTranslate('ui.Modal.Earning.Instruction.readFaqForStakingInfo')}
           />
         </div>
 

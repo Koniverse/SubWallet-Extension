@@ -29,6 +29,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 
@@ -538,7 +539,7 @@ function Component (): React.ReactElement {
                       />
                     )
                   }}
-                  i18nKey={('ui.Tokens.DetailList.tonWalletVersionInfo')}
+                  i18nKey={detectTranslate('ui.Tokens.DetailList.tonWalletVersionInfo')}
                 />}
                 title={t('ui.Tokens.DetailList.changeWalletAddressAndVersion')}
                 type={'warning'}

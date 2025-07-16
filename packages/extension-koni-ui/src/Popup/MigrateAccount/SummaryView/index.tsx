@@ -14,6 +14,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps & {
   resultProxyIds: string[];
@@ -108,7 +109,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       />
                     )
                   }}
-                  i18nKey={('ui.MigrateAccount.SummaryView.migrationCompleteReviewGuide')}
+                  i18nKey={detectTranslate('ui.MigrateAccount.SummaryView.migrationCompleteReviewGuide')}
                 />
               </div>
             )
@@ -130,7 +131,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccounts')}
+                          i18nKey={detectTranslate('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccounts')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -144,7 +145,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccount')}
+                          i18nKey={detectTranslate('ui.MigrateAccount.SummaryView.successfullyMigratedToUnifiedAccount')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )

@@ -14,6 +14,7 @@ import CN from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 interface Props extends ThemeProps {
   request: ConfirmationRequestBase;
@@ -80,7 +81,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span className='highlight' />
               )
             }}
-            i18nKey={('ui.Confirmations.NotSupport.featureNotAvailableForAccountType')}
+            i18nKey={detectTranslate('ui.Confirmations.NotSupport.featureNotAvailableForAccountType')}
             values={{ accountTitle }}
           />
         </div>

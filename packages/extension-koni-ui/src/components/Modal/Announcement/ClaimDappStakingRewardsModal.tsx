@@ -10,6 +10,7 @@ import React, { useCallback, useContext } from 'react';
 import { Trans } from 'react-i18next';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps
 const modalId = CLAIM_DAPP_STAKING_REWARDS_MODAL;
@@ -104,7 +105,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={('ui.Modal.Announcement.ClaimDappStakingRewards.astarStakingV3LaunchWarning')}
+            i18nKey={detectTranslate('ui.Modal.Announcement.ClaimDappStakingRewards.astarStakingV3LaunchWarning')}
           />
         </div>
       </SwModal>

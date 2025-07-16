@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
+import {detectTranslate, isAccountAll} from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
 import { EarningPositionItem } from '@subwallet/extension-koni-ui/components/Earning';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
@@ -161,7 +161,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
                   ),
                   highlight: <span className='__info-highlight' />
                 }}
-                i18nKey={t('ui.Earning.Entry.Positions.dualStakingNotSupportedWarning')}
+                i18nKey={detectTranslate('ui.Earning.Entry.Positions.dualStakingNotSupportedWarning')}
                 values={{ originChain, symbol }}
               />
             </div>

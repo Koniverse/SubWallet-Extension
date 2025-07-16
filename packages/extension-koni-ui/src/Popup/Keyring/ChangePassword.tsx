@@ -15,6 +15,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps
 
@@ -213,7 +214,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                       />
                     )
                   }}
-                  i18nKey={('I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>')}
+                  i18nKey={detectTranslate('ui.Keyring.ChangePassword.understandPasswordNotRecoverable')}
                 />
               </Checkbox>
             </Form.Item>

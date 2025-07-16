@@ -10,6 +10,7 @@ import { CheckCircle } from 'phosphor-react';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 interface Props extends ThemeProps {
   accounts: AccountJson[];
@@ -53,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <div className='and-more'>
               <Trans
                 components={{ highlight: <span className='highlight' /> }}
-                i18nKey={('ui.Keyring.ApplyMasterPassword.Done.andOtherNumberAccounts')}
+                i18nKey={detectTranslate('ui.Keyring.ApplyMasterPassword.Done.andOtherNumberAccounts')}
                 values={{ number: String(accounts.length - 2).padStart(2, '0') }}
               />
             </div>

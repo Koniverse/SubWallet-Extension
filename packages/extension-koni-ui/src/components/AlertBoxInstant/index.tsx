@@ -5,6 +5,7 @@ import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import React from 'react';
 import { Trans } from 'react-i18next';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 interface Props {
   type: 'new-address-format',
@@ -33,7 +34,7 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={('ui.AlertBoxInstant.dualAddressFormatInfo')}
+              i18nKey={detectTranslate('ui.AlertBoxInstant.dualAddressFormatInfo')}
             />
           </>
         }

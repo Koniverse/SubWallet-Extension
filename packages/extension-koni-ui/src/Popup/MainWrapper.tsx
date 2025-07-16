@@ -11,6 +11,7 @@ import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps & {
   children?: React.ReactNode;
@@ -63,7 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       />
                     )
                   }}
-                  i18nKey={('ui.MainWrapper.viewTransactionProgressInNotifications')}
+                  i18nKey={detectTranslate('ui.MainWrapper.viewTransactionProgressInNotifications')}
                 />
               )}
               title={t('ui.MainWrapper.doNotCloseSubWallet')}

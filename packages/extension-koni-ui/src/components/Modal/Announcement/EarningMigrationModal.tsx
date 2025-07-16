@@ -11,6 +11,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps
 const modalId = EARNING_MIGRATION_MODAL;
@@ -92,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <strong />
               )
             }}
-            i18nKey={('ui.Modal.Announcement.EarningMigration.stakingToEarningFeatureUpdate')}
+            i18nKey={detectTranslate('ui.Modal.Announcement.EarningMigration.stakingToEarningFeatureUpdate')}
           />
         </div>
       </SwModal>
