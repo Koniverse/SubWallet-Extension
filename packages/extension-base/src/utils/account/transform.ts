@@ -330,8 +330,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...POOL_STAKE_ACTIONS,
           ...EARN_VDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
-          // ...EARN_LDOT_ACTIONS,
-          // ...EARN_SDOT_ACTIONS,
+          ...EARN_LDOT_ACTIONS,
+          ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OTHER_ACTIONS
         ];
@@ -366,17 +366,17 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     }
 
     // Earning
-    if (specialNetwork === 'bifrost') {
-      result.push(...EARN_VDOT_ACTIONS, ...EARN_VMANTA_ACTIONS);
-    }
+    // if (specialNetwork === 'bifrost') {
+    //   result.push(...EARN_VDOT_ACTIONS, ...EARN_VMANTA_ACTIONS);
+    // }
 
     // if (specialNetwork === 'acala') {
     //   result.push(...EARN_LDOT_ACTIONS);
     // }
 
-    // if (specialNetwork === 'parallel') {
-    //   result.push(...EARN_SDOT_ACTIONS);
-    // }
+    if (specialNetwork === 'parallel') {
+      result.push(...EARN_SDOT_ACTIONS);
+    }
 
     // if (specialNetwork === 'interlay') {
     //   result.push(...EARN_QDOT_ACTIONS);
