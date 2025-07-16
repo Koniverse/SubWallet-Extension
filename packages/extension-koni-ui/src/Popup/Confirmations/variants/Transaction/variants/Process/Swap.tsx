@@ -161,7 +161,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {/* {!showQuoteExpired && isSwapXCM && ( */}
         {/*   <AlertBox */}
         {/*     className={'__swap-quote-expired'} */}
-        {/*     description={t('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')} */}
+        {/*     description={('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')} */}
         {/*     title={t('ui.Confirmations.Transaction.Process.Swap.payAttentionExclamation')} */}
         {/*     type='warning' */}
         {/*   /> */}
