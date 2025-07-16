@@ -206,6 +206,30 @@ function Component (): React.ReactElement {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
+  const isSupportSwapAcc = useMemo(() => {
+    const isSupportAcc = (currentAcc: AccountProxy) => {
+      const isSoloAccount = currentAcc?.accountType === AccountProxyType.SOLO;
+      const invalidEcosystem = [AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN].includes(currentAcc?.chainTypes[0]) || true;
+      const invalidAccount = isSoloAccount && invalidEcosystem;
+
+      return !invalidAccount;
+    };
+
+    const isSupportAllAcc = (accountProxies: AccountProxy[]) => {
+      return accountProxies.every((account) => isSupportAcc(account));
+    };
+
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAcc(accountProxies);
+    } else {
+      return isSupportAcc(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
   const isReadonlyAccount = useMemo(() => {
     return currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
   }, [currentAccountProxy]);
@@ -493,7 +517,7 @@ function Component (): React.ReactElement {
           isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
-          isSupportSwap={true}
+          isSupportSwap={isSupportSwapAcc}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}

@@ -154,6 +154,30 @@ const Component = (): React.ReactElement => {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
+  const isSupportSwapAcc = useMemo(() => {
+    const isSupportAcc = (currentAcc: AccountProxy) => {
+      const isSoloAccount = currentAcc?.accountType === AccountProxyType.SOLO;
+      const invalidEcosystem = [AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN].includes(currentAcc?.chainTypes[0]) || true;
+      const invalidAccount = isSoloAccount && invalidEcosystem;
+
+      return !invalidAccount;
+    };
+
+    const isSupportAllAcc = (accountProxies: AccountProxy[]) => {
+      return accountProxies.every((account) => isSupportAcc(account));
+    };
+
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAcc(accountProxies);
+    } else {
+      return isSupportAcc(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
   const tonAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => acc?.accountType === AccountProxyType.SOLO && acc?.chainTypes.includes(AccountChainType.TON)).map((item) => ({
       accountName: item.name,
@@ -314,7 +338,7 @@ const Component = (): React.ReactElement => {
           isPriceDecrease={isTotalBalanceDecrease}
           isShrink={isShrink}
           isSupportBuyTokens={isSupportBuyTokens}
-          isSupportSwap={true}
+          isSupportSwap={isSupportSwapAcc}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
           onOpenSendFund={onOpenSendFund}
