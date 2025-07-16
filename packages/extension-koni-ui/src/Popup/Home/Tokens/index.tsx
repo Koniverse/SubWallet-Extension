@@ -154,10 +154,10 @@ const Component = (): React.ReactElement => {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
-  const isSupportSwapAcc = useMemo(() => {
+  const isSwapSupported = useMemo(() => {
     const isSupportAcc = (currentAcc: AccountProxy) => {
-      const isSoloAccount = currentAcc?.accountType === AccountProxyType.SOLO;
-      const invalidEcosystem = [AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN].includes(currentAcc?.chainTypes[0]) || true;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const invalidEcosystem = ![AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
       const invalidAccount = isSoloAccount && invalidEcosystem;
 
       return !invalidAccount;
@@ -167,7 +167,7 @@ const Component = (): React.ReactElement => {
       return accountProxies.every((account) => isSupportAcc(account));
     };
 
-    if (!currentAccountProxy) {
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
       return false;
     }
 
@@ -338,7 +338,7 @@ const Component = (): React.ReactElement => {
           isPriceDecrease={isTotalBalanceDecrease}
           isShrink={isShrink}
           isSupportBuyTokens={isSupportBuyTokens}
-          isSupportSwap={isSupportSwapAcc}
+          isSupportSwap={isSwapSupported}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
           onOpenSendFund={onOpenSendFund}

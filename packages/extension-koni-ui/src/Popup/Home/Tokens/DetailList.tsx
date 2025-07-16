@@ -206,10 +206,10 @@ function Component (): React.ReactElement {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
-  const isSupportSwapAcc = useMemo(() => {
+  const isSwapSupported = useMemo(() => {
     const isSupportAcc = (currentAcc: AccountProxy) => {
-      const isSoloAccount = currentAcc?.accountType === AccountProxyType.SOLO;
-      const invalidEcosystem = [AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN].includes(currentAcc?.chainTypes[0]) || true;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const invalidEcosystem = ![AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
       const invalidAccount = isSoloAccount && invalidEcosystem;
 
       return !invalidAccount;
@@ -219,7 +219,7 @@ function Component (): React.ReactElement {
       return accountProxies.every((account) => isSupportAcc(account));
     };
 
-    if (!currentAccountProxy) {
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
       return false;
     }
 
@@ -517,7 +517,7 @@ function Component (): React.ReactElement {
           isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
-          isSupportSwap={isSupportSwapAcc}
+          isSupportSwap={isSwapSupported}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
