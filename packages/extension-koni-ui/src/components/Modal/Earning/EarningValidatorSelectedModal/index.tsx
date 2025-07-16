@@ -18,6 +18,7 @@ import { ChangeValidatorParams, ThemeProps, ValidatorDataType } from '@subwallet
 import { getTransactionFromAccountProxyValue, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
+import BigN from 'bignumber.js';
 import { Book, CaretLeft } from 'phosphor-react';
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -182,17 +183,40 @@ const Component = (props: Props) => {
       return acc;
     }, {});
 
-    return nominations.map((nomination) => {
+    const mappedNominations = nominations.map((nomination) => {
       const matched = validatorMap[reformatAddress(nomination.validatorAddress)];
 
       return {
         ...nomination,
+        validatorIdentity: matched?.identity,
         commission: matched?.commission,
-        expectedReturn: matched?.expectedReturn
+        expectedReturn: matched?.expectedReturn,
+        eraRewardPoint: matched?.eraRewardPoint
       };
     });
-  }, [items, nominations]);
 
+    // Find nomination have highest era pts
+    const maxEraNomination = mappedNominations.reduce((max, current) => {
+      const maxEra = max.eraRewardPoint ? new BigN(max.eraRewardPoint) : new BigN(0);
+      const currentEra = current.eraRewardPoint ? new BigN(current.eraRewardPoint) : new BigN(0);
+
+      return currentEra.isGreaterThan(maxEra) ? current : max;
+    }, mappedNominations[0]);
+
+    const remainingNominations = mappedNominations.filter(
+      (nomination) => nomination !== maxEraNomination
+    );
+
+    // Sort nomination by apy
+    const sortedRemaining = remainingNominations.sort((a, b) => {
+      const aReturn = a.expectedReturn ? new BigN(a.expectedReturn) : new BigN(0);
+      const bReturn = b.expectedReturn ? new BigN(b.expectedReturn) : new BigN(0);
+
+      return bReturn.comparedTo(aReturn);
+    });
+
+    return maxEraNomination ? [maxEraNomination, ...sortedRemaining] : sortedRemaining;
+  }, [items, nominations]);
   const onClickMore = useCallback((item: ValidatorDataType) => {
     return (e: SyntheticEvent) => {
       e.stopPropagation();
