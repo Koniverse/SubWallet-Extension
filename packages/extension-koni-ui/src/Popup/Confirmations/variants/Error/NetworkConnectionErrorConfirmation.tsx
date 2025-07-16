@@ -75,7 +75,7 @@ function Component ({ className, request, type }: Props) {
           {t('ui.Confirmations.Error.NetworkConnection.transactionRequest')}
         </div>
         {/* <div className='description'> */}
-        {/*  {t('You are approving a request with the following account')} */}
+        {/*  {('You are approving a request with the following account')} */}
         {/* </div> */}
         <MetaInfo>
           {account && <MetaInfo.Account
