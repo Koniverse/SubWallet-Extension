@@ -366,13 +366,13 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     }
 
     // Earning
-    // if (specialNetwork === 'bifrost') {
-    //   result.push(...EARN_VDOT_ACTIONS, ...EARN_VMANTA_ACTIONS);
-    // }
+    if (specialNetwork === 'bifrost') {
+      result.push(...EARN_VDOT_ACTIONS, ...EARN_VMANTA_ACTIONS);
+    }
 
-    // if (specialNetwork === 'acala') {
-    //   result.push(...EARN_LDOT_ACTIONS);
-    // }
+    if (specialNetwork === 'acala') {
+      result.push(...EARN_LDOT_ACTIONS);
+    }
 
     if (specialNetwork === 'parallel') {
       result.push(...EARN_SDOT_ACTIONS);
