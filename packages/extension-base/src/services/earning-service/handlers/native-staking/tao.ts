@@ -507,6 +507,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     };
   }
 
+  // Because not have subscan api
+  override async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    return Promise.resolve([]);
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */
