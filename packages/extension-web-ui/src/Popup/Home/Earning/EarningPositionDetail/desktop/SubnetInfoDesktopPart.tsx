@@ -1,14 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Eye } from 'phosphor-react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -27,6 +27,8 @@ function Component ({ className, poolInfo }: Props) {
 
     openInNewTab(`https://taostats.io/subnets/${subnetId}`)();
   }, [subnetId]);
+
+  const isMainSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
 
   const subnetLogoNetwork = `subnet-${subnetId || 0}`;
 
@@ -58,7 +60,7 @@ function Component ({ className, poolInfo }: Props) {
         <Button
           block={true}
           className={'__view-on-explorer-button -ghost-type-3'}
-          disabled={typeof subnetId !== 'number'}
+          disabled={!isMainSubnetStaking || typeof subnetId !== 'number'}
           icon={
             <Icon
               customSize={'28px'}
