@@ -25,8 +25,7 @@
     "koni-ci-ghact-build": "./scripts/koni-ci-ghact-build.mjs",
     "koni-ci-mv3-firefox": "./scripts/koni-ci-mv3-firefox.mjs",
     "koni-ci-webapp-update-build-number": "./scripts/koni-ci-webapp-update-build-number.mjs",
-    "koni-dev-build-ts": "./scripts/koni-dev-build-ts.mjs",
-    "koni-dev-lint-changes": "./scripts/lint-changes.mjs"
+    "koni-dev-build-ts": "./scripts/koni-dev-build-ts.mjs"
   },
   "scripts": {
     "build": "koni-dev-build-ts && yarn build:zip && yarn build:rollup",
@@ -50,6 +49,7 @@
     "i18n:combine-locales": "i18n-combined-data",
     "i18n:replace-text": "i18n-text-replacer",
     "i18n:update-trans": "i18n-update-translation-files",
+    "build:i18n": "koni-ci-build-i18n",
     "start": "yarn watch",
     "test": "polkadot-dev-run-test --detectOpenHandles --testPathIgnorePatterns='/node_modules/|.*/ignore-.*\\.(test|spec)\\..*'",
     "test:one": "polkadot-dev-run-test --detectOpenHandles",
