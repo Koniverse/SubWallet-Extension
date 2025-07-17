@@ -84,10 +84,10 @@ export default class SubstrateRequestHandler {
     });
   }
 
-  public async signTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON): Promise<ResponseSigning> {
+  public async signTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void): Promise<ResponseSigning> {
     const isAlwaysRequired = await this.#requestService.settingService.isAlwaysRequired;
 
-    if (isAlwaysRequired) {
+    if (isAlwaysRequired && !onSign) {
       this.#requestService.keyringService.lock();
     }
 
@@ -102,9 +102,11 @@ export default class SubstrateRequestHandler {
 
       this.updateIconSign();
 
-      if (!isInternalRequest(url)) {
+      if (!isInternalRequest(url) && !onSign) {
         this.#requestService.popupOpen();
       }
+
+      onSign?.(id);
     });
   }
 

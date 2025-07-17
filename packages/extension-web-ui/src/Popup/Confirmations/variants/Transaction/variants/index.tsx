@@ -20,3 +20,4 @@ export { default as SwapTransactionConfirmation } from './Swap';
 export { default as SwapChooseFeeTransactionConfirmation } from './SwapChooseFee';
 
 export * from './TransferBlock';
+export * from './Process';

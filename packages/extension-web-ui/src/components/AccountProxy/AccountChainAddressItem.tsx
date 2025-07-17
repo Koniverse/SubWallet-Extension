@@ -5,7 +5,7 @@ import { AccountChainAddress, ThemeProps } from '@subwallet/extension-web-ui/typ
 import { toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Copy, QrCode } from 'phosphor-react';
+import { Copy, Info, QrCode } from 'phosphor-react';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -14,13 +14,14 @@ type Props = ThemeProps & {
   onClick?: VoidFunction;
   onClickCopyButton?: VoidFunction;
   onClickQrButton?: VoidFunction;
+  onClickInfoButton?: VoidFunction;
+  isShowInfoButton?: boolean;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className,
+  const { className, isShowInfoButton,
     item,
-    onClick, onClickCopyButton, onClickQrButton } = props;
-
+    onClick, onClickCopyButton, onClickInfoButton, onClickQrButton } = props;
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
     event.stopPropagation();
     onClickCopyButton?.();
@@ -30,6 +31,11 @@ function Component (props: Props): React.ReactElement<Props> {
     event.stopPropagation();
     onClickQrButton?.();
   }, [onClickQrButton]);
+
+  const _onClickInfoButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
+    event.stopPropagation();
+    onClickInfoButton?.();
+  }, [onClickInfoButton]);
 
   return (
     <>
@@ -55,17 +61,34 @@ function Component (props: Props): React.ReactElement<Props> {
         </div>
 
         <div className='__item-right-part'>
-          <Button
-            icon={
-              <Icon
-                phosphorIcon={QrCode}
-                size='sm'
+          {!isShowInfoButton
+            ? (<Button
+              icon={
+                <Icon
+                  phosphorIcon={QrCode}
+                  size='sm'
+                />
+              }
+              onClick={_onClickQrButton}
+              size='xs'
+              type='ghost'
+            />)
+            : (
+              <Button
+                icon={
+                  <Icon
+                    phosphorIcon={Info}
+                    size='sm'
+                    weight={'fill'}
+                  />
+                }
+                onClick={_onClickInfoButton}
+                size='xs'
+                tooltip={'This network has two address formats'}
+                tooltipPlacement={'topLeft'}
+                type='ghost'
               />
-            }
-            onClick={_onClickQrButton}
-            size='xs'
-            type='ghost'
-          />
+            )}
           <Button
             icon={
               <Icon

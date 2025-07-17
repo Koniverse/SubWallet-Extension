@@ -277,8 +277,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const renderItem = useCallback((item: ValidatorDataType) => {
     const key = getValidatorKey(item.address, item.identity);
+    const keyBase = key.split('___')[0];
+
     const selected = changeValidators.includes(key);
-    const nominated = nominatorValueList.includes(key);
+    const nominated = nominatorValueList.includes(key) || nominatorValueList.some((nom) => nom.split('___')[0] === keyBase);
 
     return (
       <StakingValidatorItem
@@ -412,7 +414,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         onCancel={onCancelSelectValidator}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),

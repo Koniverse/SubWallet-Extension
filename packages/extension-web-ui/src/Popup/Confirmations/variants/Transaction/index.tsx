@@ -1,12 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
+import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
-import { AlertBox } from '@subwallet/extension-web-ui/components';
-import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { AlertBox, AlertBoxInstant } from '@subwallet/extension-web-ui/components';
+import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { SubmitApiArea } from '@subwallet/extension-web-ui/Popup/Confirmations/parts';
 import TonSignArea from '@subwallet/extension-web-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-web-ui/stores/base/RequestState';
@@ -16,8 +18,8 @@ import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapChooseFeeTransactionConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { CardanoSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapChooseFeeTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -88,9 +90,20 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
   }
 };
 
+// TODO: NEED TO MERGE THESE COMPONENTS TO COMPONENTS IN THE PROCESS DIRECTORY
+const getProcessComponent = (processType: ProcessType): typeof BaseProcessConfirmation => {
+  switch (processType) {
+    case ProcessType.SWAP:
+      return SwapProcessConfirmation;
+    case ProcessType.EARNING:
+      return EarnProcessConfirmation;
+    default:
+      return BaseProcessConfirmation;
+  }
+};
+
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, closeAlert, confirmation: { item, type },
-    openAlert } = props;
+  const { className, closeAlert, confirmation: { item, type }, openAlert } = props;
   const { id } = item;
 
   const { t } = useTranslation();
@@ -100,10 +113,24 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
 
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
 
   const renderContent = useCallback((transaction: SWTransactionResult): React.ReactNode => {
-    const { extrinsicType } = transaction;
+    const { extrinsicType, process } = transaction;
+
+    if (process) {
+      const Component = getProcessComponent(process.type);
+
+      return (
+        <Component
+          closeAlert={closeAlert}
+          openAlert={openAlert}
+          transaction={transaction}
+        />
+      );
+    }
 
     const Component = getTransactionComponent(extrinsicType);
 
@@ -123,15 +150,38 @@ const Component: React.FC<Props> = (props: Props) => {
 
       return data.quote.aliveUntil;
     }
+
+    if (transaction.process && transaction.process.type === ProcessType.SWAP) {
+      const data = transaction.process.combineInfo as SwapBaseTxData;
+
+      return data.quote.aliveUntil;
+    }
+
     // todo: there might be more types of extrinsic
 
     return undefined;
-  }, [transaction.data, transaction.extrinsicType]);
+  }, [transaction.data, transaction.extrinsicType, transaction.process]);
+
+  const isAddressFormatInfoBoxVisible = useMemo(() => {
+    if ([ExtrinsicType.TRANSFER_BALANCE, ExtrinsicType.TRANSFER_TOKEN].includes(transaction.extrinsicType)) {
+      const targetChain = transaction.chain;
+
+      return checkIsPolkadotUnifiedChain(targetChain);
+    }
+
+    return false;
+  }, [checkIsPolkadotUnifiedChain, transaction.chain, transaction.extrinsicType]);
 
   return (
     <>
       <div className={CN(className, 'confirmation-content')}>
         {renderContent(transaction)}
+        {isAddressFormatInfoBoxVisible && (
+          <AlertBoxInstant
+            className={'address-format-info-box'}
+            type={'new-address-format'}
+          />
+        )}
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
@@ -164,11 +214,33 @@ const Component: React.FC<Props> = (props: Props) => {
         )
       }
       {
+        (type === 'submitApiRequest') && (
+          <SubmitApiArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitions['submitApiRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
         (type === 'tonSendTransactionRequest' || type === 'tonWatchTransactionRequest') && (
           <TonSignArea
             extrinsicType={transaction.extrinsicType}
             id={item.id}
             payload={(item as ConfirmationDefinitionsTon['tonSendTransactionRequest' | 'tonWatchTransactionRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
+        (type === 'cardanoSendTransactionRequest' || type === 'cardanoWatchTransactionRequest') && (
+          <CardanoSignArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitionsCardano['cardanoSendTransactionRequest' | 'cardanoWatchTransactionRequest'][0])}
             txExpirationTime={txExpirationTime}
             type={type}
           />
@@ -184,6 +256,10 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
     marginTop: token.marginXS,
 
     '.network-box': {
+      marginTop: token.marginSM
+    },
+
+    '.network-box, .address-format-info-box': {
       marginTop: token.marginSM
     },
 

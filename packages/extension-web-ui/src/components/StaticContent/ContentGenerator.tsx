@@ -1,4 +1,4 @@
-// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -7,6 +7,7 @@ import { Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import gfm from 'remark-gfm';
 import styled from 'styled-components';
 
@@ -29,10 +30,20 @@ const Component = ({ className, content }: Props) => {
         img (props) {
           const { children, className, node, src, ...rest } = props;
 
+          if (className?.includes('md-element')) {
+            return (
+              <img
+                {...rest}
+                className={className}
+                src={src}
+              />
+            );
+          }
+
           return (
             <Image
               {...rest}
-              className={'custom-img'}
+              className={className || 'custom-img'}
               onClick={noop}
               src={src}
               width={'100%'}
@@ -96,6 +107,7 @@ const Component = ({ className, content }: Props) => {
           );
         }
       }}
+      rehypePlugins={[rehypeRaw]}
       remarkPlugins={[gfm]}
     >{content}</ReactMarkdown>
   );

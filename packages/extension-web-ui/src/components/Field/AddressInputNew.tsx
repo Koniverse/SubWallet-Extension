@@ -1,4 +1,4 @@
-// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BaseSelectRef } from 'rc-select';
@@ -6,12 +6,13 @@ import type { BaseSelectRef } from 'rc-select';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AnalyzeAddress, AnalyzedGroup, ResponseInputAccountSubscribe } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, reformatAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem } from '@subwallet/extension-web-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-web-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useFetchChainInfo, useForwardFieldRef, useOpenQrScanner, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useFetchChainInfo, useForwardFieldRef, useIsPolkadotUnifiedChain, useOpenQrScanner, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, saveRecentAccount, subscribeAccountsInputAddress } from '@subwallet/extension-web-ui/messaging';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ScannerResult, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { toShort } from '@subwallet/extension-web-ui/utils';
 import { isAddress } from '@subwallet/keyring';
@@ -19,6 +20,7 @@ import { AutoComplete, Button, Icon, Input, ModalContext, Switch, SwQrScanner } 
 import CN from 'classnames';
 import { Book, CheckCircle, MagicWand, Scan, XCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -49,6 +51,7 @@ interface Props extends BasicInputWrapper, ThemeProps {
 export interface AddressInputRef extends BaseSelectRef {
   setInputValue: React.Dispatch<React.SetStateAction<string | undefined>>;
   setSelectedOption: React.Dispatch<React.SetStateAction<AnalyzeAddress | undefined>>;
+  ready: boolean;
 }
 
 const defaultScannerModalId = 'input-account-address-scanner-modal';
@@ -72,6 +75,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     id, label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly,
     saveAddress, showAddressBook, showScanner, status, statusHelp, value } = props;
   const { t } = useTranslation();
+  const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const chainOldPrefixMap = useSelector((state: RootState) => state.chainStore.chainOldPrefixMap);
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { alertModal } = useContext(WalletModalContext);
@@ -112,32 +117,58 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
   }, [chainInfo]);
 
   const _onBlur: React.FocusEventHandler<HTMLInputElement> = useCallback((event) => {
-    const _inputValue = inputValue || '';
+    const _inputValue = (inputValue || '').trim();
 
-    if (isShowAdvancedAddressDetection && autoFormatValue && isAddress(_inputValue) && chainInfo && !selectedOption) {
-      const reformatedInputValue = _reformatAddressWithChain(_inputValue, chainInfo);
+    const doAction = (value: string) => {
+      parseAndChangeValue(value);
 
-      parseAndChangeValue(reformatedInputValue);
+      setOpenDropdownManually(undefined);
 
-      setSelectedOption({
-        address: _inputValue,
-        formatedAddress: reformatedInputValue,
-        analyzedGroup: AnalyzedGroup.RECENT,
-        displayName: toShort(_inputValue, 3, 4)
-      });
+      onBlur?.(event);
+    };
 
-      setInputValue(reformatedInputValue);
-    } else {
-      parseAndChangeValue(_inputValue);
+    if (!_inputValue) {
+      doAction('');
+
+      return;
     }
 
-    setOpenDropdownManually(undefined);
+    const isValidAddress = isAddress(_inputValue);
 
-    onBlur?.(event);
-  }, [autoFormatValue, chainInfo, inputValue, isShowAdvancedAddressDetection, onBlur, parseAndChangeValue, selectedOption]);
+    const isOldSubstrateAddress = () => {
+      if (!(chainSlug && checkIsPolkadotUnifiedChain(chainSlug) && isValidAddress)) {
+        return false;
+      }
+
+      const oldPrefix = chainOldPrefixMap[chainSlug];
+
+      return reformatAddress(_inputValue, oldPrefix) === _inputValue;
+    };
+
+    const shouldReformatAddress = ((isShowAdvancedAddressDetection && autoFormatValue) || isOldSubstrateAddress()) && isValidAddress && chainInfo && !selectedOption;
+    let finalInputValue = _inputValue;
+
+    if (shouldReformatAddress) {
+      const reformattedInputValue = _reformatAddressWithChain(_inputValue, chainInfo);
+
+      if (_inputValue !== reformattedInputValue) {
+        finalInputValue = reformattedInputValue;
+
+        setSelectedOption({
+          address: _inputValue,
+          formatedAddress: reformattedInputValue,
+          analyzedGroup: AnalyzedGroup.RECENT,
+          displayName: toShort(_inputValue, 3, 4)
+        });
+
+        setInputValue(reformattedInputValue);
+      }
+    }
+
+    doAction(finalInputValue);
+  }, [autoFormatValue, chainInfo, chainOldPrefixMap, chainSlug, checkIsPolkadotUnifiedChain, inputValue, isShowAdvancedAddressDetection, onBlur, parseAndChangeValue, selectedOption]);
 
   // autoComplete
-
   // "item: unknown" is hotfix for typescript error of AutoComplete
   const onSelectAutoComplete = useCallback((graftedValue: string, item: unknown) => {
     setInputValue(getInputValueFromGraftedValue(graftedValue));
@@ -348,7 +379,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       return {
         ...fieldRefCurrent,
         setInputValue,
-        setSelectedOption
+        setSelectedOption,
+        ready: true
       };
     }
 
@@ -363,7 +395,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       },
       scrollTo: () => {
         //
-      }
+      },
+      ready: false
     };
   }, [fieldRefCurrent]);
 

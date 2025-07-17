@@ -394,7 +394,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     <>
       <BaseSelectModal
         actionBtnIcon={(
-          <Badge dot={!!selectedFilters.length}>
+          <Badge
+            className={'g-filter-badge'}
+            dot={!!selectedFilters.length}
+          >
             <Icon phosphorIcon={FadersHorizontal} />
           </Badge>
         )}
@@ -427,7 +430,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),

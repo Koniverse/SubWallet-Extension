@@ -1,13 +1,15 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
-import { ActionItemType, ActionModal, EmptyList, FilterModal, Layout, PageWrapper, WebsiteAccessItem } from '@subwallet/extension-web-ui/components';
+import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
+import { AccountProxy } from '@subwallet/extension-base/types';
+import { ActionItemType, ActionModal, EmptyList, FilterModal, PageWrapper, WebsiteAccessItem } from '@subwallet/extension-web-ui/components';
 import { useDefaultNavigate, useFilterModal } from '@subwallet/extension-web-ui/hooks';
 import { changeAuthorizationAll, forgetAllSite } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-web-ui/stores/utils';
 import { ManageWebsiteAccessDetailParam, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { FadersHorizontal, GearSix, GlobeHemisphereWest, Plugs, PlugsConnected, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -24,18 +26,34 @@ function getWebsiteItems (authUrlMap: Record<string, AuthUrlInfo>): AuthUrlInfo[
   return Object.values(authUrlMap);
 }
 
-function getAccountCount (item: AuthUrlInfo): number {
-  const authType = item.accountAuthType;
+function getAccountCount (item: AuthUrlInfo, accountProxies: AccountProxy[]): number {
+  const authType = item.accountAuthTypes;
 
-  if (authType === 'evm') {
-    return item.isAllowedMap ? Object.entries(item.isAllowedMap).filter(([address, rs]) => rs && isEthereumAddress(address)).length : 0;
+  if (!authType) {
+    return 0;
   }
 
-  if (authType === 'substrate') {
-    return item.isAllowedMap ? Object.entries(item.isAllowedMap).filter(([address, rs]) => rs && !isEthereumAddress(address)).length : 0;
-  }
+  return accountProxies.filter((ap) => {
+    return ap.accounts.some((account) => {
+      if (isEthereumAddress(account.address)) {
+        return authType.includes('evm') && item.isAllowedMap[account.address];
+      }
 
-  return Object.values(item.isAllowedMap).filter((i) => i).length;
+      if (isSubstrateAddress(account.address)) {
+        return authType.includes('substrate') && item.isAllowedMap[account.address];
+      }
+
+      if (isTonAddress(account.address)) {
+        return authType.includes('ton') && item.isAllowedMap[account.address];
+      }
+
+      if (isCardanoAddress(account.address)) {
+        return authType.includes('cardano') && item.isAllowedMap[account.address];
+      }
+
+      return false;
+    });
+  }).length;
 }
 
 const ACTION_MODAL_ID = 'actionModalId';
@@ -44,12 +62,14 @@ const FILTER_MODAL_ID = 'manage-website-access-filter-id';
 enum FilterValue {
   SUBSTRATE = 'substrate',
   ETHEREUM = 'ethereum',
+  CARDANO = 'cardano',
   BLOCKED = 'blocked',
   Connected = 'connected',
 }
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const authUrlMap = useSelector((state: RootState) => state.settings.authUrls);
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -64,11 +84,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       for (const filter of selectedFilters) {
         if (filter === FilterValue.SUBSTRATE) {
-          if (item.accountAuthType === 'substrate' || item.accountAuthType === 'both') {
+          if (item.accountAuthTypes?.includes('substrate')) {
             return true;
           }
         } else if (filter === FilterValue.ETHEREUM) {
-          if (item.accountAuthType === 'evm' || item.accountAuthType === 'both') {
+          if (item.accountAuthTypes?.includes('evm')) {
             return true;
           }
         } else if (filter === FilterValue.BLOCKED) {
@@ -77,6 +97,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         } else if (filter === FilterValue.Connected) {
           if (item.isAllowed) {
+            return true;
+          }
+        } else if (filter === FilterValue.CARDANO) {
+          if (item.accountAuthTypes?.includes('cardano')) {
             return true;
           }
         }
@@ -94,6 +118,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return [
       { label: t('Substrate dApp'), value: FilterValue.SUBSTRATE },
       { label: t('Ethereum dApp'), value: FilterValue.ETHEREUM },
+      { label: t('Cardano dApp'), value: FilterValue.CARDANO },
       { label: t('Blocked dApp'), value: FilterValue.BLOCKED },
       { label: t('Connected dApp'), value: FilterValue.Connected }
     ];
@@ -151,7 +176,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       navigate('/settings/dapp-access-edit', { state: {
         siteName: item.origin,
         origin: item.id,
-        accountAuthType: item.accountAuthType || ''
+        accountAuthTypes: item.accountAuthTypes || ''
       } as ManageWebsiteAccessDetailParam });
     };
   }, [navigate]);
@@ -160,7 +185,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     (item: AuthUrlInfo) => {
       return (
         <WebsiteAccessItem
-          accountCount={getAccountCount(item)}
+          accountCount={getAccountCount(item, accountProxies)}
           className={'__item'}
           domain={item.id}
           key={item.id}
@@ -169,7 +194,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />
       );
     },
-    [onClickItem]
+    [accountProxies, onClickItem]
   );
 
   const renderEmptyList = useCallback(() => {
@@ -193,60 +218,58 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   return (
     <PageWrapper className={`manage-website-access ${className}`}>
-      <Layout.Base>
-        <SwSubHeader
-          background={'transparent'}
-          center
-          onBack={goBack}
-          paddingVertical
-          rightButtons={[
-            {
-              icon: (
-                <Icon
-                  customSize={'24px'}
-                  phosphorIcon={GearSix}
-                  type='phosphor'
-                  weight={'bold'}
-                />
-              ),
-              onClick: onOpenActionModal
-            }
-          ]}
-          showBackButton
-          title={t('Manage website access')}
-        />
+      <SwSubHeader
+        background={'transparent'}
+        center
+        onBack={goBack}
+        paddingVertical
+        rightButtons={[
+          {
+            icon: (
+              <Icon
+                customSize={'24px'}
+                phosphorIcon={GearSix}
+                type='phosphor'
+                weight={'bold'}
+              />
+            ),
+            onClick: onOpenActionModal
+          }
+        ]}
+        showBackButton
+        title={t('Manage website access')}
+      />
 
-        <SwList.Section
-          actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
-          enableSearchInput
-          filterBy={filterFunction}
-          list={websiteAccessItems}
-          onClickActionBtn={onClickActionBtn}
-          renderItem={renderItem}
-          renderWhenEmpty={renderEmptyList}
-          searchFunction={searchFunc}
-          searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search or enter a website')}
-          showActionBtn
-        />
+      <SwList.Section
+        actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
+        enableSearchInput
+        filterBy={filterFunction}
+        list={websiteAccessItems}
+        onClickActionBtn={onClickActionBtn}
+        renderItem={renderItem}
+        renderWhenEmpty={renderEmptyList}
+        searchFunction={searchFunc}
+        searchMinCharactersCount={2}
+        searchPlaceholder={t<string>('Search or enter a website')}
+        showActionBtn
+      />
 
-        <ActionModal
-          actions={actions}
-          id={ACTION_MODAL_ID}
-          onCancel={onCloseActionModal}
-          title={t('Access configuration')}
-        />
+      <ActionModal
+        actions={actions}
+        id={ACTION_MODAL_ID}
+        onCancel={onCloseActionModal}
+        title={t('Access configuration')}
+      />
 
-        <FilterModal
-          id={FILTER_MODAL_ID}
-          onApplyFilter={onApplyFilter}
-          onCancel={onCloseFilterModal}
-          onChangeOption={onChangeFilterOption}
-          optionSelectionMap={filterSelectionMap}
-          options={filterOptions}
-          title={t('Filter')}
-        />
-      </Layout.Base>
+      <FilterModal
+        id={FILTER_MODAL_ID}
+        onApplyFilter={onApplyFilter}
+        onCancel={onCloseFilterModal}
+        onChangeOption={onChangeFilterOption}
+        optionSelectionMap={filterSelectionMap}
+        options={filterOptions}
+        title={t('Filter')}
+      />
     </PageWrapper>
   );
 }

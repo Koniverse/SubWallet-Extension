@@ -158,7 +158,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance:')}
+            label={t('Available balance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>

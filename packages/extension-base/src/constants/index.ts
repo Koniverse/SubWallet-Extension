@@ -23,7 +23,7 @@ export const CRON_RECOVER_HISTORY_INTERVAL = 30000;
 export const CRON_SYNC_MANTA_PAY = 300000;
 export const MANTA_PAY_BALANCE_INTERVAL = 30000;
 export const BITTENSOR_REFRESH_STAKE_INFO = 30000;
-export const BITTENSOR_REFRESH_STAKE_APY = 300000;
+export const BITTENSOR_REFRESH_STAKE_APY = 30000;
 export const CRON_REFRESH_EARNING_REWARD_HISTORY_INTERVAL = 15 * BASE_MINUTE_INTERVAL;
 export const CRON_LISTEN_AVAIL_BRIDGE_CLAIM = 1800000;
 
@@ -40,13 +40,32 @@ export const XCM_MIN_AMOUNT_RATIO = 1.2;
 export const XCM_FEE_RATIO = 2;
 
 export const GAS_PRICE_RATIO = 1 + (2 / 100);
-
+export const MAX_COLLATERAL_AMOUNT = '5000000';
 export const NETWORK_MULTI_GAS_FEE = ['*'];
 
 export const ORDINAL_COLLECTION = '__Ordinal__';
 export const ORDINAL_METHODS = ['drc-20', 'pol-20'];
 
 export const PERMISSIONS_TO_REVOKE = ['eth_accounts'];
+
+export const _SUPPORT_TOKEN_PAY_FEE_GROUP = {
+  assetHub: ['paseo_assethub', 'westend_assethub', 'rococo_assethub', 'statemine', 'statemint'],
+  hydration: ['hydradx_main', 'hydradx_rococo']
+};
+
+export const getSupportTokenPayFeeChain = () => {
+  return Object.values(_SUPPORT_TOKEN_PAY_FEE_GROUP).flat();
+};
+
+export const isChainSupportTokenPayFee = (chainSlug: string): boolean => {
+  if (!chainSlug) {
+    console.error('You must provide chain slug!');
+
+    return false;
+  }
+
+  return getSupportTokenPayFeeChain().includes(chainSlug);
+};
 
 export * from './blocked-actions';
 export * from './environment';

@@ -10,9 +10,9 @@ import { EarningRewardsHistoryModal } from '@subwallet/extension-web-ui/componen
 import { BN_ZERO, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
-import { useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
+import { useReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getReformatedAddressRelatedToChain, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { ActivityIndicator, Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -51,20 +51,25 @@ function Component ({ className, closeAlert, compound,
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
 
   const total = useYieldRewardTotal(slug);
+  const getReformatAddress = useReformatAddress();
 
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);
 
   const canClaim = useMemo((): boolean => {
     switch (type) {
       case YieldPoolType.LENDING:
       case YieldPoolType.LIQUID_STAKING:
         return false;
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NATIVE_STAKING:
-        return isDAppStaking;
+        return isDAppStaking || isMythosStaking;
       case YieldPoolType.NOMINATION_POOL:
         return true;
     }
-  }, [isDAppStaking, type]);
+
+    return false;
+  }, [isDAppStaking, isMythosStaking, type]);
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
@@ -113,7 +118,7 @@ function Component ({ className, closeAlert, compound,
     activeModal(rewardsHistoryModalId);
   }, [activeModal]);
 
-  const canShowRewardInfo = type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && isDAppStaking);
+  const canShowRewardInfo = type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking));
 
   const onClickViewExplore = useCallback(() => {
     if (currentAccountProxy && currentAccountProxy.accounts.length > 0) {
@@ -124,13 +129,13 @@ function Component ({ className, closeAlert, compound,
         return;
       }
 
-      const formatAddress = getReformatedAddressRelatedToChain(accountJson, chainInfoMap[compound.chain]);
+      const formatAddress = getReformatAddress(accountJson, chainInfoMap[compound.chain]);
 
       if (formatAddress) {
         openInNewTab(`https://${subscanSlug}.subscan.io/account/${formatAddress}?tab=reward`)();
       }
     }
-  }, [chainInfoMap, compound.address, compound.chain, currentAccountProxy]);
+  }, [chainInfoMap, compound.address, compound.chain, currentAccountProxy, getReformatAddress]);
 
   return (
     <>
@@ -143,7 +148,7 @@ function Component ({ className, closeAlert, compound,
           ? (
             <>
               <div className={'__claim-reward-area'}>
-                {type === YieldPoolType.NOMINATION_POOL
+                {type === YieldPoolType.NOMINATION_POOL || isMythosStaking
                   ? total
                     ? (
                       <Number

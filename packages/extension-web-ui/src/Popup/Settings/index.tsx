@@ -4,7 +4,7 @@
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import SwLogosMap from '@subwallet/extension-web-ui/assets/subwallet';
 import { BaseModal, PageWrapper } from '@subwallet/extension-web-ui/components';
-import { EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEB_BUILD_NUMBER, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-web-ui/constants/common';
+import { CONTACT_SUPPORT_URL, EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEB_BUILD_NUMBER, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-web-ui/constants/common';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
@@ -17,7 +17,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Button, ButtonProps, Icon, Image, ModalContext, SettingItem, SwHeader, SwIconProps } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowsOut, ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, FrameCorners, Globe, GlobeHemisphereEast, Lock, ShareNetwork, ShieldCheck, X } from 'phosphor-react';
+import { ArrowsOut, ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, FrameCorners, Globe, GlobeHemisphereEast, Lock, ShareNetwork, ShieldCheck, UserCircleGear, X } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -143,6 +143,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick: () => {
             navigate('/settings/security', { state: true });
           }
+        },
+        {
+          key: 'account-settings',
+          leftIcon: UserCircleGear,
+          leftIconBgColor: token['purple-8'],
+          rightIcon: CaretRight,
+          title: t('Account settings'),
+          onClick: () => {
+            navigate('/settings/account-settings');
+          }
         }
       ]
     },
@@ -192,9 +202,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIconBgColor: token['geekblue-6'],
           rightIcon: ArrowSquareOut,
           title: t('Contact support'),
-          onClick: () => {
-            window.open(`${SUPPORT_MAIL}?subject=[WebApp - In-app support]`, '_self');
-          }
+          onClick: openInNewTab(CONTACT_SUPPORT_URL)
         },
         {
           key: 'user-manual',

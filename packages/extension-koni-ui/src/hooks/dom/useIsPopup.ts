@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+// deprecated, use useExtensionDisplayModes instead
 export default function useIsPopup (): boolean {
   return useMemo(() => {
     return window.innerWidth <= 400;

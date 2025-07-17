@@ -38,7 +38,8 @@ const persistConfig = {
     'staking',
     'campaign',
     'buyService',
-    'staticContent'
+    'staticContent',
+    'price'
   ]
 };
 

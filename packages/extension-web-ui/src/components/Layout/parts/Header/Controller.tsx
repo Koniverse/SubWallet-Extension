@@ -2,16 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import WalletConnect from '@subwallet/extension-web-ui/components/Layout/parts/Header/parts/WalletConnect';
-import { NOTIFICATION_MODAL } from '@subwallet/extension-web-ui/constants';
-import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import { FeatureModalContext } from '@subwallet/extension-web-ui/contexts/FeatureModalContextProvider';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
-import Notification from '@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon, ModalContext, Typography, useExcludeModal } from '@subwallet/react-ui';
+import { Button, Icon, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { BellSimpleRinging, CaretLeft } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -27,12 +25,10 @@ export type Props = ThemeProps & {
 
 function Component ({ className, onBack, showBackButton, title = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { isWebUI } = useContext(ScreenContext);
-  const { activeModal, inactiveModal } = useContext(ModalContext);
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
-  const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(false);
+  const { notificationModal: { open: openNotificationModal } } = useContext(FeatureModalContext);
 
   const unreadNotificationCount = useMemo(() => {
     if (!currentAccountProxy || !unreadNotificationCountMap) {
@@ -43,14 +39,8 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
   }, [currentAccountProxy, isAllAccount, unreadNotificationCountMap]);
 
   const onOpenNotification = useCallback(() => {
-    setIsNotificationVisible(true);
-    activeModal(NOTIFICATION_MODAL);
-  }, [activeModal]);
-
-  const onCancelNotification = useCallback(() => {
-    inactiveModal(NOTIFICATION_MODAL);
-    setIsNotificationVisible(false);
-  }, [inactiveModal]);
+    openNotificationModal();
+  }, [openNotificationModal]);
 
   const backButton = useMemo(() => {
     if (showBackButton && onBack) {
@@ -73,13 +63,6 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
     return null;
   }, [onBack, showBackButton]);
-
-  useExcludeModal(NOTIFICATION_MODAL);
-
-  const notificationModalProps = useMemo(() => ({
-    modalId: NOTIFICATION_MODAL,
-    onCancel: onCancelNotification
-  }), [onCancelNotification]);
 
   return (
     <div className={CN(className)}>
@@ -119,12 +102,6 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
 
           <LockStatus />
         </div>
-        {isWebUI && isNotificationVisible && (
-          <Notification
-            isModal={true}
-            modalProps={notificationModalProps}
-          />
-        )}
       </div>
     </div>
   );

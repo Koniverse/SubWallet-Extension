@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAuthorizationBlock, RequestAuthorizationPerSite } from '@subwallet/extension-base/background/KoniTypes';
+import { RequestAuthorizationBlock, RequestAuthorizationPerSite, RequestSwitchCurrentNetworkAuthorization } from '@subwallet/extension-base/background/KoniTypes';
 import { ResponseAuthorizeList } from '@subwallet/extension-base/background/types';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 
@@ -17,6 +17,10 @@ export async function getAuthListV2 (): Promise<ResponseAuthorizeList> {
 
 export async function toggleAuthorization (url: string): Promise<ResponseAuthorizeList> {
   return sendMessage('pri(authorize.toggle)', url);
+}
+
+export async function switchCurrentNetworkAuthorization (request: RequestSwitchCurrentNetworkAuthorization): Promise<ResponseAuthorizeList> {
+  return sendMessage('pri(authorize.switchCurrentNetwork)', request);
 }
 
 export async function changeAuthorizationAll (connectValue: boolean, callback: (data: AuthUrls) => void): Promise<boolean> {

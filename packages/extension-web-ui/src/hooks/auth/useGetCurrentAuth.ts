@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
+import { stripUrl } from '@subwallet/extension-base/utils';
 import { useGetCurrentTab } from '@subwallet/extension-web-ui/hooks/auth/useGetCurrentTab';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { useMemo } from 'react';
@@ -17,12 +18,11 @@ export const useGetCurrentAuth = () => {
     let rs: AuthUrlInfo | undefined;
 
     if (currentUrl) {
-      for (const auth of Object.values(authUrls)) {
-        if (currentUrl.includes(auth.id)) {
-          rs = auth;
-          break;
-        }
-      }
+      try {
+        const url = stripUrl(currentUrl);
+
+        rs = authUrls[url];
+      } catch (e) {}
     }
 
     return rs;

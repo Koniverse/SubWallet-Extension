@@ -124,11 +124,6 @@ function Component ({ compound,
     return compound.chain || poolInfo.chain || '';
   }, [compound.chain, poolInfo.chain]);
 
-  // Update bittensor logic later
-  const isBittensorStake = useMemo(() => {
-    return poolInfo.chain === 'bittensor';
-  }, [poolInfo.chain]);
-
   const onLeavePool = useCallback(() => {
     if (isActiveStakeZero) {
       openAlert({
@@ -144,28 +139,6 @@ function Component ({ compound,
       return;
     }
 
-    // Update bittensor logic later
-    if (isBittensorStake) {
-      openAlert({
-        title: t('Open dApp to unstake'),
-        type: NotificationType.INFO,
-        content: t('Open Taostats Dashboard and connect your SubWallet account to unstake your funds. This feature will come back to SubWallet soon!'),
-        okButton: {
-          text: t('Open dApp'),
-          onClick: () => {
-            window.open('https://dash.taostats.io/stake');
-            closeAlert();
-          }
-        },
-        cancelButton: {
-          text: t('Cancel'),
-          onClick: closeAlert
-        }
-      });
-
-      return;
-    }
-
     setUnStakeStorage({
       ...DEFAULT_UN_STAKE_PARAMS,
       slug: poolInfo.slug,
@@ -173,7 +146,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isActiveStakeZero, isBittensorStake, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isActiveStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({

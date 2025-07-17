@@ -31,6 +31,8 @@ const SwLogosMap: Record<string, string> = {
   chain_flip_mainnet: DefaultLogosMap.chain_flip,
   chain_flip_testnet: DefaultLogosMap.chain_flip,
   simple_swap: DefaultLogosMap.simple_swap,
+  uniswap: DefaultLogosMap.uniswap,
+  kyber: DefaultLogosMap.kyber,
   hydradx_mainnet: DefaultLogosMap.hydradx,
   hydradx_testnet: DefaultLogosMap.hydradx,
   [SUBSTRATE_GENERIC_KEY]: DefaultLogosMap[SUBSTRATE_GENERIC_KEY],
@@ -38,7 +40,11 @@ const SwLogosMap: Record<string, string> = {
   [SwapProviderId.POLKADOT_ASSET_HUB.toLowerCase()]: DefaultLogosMap.polkadot_assethub,
   [SwapProviderId.KUSAMA_ASSET_HUB.toLowerCase()]: DefaultLogosMap.kusama_assethub,
   [SwapProviderId.ROCOCO_ASSET_HUB.toLowerCase()]: DefaultLogosMap.rococo_assethub,
-  ton: DefaultLogosMap.ton
+  ton: DefaultLogosMap.ton,
+  ...Object.fromEntries(
+    Array.from({ length: 86 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
+  ),
+  meld: DefaultLogosMap.meld
 };
 
 export default SwLogosMap;

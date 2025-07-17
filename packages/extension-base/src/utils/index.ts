@@ -5,18 +5,19 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
-import { decodeAddress, encodeAddress, isTonAddress } from '@subwallet/keyring';
+import { decodeAddress, encodeAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 
-export { canDerive } from './canDerive';
 export * from './mv3';
 export * from './fetch';
+export * from './price';
+export { convertCardanoAddressToHex } from './cardano';
 
 export const notDef = (x: any) => x === null || typeof x === 'undefined';
 export const isDef = (x: any) => !notDef(x);
@@ -304,8 +305,9 @@ export function isAddressAndChainCompatible (address: string, chain: _ChainInfo)
   const isEvmCompatible = isEthereumAddress(address) && _isChainEvmCompatible(chain);
   const isTonCompatible = isTonAddress(address) && _isChainTonCompatible(chain);
   const isSubstrateCompatible = !isEthereumAddress(address) && !isTonAddress(address) && _isChainSubstrateCompatible(chain); // todo: need isSubstrateAddress util function to check exactly
+  const isCardanoCompatible = isCardanoAddress(address) && _isChainCardanoCompatible(chain);
 
-  return isEvmCompatible || isSubstrateCompatible || isTonCompatible;
+  return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible;
 }
 
 export function getDomainFromUrl (url: string): string {
@@ -396,6 +398,7 @@ export * from './asset';
 export * from './auth';
 export * from './environment';
 export * from './eth';
+export * from './fee';
 export * from './fetchEvmChainInfo';
 export * from './fetchStaticData';
 export * from './gear';

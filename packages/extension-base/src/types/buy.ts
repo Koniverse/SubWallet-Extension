@@ -9,7 +9,7 @@ export interface BuyService {
   supportSell: boolean;
 }
 
-export type SupportService = 'transak' | 'banxa' | 'coinbase' | 'moonpay' | 'onramper';
+export type SupportService = 'transak' | 'banxa' | 'coinbase' | 'moonpay' | 'onramper' | 'meld';
 
 export type OnrampAccountSupportType = 'ETHEREUM' | 'SUBSTRATE';
 

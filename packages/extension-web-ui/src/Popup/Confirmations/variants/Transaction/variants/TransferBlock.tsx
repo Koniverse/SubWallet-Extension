@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AlertBox } from '@subwallet/extension-web-ui/components';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { AlertBox, QuoteRateDisplay } from '@subwallet/extension-web-ui/components';
 import MetaInfo from '@subwallet/extension-web-ui/components/MetaInfo/MetaInfo';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -24,12 +25,25 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   const assetRegistryMap = useSelector((root: RootState) => root.assetRegistry.assetRegistry);
   const tokenInfo = assetRegistryMap[transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM ? xcmData.tokenSlug : data.tokenSlug];
 
+  const isAcrossBridge = useMemo(() => {
+    return _isAcrossChainBridge(xcmData.originNetworkKey, xcmData.destinationNetworkKey);
+  }, [xcmData.originNetworkKey, xcmData.destinationNetworkKey]);
+
+  const destTokenInfo = useMemo(() => {
+    if (isAcrossBridge && xcmData.metadata?.destChainSlug) {
+      return assetRegistryMap[xcmData.metadata?.destChainSlug];
+    }
+
+    return tokenInfo;
+  }, [isAcrossBridge, xcmData.metadata?.destChainSlug, tokenInfo, assetRegistryMap]);
+
   const chainInfo = useMemo(
     () => chainInfoMap[transaction.chain],
     [chainInfoMap, transaction.chain]
   );
 
-  const { decimals: chainDecimals, symbol: chainSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const feeInfo = transaction.estimateFee;
 
   return (
     <>
@@ -83,18 +97,39 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       </MetaInfo>
 
       <MetaInfo hasBackgroundWrapper>
-        <MetaInfo.Number
-          decimals={tokenInfo.decimals || 0}
-          label={t('Amount')}
-          suffix={tokenInfo.symbol}
-          value={data.value || 0}
-        />
+        {isAcrossBridge && xcmData.metadata
+          ? <>
+            <MetaInfo.Default
+              label={t('Quote')}
+            >
+              <QuoteRateDisplay
+                className={'__quote-estimate-swap-value'}
+                fromAssetInfo={tokenInfo}
+                rateValue={Number(xcmData.metadata.rate)}
+                toAssetInfo={destTokenInfo}
+              />
+            </MetaInfo.Default>
+            <MetaInfo.Number
+              decimals={destTokenInfo.decimals || 0}
+              label={t('Expected amount')}
+              suffix={destTokenInfo.symbol}
+              value={xcmData.metadata.amountOut}
+            />
+          </>
+          : (
+            <MetaInfo.Number
+              decimals={tokenInfo.decimals || 0}
+              label={t('Amount')}
+              suffix={tokenInfo.symbol}
+              value={data.value || 0}
+            />
+          )}
 
         <MetaInfo.Number
-          decimals={chainDecimals}
+          decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
           label={t('Estimated fee')}
-          suffix={chainSymbol}
-          value={transaction.estimateFee?.value || 0}
+          suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
+          value={feeInfo ? feeInfo.value : 0}
         />
       </MetaInfo>
       {

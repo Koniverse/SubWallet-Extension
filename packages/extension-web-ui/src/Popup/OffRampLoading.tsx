@@ -5,6 +5,7 @@ import { BN_TEN } from '@subwallet/extension-base/utils';
 import { DEFAULT_OFF_RAMP_PARAMS, DEFAULT_TRANSFER_PARAMS, OFF_RAMP_DATA, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { saveCurrentAccountAddress } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { OffRampParams, Theme, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
 import { Button, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
@@ -56,13 +57,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const targetAccount = findAccountByAddress(accounts, partnerCustomerId);
 
     // will not happen, this is just for backup
-    if (!targetAccount) {
+    if (!targetAccount || !targetAccount.proxyId) {
+      navigate('/home/tokens');
+
       return;
     }
 
     const transferParams: TransferParams = {
       ...DEFAULT_TRANSFER_PARAMS,
-      fromAccountProxy: targetAccount.proxyId || '',
+      fromAccountProxy: targetAccount.proxyId,
       from: partnerCustomerId,
       chain: tokenInfo?.originChain || '',
       destChain: tokenInfo?.originChain || '',
@@ -77,11 +80,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     setStorage(transferParams);
 
-    if (!isWebUI) {
-      navigate('/transaction/send-fund');
-    } else {
-      navigate('/home/tokens?openSendFund=true');
-    }
+    // Switch current account to targetAccount before navigating
+    saveCurrentAccountAddress({
+      address: targetAccount.proxyId
+    }).then(() => {
+      if (!isWebUI) {
+        navigate('/transaction/send-fund');
+      } else {
+        navigate('/home/tokens?openSendFund=true');
+      }
+    }).catch((e) => {
+      console.error('Failed to switch account', e);
+      navigate('/home/tokens');
+    });
   }, [tokenInfo?.decimals, tokenInfo?.originChain, tokenInfo?.slug, accounts, setStorage, isWebUI, navigate]);
 
   const onBackToHome = useCallback(() => {

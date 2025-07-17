@@ -62,6 +62,7 @@ function checkEarningDonePage (pathname: string) {
 
 const simplePages = [
   '/',
+  '/migrate-account',
   '/welcome',
   '/keyring/login',
   '/keyring/create-password',

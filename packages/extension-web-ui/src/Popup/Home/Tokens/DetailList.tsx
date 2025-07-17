@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, ReceiveModal, TokenBalance, TokenItem } from '@subwallet/extension-web-ui/components';
+import { AccountSelectorModal, AlertBox, LoadingScreen, ReceiveModal } from '@subwallet/extension-web-ui/components';
 import PageWrapper from '@subwallet/extension-web-ui/components/Layout/PageWrapper';
-import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenBalanceDetailItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenBalanceDetailItem';
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SHOW_BANNER_TOKEN_GROUPS, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
@@ -15,6 +14,7 @@ import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeCon
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useCoreReceiveModalHelper, useDefaultNavigate, useGetChainSlugsByAccount, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { canShowChart } from '@subwallet/extension-web-ui/messaging';
 import Banner from '@subwallet/extension-web-ui/Popup/Home/Tokens/Banner';
 import { DetailModal } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailUpperBlock';
@@ -33,7 +33,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import DetailTable from './DetailTable';
+import { DetailListDesktopContent } from './DetailListDesktopContent';
 
 type Props = ThemeProps;
 
@@ -94,7 +94,6 @@ function Component (): React.ReactElement {
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { tokens } = useSelector((state: RootState) => state.buyService);
-  const swapPairs = useSelector((state) => state.swap.swapPairs);
   const priorityTokens = useSelector((root: RootState) => root.chainStore.priorityTokens);
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
@@ -105,6 +104,8 @@ function Component (): React.ReactElement {
   const tonAddress = useMemo(() => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isChartSupported, setIsChartSupported] = useState(false);
 
   const filteredAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => {
@@ -124,32 +125,6 @@ function Component (): React.ReactElement {
       };
     });
   }, [accountProxies]);
-
-  const fromAndToTokenMap = useMemo<Record<string, string[]>>(() => {
-    const result: Record<string, string[]> = {};
-
-    swapPairs.forEach((pair) => {
-      if (!result[pair.from]) {
-        result[pair.from] = [pair.to];
-      } else {
-        result[pair.from].push(pair.to);
-      }
-    });
-
-    return result;
-  }, [swapPairs]);
-
-  const isEnableSwapButton = useMemo(() => {
-    return Object.keys(fromAndToTokenMap).some((tokenSlug) => {
-      const chainAsset = assetRegistryMap[tokenSlug];
-
-      if (chainAsset && !allowedChains.includes(_getAssetOriginChain(chainAsset))) {
-        return false;
-      }
-
-      return chainAsset.slug === tokenGroupSlug || chainAsset.multiChainAsset === tokenGroupSlug;
-    });
-  }, [allowedChains, assetRegistryMap, fromAndToTokenMap, tokenGroupSlug]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
@@ -171,6 +146,20 @@ function Component (): React.ReactElement {
 
     return '';
   }, [tokenGroupSlug, assetRegistryMap, multiChainAssetMap]);
+
+  const priceId = useMemo<string | undefined>(() => {
+    if (!tokenGroupSlug) {
+      return;
+    }
+
+    if (assetRegistryMap[tokenGroupSlug]) {
+      return _getAssetPriceId(assetRegistryMap[tokenGroupSlug]);
+    } else if (multiChainAssetMap[tokenGroupSlug]) {
+      return _getMultiChainAssetPriceId(multiChainAssetMap[tokenGroupSlug]);
+    }
+
+    return undefined;
+  }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
 
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';
@@ -265,10 +254,12 @@ function Component (): React.ReactElement {
   const [currentTokenInfo, setCurrentTokenInfo] = useState<CurrentSelectToken| undefined>(undefined);
   const [isShrink, setIsShrink] = useState<boolean>(false);
 
+  const upperBlockHeight = priceId ? 486 : 272;
+
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       setIsShrink((value) => {
         if (!value && topBlockRef.current && containerRef.current) {
           const containerProps = containerRef.current.getBoundingClientRect();
@@ -311,12 +302,12 @@ function Component (): React.ReactElement {
         return false;
       });
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const handleResize = useCallback(() => {
     const topPosition = containerRef.current?.scrollTop || 0;
 
-    if (topPosition > 60) {
+    if (topPosition > upperBlockHeight) {
       if (topBlockRef.current && containerRef.current) {
         const containerProps = containerRef.current.getBoundingClientRect();
 
@@ -333,7 +324,7 @@ function Component (): React.ReactElement {
         topBlockRef.current.style.width = '100%';
       }
     }
-  }, []);
+  }, [upperBlockHeight]);
 
   const onCloseDetail = useCallback(() => {
     setCurrentTokenInfo(undefined);
@@ -455,6 +446,33 @@ function Component (): React.ReactElement {
     });
   }, [inactiveModal, setIsShowTonWarning, tonWalletContractSelectorModal]);
 
+  useEffect(() => {
+    let sync = true;
+
+    setIsLoading(true);
+
+    if (priceId) {
+      canShowChart(priceId).then((result) => {
+        if (sync) {
+          setIsChartSupported(result);
+          setIsLoading(false);
+        }
+      }).catch(() => {
+        if (sync) {
+          setIsChartSupported(false);
+          setIsLoading(false);
+        }
+      });
+    } else {
+      setIsChartSupported(false);
+      setIsLoading(false);
+    }
+
+    return () => {
+      sync = false;
+    };
+  }, [priceId]);
+
   const onOpenTonWalletContactModal = useCallback(() => {
     if (isAllAccount) {
       activeModal(tonAccountSelectorModalId);
@@ -504,10 +522,6 @@ function Component (): React.ReactElement {
     setDetailTitle?.(detailTitle);
   }, [detailTitle, setDetailTitle]);
 
-  const onClickRow = useCallback((item: TokenBalanceItemType) => {
-    return onClickItem(item)();
-  }, [onClickItem]);
-
   const isShowBanner = useMemo(() => {
     return SHOW_BANNER_TOKEN_GROUPS.some((item) => {
       return tokenGroupSlug && (item === tokenGroupSlug || tokenGroupMap[item]?.includes(tokenGroupSlug));
@@ -529,125 +543,74 @@ function Component (): React.ReactElement {
     }
   }, [navigate, symbol, tokenGroupMap, tokenGroupSlug]);
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div
       className={CN('token-detail-container', {
+        '-no-chart': !isChartSupported,
         '__web-ui': isWebUI
       })}
       onScroll={handleScroll}
       ref={containerRef}
     >
       {!isWebUI && (
-        <div
-          className={CN('__upper-block-wrapper', {
-            '-is-shrink': isShrink
-          })}
-          ref={topBlockRef}
-        >
-          <DetailUpperBlock
-            balanceValue={tokenBalanceValue}
-            className={'__static-block'}
-            isShrink={isShrink}
-            isSupportBuyTokens={isSupportBuyTokens}
-            isSupportSwap={isEnableSwapButton}
-            onClickBack={goHome}
-            onOpenBuyTokens={onOpenBuyTokens}
-            onOpenReceive={onOpenReceive}
-            onOpenSendFund={onOpenSendFund}
-            onOpenSwap={onOpenSwap}
-            symbol={symbol}
-          />
-        </div>
+        <>
+          <div className={'__upper-block-placeholder'}></div>
+          <div
+            className={CN('__upper-block-wrapper', {
+              '-is-shrink': isShrink
+            })}
+            ref={topBlockRef}
+          >
+            <DetailUpperBlock
+              balanceValue={tokenBalanceValue}
+              className={'__static-block'}
+              isChartSupported={isChartSupported}
+              isShrink={isShrink}
+              isSupportBuyTokens={isSupportBuyTokens}
+              isSupportSwap={true}
+              onClickBack={goHome}
+              onOpenBuyTokens={onOpenBuyTokens}
+              onOpenReceive={onOpenReceive}
+              onOpenSendFund={onOpenSendFund}
+              onOpenSwap={onOpenSwap}
+              priceId={priceId}
+              symbol={symbol}
+            />
+          </div>
+
+          <div
+            className={'__scroll-container'}
+          >
+            {
+              tokenBalanceItems.map((item) => (
+                <TokenBalanceDetailItem
+                  key={item.slug}
+                  {...item}
+                  onClick={onClickItem(item)}
+                />
+              ))
+            }
+          </div>
+        </>
       )}
 
-      {!tokenBalanceItems.length
-        ? (
-          <NoContent pageType={PAGE_TYPE.TOKEN} />
+      {
+        isWebUI && (
+          <DetailListDesktopContent
+            isChartSupported={isChartSupported}
+            onClickItem={onClickItem}
+            priceId={priceId}
+            tokenBalanceItems={tokenBalanceItems}
+            tokenBalanceValue={tokenBalanceValue}
+            tokenGroupSlug={tokenGroupSlug}
+          />
         )
-        : !isWebUI
-          ? (
-            <div
-              className={'__scroll-container'}
-            >
-              {
-                tokenBalanceItems.map((item) => (
-                  <TokenBalanceDetailItem
-                    key={item.slug}
-                    {...item}
-                    onClick={onClickItem(item)}
-                  />
-                ))
-              }
-            </div>
-          )
-          : (
-            <DetailTable
-              className={'__table'}
-              columns={[
-                {
-                  title: 'Token name',
-                  dataIndex: 'name',
-                  key: 'name',
-                  render: (_, row) => {
-                    return (
-                      <TokenItem
-                        chain={row.chain}
-                        logoKey={row.logoKey}
-                        slug={row.slug}
-                        subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
-                        symbol={row.symbol}
-                        tokenGroupSlug={tokenGroupSlug}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Transferable',
-                  dataIndex: 'percentage',
-                  key: 'percentage',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.free.convertedValue}
-                        symbol={row.symbol}
-                        value={row.free.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Locked',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.locked.convertedValue}
-                        symbol={row.symbol}
-                        value={row.locked.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Balance',
-                  dataIndex: 'balance',
-                  key: 'balance',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.total.convertedValue}
-                        symbol={row.symbol}
-                        value={row.total.value}
-                      />
-                    );
-                  }
-                }
-              ]}
-              dataSource={tokenBalanceItems}
-              onClick={onClickRow}
-            />
-          )}
+      }
+
       {isShowBanner &&
         <Banner
           className={'__banner-area'}
@@ -710,14 +673,6 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
   return ({
     overflow: 'hidden',
 
-    '.__table': {
-      flex: 1,
-
-      '.ant-table-row': {
-        cursor: 'pointer'
-      }
-    },
-
     '.token-detail-container': {
       minHeight: '100%',
       color: token.colorTextLight1,
@@ -725,9 +680,61 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: 210,
       '&.__web-ui': {
         padding: 0
+      }
+    },
+
+    '.link': {
+      color: token.colorLink,
+      cursor: 'pointer'
+    },
+
+    '.__upper-block-placeholder': {
+      paddingTop: 486
+    },
+
+    '.__upper-block-wrapper': {
+      position: 'absolute',
+      backgroundColor: token.colorBgDefault,
+      zIndex: 10,
+      height: 486,
+      paddingTop: 8,
+      top: 0,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      alignItems: 'center',
+      transition: 'opacity, height 0.2s ease',
+
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
+        display: 'block',
+        zIndex: 1
+      }
+    },
+
+    '.token-detail-container.-no-chart': {
+      '.__upper-block-placeholder': {
+        paddingTop: 272
+      },
+
+      '.__upper-block-wrapper': {
+        height: 272
+      }
+    },
+
+    '.__upper-block-wrapper.__upper-block-wrapper.-is-shrink': {
+      height: 128,
+
+      '&:before': {
+        height: 80
       }
     },
 
@@ -737,39 +744,24 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       paddingRight: token.size
     },
 
-    '.__upper-block-wrapper': {
-      position: 'absolute',
-      backgroundColor: token.colorBgDefault,
-      zIndex: 10,
-      height: 206,
-      paddingTop: 8,
-      top: 0,
-      left: 0,
-      right: 0,
-      display: 'flex',
-      alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenInfoBackgroundColor,
-      transition: 'opacity, padding-top 0.27s ease',
-
-      '&.-is-shrink': {
-        height: 128
-      }
-    },
-
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scrolling-block': {
       display: 'none'
     },
 
-    '.token-balance-detail-item, .ton-solo-acc-alert-area': {
+    '.token-balance-detail-item, .token-detail-banner-wrapper, .ton-solo-acc-alert-area': {
       marginBottom: token.sizeXS
     },
+
     '.__banner-area': {
       marginTop: 24
     },
+
     '@media (max-width: 991px)': {
       '.token-detail-container': {
         overflow: 'auto',

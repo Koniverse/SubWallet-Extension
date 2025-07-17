@@ -22,6 +22,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { t } = useTranslation();
 
+  const isBittensorChain = useMemo(() => {
+    return data.poolPosition?.chain === 'bittensor' || data.poolPosition?.chain === 'bittensor_testnet';
+  }, [data.poolPosition?.chain]);
+
   const handleValidatorLabel = useMemo(() => {
     return getValidatorLabel(transaction.chain);
   }, [transaction.chain]);
@@ -61,21 +65,30 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </MetaInfo>
 
-      <AlertBox
-        className={'description'}
-        description={t('Once staked, your funds will be locked and become non-transferable. ' +
-          'To unlock your funds, you need to unstake manually, wait for the unstaking period to' +
-          ' end and then withdraw manually.')}
-        title={t('Your staked funds will be locked')}
-        type='warning'
-      />
+      {/* <AlertBox */}
+      {/*  className={'description'} */}
+      {/*  description={t('Once staked, your funds will be locked and become non-transferable. ' + */}
+      {/*    'To unlock your funds, you need to unstake manually, wait for the unstaking period to' + */}
+      {/*    ' end and then withdraw manually.')} */}
+      {/*  title={t('Your staked funds will be locked')} */}
+      {/*  type='warning' */}
+      {/* /> */}
+
+      {isBittensorChain && (
+        <AlertBox
+          className={CN(className, 'alert-box')}
+          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
+          title={t('TAO staking fee')}
+          type='info'
+        />
+      )}
     </div>
   );
 };
 
 const BondTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.description': {
+    '&.alert-box': {
       marginTop: token.marginSM
     }
   };

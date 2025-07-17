@@ -146,7 +146,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const openBuyTokens = searchParams.get('openBuyTokens') || '';
   const handleCancelTransfer = useCallback(() => {
     inactiveModal(TRANSACTION_TRANSFER_MODAL);
     setIsSendFundVisible(false);
@@ -214,6 +214,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       setSearchParams(searchParams);
     }
   }, [openSendFund, activeModal, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (openBuyTokens === 'true' && isSupportBuyTokens && isWebUI) {
+      onOpenBuyTokens();
+      searchParams.delete('openBuyTokens');
+      setSearchParams(searchParams);
+    }
+  }, [openBuyTokens, isSupportBuyTokens, onOpenBuyTokens, searchParams, setSearchParams, buyInfos, isWebUI]);
 
   useEffect(() => {
     const backgroundColor = isTotalBalanceDecrease ? BackgroundColorMap.DECREASE : BackgroundColorMap.INCREASE;
@@ -488,7 +496,13 @@ const Balance = styled(Component)<Props>(({ theme: { token } }: Props) => ({
     display: 'flex',
     justifyContent: 'start',
     alignItems: 'center',
-    marginTop: token.marginSM
+    marginTop: token.marginSM,
+
+    '.ant-typography': {
+      lineHeight: 'inherit',
+      color: 'inherit !important',
+      fontSize: 'inherit !important'
+    }
   },
 
   '.__balance-change-value': {

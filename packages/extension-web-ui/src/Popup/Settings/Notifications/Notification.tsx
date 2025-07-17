@@ -5,7 +5,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BaseModal, EmptyList, PageWrapper } from '@subwallet/extension-web-ui/components';
@@ -22,21 +22,29 @@ import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotif
 import { NotificationItem, NotificationSetting } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/index';
 import { NotificationItemActionsModal, NotificationItemActionsModalProps } from '@subwallet/extension-web-ui/Popup/Settings/Notifications/NotificationItemActionsModal';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { NotificationScreenParam, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getTotalWidrawable, getYieldRewardTotal } from '@subwallet/extension-web-ui/utils/notification';
 import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+// todo: update once sign flow with this file
+
+export type NotificationModalProps = {
+  modalId: string;
+  onCancel: VoidFunction;
+  params?: NotificationScreenParam
+}
 
 type Props = {
   isInModal?: boolean;
-  modalProps?: WrapperProps['modalProps'];
+  modalProps?: NotificationModalProps;
   refreshNotifications: VoidFunction;
   refreshNotificationsTriggerKey: string;
   notificationItemActionsModal: {
@@ -44,14 +52,12 @@ type Props = {
     close: VoidFunction;
   },
   openNotificationSettingModal: VoidFunction;
+  params?: NotificationScreenParam;
 };
 
 type WrapperProps = ThemeProps & {
   isModal?: boolean;
-  modalProps?: {
-    modalId: string;
-    onCancel: VoidFunction;
-  };
+  modalProps?: NotificationModalProps;
 };
 
 export interface NotificationInfoItem extends _NotificationInfo {
@@ -67,7 +73,9 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM = 'yellow-7',
   CLAIM_AVAIL_BRIDGE_ON_AVAIL = 'yellow-7', // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
-  CLAIM_POLYGON_BRIDGE = 'yellow-7'
+  CLAIM_POLYGON_BRIDGE = 'yellow-7',
+  SWAP = 'blue-8',
+  EARNING = 'blue-8'
 }
 
 export const NotificationIconMap = {
@@ -77,15 +85,21 @@ export const NotificationIconMap = {
   CLAIM: Gift,
   CLAIM_AVAIL_BRIDGE_ON_AVAIL: Coins, // temporary set
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
-  CLAIM_POLYGON_BRIDGE: Coins
+  CLAIM_POLYGON_BRIDGE: Coins,
+  SWAP: ArrowsLeftRight,
+  EARNING: Database
 };
 
 function Component ({ isInModal,
   modalProps, notificationItemActionsModal, openNotificationSettingModal,
-  refreshNotifications, refreshNotificationsTriggerKey }: Props): React.ReactElement<Props> {
+  params, refreshNotifications, refreshNotificationsTriggerKey }: Props): React.ReactElement<Props> {
+  const paramTransactionProcess = params?.transactionProcess;
+  const paramTransactionProcessId = paramTransactionProcess?.processId;
+  const { transactionProcessDetailModal: { open: openTransactionProcessModal } } = useContext(WalletModalContext);
+
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { goBack } = useDefaultNavigate();
+  const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertModal } = useContext(WalletModalContext);
   const chainsByAccountType = useGetChainSlugsByAccount();
@@ -212,8 +226,8 @@ function Component ({ isInModal,
 
   const onClickBack = useCallback(() => {
     setCurrentSearchText('');
-    goBack();
-  }, [goBack]);
+    goHome();
+  }, [goHome]);
 
   const showActiveChainModal = useCallback((chainSlug: string, action: NotificationActionType.WITHDRAW | NotificationActionType.CLAIM) => {
     const onOk = () => {
@@ -462,6 +476,17 @@ function Component ({ isInModal,
 
           break;
         }
+
+        case NotificationActionType.EARNING:
+
+        // eslint-disable-next-line no-fallthrough
+        case NotificationActionType.SWAP: {
+          const metadata = item.metadata as ProcessNotificationMetadata;
+
+          openTransactionProcessModal(metadata.processId);
+
+          break;
+        }
       }
 
       if (!item.isRead) {
@@ -472,7 +497,7 @@ function Component ({ isInModal,
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, modalProps, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, refreshNotifications]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, modalProps, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, openTransactionProcessModal, refreshNotifications]);
 
   const onClickMore = useCallback((item: NotificationInfoItem) => {
     return (e: SyntheticEvent) => {
@@ -594,6 +619,14 @@ function Component ({ isInModal,
     };
   }, []);
 
+  useEffect(() => {
+    // todo: may have more conditions
+    if (paramTransactionProcessId) {
+      openTransactionProcessModal(paramTransactionProcessId);
+    }
+    // need paramTransactionProcess?.triggerTime to re-run this useEffect
+  }, [openTransactionProcessModal, paramTransactionProcessId, paramTransactionProcess?.triggerTime]);
+
   return (
     <>
       {!isInModal && (
@@ -686,6 +719,8 @@ const Wrapper = (props: WrapperProps) => {
   const [notificationItemActionsModalProps, setNotificationItemActionsModalProps] = useState<NotificationItemActionsModalProps | undefined>();
   const [isNotificationSettingModalVisible, setIsNotificationSettingModalVisible] = useState<boolean>(false);
 
+  const locationParams = useLocation().state as NotificationScreenParam | undefined;
+
   const refreshNotifications = useCallback(() => {
     setRefreshNotificationsTriggerKey(`${Date.now()}`);
   }, []);
@@ -732,13 +767,14 @@ const Wrapper = (props: WrapperProps) => {
     <PageWrapper
       className={isModal ? '__layout-container' : CN(className, '-screen-container')}
       hideLoading={true}
-      resolve={dataContext.awaitStores(['earning'])}
+      resolve={dataContext.awaitStores(['earning', 'price'])}
     >
       <Component
         isInModal={isModal}
         modalProps={modalProps}
         notificationItemActionsModal={notificationItemActionsModalHandler}
         openNotificationSettingModal={openNotificationSettingModal}
+        params={modalProps?.params || locationParams}
         refreshNotifications={refreshNotifications}
         refreshNotificationsTriggerKey={refreshNotificationsTriggerKey}
       />

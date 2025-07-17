@@ -190,9 +190,9 @@ export function calculateChainStakedReturn (inflation: number, totalEraStake: BN
   return stakedReturn;
 }
 
-export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
-  if (chainInfo.slug === 'analog_timechain') { // hotfix for analog
-    return 55;
+export async function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+  if (chainInfo.slug === 'analog_timechain') {
+    return await calculateAnalogChainStakedReturn();
   }
 
   const DAYS_PER_YEAR = 365;
@@ -230,6 +230,37 @@ export function calculateTernoaValidatorReturn (rewardPerValidator: number, vali
   const stakeRatio = rewardForNominators / validatorStake;
 
   return stakeRatio * 365 * 100;
+}
+
+export async function calculateAnalogChainStakedReturn (): Promise<number | undefined> {
+  const url = 'https://explorer-api.analog.one/api/nominations?projection=apy,rewardsClaimed,eraEndsTime';
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      throw new Error(`API error: ${response.status} - ${errorText}`);
+    }
+
+    const apyInfo = await response.json() as {
+      data: {
+        apy: number;
+      }
+    };
+
+    return apyInfo?.data?.apy as number | undefined;
+  } catch (e) {
+    console.error('Fetch error:', e);
+
+    return undefined;
+  }
 }
 
 export function calculateValidatorStakedReturn (chainStakedReturn: number, totalValidatorStake: BN, avgStake: BN, commission: number) {
@@ -369,6 +400,10 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
     return [YieldAction.START_EARNING, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
   }
 
+  if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    return [YieldAction.STAKE, YieldAction.UNSTAKE];
+  }
+
   return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
 }
 
@@ -416,6 +451,14 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
 
     if (hasWithdrawal) {
       result.push(YieldAction.WITHDRAW);
+    }
+  } else if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    result.push(YieldAction.STAKE);
+
+    const activeBalance = new BigNumber(yieldPosition.activeStake);
+
+    if (activeBalance.gt('0')) {
+      result.push(YieldAction.UNSTAKE);
     }
 
     // TODO: check has unstakings to withdraw

@@ -203,7 +203,10 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <SwList.Section
           actionBtnIcon={(
-            <Badge dot={!!selectedFilters.length}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={!!selectedFilters.length}
+            >
               <Icon
                 phosphorIcon={FadersHorizontal}
                 size='sm'
