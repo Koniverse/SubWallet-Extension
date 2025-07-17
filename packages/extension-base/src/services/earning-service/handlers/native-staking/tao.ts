@@ -9,7 +9,7 @@ import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/ap
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -609,6 +609,26 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const extrinsic = chainApi.api.tx.subtensorModule.addStake(hotkey, 0, binaryAmount.toFixed());
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
+  }
+
+  // Validate for case stake more
+  public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
+    const baseErrors = await super.validateYieldJoin(data, path);
+
+    if (baseErrors.length > 0) {
+      return baseErrors;
+    }
+
+    const { amount } = data;
+
+    const minDelegatorStake = (await this.substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
+    const bnMinStake = minDelegatorStake.toString();
+
+    if (new BigN(amount).lt(bnMinStake)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+    }
+
+    return baseErrors;
   }
 
   /* Join pool action */
