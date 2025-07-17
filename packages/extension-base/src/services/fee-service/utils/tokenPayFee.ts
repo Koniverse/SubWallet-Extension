@@ -82,22 +82,20 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
   const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
     token.originChain === substrateApi.chainSlug &&
     token.assetType !== _AssetType.NATIVE &&
-    !!token.metadata &&
-    !!token.metadata.assetId
-  ));
+    !!token.metadata?.assetId &&
+    !!_getAssetPriceId(token) &&
+    supportedAssetIds.includes(_getTokenOnChainAssetId(token)))
+  );
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
-    const priceId = _getAssetPriceId(tokenInfo);
     const rate = await getHydrationRate(address, nativeTokenInfo, tokenInfo);
 
-    if (priceId && rate) {
-      if (supportedAssetIds.includes(_getTokenOnChainAssetId(tokenInfo))) {
-        tokensList.push({
-          slug: tokenInfo.slug,
-          free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
-          rate: rate.toString()
-        });
-      }
+    if (rate) {
+      tokensList.push({
+        slug: tokenInfo.slug,
+        free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
+        rate: rate.toString()
+      });
     }
   }));
 
