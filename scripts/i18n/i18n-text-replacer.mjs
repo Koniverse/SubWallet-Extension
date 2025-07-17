@@ -29,13 +29,6 @@ function loadCombinedData(filePath) {
   }
 }
 
-// function escapeForRegex(text) {
-//   return text
-//     .replace(/\n/g, '\\n')
-//     .replace(/'/g, '\\\'')     // escape dấu nháy đơn
-//     .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');  // escape ký tự đặc biệt khác
-// }
-
 function escapeForRegex(text) {
   return text
     .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -82,6 +75,7 @@ function generateReplacementPatterns(originalText, key) {
     replacement: `detectTranslate('${key}')`
   });
 
+  // 4. t() with object (replace: {...} )
   patterns.push({
     regex: new RegExp(`t\\(['"\`]${escapedText}['"\`],\\s*(\\{[\\s\\S]*?\\})\\)`, 'g'),
     replacement: `t('${key}', $1)`
@@ -102,7 +96,6 @@ async function replaceTextInCode(newDataFormat, options = { dryRun: false, verbo
 
   // 1. Build replacement rules
   for (const [text, mappings] of Object.entries(keyMappings)) {
-    const escapedText = escapeForRegex(text);
 
     for (const { filepath, key } of mappings) {
       if (!fs.existsSync(filepath)) {
@@ -122,11 +115,6 @@ async function replaceTextInCode(newDataFormat, options = { dryRun: false, verbo
       const fileRule = replacements.find(r => r.files === filepath);
 
       const patterns = generateReplacementPatterns(text, key);
-
-      // Debug log patterns
-      console.log(`Patterns for "${text}":`);
-      patterns.forEach(p => console.log(`  From: ${p.regex.source}\n  To: ${p.replacement}`));
-
 
       patterns.forEach(({ regex, replacement }) => {
         fileRule.from.push(regex);

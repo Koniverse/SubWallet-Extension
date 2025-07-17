@@ -52,10 +52,10 @@ async function updateTranslationFiles() {
     let removedCount = 0;
 
     // Process each entry in combined data
-    Object.values(combinedData).forEach(entry => {
+    Object.entries(combinedData).forEach(([key, entry]) => {
       entry.locations.forEach(location => {
         const translationKey = location.key;
-        const translationValue = entry.translations[lng] || entry.translations.en || entry.translations[Object.keys(entry.translations)[0]];
+        const translationValue = entry.translations[lng] || entry.translations.en || key;
 
         if (!newTranslations[translationKey]) {
           newTranslations[translationKey] = translationValue;

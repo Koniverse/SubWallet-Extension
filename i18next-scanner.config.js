@@ -20,6 +20,35 @@ function getPackageRelativePath(fullPath) {
 
 const translations = new Map();
 
+/***
+ The ** transform** function is for the i18n scanner (handles everything: both translated and untranslated keys,
+ and writes them to ***`locales-to-compare`***)
+ @usage: Used to compare translation keys before and after processing
+
+***/
+function transform (file, enc, done) {
+  const { ext } = path.parse(file.path);
+
+  if (['.ts', '.tsx'].includes(ext)) {
+    const content = fs.readFileSync(file.path, enc);
+
+    const { outputText } = typescript.transpileModule(content, {
+      compilerOptions: {
+        target: 'es2018'
+      },
+      fileName: path.basename(file.path)
+    });
+
+    this.parser.parseFuncFromString(outputText);
+  }
+
+  done();
+}
+
+
+/**
+ * The `customTransform` function is used to detect untranslated keys in the source code.
+ */
 function customTransform(file, enc, done) {
   const { ext } = path.parse(file.path);
   if (['.ts', '.tsx'].includes(ext)) {
@@ -27,27 +56,20 @@ function customTransform(file, enc, done) {
       const content = fs.readFileSync(file.path, enc);
       const { outputText } = typescript.transpileModule(content, {
         compilerOptions: {
-          target: 'es2018',
-          jsx: ext === '.tsx' ? 'react' : 'preserve',
-          module: 'esnext'
+          target: 'es2018'
         },
         fileName: path.basename(file.path)
       });
 
-      // Hàm kiểm tra key đã được dịch
+      // Function to check whether the key is already translated
       const isTranslatedKey = (key) => {
-        // Bước 1: Chuẩn hóa key (bỏ dấu nháy, khoảng trắng, backtick)
+        // Step 1: Normalize the key (remove quotes, whitespace, backticks)
         const cleanKey = String(key)
-          .replace(/['"`\s]/g, '') // Bỏ tất cả dấu nháy/khoảng trắng
+          .replace(/['"`\s]/g, '')
           .trim();
 
-        // Bước 2: Kiểm tra namespace
-        const isNamespaced = /^(ui|bg)\.[a-z]+(\.[a-z0-9]+)*$/i.test(cleanKey);
-
-        // Bước 3: Kiểm tra dynamic key (${...}, {{...}})
-        // const isDynamic = /(\$\{|{{|}})/.test(key);
-
-        return isNamespaced;
+        // Step 2: Check if it's namespaced
+        return /^(ui|bg)\.[a-z]+(\.[a-z0-9]+)*$/i.test(cleanKey);
       };
 
       // Parse functions t, detectTranslate
@@ -60,16 +82,6 @@ function customTransform(file, enc, done) {
         }
       });
 
-      // Parse <Trans> component
-      this.parser.parseTransFromString(outputText, { component: 'Trans', i18nKey: 'i18nKey' }, (key) => {
-        console.log(`Found Trans i18nKey: ${key} in ${file.path}`); // Log key và file
-        if (!isTranslatedKey(key)) {
-          if (!translations.has(key)) {
-            translations.set(key, []);
-          }
-          translations.get(key).push(getPackageRelativePath(file.path));
-        }
-      });
     } catch (error) {
       console.error(`Error processing file ${file.path}:`, error);
     }
@@ -124,12 +136,13 @@ module.exports = {
       jsonIndent: 2,
       lineEnding: '\n',
       loadPath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
+      savePath: 'packages/extension-koni/public/locales-to-compare/{{lng}}/{{ns}}.json',
     },
     trans: {
-      component: 'Trans',
-      i18nKey: 'i18nKey',
+      component: 'Trans'
     }
   },
   output: './',
+  transform,
   scanSourceForTranslations
 };
