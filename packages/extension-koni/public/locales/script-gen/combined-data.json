@@ -11896,6 +11896,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/JoinYieldPool.tsx",
         "key": "ui.Confirmations.Transaction.Process.Earn.JoinYieldPool.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/JoinPool.tsx",
+        "key": "ui.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.estimatedFee"
       }
     ],
     "translations": {
@@ -21080,51 +21084,6 @@
       "ru": "Earning options"
     }
   },
-  "You’re dual staking via both direct nomination and nomination pool, which": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
-        "key": "ui.Earning.Entry.Positions.dualStakingWarning"
-      }
-    ],
-    "translations": {
-      "en": "You’re dual staking via both direct nomination and nomination pool, which",
-      "ja": "You’re dual staking via both direct nomination and nomination pool, which",
-      "vi": "You’re dual staking via both direct nomination and nomination pool, which",
-      "zh": "You’re dual staking via both direct nomination and nomination pool, which",
-      "ru": "You’re dual staking via both direct nomination and nomination pool, which"
-    }
-  },
-  "will not be supported": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
-        "key": "ui.Earning.Entry.Positions.willNotBeSupported"
-      }
-    ],
-    "translations": {
-      "en": "will not be supported",
-      "ja": "will not be supported",
-      "vi": "will not be supported",
-      "zh": "will not be supported",
-      "ru": "will not be supported"
-    }
-  },
-  "from one of the methods to avoid issues": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
-        "key": "ui.Earning.Entry.Positions.fromOneMethodToAvoidIssues"
-      }
-    ],
-    "translations": {
-      "en": "from one of the methods to avoid issues",
-      "ja": "from one of the methods to avoid issues",
-      "vi": "from one of the methods to avoid issues",
-      "zh": "from one of the methods to avoid issues",
-      "ru": "from one of the methods to avoid issues"
-    }
-  },
   "Read update": {
     "locations": [
       {
@@ -22695,14 +22654,18 @@
       {
         "filepath": "packages/extension-base/src/services/keyring-service/context/handlers/Secret.ts",
         "key": "bg.keyring.handler.Secret.accountAlreadyExistsWithName"
+      },
+      {
+        "filepath": "packages/extension-base/src/types/account/error/common.ts",
+        "key": "bg.type.error.account.common.accountAlreadyExistsWithName"
       }
     ],
     "translations": {
       "en": "Account already exists under the name {{name}}",
-      "ja": "Account already exists under the name {{name}}",
-      "vi": "Account already exists under the name {{name}}",
-      "zh": "Account already exists under the name {{name}}",
-      "ru": "Account already exists under the name {{name}}"
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
     }
   },
   "Seed phrase needs to contain {{x}} words": {
@@ -22782,6 +22745,10 @@
   },
   "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.": {
     "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/BuyTokens.tsx",
+        "key": "ui.BuyTokens.leavingSubwalletDisclaimer"
+      },
       {
         "filepath": "packages/extension-koni-ui/src/Popup/BuyTokens.tsx",
         "key": "ui.BuyTokens.leavingSubwalletDisclaimer"
@@ -23127,6 +23094,737 @@
       "vi": "To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>",
       "zh": "To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>",
       "ru": "To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>"
+    }
+  },
+  "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/core/logic-validation/index.ts",
+        "key": "bg.validation.insufficientSpendingTokenBalance"
+      }
+    ],
+    "translations": {
+      "en": "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/core/logic-validation/index.ts",
+        "key": "bg.validation.insufficientFeeTokenBalance"
+      }
+    ],
+    "translations": {
+      "en": "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Feature under maintenance on {{chainInfoName}} network. Try again later": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/core/logic-validation/transfer.ts",
+        "key": "bg.validation.transfer.featureUnderMaintenanceOnNetwork"
+      }
+    ],
+    "translations": {
+      "en": "Feature under maintenance on {{chainInfoName}} network. Try again later",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Import {{accountProxiesSelected}} accounts": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
+        "key": "ui.Account.RestoreJson.importSelectedAccounts"
+      }
+    ],
+    "translations": {
+      "en": "Import {{accountProxiesSelected}} accounts",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+        "key": "ui.Transaction.Earn.dualStakingFreezeWarning"
+      }
+    ],
+    "translations": {
+      "en": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+        "key": "ui.Transaction.Earn.dualNetworkConnectionLost"
+      }
+    ],
+    "translations": {
+      "en": "{{poolChainName}} network or {{altChainName}} network has lost connection. Re-enable the network and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{poolChainName}} network has lost connection. Re-enable the network and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+        "key": "ui.Transaction.Earn.networkConnectionLost"
+      }
+    ],
+    "translations": {
+      "en": "{{poolChainName}} network has lost connection. Re-enable the network and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/SendFund.tsx",
+        "key": "ui.Transaction.SendFund.bounceableAddressNotSupported"
+      }
+    ],
+    "translations": {
+      "en": "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Select {{handleValidatorLabel}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx",
+        "key": "ui.Transaction.Unbond.selectValidatorLabel"
+      }
+    ],
+    "translations": {
+      "en": "Select {{handleValidatorLabel}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx",
+        "key": "ui.Transaction.Unbond.fastExchangeModeDescription"
+      }
+    ],
+    "translations": {
+      "en": "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/swap-service/handler/base-handler.ts",
+        "key": "bg.service.swap.baseHandler.swapAmountTooSmall"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/swap-service/handler/base-handler.ts",
+        "key": "bg.service.swap.baseHandler.swapAmountTooSmall"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/swap-service/handler/base-handler.ts",
+        "key": "bg.service.swap.baseHandler.swapAmountTooSmall"
+      }
+    ],
+    "translations": {
+      "en": "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swapping via {{provider}} can take up to {{getWaitingTime}} minutes. Make sure you review all information carefully before submitting.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Swap.tsx",
+        "key": "ui.Confirmations.Process.Swap.swapProviderWaitingTime"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Swap.tsx",
+        "key": "ui.Confirmations.Transaction.Swap.swapProviderWaitingTime"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Swap.tsx",
+        "key": "ui.Confirmations.Transaction.Process.Swap.swapProviderWaitingTime"
+      }
+    ],
+    "translations": {
+      "en": "Swapping via {{provider}} can take up to {{getWaitingTime}} minutes. Make sure you review all information carefully before submitting.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
+        "key": "ui.Transaction.Swap.highPriceImpactWarning"
+      }
+    ],
+    "translations": {
+      "en": "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Export {{getNumberAccount}} accounts": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+        "key": "ui.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts"
+      }
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} accounts",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Export {{getNumberAccount}} account": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+        "key": "ui.Layout.SelectAccount.ExportAllSelector.exportSingleAccount"
+      }
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} account",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.service.earning.nativeStaking.dtao.insufficientStakeToEarn"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.insufficientStakeToEarn"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.insufficientStakeToEarn"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.insufficientStakeToEarn"
+      }
+    ],
+    "translations": {
+      "en": "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount too low. You need to unstake at least {{amount}} {{symbol}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.service.earning.nativeStaking.dtao.unstakeAmountTooLow"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.unstakeAmountTooLow"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.service.earning.nativeStaking.dtao.unstakeAmountTooLow"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.unstakeAmountTooLow"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.service.earning.nativeStaking.dtao.unstakeAmountTooLow"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.service.earning.nativeStaking.tao.unstakeAmountTooLow"
+      }
+    ],
+    "translations": {
+      "en": "Amount too low. You need to unstake at least {{amount}} {{symbol}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "{{number}} selected {{validatorLabel}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Earn/Bond.tsx",
+        "key": "ui.Confirmations.Process.Earn.Bond.numberSelectedValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Bond.tsx",
+        "key": "ui.Confirmations.Transaction.Bond.numberSelectedValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/Bond.tsx",
+        "key": "ui.Modal.TxProcessDetail.InfoBlock.Earn.Bond.numberSelectedValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/Bond.tsx",
+        "key": "ui.Confirmations.Transaction.Process.Earn.Bond.numberSelectedValidator"
+      }
+    ],
+    "translations": {
+      "en": "{{number}} selected {{validatorLabel}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx",
+        "key": "ui.Confirmations.Transaction.ClaimReward.rewardsSmallerThanFeeWarning"
+      }
+    ],
+    "translations": {
+      "en": "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx",
+        "key": "ui.Confirmations.Transaction.ClaimReward.rewardsEqualToFeeWarning"
+      }
+    ],
+    "translations": {
+      "en": "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
+        "key": "ui.Earning.Entry.Positions.dualStakingNotSupportedWarning"
+      }
+    ],
+    "translations": {
+      "en": "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Unstake your {{tokenSymbol}} now!": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
+        "key": "ui.Earning.Entry.Positions.unstakeYourTokenNow"
+      }
+    ],
+    "translations": {
+      "en": "Unstake your {{tokenSymbol}} now!",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Keyring/ChangePassword.tsx",
+        "key": "ui.Keyring.ChangePassword.understandPasswordNotRecoverable"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Keyring/CreatePassword.tsx",
+        "key": "ui.Keyring.CreatePassword.understandPasswordNotRecoverable"
+      }
+    ],
+    "translations": {
+      "en": "I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Apply {{number}} dApp": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyOneDapp"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} dApp を適用する",
+      "vi": "Áp dụng {{number}} dApp",
+      "zh": "应用 {{number}} dApp",
+      "ru": "Применить {{number}} dApp"
+    }
+  },
+  "Apply {{number}} collator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyOneCollator"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} コレーター を適用する",
+      "vi": "Áp dụng {{number}} collator",
+      "zh": "应用 {{number}} 整理者",
+      "ru": "Применить {{number}} коллатор"
+    }
+  },
+  "Apply {{number}} validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyOneValidator"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} バリデータ ーを適用する",
+      "vi": "Áp dụng {{number}} validator",
+      "zh": "应用 {{number}} 验证者",
+      "ru": "Применить {{number}} валидатор"
+    }
+  },
+  "Apply {{number}} dApps": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyNumberDapps"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} dApp を適用する",
+      "vi": "Áp dụng {{number}} dApp",
+      "zh": "应用 {{number}} dApps",
+      "ru": "Применить {{number}} dApp'ов"
+    }
+  },
+  "Apply {{number}} collators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyNumberCollators"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} コレーター を適用する",
+      "vi": "Áp dụng {{number}} collator",
+      "zh": "应用 {{number}} 整理者",
+      "ru": "Применить {{number}} коллаторов"
+    }
+  },
+  "Apply {{number}} validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
+        "key": "ui.Field.Earning.ValidatorSelector.applyNumberValidators"
+      }
+    ],
+    "translations": {
+      "ja": "{{number}} バリデータ ーを適用する",
+      "vi": "Áp dụng {{number}} validator",
+      "zh": "应用 {{number}} 验证者",
+      "ru": "Применить {{number}} валидаторов"
+    }
+  },
+  "The account you are using is {{accountTitle}}, you cannot use this feature with it": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/account/usePreCheckAction.ts",
+        "key": "ui.hook.account.usePreCheckAction.featureNotAvailableForAccountType"
+      }
+    ],
+    "translations": {
+      "ja": "使用しているアカウントが{{accountTitle}}の場合、この機能は使用できません",
+      "vi": "The account you are using is {{accountTitle}}, you cannot use this feature with it",
+      "zh": "The account you are using is {{accountTitle}}, you cannot use this feature with it",
+      "ru": "Вы используете учетную запись {{accountTitle}}, с ней нельзя использовать эту функцию."
+    }
+  },
+  "You are using a {{accountTitle}}. Earning is not supported with this account type": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/account/usePreCheckAction.ts",
+        "key": "ui.hook.account.usePreCheckAction.earningNotSupportedForAccountType"
+      }
+    ],
+    "translations": {
+      "ja": "You are using a {{accountTitle}}. Earning is not supported with this account type",
+      "vi": "You are using a {{accountTitle}}. Earning is not supported with this account type",
+      "zh": "You are using a {{accountTitle}}. Earning is not supported with this account type",
+      "ru": "You are using a {{accountTitle}}. Earning is not supported with this account type"
+    }
+  },
+  "A fee of {{percentage}}% is automatically factored into this quote": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Swap/SwapFeesModal.tsx",
+        "key": "ui.Modal.Swap.Fees.percentageFee"
+      }
+    ],
+    "translations": {
+      "ja": "A fee of {{percentage}}% is automatically factored into this quote",
+      "vi": "A fee of {{percentage}}% is automatically factored into this quote",
+      "zh": "A fee of {{percentage}}% is automatically factored into this quote",
+      "ru": "A fee of {{percentage}}% is automatically factored into this quote"
+    }
+  },
+  "You can only choose {{number}} dApp": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseOneDapp"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるdAppは {{number}} までです",
+      "vi": "Bạn chỉ được chọn {{number}} dApp",
+      "zh": "你仅能选择 {{number}} dApp",
+      "ru": "Вы можете выбрать только {{number}} dApp"
+    }
+  },
+  "You can only choose {{number}} collator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseOneCollator"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるコレーターは {{number}} までです",
+      "vi": "Bạn chỉ được chọn {{number}} collator",
+      "zh": "你仅能选择 {{number}} 整理者",
+      "ru": "Вы можете выбрать только {{number}} коллатора"
+    }
+  },
+  "You can only choose {{number}} validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseOneValidator"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるバリデーターは {{number}} までです",
+      "vi": "Bạn chỉ được chọn {{number}} validator",
+      "zh": "你仅能选择 {{number}} 验证者",
+      "ru": "Вы можете выбрать только {{number}} валидатора"
+    }
+  },
+  "You can only choose {{number}} dApps": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseNumberDapps"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるdAppは {{number}} までです",
+      "vi": "Bạn chỉ được chọn {{number}} dApp",
+      "zh": "你仅能选择 {{number}} dApps",
+      "ru": "Вы можете выбрать только {{number}} dApp'ов"
+    }
+  },
+  "You can only choose {{number}} collators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseNumberCollators"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるコレーターは {{number}} までです",
+      "vi": "Bạn chỉ được chọn {{number}} collator",
+      "zh": "你仅能选择 {{number}} 整理者",
+      "ru": "Вы можете выбрать только {{number}} коллаторов"
+    }
+  },
+  "You can only choose {{number}} validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/modal/useSelectValidators.ts",
+        "key": "ui.hook.modal.useSelectValidators.canOnlyChooseNumberValidators"
+      }
+    ],
+    "translations": {
+      "ja": "選択できるバリデーターは {{number}} だけです",
+      "vi": "Bạn chỉ được chọn {{number}} validator",
+      "zh": "你仅能选择{{number}}位验证者",
+      "ru": "Вы можете выбрать только {{number}} валидатора(ов)"
+    }
+  },
+  "Unknown network": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/WalletConnect/Network/WCNetworkItem.tsx",
+        "key": "ui.WalletConnect.NetworkItem.unknownNetwork"
+      }
+    ],
+    "translations": {
+      "ja": "不明なネットワーク",
+      "vi": "Mạng không xác định",
+      "zh": "未知网络",
+      "ru": "Unknown network"
+    }
+  },
+  "I understand the associated risk and will act under caution": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Swap/SwapTermsOfServiceModal.tsx",
+        "key": "ui.Modal.Swap.Terms.understandAssociatedRisk"
+      }
+    ],
+    "translations": {
+      "ja": "I understand the associated risk and will act under caution",
+      "vi": "I understand the associated risk and will act under caution",
+      "zh": "I understand the associated risk and will act under caution",
+      "ru": "I understand the associated risk and will act under caution"
+    }
+  },
+  "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TermsAndConditions/GeneralTermModal.tsx",
+        "key": "ui.Modal.Terms.General.agreeToTermsOfUse"
+      }
+    ],
+    "translations": {
+      "ja": "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature",
+      "vi": "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature",
+      "zh": "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature",
+      "ru": "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature"
+    }
+  },
+  "Don’t show again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TermsAndConditions/SeedPhraseTermModal.tsx",
+        "key": "ui.Modal.Terms.SeedPhrase.dontShowAgain"
+      }
+    ],
+    "translations": {
+      "ja": "Don’t show again",
+      "vi": "Don’t show again",
+      "zh": "Don’t show again",
+      "ru": "Don’t show again"
+    }
+  },
+  "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Settings/Notifications/Notification.tsx",
+        "key": "ui.Settings.Notifications.Notification.enableNetworkToWithdraw"
+      }
+    ],
+    "translations": {
+      "ja": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds",
+      "vi": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds",
+      "zh": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds",
+      "ru": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds"
+    }
+  },
+  "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Settings/Notifications/Notification.tsx",
+        "key": "ui.Settings.Notifications.Notification.enableNetworkToClaim"
+      }
+    ],
+    "translations": {
+      "ja": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds",
+      "vi": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds",
+      "zh": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds",
+      "ru": "{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds"
+    }
+  },
+  "Stake reward after claim": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/ClaimReward.tsx",
+        "key": "ui.Transaction.ClaimReward.stakeRewardAfterClaim"
+      }
+    ],
+    "translations": {
+      "ja": "Stake reward after claim",
+      "vi": "Stake reward after claim",
+      "zh": "Stake reward after claim",
+      "ru": "Stake reward after claim"
+    }
+  },
+  "The account you are using is {{accountTitle}}, you cannot send assets with it": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/SendFund.tsx",
+        "key": "ui.Transaction.SendFund.cannotSendWithAccountType"
+      }
+    ],
+    "translations": {
+      "ja": "あなたが使っているアカウントは{{accountTitle}}のため、資産を送ることはできません",
+      "vi": "Bạn đang dùng tài khoản {{accountTitle}}. Bạn không thể chuyển tài sản từ tài khoản này",
+      "zh": "你正在使用{{accountTitle}}的账户，故无法发送资产",
+      "ru": "The account you are using is {{accountTitle}}, you cannot send assets with it"
     }
   }
 }

@@ -1374,5 +1374,7 @@
   "The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": "rewardsSmallerThanFeeWarning",
   "The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?": "rewardsEqualToFeeWarning",
   "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.": "dualStakingNotSupportedWarning",
-  "Unstake your {{tokenSymbol}} now!": "unstakeYourTokenNow"
+  "Unstake your {{tokenSymbol}} now!": "unstakeYourTokenNow",
+  "I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>": "understandPasswordNotRecoverable",
+  "Unknown network": "unknownNetwork"
 }
