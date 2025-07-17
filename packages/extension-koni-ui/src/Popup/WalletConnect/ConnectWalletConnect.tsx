@@ -47,28 +47,6 @@ const getTimeOutRecords = () => {
   return JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
 };
 
-const convertWCErrorMessage = (e: Error): ConnectionError => {
-  const message = e.message.toLowerCase();
-  let newStandardMessage = t('Connection unsuccessful. Review our user guide and try connecting again.');
-  let isConnectionBlockedError = false;
-
-  if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
-    newStandardMessage = t('Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app');
-    isConnectionBlockedError = true;
-  }
-
-  if (message.includes('failed for host')) {
-    newStandardMessage = t('Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app');
-    isConnectionBlockedError = true;
-  }
-
-  if (message.includes('pairing already exists')) {
-    newStandardMessage = t('Connection already exists');
-  }
-
-  return { message: newStandardMessage, isConnectionBlockedError };
-};
-
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
   const { t } = useTranslation();
@@ -118,6 +96,24 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [form, inactiveModal, setTimeOutRecords]);
 
+  const convertWCErrorMessage = useCallback((e: Error): ConnectionError => {
+    const message = e.message.toLowerCase();
+    let newStandardMessage = t('Connection unsuccessful. Review our user guide and try connecting again.');
+    let isConnectionBlockedError = false;
+
+    if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
+      newStandardMessage = t('Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app');
+      isConnectionBlockedError = true;
+    }
+
+    if (message.includes('failed for host')) {
+      newStandardMessage = t('Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app');
+      isConnectionBlockedError = true;
+    }
+
+    return { message: newStandardMessage, isConnectionBlockedError };
+  }, [t]);
+
   const footerModalWC = useMemo(() => {
     if (connectionError?.isConnectionBlockedError) {
       return (
@@ -158,7 +154,7 @@ const Component: React.FC<Props> = (props: Props) => {
         setConnectionError(convertWCErrorMessage(e));
         activeModal(modalId);
       });
-  }, [activeModal]);
+  }, [convertWCErrorMessage, activeModal]);
 
   const onFinish: FormCallbacks<AddConnectionFormState>['onFinish'] = useCallback((values: AddConnectionFormState) => {
     const { uri } = values;
