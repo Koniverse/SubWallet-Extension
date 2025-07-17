@@ -9,6 +9,7 @@ import { FormCallbacks, ScannerResult, Theme, ThemeProps } from '@subwallet/exte
 import { noop, validWalletConnectUri } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Input, ModalContext, PageIcon, SwModal, SwQrScanner } from '@subwallet/react-ui';
 import CN from 'classnames';
+import { t } from 'i18next';
 import { Scan, XCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -23,6 +24,11 @@ interface AddConnectionFormState {
   uri: string;
 }
 
+interface ConnectionError {
+  message: string;
+  isConnectionBlockedError?: boolean;
+}
+
 const DEFAULT_FORM_VALUES: AddConnectionFormState = {
   uri: ''
 };
@@ -33,9 +39,34 @@ const scannerId = 'connect-connection-scanner-modal';
 const showScanner = true;
 const keyRecords = 'unsuccessful_connect_wc_modal';
 let idTimeOut: NodeJS.Timeout;
+const connectionErrorDefault: ConnectionError = {
+  message: t('Connection unsuccessful. Review our user guide and try connecting again.')
+};
 
 const getTimeOutRecords = () => {
   return JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
+};
+
+const convertWCErrorMessage = (e: Error): ConnectionError => {
+  const message = e.message.toLowerCase();
+  let newStandardMessage = t('Connection unsuccessful. Review our user guide and try connecting again.');
+  let isConnectionBlockedError = false;
+
+  if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
+    newStandardMessage = t('Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app');
+    isConnectionBlockedError = true;
+  }
+
+  if (message.includes('failed for host')) {
+    newStandardMessage = t('Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app');
+    isConnectionBlockedError = true;
+  }
+
+  if (message.includes('pairing already exists')) {
+    newStandardMessage = t('Connection already exists');
+  }
+
+  return { message: newStandardMessage, isConnectionBlockedError };
 };
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -46,6 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { token } = useTheme() as Theme;
 
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const [connectionError, setConnectionError] = useState<ConnectionError>(connectionErrorDefault);
   const isActiveModal = useMemo(() => checkActive(modalId), [checkActive]);
   const [, setTimeOutRecords] = useLocalStorage(TIME_OUT_RECORD, {});
   const [form] = Form.useForm<AddConnectionFormState>();
@@ -87,6 +119,17 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [form, inactiveModal, setTimeOutRecords]);
 
   const footerModalWC = useMemo(() => {
+    if (connectionError?.isConnectionBlockedError) {
+      return (
+        <div className={'__footer-wc-modal'}>
+          <Button
+            block={true}
+            onClick={onClickToFAQ(true)}
+          >{t('I understand')}</Button>
+        </div>
+      );
+    }
+
     return (
       <div className={'__footer-wc-modal'}>
         <Button
@@ -100,7 +143,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >{t('Review guide')}</Button>
       </div>
     );
-  }, [onClickToFAQ, t]);
+  }, [connectionError?.isConnectionBlockedError, onClickToFAQ, t]);
 
   const onConnect = useCallback((uri: string) => {
     setLoading(true);
@@ -109,9 +152,10 @@ const Component: React.FC<Props> = (props: Props) => {
       uri
     })
       .then(noop)
-      .catch((e) => {
+      .catch((e: Error) => {
         console.error(e);
         setLoading(false);
+        setConnectionError(convertWCErrorMessage(e));
         activeModal(modalId);
       });
   }, [activeModal]);
@@ -291,7 +335,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
           <div className={'__wc-modal-content'}>
-            {t('Connection unsuccessful. Review our user guide and try connecting again.')}
+            {connectionError.message}
           </div>
         </div>
       </SwModal>
