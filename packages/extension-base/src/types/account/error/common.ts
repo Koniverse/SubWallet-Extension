@@ -12,7 +12,7 @@ export enum CommonAccountErrorType {
 
 const DEFAULT_DATA: Record<CommonAccountErrorType, { message: string, code: number | undefined }> = {
   [CommonAccountErrorType.ACCOUNT_NOT_FOUND]: { message: detectTranslate('bg.type.error.account.common.accountNotFound'), code: 1001 },
-  [CommonAccountErrorType.ACCOUNT_EXISTED]: { message: detectTranslate('bg.type.error.account.common.accountExistsWithName'), code: 1002 },
+  [CommonAccountErrorType.ACCOUNT_EXISTED]: { message: detectTranslate('bg.type.error.account.common.accountAlreadyExistsWithName'), code: 1002 },
   [CommonAccountErrorType.ACCOUNT_NAME_EXISTED]: { message: detectTranslate('bg.type.error.account.common.accountNameInUse'), code: 1003 }
 };
 
