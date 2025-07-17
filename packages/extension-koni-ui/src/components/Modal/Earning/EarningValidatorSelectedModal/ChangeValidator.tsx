@@ -509,7 +509,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
     },
 
     '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXXS
+      marginBottom: token.marginXS
     }
   };
 });

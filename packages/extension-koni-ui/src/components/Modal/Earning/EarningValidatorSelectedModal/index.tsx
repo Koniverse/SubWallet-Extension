@@ -252,6 +252,7 @@ const Component = (props: Props) => {
         <StakingNominationItem
           className='pool-item'
           isChangeValidator={true}
+          isSelectable={false}
           isSelected={false}
           nominationInfo={nomination}
           poolInfo={poolInfo}
@@ -362,7 +363,7 @@ const Component = (props: Props) => {
                 items={items}
                 loading={targetLoading}
                 modalId={EARNING_CHANGE_VALIDATOR_MODAL}
-                nominations={nominations}
+                nominations={expandNominations}
                 onCancel={onCancel}
                 setForceFetchValidator={setForceFetchValidator}
                 slug={poolInfo.slug}
@@ -406,7 +407,7 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ th
     },
 
     '.pool-item + .pool-item': {
-      marginTop: token.marginXXS
+      marginTop: token.marginXS
     },
 
     '&.modal-full': {

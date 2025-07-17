@@ -525,7 +525,7 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
     },
 
     '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXXS
+      marginBottom: token.marginXS
     }
   };
 });
