@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
+import {detectTranslate, isSameAddress} from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
@@ -147,7 +147,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoItems = isSubnetStaking
         ? [
-          metaInfoNumber('Total stake', new BigN(item.totalStake)),
+          metaInfoNumber(detectTranslate('ui.Earning.PositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
           {
             label: t('ui.Earning.PositionDetail.AccountInfoPart.derivativeTokenBalance'),
             value: item.subnetData?.originalTotalStake || '',
@@ -157,12 +157,12 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ]
         : !isSpecial
           ? [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
-            metaInfoNumber('Active stake', item.activeStake),
-            metaInfoNumber('Unstaked', item.unstakeBalance)
+            metaInfoNumber(detectTranslate('ui.Earning.PositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('ui.Earning.PositionDetail.AccountInfoPart.activeStake'), item.activeStake),
+            metaInfoNumber(detectTranslate('ui.Earning.PositionDetail.AccountInfoPart.unstaked'), item.unstakeBalance)
           ]
           : [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('ui.Earning.PositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
             {
               label: t('ui.Earning.PositionDetail.AccountInfoPart.derivativeTokenBalance'),
               value: item.activeStake,

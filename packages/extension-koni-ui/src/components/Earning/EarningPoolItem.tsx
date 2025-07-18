@@ -102,7 +102,6 @@ const Component: React.FC<Props> = (props: Props) => {
               </span>
             </div>
 
-            // TODO:-I18N Research how to support dynamic variables in i18n
             {!!apy && (
               <div className='__item-rewards'>
                 <div className='__item-rewards-label'>

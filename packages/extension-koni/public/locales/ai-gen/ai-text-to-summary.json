@@ -1376,5 +1376,19 @@
   "You’re dual staking via both direct nomination and nomination pool, which <highlight>will not be supported</highlight> in the upcoming {{originChain}} runtime upgrade. Read more to learn about the upgrade, and <openlink>unstake your {{symbol}}</openlink> from one of the methods to avoid issues.": "dualStakingNotSupportedWarning",
   "Unstake your {{tokenSymbol}} now!": "unstakeYourTokenNow",
   "I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>": "understandPasswordNotRecoverable",
-  "Unknown network": "unknownNetwork"
+  "Unknown network": "unknownNetwork",
+  "days": "days",
+  "day": "day",
+  "hours": "hours",
+  "hour": "hour",
+  "minutes": "minutes",
+  "minute": "minute",
+  "Unstaked": "unstaked",
+  "Upcoming": "upcoming",
+  "Live": "live",
+  "Archived": "archived",
+  "FCFS": "fcfs",
+  "Points": "points",
+  "Lucky draw": "luckyDraw",
+  "Manual selection": "manualSelection"
 }

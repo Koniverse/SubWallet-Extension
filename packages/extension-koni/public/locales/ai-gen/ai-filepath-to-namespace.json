@@ -370,5 +370,6 @@
   "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/ProcessStepList/index.tsx": "ui.Modal.TxProcessDetail.StepList",
   "packages/extension-base/src/core/logic-validation/index.ts": "bg.validation",
   "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts": "bg.service.earning.nativeStaking.dtao",
-  "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts": "bg.service.earning.nativeStaking.tao"
+  "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts": "bg.service.earning.nativeStaking.tao",
+  "packages/extension-koni-ui/src/Popup/Settings/MissionPool/predefined.ts": "ui.Settings.MissionPool.predefined"
 }
