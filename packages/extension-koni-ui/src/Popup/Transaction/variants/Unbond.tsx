@@ -276,7 +276,7 @@ const Component: React.FC = () => {
     ) {
       const time = poolInfo.statistic.unstakingPeriod;
 
-      return getEarningTimeText(time);
+      return getEarningTimeText(t, time);
     } else {
       return t('ui.Transaction.Unbond.unknownTime');
     }

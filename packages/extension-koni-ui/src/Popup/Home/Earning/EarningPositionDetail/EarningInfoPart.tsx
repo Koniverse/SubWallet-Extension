@@ -98,8 +98,8 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         />
         {unstakePeriod !== undefined && (
           <MetaInfo.Default label={t('ui.Earning.PositionDetail.EarningInfo.unstakingPeriod')}>
-            {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING) && <span className={'__label'}>Up to</span>}
-            {getEarningTimeText(unstakePeriod)}
+            {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING) && <span className={'__label'}>{t('ui.Earning.PositionDetail.EarningInfo.upTo')}</span>}
+            {getEarningTimeText(t, unstakePeriod)}
           </MetaInfo.Default>
         )}
       </MetaInfo>
