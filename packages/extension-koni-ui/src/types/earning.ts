@@ -66,6 +66,7 @@ export interface NominationPoolDataType extends NominationPoolInfo {
 export interface ValidatorDataType extends ValidatorInfo {
   symbol: string;
   decimals: number;
+  isMissingInfo?: boolean;
 }
 export enum NetworkType {
   MAIN_NETWORK = 'MAIN_NETWORK',

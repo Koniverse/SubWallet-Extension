@@ -20,6 +20,7 @@ export interface BaseAccountInfo {
 interface Props extends ThemeProps {
   accounts?: Array<BaseAccountInfo>;
   identPrefix?: number
+  size?: number
 }
 
 const sizeAva = {
@@ -27,7 +28,7 @@ const sizeAva = {
   large: 24
 };
 
-const Component: React.FC<Props> = ({ accounts: _accounts, className, identPrefix }: Props) => {
+const Component: React.FC<Props> = ({ accounts: _accounts, className, identPrefix, size }: Props) => {
   const accounts = useSelector((state: RootState) => state.accountState.accounts);
   const noAllAccount: BaseAccountInfo[] = useMemo((): BaseAccountInfo[] => {
     return (_accounts || accounts).filter((account) => !isAccountAll(account.address));
@@ -58,7 +59,7 @@ const Component: React.FC<Props> = ({ accounts: _accounts, className, identPrefi
               >
                 <SwAvatar
                   identPrefix={identPrefix || 42}
-                  size={showCount === 3 ? sizeAva.default : sizeAva.large}
+                  size={size || showCount === 3 ? sizeAva.default : sizeAva.large}
                   value={account.address}
                 />
               </div>
