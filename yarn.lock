@@ -6693,15 +6693,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.108-beta.15":
-  version: 0.2.108-beta.15
-  resolution: "@subwallet/chain-list@npm:0.2.108-beta.15"
+"@subwallet/chain-list@npm:0.2.109":
+  version: 0.2.109
+  resolution: "@subwallet/chain-list@npm:0.2.109"
   dependencies:
     "@polkadot/dev": 0.67.167
     "@polkadot/util": ^12.5.1
     eventemitter3: ^5.0.1
     ts-md5: ^1.3.1
-  checksum: d601316918b7a0a83b10fa27cfd1a586671b159fae3a0db14ae5b5a21200225e9e6d503ef1804bc59c6f5dbbdcb227420cf00a458e83febf503ebb5f984445a0
+  checksum: ab024ba6b8ff18132c984732db950a085fe0af47d7c253b347c65a7f6c6f30cb6fea2b95ccc8cf70844eacd90fa56be26b84143c4590ef477bfce1aa5ca3cb5b
   languageName: node
   linkType: hard
 
@@ -6743,7 +6743,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet/chain-list": 0.2.108-beta.15
+    "@subwallet/chain-list": 0.2.109
     "@subwallet/extension-base": ^1.3.48-0
     "@subwallet/extension-chains": ^1.3.48-0
     "@subwallet/extension-dapp": ^1.3.48-0
@@ -6885,7 +6885,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.108-beta.15
+    "@subwallet/chain-list": 0.2.109
     "@subwallet/extension-base": ^1.3.48-0
     "@subwallet/extension-chains": ^1.3.48-0
     "@subwallet/extension-dapp": ^1.3.48-0
@@ -7027,7 +7027,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.4.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.108-beta.15
+    "@subwallet/chain-list": 0.2.109
     "@subwallet/extension-base": ^1.3.48-0
     "@subwallet/extension-chains": ^1.3.48-0
     "@subwallet/extension-dapp": ^1.3.48-0
@@ -7209,7 +7209,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.108-beta.15
+    "@subwallet/chain-list": 0.2.109
   languageName: unknown
   linkType: soft
 
