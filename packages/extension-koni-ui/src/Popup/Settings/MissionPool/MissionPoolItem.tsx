@@ -46,7 +46,7 @@ function Component (props: Props): React.ReactElement<Props> {
     const tagSlug = data.tags[0];
     const tagCategory = data?.categories?.[0];
     const theme = tagMap[tagSlug]?.theme || 'gray';
-    const name = tagMap[tagSlug]?.name || t(capitalize(tagSlug.replace('_', ' ')));
+    const name = t(tagMap[tagSlug]?.name) || capitalize(tagSlug.replace('_', ' '));
     const iconWeight = tagMap[tagSlug]?.iconWeight;
     const icon = tagMap[tagSlug]?.icon || MagicWand;
     let missionTheme, missionName, missionIconWeight, missionIcon;
@@ -54,7 +54,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
     if (missionStatus) {
       missionTheme = tagMap[missionStatus]?.theme || 'gray';
-      missionName = tagMap[missionStatus]?.name;
+      missionName = t(tagMap[missionStatus]?.name);
       missionIconWeight = tagMap[missionStatus]?.iconWeight;
       missionIcon = tagMap[missionStatus]?.icon;
     }
@@ -71,8 +71,7 @@ function Component (props: Props): React.ReactElement<Props> {
             phosphorIcon={icon}
             weight={iconWeight}
           />
-          // TODO:-I18N Research how to support dynamic variables in i18n
-          {t(`${name}`)}
+          {name}
         </Tag>
         {
           !!missionStatus && !!missionName && (
@@ -86,8 +85,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 phosphorIcon={missionIcon}
                 weight={missionIconWeight}
               />
-              // TODO:-I18N Research how to support dynamic variables in i18n
-              {t(`${missionName}`)}
+              {missionName}
             </Tag>
           )
         }
