@@ -15,6 +15,10 @@
     "packages/*"
   ],
   "bin": {
+    "i18n-combined-data": "scripts/i18n/i18n-combined.mjs",
+    "i18n-mapping-generator": "scripts/i18n/i18n-mapping-generator.mjs",
+    "i18n-text-replacer": "scripts/i18n/i18n-text-replacer.mjs",
+    "i18n-update-translation-files": "scripts/i18n/i18n-update-translation-files.mjs",
     "koni-ci-build-dev": "./scripts/koni-ci-build-dev.mjs",
     "koni-ci-build-i18n": "./scripts/koni-ci-build-i18n.mjs",
     "koni-ci-build-webapp": "./scripts/koni-ci-build-webapp.mjs",
@@ -26,7 +30,6 @@
   "scripts": {
     "build": "koni-dev-build-ts && yarn build:zip && yarn build:rollup",
     "build:extra": "yarn build:i18n && yarn build:ui",
-    "build:i18n": "koni-ci-build-i18n",
     "build:koni-dev": "koni-ci-build-dev",
     "build:koni-webapp": "koni-ci-build-webapp",
     "build:release": "koni-ci-ghact-build",
@@ -42,6 +45,11 @@
     "lint": "polkadot-dev-run-lint",
     "lint:changes": "git diff --name-only | grep -E '.(js|ts|tsx)$' | xargs eslint --fix",
     "postinstall": "polkadot-dev-yarn-only && patch-package",
+    "i18n:scan": "i18n-mapping-generator",
+    "i18n:combine-locales": "i18n-combined-data",
+    "i18n:replace-text": "i18n-text-replacer",
+    "i18n:update-trans": "i18n-update-translation-files",
+    "build:i18n": "koni-ci-build-i18n",
     "start": "yarn watch",
     "test": "polkadot-dev-run-test --detectOpenHandles --testPathIgnorePatterns='/node_modules/|.*/ignore-.*\\.(test|spec)\\..*'",
     "test:one": "polkadot-dev-run-test --detectOpenHandles",
@@ -82,7 +90,9 @@
     "jest-environment-jsdom": "^29.5.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
-    "sinon-chrome": "^3.0.1"
+    "replace-in-file": "^8.3.0",
+    "sinon-chrome": "^3.0.1",
+    "vinyl-fs": "^4.0.2"
   },
   "resolutions": {
     "@ethereumjs/common": "^4.1.0",
