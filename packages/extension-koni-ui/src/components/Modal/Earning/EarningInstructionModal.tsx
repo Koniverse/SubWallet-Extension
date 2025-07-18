@@ -199,8 +199,8 @@ const Component: React.FC<Props> = (props: Props) => {
       time = poolInfo.statistic.unstakingPeriod;
     }
 
-    return getEarningTimeText(time);
-  }, [poolInfo.statistic]);
+    return getEarningTimeText(t, time);
+  }, [poolInfo.statistic, t]);
 
   const data: BoxProps[] = useMemo(() => {
     if (!poolInfo) {

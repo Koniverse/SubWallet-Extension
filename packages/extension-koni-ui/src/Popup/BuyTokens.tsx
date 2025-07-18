@@ -540,7 +540,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             i18nKey={detectTranslate('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
             values={{
               service: serviceName,
-              action: t('buying')
+              action: ('buying')
             }}
           />
         </SwModal>

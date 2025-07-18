@@ -438,7 +438,7 @@ export class SwapBaseHandler {
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
       const atLeastStr = formatNumber(_getTokenMinAmount(receivingToken), _getAssetDecimals(receivingToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('You can\'t receive less than {{number}} {{symbol}}', { replace: { number: atLeastStr, symbol: _getAssetSymbol(receivingToken) } }))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t("You can't receive less than {{number}} {{symbol}}", { replace: { number: atLeastStr, symbol: _getAssetSymbol(receivingToken) } }))];
     }
 
     if (recipient) {
@@ -598,7 +598,13 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Swap amount too small. Increase to more than ${atLeastString} ${_getAssetSymbol(swapToken)} and try again`))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', {
+        replace: {
+          amount: atLeastString,
+          symbol: _getAssetSymbol(swapToken)
+        }
+      }
+      ))];
     }
 
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
@@ -656,7 +662,13 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Swap amount too small. Increase to more than ${atLeastString} ${_getAssetSymbol(swapToken)} and try again`))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', {
+        replace: {
+          amount: atLeastString,
+          symbol: _getAssetSymbol(swapToken)
+        }
+      }
+      ))];
     }
 
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);
@@ -828,7 +840,7 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t(`Swap amount too small. Increase to more than ${atLeastString} ${_getAssetSymbol(swapToken)} and try again`))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', { replace: { amount: atLeastString, symbol: _getAssetSymbol(swapToken) } }))];
     }
 
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);

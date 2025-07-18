@@ -100,7 +100,7 @@ function Component (props: Props): React.ReactElement<Props> {
         />
 
         {/* <MetaInfo.Status */}
-        {/*  label={t('Status')} */}
+        {/*  label={('Status')} */}
         {/*  statusIcon={StakingStatusUi[status].icon} */}
         {/*  statusName={StakingStatusUi[status].name} */}
         {/*  valueColorSchema={StakingStatusUi[status].schema} */}

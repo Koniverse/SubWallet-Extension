@@ -395,18 +395,16 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const altNetworkName = _getAssetName(altInputTokenInfo);
       const currentValue = formatNumber(bnInputTokenBalance.toString(), inputTokenDecimal);
 
-      processValidation.message = t(
-        'You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.',
-        {
-          replace: {
-            symbol,
-            maxValue,
-            inputNetworkName,
-            altNetworkName,
-            currentValue,
-            maxXCMValue
-          }
+      processValidation.message = t('You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.', {
+        replace: {
+          symbol,
+          maxValue,
+          inputNetworkName,
+          altNetworkName,
+          currentValue,
+          maxXCMValue
         }
+      }
       );
 
       return [new TransactionError(YieldValidationStatus.NOT_ENOUGH_BALANCE, processValidation.message, processValidation)];

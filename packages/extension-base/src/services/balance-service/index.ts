@@ -214,7 +214,7 @@ export class BalanceService implements StoppableServiceInterface {
     const tokenInfo = this.state.chainService.getAssetBySlug(tSlug);
 
     if (!tokenInfo) {
-      return Promise.reject(new BalanceError(BalanceErrorType.TOKEN_ERROR, t('Transfer is currently not available for this token: {{tSlug}}', { replace: { slug: tSlug } })));
+      return Promise.reject(new BalanceError(BalanceErrorType.TOKEN_ERROR, t('Transfer is currently not available for this token: {{Slug}}', { replace: { slug: tSlug } })));
     }
 
     return new Promise((resolve, reject) => {

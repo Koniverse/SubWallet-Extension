@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { TERMS_OF_SERVICE_URL } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useFocusFormItem, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -12,6 +13,7 @@ import CN from 'classnames';
 import { FloppyDiskBack, ShieldCheck } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -200,13 +202,20 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Checkbox
                 className={'checkbox'}
               >
-                {t('I understand that SubWallet can’t recover the password.')}
-                <a
-                  href={TERMS_OF_SERVICE_URL}
-                  rel='noreferrer'
-                  style={{ textDecoration: 'underline' }}
-                  target={'_blank'}
-                >Learn more.</a>
+                <Trans
+                  components={{
+                    highlight: (
+                      <a
+                        className='link'
+                        href={TERMS_OF_SERVICE_URL}
+                        rel='noopener noreferrer'
+                        style={{ textDecoration: 'underline' }}
+                        target='_blank'
+                      />
+                    )
+                  }}
+                  i18nKey={detectTranslate('I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>')}
+                />
               </Checkbox>
             </Form.Item>
             <Form.Item

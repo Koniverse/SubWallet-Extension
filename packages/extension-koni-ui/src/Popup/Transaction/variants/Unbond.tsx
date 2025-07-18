@@ -276,7 +276,7 @@ const Component: React.FC = () => {
     ) {
       const time = poolInfo.statistic.unstakingPeriod;
 
-      return getEarningTimeText(time);
+      return getEarningTimeText(t, time);
     } else {
       return t('unknown time');
     }
@@ -548,7 +548,7 @@ const Component: React.FC = () => {
               chain={chainValue}
               defaultValue={persistValidator}
               disabled={!fromValue}
-              label={t(`Select ${handleValidatorLabel}`)}
+              label={t('Select {{handleValidatorLabel}}', { replace: { handleValidatorLabel: handleValidatorLabel } })}
               networkPrefix={networkPrefix}
               nominators={nominators}
               poolInfo={poolInfo}
@@ -647,7 +647,7 @@ const Component: React.FC = () => {
               : (
                 <AlertBox
                   description={poolChain === 'bifrost_dot'
-                    ? t(`In this mode, ${symbol} will be directly exchanged for ${altSymbol} at the market price without waiting for the unstaking period`)
+                    ? t('In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period', { replace: { symbol: symbol, altSymbol: altSymbol } })
                     : t('With fast unstake, you will receive your funds immediately with a higher fee')}
                   title={t('Fast unstake')}
                   type={'info'}

@@ -124,7 +124,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
           <MetaInfo.Status
             label={title}
             statusIcon={EarningStatusUi[compound.status].icon}
-            statusName={EarningStatusUi[compound.status].name}
+            statusName={t(EarningStatusUi[compound.status].name)}
             valueColorSchema={EarningStatusUi[compound.status].schema}
           />
         </MetaInfo>

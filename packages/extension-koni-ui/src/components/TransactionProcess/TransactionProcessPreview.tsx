@@ -57,7 +57,7 @@ const Component: FC<Props> = (props: Props) => {
                 className={'__chain-logo-group'}
               />
               <div className='__steps-label'>
-                {`${chains.length} ${t('steps')}`}
+                {t('{{number}} steps', { replace: { number: chains.length } })}
               </div>
             </>
           )

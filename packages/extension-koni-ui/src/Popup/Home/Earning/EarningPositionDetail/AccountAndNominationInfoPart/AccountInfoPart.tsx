@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
+import {detectTranslate, isSameAddress} from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
@@ -147,7 +147,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoItems = isSubnetStaking
         ? [
-          metaInfoNumber('Total stake', new BigN(item.totalStake)),
+          metaInfoNumber(detectTranslate('Total stake'), new BigN(item.totalStake)),
           {
             label: t('Derivative token balance'),
             value: item.subnetData?.originalTotalStake || '',
@@ -157,12 +157,12 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ]
         : !isSpecial
           ? [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
-            metaInfoNumber('Active stake', item.activeStake),
-            metaInfoNumber('Unstaked', item.unstakeBalance)
+            metaInfoNumber(detectTranslate('Total stake'), new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('Active stake'), item.activeStake),
+            metaInfoNumber(detectTranslate('Unstaked'), item.unstakeBalance)
           ]
           : [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('Total stake'), new BigN(item.totalStake)),
             {
               label: t('Derivative token balance'),
               value: item.activeStake,
@@ -197,7 +197,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                 className={'__meta-earning-status-item'}
                 label={renderAccount(item)}
                 statusIcon={EarningStatusUi[item.status].icon}
-                statusName={EarningStatusUi[item.status].name}
+                statusName={t(EarningStatusUi[item.status].name)}
                 valueColorSchema={EarningStatusUi[item.status].schema}
               />
             )}

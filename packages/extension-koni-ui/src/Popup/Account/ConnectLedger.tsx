@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import {detectTranslate, reformatAddress} from '@subwallet/extension-base/utils';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { LedgerChainSelector, LedgerItemType } from '@subwallet/extension-koni-ui/components/Field/LedgerChainSelector';
 import { ATTACH_ACCOUNT_MODAL, SUBSTRATE_MIGRATION_KEY, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
@@ -15,7 +15,7 @@ import { BackgroundIcon, Button, Icon, Image, SwList } from '@subwallet/react-ui
 import CN from 'classnames';
 import { CheckCircle, CircleNotch, Swatches } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -298,13 +298,18 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <div className={CN('container')}>
           <div className='sub-title'>
-            {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
-            <a
-              href={CONNECT_LEDGER_USER_GUIDE_URL}
-              target='__blank'
-            >
-              {t('here')}
-            </a>
+            <Trans
+              components={{
+                highlight: (
+                  <a
+                    className='link'
+                    href={CONNECT_LEDGER_USER_GUIDE_URL}
+                    target='__blank'
+                  />
+                )
+              }}
+              i18nKey={detectTranslate('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click <highlight>here</highlight>')}
+            />
           </div>
           {
             firstStep && (

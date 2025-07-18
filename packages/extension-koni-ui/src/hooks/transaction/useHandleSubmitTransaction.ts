@@ -47,8 +47,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           openAlert({
             title: t('Insufficient balance'),
             type: NotificationType.ERROR,
-            content: t('You don\'t have enough {{symbol}} ({{chainName}}) to pay gas fee. Top up your transferable balance and try again',
-              { replace: { ..._data } }),
+            content: t("You don't have enough {{symbol}} ({{chainName}}) to pay gas fee. Top up your transferable balance and try again", { replace: { ..._data } }),
             okButton: {
               text: t('I understand'),
               onClick: () => {

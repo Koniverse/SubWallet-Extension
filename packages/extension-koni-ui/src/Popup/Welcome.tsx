@@ -95,7 +95,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           />
         </div>
         <div className='sub-title'>
-          {t('Choose how you\'d like to set up your wallet')}
+          {t("Choose how you'd like to set up your wallet")}
         </div>
         <div className='buttons-container'>
           {

@@ -668,7 +668,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         title: isHighPriceImpact ? t('High price impact!') : t('Pay attention!'),
         type: NotificationType.WARNING,
         content: isHighPriceImpact && metadata.priceImpact
-          ? t(`Swapping this amount will result in a -${metadata.priceImpact}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk`)
+          ? t('Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk', { replace: { priceImpact: metadata.priceImpact } })
           : t('Low liquidity. Swap is available but not recommended as swap rate is unfavorable'),
         okButton: {
           text: t('Continue'),

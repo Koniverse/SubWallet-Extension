@@ -36,9 +36,10 @@ const Component: React.FC<Props> = (props: Props) => {
       openAlert({
         title: t('Pay attention!'),
         type: NotificationType.WARNING,
-        content: t(`The rewards you are about to claim are ${
-          isRewardLtFee ? 'smaller than' : 'equal to'
-        } the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?`),
+        content: (isRewardLtFee
+          ? t('The rewards you are about to claim are smaller than the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?')
+          : t('The rewards you are about to claim are equal to the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?')
+        ),
         okButton: {
           text: t('I understand'),
           onClick: closeAlert,

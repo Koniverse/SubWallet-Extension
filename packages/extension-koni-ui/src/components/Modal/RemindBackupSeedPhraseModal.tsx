@@ -15,6 +15,8 @@ import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 
@@ -116,14 +118,18 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t(' Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with')}
-            <a
-              className={'__modal-user-guide'}
-              href={`${USER_GUIDE_URL}${DomainUserGuide}`}
-              target='__blank'
-            >
-              {t('our user guide.')}
-            </a>
+            <Trans
+              components={{
+                highlight: (
+                  <a
+                    className={'__modal-user-guide'}
+                    href={`${USER_GUIDE_URL}${DomainUserGuide}`}
+                    target='__blank'
+                  />
+                )
+              }}
+              i18nKey={detectTranslate('Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>')}
+            />
           </div>
         </div>
       </SwModal>

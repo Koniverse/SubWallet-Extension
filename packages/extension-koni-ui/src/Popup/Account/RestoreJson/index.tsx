@@ -23,6 +23,8 @@ import styled from 'styled-components';
 import { u8aToString } from '@polkadot/util';
 
 import AccountRestoreJsonItem from './AccountRestoreJsonItem';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 type ListItemGroupLabel = {
@@ -315,14 +317,18 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       closable: true,
       content:
         <div>
-          {t(' You have accounts with the same name. We have added numbers to these account names to differentiate them. You can change account names later using ')}
-          <a
-            className={'__modal-user-guide'}
-            href={CHANGE_ACCOUNT_NAME}
-            target='__blank'
-          >
-            {t('this guide')}
-          </a>
+          <Trans
+            components={{
+              highlight: (
+                <a
+                  className={'__modal-user-guide'}
+                  href={CHANGE_ACCOUNT_NAME}
+                  target='__blank'
+                />
+              )
+            }}
+            i18nKey={detectTranslate('You have accounts with the same name. We have added numbers to these account names to differentiate them. You can change account names later using <highlight>this guide</highlight>')}
+          />
         </div>,
       title: t('Duplicate account name'),
       okButton: {
@@ -435,7 +441,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       } else if (accountProxiesSelected.length === 1) {
         return t('Import 1 account');
       } else {
-        return t(`Import ${accountProxiesSelected.length} accounts`);
+        return t('Import {{accountProxiesSelected}} accounts', { replace: { accountProxiesSelected: accountProxiesSelected.length } });
       }
     }
   }, [accountProxiesSelected.length, stepState, t]);
@@ -490,7 +496,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         <div className={CN('container')}>
           <div className='description'>
             {stepState === StepState.SELECT_ACCOUNT_IMPORT && passwordValidateState.status === 'success'
-              ? t('Select the account(s) you\'d like to import')
+              ? t("Select the account(s) you'd like to import")
               : t('Drag and drop the JSON file you exported from Polkadot.{js}')}
           </div>
 

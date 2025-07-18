@@ -1,17 +1,19 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BackgroundExpandView, Layout } from '@subwallet/extension-koni-ui/components';
-import { useDefaultNavigate, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { passPhishingPage } from '@subwallet/extension-koni-ui/messaging';
-import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { noop } from '@subwallet/extension-koni-ui/utils';
-import { ButtonProps, Icon, PageIcon, Typography } from '@subwallet/react-ui';
+import {BackgroundExpandView, Layout} from '@subwallet/extension-koni-ui/components';
+import {useDefaultNavigate, useTranslation} from '@subwallet/extension-koni-ui/hooks';
+import {passPhishingPage} from '@subwallet/extension-koni-ui/messaging';
+import {Theme} from '@subwallet/extension-koni-ui/themes';
+import {noop} from '@subwallet/extension-koni-ui/utils';
+import {ButtonProps, Icon, PageIcon} from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ShieldSlash, XCircle } from 'phosphor-react';
-import React, { useCallback } from 'react';
-import { useParams } from 'react-router';
-import styled, { useTheme } from 'styled-components';
+import {ShieldSlash, XCircle} from 'phosphor-react';
+import React, {useCallback} from 'react';
+import {useParams} from 'react-router';
+import styled, {useTheme} from 'styled-components';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 interface Props {
   className?: string;
@@ -57,13 +59,18 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
       <div className='title h3-text text-danger'>{t('Phishing detection')}</div>
       <div className='h4-text text-danger website-url'>{decodedWebsite}</div>
       <div className='phishing-detection-message'>
-        <span>{t('This domain has been reported as a known phishing site on a community maintained list:')}&nbsp;</span>
-        <Typography.Link
-          href='https://polkadot.js.org/phishing/#'
-          size='lg'
-        >
-          {t('view full list')}
-        </Typography.Link>
+        <Trans
+          components={{
+            highlight: (
+              <a
+                className='link'
+                href={'https://polkadot.js.org/phishing/#'}
+                target='__blank'
+              />
+            )
+          }}
+          i18nKey={detectTranslate('This domain has been reported as a known phishing site on a community maintained list: <highlight>view full list</highlight>')}
+        />
       </div>
       <div
         className='trust-site'
