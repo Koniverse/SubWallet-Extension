@@ -155,16 +155,17 @@ const Component = (): React.ReactElement => {
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
   const isSwapSupported = useMemo(() => {
-    const isSupportAcc = (currentAcc: AccountProxy) => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
       const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
-      const invalidEcosystem = ![AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
-      const invalidAccount = isSoloAccount && invalidEcosystem;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
 
-      return !invalidAccount;
+      return !invalidSoloAccount && !isLedgerAccount;
     };
 
-    const isSupportAllAcc = (accountProxies: AccountProxy[]) => {
-      return accountProxies.every((account) => isSupportAcc(account));
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.some((account) => isSupportAccount(account));
     };
 
     if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
@@ -172,9 +173,9 @@ const Component = (): React.ReactElement => {
     }
 
     if (isAllAccount) {
-      return isSupportAllAcc(accountProxies);
+      return isSupportAllAccount(accountProxies);
     } else {
-      return isSupportAcc(currentAccountProxy);
+      return isSupportAccount(currentAccountProxy);
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
