@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 1.3.48
+Build date: Jul 11, 2025.
+
+Features & Update:
+- Support Change validator feature (#4214)
+- Stake TAO with Seamless Validator Switching (#4359)
+- Turn off default enabled tokens (#4475)
+- Update new content to submitted screen when swap (#4512)
+- Update chain-list stable v0.2.110
+
+Bug fixed:
+- Fixed bug when stake/unstake with subnet staking (#4510)
+- Fixed bug Cannot withdraw on Westend Asset Hub (#4522)
+- Fixed bug auto-enable chain for popular tokens (#4525)
+- Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375)
+
+
 ## 1.3.47
 Build date: Jul 11, 2025.
 
