@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 1.3.47
+Build date: Jul 11, 2025.
+
+Features & Update:
+- Optimize Subscan API request (#4458)
+- Update Gears Library (#4443)
+- Support buy token BTC (Bitcoin) (#4490)
+- Update chainlist stable v0.2.108 (#4458)
+  - Update block explorer for TON Network
+  - Add support for gigaETH token
+  - Support for PolkaVM Compatibility
+  - Add swap support for gigaETH
+  - ...
+
+Bug fixed:
+- Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481)
+
+
 ## 1.3.46
 Build date: Jul 04, 2025.
 
