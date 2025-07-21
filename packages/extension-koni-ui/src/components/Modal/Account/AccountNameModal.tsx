@@ -13,6 +13,8 @@ import { CheckCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps & {
   isLoading?: boolean;
@@ -80,7 +82,9 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       title={t<string>('Account name')}
     >
       <div className={'__brief'}>
-        {t('Enter a name for your account.\n You can edit this later.')}
+        <Trans
+          i18nKey={detectTranslate('Enter a name for your account.<br /> You can edit this later.')}
+        />
       </div>
 
       <Form

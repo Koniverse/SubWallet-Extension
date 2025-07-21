@@ -1107,7 +1107,6 @@
   "Injected account": "",
   "Select address": "",
   "Account name invalid": "",
-  "Enter a name for your account.\n You can edit this later.": "",
   "Enter the account name": "",
   "Import from JSON file": "",
   "Import from private key": "",
@@ -1347,11 +1346,14 @@
   "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.": "",
   "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.": "",
   "Feature under maintenance on {{chainInfoName}} network. Try again later": "",
+  "Transfer is currently not available for this token: {{slug}}": "",
   "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards": "",
   "Amount too low. You need to unstake at least {{amount}} {{symbol}}": "",
   "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again": "",
   "Export {{getNumberAccount}} accounts": "",
   "Export {{getNumberAccount}} account": "",
+  "Enter a name for your account.<br /> You can edit this later.": "",
+  "The network you're connecting to is not yet supported on SubWallet. Add the network first, then connect with WalletConnect again.": "",
   "Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>": "",
   "You're using an old version of Firefox, which no longer supports automatic dApp access and phishing detection. Review our user guide to learn how to update Firefox to version 127.0 or manually enable dApp access.": "",
   "{{number}} selected {{validatorLabel}}": "",
@@ -1379,7 +1381,5 @@
   "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)": "",
   "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk": "",
   "Select {{handleValidatorLabel}}": "",
-  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": "",
-  "Transfer is currently not available for this token: {{slug}}": "",
-  "The network you're connecting to is not yet supported on SubWallet. Add the network first, then connect with WalletConnect again.": ""
+  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": ""
 }
