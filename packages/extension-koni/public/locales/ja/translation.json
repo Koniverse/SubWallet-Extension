@@ -1045,7 +1045,6 @@
   "Insufficient liquidity to complete the swap. Lower your amount and try again": "",
   "Wrong device. Connect your previously used Ledger and try again": "",
   "Add network to connect": "",
-  " The network you're connecting to is not yet supported on SubWallet. Add the network first, then connect with WalletConnect again.": "",
   "{{number}} networks supported": "",
   "Select Ledger app": "",
   "Re-enable the network or change RPC on the extension and try again": "",
@@ -1348,7 +1347,6 @@
   "Insufficient balance. Deposit {{spendingTokenSymbol}} and try again.": "",
   "Insufficient balance. Deposit {{feeTokenSymbol}} and try again.": "",
   "Feature under maintenance on {{chainInfoName}} network. Try again later": "",
-  "Transfer is currently not available for this token: {{Slug}}": "",
   "Insufficient stake. You need to stake at least {{amount}} {{symbol}} to earn rewards": "",
   "Amount too low. You need to unstake at least {{amount}} {{symbol}}": "",
   "Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again": "",
@@ -1381,5 +1379,7 @@
   "Transferring to an {{bounceableAddressPrefix}} address is not supported. Continuing will result in a transfer to the corresponding {{formattedAddressPrefix}} address (same seed phrase)": "",
   "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk": "",
   "Select {{handleValidatorLabel}}": "",
-  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": ""
+  "In this mode, {{symbol}} will be directly exchanged for {{altSymbol}} at the market price without waiting for the unstaking period": "",
+  "Transfer is currently not available for this token: {{slug}}": "",
+  "The network you're connecting to is not yet supported on SubWallet. Add the network first, then connect with WalletConnect again.": ""
 }
