@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
 
@@ -15,13 +15,14 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: true,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   static generateSlug (symbol: string, chain: string): string {
@@ -160,6 +161,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNativeStaking;
     const { address, amount, selectedValidators, slug } = data;
+
     const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
@@ -194,6 +196,10 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   /* Other action */
 
   async handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
+
+  async handleChangeEarningValidator (_data: SubmitChangeValidatorStaking): Promise<TransactionData> {
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 
