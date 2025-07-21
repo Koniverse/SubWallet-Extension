@@ -323,17 +323,17 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const updateStakingInfo = async () => {
       await this.substrateApi.isReady;
 
-      try {
-        if (cancel) {
-          return;
-        }
+      if (cancel) {
+        return;
+      }
 
-        this.subnetData.forEach((subnet) => {
+      try {
+        for (const subnet of this.subnetData) {
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
           const bnTaoIn = new BigN(subnet.taoIn);
-          const emission = new BigN(subnet.taoInEmission).dividedBy(new BigN(10).pow(new BigN(7)));
+          const emission = new BigN(subnet.taoInEmission).dividedBy(new BigN(10).pow(7));
 
           const data: NativeYieldPoolInfo = {
             ...this.baseInfo,
@@ -350,11 +350,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
               }
             },
             statistic: {
-              assetEarning: [
-                {
-                  slug: this.nativeToken.slug
-                }
-              ],
+              assetEarning: [{ slug: this.nativeToken.slug }],
               maxCandidatePerFarmer: subnet.maxAllowedValidators,
               maxWithdrawalRequestPerFarmer: 1,
               earningThreshold: {
@@ -371,22 +367,16 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
           };
 
           callback(data);
-        });
+        }
       } catch (error) {
         console.error('Error updating staking info:', error);
       }
     };
 
-    const subscribeStakingMetadataInterval = () => {
-      updateStakingInfo().catch(console.error);
-    };
-
-    subscribeStakingMetadataInterval();
-    const interval = setInterval(subscribeStakingMetadataInterval, BITTENSOR_REFRESH_STAKE_APY);
+    await updateStakingInfo();
 
     return () => {
       cancel = true;
-      clearInterval(interval);
     };
   }
 

@@ -237,25 +237,27 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
     let cancel = false;
-    const substrateApi = this.substrateApi;
+    const substrateApi = await this.substrateApi.isReady;
 
     const updateStakingInfo = async () => {
-      try {
-        if (cancel) {
-          return;
-        }
+      if (cancel) {
+        return;
+      }
 
-        const minDelegatorStake = (await substrateApi.api.query.subtensorModule.nominatorMinRequiredStake()).toPrimitive() || 0;
-        const maxValidatorPerNominator = (await substrateApi.api.query.subtensorModule.maxAllowedValidators(0)).toPrimitive();
-        const taoIn = (await substrateApi.api.query.subtensorModule.subnetTAO(0)).toPrimitive() as number;
-        const _topValidator = await this.bittensorCache.fetchApr(0);
+      try {
+        const [minDelegatorStake, maxValidatorPerNominator, taoInRaw, _topValidator] = await Promise.all([
+          substrateApi.api.query.subtensorModule.nominatorMinRequiredStake(),
+          substrateApi.api.query.subtensorModule.maxAllowedValidators(0),
+          substrateApi.api.query.subtensorModule.subnetTAO(0),
+          this.bittensorCache.fetchApr(0)
+        ]);
 
         const validators = _topValidator.data;
-        const highestApr = validators[0];
-
-        const bnTaoIn = new BigN(taoIn);
+        const highestApr = validators?.[0];
+        const bnTaoIn = new BigN(taoInRaw.toString());
         const BNminDelegatorStake = new BigN(minDelegatorStake.toString());
-        const apr = this.chain === 'bittensor' ? Number(highestApr.thirty_day_apy) * 100 : 0;
+
+        const apr = this.chain === 'bittensor' ? Number(highestApr?.thirty_day_apy || 0) * 100 : 0;
 
         const data: NativeYieldPoolInfo = {
           ...this.baseInfo,
@@ -265,12 +267,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
             description: this.getDescription(formatNumber(BNminDelegatorStake, _getAssetDecimals(this.nativeToken)))
           },
           statistic: {
-            assetEarning: [
-              {
-                slug: this.nativeToken.slug
-              }
-            ],
-            maxCandidatePerFarmer: Number(maxValidatorPerNominator),
+            assetEarning: [{ slug: this.nativeToken.slug }],
+            maxCandidatePerFarmer: Number(maxValidatorPerNominator.toString()),
             maxWithdrawalRequestPerFarmer: 1,
             earningThreshold: {
               join: BNminDelegatorStake.toString(),
@@ -286,23 +284,15 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         };
 
         callback(data);
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        console.error(err);
       }
     };
 
-    const subscribeStakingMetadataInterval = () => {
-      updateStakingInfo().catch(console.error);
-    };
-
-    await substrateApi.isReady;
-
-    subscribeStakingMetadataInterval();
-    const interval = setInterval(subscribeStakingMetadataInterval, BITTENSOR_REFRESH_STAKE_APY);
+    await updateStakingInfo?.();
 
     return () => {
       cancel = true;
-      clearInterval(interval);
     };
   }
 
