@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
           {t('Back up your accounts!')}
         </div>
         <div className='description'>
-          {t('If you lose your seed phrases/private keys/JSON backup files/QR backup codes, your accounts can\'t be recovered and your assets are lost. Learn how to back up your accounts to secure your assets now.')}
+          {t("If you lose your seed phrases/private keys/JSON backup files/QR backup codes, your accounts can't be recovered and your assets are lost. Learn how to back up your accounts to secure your assets now.")}
         </div>
       </div>
     </Layout.WithSubHeaderOnly>

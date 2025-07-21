@@ -530,7 +530,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 />
               )
             }}
-            i18nKey={detectTranslate('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
+            i18nKey={detectTranslate("You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.")}
             values={{
               service: serviceName
             }}
