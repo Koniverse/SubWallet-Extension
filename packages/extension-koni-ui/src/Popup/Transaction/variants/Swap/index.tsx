@@ -1382,6 +1382,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
   const [isSkipDefaultSlug, setIsSkipDefaultSlug] = useState<boolean>(false);
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1394,19 +1395,36 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }, [accountProxies, defaultData.fromAccountProxy]);
 
   const swappableSlugsSet: Set<string> = useMemo(() => new Set(Object.keys(pairMap).filter((key) => pairMap[key].length !== 0)), [pairMap]);
-  const multiAssetSlugSet = useMemo(() => {
-    const result = new Set<string>();
-
-    swappableSlugsSet.forEach((slug) => {
-      result.add(_getMultiChainAsset(assetRegistryMap[slug]));
-    });
-
-    if (result.has('')) {
-      result.delete('');
+  const finalDefaultSlug = isSkipDefaultSlug ? '' : defaultData.defaultSlug;
+  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
+    if (!targetAccountProxy) {
+      return { allowedChains: [], excludedTokens: [] };
     }
 
-    return result;
-  }, [swappableSlugsSet, assetRegistryMap]);
+    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
+  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
+
+  const multiAssetOfAccountSwappable = useMemo(() => {
+    const { allowedChains, excludedTokens } = allowedChainAndExcludedTokenForTargetAccountProxy;
+
+    return Array.from(swappableSlugsSet).some((slug) => {
+      const assetInfo = assetRegistryMap[slug];
+      const multiChainAsset = _getMultiChainAsset(assetInfo);
+      const originChain = _getAssetOriginChain(assetInfo);
+
+      return (
+        multiChainAsset === finalDefaultSlug &&
+        allowedChains.includes(originChain) &&
+        !excludedTokens.includes(slug)
+      );
+    });
+  }, [allowedChainAndExcludedTokenForTargetAccountProxy, assetRegistryMap, finalDefaultSlug, swappableSlugsSet]);
+
+  const isUnsupportedDefaultSlug = useMemo(() => {
+    return (finalDefaultSlug !== '' &&
+      !swappableSlugsSet.has(finalDefaultSlug) &&
+      !multiAssetOfAccountSwappable);
+  }, [finalDefaultSlug, multiAssetOfAccountSwappable, swappableSlugsSet]);
 
   const fetchDestinationsMap = useCallback(() => {
     setLoading(true);
@@ -1477,13 +1495,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       />
     );
   }
-
-  const finalDefaultSlug = isSkipDefaultSlug ? '' : defaultData.defaultSlug;
-  const isUnsupportedDefaultSlug = (
-    finalDefaultSlug !== '' &&
-    !swappableSlugsSet.has(finalDefaultSlug) &&
-    !multiAssetSlugSet.has(finalDefaultSlug)
-  );
 
   if (isUnsupportedDefaultSlug) {
     return (
