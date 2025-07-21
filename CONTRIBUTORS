@@ -1,6 +1,6 @@
-    3108	AnhMTV                        	Fix @subwallet/chain-list version
+    3110	AnhMTV                        	
     2671	Nam Phạm                      	disable block explorer for truth network
-    2595	S2kael                        	[Issue-4522] Fix cannot withdraw
+    2599	S2kael                        	[Issue-4521] Update stable version for chain-list
      872	bluezdot                      	chores: update content
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
@@ -9,7 +9,7 @@
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      344	tunghp2002                    	[Issue-4214] Fix some UI bugs
      276	lw                            	[Issue-4512] refactor: Update swap submission content
-     196	PDTnhah                       	
+     197	PDTnhah                       	[Issue-4521] Extension - Update chainlist stable v0.2.110
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
