@@ -50,11 +50,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
     switch (label) {
       case 'dApp':
-        return t('DApp details');
+        return t('ui.EARNING.components.Modal.Earning.ValidatorDetail.dAppDetails');
       case 'Collator':
-        return t('Collator details');
+        return t('ui.EARNING.components.Modal.Earning.ValidatorDetail.collatorDetails');
       case 'Validator':
-        return t('Validator details');
+        return t('ui.EARNING.components.Modal.Earning.ValidatorDetail.validatorDetails');
     }
   }, [t, chain]);
 
@@ -108,7 +108,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Minimum stake required')}
+          label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.minimumStakeRequired')}
           suffix={symbol}
           value={minStake}
           valueColorSchema={'even-odd'}
@@ -117,7 +117,7 @@ function Component (props: Props): React.ReactElement<Props> {
         {
           totalStake !== '0' && <MetaInfo.Number
             decimals={decimals}
-            label={t('Total stake')}
+            label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.totalStake')}
             suffix={symbol}
             value={totalStake}
             valueColorSchema={'even-odd'}
@@ -126,7 +126,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Own stake')}
+          label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.ownStake')}
           suffix={symbol}
           value={ownStake}
           valueColorSchema={'even-odd'}
@@ -135,7 +135,7 @@ function Component (props: Props): React.ReactElement<Props> {
         {
           otherStake !== '0' && <MetaInfo.Number
             decimals={decimals}
-            label={t('Stake from others')}
+            label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.stakeFromOthers')}
             suffix={symbol}
             value={otherStake}
             valueColorSchema={'even-odd'}
@@ -144,7 +144,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
         {
           earningEstimated > 0 && earningEstimated !== '' && <MetaInfo.Number
-            label={t('Estimated APY')}
+            label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.estimatedApy')}
             suffix={'%'}
             value={earningEstimated}
             valueColorSchema={'even-odd'}
@@ -152,7 +152,7 @@ function Component (props: Props): React.ReactElement<Props> {
         }
 
         <MetaInfo.Number
-          label={t('Commission')}
+          label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.commission')}
           suffix={'%'}
           value={commission}
           valueColorSchema={'even-odd'}

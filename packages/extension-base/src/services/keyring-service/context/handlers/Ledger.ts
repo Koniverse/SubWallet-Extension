@@ -25,7 +25,7 @@ export class AccountLedgerHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists([address]);
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || address } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Ledger.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || address } }));
 
     const baseMeta: KeyringPair$Meta = {
       name,
@@ -74,12 +74,12 @@ export class AccountLedgerHandler extends AccountBaseHandler {
     const addresses: string[] = [];
 
     if (!accounts.length) {
-      throw new Error(t("Can't find an account. Please try again"));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Ledger.cantFindAccountTryAgain'));
     }
 
     const exists = this.state.checkAddressExists(accounts.map((account) => account.address));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Ledger.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     const slugMap: Record<string, string> = {};
     const modifyPairs = this.state.modifyPairs;

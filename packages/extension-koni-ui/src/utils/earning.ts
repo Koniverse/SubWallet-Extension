@@ -116,17 +116,17 @@ export const getEarningTimeText = (t: TFunction, hours?: number) => {
 
     if (isDay) {
       time = Math.floor(hours / 24);
-      unit = time > 1 ? t('days') : t('day');
+      unit = time > 1 ? t('ui.EARNING.util.earning.days') : t('ui.EARNING.util.earning.day');
     } else if (isHour) {
       time = hours;
-      unit = time > 1 ? t('hours') : t('hour');
+      unit = time > 1 ? t('ui.EARNING.util.earning.hours') : t('ui.EARNING.util.earning.hour');
     } else {
       time = hours * 60;
-      unit = time > 1 ? t('minutes') : t('minute');
+      unit = time > 1 ? t('ui.EARNING.util.earning.minutes') : t('ui.EARNING.util.earning.minute');
     }
 
     return [time, unit].join(' ');
   } else {
-    return t('unknown time');
+    return t('ui.EARNING.util.earning.unknownTime');
   }
 };

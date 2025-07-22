@@ -118,7 +118,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('Lowest commission'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -126,7 +126,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('Highest annual return'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -134,14 +134,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('Nomination'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('Lowest min active stake'),
+      label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -167,20 +167,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApp');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneDapp');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneCollator');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApps');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberDapps');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberCollators');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberValidators');
       }
     }
   }, [chain, fewValidators]);
@@ -402,7 +402,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         chain={chain}
         disabled={!chain || !from}
         identPrefix={networkPrefix}
-        label={t('Select') + ' ' + t(handleValidatorLabel)}
+        label={t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
         loading={loading}
         onClick={onActiveValidatorSelector}
         value={value || ''}
@@ -445,7 +445,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select') + ' ' + t(handleValidatorLabel)}
+        title={t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}

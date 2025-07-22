@@ -211,12 +211,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )}
             onClick={exportAllAccounts}
           >
-            {getNumberAccount > 1 ? t('Export {{getNumberAccount}} accounts', { replace: { getNumberAccount: getNumberAccount } }) : t('Export {{getNumberAccount}} account', { replace: { getNumberAccount: getNumberAccount } })}
+            {getNumberAccount > 1 ? t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts', { replace: { getNumberAccount: getNumberAccount } }) : t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount', { replace: { getNumberAccount: getNumberAccount } })}
           </Button>
         )}
         id={id}
         onCancel={onBack}
-        title={t('Export account')}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -229,7 +229,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </SwModal>

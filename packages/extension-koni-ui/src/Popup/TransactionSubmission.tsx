@@ -36,9 +36,9 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
 
   const messages = useMemo<string[]>(() => {
     return [
-      t('Transaction in process. Hit "View process" to view step-by-step details'),
-      t('Hanging in there...'),
-      t('Pro tip: You can hit "View process" to view step-by-step details of your transaction')
+      t('ui.TRANSACTION.screen.TransactionSubmission.transactionInProcessViewDetails'),
+      t('ui.TRANSACTION.screen.TransactionSubmission.hangingInThere'),
+      t('ui.TRANSACTION.screen.TransactionSubmission.proTipViewProcessDetails')
     ];
   }, [t]);
 
@@ -63,7 +63,7 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
         />
       </div>
       <div className='title'>
-        {t('Do not close the app!')}
+        {t('ui.TRANSACTION.screen.TransactionSubmission.doNotCloseApp')}
       </div>
       <div className='description'>
         {messages[messageIndex]}
@@ -174,18 +174,18 @@ const Component: React.FC<Props> = (props: Props) => {
           ? ({
             block: true,
             onClick: goHome,
-            children: t('Back to home')
+            children: t('ui.TRANSACTION.screen.TransactionSubmission.backToHome')
           })
           : undefined}
         rightFooterButton={processData
           ? ({
             block: true,
             onClick: viewProgress,
-            children: t('View process')
+            children: t('ui.TRANSACTION.screen.TransactionSubmission.viewProcess')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={t('Submitted')}
+        title={t('ui.TRANSACTION.screen.TransactionSubmission.submitted')}
       >
         {!processData && (
           <LoadingScreen />
@@ -208,10 +208,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               </div>
               <div className='title'>
-                {t('Transaction submitted!')}
+                {t('ui.TRANSACTION.screen.TransactionSubmission.transactionSubmitted')}
               </div>
               <div className='description'>
-                {t('View transaction progress in the Notifications screen or go back to home')}
+                {t('ui.TRANSACTION.screen.TransactionSubmission.trackTransactionInNotifications')}
               </div>
             </div>
           )

@@ -123,7 +123,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={t('Select') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
+        title={t('ui.EARNING.components.Field.NominationSelector.select') + ' ' + t(handleValidatorLabel) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
       />
     </>
   );

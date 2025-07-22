@@ -151,7 +151,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             loading={isSubmit}
             onClick={onCancel}
           >
-            {t('Close')}
+            {t('ui.components.Layout.ConnectWebsiteModal.close')}
           </Button>
         </>
       );
@@ -172,7 +172,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             onClick={onCancel}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
           </Button>
           <Button
             block
@@ -185,7 +185,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             loading={isSubmit}
             onClick={handlerUnblock}
           >
-            {t('Unblock')}
+            {t('ui.components.Layout.ConnectWebsiteModal.unblock')}
           </Button>
         </>
       );
@@ -205,7 +205,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
         </Button>
         <Button
           block
@@ -218,7 +218,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
           loading={isSubmit}
           onClick={handlerSubmit}
         >
-          {t('Confirm')}
+          {t('ui.components.Layout.ConnectWebsiteModal.confirm')}
         </Button>
       </>
     );
@@ -254,9 +254,9 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     if (_isNotConnected) {
       return (
         <>
-          <div className={'__content-heading'}>{t('Not connected to this site')}</div>
+          <div className={'__content-heading'}>{t('ui.components.Layout.ConnectWebsiteModal.notConnectedToThisSite')}</div>
           <div className={'text-tertiary __content-text'}>
-            {t('SubWallet is not connected to this site. Please find and click in the website the "Connect Wallet" button to connect.')}
+            {t('ui.components.Layout.ConnectWebsiteModal.notConnectedConnectFromSite')}
           </div>
         </>
       );
@@ -265,9 +265,9 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     if (isBlocked) {
       return (
         <>
-          <div className={'__content-heading'}>{t('This site has been blocked')}</div>
+          <div className={'__content-heading'}>{t('ui.components.Layout.ConnectWebsiteModal.thisSiteHasBeenBlocked')}</div>
           <div className={'text-tertiary __content-text'}>
-            {t('This site has been previously blocked. Do you wish to unblock and grant access to it?')}
+            {t('ui.components.Layout.ConnectWebsiteModal.confirmUnblockSite')}
           </div>
         </>
       );
@@ -293,7 +293,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     return (
       <>
         <div className={CN('__number-of-select-text')}>
-          {t('Your following account(s) are connected to this site')}
+          {t('ui.components.Layout.ConnectWebsiteModal.yourAccountsConnectedToSite')}
         </div>
 
         <div className={'__account-item-container'}>
@@ -347,11 +347,11 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             }
             : undefined
         }
-        title={t('Connect website')}
+        title={t('ui.components.Layout.ConnectWebsiteModal.connectWebsite')}
       >
         {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
           <div className={'__switch-network-authorize-label'}>
-            {t('Switch network')}
+            {t('ui.components.Layout.ConnectWebsiteModal.switchNetwork')}
           </div>
           <NetworkItem
             name={currentEvmNetworkInfo.name}

@@ -33,25 +33,25 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const [_isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
   const items = useMemo((): WelcomeButtonItem[] => [
     {
-      description: t('Create a new account with SubWallet'),
+      description: t('ui.screen.Welcome.createNewAccountWithSubWallet'),
       icon: PlusCircle,
       id: CREATE_ACCOUNT_MODAL,
       schema: 'primary',
-      title: t('Create a new account')
+      title: t('ui.screen.Welcome.createNewAccount')
     },
     {
-      description: t('Import an existing account'),
+      description: t('ui.screen.Welcome.importExistingAccount'),
       icon: FileArrowDown,
       id: IMPORT_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Import an account')
+      title: t('ui.screen.Welcome.importAccount')
     },
     {
-      description: t('Attach an account without private key'),
+      description: t('ui.screen.Welcome.attachAccountWithoutPrivateKey'),
       icon: Swatches,
       id: ATTACH_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Attach an account')
+      title: t('ui.screen.Welcome.attachAccount')
     }
   ], [t]);
 
@@ -95,7 +95,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           />
         </div>
         <div className='sub-title'>
-          {t("Choose how you'd like to set up your wallet")}
+          {t('ui.screen.Welcome.chooseWalletSetupMethod')}
         </div>
         <div className='buttons-container'>
           {

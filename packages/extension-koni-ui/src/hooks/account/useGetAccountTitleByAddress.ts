@@ -18,24 +18,24 @@ const useGetAccountTitleByAddress = (address?: string): string => {
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
-        return t('Ledger account');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.ledgerAccount');
       case AccountSignMode.ALL_ACCOUNT:
-        return t('All account');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.allAccount');
       case AccountSignMode.PASSWORD:
-        return t('Normal account');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.normalAccount');
 
       case AccountSignMode.QR:
         if (isEvm) {
-          return t('EVM QR signer account');
+          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.evmQrSignerAccount');
         } else {
-          return t('Substrate QR signer account');
+          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.substrateQrSignerAccount');
         }
 
       case AccountSignMode.READ_ONLY:
-        return t('Watch-only account');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.watchOnlyAccount');
       case AccountSignMode.UNKNOWN:
       default:
-        return t('Unknown account');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.unknownAccount');
     }
   }, [signMode, t, isEvm]);
 };

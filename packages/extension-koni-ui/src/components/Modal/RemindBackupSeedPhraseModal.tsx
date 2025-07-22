@@ -85,14 +85,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('I’ve backed up')}
+          {t('ui.ACCOUNT.components.Modal.RemindBackupSeedPhrase.iveBackedUp')}
         </Button>
 
         <Button
           block={true}
           onClick={onExport}
         >
-          {t('Back up now')}
+          {t('ui.ACCOUNT.components.Modal.RemindBackupSeedPhrase.backUpNow')}
         </Button>
       </>
     );
@@ -107,7 +107,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         id={RemindBackupSeedPhraseModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Back up your seed phrase!')}
+        title={t('ui.ACCOUNT.components.Modal.RemindBackupSeedPhrase.backUpYourSeedPhrase')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -128,7 +128,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
                   />
                 )
               }}
-              i18nKey={detectTranslate('Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>')}
+              i18nKey={detectTranslate('ui.ACCOUNT.components.Modal.RemindBackupSeedPhrase.seedPhraseLostWarning')}
             />
           </div>
         </div>

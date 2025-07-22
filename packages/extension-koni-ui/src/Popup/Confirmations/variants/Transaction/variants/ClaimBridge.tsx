@@ -62,7 +62,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           claimToken && (
             <MetaInfo.Number
               decimals={claimToken.decimals || 0}
-              label={t('Amount')}
+              label={t('ui.TRANSACTION.Confirmations.ClaimBridge.amount')}
               suffix={claimToken.symbol}
               value={amountValue}
             />
@@ -70,7 +70,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         }
         <MetaInfo.Number
           decimals={nativeToken.decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.ClaimBridge.estimatedFee')}
           suffix={nativeToken.symbol}
           value={transaction.estimateFee?.value || 0}
         />

@@ -47,14 +47,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Dismiss')}
+          {t('ui.SETTING.components.Modal.RemindUpgradeFirefox.dismiss')}
         </Button>
 
         <Button
           block={true}
           onClick={goUserGuide}
         >
-          {t('Review guide')}
+          {t('ui.SETTING.components.Modal.RemindUpgradeFirefox.reviewGuide')}
         </Button>
       </>
     );
@@ -69,7 +69,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         id={RemindUpdateFireFoxVersionModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Pay attention!')}
+        title={t('ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -80,7 +80,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t("You're using an old version of Firefox, which no longer supports automatic dApp access and phishing detection. Review our user guide to learn how to update Firefox to version 127.0 or manually enable dApp access.")}
+            {t('ui.SETTING.components.Modal.RemindUpgradeFirefox.oldFirefoxVersionWarning')}
           </div>
         </div>
       </SwModal>

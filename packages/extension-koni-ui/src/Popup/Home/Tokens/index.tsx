@@ -213,7 +213,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -243,7 +243,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -331,8 +331,8 @@ const Component = (): React.ReactElement => {
           isZkModeSyncing && (
             <SwAlert
               className={classNames('zk-mode-alert-area')}
-              description={t('This may take a few minutes. Please keep the app open')}
-              title={t('Zk mode is syncing: {{percent}}%', { replace: { percent: zkModeSyncProgress || '0' } })}
+              description={t('ui.BALANCE.screen.Tokens.refreshBalanceInfo')}
+              title={t('ui.BALANCE.screen.Tokens.zkModeSyncing', { replace: { percent: zkModeSyncProgress || '0' } })}
               type={'warning'}
             />
           )
@@ -351,9 +351,9 @@ const Component = (): React.ReactElement => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  i18nKey={detectTranslate('ui.BALANCE.screen.Tokens.tonWalletVersionInfo')}
                 />}
-                title={t('Change wallet address & version')}
+                title={t('ui.BALANCE.screen.Tokens.changeWalletAddressAndVersion')}
                 type={'warning'}
               />
               <AccountSelectorModal
@@ -403,8 +403,8 @@ const Component = (): React.ReactElement => {
           !tokenGroupBalanceItems.length && (
             <EmptyList
               className={'__empty-list'}
-              emptyMessage={t('Try searching or importing one')}
-              emptyTitle={t('No tokens found')}
+              emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
+              emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
               phosphorIcon={Coins}
             />
           )
@@ -416,7 +416,7 @@ const Component = (): React.ReactElement => {
             size={'xs'}
             type={'ghost'}
           >
-            {t('Manage tokens')}
+            {t('ui.BALANCE.screen.Tokens.manageTokens')}
           </Button>
         </div>
       </div>

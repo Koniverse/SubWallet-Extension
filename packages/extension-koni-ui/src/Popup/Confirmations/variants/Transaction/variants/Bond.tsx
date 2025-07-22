@@ -45,21 +45,21 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.AccountGroup
           accounts={data.selectedValidators}
-          content={t('{{number}} selected {{validatorLabel}}', { replace: { number: data.selectedValidators.length, validatorLabel: handleValidatorLabel.toLowerCase() } })}
+          content={t('ui.TRANSACTION.Confirmations.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: handleValidatorLabel.toLowerCase() } })}
           identPrefix={networkPrefix}
           label={t(data.type === StakingType.POOLED ? 'Pool' : handleValidatorLabel)}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.TRANSACTION.Confirmations.Bond.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.Bond.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -67,8 +67,8 @@ const Component: React.FC<Props> = (props: Props) => {
       {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
-          title={t('TAO staking fee')}
+          description={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFeeInfo')}
+          title={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFee')}
           type='info'
         />
       )}

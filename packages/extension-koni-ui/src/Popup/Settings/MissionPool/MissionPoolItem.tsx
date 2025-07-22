@@ -25,11 +25,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
   const timeline = useMemo<string>(() => {
     if (!data.start_time && !data.end_time) {
-      return t('TBD');
+      return t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
     }
 
-    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('TBD');
-    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('TBD');
+    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
+    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
 
     return `${start} - ${end}`;
   }, [data.end_time, data.start_time, t]);
@@ -134,7 +134,7 @@ function Component (props: Props): React.ReactElement<Props> {
           </div>
           <div className={'__item-timeline'}>{timeline}</div>
           <div className={'__item-rewards'}>
-            <div className='__item-label'>{t('Rewards')}:&nbsp;</div>
+            <div className='__item-label'>{t('ui.SETTINGS.screen.Setting.MissionPool.Item.rewards')}:&nbsp;</div>
             <div className='__item-value'>
               {data.reward}
             </div>

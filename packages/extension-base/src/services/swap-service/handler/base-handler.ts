@@ -399,7 +399,7 @@ export class SwapBaseHandler {
     if (bnBridgeAmount.lte(minBridgeAmountRequired.plus(bnBridgeDeliveryFee))) {
       const atLeastStr = formatNumber(minBridgeAmountRequired.plus(bnBridgeDeliveryFee), _getAssetDecimals(toToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(toToken) || 6 });
 
-      return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: fromToken.symbol } }))];
+      return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('bg.SWAP.services.service.swap.baseHandler.transferMinimumToKeepDestAlive', { replace: { amount: atLeastStr, symbol: fromToken.symbol } }))];
     }
 
     const isAcrossBridge = _isAcrossChainBridge(_getAssetOriginChain(fromToken), _getAssetOriginChain(toToken));
@@ -420,7 +420,7 @@ export class SwapBaseHandler {
         const toChainNativeTokenBalance = await this.balanceService.getTotalBalance(receiver, toToken.originChain, toChainNativeToken.slug, ExtrinsicType.TRANSFER_BALANCE);
 
         if (!_isAccountActive(toChainNativeTokenBalance.metadata as FrameSystemAccountInfo)) {
-          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
+          return [new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('bg.SWAP.services.service.swap.baseHandler.recipientBalanceTooLow', { replace: { amount: toChainNativeTokenBalance.value, nativeSymbol: toChainNativeToken.symbol, localSymbol: toToken.symbol } }))];
         }
       }
     }
@@ -438,7 +438,7 @@ export class SwapBaseHandler {
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
       const atLeastStr = formatNumber(_getTokenMinAmount(receivingToken), _getAssetDecimals(receivingToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t("You can't receive less than {{number}} {{symbol}}", { replace: { number: atLeastStr, symbol: _getAssetSymbol(receivingToken) } }))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('bg.SWAP.services.service.swap.baseHandler.receiveMinimumAmount', { replace: { number: atLeastStr, symbol: _getAssetSymbol(receivingToken) } }))];
     }
 
     if (recipient) {
@@ -598,7 +598,7 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', {
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('bg.SWAP.services.service.swap.baseHandler.swapAmountTooSmall', {
         replace: {
           amount: atLeastString,
           symbol: _getAssetSymbol(swapToken)
@@ -662,7 +662,7 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', {
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('bg.SWAP.services.service.swap.baseHandler.swapAmountTooSmall', {
         replace: {
           amount: atLeastString,
           symbol: _getAssetSymbol(swapToken)
@@ -840,7 +840,7 @@ export class SwapBaseHandler {
     if (bnSwapValue.lte(_getTokenMinAmount(swapToken))) {
       const atLeastString = formatNumber(_getTokenMinAmount(swapToken), _getAssetDecimals(swapToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(swapToken) || 6 });
 
-      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('Swap amount too small. Increase to more than {{amount}} {{symbol}} and try again', { replace: { amount: atLeastString, symbol: _getAssetSymbol(swapToken) } }))];
+      return [new TransactionError(SwapErrorType.NOT_MEET_MIN_SWAP, t('bg.SWAP.services.service.swap.baseHandler.swapAmountTooSmall', { replace: { amount: atLeastString, symbol: _getAssetSymbol(swapToken) } }))];
     }
 
     const swapFeeToken = this.chainService.getAssetBySlug(swapFee.selectedFeeToken || swapFee.defaultFeeToken);

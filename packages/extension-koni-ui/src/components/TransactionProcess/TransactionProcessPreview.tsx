@@ -57,7 +57,7 @@ const Component: FC<Props> = (props: Props) => {
                 className={'__chain-logo-group'}
               />
               <div className='__steps-label'>
-                {t('{{number}} steps', { replace: { number: chains.length } })}
+                {t('ui.TRANSACTION.components.TransactionProcess.Preview.numberSteps', { replace: { number: chains.length } })}
               </div>
             </>
           )

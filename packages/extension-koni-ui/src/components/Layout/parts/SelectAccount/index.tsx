@@ -167,20 +167,20 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       // eslint-disable-next-line padding-line-between-statements, no-fallthrough
       case ConnectionStatement.PARTIAL_CONNECTED:
         if (isAllAccount) {
-          return t('Connected {{connected}}/{{canConnect}}', { replace: { connected, canConnect } });
+          return t('ui.ACCOUNT.components.Layout.SelectAccount.connectedStatus', { replace: { connected, canConnect } });
         } else {
-          return t('Connected');
+          return t('ui.ACCOUNT.components.Layout.SelectAccount.connected');
         }
 
       case ConnectionStatement.DISCONNECTED:
-        return t('Disconnected');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.disconnected');
 
       case ConnectionStatement.BLOCKED:
-        return t('Blocked');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.blocked');
 
       case ConnectionStatement.NOT_CONNECTED:
       default:
-        return t('Not connected');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.notConnected');
     }
   }, [canConnect, connected, connectionState, isAllAccount, t]);
 

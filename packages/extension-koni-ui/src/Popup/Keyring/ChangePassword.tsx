@@ -46,11 +46,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const [loading, setLoading] = useState(false);
 
-  const newPasswordRules = useMemo(() => renderBasePasswordRules(t('New password'), t), [t]);
+  const newPasswordRules = useMemo(() => renderBasePasswordRules(t('ui.ACCOUNT.screen.Keyring.ChangePassword.newPassword'), t), [t]);
   const confirmPasswordRules = useMemo(() => renderBaseConfirmPasswordRules(FormFieldName.PASSWORD, t), [t]);
   const checkBoxValidator = useCallback((rule: RuleObject, value: boolean): Promise<void> => {
     if (!value) {
-      return Promise.reject(new Error(t('CheckBox is required')));
+      return Promise.reject(new Error(t('ui.ACCOUNT.screen.Keyring.ChangePassword.checkboxIsRequired')));
     }
 
     return Promise.resolve();
@@ -105,7 +105,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={goBack}
         rightFooterButton={{
-          children: t('Save'),
+          children: t('ui.ACCOUNT.screen.Keyring.ChangePassword.save'),
           onClick: form.submit,
           loading: loading,
           disabled: isDisabled,
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t('Change password')}
+        title={t('ui.ACCOUNT.screen.Keyring.ChangePassword.changePassword')}
       >
         <div className='body-container'>
           <div className='page-icon'>
@@ -135,7 +135,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             />
           </div>
           <div className='title'>
-            {t('Change your password')}
+            {t('ui.ACCOUNT.screen.Keyring.ChangePassword.changeYourPassword')}
           </div>
           <Form
             form={form}
@@ -153,7 +153,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               name={FormFieldName.OLD_PASSWORD}
               rules={[
                 {
-                  message: t('Password is required'),
+                  message: t('ui.ACCOUNT.screen.Keyring.ChangePassword.passwordIsRequired'),
                   required: true
                 }
               ]}
@@ -161,7 +161,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               <Input.Password
                 disabled={loading}
-                placeholder={t('Current password')}
+                placeholder={t('ui.ACCOUNT.screen.Keyring.ChangePassword.currentPassword')}
                 type='password'
               />
             </Form.Item>
@@ -173,7 +173,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Input.Password
                 disabled={loading}
                 onChange={onChangePassword}
-                placeholder={t('New password')}
+                placeholder={t('ui.ACCOUNT.screen.Keyring.ChangePassword.newPassword')}
                 type='password'
               />
             </Form.Item>
@@ -184,7 +184,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               <Input.Password
                 disabled={loading}
-                placeholder={t('Confirm new password')}
+                placeholder={t('ui.ACCOUNT.screen.Keyring.ChangePassword.confirmNewPassword')}
                 type='password'
               />
             </Form.Item>
@@ -214,7 +214,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('I understand that SubWallet can’t recover the password. <highlight>Learn more.</highlight>')}
+                  i18nKey={detectTranslate('ui.ACCOUNT.screen.Keyring.ChangePassword.understandPasswordNotRecoverable')}
                 />
               </Checkbox>
             </Form.Item>

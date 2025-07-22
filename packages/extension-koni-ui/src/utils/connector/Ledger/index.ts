@@ -12,7 +12,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   switch (name) {
     case 'TransportInterfaceNotAvailable':
       return {
-        message: t('Please make sure that this browser tab is the only tab connecting to Ledger'),
+        message: t('ui.LEDGER.util.connector.Ledger.ledgerOnlyOneTab'),
         status: 'error'
       };
   }
@@ -23,7 +23,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'warning',
-      message: t('Please unlock your Ledger')
+      message: t('ui.LEDGER.util.connector.Ledger.pleaseUnlockLedger')
     };
   }
 
@@ -36,12 +36,12 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     if (isSigning) {
       return {
         status: 'error',
-        message: t('Unable to sign. Open “{{network}}” on Ledger, refresh and approve again', { replace: { network: network } })
+        message: t('ui.LEDGER.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
       };
     } else {
       return {
         status: 'error',
-        message: t('Open "{{network}}" on Ledger to connect', { replace: { network: network } })
+        message: t('ui.LEDGER.util.connector.Ledger.openLedgerAppToConnect', { replace: { network: network } })
       };
     }
   }
@@ -50,7 +50,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     if (!isGetAddress) {
       return {
         status: 'error',
-        message: t('Unable to sign. Open “{{network}}” on Ledger, refresh and approve again', { replace: { network: network } })
+        message: t('ui.LEDGER.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
       };
     }
   }
@@ -59,7 +59,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   if (message.includes('Please enable Blind signing or Contract data in the Ethereum app Settings')) {
     return {
       status: 'error',
-      message: t('Please open the Ethereum app and enable Blind signing or Contract data')
+      message: t('ui.LEDGER.util.connector.Ledger.ledgerEnableBlindSigning')
     };
   }
 
@@ -69,7 +69,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'error',
-      message: t('Your Ledger is disconnected. Reconnect and try again')
+      message: t('ui.LEDGER.util.connector.Ledger.ledgerIsDisconnected')
     };
   }
 
@@ -81,7 +81,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'error',
-      message: t('Another request is in queue. Please try again later')
+      message: t('ui.LEDGER.util.connector.Ledger.anotherRequestInQueue')
     };
   }
 
@@ -92,7 +92,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'error',
-      message: t('Rejected by user')
+      message: t('ui.LEDGER.util.connector.Ledger.rejectedByUser')
     };
   }
 
@@ -100,7 +100,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   if (message.includes('Txn version not supported')) {
     return {
       status: 'error',
-      message: t('"{{network}}" is out of date. Please update your device with Ledger Live', { replace: { network: network } })
+      message: t('ui.LEDGER.util.connector.Ledger.ledgerAppOutOfDate', { replace: { network: network } })
     };
   }
 
@@ -115,6 +115,6 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
 
   return {
     status: 'error',
-    message: t('Fail to connect. Click to retry')
+    message: t('ui.LEDGER.util.connector.Ledger.failToConnectClickRetry')
   };
 };
