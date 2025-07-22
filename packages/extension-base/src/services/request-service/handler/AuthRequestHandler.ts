@@ -6,7 +6,7 @@ import { AuthRequestV2, ResultResolver } from '@subwallet/extension-base/backgro
 import { AccountAuthType, AuthorizeRequest, RequestAuthorizeTab, Resolver } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES } from '@subwallet/extension-base/constants';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
@@ -14,7 +14,8 @@ import { AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/se
 import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -49,6 +50,19 @@ export default class AuthRequestHandler {
       if (existKeyBothConnectAuthType && (!value.accountAuthTypes || value.accountAuthTypes.length < 2)) {
         value.accountAuthTypes = ['evm', 'substrate'];
         needUpdateAuthList = true;
+      }
+
+      const existKeyEvmNetworkConnect = (value as AuthUrlInfoNeedMigration).currentEvmNetworkKey;
+
+      if (existKeyEvmNetworkConnect) {
+        value.currentNetworkMap = { evm: existKeyEvmNetworkConnect };
+        needUpdateAuthList = true;
+      } else if (!value.currentNetworkMap) {
+        value.currentNetworkMap = {};
+      }
+
+      if (existKeyBothConnectAuthType) {
+        value.canConnectSubstrateEcdsa = true;
       }
 
       acc[key] = { ...value };
@@ -86,6 +100,22 @@ export default class AuthRequestHandler {
     const addressList = Object.keys(this.keyringService.context.pairs);
 
     return addressList.reduce((addressList, v) => ({ ...addressList, [v]: value }), {});
+  }
+
+  private getEcdsaAddressList (): Set<string> {
+    const addressList = Object.keys(this.keyringService.context.pairs);
+    const pairs = this.keyringService.context.pairs;
+    const ecdsaAddressList = new Set<string>();
+
+    addressList.forEach((address) => {
+      const pair = pairs[address];
+
+      if (pair && pair.json.meta.isSubstrateECDSA) {
+        ecdsaAddressList.add(address);
+      }
+    });
+
+    return ecdsaAddressList;
   }
 
   public get numAuthRequestsV2 (): number {
@@ -164,6 +194,30 @@ export default class AuthRequestHandler {
       }
     }
 
+    if (options.accessType === 'cardano') {
+      const cardanoChains = Object.values(chainInfoMaps).filter(_isChainCardanoCompatible);
+
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.cardano) || cardanoChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
+
+      if (options.autoActive) {
+        if (!needEnableChains.includes(chainInfo?.slug)) {
+          needEnableChains.push(chainInfo?.slug);
+        }
+      }
+    }
+
+    if (options.accessType === 'bitcoin') {
+      const bitcoinChains = Object.values(chainInfoMaps).filter(_isChainBitcoinCompatible);
+
+      chainInfo = (defaultChain ? chainInfoMaps[defaultChain] : chainInfoMaps.bitcoin) || bitcoinChains[0]; // auto active cardano mainnet chain, because dont support switch network yet
+
+      if (options.autoActive) {
+        if (!needEnableChains.includes(chainInfo?.slug)) {
+          needEnableChains.push(chainInfo?.slug);
+        }
+      }
+    }
+
     needEnableChains = needEnableChains.filter((slug) => !chainStateMap[slug]?.active);
     needEnableChains.length > 0 && this.#chainService.enableChains(needEnableChains);
 
@@ -172,6 +226,7 @@ export default class AuthRequestHandler {
 
   private authCompleteV2 = (id: string, url: string, resolve: (result: boolean) => void, reject: (error: Error) => void): Resolver<ResultResolver> => {
     const isAllowedMap = this.getAddressList();
+    const ecdsaAddressList = this.getEcdsaAddressList();
 
     const complete = (result: boolean | Error, cb: () => void, accounts?: string[]) => {
       const isAllowed = result === true;
@@ -191,15 +246,14 @@ export default class AuthRequestHandler {
         });
       }
 
-      const { accountAuthTypes, idStr, request: { allowedAccounts, origin }, url } = this.#authRequestsV2[id];
+      const { accountAuthTypes, idStr, request: { allowedAccounts, canConnectSubstrateEcdsa, origin }, url } = this.#authRequestsV2[id];
 
       // Note: accountAuthTypes represents the accountAuthType of this request
       //       allowedAccounts is a list of connected accounts that exist for this origin during this request.
-
       if (accountAuthTypes.length !== ALL_ACCOUNT_AUTH_TYPES.length) {
         const backupAllowed = (allowedAccounts || [])
           .filter((a) => {
-            if (isEthereumAddress(a) && !accountAuthTypes.includes('evm')) {
+            if (isEthereumAddress(a) && (canConnectSubstrateEcdsa || !ecdsaAddressList.has(a)) && !accountAuthTypes.includes('evm')) {
               return true;
             }
 
@@ -211,6 +265,14 @@ export default class AuthRequestHandler {
               return true;
             }
 
+            if (isCardanoAddress(a) && !accountAuthTypes.includes('cardano')) {
+              return true;
+            }
+
+            if (isBitcoinAddress(a) && !accountAuthTypes.includes('bitcoin')) {
+              return true;
+            }
+
             return false;
           });
 
@@ -219,12 +281,18 @@ export default class AuthRequestHandler {
         });
       }
 
-      let defaultEvmNetworkKey: string | undefined;
+      const defaultNetworkMap: Partial<Record<AccountAuthType, string>> = {};
 
       if (accountAuthTypes.includes('evm')) {
         const chainInfo = this.getDAppChainInfo({ accessType: 'evm', autoActive: true, url });
 
-        defaultEvmNetworkKey = chainInfo?.slug;
+        defaultNetworkMap.evm = chainInfo?.slug;
+      }
+
+      if (accountAuthTypes.includes('cardano')) {
+        const chainInfo = this.getDAppChainInfo({ accessType: 'cardano', autoActive: true, url });
+
+        defaultNetworkMap.cardano = chainInfo?.slug;
       }
 
       this.getAuthorize((value) => {
@@ -253,7 +321,8 @@ export default class AuthRequestHandler {
           origin,
           url,
           accountAuthTypes: [...new Set<AccountAuthType>([...accountAuthTypes, ...(existed?.accountAuthTypes || [])])],
-          currentEvmNetworkKey: existed ? existed.currentEvmNetworkKey : defaultEvmNetworkKey
+          currentNetworkMap: existed ? { ...defaultNetworkMap, ...existed.currentNetworkMap } : defaultNetworkMap,
+          canConnectSubstrateEcdsa: canConnectSubstrateEcdsa || existed?.canConnectSubstrateEcdsa
         };
 
         this.setAuthorize(authorizeList, () => {
@@ -284,6 +353,7 @@ export default class AuthRequestHandler {
     const idStr = stripUrl(url);
     const isAllowedDappConnectBothType = !!DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL.find((url_) => url.includes(url_));
     let accountAuthTypes = [...new Set<AccountAuthType>(isAllowedDappConnectBothType ? ['evm', 'substrate'] : (request.accountAuthTypes || ['substrate']))];
+    let canConnectSubstrateEcdsa = !!request.canConnectSubstrateEcdsa || isAllowedDappConnectBothType;
 
     if (!authList) {
       authList = {};
@@ -317,6 +387,10 @@ export default class AuthRequestHandler {
             const filteredAccountAuthTypes = new Set<AccountAuthType>([..._request.accountAuthTypes, ...accountAuthTypes]);
 
             accountAuthTypes = [...filteredAccountAuthTypes];
+
+            if (_request.request.canConnectSubstrateEcdsa) {
+              canConnectSubstrateEcdsa = true;
+            }
           }
 
           mergeKeys.push(key);
@@ -354,14 +428,19 @@ export default class AuthRequestHandler {
         .filter((item) => (item !== ''));
 
       let allowedListByRequestType = [...request.allowedAccounts];
+      const ecdsaAddressList = this.getEcdsaAddressList();
 
       allowedListByRequestType = accountAuthTypes.reduce<string[]>((list, accountAuthType) => {
         if (accountAuthType === 'evm') {
-          list.push(...allowedListByRequestType.filter((a) => isEthereumAddress(a)));
+          list.push(...allowedListByRequestType.filter((a) => isEthereumAddress(a) && (canConnectSubstrateEcdsa || !ecdsaAddressList.has(a))));
         } else if (accountAuthType === 'substrate') {
           list.push(...allowedListByRequestType.filter((a) => isSubstrateAddress(a)));
         } else if (accountAuthType === 'ton') {
           list.push(...allowedListByRequestType.filter((a) => isTonAddress(a)));
+        } else if (accountAuthType === 'cardano') {
+          list.push(...allowedListByRequestType.filter((a) => isCardanoAddress(a)));
+        } else if (accountAuthType === 'bitcoin') {
+          list.push(...allowedListByRequestType.filter((a) => isBitcoinAddress(a)));
         }
 
         return list;
@@ -369,7 +448,7 @@ export default class AuthRequestHandler {
 
       if (!confirmAnotherType && !request.reConfirm && allowedListByRequestType.length !== 0) {
         // Prevent appear confirmation popup
-        return false;
+        return true;
       }
     } else {
       // Auto auth for web app
@@ -387,7 +466,9 @@ export default class AuthRequestHandler {
           isAllowedMap,
           origin,
           url,
-          accountAuthTypes: ALL_ACCOUNT_AUTH_TYPES
+          accountAuthTypes: ALL_ACCOUNT_AUTH_TYPES,
+          currentNetworkMap: {},
+          canConnectSubstrateEcdsa
         };
 
         this.setAuthorize(authList);
@@ -400,7 +481,7 @@ export default class AuthRequestHandler {
       ...this.authCompleteV2(id, url, resolve, reject),
       id,
       idStr,
-      request: { ...request, accountAuthTypes },
+      request: { ...request, accountAuthTypes, canConnectSubstrateEcdsa },
       url,
       accountAuthTypes: accountAuthTypes || ['substrate']
     };

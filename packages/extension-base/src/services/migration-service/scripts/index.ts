@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import BaseMigrationJob from '../Base';
-import AutoEnableSomeTokens from './databases/AutoEnableSomeTokens';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
 import MigrateAssetSetting from './databases/MigrateAssetSetting';
@@ -19,10 +18,12 @@ import MigratePolygonUSDCProvider from './tokens/MigratePolygonUSDCProvider';
 import DeleteChain from './DeleteChain';
 import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
+import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
 import MigrateImportedToken from './MigrateImportedToken';
 import MigrateNetworkSettings from './MigrateNetworkSettings';
+import MigrateNewUnifiedAccount from './MigrateNewUnifiedAccount';
 import MigrateTokenDecimals from './MigrateTokenDecimals';
 import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
@@ -56,7 +57,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.28-01': MigrateEarningVersion,
   '1.1.33-01': MigrateLedgerAccountV2,
   '1.1.41-01': DeleteChainStaking,
-  '1.1.46-01': AutoEnableSomeTokens,
+  // '1.1.46-01': AutoEnableSomeTokens,
   '1.2.28-01': MigrateAssetSetting,
   '1.2.28-02': MigrateTransactionHistoryBySymbol,
   '1.2.69-01': MigrateRemoveGenesisHash,
@@ -64,7 +65,9 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.2.32-01': MigratePairData,
   '1.3.6-01': MigrateTransactionHistoryBridge,
   '1.3.10-01': ClearMetadataDatabase,
-  [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos
+  '1.3.26-01': DisableZeroBalanceTokens,
+  [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos,
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
+  '1.3.42-01': MigrateNewUnifiedAccount
 };

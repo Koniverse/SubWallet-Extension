@@ -7,27 +7,28 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
-import { addLazy } from '@subwallet/extension-base/utils';
+import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { EARNING_INSTRUCTION_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
+import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useIsPopup, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getSignModeByAccountProxy, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { CheckCircle, Info, PlusCircle } from 'phosphor-react';
+import { CheckCircle, Info, PencilSimpleLine, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -50,9 +51,10 @@ export const insufficientXCMMessages = ['You can only enter a maximum'];
 const Component = () => {
   const { t } = useTranslation();
   const notify = useNotification();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const navigate = useNavigate();
-  const isPopup = useIsPopup();
+  const { closeSidePanel } = useSidePanelUtils();
+  const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone,
     openAlert, persistData,
@@ -78,7 +80,7 @@ const Component = () => {
 
   const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const isClickInfoButtonRef = useRef<boolean>(false);
 
@@ -111,21 +113,24 @@ const Component = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   // const [checkMintLoading, setCheckMintLoading] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(true);
+  const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
 
   const chainState = useFetchChainState(poolInfo?.chain || '');
 
   const onHandleOneSignConfirmation = useCallback((transactionProcessId: string) => {
-    if (isPopup) {
+    if (!isExpanseMode) {
       windowOpen({
         allowedPath: '/transaction-submission',
         params: {
           'transaction-process-id': transactionProcessId
         }
       }).then(window.close).catch(console.log);
+
+      isSidePanelMode && closeSidePanel();
     } else {
       navigate(`/transaction-submission?transaction-process-id=${transactionProcessId}`);
     }
-  }, [isPopup, navigate]);
+  }, [closeSidePanel, isExpanseMode, isSidePanelMode, navigate]);
 
   const currentConfirmation = useMemo(() => {
     if (slug) {
@@ -283,10 +288,18 @@ const Component = () => {
       return [];
     }
 
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(inputAsset, chainInfo);
+
     const result: AccountAddressItemType[] = [];
 
     accountProxies.forEach((ap) => {
       if (!(!fromAccountProxy || ap.id === fromAccountProxy)) {
+        return;
+      }
+
+      const signMode = getSignModeByAccountProxy(ap);
+
+      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
         return;
       }
 
@@ -306,7 +319,7 @@ const Component = () => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, poolChain]);
+  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, inputAsset, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
@@ -452,7 +465,7 @@ const Component = () => {
         if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && target) {
           const targets = poolTargets;
 
-          if (poolInfo.type === YieldPoolType.NOMINATION_POOL || YieldPoolType.SUBNET_STAKING) {
+          if (poolInfo.type === YieldPoolType.NOMINATION_POOL) {
             const selectedPool = targets[0];
 
             return {
@@ -460,15 +473,18 @@ const Component = () => {
               address: from,
               amount: _currentAmount,
               selectedPool,
-              selectedValidators: targets,
-              netuid: netuid
+              selectedValidators: targets
             } as SubmitJoinNominationPool;
           } else {
             return {
               slug: slug,
               address: from,
               amount: _currentAmount,
-              selectedValidators: targets
+              selectedValidators: targets,
+              subnetData: {
+                netuid: netuid,
+                slippage: maxSlippage?.slippage.toNumber()
+              }
             } as SubmitJoinNativeStaking;
           }
         } else {
@@ -603,7 +619,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -623,48 +639,198 @@ const Component = () => {
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
+  const networkKey = useMemo(() => {
+    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+
+    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
+  }, [poolInfo.metadata.subnetData?.netuid]);
+
   // For subnet staking
+
   const [earningSlippage, setEarningSlippage] = useState<number>(0);
-  const [maxSlippage] = useState<number>(0.005);
+  const [earningRate, setEarningRate] = useState<number>(0);
+  const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
+
+  const isDisabledSubnetContent = useMemo(
+    () =>
+      !isSubnetStaking ||
+      !amountValue ||
+      (mustChooseTarget && !poolTargetValue),
+
+    [isSubnetStaking, amountValue, mustChooseTarget, poolTargetValue]
+  );
+
+  const alertBoxRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState<boolean>(false);
+  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!isSubnetStaking || (mustChooseTarget && !poolTargetValue)) {
+    if (isDisabledSubnetContent) {
       return;
     }
 
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-    const data = {
-      slug: poolInfo.slug,
-      value: amountValue,
-      netuid: netuid,
-      type: ExtrinsicType.STAKING_BOND
-    };
+    setSubmitLoading(true);
 
-    getEarningSlippage(data)
-      .then((result) => {
-        console.log('Actual stake slippage:', result * 100);
-        setEarningSlippage(result);
-      })
-      .catch((error) => {
-        console.error('Error fetching earning slippage:', error);
-      });
-  }, [amountValue, isFormInvalid, isSubnetStaking, mustChooseTarget, poolInfo.metadata.subnetData?.netuid, poolInfo.slug, poolTargetValue]);
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
+
+    debounce.current = setTimeout(() => {
+      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+      const data = {
+        slug: poolInfo.slug,
+        value: amountValue,
+        netuid: netuid,
+        type: ExtrinsicType.STAKING_BOND
+      };
+
+      getEarningSlippage(data)
+        .then((result) => {
+          console.log('Actual stake slippage:', result.slippage * 100);
+          setEarningSlippage(result.slippage);
+          setEarningRate(result.rate);
+        })
+        .catch((error) => {
+          console.error('Error fetching earning slippage:', error);
+        })
+        .finally(() => {
+          setSubmitLoading(false);
+        });
+    }, 200);
+
+    return () => {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+    };
+  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
       return true;
     }
 
-    return earningSlippage <= maxSlippage;
+    return earningSlippage <= maxSlippage.slippage.toNumber();
   }, [earningSlippage, maxSlippage, amountValue]);
 
+  useEffect(() => {
+    if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
+      alertBoxRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHasScrolled(true);
+    }
+  }, [isSlippageAcceptable, hasScrolled]);
+
+  const onSelectSlippage = useCallback((slippage: SlippageType) => {
+    setMaxSlippage(slippage);
+  }, []);
+
+  const closeSlippageModal = useCallback(() => {
+    inactiveModal(EARNING_SLIPPAGE_MODAL);
+    setIsSlippageModalVisible(false);
+  }, [inactiveModal]);
+
+  const onOpenSlippageModal = useCallback(() => {
+    setIsSlippageModalVisible(true);
+    activeModal(EARNING_SLIPPAGE_MODAL);
+  }, [activeModal]);
+
+  const renderSubnetStaking = useCallback(() => {
+    return (
+      <>
+        <MetaInfo.Default
+          className='__label-bottom'
+          label={t('Subnet')}
+        >
+          <div className='__subnet-wrapper'>
+            <Logo
+              className='__item-logo'
+              isShowSubLogo={false}
+              network={networkKey}
+              shape='circle'
+              size={24}
+            />
+            <span
+              className='chain-name'
+              style={{ color: '#A6A6A6' }}
+            >
+              {poolInfo.metadata.shortName}
+            </span>
+          </div>
+        </MetaInfo.Default>
+
+        {!isDisabledSubnetContent && earningRate > 0 && (
+          <>
+            <MetaInfo.Number
+              className='__label-bottom'
+              decimals={assetDecimals}
+              label={t('Expected alpha amount')}
+              suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
+              value={BigN(amountValue).multipliedBy(1 / earningRate)}
+            />
+            <MetaInfo.Default
+              className='__label-bottom'
+              label={t('Conversion rate')}
+            >
+              <div className='__subnet-rate'>
+                <span
+                  className='chain-name'
+                  style={{ color: '#A6A6A6' }}
+                >
+                  {`1 ${inputAsset.symbol} = `}
+                </span>
+                <Number
+                  className='__label-bottom'
+                  decimal={assetDecimals}
+                  suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
+                  value={BigN(1).multipliedBy(10 ** assetDecimals).multipliedBy(1 / earningRate)}
+                />
+              </div>
+            </MetaInfo.Default>
+          </>
+        )}
+
+        <MetaInfo.Default
+          label={
+            <Tooltip
+              placement={'topLeft'}
+              title={'Transaction will not be executed if the price changes more than this slippage'}
+            >
+              <div className={'__max-slippage'}>
+                <div className='__label-bottom'>{t('Slippage')}</div>
+                <Icon
+                  className='__label-bottom'
+                  customSize={'16px'}
+                  phosphorIcon={Info}
+                  size='sm'
+                />
+              </div>
+            </Tooltip>
+          }
+        >
+          <div className='__slippage-wrapper'>
+            <span
+              className='chain-name'
+              style={{ color: isSlippageAcceptable ? '#A6A6A6' : '#BF1616' }}
+            >
+              {+(maxSlippage.slippage.toNumber() * 100).toFixed(10)}%
+            </span>
+            <div
+              className='__slippage-editor-button'
+              onClick={onOpenSlippageModal}
+            >
+              <Icon
+                className='__slippage-editor-button-icon'
+                phosphorIcon={PencilSimpleLine}
+                size='xs'
+              />
+            </div>
+          </div>
+        </MetaInfo.Default>
+      </>
+    );
+  }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, networkKey, onOpenSlippageModal, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, t]);
+
   // For subnet staking
-
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
 
   const isDisabledButton = useMemo(
     () =>
@@ -752,52 +918,8 @@ const Component = () => {
               label={t('Network')}
             />
           )
-          : (<>
-            <MetaInfo.Default label={
-              <Tooltip
-                placement={'topLeft'}
-                title={'If slippage exceeds this limit, transaction will not be executed'}
-              >
-                <div className={'__max-slippage'}>
-                  <div className='__label-bottom'>{t('Max slippage')}</div>
-                  <Icon
-                    className='__label-bottom'
-                    customSize={'16px'}
-                    phosphorIcon={Info}
-                    size='sm'
-                  />
-                </div>
-              </Tooltip>}
-            >
-              <div className='__subnet-wrapper'>
-                <span
-                  className='chain-name'
-                  style={{ color: isSlippageAcceptable ? '#A6A6A6' : '#BF1616' }}
-                >
-                  {maxSlippage * 100}%
-                </span>
-              </div>
-            </MetaInfo.Default>
-            <MetaInfo.Default
-              className='__label-bottom'
-              label={t('Subnet')}
-            >
-              <div className='__subnet-wrapper'>
-                <Logo
-                  className='__item-logo'
-                  isShowSubLogo={false}
-                  network={networkKey}
-                  shape='circle'
-                  size={24}
-                />
-                <span
-                  className='chain-name'
-                  style={{ color: '#A6A6A6' }}
-                >{poolInfo.metadata.shortName}</span>
-              </div>
-            </MetaInfo.Default>
-          </>
-          )}
+          : (renderSubnetStaking())
+        }
         {showFee && (
           <MetaInfo.Number
             className='__label-bottom'
@@ -810,7 +932,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, inputAsset.symbol, poolInfo.statistic, poolInfo.metadata, poolInfo?.type, t, isSubnetStaking, chainValue, isSlippageAcceptable, maxSlippage, networkKey, currencyData?.isPrefix, currencyData.symbol, estimatedFee, poolTargets, chainAsset]);
+  }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargets, renderSubnetStaking, t]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -824,15 +946,31 @@ const Component = () => {
         return ExtrinsicType.MINT_STDOT;
       }
 
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.MINT_VMANTA;
+        }
+
+        return ExtrinsicType.MINT_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.MINT_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.MINT_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.MINT_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_BOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -1242,12 +1380,14 @@ const Component = () => {
               />
 
               {!isSlippageAcceptable && (
-                <AlertBox
-                  className='__alert-box'
-                  description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the maximum allowed. Lower your stake amount and try again`}
-                  title='Slippage too high!'
-                  type='error'
-                />
+                <div ref={alertBoxRef}>
+                  <AlertBox
+                    className='__alert-box'
+                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    title='Slippage too high!'
+                    type='error'
+                  />
+                </div>
               )}
             </TransactionContent>
             <TransactionFooter>
@@ -1276,6 +1416,14 @@ const Component = () => {
         openAlert={openAlert}
         slug={slug}
       />
+      {isSlippageModalVisible && (
+        <SlippageModal
+          modalId={EARNING_SLIPPAGE_MODAL}
+          onApplySlippage={onSelectSlippage}
+          onCancel={closeSlippageModal}
+          slippageValue={maxSlippage}
+        />
+      )}
     </>
   );
 };
@@ -1331,11 +1479,29 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       marginTop: token.marginSM
     },
 
+    // For subnet
     '.__subnet-wrapper': {
       display: 'flex',
       alignItems: 'center',
       gap: token.sizeXS,
       minWidth: 0
+    },
+
+    '.__subnet-rate': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem'
+    },
+
+    '.__slippage-wrapper': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.25rem',
+      minWidth: 0
+    },
+
+    '.__slippage-editor-button': {
+      cursor: 'pointer'
     },
 
     // TODO: recheck with other UI

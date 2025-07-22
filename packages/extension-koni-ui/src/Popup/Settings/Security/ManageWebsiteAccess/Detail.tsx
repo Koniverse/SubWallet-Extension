@@ -3,22 +3,22 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
-import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
-import { AccountProxyItem, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components/Modal/ActionModal';
+import { AccountChainType, AccountJson, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
-import { changeAuthorization, changeAuthorizationPerSite, forgetSite, toggleAuthorization } from '@subwallet/extension-koni-ui/messaging';
+import { changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
-import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
+import { convertAuthorizeTypeToChainTypes, getSignMode, getSignModeByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
-import { GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
+import { GearSix, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 type Props = ThemeProps & ManageWebsiteAccessDetailParam & {
   authInfo: AuthUrlInfo;
@@ -27,98 +27,52 @@ type Props = ThemeProps & ManageWebsiteAccessDetailParam & {
 
 type WrapperProps = ThemeProps;
 
-const ActionModalId = 'actionModalId';
-// const FilterModalId = 'filterModalId';
+interface AccountAddressValidationConditions {
+  accountAuthTypes: AccountAuthType[];
+  canConnectSubstrateEcdsa?: boolean;
+  accountSignMode?: AccountSignMode;
+}
 
-const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?: AccountAuthType[]): boolean => {
+const isValidAccountChainType = (chainType: AccountChainType, conditions: AccountAddressValidationConditions): boolean => {
+  const { accountAuthTypes, accountSignMode, canConnectSubstrateEcdsa } = conditions;
+
   if (!accountAuthTypes) {
     return false;
   }
 
   switch (chainType) {
     case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
-    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm');
+    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') && (canConnectSubstrateEcdsa || accountSignMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER);
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
+    case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
+    case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
 
   return false;
 };
 
+const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
+
 function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const [pendingMap, setPendingMap] = useState<Record<string, boolean>>({});
-  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { activeModal } = useContext(ModalContext);
   const { t } = useTranslation();
-  const { token } = useTheme() as Theme;
   const accountProxyItems = useMemo(() => {
-    return accountProxies.filter((ap) => ap.id !== 'ALL' && ap.chainTypes.some((chainType) => checkAccountAddressValid(chainType, accountAuthTypes)));
-  }, [accountAuthTypes, accountProxies]);
+    return accountProxies.filter((ap) => {
+      const accountSignMode = getSignModeByAccountProxy(ap);
 
-  const onOpenActionModal = useCallback(() => {
-    activeModal(ActionModalId);
+      return ap.id !== 'ALL' && ap.chainTypes.some((chainType) => isValidAccountChainType(chainType, {
+        accountAuthTypes,
+        accountSignMode,
+        canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
+      }));
+    });
+  }, [accountAuthTypes, accountProxies, authInfo.canConnectSubstrateEcdsa]);
+
+  const onOpenDAppConfigurationModal = useCallback(() => {
+    activeModal(dAppConfigurationModalId);
   }, [activeModal]);
-
-  const onCloseActionModal = useCallback(() => {
-    inactiveModal(ActionModalId);
-  }, [inactiveModal]);
-
-  const actions: ActionItemType[] = useMemo(() => {
-    const isAllowed = authInfo.isAllowed;
-
-    const result: ActionItemType[] = [
-      {
-        key: isAllowed ? 'block' : 'unblock',
-        icon: isAllowed ? ShieldSlash : ShieldCheck,
-        iconBackgroundColor: isAllowed ? token.colorError : token.colorSuccess,
-        title: isAllowed ? t('Block this site') : t('Unblock this site'),
-        onClick: () => {
-          toggleAuthorization(origin)
-            .then(({ list }) => {
-              updateAuthUrls(list);
-            })
-            .catch(console.error);
-          onCloseActionModal();
-        }
-      },
-      {
-        key: 'forget-site',
-        icon: X,
-        iconBackgroundColor: token.colorWarning,
-        title: t('Forget this site'),
-        onClick: () => {
-          forgetSite(origin, updateAuthUrls).catch(console.error);
-          onCloseActionModal();
-        }
-      }
-    ];
-
-    if (isAllowed) {
-      result.push(
-        {
-          key: 'disconnect-all',
-          icon: Plugs,
-          iconBackgroundColor: token['gray-3'],
-          title: t('Disconnect all accounts'),
-          onClick: () => {
-            changeAuthorization(false, origin, updateAuthUrls).catch(console.error);
-            onCloseActionModal();
-          }
-        },
-        {
-          key: 'connect-all',
-          icon: PlugsConnected,
-          iconBackgroundColor: token['green-6'],
-          title: t('Connect all accounts'),
-          onClick: () => {
-            changeAuthorization(true, origin, updateAuthUrls).catch(console.error);
-            onCloseActionModal();
-          }
-        }
-      );
-    }
-
-    return result;
-  }, [authInfo.isAllowed, onCloseActionModal, origin, t, token]);
 
   const renderItem = useCallback((item: AccountProxy) => {
     const isEnabled: boolean = item.accounts.some((account) => authInfo.isAllowedMap[account.address]);
@@ -133,7 +87,11 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
       const newAllowedMap = { ...authInfo.isAllowedMap };
 
       item.accounts.forEach((account) => {
-        if (checkAccountAddressValid(account.chainType, authInfo.accountAuthTypes)) {
+        if (isValidAccountChainType(account.chainType, {
+          accountAuthTypes: authInfo.accountAuthTypes,
+          accountSignMode: getSignMode(account),
+          canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
+        })) {
           newAllowedMap[account.address] = !isEnabled;
         }
       });
@@ -156,6 +114,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
     return (
       <AccountProxyItem
         accountProxy={item}
+        chainTypes={convertAuthorizeTypeToChainTypes(authInfo.accountAuthTypes, item.chainTypes)}
         className={'__account-proxy-connect-item'}
         key={item.id}
         rightPartNode={(
@@ -168,7 +127,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
         )}
       />
     );
-  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, pendingMap]);
+  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, authInfo.canConnectSubstrateEcdsa, pendingMap]);
 
   const searchFunc = useCallback((item: AccountJson, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
@@ -214,7 +173,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
                 weight='bold'
               />
             ),
-            onClick: onOpenActionModal
+            onClick: onOpenDAppConfigurationModal
           }
         ]}
         title={siteName || authInfo.id}
@@ -230,12 +189,8 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           searchPlaceholder={t<string>('Search account')}
         />
 
-        <ActionModal
-          actions={actions}
-          className={`${className} action-modal`}
-          id={ActionModalId}
-          onCancel={onCloseActionModal}
-          title={t('dApp configuration')}
+        <DAppConfigurationModal
+          authInfo={authInfo}
         />
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
@@ -289,12 +244,6 @@ const ManageWebsiteAccessDetail = styled(WrapperComponent)<Props>(({ theme: { to
     },
     '.ant-sw-screen-layout-body': {
       paddingTop: token.paddingSM
-    },
-
-    '&.action-modal': {
-      '.__action-item.block .ant-setting-item-name': {
-        color: token.colorError
-      }
     },
 
     '.list-account-item .ant-sw-list': {

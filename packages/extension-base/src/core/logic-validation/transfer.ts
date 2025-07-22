@@ -12,12 +12,12 @@ import { getCardanoAssetId } from '@subwallet/extension-base/services/balance-se
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainExistentialDeposit, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
-import { isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
+import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, EvmEIP1559FeeOption, EvmFeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineEthFee, formatNumber, pairToAccount } from '@subwallet/extension-base/utils';
+import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -66,6 +66,7 @@ export function additionalValidateTransferForRecipient (
   isSendingTokenSufficient?: boolean
 ): [TransactionWarning[], TransactionError[]] {
   const sendingTokenMinAmount = BigInt(_getTokenMinAmount(sendingTokenInfo));
+  const sendingTokenMinAmountXCM = new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
   const nativeTokenMinAmount = _getTokenMinAmount(nativeTokenInfo);
 
   const warnings: TransactionWarning[] = [];
@@ -74,8 +75,20 @@ export function additionalValidateTransferForRecipient (
   const remainingSendingTokenOfSenderEnoughED = senderSendingTokenTransferable ? senderSendingTokenTransferable - transferAmount >= sendingTokenMinAmount : false;
   const isReceiverAliveByNativeToken = receiverSystemAccountInfo ? _isAccountActive(receiverSystemAccountInfo) : false;
   const isReceivingAmountPassED = receiverSendingTokenKeepAliveBalance + transferAmount >= sendingTokenMinAmount;
+  const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(sendingTokenMinAmountXCM) : true;
 
-  if (extrinsicType === ExtrinsicType.TRANSFER_TOKEN) {
+  if (!enoughAmountForXCM) {
+    const minXCMStr = formatNumber(sendingTokenMinAmountXCM.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
+
+    const error = new TransactionError(
+      TransferTxErrorType.NOT_ENOUGH_VALUE,
+      t('You must transfer at least {{amount}} {{symbol}} to keep the recipient account alive. Increase amount and try again', { replace: { amount: minXCMStr, symbol: sendingTokenInfo.symbol } })
+    );
+
+    errors.push(error);
+  }
+
+  if (!_isNativeToken(sendingTokenInfo)) {
     if (!remainingSendingTokenOfSenderEnoughED) {
       const warning = new TransactionWarning(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT);
 
@@ -133,40 +146,6 @@ export function validateXcmTransferRequest (destTokenInfo: _ChainAsset | undefin
   }
 
   return [errors, keypair];
-}
-
-export function additionalValidateXcmTransfer (originTokenInfo: _ChainAsset, destinationTokenInfo: _ChainAsset, sendingAmount: string, senderTransferable: string, receiverNativeBalance: string, destChainInfo: _ChainInfo, isSnowBridge = false): [TransactionWarning | undefined, TransactionError | undefined] {
-  const destMinAmount = _getTokenMinAmount(destinationTokenInfo);
-  const minSendingRequired = new BigN(destMinAmount).multipliedBy(XCM_MIN_AMOUNT_RATIO);
-
-  let error: TransactionError | undefined;
-  let warning: TransactionWarning | undefined;
-
-  // Check sending token ED for receiver
-  if (new BigN(sendingAmount).lt(minSendingRequired)) {
-    const atLeastStr = formatNumber(minSendingRequired, destinationTokenInfo.decimals || 0, balanceFormatter, { maxNumberFormat: destinationTokenInfo.decimals || 6 });
-
-    error = new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: originTokenInfo.symbol } }));
-  }
-
-  // check native token ED on dest chain for receiver
-  const bnKeepAliveBalance = _isNativeToken(destinationTokenInfo) ? new BigN(receiverNativeBalance).plus(sendingAmount) : new BigN(receiverNativeBalance);
-
-  if (isSnowBridge && bnKeepAliveBalance.lt(_getChainExistentialDeposit(destChainInfo))) {
-    const { decimals, symbol } = _getChainNativeTokenBasicInfo(destChainInfo);
-    const atLeastStr = formatNumber(_getChainExistentialDeposit(destChainInfo), decimals || 0, balanceFormatter, { maxNumberFormat: 6 });
-
-    error = new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t(' Insufficient {{symbol}} on {{chain}} to cover min balance ({{amount}} {{symbol}})', { replace: { amount: atLeastStr, symbol, chain: destChainInfo.name } }));
-  }
-
-  // Check ed for sender
-  if (!_isNativeToken(originTokenInfo)) {
-    if (new BigN(senderTransferable).minus(sendingAmount).lt(_getTokenMinAmount(originTokenInfo))) {
-      warning = new TransactionWarning(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT);
-    }
-  }
-
-  return [warning, error];
 }
 
 export function checkSupportForFeature (validationResponse: SWTransactionResponse, blockedFeaturesList: string[], chainInfo: _ChainInfo) {
@@ -243,6 +222,14 @@ export function checkSupportForAction (validationResponse: SWTransactionResponse
       const chain = data.chain;
 
       currentAction = `${extrinsicType}___${chain}`;
+      break;
+    }
+
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR: {
+      const data = validationResponse.data as ExtrinsicDataTypeMap[ExtrinsicType.CHANGE_EARNING_VALIDATOR];
+      const slug = data.slug;
+
+      currentAction = `${extrinsicType}___${slug}`;
       break;
     }
 
@@ -368,7 +355,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: EvmFeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -379,24 +366,43 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
 
   estimateFee.decimals = decimals;
   estimateFee.symbol = symbol;
+  const { address, feeCustom, feeOption } = validationResponse;
 
   if (transaction) {
     try {
       if (isSubstrateTransaction(transaction)) {
-        estimateFee.value = (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
       } else if (isTonTransaction(transaction)) {
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {
         estimateFee.value = transaction.estimateCardanoFee;
+      } else if (isBitcoinTransaction(transaction)) {
+        const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, feeOption, feeCustom as BitcoinFeeRate);
+
+        const recipients: string[] = [];
+
+        for (const txOutput of transaction.txOutputs) {
+          txOutput.address && recipients.push(txOutput.address);
+        }
+
+        // TODO: Need review
+        const sizeInfo = getSizeInfo({
+          inputLength: transaction.inputCount,
+          recipients: recipients,
+          sender: address
+        });
+
+        estimateFee.value = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
       } else {
-        const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
+        const _transaction = transaction;
+        const gasLimit = _transaction.gas || await evmApi.api.eth.estimateGas(_transaction);
 
-        const feeCombine = combineEthFee(feeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);
+        const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);
 
-        if (transaction.maxFeePerGas) {
-          estimateFee.value = new BigN(transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
-        } else if (transaction.gasPrice) {
-          estimateFee.value = new BigN(transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
+        if (_transaction.maxFeePerGas) {
+          estimateFee.value = new BigN(_transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
+        } else if (_transaction.gasPrice) {
+          estimateFee.value = new BigN(_transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
         } else {
           if (feeCombine.maxFeePerGas) {
             const maxFee = new BigN(feeCombine.maxFeePerGas); // TODO: Need review
@@ -529,4 +535,17 @@ async function isAccountActive (tonApi: _TonApi, address: string) {
   const state = await tonApi.getAccountState(address);
 
   return state === 'active';
+}
+
+export function validateXcmMinAmountToMythos (destChain: string, destToken: string, amount: string) {
+  const MYTHOS_DESTINATION_FEE = '2500000000000000000';
+  const errorMsg = 'Enter an amount higher than 2.5 MYTH to pay cross-chain fee and avoid your MYTH being lost after the transaction';
+
+  if (destChain === 'mythos' && destToken === 'mythos-NATIVE-MYTH') {
+    if (BigN(amount).lte(MYTHOS_DESTINATION_FEE)) {
+      return new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, t(errorMsg));
+    }
+  }
+
+  return undefined;
 }

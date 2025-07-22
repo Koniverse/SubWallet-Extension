@@ -31,8 +31,10 @@ type Props = ThemeProps & {
 
 const groupOrdinal = (group: YieldGroupInfo): number => {
   if (group.group === 'DOT-Polkadot') {
-    return 2;
+    return 3;
   } else if (group.group === 'KSM-Kusama') {
+    return 2;
+  } else if (group.group === 'bittensor-NATIVE-TAO') {
     return 1;
   } else {
     return 0;
@@ -62,6 +64,7 @@ enum FilterOptionType {
   TEST_NETWORK = 'TEST_NETWORK',
 }
 
+// Todo: Recheck the compatibility of earning types with each ecosystem instead of filtering by network type
 function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();

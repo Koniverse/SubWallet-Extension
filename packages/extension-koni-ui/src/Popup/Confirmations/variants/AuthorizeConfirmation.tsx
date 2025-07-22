@@ -1,17 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountAuthType, AuthorizeRequest } from '@subwallet/extension-base/background/types';
+import { AuthorizeRequest } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES, ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { AccountProxyItem, AccountProxySelectorAllItem, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_ACCOUNT_TYPES } from '@subwallet/extension-koni-ui/constants';
 import { useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
-import { KeypairType } from '@subwallet/keyring/types';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { PlusCircle, ShieldSlash, XCircle } from 'phosphor-react';
@@ -40,7 +39,7 @@ async function handleBlock ({ id }: AuthorizeRequest) {
 function Component ({ className, request }: Props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const { accountAuthTypes, allowedAccounts } = request.request;
+  const { accountAuthTypes, allowedAccounts, canConnectSubstrateEcdsa } = request.request;
   const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
   const navigate = useNavigate();
 
@@ -48,8 +47,10 @@ function Component ({ className, request }: Props) {
   const setSelectedAccountTypes = useSetSelectedAccountTypes(true);
 
   // List all of all accounts by auth type
-  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES)),
-    [accountAuthTypes, accountProxies]);
+  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, {
+    accountAuthTypes: accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, canConnectSubstrateEcdsa
+  })),
+  [accountAuthTypes, accountProxies, canConnectSubstrateEcdsa]);
 
   // Selected map with default values is map of all accounts
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});
@@ -67,6 +68,10 @@ function Component ({ className, request }: Props) {
           return t('No available EVM account');
         case 'ton':
           return t('No available TON account');
+        case 'cardano':
+          return t('No available Cardano account');
+        case 'bitcoin':
+          return t('No available Bitcoin account');
       }
     }
 
@@ -80,6 +85,10 @@ function Component ({ className, request }: Props) {
           return t("You don't have any Substrate account to connect. Please create one or skip this step by hitting Cancel.");
         case 'evm':
           return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+        case 'cardano':
+          return t("You don't have any Cardano account to connect. Please create one or skip this step by hitting Cancel.");
+        case 'bitcoin':
+          return t("You don't have any Bitcoin account to connect. Please create one or skip this step by hitting Cancel.");
       }
     }
 
@@ -110,6 +119,8 @@ function Component ({ className, request }: Props) {
           case AccountChainType.SUBSTRATE: return accountAuthTypes?.includes('substrate');
           case AccountChainType.ETHEREUM: return accountAuthTypes?.includes('evm');
           case AccountChainType.TON: return accountAuthTypes?.includes('ton');
+          case AccountChainType.CARDANO: return accountAuthTypes?.includes('cardano');
+          case AccountChainType.BITCOIN: return accountAuthTypes?.includes('bitcoin');
         }
       }
 
@@ -122,23 +133,9 @@ function Component ({ className, request }: Props) {
   }, [accountAuthTypes, accounts, request, selectedMap]);
 
   const onAddAccount = useCallback(() => {
-    let types: KeypairType[];
-
-    const addAccountType: Record<AccountAuthType, KeypairType> = {
-      evm: EVM_ACCOUNT_TYPE,
-      substrate: SUBSTRATE_ACCOUNT_TYPE,
-      ton: TON_ACCOUNT_TYPE
-    };
-
-    if (accountAuthTypes) {
-      types = accountAuthTypes.map((type) => addAccountType[type]);
-    } else {
-      types = DEFAULT_ACCOUNT_TYPES;
-    }
-
-    setSelectedAccountTypes(types);
+    setSelectedAccountTypes(DEFAULT_ACCOUNT_TYPES);
     navigate('/accounts/new-seed-phrase', { state: { useGoBack: true } });
-  }, [accountAuthTypes, navigate, setSelectedAccountTypes]);
+  }, [navigate, setSelectedAccountTypes]);
 
   const onAccountSelect = useCallback((proxyId: string) => {
     const isAll = isAccountAll(proxyId);
@@ -185,6 +182,10 @@ function Component ({ className, request }: Props) {
                   return accountAuthTypes?.includes('evm');
                 case AccountChainType.TON:
                   return accountAuthTypes?.includes('ton');
+                case AccountChainType.CARDANO:
+                  return accountAuthTypes?.includes('cardano');
+                case AccountChainType.BITCOIN:
+                  return accountAuthTypes?.includes('bitcoin');
               }
             }
 
@@ -235,6 +236,7 @@ function Component ({ className, request }: Props) {
               {visibleAccountProxies.map((item) => (
                 <AccountProxyItem
                   accountProxy={item}
+                  chainTypes={convertAuthorizeTypeToChainTypes(accountAuthTypes, item.chainTypes)}
                   className={'__account-proxy-item'}
                   isSelected={selectedMap[item.id]}
                   key={item.id}

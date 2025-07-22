@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProcessTransactionData, ResponseSubscribeProcessById } from '@subwallet/extension-base/types';
-import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
+import { ProcessTransactionData, ProcessType, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
+import { CloseIcon, Layout, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-koni-ui/messaging';
 import { NotificationScreenParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -16,9 +18,70 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import reformatAddress from '../utils/account/reformatAddress';
-
 type Props = ThemeProps;
+
+type SwapProcessingContentComponentProps = {
+  processData: ProcessTransactionData;
+}
+
+const SwapProcessingContentComponent = (props: SwapProcessingContentComponentProps) => {
+  const { t } = useTranslation();
+  const { processData } = props;
+  const [messageIndex, setMessageIndex] = useState(0);
+  const data = processData.combineInfo as SwapBaseTxData;
+
+  const originSwapPair = useMemo(() => {
+    return getTokenPairFromStep(data.process.steps);
+  }, [data.process.steps]);
+
+  const messages = useMemo<string[]>(() => {
+    return [
+      t('Tip: Hit “View process” to view step-by-step details of your swap'),
+      t('Hanging in there...')
+    ];
+  }, [t]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prevIndex) => (prevIndex + 1) % messages.length);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
+  return (
+    <div className='container'>
+      <div className='page-icon'>
+        <PageIcon
+          color='var(--page-icon-color)'
+          iconProps={{
+            weight: 'fill',
+            phosphorIcon: SpinnerGap,
+            className: 'spinner'
+          }}
+        />
+      </div>
+      <div className='title'>
+        {t('Swap in process')}
+      </div>
+      <div className='subtitle'>
+        {t('DO NOT close the app!')}
+      </div>
+      <div className='description'>
+        {messages[messageIndex]}
+      </div>
+
+      <SwapTransactionBlock
+        className={'swap-transaction-block'}
+        fromAmount={data.quote.fromAmount}
+        fromAssetSlug={originSwapPair?.from}
+        logoSize={36}
+        toAmount={data.quote.toAmount}
+        toAssetSlug={originSwapPair?.to}
+      />
+    </div>
+  );
+};
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
@@ -42,17 +105,6 @@ const Component: React.FC<Props> = (props: Props) => {
       });
     },
     [navigate, transactionProcessId]
-  );
-
-  const viewInHistory = useCallback(
-    () => {
-      if (processData?.address && processData?.lastTransactionChain && processData?.lastTransactionId) {
-        navigate(`/home/history/${reformatAddress(processData?.address)}/${processData?.lastTransactionChain}/${processData?.lastTransactionId}`, { state: { from: 'ignoreRemind' } });
-      } else {
-        navigate('/home/history');
-      }
-    },
-    [processData?.address, processData?.lastTransactionChain, processData?.lastTransactionId, navigate]
   );
 
   const isFinal = useMemo(() => {
@@ -106,8 +158,13 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [transactionProcessId]);
 
+  const isSwapProcessing = processData?.type === ProcessType.SWAP;
+
   return (
     <PageWrapper className={CN(className, {
+      '-transaction-done': isFinal,
+      '-swap-processing': isSwapProcessing,
+      '-common-processing': !isSwapProcessing,
       '-processing': !processData || !isFinal,
       '-complete': isStepCompleted(processData?.status),
       '-failed': isStepFailed(processData?.status),
@@ -115,36 +172,52 @@ const Component: React.FC<Props> = (props: Props) => {
     })}
     >
       <Layout.WithSubHeaderOnly
-        leftFooterButton={{
-          block: true,
-          onClick: goHome,
-          children: t('Back to home')
-        }}
-        rightFooterButton={{
-          block: true,
-          onClick: isFinal ? viewInHistory : viewProgress,
-          children: isFinal ? t('View transaction') : t('View progress')
-        }}
+        leftFooterButton={processData
+          ? ({
+            block: true,
+            onClick: goHome,
+            children: t('Back to home')
+          })
+          : undefined}
+        rightFooterButton={processData
+          ? ({
+            block: true,
+            onClick: viewProgress,
+            children: t('View process')
+          })
+          : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={t('Submitted')}
+        title={isSwapProcessing ? t('Swap') : t('Submitted')}
       >
-        <div className='container'>
-          <div className='page-icon'>
-            <PageIcon
-              color='var(--page-icon-color)'
-              iconProps={{
-                weight: 'fill',
-                phosphorIcon: icon
-              }}
-            />
-          </div>
-          <div className='title'>
-            {t('Transaction submitted!')}
-          </div>
-          <div className='description'>
-            {isFinal ? t('View transaction progress in the History tab or go back to home') : t('View transaction progress in the Notifications screen or go back to home')}
-          </div>
-        </div>
+        {!processData && (
+          <LoadingScreen />
+        )}
+
+        {!!processData && isSwapProcessing && !isFinal && (
+          <SwapProcessingContentComponent processData={processData} />
+        )}
+
+        {
+          !!processData && (!isSwapProcessing || isFinal) && (
+            <div className='container'>
+              <div className='page-icon'>
+                <PageIcon
+                  color='var(--page-icon-color)'
+                  iconProps={{
+                    weight: 'fill',
+                    phosphorIcon: icon
+                  }}
+                />
+              </div>
+              <div className='title'>
+                {t('Transaction submitted!')}
+              </div>
+              <div className='description'>
+                {t('View transaction progress in the Notifications screen or go back to home')}
+              </div>
+            </div>
+          )
+        }
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
   );
@@ -156,9 +229,7 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '.page-icon': {
       display: 'flex',
-      justifyContent: 'center',
-      marginTop: 48,
-      marginBottom: 40
+      justifyContent: 'center'
     },
 
     '.title': {
@@ -169,13 +240,66 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
       color: token.colorTextBase
     },
 
-    '.description': {
-      padding: '0 36px',
-      marginBottom: token.margin * 2,
-      fontSize: token.fontSizeHeading5,
-      lineHeight: token.lineHeightHeading5,
-      color: token.colorTextLight5,
-      textAlign: 'center'
+    '&.-swap-processing': {
+      '.spinner': {
+        animation: 'swRotate 1.2s linear infinite'
+      },
+
+      '.page-icon': {
+        marginTop: 24,
+        marginBottom: 36
+      },
+
+      '.container': {
+        paddingLeft: token.padding,
+        paddingRight: token.padding
+      },
+
+      '.title': {
+        marginBottom: token.marginXXS
+      },
+
+      '.subtitle': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        marginBottom: token.margin,
+        fontWeight: token.headingFontWeight
+      },
+
+      '.description': {
+        padding: '0 24px',
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight4,
+        marginBottom: token.margin
+      },
+
+      '.swap-transaction-block': {
+        '.__summary-quote': {
+          marginBottom: 0
+        },
+
+        '.__amount-destination': {
+          marginTop: 10,
+          marginBottom: 4
+        }
+      }
+    },
+
+    '&.-common-processing, &.-transaction-done': {
+      '.page-icon': {
+        marginTop: 48,
+        marginBottom: 40
+      },
+
+      '.description': {
+        padding: '0 24px',
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight4,
+        marginBottom: token.margin
+      }
     },
 
     '&.-processing': {

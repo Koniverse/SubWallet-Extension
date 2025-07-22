@@ -26,6 +26,10 @@ export const remindNotificationTime: Record<NotificationActionType, number> = re
 export const blockedActions: Record<string, EnvConfig> = require('./blockedActions.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const oldChainPrefix: Record<string, EnvConfig> = require('./oldChainPrefix.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const paraSpellChainMap: Record<string, EnvConfig> = require('./paraSpellChainMap.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const assetHubStakingMap: Record<string, EnvConfig> = require('./assetHubStaking.json');
 
 export enum StaticKey {
   BUY_SERVICE_INFOS = 'buy-service-infos',
@@ -39,6 +43,8 @@ export enum StaticKey {
   REMIND_NOTIFICATION_TIME = 'remind-notification-time',
   BLOCKED_ACTIONS = 'blocked-actions',
   OLD_CHAIN_PREFIX = 'old-chain-prefix',
+  PARASPELL_CHAIN_MAP= 'paraspell-chain-map',
+  ASSET_HUB_STAKING_MAP= 'asset-hub-staking-map',
 }
 
 export const staticData = {
@@ -52,5 +58,7 @@ export const staticData = {
   [StaticKey.BLOCKED_ACTIONS_FEATURES]: blockedActionsFeatures,
   [StaticKey.REMIND_NOTIFICATION_TIME]: remindNotificationTime,
   [StaticKey.BLOCKED_ACTIONS]: blockedActions,
-  [StaticKey.OLD_CHAIN_PREFIX]: oldChainPrefix
+  [StaticKey.OLD_CHAIN_PREFIX]: oldChainPrefix,
+  [StaticKey.PARASPELL_CHAIN_MAP]: paraSpellChainMap,
+  [StaticKey.ASSET_HUB_STAKING_MAP]: assetHubStakingMap
 };

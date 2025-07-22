@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-inject authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AuthRequestOption, Injected, InjectedWindow, InjectOptions } from './types';
+import type { AuthRequestOption, BitcoinProvider, CardanoProvider, Injected, InjectedWindow, InjectOptions } from './types';
 
 import { EIP6963ProviderDetail, EIP6963ProviderInfo, EvmProvider } from './types';
 
@@ -30,14 +30,7 @@ export function injectEvmExtension (evmProvider: EvmProvider): void {
   // small helper with the typescript types, just cast window
   const windowInject = window as Window & InjectedWindow;
 
-  // add our enable function
-  if (windowInject.SubWallet) {
-    // Provider has been initialized in proxy mode
-    windowInject.SubWallet.provider = evmProvider;
-  } else {
-    // Provider has been initialized in direct mode
-    windowInject.SubWallet = evmProvider;
-  }
+  windowInject.SubWallet = evmProvider;
 
   if (!windowInject.ethereum) {
     windowInject.ethereum = evmProvider;
@@ -96,3 +89,22 @@ export const inject6963EIP = (provider: EvmProvider) => {
 
   announceProvider();
 };
+
+// Inject Cardano Provider
+export function injectCardanoExtension (cardanoProvider: CardanoProvider): void {
+  const windowInject = window as Window & InjectedWindow;
+
+  if (!windowInject.cardano) {
+    windowInject.cardano = {};
+  }
+
+  windowInject.cardano.subwallet = Object.freeze(cardanoProvider);
+
+  windowInject.dispatchEvent(new Event('subwallet#initialized'));
+}
+
+export function injectBitcoinExtension (bitcoinProvider: BitcoinProvider) {
+  const windowInject = window as Window & InjectedWindow;
+
+  windowInject.SubWalletBitcoin = bitcoinProvider;
+}

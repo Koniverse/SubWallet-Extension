@@ -1,5 +1,279 @@
 # CHANGELOG
 
+## 1.3.48
+Build date: Jul 21, 2025.
+
+Features & Update:
+- Support Change validator feature (#4214)
+- Stake TAO with Seamless Validator Switching (#4359)
+- Turn off default enabled tokens (#4475)
+- Update new content to submitted screen when swap (#4512)
+- Update chain-list stable v0.2.110 (#4521)
+
+Bug fixed:
+- Fixed bug when stake/unstake with subnet staking (#4510)
+- Fixed bug Cannot withdraw on Westend Asset Hub (#4522)
+- Fixed bug auto-enable chain for popular tokens (#4525)
+- Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375)
+
+
+## 1.3.47
+Build date: Jul 11, 2025.
+
+Features & Update:
+- Optimize Subscan API request (#4458)
+- Update Gears Library (#4443)
+- Support buy token BTC (Bitcoin) (#4490)
+- Update chainlist stable v0.2.108 (#4458)
+  - Update block explorer for TON Network
+  - Add support for gigaETH token
+  - Support for PolkaVM Compatibility
+  - Add swap support for gigaETH
+  - ...
+
+Bug fixed:
+- Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481)
+
+
+## 1.3.46
+Build date: Jul 04, 2025.
+
+Features & Update:
+- Update ledger-substrate-js library (#4365)
+- Upgrading certain technical issues of the EVM provider (#2871)
+- Support Asset Hub migration (#3710)
+
+
+## 1.3.45
+Build date: Jul 01, 2025.
+
+Bug fixed:
+- Fixed error validate receive address when transferring MYTH (Mythos) (#4486)
+
+
+## 1.3.44
+Build date: Jun 27, 2025.
+
+Bug fixed:
+- Hot fix error validate receive address when transferring MYTH (Mythos) (#4486)
+
+
+## 1.3.43
+Build date: Jun 26, 2025.
+
+Features & Update:
+- TAO On-ramp Integration in SubWallet (#4358)
+- Update content for Buy & Sell tokens (#4456)
+- Update script scan list token support feature on/off-ramp (#4350)
+- Unblock when perform stake on Bifrost with ledger account (#3931)
+
+Bug fixed:
+- Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver (#4224)
+- Fixed bug Fails to Load on the Hone and earning screen (#4478)
+
+
+## 1.3.42
+Build date: Jun 23, 2025.
+
+Features & Update:
+- Support Bitcoin account (#4168)
+  - Support Bitcoin for new unified account (#4200)
+  - Migrate unifed account to support Bitcoin (#4201)
+  - Support watch-only account for Bitcoin (#4228)
+  - Support bitcoin derivation with unified account (#4261)
+  - Support import/export Bitcoin account (#4262)
+  - Improvements unified account after Bitcoin supported (#4094)
+  - Review address/chain/token handling for Bitcoin support (#4297)
+  - Improve UI after Bitcoin integration (#4316)
+- Update logic fetching Bitcoin balance (#4162)
+- Support transfer for Bitcoin (#4263)
+- Optimize Request Handling in SendFund Form (#4434)
+- Optimize Lifecycle Management - P1 (#4428)
+- Update chain-list stable v0.2.106 (#4410)
+
+Bug fixed:
+- Fixed some UI bugs after Bitcoin integration (#4412, #4425)
+
+
+## 1.3.41
+Build date: Jun 11, 2025.
+
+Features & Update:
+- Support Asset Hub Testnet swap for Chainflip (#4265)
+- Exposed API Key in SubWallet Chrome Extension
+- Moving BlockFrost interaction Logic to the Backend (#4368)
+- Update UI Connect dApp screen (#4377)
+
+Bug fixed:
+- Fixed bug show Moonbeam local token balance (#4413)
+- Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416)
+- Fixed bug Error page when use marketing campaign (#4403)
+- Fixed bug navigating actions in Earning feature (#4441)
+
+
+## 1.3.40
+Build date: May 30, 2025.
+
+Features & Update:
+- Update chain-list stable v0.2.105 (#4273),
+- Update SimpleSwap API
+- Update Paraspell's fee calculation API (#4314),
+
+Bug fixed:
+- Fixed bug Wrong Price Impact When Swapping on PAH (#4241)
+
+
+## 1.3.39
+Build date: May 26, 2025.
+
+Bug fixed:
+- Fix bug error page when connect with dApp (#4401)
+
+
+## 1.3.38
+Build date: May 23, 2025.
+
+Features & Update:
+- Support Bridge-Swap process for cross-chain swap on EVM (#4321)
+- Update UI to clearly display fees (#4347)
+
+Bug fixed:
+- Fixed bug related to feedback from Cardano Foundation (#4352)
+
+
+## 1.3.37
+Build date: May 23, 2025.
+
+Features & Update:
+- Update fee for UniSwap (#4385)
+- Update Wallet Connector Libraries (#4353)
+- Turn off the update manifest v3 popup (#4023)
+
+Bug fixed:
+- Fixed bug when connects to Remix (#4330)
+
+
+## 1.3.36
+Build date: May 16, 2025.
+
+Features & Update:
+- Support KyberSwap Aggregator (#4144)
+- Support UniswapX Dutch Swap (#4293)
+- Review Uniswap fee (#4088)
+
+
+## 1.3.35
+Build date: May 09, 2025.
+
+Features & Update:
+- Refactor Across bridge (#4282)
+- Review extrinsic status subscription (#4240)
+- Update content in-app for swap (#4259)
+
+Bug fixed:
+- Fixed bug Cannot sign transaction when chain connection not be initialized (#4300)
+- Fixed bug connecting to Aleph Zero EVM dapp (#4320)
+- Fixed bug related to price chart for derivation token (#4332, #4344)
+
+
+## 1.3.34
+Build date: May 05, 2025.
+
+Features & Update:
+- Support extension side panel (#4091)
+- Update padding for the time frame selector for price chart
+
+
+## 1.3.33
+Build date: Apr 30, 2025.
+
+Features & Update:
+- Support price chart (#4122, #4266)
+- Update link for "Contact support" (#4324)
+
+
+## 1.3.32
+Build date: Apr 26, 2025.
+
+Features & Update:
+- Support CIP-30 on Cardano (#4100)
+- Support swap-bridge for EVM chains (#4220)
+- Swap support and direct cross-chain swap on more EVM chains (#4219)
+- Change TAO's position in Earning options (#4290)
+- Update features related to middleware services (#4312)
+- Update chain-list
+
+Bug fixed:
+- Fixed bug when stake for subnet (#4287)
+
+
+## 1.3.31
+Build date: Apr 18, 2025.
+
+Features & Update:
+- Improve token enabling (#3960)
+- Update XCM feature:
+  - Estimate delivery fee when XCM (#4133)
+  - Dry run XCM (#4134)
+  - Improve validate recipient when make XCM transfer (#4233)
+- Support Across bridge (#3918, #4299)
+- Update chain-list stable v0.2.103 (#4163)
+- Support GIGADOT token for Hydration (#4283)
+
+
+Bug fixed:
+- Fixed XCM bugs:
+  - Fixed bug XCM USDT: PAH -> ASTR (#3606)
+  - Fixed bug XCM for Acala (#3725)
+  - Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903)
+
+## 1.3.30
+Build date: Apr 14, 2025.
+
+Features & Update:
+- Improve UX for swap cross-chain Round 2 (#4114):
+  - Improve swap feature (#4069)
+  - Improve Select provider in Swap feature (#3933)
+  - Optimize swap pair selection (#3902)
+  - Update New UI for Swap quote (#4204)
+  - Recheck swap quote with asset hub (#4113)
+- Support custom slippage for TAO subnet staking (#4145)
+- Add APY information for TAO and dTao staking (#4217)
+
+
+Bug fixed:
+- Fixed enforcing the minimum miner tip 1 wei (#2393)
+- Fixed UX for swap cross-chain Round 2 (#4114)
+  - Error when swap on hydration (#3993)
+  - Fixed bug Cannot read properties of undefined (reading 'destinationTokenInfo') when open the old Notification details (#4195)
+  - Fixed bug Error page when perform sign permit from Uniswap (#4248)
+
+
+## 1.3.29
+Build date: Apr 08, 2025.
+
+Features & Update:
+- Support auto detect balance for EVM (#2836)
+- Sort token by balance (#2339)
+- Update for Meld on-ramp (#4198)
+- Add validate sufficient token for XCM transfer (#3895)
+
+Bug fixed:
+- Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
+
+
+## 1.3.28
+Build date: Apr 02, 2025.
+
+Features & Update:
+- Show value of derivative token relative to the origin tokens (#4081)
+- Add dTAO token (#4151)
+- Display dTAO balance like another token (#4150)
+
+Bug fixed:
+- Fixed bug related to subnet staking feature (#4140)
+- Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
+
 ## 1.3.27
 Build date: Mar 29, 2025.
 

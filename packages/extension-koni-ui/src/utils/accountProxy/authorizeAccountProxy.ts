@@ -5,19 +5,32 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 
-export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], accountAuthTypes: AccountAuthType[]): AccountProxy[] => {
-  const rs = accountProxies.filter(({ chainTypes, id }) => {
+interface AuthorizeAccountProxiesConditions {
+  accountAuthTypes: AccountAuthType[];
+  canConnectSubstrateEcdsa?: boolean;
+}
+
+export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], conditions: AuthorizeAccountProxiesConditions): AccountProxy[] => {
+  const { accountAuthTypes, canConnectSubstrateEcdsa } = conditions;
+
+  const rs = accountProxies.filter(({ accounts, chainTypes, id }) => {
     if (isAccountAll(id)) {
       return false;
     }
+
+    const isEcdsaAccountProxy = accounts.some((account) => account.isSubstrateECDSA);
 
     return accountAuthTypes.some((type) => {
       if (type === 'substrate') {
         return chainTypes.includes(AccountChainType.SUBSTRATE);
       } else if (type === 'evm') {
-        return chainTypes.includes(AccountChainType.ETHEREUM);
+        return chainTypes.includes(AccountChainType.ETHEREUM) && (canConnectSubstrateEcdsa || !isEcdsaAccountProxy);
       } else if (type === 'ton') {
         return chainTypes.includes(AccountChainType.TON);
+      } else if (type === 'cardano') {
+        return chainTypes.includes(AccountChainType.CARDANO);
+      } else if (type === 'bitcoin') {
+        return chainTypes.includes(AccountChainType.BITCOIN);
       }
 
       return false;
@@ -29,4 +42,28 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], ac
   }
 
   return rs;
+};
+
+export const convertAuthorizeTypeToChainTypes = (accountAuthTypes: AccountAuthType[] = [], accountChainTypes: AccountChainType[]): AccountChainType[] => {
+  if (!accountAuthTypes) {
+    return [];
+  }
+
+  const chainTypes: AccountChainType[] = [];
+
+  accountAuthTypes.forEach((type) => {
+    if (type === 'substrate') {
+      chainTypes.push(AccountChainType.SUBSTRATE);
+    } else if (type === 'evm') {
+      chainTypes.push(AccountChainType.ETHEREUM);
+    } else if (type === 'ton') {
+      chainTypes.push(AccountChainType.TON);
+    } else if (type === 'cardano') {
+      chainTypes.push(AccountChainType.CARDANO);
+    } else if (type === 'bitcoin') {
+      chainTypes.push(AccountChainType.BITCOIN);
+    }
+  });
+
+  return chainTypes.filter((type) => accountChainTypes.includes(type));
 };

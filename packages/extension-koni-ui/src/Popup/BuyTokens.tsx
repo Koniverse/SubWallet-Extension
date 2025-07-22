@@ -3,16 +3,17 @@
 
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountProxy, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
-import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
+import { AccountProxy, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
+import { detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
-import { TokenItemType, TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
+import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -41,6 +42,8 @@ interface LinkUrlProps {
   content: string;
 }
 
+type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
+
 const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
   if (props.url) {
     return (
@@ -67,15 +70,17 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
-  // const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
-  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
+
+  const { chainInfoMap, chainStateMap, priorityTokens } = useSelector((root: RootState) => root.chainStore);
   const { assetRegistry } = useSelector((state: RootState) => state.assetRegistry);
   const { walletReference } = useSelector((state: RootState) => state.settings);
   const { services, tokens } = useSelector((state: RootState) => state.buyService);
 
+  const getAccountTokenBalance = useGetAccountTokenBalance();
+
   const checkAsset = useAssetChecker();
-  const allowedChains = useGetChainSlugsByAccount();
-  const getReformatAddress = useReformatAddress();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {
@@ -155,15 +160,32 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     promiseRef.current.reject(new Error('User reject'));
   }, []);
 
-  const tokenItems = useMemo<TokenItemType[]>(() => {
-    const result: TokenItemType[] = [];
+  const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+    const tokenBalanceMap = getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
 
-    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
-        originChain: info.network
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };
 
@@ -172,23 +194,32 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
         return;
       }
 
+      if (excludedTokens.includes(item.slug)) {
+        return;
+      }
+
       if (!currentSymbol || (item.slug === currentSymbol || item.symbol === currentSymbol)) {
         result.push(convertToItem(item));
       }
     });
 
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
     return result;
-  }, [allowedChains, assetRegistry, currentSymbol, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentAccountProxy.id, currentSymbol, excludedTokens, getAccountTokenBalance, priorityTokens, tokens]);
 
   const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
 
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
     const chainInfo = chainSlug ? chainInfoMap[chainSlug] : undefined;
+    const tokenInfo = selectedTokenSlug ? assetRegistry[selectedTokenSlug] : undefined;
 
-    if (!chainInfo) {
+    if (!chainInfo || !tokenInfo) {
       return [];
     }
+
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
 
     const result: AccountAddressItemType[] = [];
 
@@ -214,6 +245,12 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           return;
         }
 
+        const signMode = getSignModeByAccountProxy(ap);
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
+          return;
+        }
+
         updateResult(ap);
       });
     } else {
@@ -221,7 +258,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
+  }, [accountProxies, assetRegistry, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
     if (selectedService && selectedTokenSlug && selectedAddress) {
@@ -364,7 +401,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
   return (
     <Layout.Home
-      showFilterIcon
+      showFaderIcon
       showTabBar={false}
     >
       <PageWrapper className={CN(className, 'transaction-wrapper')}>
@@ -509,6 +546,14 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             i18nKey={detectTranslate('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
             values={{
               service: serviceName
+            }}
+          />
+          <br />
+          <Trans
+            i18nKey={detectTranslate('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
+            values={{
+              service: serviceName,
+              action: t('buying')
             }}
           />
         </SwModal>

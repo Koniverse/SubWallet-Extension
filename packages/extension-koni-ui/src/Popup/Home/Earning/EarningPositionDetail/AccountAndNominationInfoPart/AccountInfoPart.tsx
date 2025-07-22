@@ -7,7 +7,8 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { EARNING_NOMINATION_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
+import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
+import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
@@ -63,6 +64,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { accounts } = useSelector((state) => state.accountState);
   const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
+
   const sliderSettings: Settings = useMemo(() => {
     return {
       dots: false,
@@ -95,8 +97,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
 
   const haveNomination = useMemo(() => {
-    return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
+    return [YieldPoolType.NOMINATION_POOL].includes(poolInfo.type);
   }, [poolInfo.type]);
+
+  const haveValidator = useMemo(() => {
+    return [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);
+  }, [poolInfo.type]);
+
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
+
   const noNomination = useMemo(
     () => !haveNomination || isAllAccount || !compound.nominations.length,
     [compound.nominations.length, haveNomination, isAllAccount]
@@ -136,6 +147,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return () => {
       setSelectedAddress(item.address);
       activeModal(EARNING_NOMINATION_MODAL);
+    };
+  }, [activeModal]);
+
+  const createOpenValidator = useCallback((item: YieldPositionInfo) => {
+    return () => {
+      setSelectedAddress(item.address);
+      activeModal(EARNING_SELECTED_VALIDATOR_MODAL);
     };
   }, [activeModal]);
 
@@ -216,7 +234,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               valueColorSchema='even-odd'
             />
           ))}
-          {isAllAccount && haveNomination && (
+          {isAllAccount && (haveNomination || haveValidator) && (
             <>
               <div className='__separator'></div>
 
@@ -225,17 +243,21 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   block={true}
                   className={'__nomination-button'}
                   disabled={disableButton}
-                  onClick={createOpenNomination(item)}
-                  size={'xs'}
-                  type={'ghost'}
+                  onClick={
+                    canChangeValidator
+                      ? createOpenValidator(item)
+                      : createOpenNomination(item)
+                  }
+                  size='xs'
+                  type='ghost'
                 >
-                  <div className={'__nomination-button-label'}>
-                    {t('Nomination info')}
+                  <div className='__nomination-button-label'>
+                    {t(canChangeValidator ? 'Your validators' : 'Nomination info')}
                   </div>
 
                   <Icon
                     phosphorIcon={ArrowSquareOut}
-                    size={'sm'}
+                    size='sm'
                   />
                 </Button>
               </div>
@@ -244,7 +266,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSubnetStaking, isSpecial, list, networkPrefix, poolInfo.chain, renderAccount, t]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination]);
 
   return (
     <>
@@ -257,7 +279,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         title={t('Account info')}
       >
 
-        {isAllAccount
+        {isAllAccount && list.length > 1
           ? (
             <div className={'__slider-container'}>
               <Slider
@@ -279,6 +301,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
+      {selectedItem && (
+        <EarningValidatorSelectedModal
+          chain={poolInfo.chain}
+          compound={compound}
+          disabled={false}
+          displayType={'nomination'}
+          from={selectedAddress}
+          modalId={EARNING_SELECTED_VALIDATOR_MODAL}
+          nominations={selectedItem?.nominations}
+          slug={poolInfo.slug}
+        />)}
     </>
   );
 }
@@ -301,7 +334,7 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
   '&.-horizontal-mode.-has-one-item': {
     '.__account-info-item.-box-mode': {
-      minWidth: 300
+      flex: 1
     }
   },
 
@@ -331,8 +364,9 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
   '.__carousel-container': {
     '.slick-prev, .slick-next': {
       width: 40,
+      height: 0,
       position: 'absolute',
-      top: 0,
+      top: 'calc(50% - 20px)',
       bottom: 0,
       cursor: 'pointer',
       zIndex: 20
@@ -356,7 +390,6 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__left-arrow, .__right-arrow': {
       width: '100%',
-      height: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'

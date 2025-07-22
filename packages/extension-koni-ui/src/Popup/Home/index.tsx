@@ -8,13 +8,11 @@ import { GeneralTermModal } from '@subwallet/extension-koni-ui/components/Modal/
 import { CONFIRM_GENERAL_TERM, DEFAULT_SESSION_VALUE, GENERAL_TERM_AND_CONDITION_MODAL, HOME_CAMPAIGN_BANNER_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL, REMIND_UPGRADE_FIREFOX_VERSION } from '@subwallet/extension-koni-ui/constants';
 import { AppOnlineContentContext } from '@subwallet/extension-koni-ui/contexts/AppOnlineContentProvider';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useAccountBalance, useGetChainSlugsByAccount, useGetMantaPayConfig, useHandleMantaPaySync, useSetSessionLatest, useTokenGroup, useUpgradeFireFoxVersion } from '@subwallet/extension-koni-ui/hooks';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetSessionLatest, useTokenGroup, useUpgradeFireFoxVersion } from '@subwallet/extension-koni-ui/hooks';
 import { RemindBackUpSeedPhraseParamState, SessionStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox } from '@subwallet/extension-koni-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -28,18 +26,14 @@ const historyPageIgnoreBanner = 'ignoreBanner';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const chainsByAccountType = useGetChainSlugsByAccount();
-  const tokenGroupStructure = useTokenGroup(chainsByAccountType);
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const tokenGroupStructure = useTokenGroup(allowedChains, excludedTokens);
   const location = useLocation();
   const accountBalance = useAccountBalance(tokenGroupStructure.tokenGroupMap);
-  const currentAccount = useSelector((state: RootState) => state.accountState.currentAccount);
   const [isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
   const { isNeedUpgradeVersion } = useUpgradeFireFoxVersion();
   const { showAppPopup } = useContext(AppOnlineContentContext);
 
-  const mantaPayConfig = useGetMantaPayConfig(currentAccount?.address);
-  const isZkModeSyncing = useSelector((state: RootState) => state.mantaPay.isSyncing);
-  const handleMantaPaySync = useHandleMantaPaySync();
   const remindBackUpShowed = useRef<boolean>(false);
   const showAppPopupFunc = useRef<(currentRoute: string | undefined) => void>(showAppPopup);
 
@@ -56,12 +50,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onAfterConfirmTermModal = useCallback(() => {
     setIsConfirmedTermGeneral('confirmed');
   }, [setIsConfirmedTermGeneral]);
-
-  useEffect(() => {
-    if (mantaPayConfig && mantaPayConfig.enabled && !mantaPayConfig.isInitialSync && !isZkModeSyncing) {
-      handleMantaPaySync(mantaPayConfig.address);
-    }
-  }, [handleMantaPaySync, isZkModeSyncing, mantaPayConfig]);
 
   useEffect(() => {
     showAppPopupFunc.current = showAppPopup;
@@ -123,10 +111,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       >
         <div className={`home home-container ${className}`}>
           <Layout.Home
-            onClickSearchIcon={onOpenGlobalSearchToken}
-            showFilterIcon
+            onClickSearchToken={onOpenGlobalSearchToken}
+            showFaderIcon
             showNotificationIcon
-            showSearchIcon
+            showSearchToken
+            showSidebarIcon
           >
             <Outlet />
             <GeneralTermModal onOk={onAfterConfirmTermModal} />
@@ -138,8 +127,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <GlobalSearchTokenModal
         id={GlobalSearchTokenModalId}
         onCancel={onCloseGlobalSearchToken}
-        sortedTokenSlugs={tokenGroupStructure.sortedTokenSlugs}
         tokenBalanceMap={accountBalance.tokenBalanceMap}
+        tokenSlugs={tokenGroupStructure.tokenSlugs}
       />
     </>
   );

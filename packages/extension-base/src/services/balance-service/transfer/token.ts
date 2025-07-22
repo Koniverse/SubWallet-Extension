@@ -68,8 +68,7 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
     const contractPromise = tokenInfo.assetType === _AssetType.GRC20
       ? getGRC20ContractPromise(api, _getContractAddressOfToken(tokenInfo))
       : getVFTContractPromise(api, _getContractAddressOfToken(tokenInfo));
-    const transaction = await contractPromise
-      .service
+    const transaction = await contractPromise.service
       .transfer(u8aToHex(decodeAddress(to)), value) // Create transfer transaction
       .withAccount(from) // Set sender account
       .calculateGas(); // Add account arg to extrinsic
@@ -120,6 +119,8 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
         transfer = api.tx.balances.transfer(to, new BN(value));
       }
     }
+  } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
+    transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   }
 
   return [transfer, transferAmount || value];

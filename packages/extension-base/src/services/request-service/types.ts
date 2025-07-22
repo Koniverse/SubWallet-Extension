@@ -25,11 +25,14 @@ export interface AuthUrlInfo {
   url: string;
   accountAuthTypes: AccountAuthType[];
   isAllowedMap: Record<string, boolean>;
-  currentEvmNetworkKey?: string;
+  currentNetworkMap: Partial<Record<AccountAuthType, string>>;
+  currentAccount?: string;
+  canConnectSubstrateEcdsa?: boolean;
 }
 
 export interface AuthUrlInfoNeedMigration extends Omit<AuthUrlInfo, 'accountAuthTypes'> {
   accountAuthType?: AccountAuthType | 'both';
+  currentEvmNetworkKey?: string;
 }
 
 export type AuthUrls = Record<string, AuthUrlInfo>;

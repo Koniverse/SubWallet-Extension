@@ -9,7 +9,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, RequestYieldStepSubmit, SpStakingExposurePage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, RequestYieldStepSubmit, SpStakingExposurePage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -27,14 +27,19 @@ export default class NominationPoolHandler extends BasePoolHandler {
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
+
+  static generateSlug (symbol: string, chain: string): string {
+    return `${symbol}___nomination_pool___${chain}`;
+  }
 
   constructor (state: KoniState, chain: string) {
     super(state, chain);
@@ -108,7 +113,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
 
       const maxSupportedEras = substrateApi.api.consts.staking.historyDepth.toString();
-      const erasPerDay = 24 / _STAKING_ERA_LENGTH_MAP[chainInfo.slug]; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
+      const eraInHours = _STAKING_ERA_LENGTH_MAP[chainInfo.slug] || _STAKING_ERA_LENGTH_MAP.default; // in hours
+      const erasPerDay = 24 / eraInHours; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
 
       const supportedDays = getSupportedDaysByHistoryDepth(erasPerDay, parseInt(maxSupportedEras), parseInt(currentEra) / erasPerDay);
 
@@ -138,7 +144,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
       const inflation = calculateInflation(bnTotalEraStake, bnTotalIssuance, numAuctions, chainInfo.slug);
       const minPoolJoin = _minPoolJoin?.toString() || undefined;
-      const expectedReturn = calculateChainStakedReturnV2(chainInfo, rawTotalIssuance, erasPerDay, lastTotalStaked, validatorEraReward, new BigN(inflation), true);
+      const expectedReturn = await calculateChainStakedReturnV2(chainInfo, rawTotalIssuance, erasPerDay, lastTotalStaked, validatorEraReward, new BigN(inflation), true);
       const eraTime = _STAKING_ERA_LENGTH_MAP[this.chain] || _STAKING_ERA_LENGTH_MAP.default; // in hours
       const unlockingPeriod = parseInt(unlockingEras) * eraTime; // in hours
 
@@ -680,8 +686,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-      const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
-      const slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      const slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {
@@ -690,5 +695,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
   }
 
+  public override handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
   /* Other actions */
 }

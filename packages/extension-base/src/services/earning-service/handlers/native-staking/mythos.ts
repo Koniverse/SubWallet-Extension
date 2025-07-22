@@ -10,6 +10,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
@@ -37,14 +38,34 @@ interface PalletCollatorStakingReleaseRequest {
   amount: string
 }
 
+const FIXED_DAY_REWARD = '123287670000000000000000';
+const COMMISSION = 0.1;
+const DAYS_PER_YEAR = 365;
+
+function calculateCollatorApy (numberOfCollators: number, totalStakeStr: string): number {
+  const totalStake = new BigN(totalStakeStr);
+  const collatorRewardPerDay = new BigN(FIXED_DAY_REWARD).div(numberOfCollators);
+
+  const dayRate = collatorRewardPerDay.div(totalStake);
+  const finalTokens = totalStake.multipliedBy(dayRate.multipliedBy(DAYS_PER_YEAR).plus(1));
+  const yearReward = finalTokens.minus(totalStake).multipliedBy(1 - COMMISSION);
+
+  return yearReward.div(totalStake).multipliedBy(100).toNumber();
+}
+
+function calculateNetworkApy (totalStake: BigN) {
+  return new BigN(FIXED_DAY_REWARD).multipliedBy(DAYS_PER_YEAR).multipliedBy(1 - COMMISSION).div(totalStake).multipliedBy(100).toNumber();
+}
+
 export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  public override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   /* Subscribe pool info */
@@ -96,7 +117,17 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
       const blockTime = _EXPECTED_BLOCK_TIME[this.chain];
       const unstakingPeriod = parseInt(unstakeDelay) * blockTime / 60 / 60;
 
-      const _minStake = await substrateApi.api.query.collatorStaking.minStake();
+      const [_minStake, _candidates] = await Promise.all([
+        substrateApi.api.query.collatorStaking.minStake(),
+        substrateApi.api.query.collatorStaking.candidates.entries()
+      ]);
+
+      const bnTotalChainStake = _candidates.reduce((total, _candidate) => {
+        const collatorInfo = _candidate[1].toPrimitive() as unknown as PalletCollatorStakingCandidateInfo;
+        const collatorTotalStake = new BigN(collatorInfo.stake);
+
+        return total.plus(collatorTotalStake);
+      }, new BigN(0));
       const minStake = _minStake.toString();
       const minStakeToHuman = formatNumber(minStake, nativeToken.decimals || 0, balanceFormatter);
 
@@ -123,7 +154,7 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
           era: parseInt(currentSession),
           eraTime: sessionTime,
           unstakingPeriod: unstakingPeriod,
-          totalApy: undefined
+          totalApy: calculateNetworkApy(bnTotalChainStake)
           // tvl: totalStake.toString(),
           // inflation
         },
@@ -142,6 +173,37 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   /* Subscribe pool info */
 
   /* Subscribe pool position */
+
+  async checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.collatorStaking?.userStake?.multi?.(useAddresses);
+    const _unstakings = await Promise.all(useAddresses.map((stakerAddress: string) => {
+      return substrateApi.api.query.collatorStaking?.releaseQueues?.(stakerAddress);
+    }));
+
+    if (!ledgers || !_unstakings) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const _userStake = ledgers[i];
+      const userStake = _userStake.toPrimitive() as unknown as PalletCollatorStakingUserStakeInfo;
+      const _unstaking = _unstakings[i];
+      const unstakings = _unstaking.toPrimitive() as unknown as PalletCollatorStakingReleaseRequest[];
+
+      // TODO: Need to improve, check if can only load stake info
+      if (userStake && userStake.stake !== '0') {
+        result.push(owner);
+      } else if (unstakings && unstakings.some((unstake) => unstake.amount !== '0')) {
+        result.push(owner);
+      }
+    }
+
+    return result;
+  }
 
   async subscribePoolPosition (useAddresses: string[], resultCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
     let cancel = false;
@@ -273,36 +335,55 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const substrateApi = await this.substrateApi.isReady;
 
-    const [_allCollators, _minStake, _commission] = await Promise.all([
+    const [_allCollators, _minStake, _commission, _desiredCandidates] = await Promise.all([
       substrateApi.api.query.collatorStaking.candidates.entries(),
       substrateApi.api.query.collatorStaking.minStake(),
-      substrateApi.api.query.collatorStaking.collatorRewardPercentage()
+      substrateApi.api.query.collatorStaking.collatorRewardPercentage(),
+      substrateApi.api.query.collatorStaking.desiredCandidates()
     ]);
 
     const maxStakersPerCollator = substrateApi.api.consts.collatorStaking.maxStakers.toPrimitive() as number;
+    const numberOfRewardCollators = parseInt(_desiredCandidates.toString());
+    const numberOfCollators = _allCollators.length;
 
-    return _allCollators.map((_collator) => {
+    const allTargets = _allCollators.map((_collator) => {
       const _collatorAddress = _collator[0].toHuman() as unknown as string[];
       const collatorAddress = _collatorAddress[0];
       const collatorInfo = _collator[1].toPrimitive() as unknown as PalletCollatorStakingCandidateInfo;
 
-      const bnTotalStake = BigInt(collatorInfo.stake);
+      const totalStake = collatorInfo.stake;
       const numOfStakers = parseInt(collatorInfo.stakers);
       const isCrowded = numOfStakers >= maxStakersPerCollator;
 
       return {
         address: collatorAddress,
         chain: this.chain,
-        totalStake: bnTotalStake.toString(),
+        totalStake: totalStake,
         ownStake: '0',
-        otherStake: bnTotalStake.toString(),
+        otherStake: totalStake,
         minBond: _minStake.toPrimitive(),
         nominatorCount: numOfStakers,
         commission: getCommission(_commission.toString()),
         blocked: false,
         isVerified: false,
-        isCrowded
+        isCrowded,
+        expectedReturn: calculateCollatorApy(numberOfCollators, totalStake)
       } as ValidatorInfo;
+    });
+
+    const sortTargetsByStake = allTargets.sort((a, b) => (BigN(b.totalStake).minus(BigN(a.totalStake))).toNumber());
+
+    return sortTargetsByStake.map((target, rank) => {
+      let expectedReturn = target.expectedReturn;
+
+      if (rank >= numberOfRewardCollators) {
+        expectedReturn = 0.000000000000001;
+      }
+
+      return {
+        ...target,
+        expectedReturn
+      };
     });
   }
 

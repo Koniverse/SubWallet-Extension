@@ -5,6 +5,7 @@ import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { ASTAR_REFRESH_BALANCE_INTERVAL, SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { getERC20Contract } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem, SubscribeEvmPalletBalance } from '@subwallet/extension-base/types';
@@ -15,7 +16,14 @@ import { BN } from '@polkadot/util';
 
 export function subscribeERC20Interval ({ addresses, assetMap, callback, chainInfo, evmApi }: SubscribeEvmPalletBalance): () => void {
   const chain = chainInfo.slug;
-  const tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]);
+  let tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]);
+
+  if (_BALANCE_CHAIN_GROUP.moonbeam.includes(chain)) {
+    const moonbeamLocal = filterAssetsByChainAndType(assetMap, chain, [_AssetType.LOCAL]);
+
+    tokenList = Object.assign({}, tokenList, moonbeamLocal);
+  }
+
   const erc20ContractMap = {} as Record<string, Contract>;
 
   Object.entries(tokenList).forEach(([slug, tokenInfo]) => {

@@ -4,11 +4,13 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _chainInfoToChainType, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountChainType } from '@subwallet/extension-base/types';
-import { getAccountChainTypeFromKeypairType } from '@subwallet/extension-base/utils';
+import { _chainInfoToChainType, _getChainSubstrateAddressPrefix, _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountJson } from '@subwallet/extension-base/types';
+import { getAccountChainTypeFromKeypairType, pairToAccount } from '@subwallet/extension-base/utils';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isAddress, isBitcoinAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
+import { keyring } from '@subwallet/ui-keyring';
 
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -16,7 +18,7 @@ export function isAccountAll (address?: string): boolean {
   return address === ALL_ACCOUNT_KEY;
 }
 
-export function reformatAddress (address: string, networkPrefix = 42, isEthereum = false): string {
+export function reformatAddress (address: string, networkPrefix = 42, isEthereum = false, ignoreError = true): string {
   try {
     if (!address || address === '') {
       return '';
@@ -46,6 +48,10 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
   } catch (e) {
     console.warn('Get error while reformat address', address, e);
 
+    if (!ignoreError) {
+      return '';
+    }
+
     return address;
   }
 }
@@ -70,29 +76,31 @@ export const getAccountChainTypeForAddress = (address: string): AccountChainType
   return getAccountChainTypeFromKeypairType(type);
 };
 
-interface AddressesByChainType {
-  [ChainType.SUBSTRATE]: string[],
-  [ChainType.EVM]: string[],
-  [ChainType.BITCOIN]: string[],
-  [ChainType.TON]: string[],
-  [ChainType.CARDANO]: string[]
+type AddressesByChainType = {
+  [key in ChainType]: string[]
 }
 
-export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[]): string[] {
-  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses);
+interface ExtendAddressesByChainType extends AddressesByChainType {
+  _bitcoin: string[];
+}
+
+// TODO: Recheck the usage of this function for Bitcoin; it is currently applied to history.
+export function getAddressesByChainType (addresses: string[], chainTypes: ChainType[], chainInfo?: _ChainInfo): string[] {
+  const addressByChainTypeMap = getAddressesByChainTypeMap(addresses, chainInfo);
 
   return chainTypes.map((chainType) => {
     return addressByChainTypeMap[chainType];
   }).flat(); // todo: recheck
 }
 
-export function getAddressesByChainTypeMap (addresses: string[]): AddressesByChainType {
-  const addressByChainType: AddressesByChainType = {
+export function getAddressesByChainTypeMap (addresses: string[], chainInfo?: _ChainInfo): ExtendAddressesByChainType {
+  const addressByChainType: ExtendAddressesByChainType = {
     substrate: [],
     evm: [],
     bitcoin: [],
     ton: [],
-    cardano: []
+    cardano: [],
+    _bitcoin: []
   };
 
   addresses.forEach((address) => {
@@ -101,7 +109,17 @@ export function getAddressesByChainTypeMap (addresses: string[]): AddressesByCha
     } else if (isTonAddress(address)) {
       addressByChainType.ton.push(address);
     } else if (isBitcoinAddress(address)) {
-      addressByChainType.bitcoin.push(address);
+      const addressInfo = getBitcoinAddressInfo(address);
+
+      if (chainInfo?.bitcoinInfo) {
+        const isNetworkMatch = addressInfo.network === chainInfo.bitcoinInfo.bitcoinNetwork;
+
+        if (isNetworkMatch) {
+          addressByChainType.bitcoin.push(address);
+        } else {
+          addressByChainType._bitcoin.push(address);
+        }
+      }
     } else if (isCardanoAddress(address)) {
       addressByChainType.cardano.push(address);
     } else {
@@ -144,4 +162,95 @@ export const modifyAccountName = (type: KeypairType, name: string, modify: boole
   }
 
   return network ? [name, network].join(' - ') : name;
+};
+
+/**
+ * @function getAccountJsonByAddress
+ * @desc Get account info by address
+ * <p>
+ *   Note: Use on the background only
+ * </p>
+ * @param {string} address - Address
+ * @returns {AccountJson|null}  - Account info or null if not found
+ */
+export const getAccountJsonByAddress = (address: string): AccountJson | null => {
+  try {
+    const pair = keyring.getPair(address);
+
+    if (pair) {
+      return pairToAccount(pair);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    console.warn(e);
+
+    return null;
+  }
+};
+
+/** Filter addresses to subscribe by chain info */
+export const filterAddressByChainInfo = (addresses: string[], chainInfo: _ChainInfo): [string[], string[]] => {
+  const { _bitcoin, bitcoin, cardano, evm, substrate, ton } = getAddressesByChainTypeMap(addresses, chainInfo);
+
+  if (_isChainEvmCompatible(chainInfo)) {
+    const [fetchList, unFetchList] = processEvmAndSubstrateAddresses(evm, chainInfo);
+
+    return [fetchList, [...unFetchList, ...bitcoin, ...ton, ...substrate, ...cardano, ..._bitcoin].flat()];
+  } else if (_isChainBitcoinCompatible(chainInfo)) {
+    return [bitcoin, [...evm, ...substrate, ...ton, ...cardano, ..._bitcoin].flat()];
+  } else if (_isChainTonCompatible(chainInfo)) {
+    return [ton, [...bitcoin, ...evm, ...substrate, ...cardano, ..._bitcoin].flat()];
+  } else if (_isChainCardanoCompatible(chainInfo)) {
+    return [cardano, [...bitcoin, ...evm, ...substrate, ...ton, ..._bitcoin].flat()];
+  } else {
+    const [fetchList, unFetchList] = processEvmAndSubstrateAddresses(substrate, chainInfo);
+
+    return [fetchList, [...unFetchList, ...bitcoin, ...evm, ...ton, ...cardano, ..._bitcoin].flat()];
+  }
+};
+
+const processEvmAndSubstrateAddresses = (addressList: string[], chainInfo: _ChainInfo): [string[], string[]] => {
+  const fetchList: string[] = [];
+  const unFetchList: string[] = [];
+  const isEvm = isEthereumAddress(addressList[0]);
+
+  addressList.forEach((address) => {
+    const account = getAccountJsonByAddress(address);
+
+    if (account) {
+      if (account.isHardware) {
+        if (isEvm) {
+          if (account.isGeneric && account.isSubstrateECDSA) {
+            if (_isSubstrateEvmCompatibleChain(chainInfo)) {
+              fetchList.push(address);
+            } else {
+              unFetchList.push(address);
+            }
+          } else {
+            fetchList.push(address);
+          }
+        } else {
+          if (account.isGeneric) {
+            fetchList.push(address);
+          } else {
+            const availGen = account.availableGenesisHashes || [];
+            const gen = _getSubstrateGenesisHash(chainInfo);
+
+            if (availGen.includes(gen)) {
+              fetchList.push(address);
+            } else {
+              unFetchList.push(address);
+            }
+          }
+        }
+      } else {
+        fetchList.push(address);
+      }
+    } else {
+      fetchList.push(address);
+    }
+  });
+
+  return [fetchList, unFetchList];
 };

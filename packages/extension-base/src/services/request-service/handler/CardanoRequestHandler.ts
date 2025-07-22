@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano } from '@subwallet/extension-base/background/KoniTypes';
+import { FixedTransaction, TransactionWitnessSet, Vkeywitnesses } from '@emurgo/cardano-serialization-lib-nodejs';
+import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano, ResponseCardanoSignData } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
@@ -19,7 +20,8 @@ export default class CardanoRequestHandler {
   private readonly confirmationsQueueSubjectCardano = new BehaviorSubject<ConfirmationsQueueCardano>({
     cardanoSignatureRequest: {},
     cardanoSendTransactionRequest: {},
-    cardanoWatchTransactionRequest: {}
+    cardanoWatchTransactionRequest: {},
+    cardanoSignTransactionRequest: {}
   });
 
   private readonly confirmationsPromiseMap: Record<string, { resolver: Resolver<any>, validator?: (rs: any) => Error | undefined }> = {};
@@ -144,9 +146,11 @@ export default class CardanoRequestHandler {
   private async decorateResult<T extends ConfirmationTypeCardano> (t: T, request: ConfirmationDefinitionsCardano[T][0], result: ConfirmationDefinitionsCardano[T][1]) {
     if (result.payload === '') {
       if (t === 'cardanoSignatureRequest') {
-        // result.payload = await this.signMessage(request as ConfirmationDefinitions['evmSignatureRequest'][0]);
+        result.payload = this.signMessage(request as ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]);
       } else if (t === 'cardanoSendTransactionRequest') {
         result.payload = this.signTransactionCardano(request as ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]);
+      } else if (t === 'cardanoSignTransactionRequest') {
+        result.payload = this.signDappTransactionCardano(request as ConfirmationDefinitionsCardano['cardanoSignTransactionRequest'][0]);
       }
 
       if (t === 'cardanoSignatureRequest' || t === 'cardanoSendTransactionRequest') {
@@ -159,6 +163,17 @@ export default class CardanoRequestHandler {
     }
   }
 
+  private signMessage (confirmation: ConfirmationDefinitionsCardano['cardanoSignatureRequest'][0]): ResponseCardanoSignData {
+    const { address: addressToSign, currentAddress, payload } = confirmation.payload;
+    const pair = keyring.getPair(currentAddress);
+
+    if (pair.isLocked) {
+      keyring.unlockPair(pair.address);
+    }
+
+    return pair.cardano.signMessage(payload as string, addressToSign);
+  }
+
   private signTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSendTransactionRequest'][0]): string { // alibaba
     const transaction = confirmation.payload;
     const { cardanoPayload, from } = transaction;
@@ -169,7 +184,33 @@ export default class CardanoRequestHandler {
       keyring.unlockPair(pair.address);
     }
 
-    return pair.cardano.sign(cardanoPayload);
+    return pair.cardano.signTransaction(cardanoPayload);
+  }
+
+  private signDappTransactionCardano (confirmation: ConfirmationDefinitionsCardano['cardanoSignTransactionRequest'][0]): string { // alibaba
+    const transaction = confirmation.payload;
+    const { addressRequireKeyTypes, cardanoPayload, from } = transaction;
+    const vkeyWitnessesFinal = Vkeywitnesses.new();
+    const txWitnessSet = FixedTransaction.from_hex(cardanoPayload).witness_set() ?? TransactionWitnessSet.new();
+
+    const pair = keyring.getPair(from);
+
+    if (pair.isLocked) {
+      keyring.unlockPair(pair.address);
+    }
+
+    const keyTypes = [...new Set(addressRequireKeyTypes)];
+    const vKeyWitnessesHex = pair.cardano.signTransaction(cardanoPayload, { needVkeywitness: true, keyTypes });
+
+    const vKeyWitnesses = Vkeywitnesses.from_hex(vKeyWitnessesHex);
+
+    for (let i = 0; i < vKeyWitnesses.len(); i++) {
+      vkeyWitnessesFinal.add(vKeyWitnesses.get(i));
+    }
+
+    txWitnessSet.set_vkeys(vkeyWitnessesFinal);
+
+    return txWitnessSet.to_hex();
   }
 
   public resetWallet () {

@@ -1,15 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
+import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtRequest, BitcoinSignPsbtResult, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
-import { BACKEND_API_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
-import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthMiddleware, validationAuthWCMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
+import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import BuyService from '@subwallet/extension-base/services/buy-service';
@@ -33,6 +36,7 @@ import NotificationService from '@subwallet/extension-base/services/notification
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
+import { convertAssetToValue, convertValueToAsset, extractKeyHashesFromCollaterals, extractKeyHashesFromRequiredSigners, extractKeyHashesFromScripts, extractKeyHashesFromWithdrawals, extractKeyHashFromCertificate, getBalanceAddressMap } from '@subwallet/extension-base/services/request-service/helper';
 import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/services/request-service/types';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
@@ -43,11 +47,14 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { isManifestV3, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
+import BigN from 'bignumber.js';
+import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
 import { t } from 'i18next';
 import { interfaces } from 'manta-extension-sdk';
@@ -140,22 +147,28 @@ export default class KoniState {
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
   private waitSleeping: Promise<void> | null = null;
   private waitStarting: Promise<void> | null = null;
+  private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
     // Init subwallet api sdk
-    subwalletApiSdk.init(BACKEND_API_URL);
+    subwalletApiSdk.init({
+      url: BACKEND_API_URL,
+      priceHistoryUrl: BACKEND_PRICE_HISTORY_URL
+    });
 
     this.providers = providers;
 
     this.eventService = new EventService();
     this.dbService = new DatabaseService(this.eventService);
     this.keyringService = new KeyringService(this);
+    this.feeService = new FeeService(this);
+    this.transactionService = new TransactionService(this);
 
     this.notificationService = new NotificationService();
     this.chainService = new ChainService(this.dbService, this.eventService);
     this.subscanService = SubscanService.getInstance();
     this.settingService = new SettingService();
-    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService);
+    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.transactionService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
     this.balanceService = new BalanceService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
@@ -166,9 +179,7 @@ export default class KoniState {
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
     this.buyService = new BuyService(this);
-    this.transactionService = new TransactionService(this);
     this.earningService = new EarningService(this);
-    this.feeService = new FeeService(this);
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
@@ -179,7 +190,9 @@ export default class KoniState {
 
     // Init state
     if (targetIsWeb) {
-      this.init().catch(console.error);
+      this.init().then(() => {
+        this.wakeup(true).catch(console.error);
+      }).catch(console.error);
     }
   }
 
@@ -299,7 +312,7 @@ export default class KoniState {
     await this.swapService.init();
     await this.inappNotificationService.init();
 
-    this.onReady();
+    // this.onReady();
     this.onAccountAdd();
     this.onAccountRemove();
 
@@ -312,6 +325,12 @@ export default class KoniState {
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
     });
+
+    // init sails
+    await sailsCache.init();
+
+    // Mark app is ready
+    this.eventService.emit('general.init', true);
   }
 
   public async initMantaPay (password: string) {
@@ -338,12 +357,6 @@ export default class KoniState {
     this.dbService.subscribeMantaPayConfig(_DEFAULT_MANTA_ZK_CHAIN, (data) => {
       this.mantaPayConfigSubject.next(data);
     });
-  }
-
-  public onReady () {
-    // Todo: Need optimize in the future to, only run important services onetime to save resources
-    // Todo: If optimize must check activity of web-runner of mobile
-    this._start().catch(console.error);
   }
 
   public updateKeyringState (isReady = true, callback?: () => void): void {
@@ -578,10 +591,10 @@ export default class KoniState {
 
     if (authUrls[shortenUrl]) {
       if (chainInfo && !_isChainEnabled(chainState)) {
-        await this.enableChain(networkKey);
+        await this.enableChainWithPriorityAssets(networkKey);
       }
 
-      authUrls[shortenUrl].currentEvmNetworkKey = networkKey;
+      authUrls[shortenUrl].currentNetworkMap.evm = networkKey;
       this.setAuthorize(authUrls);
     } else {
       throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, t('Not found {{shortenUrl}} in auth list', { replace: { shortenUrl } }));
@@ -899,6 +912,14 @@ export default class KoniState {
     return this.chainService.enableChain(chainSlug);
   }
 
+  public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
+    if (enableTokens) {
+      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+    }
+
+    return this.chainService.enableChain(chainSlug);
+  }
+
   public resetDefaultChains () {
     const defaultChains = this.getDefaultNetworkKeys();
 
@@ -935,6 +956,10 @@ export default class KoniState {
 
   public getCardanoApi (networkKey: string) {
     return this.chainService.getCardanoApi(networkKey);
+  }
+
+  public getBitcoinApi (networkKey: string) {
+    return this.chainService.getBitcoinApi(networkKey);
   }
 
   public getApiMap () {
@@ -1111,6 +1136,7 @@ export default class KoniState {
 
     const payloadValidation: PayloadValidated = {
       address,
+      type: 'evm',
       payloadAfterValidated: payload,
       method,
       errors: [],
@@ -1177,6 +1203,7 @@ export default class KoniState {
   public async evmSendTransaction (id: string, url: string, transactionParams: EvmSendTransactionParams, networkKeyInit?: string, topic?: string): Promise<string | undefined> {
     const payloadValidation: PayloadValidated = {
       errors: [],
+      type: 'evm',
       networkKey: networkKeyInit || '',
       payloadAfterValidated: transactionParams,
       address: transactionParams.from
@@ -1194,7 +1221,7 @@ export default class KoniState {
 
     if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
       if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
-        return this.requestService.addConfirmation(id, url, confirmationType, { ...result, errors: errorsFormated }, {})
+        return this.requestService.addConfirmation(id, url, confirmationType as ConfirmationType, { ...result, errors: errorsFormated }, {})
           .then(() => {
             throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
           });
@@ -1260,6 +1287,464 @@ export default class KoniState {
     });
   }
 
+  // Cardano
+  public async cardanoGetBalance (id: string, url: string, address: string): Promise<CardanoWasm.Value> {
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
+
+    let networkKey = authInfo?.currentNetworkMap.cardano;
+
+    const autoActiveChain = authInfo?.isAllowed || false;
+    const chainInfo = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
+
+    networkKey = chainInfo?.slug || 'cardano';
+    const cardanoApi = this.chainService.getCardanoApi(networkKey);
+    const networkAddress = reformatAddress(address, chainInfo?.isTestnet ? 0 : 1);
+    const balances = await cardanoApi.getBalanceMap(networkAddress);
+
+    return convertAssetToValue(balances);
+  }
+
+  public async cardanoSignData (id: string, url: string, params: RequestCardanoSignData, currentAddress: string): Promise<ResponseCardanoSignData> {
+    const { address: addressHex, payload } = params;
+    const address = convertCardanoHexToBech32(addressHex);
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'cardano',
+      payloadAfterValidated: payload,
+      errors: [],
+      networkKey: ''
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthCardanoMiddleware,
+        validationCardanoSignDataMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    const errorsFormated = convertErrorFormat(result.errors);
+    const payloadAfterValidated: CardanoSignatureRequest = {
+      ...result.payloadAfterValidated as CardanoSignatureRequest,
+      currentAddress,
+      errors: errorsFormated,
+      id
+    };
+
+    return this.requestService.addConfirmationCardano(id, url, 'cardanoSignatureRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+          }
+        } else {
+          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_DATA_DECLINED);
+        }
+      });
+  }
+
+  // Todo: Add validate for this method
+  public async cardanoSignTx (id: string, url: string, param: RequestCardanoSignTransaction, currentAddress: string): Promise<ResponseCardanoSignTransaction> {
+    const { partialSign, tx: txHex } = param;
+    const tx = CardanoWasm.Transaction.from_hex(txHex);
+    const inputs = tx.body().inputs();
+    const outputs = tx.body().outputs();
+
+    const estimateCardanoFee = tx.body().fee().to_str();
+
+    const authInfoMap = await this.getAuthList();
+    const authInfo = authInfoMap[stripUrl(url)];
+
+    if (!authInfo) {
+      throw new CardanoProviderError(CardanoProviderErrorType.REFUSED_REQUEST, t('Not found auth info'));
+    }
+
+    let requireKeyHashes: string[] = [];
+    let networkKey = authInfo?.currentNetworkMap.cardano;
+    let autoActiveChain = false;
+
+    if (authInfo?.isAllowed) {
+      autoActiveChain = true;
+    }
+
+    const currentCardanoNetwork = this.requestService.getDAppChainInfo({
+      autoActive: autoActiveChain,
+      accessType: 'cardano',
+      defaultChain: networkKey,
+      url
+    });
+
+    networkKey = currentCardanoNetwork?.slug || 'cardano';
+    const allUtxos = await this.chainService.getUtxosByAddress(currentAddress, networkKey);
+
+    const outputTransactionUnSpend = CardanoWasm.TransactionOutputs.new();
+
+    inputs.to_js_value().forEach((input) => {
+      const availableUtxo = allUtxos.find((utxo) => {
+        const txIn = utxo.input();
+
+        return txIn.transaction_id().to_hex() === input.transaction_id && txIn.index() === input.index;
+      });
+
+      if (availableUtxo) {
+        const keyHash = availableUtxo.output().address().payment_cred()?.to_keyhash()?.to_hex();
+
+        if (keyHash) {
+          requireKeyHashes.push(keyHash);
+        }
+
+        outputTransactionUnSpend.add(availableUtxo.output());
+      }
+    });
+
+    const addressInputMap = getBalanceAddressMap(outputTransactionUnSpend);
+    const addressOutputMap = getBalanceAddressMap(outputs);
+    const addressInputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
+    const addressOutputAmountMap: Record<string, AddressCardanoTransactionBalance> = {};
+    let transactionValue = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
+
+    for (const address in addressInputMap) {
+      const output = addressOutputMap[address] ?? CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('0'));
+      const input = addressInputMap[address];
+
+      const amount = input.checked_sub(output);
+
+      if (amount.is_zero()) {
+        continue;
+      }
+
+      addressInputAmountMap[address] = { values: convertValueToAsset(input) };
+      addressOutputAmountMap[address] = { values: convertValueToAsset(output) };
+
+      if (isSameAddress(currentAddress, address)) {
+        if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+          throw new CardanoProviderError(CardanoProviderErrorType.ACCOUNT_CHANGED, t('Current network is changed'));
+        }
+
+        transactionValue = transactionValue.checked_add(amount);
+        addressInputAmountMap[address].isOwner = true;
+        addressOutputAmountMap[address].isOwner = true;
+      }
+
+      // Check if address is valid with current network
+      if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with input address'));
+      }
+    }
+
+    for (const address in addressOutputMap) {
+      if (!validateAddressNetwork(address, currentCardanoNetwork)) {
+        throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Current network is not match with output address'));
+      }
+
+      if (!addressInputAmountMap[address] && !addressOutputMap[address].is_zero()) {
+        addressOutputAmountMap[address] = { values: convertValueToAsset(addressOutputMap[address]), isRecipient: true };
+      }
+    }
+
+    const transactionBody = tx.body();
+    const getSpecificUtxo = this.chainService.getSpecificUtxo.bind(this);
+
+    requireKeyHashes.push(...extractKeyHashFromCertificate(transactionBody.certs()));
+    requireKeyHashes.push(...extractKeyHashesFromWithdrawals(transactionBody.withdrawals()));
+    requireKeyHashes.push(...extractKeyHashesFromRequiredSigners(transactionBody.required_signers()));
+    requireKeyHashes.push(...(await extractKeyHashesFromCollaterals(transactionBody.collateral(), getSpecificUtxo(networkKey))));
+    requireKeyHashes.push(...extractKeyHashesFromScripts(tx.witness_set().native_scripts()));
+
+    requireKeyHashes = [...new Set(requireKeyHashes)];
+    const addressRequireKeyTypes: CardanoKeyType[] = [];
+    const keyHashAddressMap: Record<string, CardanoKeyType> = {};
+
+    const pair = keyring.getPair(currentAddress);
+
+    if (pair) {
+      const paymentPubKey = CardanoWasm.Bip32PublicKey.from_hex(pair.cardano.paymentPubKey).to_raw_key().hash().to_hex();
+      const stakePubKey = CardanoWasm.Bip32PublicKey.from_hex(pair.cardano.stakePubKey).to_raw_key().hash().to_hex();
+
+      keyHashAddressMap[paymentPubKey] = 'payment';
+      keyHashAddressMap[stakePubKey] = 'stake';
+    } else {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST);
+    }
+
+    const needForeignKeyHash = requireKeyHashes.some((key) => {
+      const ownKeyHash = keyHashAddressMap[key];
+
+      if (ownKeyHash) {
+        addressRequireKeyTypes.push(ownKeyHash);
+
+        return false;
+      }
+
+      return true;
+    });
+
+    const needOwnerKeyHash = requireKeyHashes.some((key) => {
+      const ownKeyHash = keyHashAddressMap[key];
+
+      if (ownKeyHash) {
+        addressRequireKeyTypes.push(ownKeyHash);
+
+        return true;
+      }
+
+      return false;
+    });
+
+    if (!needOwnerKeyHash) {
+      throw new CardanoProviderError(CardanoProviderErrorType.PROOF_GENERATION_FAILED, t('Not found owner key hash'));
+    }
+
+    if (needForeignKeyHash && !partialSign) {
+      throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, 'Not support foreign key hash yet');
+    }
+
+    const result: CardanoTransactionDappConfig = {
+      id,
+      txInputs: addressInputAmountMap,
+      txOutputs: addressOutputAmountMap,
+      addressRequireKeyTypes,
+      value: convertValueToAsset(transactionValue),
+      estimateCardanoFee,
+      from: currentAddress,
+      cardanoPayload: txHex,
+      networkKey
+    };
+
+    return this.requestService.addConfirmationCardano(id, url, 'cardanoSignTransactionRequest', result, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, t('Not found signature'));
+          }
+        } else {
+          throw new CardanoProviderError(CardanoProviderErrorType.SIGN_TRANSACTION_DECLINED);
+        }
+      });
+  }
+
+  public async cardanoSubmitTx (id: string, url: string, txHex: string): Promise<string> {
+    const currentNetwork = this.requestService.getDAppChainInfo({
+      autoActive: true,
+      accessType: 'cardano',
+      url
+    });
+
+    const networkKey = currentNetwork?.slug || 'cardano_preproduction';
+
+    const cardanoApi = this.chainService.getCardanoApi(networkKey);
+
+    return await cardanoApi.sendCardanoTxReturnHash(txHex);
+  }
+
+  // Bitcoin
+  public async bitcoinSign (id: string, url: string, method: string, params: BitcoinSignMessageParams): Promise<BitcoinSignMessageResult> {
+    const { address, message } = params;
+
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'bitcoin',
+      payloadAfterValidated: message,
+      errors: [],
+      networkKey: ''
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinSignMessageMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    const errorsFormated = convertErrorFormat(result.errors);
+    const payloadAfterValidated: BitcoinSignatureRequest = {
+      ...result.payloadAfterValidated as BitcoinSignatureRequest,
+      errors: errorsFormated,
+      id
+    };
+
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignatureRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
+  public async bitcoinSignPspt (id: string, url: string, params: BitcoinSignPsbtParams): Promise<BitcoinSignPsbtResult> {
+    const { address, network, psbt } = params;
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'bitcoin',
+      payloadAfterValidated: params,
+      errors: [],
+      networkKey: network === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet'
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinConnectMiddleware,
+        validationBitcoinSignPsbtMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    const errorsFormated = convertErrorFormat(result.errors);
+
+    const payloadAfterValidated: BitcoinSignPsbtRequest = {
+      ...result.payloadAfterValidated as BitcoinSignPsbtRequest,
+      errors: errorsFormated
+    };
+    const network_ = network === 'mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
+    const psbtGenerate = bitcoin.Psbt.fromHex(psbt, {
+      network: network_
+    });
+
+    const isExistedInput = (inputs: PsbtTransactionArg[], address: string) => inputs.findIndex(({ address: address_ }) => isSameAddress(address, address_ || ''));
+    let to = '';
+    const tokenInfo = this.getNativeTokenInfo(result.networkKey);
+    let value = new BigN(0);
+    const totalBalance = await this.balanceService.getTotalBalance(address, result.networkKey, tokenInfo.slug);
+    let inputAmount = new BigN(0);
+    const psbtInputData = psbtGenerate.data.inputs.reduce((inputs, { nonWitnessUtxo, witnessUtxo }, inputIndex) => {
+      let inputData: PsbtTransactionArg | null = null;
+
+      if (witnessUtxo) {
+        inputData = {
+          address: bitcoin.address.fromOutputScript(witnessUtxo?.script, network_),
+          amount: witnessUtxo.value.toString()
+        };
+      } else if (nonWitnessUtxo) {
+        const txin = psbtGenerate.txInputs[inputIndex];
+        const txout = bitcoin.Transaction.fromBuffer(nonWitnessUtxo).outs[txin.index];
+
+        inputData = {
+          address: bitcoin.address.fromOutputScript(txout.script, network_),
+          amount: txout.value.toString()
+        };
+      }
+
+      if (inputData) {
+        inputs.push(inputData);
+
+        if (isSameAddress(address, inputData.address || '')) {
+          inputAmount = inputAmount.plus(new BigN(inputData.amount || '0'));
+        }
+      }
+
+      return inputs;
+    }, [] as PsbtTransactionArg[]);
+
+    if (new BigN(totalBalance.value).lt(inputAmount)) {
+      payloadAfterValidated.errors = [{ message: t('Insufficient balance'), name: t('Unable to sign transaction') }];
+    }
+
+    const psbtOutputData = psbtGenerate.txOutputs.map((output) => {
+      let address = '';
+
+      try {
+        address = output.address || bitcoin.address.fromOutputScript(output.script, network_);
+      } catch (e) {
+        if (output.script.includes(bitcoin.opcodes.OP_RETURN)) {
+          address = 'OP_RETURN';
+        } else {
+          address = 'Unknown';
+        }
+      }
+
+      if (isExistedInput(psbtInputData, address) === -1) {
+        to = address;
+        value = value.plus(new BigN(output.value));
+      }
+
+      return {
+        address,
+        amount: output.value.toString()
+      } as PsbtTransactionArg;
+    });
+
+    payloadAfterValidated.payload = {
+      ...payloadAfterValidated.payload,
+      psbt,
+      tokenSlug: tokenInfo.slug,
+      value: value.toString(),
+      to,
+      txInput: psbtInputData,
+      txOutput: psbtOutputData
+    };
+
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignPsbtRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
+  public async bitcoinSendTransaction (id: string, url: string, transactionParams: BitcoinSendTransactionParams): Promise<string | undefined> {
+    const payloadValidation: PayloadValidated = {
+      address: transactionParams.account,
+      type: 'bitcoin',
+      payloadAfterValidated: transactionParams,
+      errors: [],
+      networkKey: transactionParams.network === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet'
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinConnectMiddleware,
+        validationBitcoinSendTransactionMiddleware
+      ];
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+    const errorsFormated = convertErrorFormat(result.errors);
+    const requestPayload: BitcoinSendTransactionRequest = {
+      ...result.payloadAfterValidated as BitcoinSendTransactionRequest,
+      hashPayload: JSON.stringify(result.payloadAfterValidated),
+      from: transactionParams.account,
+      id,
+      errors: errorsFormated
+    };
+
+    // Custom handle this instead of general handler transaction
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSendTransactionRequestAfterConfirmation', requestPayload, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
   public getConfirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {
     return this.requestService.confirmationsQueueSubject;
   }
@@ -1270,6 +1755,10 @@ export default class KoniState {
 
   public getConfirmationsQueueSubjectCardano (): BehaviorSubject<ConfirmationsQueueCardano> {
     return this.requestService.confirmationsQueueSubjectCardano;
+  }
+
+  public getConfirmationsQueueSubjectBitcoin (): BehaviorSubject<ConfirmationsQueueBitcoin> {
+    return this.requestService.confirmationsQueueSubjectBitcoin;
   }
 
   public async completeConfirmation (request: RequestConfirmationComplete) {
@@ -1284,18 +1773,15 @@ export default class KoniState {
     return await this.requestService.completeConfirmationCardano(request);
   }
 
+  public async completeConfirmationBitcoin (request: RequestConfirmationCompleteBitcoin) {
+    return await this.requestService.completeConfirmationBitcoin(request);
+  }
+
   private async onMV3Update () {
     const migrationStatus = await SWStorage.instance.getItem('mv3_migration');
 
     if (!migrationStatus || migrationStatus !== 'done') {
-      if (isManifestV3) {
-        // Open migration tab
-        const url = `${chrome.runtime.getURL('index.html')}#/mv3-migration`;
-
-        await openPopup(url);
-
-        // migrateMV3LocalStorage will be called when user open migration tab with data from localStorage on frontend
-      } else {
+      if (!isManifestV3) {
         this.migrateMV3LocalStorage(JSON.stringify(self.localStorage)).catch(console.error);
       }
     }
@@ -1468,8 +1954,12 @@ export default class KoniState {
   }
 
   public async sleep () {
+    // Wait for app initialized before sleep
+    await this.eventService.waitAppInitialized;
+
     // Wait starting finish before sleep to avoid conflict
     this.generalStatus === ServiceStatus.STARTING && this.waitStarting && await this.waitStarting;
+    this.generalStatus === ServiceStatus.STARTING_FULL && this.waitStartingFull && await this.waitStartingFull;
     this.eventService.emit('general.sleep', true);
 
     // Avoid sleep multiple times
@@ -1502,6 +1992,9 @@ export default class KoniState {
   }
 
   private async _start () {
+    // Wait for app initialized before start
+    await this.eventService.waitAppInitialized;
+
     // Wait sleep finish before start to avoid conflict
     this.generalStatus === ServiceStatus.STOPPING && this.waitSleeping && await this.waitSleeping;
 
@@ -1530,16 +2023,44 @@ export default class KoniState {
     }
 
     // Start services
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start', true);
 
     // Complete starting
-    starting.resolve();
     this.waitStarting = null;
     this.generalStatus = ServiceStatus.STARTED;
+    starting.resolve();
   }
 
-  public async wakeup () {
+  private async _startFull () {
+    // Continue wait existed starting process
+    if (this.generalStatus === ServiceStatus.STARTING) {
+      await this.waitStarting;
+    }
+
+    // Always start full from start state
+    if (this.generalStatus !== ServiceStatus.STARTED) {
+      return;
+    }
+
+    this.generalStatus = ServiceStatus.STARTING_FULL;
+    const startingFull = createPromiseHandler<void>();
+
+    this.waitStartingFull = startingFull.promise;
+
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start_full', true);
+
+    this.waitStartingFull = null;
+    this.generalStatus = ServiceStatus.STARTED_FULL;
+    startingFull.resolve();
+  }
+
+  public async wakeup (fullWakeup = false) {
     await this._start();
+
+    if (fullWakeup) {
+      await this._startFull();
+    }
   }
 
   public cancelSubscription (id: string): boolean {
@@ -1575,9 +2096,16 @@ export default class KoniState {
     return result;
   }
 
+  scanAddressOnAdd: string[] = [];
+
   public onAccountAdd () {
     this.eventService.on('account.add', (address) => {
-      this.balanceService.autoEnableChains([address]).catch(this.logger.error);
+      this.scanAddressOnAdd.push(address);
+
+      addLazy('autoScanBalanceOnAdd', () => {
+        this.balanceService.autoEnableChains(this.scanAddressOnAdd).catch(this.logger.error);
+        this.scanAddressOnAdd = [];
+      }, 500, 5000, false);
     });
   }
 

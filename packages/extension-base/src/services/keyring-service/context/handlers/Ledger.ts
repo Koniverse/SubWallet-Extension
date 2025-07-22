@@ -3,7 +3,7 @@
 
 import { RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2 } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { KeyringPair, KeyringPair$Meta } from '@subwallet/keyring/types';
+import { KeypairType, KeyringPair, KeyringPair$Meta } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
@@ -86,7 +86,7 @@ export class AccountLedgerHandler extends AccountBaseHandler {
     const pairs: KeyringPair[] = [];
 
     for (const account of accounts) {
-      const { accountIndex, address, addressOffset, genesisHash, hardwareType, isEthereum, isGeneric, isLedgerRecovery, name, originGenesisHash } = account;
+      const { accountIndex, address, addressOffset, genesisHash, hardwareType, isEthereum, isGeneric, isLedgerRecovery, isSubstrateECDSA, name, originGenesisHash } = account;
 
       const baseMeta: KeyringPair$Meta = {
         name,
@@ -96,10 +96,16 @@ export class AccountLedgerHandler extends AccountBaseHandler {
         genesisHash,
         originGenesisHash,
         isGeneric,
-        isLedgerRecovery
+        isLedgerRecovery,
+        isSubstrateECDSA
       };
 
-      const type = isEthereum ? 'ethereum' : 'sr25519';
+      let type: KeypairType = 'sr25519';
+
+      if (isEthereum || isSubstrateECDSA) {
+        type = 'ethereum';
+      }
+
       const pair = keyring.keyring.createFromAddress(
         address,
         {
@@ -151,7 +157,7 @@ export class AccountLedgerHandler extends AccountBaseHandler {
 
     if (Object.keys(slugMap).length) {
       for (const chainSlug of Object.keys(slugMap)) {
-        this.state.enableChain(chainSlug);
+        this.state.enableChainWithPriorityAssets(chainSlug);
       }
     }
 

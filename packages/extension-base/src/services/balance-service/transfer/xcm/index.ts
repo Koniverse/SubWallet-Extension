@@ -2,17 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
+import { buildXcm, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { combineEthFee } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -32,7 +35,7 @@ export type CreateXcmExtrinsicProps = {
   feeInfo: FeeInfo;
 } & TransactionFee;
 
-export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig>;
+export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig | undefined>;
 
 // SnowBridge
 export const createSnowBridgeExtrinsic = async ({ destinationChain,
@@ -60,6 +63,7 @@ export const createSnowBridgeExtrinsic = async ({ destinationChain,
   return getSnowBridgeEvmTransfer(originTokenInfo, originChain, destinationChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
 
+// deprecated
 export const createXcmExtrinsic = async ({ destinationChain,
   originChain,
   originTokenInfo,
@@ -150,4 +154,94 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
       : _createPosBridgeL1toL2Extrinsic;
 
   return createExtrinsic(originTokenInfo, originChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
+};
+
+export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'> | undefined> => {
+  try {
+    return await buildXcm(request);
+  } catch (e) {
+    console.log('createXcmExtrinsicV2 error: ', e);
+
+    return undefined;
+  }
+};
+
+export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
+  try {
+    const dryRunResult = await dryRunXcm(request);
+    const originDryRunRs = dryRunResult.origin;
+
+    if (originDryRunRs.success) {
+      const { assetHub, bridgeHub, destination } = dryRunResult;
+
+      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
+        if (destination?.success === false) {
+          // pass dry-run in these cases
+          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
+        }
+
+        return false;
+      }
+
+      return true;
+    }
+
+    // pass dry-run in these cases
+    return isChainNotSupportDryRun(originDryRunRs.failureReason) || isChainNotSupportPolkadotApi(originDryRunRs.failureReason);
+  } catch (e) {
+    return false;
+  }
+};
+
+export const createAcrossBridgeExtrinsic = async ({ destinationChain,
+  destinationTokenInfo,
+  evmApi,
+  feeCustom,
+  feeInfo,
+  feeOption,
+  originChain,
+  originTokenInfo,
+  recipient,
+  sender,
+  sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  const isAcrossBridgeXcm = _isAcrossBridgeXcm(originChain, destinationChain);
+
+  if (!isAcrossBridgeXcm) {
+    throw new Error('This is not a valid AcrossBridge transfer');
+  }
+
+  if (!evmApi) {
+    throw new Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw new Error('Sender is required');
+  }
+
+  try {
+    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+
+    const _feeCustom = feeCustom as EvmEIP1559FeeOption;
+    const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
+
+    if (!data) {
+      throw new Error('Failed to fetch Across Bridge Data. Please try again later');
+    }
+
+    const transactionConfig: TransactionConfig = {
+      from: data.sender,
+      to: data.to,
+      value: data.value,
+      data: data.transferEncodedCall,
+      ...feeCombine
+    };
+
+    const gasLimit = await evmApi.api.eth.estimateGas(transactionConfig).catch(() => 200000);
+
+    transactionConfig.gas = gasLimit.toString();
+
+    return transactionConfig;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };

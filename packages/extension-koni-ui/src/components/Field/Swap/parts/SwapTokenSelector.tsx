@@ -78,9 +78,8 @@ const Component = (props: Props) => {
         balanceInfo={item.balanceInfo}
         chainName={_getChainName(chainInfoMap[item.originChain])}
         chainSlug={item.originChain}
-        className={CN('token-selector-item', {
-          '-selected': value === item.slug
-        })}
+        className={CN('token-selector-item')}
+        isSelected={value === item.slug}
         key={item.slug}
         onClick={onClickItem(item)}
         showBalance={true}
@@ -191,6 +190,12 @@ const Component = (props: Props) => {
     return result;
   }, [items, selectedItem, currentSearchText, hasAnyFilterValue, filterFunction, searchFunction]);
 
+  const filterSearchBox = useMemo(() => {
+    return {
+      placeholder: t('Search network')
+    };
+  }, [t]);
+
   return (
     <>
       <div
@@ -218,7 +223,7 @@ const Component = (props: Props) => {
                     token={selectedItem.slug.toLowerCase()}
                   />
                   <div className={'__item-token-info'}>
-                    <span>{selectedItem.symbol}</span>
+                    <span className={'__item-token-symbol'}>{selectedItem.symbol}</span>
                     <span className={'__item-token-name'}>{chainInfoMap[selectedItem.originChain]?.name}</span>
                   </div>
                 </div>
@@ -277,6 +282,7 @@ const Component = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
+        searchBox={filterSearchBox}
       />
     </>
   );
@@ -287,8 +293,6 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
     '&.-modal-trigger': {
       display: 'flex',
       alignItems: 'center',
-      paddingLeft: token.padding,
-      paddingRight: token.padding,
       cursor: 'pointer',
 
       '.__modal-trigger-content': {
@@ -311,6 +315,15 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
         flexDirection: 'column',
         color: token.colorWhite,
         overflow: 'hidden'
+      },
+
+      '.__item-token-symbol': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
       },
 
       '.__item-token-name': {
@@ -365,10 +378,6 @@ const SwapTokenSelector = styled(Component)<Props>(({ theme: { token } }: Props)
         flex: 1,
         overflow: 'auto',
         paddingBottom: token.padding
-      },
-
-      '.token-selector-item.-selected': {
-        backgroundColor: token.colorBgInput
       },
 
       '.token-selector-item + .token-selector-item': {

@@ -120,6 +120,8 @@ export interface InjectedWindow extends This {
   injectedWeb3: Record<string, InjectedWindowProvider>;
   ethereum: EvmProvider;
   SubWallet: EvmProvider;
+  cardano: Record<string, CardanoProvider>,
+  SubWalletBitcoin: BitcoinProvider
 }
 
 export type InjectedExtension = InjectedExtensionInfo & Injected;
@@ -150,4 +152,31 @@ export interface EIP6963AnnounceProviderEvent extends CustomEvent {
 
 export interface EIP6963RequestProviderEvent extends Event {
   type: 'eip6963:requestProvider';
+}
+
+export interface CardanoExtensionCIP {
+  cip: number
+}
+
+export interface CardanoProvider {
+  apiVersion: string;
+  name: string;
+  icon: string;
+  enable: () => Promise<unknown>;
+  supportedExtensions: CardanoExtensionCIP[];
+  isEnable: () => Promise<boolean>;
+}
+
+export interface BitcoinProvider {
+  isSubWallet: boolean;
+  requestAccounts: () => Promise<any[]>;
+  getAccounts: () => Promise<any[]>;
+  signPsbt (params: any): Promise<any>;
+  signMessage (params: any): Promise<any>;
+  sendTransfer (params: any): Promise<any>;
+  request: <T>(method: string, params?: any) => Promise<T>;
+  getProductInfo: () => {
+    name: string;
+    version: string;
+  };
 }

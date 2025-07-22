@@ -4,16 +4,24 @@ This is a basic extension injector that manages access to the global objects ava
 
 ## Usage
 
-```js
+```ts
 import { injectExtension } from '@subwallet/extension-inject';
 
-// this a the function that will be exposed to be callable by the dapp. It resolves a promise
+// This a the function that will be exposed to be callable by the dapp. It resolves a promise
 // with the injected interface, (see `Injected`) when the dapp at `originName` (url) is allowed
 // to access functionality
-function enableFn (originName: string): Promise<Injected> {
+function enable (originName: string, option?: AuthRequestOption ): Promise<Injected> {
   ...
 }
 
+// Additionally, this function provides an options parameter
+// that allows DApps to actively request the desired address type of the unified account,
+// including substrate format, evm format, or both.
+interface AuthRequestOption {
+  accountAuthType: 'substrate' | 'both' | 'evm';
+}
+
+
 // injects the extension into the page
-injectExtension(enableFn, { name: 'myExtension', version: '1.0.1' });
+injectExtension(enable, { name: 'myExtension', version: '1.0.1' });
 ```

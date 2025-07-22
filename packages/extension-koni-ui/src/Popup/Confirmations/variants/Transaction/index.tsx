@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { SubmitApiArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -18,8 +19,8 @@ import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -44,6 +45,8 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return BondTransactionConfirmation;
     case ExtrinsicType.STAKING_UNBOND:
       return UnbondTransactionConfirmation;
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
+      return ChangeEarningValidatorTransactionConfirmation;
     case ExtrinsicType.STAKING_WITHDRAW:
     case ExtrinsicType.STAKING_POOL_WITHDRAW:
       return WithdrawTransactionConfirmation;
@@ -211,6 +214,17 @@ const Component: React.FC<Props> = (props: Props) => {
         )
       }
       {
+        (type === 'submitApiRequest') && (
+          <SubmitApiArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitions['submitApiRequest'][0])}
+            txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
         (type === 'tonSendTransactionRequest' || type === 'tonWatchTransactionRequest') && (
           <TonSignArea
             extrinsicType={transaction.extrinsicType}
@@ -228,6 +242,16 @@ const Component: React.FC<Props> = (props: Props) => {
             id={item.id}
             payload={(item as ConfirmationDefinitionsCardano['cardanoSendTransactionRequest' | 'cardanoWatchTransactionRequest'][0])}
             txExpirationTime={txExpirationTime}
+            type={type}
+          />
+        )
+      }
+      {
+        (type === 'bitcoinSignatureRequest' || type === 'bitcoinSendTransactionRequest' || type === 'bitcoinWatchTransactionRequest' || type === 'bitcoinSignPsbtRequest') && (
+          <BitcoinSignArea
+            extrinsicType={transaction.extrinsicType}
+            id={item.id}
+            payload={(item as ConfirmationDefinitionsBitcoin['bitcoinSignatureRequest' | 'bitcoinSendTransactionRequest' | 'bitcoinWatchTransactionRequest' | 'bitcoinSignPsbtRequest'][0])}
             type={type}
           />
         )

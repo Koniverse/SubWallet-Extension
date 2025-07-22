@@ -100,19 +100,19 @@ export async function getClaimTxOnAvail (notification: _NotificationInfo, substr
   const chainApi = await substrateApi.isReady;
   const chainSlug = chainApi.chainSlug;
   const metadata = notification.metadata as ClaimAvailBridgeNotificationMetadata;
-  const lastestEthHeadSlot = await getLastestEthHeadSlot(chainSlug);
-  const lastestBlockHash = await getLastestBlockHash(chainSlug, lastestEthHeadSlot);
-  const proof = await getClaimProofOnAvail(chainSlug, lastestBlockHash, metadata.messageId);
+  const latestEthHeadSlot = await getLatestEthHeadSlot(chainSlug);
+  const latestBlockHash = await getLatestBlockHash(chainSlug, latestEthHeadSlot);
+  const proof = await getClaimProofOnAvail(chainSlug, latestBlockHash, metadata.messageId);
 
   return chainApi.api.tx.vector.execute(
-    lastestEthHeadSlot,
+    latestEthHeadSlot,
     getAddressMessage(notification),
     proof.accountProof,
     proof.storageProof
   );
 }
 
-async function getLastestEthHeadSlot (chainSlug: string) {
+async function getLatestEthHeadSlot (chainSlug: string) {
   try {
     const api = getAvailBridgeApi(chainSlug);
     const rawResponse = await fetch(`${api}/eth/head`);
@@ -125,7 +125,7 @@ async function getLastestEthHeadSlot (chainSlug: string) {
   }
 }
 
-async function getLastestBlockHash (chainSlug: string, slot: number) {
+async function getLatestBlockHash (chainSlug: string, slot: number) {
   try {
     const api = getAvailBridgeApi(chainSlug);
     const rawResponse = await fetch(`${api}/beacon/slot/${slot}`);
