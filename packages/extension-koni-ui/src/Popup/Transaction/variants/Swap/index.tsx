@@ -272,6 +272,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     return accountProxyByFromValue?.accountProxyId || targetAccountProxy.id;
   }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
+  // todo: Optimize assetItems filtering for improved performance. Utilize swappableSlugsSet or pairMap instead of using the whole assetRegistryMap
   const assetItems = useMemo<_ChainAsset[]>(() => {
     const result: _ChainAsset[] = [];
 
