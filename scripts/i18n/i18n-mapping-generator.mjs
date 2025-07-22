@@ -31,7 +31,7 @@ function loadTranslations() {
         }
       });
     } catch (err) {
-      console.warn(`Không đọc được file ${lng}:`, err.message);
+      console.warn(`Failed to read ${lng}:`, err.message);
     }
   });
 
@@ -48,23 +48,23 @@ async function main() {
     return;
   }
 
+  // Log for dev
   console.log('========================================= sourceLocations ====================================', sourceLocations);
 
   // Convert Map to a plain object for serialization
   const translationsObject = Object.fromEntries(sourceLocations);
   const translationKeys = Object.keys(translationsObject);
   const translations = loadTranslations();
-  // 3. Kết hợp dữ liệu
+
   const combinedData = {};
 
-  // Xử lý các key từ source code
+
   Object.keys(translationsObject).forEach(key => {
     combinedData[key] = {
-      locations: [...new Set(translationsObject[key])], // Loại bỏ trùng lặp
-      translations: translations[key] || {} // Thêm thông tin dịch nếu có
+      locations: [...new Set(translationsObject[key])],
+      translations: translations[key] || {}
     };
 
-    // Nếu key chưa có trong translations, thêm vào với giá trị mặc định
     if (!translations[key]) {
       LANGUAGES.forEach(lng => {
         if (!combinedData[key].translations[lng]) {
@@ -75,12 +75,10 @@ async function main() {
   });
 
   try {
-    // Ghi các key vào file translation-keys.json
     fs.writeFileSync(rawI18nStringsPath, JSON.stringify(translationKeys, null, 2), 'utf-8');
     console.log(`Successfully wrote rawContentI18nFilePath to ${rawI18nStringsPath}`);
 
 
-    // Write to file rawTextMetaMappingPath
     fs.writeFileSync(rawTextMetaMappingPath, JSON.stringify(combinedData, null, 2), 'utf-8');
     console.log(`Successfully wrote textToKeyFile to ${rawTextMetaMappingPath}`);
   } catch (error) {
@@ -91,7 +89,6 @@ async function main() {
   try {
 
     const filePathsData = [...new Set(Object.values(translationsObject).flat())];
-    // Write to file asynchronously
     fs.writeFileSync(rawFilePathsPath, JSON.stringify(filePathsData, null, 2), 'utf-8');
 
     console.log(`Successfully wrote locationFilePaths to ${rawFilePathsPath}`);

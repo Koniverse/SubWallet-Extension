@@ -63,7 +63,7 @@ function generateReplacementPatterns(originalText, key) {
     replacement: `t('${key}')`
   });
 
-  // 2. t() with type parameter
+  // 2. t<string>()
   patterns.push({
     regex: new RegExp(`t<\\w+>\\(['"]${escapedText}['"]\\)`, 'g'),
     replacement: `t<string>('${key}')`
@@ -78,6 +78,12 @@ function generateReplacementPatterns(originalText, key) {
   // 4. t() with object (replace: {...} )
   patterns.push({
     regex: new RegExp(`t\\(['"\`]${escapedText}['"\`],\\s*(\\{[\\s\\S]*?\\})\\)`, 'g'),
+    replacement: `t('${key}', $1)`
+  });
+
+  // 5. t<string>() with object (replace: {...} )
+  patterns.push({
+    regex: new RegExp(`t<\\w+>\\(['"\`]${escapedText}['"\`],\\s*(\\{[\\s\\S]*?\\})\\)`, 'g'),
     replacement: `t('${key}', $1)`
   });
 

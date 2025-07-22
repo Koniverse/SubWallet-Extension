@@ -34,22 +34,22 @@ function readExistingData(filePath) {
 
 async function main() {
   try {
-    // 1. Đọc dữ liệu hiện có (nếu có)
+    // 1. Read existing data (if available)
     const existingData = readExistingData(outputFilePath);
 
-    // 1. Đọc các file mapping với validation
+    // 2. Read mapping files with validation
     const textToLocations = readJsonFile(textToFilepaths);
     const filepathToNamespace = readJsonFile(filepathToNamespaceFile);
     const textToKey = readJsonFile(mappingRawContentI18nFilePath);
 
-    // 2. Khởi tạo kết quả và thống kê
+    // 3. Initialize result and statistics
     const combinedData = {...existingData};
     const skippedTexts = [];
     const missingNamespaces = [];
     const updatedTexts = [];
     const newTexts = [];
 
-    // 3. Xử lý từng text key
+    // 4. Process each text key
     for (const [textKey, data] of Object.entries(textToLocations)) {
       const camelCaseKey = textToKey[textKey];
       const { locations, translations } = data;
@@ -59,7 +59,7 @@ async function main() {
         continue;
       }
 
-      // Xử lý locations
+      // Process locations
       const processedLocations = locations.map(filepath => {
         const namespace = filepathToNamespace[filepath];
 
@@ -77,26 +77,36 @@ async function main() {
       if (processedLocations.length > 0) {
         const newEntry = {
           locations: processedLocations,
-          translations: translations || {} // Đảm bảo luôn có translations
+          translations: translations || {}
         };
 
         if (textKey in combinedData) {
-          // Nếu textKey đã tồn tại, merge locations và translations
+          // If textKey already exists, merge locations and translations
           const existingEntry = combinedData[textKey];
+
+          // Merge existing and new locations while removing duplicates based on filepath and key
+          const mergedLocations = Array.from(
+            new Map(
+              [...existingEntry.locations, ...newEntry.locations].map(loc => {
+                return [loc.filepath, loc];
+              })
+            ).values()
+          );
+
           combinedData[textKey] = {
-            locations: [...existingEntry.locations, ...newEntry.locations],
+            locations: mergedLocations,
             translations: {...existingEntry.translations, ...newEntry.translations}
           };
           updatedTexts.push(textKey);
         } else {
-          // Nếu là textKey mới
+          // If textKey is new
           combinedData[textKey] = newEntry;
           newTexts.push(textKey);
         }
       }
     }
 
-    // 4. Thống kê và cảnh báo
+    // 5. Show statistics and warnings
     if (skippedTexts.length > 0) {
       console.warn(`⚠️  Skipped ${skippedTexts.length} texts without keys:`);
       console.warn(skippedTexts.slice(0, 5).join('\n'));
@@ -109,15 +119,18 @@ async function main() {
       if (missingNamespaces.length > 5) console.warn('...and more');
     }
 
-    // 5. Ghi dữ liệu kết hợp
+    // 6. Write combined data to file
     fs.writeFileSync(outputFilePath, JSON.stringify(combinedData, null, 2), 'utf-8');
 
     console.log(`✅ Successfully updated combined data at ${outputFilePath}`);
-    console.log(`ℹ️ Total entries: ${Object.keys(combinedData).length}`);
-    console.log(`ℹ️ New entries: ${newTexts.length}`);
-    console.log(`ℹ️ Updated entries: ${updatedTexts.length}`);
-    console.log(`ℹ️ Missing keys: ${skippedTexts.length}`);
-    console.log(`ℹ️ Missing namespaces: ${missingNamespaces.length}`);
+
+    console.table({
+      'Total entries': Object.keys(combinedData).length,
+      'New entries': newTexts.length,
+      'Updated entries': updatedTexts.length,
+      'Missing keys': skippedTexts.length,
+      'Missing namespaces': missingNamespaces.length
+    });
 
   } catch (error) {
     console.error('❌ Error combining data:', error);

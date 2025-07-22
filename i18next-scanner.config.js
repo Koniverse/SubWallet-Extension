@@ -69,7 +69,7 @@ function customTransform(file, enc, done) {
           .trim();
 
         // Step 2: Check if it's namespaced
-        return /^(ui|bg)\.[a-z]+(\.[a-z0-9]+)*$/i.test(cleanKey);
+        return /^(ui|bg)(\.[A-Za-z0-9_]+)+$/.test(cleanKey);
       };
 
       // Parse functions t, detectTranslate
