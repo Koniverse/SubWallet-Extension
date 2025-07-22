@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountProxyExtra, AccountProxyStoreData, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
+import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
 import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
@@ -318,7 +318,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
       const _proxyIds = proxyIds || Object.keys(_account);
       const modifyPairs: ModifyPairStoreData = Object.fromEntries(Object.entries(_modifyPair).filter(([, modifyPair]) => _proxyIds.includes(modifyPair.accountProxyId || '')));
       const accountProxies: AccountProxyStoreData = Object.fromEntries(Object.entries(_accountProxy).filter(([, proxy]) => _proxyIds.includes(proxy.id)));
-      const addresses = Object.values(_account).filter((account) => _proxyIds.includes(account.id)).flatMap((proxy) => proxy.accounts.map((account) => account.address));
+      const addresses = Object.values(_account).filter((account) => _proxyIds.includes(account.id) && account.accountType !== AccountProxyType.LEDGER).flatMap((proxy) => proxy.accounts.map((account) => account.address));
       const rs: KeyringPairs$JsonV2 = await keyring.backupAccounts(password, addresses);
 
       if (Object.keys(modifyPairs).length && Object.keys(accountProxies).length) {

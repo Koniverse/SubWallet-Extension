@@ -36,9 +36,8 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
 
   const messages = useMemo<string[]>(() => {
     return [
-      t('ui.TRANSACTION.screen.TransactionSubmission.transactionInProcessViewDetails'),
-      t('ui.TRANSACTION.screen.TransactionSubmission.hangingInThere'),
-      t('ui.TRANSACTION.screen.TransactionSubmission.proTipViewProcessDetails')
+      t('Tip: Hit “View process” to view step-by-step details of your swap'),
+      t('Hanging in there...')
     ];
   }, [t]);
 
@@ -63,7 +62,10 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
         />
       </div>
       <div className='title'>
-        {t('ui.TRANSACTION.screen.TransactionSubmission.doNotCloseApp')}
+        {t('Swap in process')}
+      </div>
+      <div className='subtitle'>
+        {t('DO NOT close the app!')}
       </div>
       <div className='description'>
         {messages[messageIndex]}
@@ -174,18 +176,18 @@ const Component: React.FC<Props> = (props: Props) => {
           ? ({
             block: true,
             onClick: goHome,
-            children: t('ui.TRANSACTION.screen.TransactionSubmission.backToHome')
+            children: t('Back to home')
           })
           : undefined}
         rightFooterButton={processData
           ? ({
             block: true,
             onClick: viewProgress,
-            children: t('ui.TRANSACTION.screen.TransactionSubmission.viewProcess')
+            children: t('View process')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={t('ui.TRANSACTION.screen.TransactionSubmission.submitted')}
+        title={isSwapProcessing ? t('Swap') : t('Submitted')}
       >
         {!processData && (
           <LoadingScreen />
@@ -208,10 +210,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               </div>
               <div className='title'>
-                {t('ui.TRANSACTION.screen.TransactionSubmission.transactionSubmitted')}
+                {t('Transaction submitted!')}
               </div>
               <div className='description'>
-                {t('ui.TRANSACTION.screen.TransactionSubmission.trackTransactionInNotifications')}
+                {t('View transaction progress in the Notifications screen or go back to home')}
               </div>
             </div>
           )
@@ -251,6 +253,18 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
       '.container': {
         paddingLeft: token.padding,
         paddingRight: token.padding
+      },
+
+      '.title': {
+        marginBottom: token.marginXXS
+      },
+
+      '.subtitle': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        marginBottom: token.margin,
+        fontWeight: token.headingFontWeight
       },
 
       '.description': {

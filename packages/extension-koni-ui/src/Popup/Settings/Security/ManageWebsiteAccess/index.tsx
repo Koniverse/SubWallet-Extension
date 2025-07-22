@@ -36,7 +36,9 @@ function getAccountCount (item: AuthUrlInfo, accountProxies: AccountProxy[]): nu
   return accountProxies.filter((ap) => {
     return ap.accounts.some((account) => {
       if (isEthereumAddress(account.address)) {
-        return authType.includes('evm') && item.isAllowedMap[account.address];
+        const supportECDSASubstrateAddress = account.isSubstrateECDSA && authType.includes('substrate');
+
+        return item.isAllowedMap[account.address] && (authType.includes('evm') || supportECDSASubstrateAddress);
       }
 
       if (isSubstrateAddress(account.address)) {

@@ -8,8 +8,9 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { CheckCircle } from 'phosphor-react';
+import { CheckCircle, CurrencyCircleDollar } from 'phosphor-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -17,11 +18,13 @@ import styled, { useTheme } from 'styled-components';
 type Props = ThemeProps & {
   nominationInfo: NominationInfo;
   isSelected?: boolean;
+  isSelectable?: boolean;
   poolInfo: YieldPoolInfo
+  isChangeValidator?: boolean
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isSelected, nominationInfo, poolInfo } = props;
+  const { className, isChangeValidator, isSelectable = true, isSelected, nominationInfo, poolInfo } = props;
   const { chain } = nominationInfo;
   const networkPrefix = useGetChainPrefixBySlug(chain);
 
@@ -41,42 +44,76 @@ const Component: React.FC<Props> = (props: Props) => {
         leftItem={
           <SwAvatar
             identPrefix={networkPrefix}
-            size={40}
+            size={32}
             value={nominationInfo.validatorAddress}
           />
         }
         middleItem={
           <>
             <div className={'middle-item__name-wrapper'}>
-              <div className={'middle-item__name'}>{nominationInfo.validatorIdentity || toShort(nominationInfo.validatorAddress)}</div>
+              <div className={'middle-item__name'}>
+                {nominationInfo.validatorIdentity || toShort(nominationInfo.validatorAddress)}
+              </div>
             </div>
 
             <div className={'middle-item__info'}>
-              <div className={'middle-item__active-stake'}>
-                <span>
-                  {`${t('ui.EARNING.components.StakingItem.Nomination.staked')}:`}
-                </span>
-                <span>
-                  &nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;
-                </span>
-                <span>{ subnetSymbol || symbol }</span>
-              </div>
+              {
+                isChangeValidator
+                  ? (
+                    <div className={'middle-item__change-validator'}>
+                      <div className={'middle-item'}>
+                        <span className='middle-item__commission'>
+                          <Icon
+                            phosphorIcon={CurrencyCircleDollar}
+                            size='xs'
+                            weight='fill'
+                          />
+                            &nbsp;: {nominationInfo.commission !== undefined ? `${nominationInfo.commission}%` : 'N/A'}
+                        </span>
+                        <>
+                            -
+                          <div className='middle-item__apy'>
+                            &nbsp;{t('APY')}: {nominationInfo.expectedReturn ? formatBalance(nominationInfo.expectedReturn, 0) : '0'}%
+                          </div>
+                        </>
+                      </div>
+                      {new BigN(nominationInfo.activeStake).gt(0) && (
+                        <span className={'middle-item__active-stake'}>
+                          {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
+                        </span>
+                      )}
+                    </div>
+                  )
+                  : (
+                    new BigN(nominationInfo.activeStake).gt(0) && (
+                      <div className={'middle-item__active-stake'}>
+                        <span>{t('Staked:')}</span>
+                        <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
+                        <span>{subnetSymbol || symbol}</span>
+                      </div>
+                    )
+                  )
+              }
             </div>
           </>
         }
 
         rightItem={
-          isSelected &&
-          (
-            <Icon
-              className={'right-item__select-icon'}
-              iconColor={token.colorSuccess}
-              phosphorIcon={CheckCircle}
-              size={'sm'}
-              weight={'fill'}
-            />
-          )
-        }
+          isSelectable &&
+            (
+              <div className={'right-item__selected-icon-wrapper'}>
+                {(isSelected && (
+                  <Icon
+                    className={'right-item__select-icon'}
+                    iconColor={token.colorSuccess}
+                    phosphorIcon={CheckCircle}
+                    size={'sm'}
+                    weight={'fill'}
+                  />
+                ))
+                }
+              </div>
+            )}
       />
     </div>
   );
@@ -88,11 +125,10 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
     background: token.colorBgSecondary,
 
     '.validator-item-content': {
-      borderRadius: token.borderRadiusLG
-    },
-
-    '.ant-web3-block-middle-item': {
-      paddingRight: token.padding
+      borderRadius: token.borderRadiusLG,
+      paddingBottom: '0px',
+      paddingTop: '0px',
+      minHeight: '58px'
     },
 
     '.middle-item__name-wrapper': {
@@ -120,9 +156,42 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
       paddingRight: token.paddingXXS
     },
 
+    '.right-item__selected-icon-wrapper': {
+      minWidth: '40px',
+      display: 'flex',
+      justifyContent: 'center',
+      marginLeft: token.marginXXS
+    },
+
     '.right-item__select-icon': {
       paddingLeft: token.paddingSM - 2,
       paddingRight: token.paddingSM - 2
+    },
+
+    '.middle-item__change-validator': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight4
+    },
+
+    '.middle-item': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.marginXXS
+    },
+
+    '.middle-item__commission': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.middle-item__apy': {
+      color: token.colorSuccess,
+      display: 'flex',
+      alignItems: 'center'
     }
   };
 });

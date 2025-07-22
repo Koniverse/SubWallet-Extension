@@ -20,7 +20,7 @@ import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/compone
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useCoreCreateGetChainSlugsByAccountProxy, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -216,7 +216,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
-  const getChainSlugsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -295,9 +295,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
 
-  const allowedChainSlugsForTargetAccountProxy = useMemo(() => {
-    return getChainSlugsByAccountProxy(targetAccountProxy);
-  }, [getChainSlugsByAccountProxy, targetAccountProxy]);
+  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
+    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
+  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
 
   const isTokenCompatibleWithTargetAccountProxy = useCallback((tokenSlug: string): boolean => {
     if (!tokenSlug) {
@@ -306,8 +306,10 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     const chainSlug = _getOriginChainOfAsset(tokenSlug);
 
-    return allowedChainSlugsForTargetAccountProxy.includes(chainSlug);
-  }, [allowedChainSlugsForTargetAccountProxy]);
+    const { allowedChains, excludedTokens } = allowedChainAndExcludedTokenForTargetAccountProxy;
+
+    return allowedChains.includes(chainSlug) && !excludedTokens.includes(tokenSlug);
+  }, [allowedChainAndExcludedTokenForTargetAccountProxy]);
 
   const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     return tokenSelectorItems.filter((item) => {
@@ -389,7 +391,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return false;
     }
 
-    return !_isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson.chainType, fromAccountJson.type);
+    return !_isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
 
   const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
@@ -405,12 +407,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
       fromAddress: from,
+      assetInfo: toAssetInfo,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SWAP,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks]);
+  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks, toAssetInfo]);
 
   const onSelectFromToken = useCallback((tokenSlug: string) => {
     form.setFieldValue('fromTokenSlug', tokenSlug);
@@ -780,7 +783,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, a.chainType, a.type));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo));
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;
@@ -1251,6 +1254,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 statusHelpAsTooltip={true}
               >
                 <AddressInputNew
+                  actionType={ActionType.SWAP}
                   chainSlug={destChainValue}
                   dropdownHeight={isNotShowAccountSelector ? 227 : 167}
                   label={`${t('ui.TRANSACTION.screen.Transaction.Swap.to')}:`}
@@ -1259,6 +1263,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   ref={addressInputRef}
                   showAddressBook={true}
                   showScanner={true}
+                  tokenSlug={toTokenSlugValue}
                 />
               </Form.Item>
 

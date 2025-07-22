@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { useGetAccountSignModeByAddress } from '@subwallet/extension-koni-ui/hooks';
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,24 +18,25 @@ const useGetAccountTitleByAddress = (address?: string): string => {
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
-        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.ledgerAccount');
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+        return t('Ledger account');
       case AccountSignMode.ALL_ACCOUNT:
-        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.allAccount');
+        return t('All account');
       case AccountSignMode.PASSWORD:
-        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.normalAccount');
+        return t('Normal account');
 
       case AccountSignMode.QR:
         if (isEvm) {
-          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.evmQrSignerAccount');
+          return t('EVM QR signer account');
         } else {
-          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.substrateQrSignerAccount');
+          return t('Substrate QR signer account');
         }
 
       case AccountSignMode.READ_ONLY:
-        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.watchOnlyAccount');
+        return t('Watch-only account');
       case AccountSignMode.UNKNOWN:
       default:
-        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.unknownAccount');
+        return t('Unknown account');
     }
   }, [signMode, t, isEvm]);
 };

@@ -508,7 +508,7 @@ const EarningPoolSelector = styled(forwardRef(Component))<Props>(({ theme: { tok
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingSM
     },
 
     '.ant-sw-modal-content': {

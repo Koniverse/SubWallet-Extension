@@ -19,6 +19,8 @@ const convertSupportType = (support: OnrampAccountSupportType): AccountChainType
       return AccountChainType.CARDANO;
     case 'TON':
       return AccountChainType.TON;
+    case 'BITCOIN':
+      return AccountChainType.BITCOIN;
     default:
       return null;
   }

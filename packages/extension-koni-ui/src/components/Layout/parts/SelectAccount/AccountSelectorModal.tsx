@@ -103,6 +103,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     return accountProxies.find((ap) => ap.id === selectedAccountProxy.proxyId);
   }, [accountProxies, selectedAccountProxy]);
 
+  const accountProxiesCanExport = useMemo(() => {
+    return accountProxies.filter((item) => {
+      return item.accountType !== AccountProxyType.LEDGER;
+    });
+  }, [accountProxies]);
+
   const listItems = useMemo<ListItem[]>(() => {
     let accountAll: AccountProxy | undefined;
     const result: ListItem[] = [];
@@ -178,7 +184,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.injectedAccount')
       });
 
-      result.push(...ledgerAccounts);
+      result.push(...injectedAccounts);
     }
 
     if (unknownAccounts.length) {
@@ -389,9 +395,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: exportAllAccounts,
       size: 'xs',
       type: 'ghost',
-      tooltipPlacement: 'topLeft'
+      tooltipPlacement: 'topLeft',
+      disabled: accountProxiesCanExport.length === 1 && isAccountAll(accountProxiesCanExport[0].id)
     });
-  }, [exportAllAccounts, t, token.colorHighlight]);
+  }, [accountProxiesCanExport, exportAllAccounts, t, token.colorHighlight]);
 
   const closeAccountChainAddressesModal = useCallback(() => {
     inactiveModal(accountChainAddressesModalId);
@@ -456,7 +463,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       }
 
       <ExportAllSelector
-        items={accountProxies}
+        items={accountProxiesCanExport}
       />
     </>
   );

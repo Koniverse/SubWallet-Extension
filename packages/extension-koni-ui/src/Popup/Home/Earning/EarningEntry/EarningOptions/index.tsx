@@ -64,6 +64,7 @@ enum FilterOptionType {
   TEST_NETWORK = 'TEST_NETWORK',
 }
 
+// Todo: Recheck the compatibility of earning types with each ecosystem instead of filtering by network type
 function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();

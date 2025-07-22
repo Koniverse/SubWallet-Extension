@@ -16,6 +16,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   decimals: number;
   maxValue: string;
   onSetMax?: (value: boolean) => void;
+  prefix?: React.ReactNode
   showMaxButton?: boolean;
   forceUpdateMaxValue?: object;
   defaultInvalidOutputValue?: string;
@@ -70,7 +71,7 @@ const isControlKey = (keycode: number) => {
 };
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, showMaxButton, statusHelp, tooltip, value } = props;
+  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, prefix, showMaxButton, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
 
@@ -109,7 +110,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           size='xs'
           type='ghost'
         >
-          <span className='max-btn-text'>{t('ui.components.Field.AmountInput.max')}</span>
+          <span className='max-btn-text'>{t('Max')}</span>
         </Button>
       )
       : (
@@ -245,7 +246,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       onKeyUp={onKeyUp}
       onPaste={onPaste}
       // onCopy={onPaste}
-      placeholder={props.placeholder || t('ui.components.Field.AmountInput.amount')}
+      placeholder={props.placeholder || t('Amount')}
+      prefix= {prefix}
       readOnly={props.readOnly}
       ref={inputRef}
       statusHelp={statusHelp}

@@ -13,7 +13,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -33,7 +33,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   processing: Spinner,
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
-  swap: ArrowsLeftRight
+  swap: ArrowsLeftRight,
+  nominate: Pencil
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -55,6 +56,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (item.type === ExtrinsicType.STAKING_CLAIM_REWARD) {
     return IconMap.claim_reward;
+  }
+
+  if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
+    return IconMap.nominate;
   }
 
   if (item.type === ExtrinsicType.SWAP) {
@@ -259,15 +264,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const filterOptions = useMemo(() => {
     return [
-      { label: t('ui.HISTORY.screen.History.sendToken'), value: FilterValue.SEND },
-      { label: t('ui.HISTORY.screen.History.receiveToken'), value: FilterValue.RECEIVED },
-      { label: t('ui.HISTORY.screen.History.nftTransaction'), value: FilterValue.NFT },
-      { label: t('ui.HISTORY.screen.History.earningTransaction'), value: FilterValue.STAKE },
-      { label: t('ui.HISTORY.screen.History.claimReward'), value: FilterValue.CLAIM },
-      { label: t('ui.HISTORY.screen.History.swap'), value: FilterValue.SWAP },
-      // { label: t('ui.HISTORY.screen.History.crowdloanTransaction'), value: FilterValue.CROWDLOAN }, // support crowdloan later
-      { label: t('ui.HISTORY.screen.History.successful'), value: FilterValue.SUCCESSFUL },
-      { label: t('ui.HISTORY.screen.History.failed'), value: FilterValue.FAILED }
+      { label: t('Send token'), value: FilterValue.SEND },
+      { label: t('Receive token'), value: FilterValue.RECEIVED },
+      { label: t('NFT transaction'), value: FilterValue.NFT },
+      { label: t('Earning transaction'), value: FilterValue.STAKE },
+      { label: t('Claim reward'), value: FilterValue.CLAIM },
+      { label: t('Swap'), value: FilterValue.SWAP },
+      // { label: t('Crowdloan transaction'), value: FilterValue.CROWDLOAN }, // support crowdloan later
+      { label: t('Successful'), value: FilterValue.SUCCESSFUL },
+      { label: t('Failed'), value: FilterValue.FAILED }
     ];
   }, [t]);
 
@@ -280,96 +285,98 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [accounts]);
 
   const typeNameMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'submitting' | 'processing' | 'timeout' | 'send' | 'received', string> => ({
-    default: t('ui.HISTORY.screen.History.transaction'),
-    submitting: t('ui.HISTORY.screen.History.submittingEllipsis'),
-    processing: t('ui.HISTORY.screen.History.processingEllipsis'),
-    timeout: t('ui.HISTORY.screen.History.timeOut'),
-    send: t('ui.HISTORY.screen.History.send'),
-    received: t('ui.HISTORY.screen.History.receive'),
-    [ExtrinsicType.TRANSFER_BALANCE]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.TRANSFER_TOKEN]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.TRANSFER_XCM]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.SEND_NFT]: t('ui.HISTORY.screen.History.nft'),
-    [ExtrinsicType.CROWDLOAN]: t('ui.HISTORY.screen.History.crowdloan'),
-    [ExtrinsicType.STAKING_JOIN_POOL]: t('ui.HISTORY.screen.History.stake'),
-    [ExtrinsicType.STAKING_LEAVE_POOL]: t('ui.HISTORY.screen.History.unstake'),
-    [ExtrinsicType.STAKING_BOND]: t('ui.HISTORY.screen.History.stake'),
-    [ExtrinsicType.STAKING_UNBOND]: t('ui.HISTORY.screen.History.unstake'),
-    [ExtrinsicType.STAKING_CLAIM_REWARD]: t('ui.HISTORY.screen.History.claimReward'),
-    [ExtrinsicType.STAKING_WITHDRAW]: t('ui.HISTORY.screen.History.withdraw'),
-    [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('ui.HISTORY.screen.History.withdraw'),
-    [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: t('ui.HISTORY.screen.History.cancelUnstake'),
-    [ExtrinsicType.STAKING_COMPOUNDING]: t('ui.HISTORY.screen.History.compound'),
-    [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: t('ui.HISTORY.screen.History.cancelCompound'),
-    [ExtrinsicType.EVM_EXECUTE]: t('ui.HISTORY.screen.History.evmTransaction'),
-    [ExtrinsicType.JOIN_YIELD_POOL]: t('ui.HISTORY.screen.History.stake'),
-    [ExtrinsicType.MINT_QDOT]: t('ui.HISTORY.screen.History.mintQDot'),
-    [ExtrinsicType.MINT_SDOT]: t('ui.HISTORY.screen.History.mintSDot'),
-    [ExtrinsicType.MINT_LDOT]: t('ui.HISTORY.screen.History.mintLDot'),
-    [ExtrinsicType.MINT_VDOT]: t('ui.HISTORY.screen.History.mintVDot'),
-    [ExtrinsicType.MINT_VMANTA]: t('ui.HISTORY.screen.History.mintVManta'),
-    [ExtrinsicType.MINT_STDOT]: t('ui.HISTORY.screen.History.mintStDot'),
-    [ExtrinsicType.REDEEM_QDOT]: t('ui.HISTORY.screen.History.redeemQDot'),
-    [ExtrinsicType.REDEEM_SDOT]: t('ui.HISTORY.screen.History.redeemSDot'),
-    [ExtrinsicType.REDEEM_LDOT]: t('ui.HISTORY.screen.History.redeemLDot'),
-    [ExtrinsicType.REDEEM_VDOT]: t('ui.HISTORY.screen.History.redeemVDot'),
-    [ExtrinsicType.REDEEM_VMANTA]: t('ui.HISTORY.screen.History.redeemVManta'),
-    [ExtrinsicType.REDEEM_STDOT]: t('ui.HISTORY.screen.History.redeemStDot'),
-    [ExtrinsicType.UNSTAKE_QDOT]: t('ui.HISTORY.screen.History.unstakeQDot'),
-    [ExtrinsicType.UNSTAKE_VDOT]: t('ui.HISTORY.screen.History.unstakeVDot'),
-    [ExtrinsicType.UNSTAKE_VMANTA]: t('ui.HISTORY.screen.History.unstakeVManta'),
-    [ExtrinsicType.UNSTAKE_LDOT]: t('ui.HISTORY.screen.History.unstakeLDot'),
-    [ExtrinsicType.UNSTAKE_SDOT]: t('ui.HISTORY.screen.History.unstakeSDot'),
-    [ExtrinsicType.UNSTAKE_STDOT]: t('ui.HISTORY.screen.History.unstakeStDot'),
-    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
-    [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
-    [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
-    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
+    default: t('Transaction'),
+    submitting: t('Submitting...'),
+    processing: t('Processing...'),
+    timeout: t('Time-out'),
+    send: t('Send'),
+    received: t('Receive'),
+    [ExtrinsicType.TRANSFER_BALANCE]: t('Send token'),
+    [ExtrinsicType.TRANSFER_TOKEN]: t('Send token'),
+    [ExtrinsicType.TRANSFER_XCM]: t('Send token'),
+    [ExtrinsicType.SEND_NFT]: t('NFT'),
+    [ExtrinsicType.CROWDLOAN]: t('Crowdloan'),
+    [ExtrinsicType.STAKING_JOIN_POOL]: t('Stake'),
+    [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake'),
+    [ExtrinsicType.STAKING_BOND]: t('Stake'),
+    [ExtrinsicType.STAKING_UNBOND]: t('Unstake'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Nominate'),
+    [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward'),
+    [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw'),
+    [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw'),
+    [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: t('Cancel unstake'),
+    [ExtrinsicType.STAKING_COMPOUNDING]: t('Compound'),
+    [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: t('Cancel compound'),
+    [ExtrinsicType.EVM_EXECUTE]: t('EVM Transaction'),
+    [ExtrinsicType.JOIN_YIELD_POOL]: t('Stake'),
+    [ExtrinsicType.MINT_QDOT]: t('Mint qDOT'),
+    [ExtrinsicType.MINT_SDOT]: t('Mint sDOT'),
+    [ExtrinsicType.MINT_LDOT]: t('Mint LDOT'),
+    [ExtrinsicType.MINT_VDOT]: t('Mint vDOT'),
+    [ExtrinsicType.MINT_VMANTA]: t('Mint vMANTA'),
+    [ExtrinsicType.MINT_STDOT]: t('Mint stDOT'),
+    [ExtrinsicType.REDEEM_QDOT]: t('Redeem qDOT'),
+    [ExtrinsicType.REDEEM_SDOT]: t('Redeem sDOT'),
+    [ExtrinsicType.REDEEM_LDOT]: t('Redeem LDOT'),
+    [ExtrinsicType.REDEEM_VDOT]: t('Redeem vDOT'),
+    [ExtrinsicType.REDEEM_VMANTA]: t('Redeem vMANTA'),
+    [ExtrinsicType.REDEEM_STDOT]: t('Redeem stDOT'),
+    [ExtrinsicType.UNSTAKE_QDOT]: t('Unstake qDOT'),
+    [ExtrinsicType.UNSTAKE_VDOT]: t('Unstake vDOT'),
+    [ExtrinsicType.UNSTAKE_VMANTA]: t('Unstake vMANTA'),
+    [ExtrinsicType.UNSTAKE_LDOT]: t('Unstake LDOT'),
+    [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT'),
+    [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT'),
+    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve'),
+    [ExtrinsicType.SWAP]: t('Swap'),
+    [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
+    [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
   const typeTitleMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'send' | 'received', string> => ({
-    default: t('ui.HISTORY.screen.History.transaction'),
-    send: t('ui.HISTORY.screen.History.sendToken'),
-    received: t('ui.HISTORY.screen.History.receiveToken'),
-    [ExtrinsicType.TRANSFER_BALANCE]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.TRANSFER_TOKEN]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.TRANSFER_XCM]: t('ui.HISTORY.screen.History.sendToken'),
-    [ExtrinsicType.SEND_NFT]: t('ui.HISTORY.screen.History.nftTransaction'),
-    [ExtrinsicType.CROWDLOAN]: t('ui.HISTORY.screen.History.crowdloanTransaction'),
-    [ExtrinsicType.STAKING_JOIN_POOL]: t('ui.HISTORY.screen.History.stakeTransaction'),
-    [ExtrinsicType.STAKING_LEAVE_POOL]: t('ui.HISTORY.screen.History.unstakeTransaction'),
-    [ExtrinsicType.STAKING_BOND]: t('ui.HISTORY.screen.History.stakeTransaction'),
-    [ExtrinsicType.STAKING_UNBOND]: t('ui.HISTORY.screen.History.unstakeTransaction'),
-    [ExtrinsicType.STAKING_CLAIM_REWARD]: t('ui.HISTORY.screen.History.claimRewardTransaction'),
-    [ExtrinsicType.STAKING_WITHDRAW]: t('ui.HISTORY.screen.History.withdrawTransaction'),
-    [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('ui.HISTORY.screen.History.withdrawTransaction'),
-    [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: t('ui.HISTORY.screen.History.cancelUnstakeTransaction'),
-    [ExtrinsicType.STAKING_COMPOUNDING]: t('ui.HISTORY.screen.History.compoundTransaction'),
-    [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: t('ui.HISTORY.screen.History.cancelCompoundTransaction'),
-    [ExtrinsicType.EVM_EXECUTE]: t('ui.HISTORY.screen.History.evmTransaction'),
-    [ExtrinsicType.JOIN_YIELD_POOL]: t('ui.HISTORY.screen.History.stakeTransaction'),
-    [ExtrinsicType.MINT_QDOT]: t('ui.HISTORY.screen.History.mintQDotTransaction'),
-    [ExtrinsicType.MINT_SDOT]: t('ui.HISTORY.screen.History.mintSDotTransaction'),
-    [ExtrinsicType.MINT_LDOT]: t('ui.HISTORY.screen.History.mintLDotTransaction'),
-    [ExtrinsicType.MINT_VDOT]: t('ui.HISTORY.screen.History.mintVDotTransaction'),
-    [ExtrinsicType.MINT_VMANTA]: t('ui.HISTORY.screen.History.mintVMantaTransaction'),
-    [ExtrinsicType.MINT_STDOT]: t('ui.HISTORY.screen.History.mintStDotTransaction'),
-    [ExtrinsicType.REDEEM_QDOT]: t('ui.HISTORY.screen.History.redeemQDotTransaction'),
-    [ExtrinsicType.REDEEM_SDOT]: t('ui.HISTORY.screen.History.redeemSDotTransaction'),
-    [ExtrinsicType.REDEEM_LDOT]: t('ui.HISTORY.screen.History.redeemLDotTransaction'),
-    [ExtrinsicType.REDEEM_VDOT]: t('ui.HISTORY.screen.History.redeemVDotTransaction'),
-    [ExtrinsicType.REDEEM_VMANTA]: t('ui.HISTORY.screen.History.redeemVMantaTransaction'),
-    [ExtrinsicType.REDEEM_STDOT]: t('ui.HISTORY.screen.History.redeemStDotTransaction'),
-    [ExtrinsicType.UNSTAKE_QDOT]: t('ui.HISTORY.screen.History.unstakeQDotTransaction'),
-    [ExtrinsicType.UNSTAKE_VDOT]: t('ui.HISTORY.screen.History.unstakeVDotTransaction'),
-    [ExtrinsicType.UNSTAKE_VMANTA]: t('ui.HISTORY.screen.History.unstakeVMantaTransaction'),
-    [ExtrinsicType.UNSTAKE_LDOT]: t('ui.HISTORY.screen.History.unstakeLDotTransaction'),
-    [ExtrinsicType.UNSTAKE_SDOT]: t('ui.HISTORY.screen.History.unstakeSDotTransaction'),
-    [ExtrinsicType.UNSTAKE_STDOT]: t('ui.HISTORY.screen.History.unstakeStDotTransaction'),
-    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
-    [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
-    [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
-    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
+    default: t('Transaction'),
+    send: t('Send token'),
+    received: t('Receive token'),
+    [ExtrinsicType.TRANSFER_BALANCE]: t('Send token'),
+    [ExtrinsicType.TRANSFER_TOKEN]: t('Send token'),
+    [ExtrinsicType.TRANSFER_XCM]: t('Send token'),
+    [ExtrinsicType.SEND_NFT]: t('NFT transaction'),
+    [ExtrinsicType.CROWDLOAN]: t('Crowdloan transaction'),
+    [ExtrinsicType.STAKING_JOIN_POOL]: t('Stake transaction'),
+    [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake transaction'),
+    [ExtrinsicType.STAKING_BOND]: t('Stake transaction'),
+    [ExtrinsicType.STAKING_UNBOND]: t('Unstake transaction'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Stake transaction'),
+    [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward transaction'),
+    [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw transaction'),
+    [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw transaction'),
+    [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: t('Cancel unstake transaction'),
+    [ExtrinsicType.STAKING_COMPOUNDING]: t('Compound transaction'),
+    [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: t('Cancel compound transaction'),
+    [ExtrinsicType.EVM_EXECUTE]: t('EVM Transaction'),
+    [ExtrinsicType.JOIN_YIELD_POOL]: t('Stake transaction'),
+    [ExtrinsicType.MINT_QDOT]: t('Mint qDOT transaction'),
+    [ExtrinsicType.MINT_SDOT]: t('Mint sDOT transaction'),
+    [ExtrinsicType.MINT_LDOT]: t('Mint LDOT transaction'),
+    [ExtrinsicType.MINT_VDOT]: t('Mint vDOT transaction'),
+    [ExtrinsicType.MINT_VMANTA]: t('Mint vMANTA transaction'),
+    [ExtrinsicType.MINT_STDOT]: t('Mint stDOT transaction'),
+    [ExtrinsicType.REDEEM_QDOT]: t('Redeem qDOT transaction'),
+    [ExtrinsicType.REDEEM_SDOT]: t('Redeem sDOT transaction'),
+    [ExtrinsicType.REDEEM_LDOT]: t('Redeem LDOT transaction'),
+    [ExtrinsicType.REDEEM_VDOT]: t('Redeem vDOT transaction'),
+    [ExtrinsicType.REDEEM_VMANTA]: t('Redeem vMANTA transaction'),
+    [ExtrinsicType.REDEEM_STDOT]: t('Redeem stDOT transaction'),
+    [ExtrinsicType.UNSTAKE_QDOT]: t('Unstake qDOT tranasction'),
+    [ExtrinsicType.UNSTAKE_VDOT]: t('Unstake vDOT tranasction'),
+    [ExtrinsicType.UNSTAKE_VMANTA]: t('Unstake vMANTA tranasction'),
+    [ExtrinsicType.UNSTAKE_LDOT]: t('Unstake LDOT tranasction'),
+    [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT tranasction'),
+    [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT tranasction'),
+    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve transaction'),
+    [ExtrinsicType.SWAP]: t('Swap transaction'),
+    [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
+    [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 
   // Fill display data to history list
@@ -482,8 +489,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('ui.HISTORY.screen.History.yourTransactionsWillShowUpHere')}
-        emptyTitle={t('ui.HISTORY.screen.History.noTransactionsFound')}
+        emptyMessage={t('Your transactions will show up here')}
+        emptyTitle={t('No transactions found')}
         phosphorIcon={Clock}
       />
     );
@@ -504,7 +511,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const groupBy = useCallback((item: TransactionHistoryDisplayItem) => {
     if (PROCESSING_STATUSES.includes(item.status)) {
-      return t('ui.HISTORY.screen.History.processing');
+      return t('Processing');
     }
 
     return formatHistoryDate(item.displayTime, language, 'list');
@@ -534,7 +541,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         items={chainItems}
         loading={loading}
         onChange={onSelectChain}
-        title={t('ui.HISTORY.screen.History.selectChain')}
+        title={t('Select chain')}
         value={selectedChain}
       />
 
@@ -674,7 +681,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             paddingVertical
             rightButtons={headerIcons}
             showBackButton={false}
-            title={t('ui.HISTORY.screen.History.history')}
+            title={t('History')}
           />
 
           <div className={'__page-background'}></div>

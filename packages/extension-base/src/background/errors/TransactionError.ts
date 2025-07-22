@@ -85,6 +85,10 @@ const defaultErrorMap = {
     message: detectTranslate('bg.TRANSACTION.background.error.Transaction.unableToFetchStakingData'),
     code: undefined
   },
+  [StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW]: {
+    message: detectTranslate('Remaining amount too low'),
+    code: undefined
+  },
   [TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT]: {
     message: detectTranslate('bg.TRANSACTION.background.error.Transaction.receiverNotEnoughExistentialDeposit'),
     code: undefined
