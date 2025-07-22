@@ -1,16 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
-import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
+import {POLKADOT_LEDGER_SCHEME} from '@subwallet/extension-base/background/KoniTypes';
+import {BasicInputWrapper} from '@subwallet/extension-koni-ui/components';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
-import { ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block } from '@subwallet/react-ui';
+import {useSelectModalInputHelper} from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
+import {ChainItemType, ThemeProps} from '@subwallet/extension-koni-ui/types';
+import {Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block} from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CaretDown } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
+import {CaretDown} from 'phosphor-react';
+import React, {ForwardedRef, forwardRef, useCallback, useContext, useMemo} from 'react';
 import styled from 'styled-components';
+import {Trans} from "react-i18next";
+import {detectTranslate} from "@subwallet/extension-base/utils";
 
 export interface LedgerPolkadotAccountItemType extends ChainItemType {
   scheme: POLKADOT_LEDGER_SCHEME;
@@ -116,8 +118,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         <Field
           className={CN('is-selectable')}
           content={fieldContent}
-          label={t('Select account type')}
-          placeholder={t('Select account type')}
+          label={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+          placeholder={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
           suffix={fieldSuffix}
         />
       </div>
@@ -126,16 +128,20 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         closable={true}
         id={id}
         onCancel={onCancelModal}
-        title={t('Select account type')}
+        title={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
       >
         <div className={'modal-description'}>
-          {t('Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ')}
-          <a
-            href={CONNECT_LEDGER_USER_GUIDE_URL}
-            target='__blank'
-          >
-            {t('click here')}
-          </a>
+          <Trans
+            components={{
+              highlight: (
+                <a
+                  href={CONNECT_LEDGER_USER_GUIDE_URL}
+                  target='__blank'
+                />
+              )
+            }}
+            i18nKey={detectTranslate('ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo')}
+          />
         </div>
 
         <div className={'modal-content'}>

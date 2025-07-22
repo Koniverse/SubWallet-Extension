@@ -217,9 +217,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             weight={'fill'}
           />,
           tooltipPlacement: 'bottomRight',
-          tooltip: t('SubWallet doesn’t support exporting Ledger accounts')
+          tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportLedgerNotSupported')
         }}
-        title={t('Export account')}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -232,7 +232,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </SwModal>

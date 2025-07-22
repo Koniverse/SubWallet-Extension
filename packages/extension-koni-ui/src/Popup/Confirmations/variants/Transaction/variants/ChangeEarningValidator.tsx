@@ -165,14 +165,14 @@ const Component: React.FC<Props> = (props: Props) => {
           {isShowAmount && (
             <MetaInfo.Number
               decimals={decimals}
-              label={t('Amount')}
+              label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.amount')}
               suffix={data.metadata?.subnetSymbol || symbol}
               value={data.amount}
             />
           )}
           <MetaInfo.Number
             decimals={decimals}
-            label={t('Estimated fee')}
+            label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
           />
@@ -212,8 +212,8 @@ const Component: React.FC<Props> = (props: Props) => {
           </MetaInfo>
           <AlertBox
             className={'alert-box'}
-            description={t('A fee equivalent of 0.00005 TAO will be deducted from your stake amount on the new validator once the transaction is complete')}
-            title={t('Validator change fee')}
+            description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', {replace: {number: 0.00005}})}
+            title={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee')}
             type='info'
           />
         </>

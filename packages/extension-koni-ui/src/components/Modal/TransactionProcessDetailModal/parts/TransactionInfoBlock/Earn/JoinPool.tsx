@@ -73,7 +73,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={0}
-          label={'Estimated fee'}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.estimatedFee')}
           prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}

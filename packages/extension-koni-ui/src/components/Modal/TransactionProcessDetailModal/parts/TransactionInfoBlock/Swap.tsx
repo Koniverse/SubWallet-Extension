@@ -137,7 +137,7 @@ const Component: FC<Props> = (props: Props) => {
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
           decimals={0}
-          label={'Estimated fee'}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Swap.estimatedFee')}
           prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}

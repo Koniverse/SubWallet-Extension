@@ -1188,7 +1188,7 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
   }
 
   if (message.includes('substrate') && message.includes('receive this token')) {
-    return [t('The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again'), t('Invalid account type')];
+    return [t('bg.TRANSACTION.core.validation.request.recipientLedgerEvmNotSupported'), t('bg.TRANSACTION.core.validation.request.invalidAccountType')];
   }
 
   // Sign Message
