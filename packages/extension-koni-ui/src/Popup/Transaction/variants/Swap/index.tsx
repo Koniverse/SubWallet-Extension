@@ -22,6 +22,7 @@ import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSel
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { ChainAndExcludedTokenInfo } from '@subwallet/extension-koni-ui/hooks/chain/useCreateGetChainAndExcludedTokenByAccountProxy';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -53,6 +54,7 @@ type ComponentProps = {
   pairMap: Record<string, string[]>;
   defaultSlug: string;
   swappableSlugsSet: Set<string>;
+  allowedChainAndExcludedTokenForTargetAccountProxy: ChainAndExcludedTokenInfo;
 };
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
@@ -108,7 +110,7 @@ function getTokenSelectorItem (
 
 // todo: recheck validation logic, especially recipientAddress
 
-const Component = ({ defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
+const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
@@ -220,7 +222,6 @@ const Component = ({ defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy
   const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
-  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -298,10 +299,6 @@ const Component = ({ defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy
 
     return result;
   }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
-
-  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
-    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
-  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
 
   const isTokenCompatibleWithTargetAccountProxy = useCallback((tokenSlug: string): boolean => {
     if (!tokenSlug) {
@@ -1510,6 +1507,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       resolve={dataContext.awaitStores(['price'])}
     >
       <Component
+        allowedChainAndExcludedTokenForTargetAccountProxy={allowedChainAndExcludedTokenForTargetAccountProxy}
         defaultSlug={finalDefaultSlug}
         pairMap={pairMap}
         swappableSlugsSet={swappableSlugsSet}
