@@ -80,6 +80,7 @@
   "packages/extension-koni-ui/src/components/Field/BuyTokens/ServiceSelector.tsx": "ui.components.Field.BuyTokens.ServiceSelector",
   "packages/extension-koni-ui/src/components/Field/CancelUnstakeSelector.tsx": "ui.components.Field.CancelUnstakeSelector",
   "packages/extension-koni-ui/src/components/Field/ChainSelector.tsx": "ui.components.Field.ChainSelector",
+  "packages/extension-koni-ui/src/components/Field/LedgerAccountTypeSelector.tsx":  "ui.components.Field.LedgerAccountTypeSelector",
   "packages/extension-koni-ui/src/components/Field/Earning/EarningPoolSelector.tsx": "ui.EARNING.components.Field.Earning.PoolSelector",
   "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx": "ui.EARNING.components.Field.Earning.ValidatorSelector",
   "packages/extension-koni-ui/src/components/Field/LedgerChainSelector.tsx": "ui.LEDGER.components.Field.LedgerChainSelector",
@@ -141,6 +142,9 @@
   "packages/extension-koni-ui/src/components/Modal/Earning/EarningNominationModal.tsx": "ui.EARNING.components.Modal.Earning.Nomination",
   "packages/extension-koni-ui/src/components/Modal/Earning/EarningPoolDetailModal.tsx": "ui.EARNING.components.Modal.Earning.PoolDetail",
   "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx": "ui.EARNING.components.Modal.Earning.ValidatorDetail",
+  "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx":  "ui.EARNING.components.Modal.Earning.Validator.Change",
+  "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/index.tsx":  "ui.EARNING.components.Modal.Earning.Validator",
+  "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx":  "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor",
 
   "packages/extension-koni-ui/src/components/Modal/FilterModal.tsx": "ui.components.Modal.Filter",
 
@@ -303,6 +307,8 @@
   "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/TransferBlock.tsx": "ui.TRANSACTION.Confirmations.TransferBlock",
   "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Unbond.tsx": "ui.TRANSACTION.Confirmations.Unbond",
   "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Withdraw.tsx": "ui.TRANSACTION.Confirmations.Withdraw",
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ChangeEarningValidator.tsx": "ui.TRANSACTION.Confirmations.Earning.Validator.Change",
+
   "packages/extension-koni-ui/src/Popup/CreateDone.tsx": "ui.screen.CreateDone",
   "packages/extension-koni-ui/src/Popup/ErrorFallback.tsx": "ui.screen.ErrorFallback",
   "packages/extension-koni-ui/src/Popup/Home/Crowdloans/index.tsx": "ui.CROWDLOAN.screen.Crowdloans",

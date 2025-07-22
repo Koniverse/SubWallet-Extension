@@ -278,6 +278,14 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningEntry/EarningPositions/index.tsx",
         "key": "ui.EARNING.screen.EarningPositions.cancel"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.cancel"
       }
     ],
     "translations": {
@@ -1924,6 +1932,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
         "key": "ui.TRANSACTION.screen.Transaction.Swap.swap"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/TransactionSubmission.tsx",
+        "key": "ui.TRANSACTION.screen.TransactionSubmission.swap"
       }
     ],
     "translations": {
@@ -4730,6 +4742,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
         "key": "ui.TRANSACTION.screen.Transaction.Swap.continue"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.continue"
       }
     ],
     "translations": {
@@ -5914,6 +5930,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Home/History/Detail/parts/SwapLayout.tsx",
         "key": "ui.HISTORY.screen.HistoryDetail.SwapLayout.network"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.network"
       }
     ],
     "translations": {
@@ -7237,6 +7257,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/JoinYieldPool.tsx",
         "key": "ui.TRANSACTION.Confirmations.Process.Earn.JoinYieldPool.amount"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ChangeEarningValidator.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Earning.Validator.Change.amount"
       }
     ],
     "translations": {
@@ -8121,6 +8145,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Swap.tsx",
         "key": "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.payAttentionExclamation"
       }
     ],
     "translations": {
@@ -8588,6 +8616,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/StakingItem/StakingValidatorItem.tsx",
         "key": "ui.EARNING.components.StakingItem.Validator.apy"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/StakingItem/StakingNominationItem.tsx",
+        "key": "ui.EARNING.components.StakingItem.Nomination.apy"
       }
     ],
     "translations": {
@@ -10111,6 +10143,14 @@
       {
         "filepath": "packages/extension-base/src/services/earning-service/handlers/nomination-pool/index.ts",
         "key": "bg.EARNING.services.service.earning.nominationPool.amountMustBeGreaterThanZero"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.dtao.amountMustBeGreaterThanZero"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.amountMustBeGreaterThanZero"
       }
     ],
     "translations": {
@@ -12715,6 +12755,42 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Earn/JoinYieldPool.tsx",
         "key": "ui.TRANSACTION.Confirmations.Process.Earn.JoinYieldPool.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Process/Swap.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Process.Swap.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Swap.tsx",
+        "key": "ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Swap.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Swap.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Swap.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/History/Detail/parts/SwapLayout.tsx",
+        "key": "ui.HISTORY.screen.HistoryDetail.SwapLayout.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/Bond.tsx",
+        "key": "ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.Bond.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/JoinPool.tsx",
+        "key": "ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/TransactionProcessDetailModal/parts/TransactionInfoBlock/Earn/JoinYieldPool.tsx",
+        "key": "ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinYieldPool.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Process/Swap.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Process.Swap.estimatedFee"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ChangeEarningValidator.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee"
       }
     ],
     "translations": {
@@ -15491,6 +15567,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Settings/MissionPool/MissionDetailModal.tsx",
         "key": "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.status"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.status"
       }
     ],
     "translations": {
@@ -16918,6 +16998,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningPositionDetail/EarningInfoPart.tsx",
         "key": "ui.EARNING.screen.EarningPositionDetail.EarningInfo.subnet"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.subnet"
       }
     ],
     "translations": {
@@ -16986,6 +17070,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningPositionDetail/EarningInfoPart.tsx",
         "key": "ui.EARNING.screen.EarningPositionDetail.EarningInfo.minimumActiveStake"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumActiveStake"
       }
     ],
     "translations": {
@@ -17341,6 +17429,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Detail/Substrate/Extrinsic.tsx",
         "key": "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.from"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.from"
       }
     ],
     "translations": {
@@ -17664,6 +17756,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningPoolSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.PoolSelector.searchValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator"
       }
     ],
     "translations": {
@@ -17679,6 +17775,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.lowestCommission"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.lowestCommission"
       }
     ],
     "translations": {
@@ -17694,6 +17794,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.highestAnnualReturn"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.highestAnnualReturn"
       }
     ],
     "translations": {
@@ -17709,6 +17813,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.nomination"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.nomination"
       }
     ],
     "translations": {
@@ -17724,6 +17832,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.lowestMinActiveStake"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.lowestMinActiveStake"
       }
     ],
     "translations": {
@@ -17769,6 +17881,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.applyOneValidator"
       }
     ],
     "translations": {
@@ -17814,6 +17930,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningValidatorSelector.tsx",
         "key": "ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberValidators"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.applyNumberValidators"
       }
     ],
     "translations": {
@@ -18251,6 +18371,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/components/Modal/Account/AccountTypeModal.tsx",
         "key": "ui.ACCOUNT.components.Modal.Account.Type.selectAccountType"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/LedgerAccountTypeSelector.tsx",
+        "key": "ui.components.Field.LedgerAccountTypeSelector.selectAccountType"
       }
     ],
     "translations": {
@@ -20743,6 +20867,10 @@
       {
         "filepath": "packages/extension-base/src/types/account/error/derive.ts",
         "key": "bg.ACCOUNT.types.error.account.derive.invalidAccountType"
+      },
+      {
+        "filepath": "packages/extension-base/src/core/logic-validation/request.ts",
+        "key": "bg.TRANSACTION.core.validation.request.invalidAccountType"
       }
     ],
     "translations": {
@@ -24042,6 +24170,742 @@
       "vi": "Due to market conditions, you may receive more or less than expected.",
       "zh": "Due to market conditions, you may receive more or less than expected.",
       "ru": "Due to market conditions, you may receive more or less than expected."
+    }
+  },
+  "Staked:": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/StakingItem/StakingNominationItem.tsx",
+        "key": "ui.EARNING.components.StakingItem.Nomination.staked"
+      }
+    ],
+    "translations": {
+      "en": "Staked:",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "here": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.here"
+      }
+    ],
+    "translations": {
+      "en": "here",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Nominate": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/constants/history.ts",
+        "key": "ui.HISTORY.constant.history.nominate"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/History/index.tsx",
+        "key": "ui.HISTORY.screen.History.nominate"
+      }
+    ],
+    "translations": {
+      "en": "Nominate",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Change validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/constants/transaction.ts",
+        "key": "ui.TRANSACTION.constant.transaction.changeValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeValidator"
+      }
+    ],
+    "translations": {
+      "en": "Change validator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Tip: Hit “View process” to view step-by-step details of your swap": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/TransactionSubmission.tsx",
+        "key": "ui.TRANSACTION.screen.TransactionSubmission.tipViewSwapProcess"
+      }
+    ],
+    "translations": {
+      "en": "Tip: Hit “View process” to view step-by-step details of your swap",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Swap in process": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/TransactionSubmission.tsx",
+        "key": "ui.TRANSACTION.screen.TransactionSubmission.swapInProcess"
+      }
+    ],
+    "translations": {
+      "en": "Swap in process",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "DO NOT close the app!": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/TransactionSubmission.tsx",
+        "key": "ui.TRANSACTION.screen.TransactionSubmission.doNotCloseApp"
+      }
+    ],
+    "translations": {
+      "en": "DO NOT close the app!",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/LedgerAccountTypeSelector.tsx",
+        "key": "ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeInfo"
+      }
+    ],
+    "translations": {
+      "en": "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "click here": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/LedgerAccountTypeSelector.tsx",
+        "key": "ui.components.Field.LedgerAccountTypeSelector.clickHere"
+      }
+    ],
+    "translations": {
+      "en": "click here",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Select a {{validatorLabel}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/NominationSelector.tsx",
+        "key": "ui.EARNING.components.Field.NominationSelector.selectValidatorLabel"
+      }
+    ],
+    "translations": {
+      "en": "Select a {{validatorLabel}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Ledger - Polkadot (EVM) account": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/account/usePreCheckAction.ts",
+        "key": "ui.ACCOUNT.hook.account.usePreCheckAction.ledgerPolkadotEvmAccount"
+      }
+    ],
+    "translations": {
+      "en": "Ledger - Polkadot (EVM) account",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Polkadot account": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.polkadotAccount"
+      }
+    ],
+    "translations": {
+      "en": "Polkadot account",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.polkadotAccountDescription"
+      }
+    ],
+    "translations": {
+      "en": "Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Ethereum account": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.ethereumAccount"
+      }
+    ],
+    "translations": {
+      "en": "Ethereum account",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.ethereumAccountDescription"
+      }
+    ],
+    "translations": {
+      "en": "Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "To use this network, choose Polkadot Ledger app": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/ConnectLedger.tsx",
+        "key": "ui.ACCOUNT.screen.Account.ConnectLedger.choosePolkadotLedgerApp"
+      }
+    ],
+    "translations": {
+      "en": "To use this network, choose Polkadot Ledger app",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Move your stake confirm": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/index.tsx",
+        "key": "ui.Confirmations.moveStakeConfirm"
+      }
+    ],
+    "translations": {
+      "en": "Move your stake confirm",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Change validator confirm": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/index.tsx",
+        "key": "ui.Confirmations.changeValidatorConfirm"
+      }
+    ],
+    "translations": {
+      "en": "Change validator confirm",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Remaining amount too low": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/background/errors/TransactionError.ts",
+        "key": "bg.TRANSACTION.background.error.Transaction.remainingAmountTooLow"
+      }
+    ],
+    "translations": {
+      "en": "Remaining amount too low",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/core/logic-validation/request.ts",
+        "key": "bg.TRANSACTION.core.validation.request.recipientLedgerEvmNotSupported"
+      }
+    ],
+    "translations": {
+      "en": "The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Total stake weight": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.totalStakeWeight"
+      }
+    ],
+    "translations": {
+      "en": "Total stake weight",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Calculated as 18% of the root stake": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.calculatedAsPercentageOfRootStake"
+      }
+    ],
+    "translations": {
+      "en": "Calculated as 18% of the root stake",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Root weight": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.rootWeight"
+      }
+    ],
+    "translations": {
+      "en": "Root weight",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Subnet stake": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.subnetStake"
+      }
+    ],
+    "translations": {
+      "en": "Subnet stake",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "SubWallet doesn’t support exporting Ledger accounts": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+        "key": "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportLedgerNotSupported"
+      }
+    ],
+    "translations": {
+      "en": "SubWallet doesn’t support exporting Ledger accounts",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Move all": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.moveAll"
+      }
+    ],
+    "translations": {
+      "en": "Move all",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Update validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.updateValidator"
+      }
+    ],
+    "translations": {
+      "en": "Update validator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Staked balance:": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.stakedBalance"
+      }
+    ],
+    "translations": {
+      "en": "Staked balance:",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Change to": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeTo"
+      }
+    ],
+    "translations": {
+      "en": "Change to",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount you want to move from the selected validator to the new validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountToMoveDescription"
+      }
+    ],
+    "translations": {
+      "en": "Amount you want to move from the selected validator to the new validator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Change staking amount": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeBittensorValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeStakingAmount"
+      }
+    ],
+    "translations": {
+      "en": "Change staking amount",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Your new selections of validators is the same as the original selection. Do you still want to continue?": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.noValidatorChangesWarning"
+      }
+    ],
+    "translations": {
+      "en": "Your new selections of validators is the same as the original selection. Do you still want to continue?",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "No changes detected!": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.noChangesDetected"
+      }
+    ],
+    "translations": {
+      "en": "No changes detected!",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.validators"
+      }
+    ],
+    "translations": {
+      "en": "Validators",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Select validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.selectValidators"
+      }
+    ],
+    "translations": {
+      "en": "Select validators",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Change validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/index.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.changeValidators"
+      }
+    ],
+    "translations": {
+      "en": "Change validators",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "From validator is the same with to validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.dtao.fromValidatorSameAsTo"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo"
+      }
+    ],
+    "translations": {
+      "en": "From validator is the same with to validator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount too low. You need to move at least {{formattedMinUnstake}} {{subnetSymbol}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.dtao.moveAmountTooLow"
+      }
+    ],
+    "translations": {
+      "en": "Amount too low. You need to move at least {{formattedMinUnstake}} {{subnetSymbol}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/dtao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning"
+      },
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning"
+      }
+    ],
+    "translations": {
+      "en": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Insufficient stake. You need to stake at least {{bnMinStake}} {{symbol}} to earn rewards": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn"
+      }
+    ],
+    "translations": {
+      "en": "Insufficient stake. You need to stake at least {{bnMinStake}} {{symbol}} to earn rewards",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount too low. You need to unstake at least {{bnMinUnstake}} {{symbol}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow"
+      }
+    ],
+    "translations": {
+      "en": "Amount too low. You need to unstake at least {{bnMinUnstake}} {{symbol}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/earning-service/handlers/native-staking/tao.ts",
+        "key": "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow"
+      }
+    ],
+    "translations": {
+      "en": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ChangeEarningValidator.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo"
+      }
+    ],
+    "translations": {
+      "en": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Validator change fee": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ChangeEarningValidator.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee"
+      }
+    ],
+    "translations": {
+      "en": "Validator change fee",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Your validators": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart/AccountInfoPart.tsx",
+        "key": "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.yourValidators"
+      }
+    ],
+    "translations": {
+      "en": "Your validators",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Delegator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.delegator"
+      }
+    ],
+    "translations": {
+      "en": "Delegator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Nominator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorDetailModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.ValidatorDetail.nominator"
+      }
+    ],
+    "translations": {
+      "en": "Nominator",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/LedgerAccountTypeSelector.tsx",
+        "key": "ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo"
+      }
+    ],
+    "translations": {
+      "en": "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
     }
   }
 }
