@@ -26,6 +26,14 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
     const ledgerCheck = ledgerGenericAccountProblemCheck(accountProxy);
 
     if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(chainSlug)) {
+      let ledgerApp = 'Migration';
+
+      if (ledgerCheck === 'polkadot') {
+        ledgerApp = 'Polkadot';
+      } else if (ledgerCheck === 'polkadot_ecdsa') {
+        ledgerApp = 'Polkadot (EVM)';
+      }
+
       alertModal.open({
         closable: false,
         title: t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.unsupportedNetwork'),
@@ -36,7 +44,7 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
             <div>
               {t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.ledgerIncompatibleNetworkWarning', {
                 replace: {
-                  ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+                  ledgerApp: ledgerApp,
                   networkName: chainInfoMap[chainSlug]?.name
                 }
               }
