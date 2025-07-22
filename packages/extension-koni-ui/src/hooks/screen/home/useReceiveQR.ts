@@ -217,7 +217,7 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
           if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(firstToken.originChain)) {
             handleSimpleConfirmModal({
-              content: t<string>('Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.', {
+              content: t<string>("Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can't be transferred out or staked) when sent to this account type.", {
                 replace: {
                   ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
                   networkName: chainInfoMap[firstToken.originChain]?.name
@@ -258,7 +258,7 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
         if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(first.originChain)) {
           handleSimpleConfirmModal({
-            content: t<string>('Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.', {
+            content: t<string>("Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can't be transferred out or staked) when sent to this account type.", {
               replace: {
                 ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
                 networkName: chainInfoMap[first.originChain]?.name

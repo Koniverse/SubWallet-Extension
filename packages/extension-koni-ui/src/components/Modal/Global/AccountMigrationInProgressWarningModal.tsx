@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
 
-          {t('You can\'t perform any action in Expand view while account migration is in progress. Reopen SubWallet extension to complete migration, then reload to continue using Expand view')}
+          {t("You can't perform any action in Expand view while account migration is in progress. Reopen SubWallet extension to complete migration, then reload to continue using Expand view")}
         </div>
       </SwModal>
     </>

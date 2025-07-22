@@ -77,7 +77,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
     return () => {
       if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(item.originChain)) {
         handleSimpleConfirmModal({
-          content: t<string>('Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.', {
+          content: t<string>("Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can't be transferred out or staked) when sent to this account type.", {
             replace: {
               ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
               networkName: chainInfoMap[item.originChain]?.name
@@ -106,7 +106,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
   const onPreCopy = useCallback((item: _ChainAsset, ledgerCheck: string) => {
     return () => {
       return handleSimpleConfirmModal({
-        content: t<string>('Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.', {
+        content: t<string>("Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can't be transferred out or staked) when sent to this account type.", {
           replace: {
             ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
             networkName: chainInfoMap[item.originChain]?.name
