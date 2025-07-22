@@ -32,6 +32,16 @@ function readExistingData(filePath) {
   }
 }
 
+function mergeTranslations(existingTranslations, newTranslations) {
+  const merged = { ...existingTranslations };
+  for (const [lang, value] of Object.entries(newTranslations || {})) {
+    if (value && value !== merged[lang]) {
+      merged[lang] = value;
+    }
+  }
+  return merged;
+}
+
 async function main() {
   try {
     // 1. Read existing data (if available)
@@ -95,7 +105,7 @@ async function main() {
 
           combinedData[textKey] = {
             locations: mergedLocations,
-            translations: {...existingEntry.translations, ...newEntry.translations}
+            translations: mergeTranslations(existingEntry.translations, newEntry.translations)
           };
           updatedTexts.push(textKey);
         } else {
