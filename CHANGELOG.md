@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 1.3.48
+Build date: Jul 21, 2025.
+
+Features & Update:
+- Support Change validator feature (#4214)
+- Stake TAO with Seamless Validator Switching (#4359)
+- Turn off default enabled tokens (#4475)
+- Update new content to submitted screen when swap (#4512)
+- Update chain-list stable v0.2.110 (#4521)
+
+Bug fixed:
+- Fixed bug when stake/unstake with subnet staking (#4510)
+- Fixed bug Cannot withdraw on Westend Asset Hub (#4522)
+- Fixed bug auto-enable chain for popular tokens (#4525)
+- Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375)
+
+
+## 1.3.47
+Build date: Jul 11, 2025.
+
+Features & Update:
+- Optimize Subscan API request (#4458)
+- Update Gears Library (#4443)
+- Support buy token BTC (Bitcoin) (#4490)
+- Update chainlist stable v0.2.108 (#4458)
+  - Update block explorer for TON Network
+  - Add support for gigaETH token
+  - Support for PolkaVM Compatibility
+  - Add swap support for gigaETH
+  - ...
+
+Bug fixed:
+- Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481)
+
+
 ## 1.3.46
 Build date: Jul 04, 2025.
 

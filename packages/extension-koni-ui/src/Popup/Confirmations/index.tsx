@@ -5,7 +5,7 @@ import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDe
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountSignMode, ProcessType } from '@subwallet/extension-base/types';
+import { AccountJson, AccountSignMode, ProcessType, SubmitBittensorChangeValidatorStaking } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
@@ -325,6 +325,13 @@ const Component = function ({ className }: Props) {
           return t('Claim rewards confirm');
         case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
           return t('Cancel unstake confirm');
+
+        case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
+          if ((transaction.data as SubmitBittensorChangeValidatorStaking)?.isMovePartialStake) {
+            return t('Move your stake confirm');
+          }
+
+          return t('Change validator confirm');
         case ExtrinsicType.MINT_VDOT:
           return t('Mint vDOT confirm');
         case ExtrinsicType.MINT_VMANTA:
