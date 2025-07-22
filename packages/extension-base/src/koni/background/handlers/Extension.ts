@@ -2229,15 +2229,15 @@ export default class KoniExtension {
 
     const validationMethod = [
       {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
         method: () => tokenContract.methods.ownerOf(1).call()
       },
       {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
         method: () => tokenContract.methods.tokenURI(1).call()
       },
       {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
         method: () => tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call(),
         isErrorValid: (error: Error) => error.message.includes('index out of bounds')
       }
