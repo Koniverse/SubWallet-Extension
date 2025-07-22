@@ -1,14 +1,14 @@
 # CHANGELOG
 
 ## 1.3.48
-Build date: Jul 11, 2025.
+Build date: Jul 21, 2025.
 
 Features & Update:
 - Support Change validator feature (#4214)
 - Stake TAO with Seamless Validator Switching (#4359)
 - Turn off default enabled tokens (#4475)
 - Update new content to submitted screen when swap (#4512)
-- Update chain-list stable v0.2.110
+- Update chain-list stable v0.2.110 (#4521)
 
 Bug fixed:
 - Fixed bug when stake/unstake with subnet staking (#4510)
