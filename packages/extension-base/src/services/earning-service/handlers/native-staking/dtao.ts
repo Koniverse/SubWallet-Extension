@@ -12,7 +12,7 @@ import BigN from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import TaoNativeStakingPoolHandler, { RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
+import TaoNativeStakingPoolHandler, { DEFAULT_DTAO_MINBOND, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
   netuid: number;
@@ -98,8 +98,6 @@ export interface EarningSlippageResult {
   rate: number;
 }
 
-export const DEFAULT_DTAO_MINBOND = '21000000';
-
 const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
   const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
 
@@ -133,10 +131,6 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
   protected override shortName: string;
   public subnetData: SubnetData[] = [];
   private isInit = false;
-
-  protected override getMinBond (): Promise<BigN> {
-    return Promise.resolve(new BigN(DEFAULT_DTAO_MINBOND));
-  }
 
   constructor (state: KoniState, chain: string) {
     super(state, chain);
@@ -261,7 +255,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       try {
         for (const subnet of this.subnetData) {
           const netuid = subnet.netuid.toString().padStart(2, '0');
-          const subnetSlug = `${this.slug}__subnet_${netuid.padStart(2, '0')}`;
+          const subnetSlug = `${this.slug}__subnet_${netuid}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
           const bnTaoIn = new BigN(subnet.taoIn);
           const emission = new BigN(subnet.taoInEmission).dividedBy(new BigN(10).pow(7));
@@ -278,7 +272,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
               subnetData: {
                 netuid: subnet.netuid,
                 subnetSymbol: subnet.symbol || 'dTAO'
-              }
+              },
+              minValidate: DEFAULT_DTAO_MINBOND
             },
             statistic: {
               assetEarning: [{ slug: this.nativeToken.slug }],
@@ -319,8 +314,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
 
   /* Subscribe pool position */
 
-  override async parseNominatorMetadata (chainInfo: _ChainInfo, delegatorState: TaoStakingStakeOption[]): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
-    const bnMinBond = await this.getMinBond();
+  override async parseNominatorMetadata (chainInfo: _ChainInfo, delegatorState: TaoStakingStakeOption[], netuid?: number): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+    const bnMinBond = await this.getMinBond(netuid);
 
     return this.parseNominatorMetadataBase(chainInfo, delegatorState, bnMinBond.toString(), true);
   }
@@ -393,7 +388,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
             const { delegatorState = [], originalTotalStake = BN_ZERO } = subnetPositions[netuid] || {};
 
             if (delegatorState.length > 0) {
-              this.parseNominatorMetadata(chainInfo, delegatorState)
+              this.parseNominatorMetadata(chainInfo, delegatorState, netuid)
                 .then((nominatorMetadata) => {
                   rsCallback({
                     ...defaultInfo,
