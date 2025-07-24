@@ -19,7 +19,7 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { _reformatAddressWithChain, detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -139,7 +139,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
-  const checkAction = usePreCheckAction(fromValue, true, detectTranslate('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
+  const checkAction = usePreCheckAction(fromValue, true, t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
 
   const currentConfirmation = useMemo(() => {
     if (chainValue && destChainValue) {

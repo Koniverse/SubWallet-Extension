@@ -4,6 +4,7 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { SwapErrorType } from '@subwallet/extension-base/types/swap';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 const defaultErrorMap: Record<SwapErrorType, { message: string, code?: number }> = {
   ERROR_FETCHING_QUOTE: {
@@ -63,7 +64,7 @@ export class SwapError extends SWError {
   constructor (errorType: SwapErrorType, errMessage?: string, data?: unknown) {
     const { code, message } = defaultErrorMap[errorType];
 
-    super(errorType, errMessage || message, code, data);
+    super(errorType, errMessage || t(message), code, data);
 
     this.errorType = errorType;
   }

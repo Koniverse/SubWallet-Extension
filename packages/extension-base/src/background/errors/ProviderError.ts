@@ -4,6 +4,7 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 const defaultErrorMap: Record<ProviderErrorType, { message: string, code?: number }> = {
   CHAIN_DISCONNECTED: {
@@ -30,7 +31,7 @@ export class ProviderError extends SWError {
   constructor (errorType: ProviderErrorType, errMessage?: string, data?: unknown, errorCode?: number) {
     const { code, message } = defaultErrorMap[errorType];
 
-    super(errorType, errMessage || message, errorCode || code, data);
+    super(errorType, errMessage || t(message), errorCode || code, data);
 
     this.errorType = errorType;
   }

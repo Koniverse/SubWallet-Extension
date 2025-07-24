@@ -3,6 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 export enum DeriveErrorType {
   INVALID_DERIVATION_PATH = 'INVALID_DERIVATION_PATH',
@@ -26,7 +27,7 @@ export class SWDeriveError extends SWError {
   override errorClass = 'Derive';
   constructor (errorType: DeriveErrorType, _message?: string) {
     const defaultData = DEFAULT_DATA[errorType];
-    const message = _message || defaultData.message;
+    const message = _message || t(defaultData.message) || '';
 
     super(errorType, message, defaultData.code);
   }

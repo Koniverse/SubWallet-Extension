@@ -3,6 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 export enum CommonAccountErrorType {
   ACCOUNT_NOT_FOUND = 'ACCOUNT_NOT_FOUND',
@@ -20,7 +21,7 @@ export class SWCommonAccountError extends SWError {
   override errorClass = 'Account';
   constructor (errorType: CommonAccountErrorType, _message?: string) {
     const defaultData = DEFAULT_DATA[errorType];
-    const message = _message || defaultData.message;
+    const message = _message || t(defaultData.message) || '';
 
     super(errorType, message, defaultData.code);
   }

@@ -101,7 +101,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         } else {
           notify({
             message: t(
-              message ?? defaultMessage,
+              message ?? t(defaultMessage),
               { replace: { accountTitle: accountTitle } }
             ),
             type: 'info',
