@@ -19,7 +19,7 @@ export const chainsToWalletConnectChainInfos = (chainMap: Record<string, _ChainI
         chainInfo,
         slug: chainInfo?.slug || chain,
         supported: !!chainInfo,
-        accountType: chainInfo ? _chainInfoToChainType(chainInfo) : AccountChainType.ETHEREUM, // Default to Ethereum for the EIP-155 namespace so that unsupported EVM networks can still be imported.
+        accountType: AccountChainType.ETHEREUM,
         wcChain: chain
       };
     } else if (namespace === WALLET_CONNECT_POLKADOT_NAMESPACE) {
