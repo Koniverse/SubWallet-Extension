@@ -2230,8 +2230,6 @@ export default class KoniExtension {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      await tokenContract.methods.tokenURI(1).call();
 
       return true;
     } catch (err) {
