@@ -3,6 +3,7 @@
 
 import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { hasAnyAccountForMigration } from '@subwallet/extension-base/services/keyring-service/utils';
+import { AccountProxyType } from '@subwallet/extension-base/types';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import { useDefaultNavigate } from '@subwallet/extension-web-ui/hooks';
 import { saveMigrationAcknowledgedStatus } from '@subwallet/extension-web-ui/messaging';
@@ -22,6 +23,7 @@ import { EnterPasswordModal, enterPasswordModalId } from './EnterPasswordModal';
 import { SoloAccountMigrationView } from './SoloAccountMigrationView';
 import { SummaryView } from './SummaryView';
 
+type WrapperProps = ThemeProps;
 type Props = ThemeProps;
 
 export enum ScreenView {
@@ -186,7 +188,41 @@ function Component ({ className = '' }: Props) {
   );
 }
 
-const MigrateAccount = styled(Component)<Props>(({ theme: { extendToken, token } }: Props) => {
+const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
+  const { accountProxies, currentAccountProxy } = useSelector((state: RootState) => state.accountState);
+  const isAcknowledgedUnifiedAccountMigration = useSelector((state: RootState) => state.settings.isAcknowledgedUnifiedAccountMigration);
+  const { goHome } = useDefaultNavigate();
+
+  useEffect(() => {
+    if (!isAcknowledgedUnifiedAccountMigration && accountProxies.length && !accountProxies.some((ap) => {
+      return [
+        AccountProxyType.SOLO,
+        AccountProxyType.UNIFIED,
+        AccountProxyType.QR,
+        AccountProxyType.LEDGER,
+        AccountProxyType.READ_ONLY
+      ].includes(ap.accountType);
+    })) {
+      saveMigrationAcknowledgedStatus({ isAcknowledgedUnifiedAccountMigration: true }).finally(() => {
+        goHome();
+      });
+    }
+  }, [goHome, accountProxies, isAcknowledgedUnifiedAccountMigration]);
+
+  if (!currentAccountProxy || !accountProxies.length) {
+    return (
+      <></>
+    );
+  }
+
+  return (
+    <Component
+      {...props}
+    />
+  );
+};
+
+const MigrateAccount = styled(Wrapper)<Props>(({ theme: { extendToken, token } }: Props) => {
   return ({
     // desktop
     '&-web-base-container': {
