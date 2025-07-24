@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { REMIND_BACKUP_SEED_PHRASE_MODAL, SELECT_ACCOUNT_MODAL, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
 import { useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -12,11 +13,10 @@ import { Button, ModalContext, PageIcon, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ShieldCheck } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import {Trans} from "react-i18next";
-import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 

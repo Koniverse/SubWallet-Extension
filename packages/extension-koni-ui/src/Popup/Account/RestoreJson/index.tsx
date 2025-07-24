@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyExtra } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { IMPORT_ACCOUNT_MODAL, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -17,14 +18,13 @@ import { KeyringPairs$Json } from '@subwallet/ui-keyring/types';
 import CN from 'classnames';
 import { CheckCircle, FileArrowDown } from 'phosphor-react';
 import React, { ChangeEventHandler, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { u8aToString } from '@polkadot/util';
 
 import AccountRestoreJsonItem from './AccountRestoreJsonItem';
-import {Trans} from "react-i18next";
-import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps;
 type ListItemGroupLabel = {

@@ -136,7 +136,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )
             : undefined
         }
-        title={t('ui.EARNING.components.Field.NominationSelector.selectValidatorLabel', {replace: {validatorLabel: handleValidatorLabel}}) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
+        title={t('ui.EARNING.components.Field.NominationSelector.selectValidatorLabel', { replace: { validatorLabel: handleValidatorLabel } }) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
       />
     </>
   );

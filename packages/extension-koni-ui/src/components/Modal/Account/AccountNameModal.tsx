@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountProxyTypeTag } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -12,9 +13,8 @@ import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import styled from 'styled-components';
-import {Trans} from "react-i18next";
-import {detectTranslate} from "@subwallet/extension-base/utils";
 
 type Props = ThemeProps & {
   isLoading?: boolean;

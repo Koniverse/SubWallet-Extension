@@ -1,11 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { MissionCategory } from '@subwallet/extension-koni-ui/types';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import { CheckCircle, Coin, Cube, DiceSix, MegaphoneSimple, SelectionBackground, User } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
-import { detectTranslate } from '@subwallet/extension-base/utils';
+
 export enum MissionCategoryType {
   ALL='all',
   UPCOMING='upcoming',

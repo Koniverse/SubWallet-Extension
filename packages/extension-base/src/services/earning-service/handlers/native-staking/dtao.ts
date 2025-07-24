@@ -750,7 +750,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
 
     if (new BigN(amount).lt(formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)))) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.dtao.unstakeAmountTooLow', { replace: { amount: formattedMinUnstake.toString(), symbol: poolInfo.metadata.subnetData?.subnetSymbol || ''} }))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.dtao.unstakeAmountTooLow', { replace: { amount: formattedMinUnstake.toString(), symbol: poolInfo.metadata.subnetData?.subnetSymbol || '' } }))];
     }
 
     return baseErrors;
@@ -787,13 +787,13 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinUnstake = formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken));
 
     if (new BigN(maxAmount).lt(bnMinUnstake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.dtao.moveAmountTooLow', {replace: {formattedMinUnstake: formattedMinUnstake.toString(), subnetSymbol: metadata?.subnetSymbol || ''}} )));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.dtao.moveAmountTooLow', { replace: { formattedMinUnstake: formattedMinUnstake.toString(), subnetSymbol: metadata?.subnetSymbol || '' } })));
     }
 
     // Avoid remaining amount too low -> can't do anything with that amount
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
       return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
-        t('bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning', {replace: {maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: metadata?.subnetSymbol || ''}})));
+        t('bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning', { replace: { maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: metadata?.subnetSymbol || '' } })));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);

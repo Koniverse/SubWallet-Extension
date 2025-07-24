@@ -630,7 +630,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinStake = minDelegatorStake.toString();
 
     if (new BigN(amount).lt(bnMinStake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn', {replace: {bnMinStake: formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken)}}))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn', { replace: { bnMinStake: formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } }))];
     }
 
     return baseErrors;
@@ -669,7 +669,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinUnstake = new BigN(minDelegatorStake.toString());
 
     if (new BigN(amount).lt(bnMinUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow', {replace: {bnMinUnstake: formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken)}}))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow', { replace: { bnMinUnstake: formatNumber(bnMinUnstake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } }))];
     }
 
     return baseErrors;
@@ -702,13 +702,13 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinMoveStake = new BigN(minDelegatorStake.toString());
 
     if (new BigN(maxAmount).lt(bnMinMoveStake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow', {replace: {bnMinMoveStake: formatNumber(bnMinMoveStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken)}})));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow', { replace: { bnMinMoveStake: formatNumber(bnMinMoveStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } })));
     }
 
     // Avoid remaining amount too low -> can't do anything with that amount
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinMoveStake)) {
       return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
-        t('bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning', {replace: {maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: _getAssetSymbol(this.nativeToken)}})));
+        t('bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning', { replace: { maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: _getAssetSymbol(this.nativeToken) } })));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, 0, 0, amount);

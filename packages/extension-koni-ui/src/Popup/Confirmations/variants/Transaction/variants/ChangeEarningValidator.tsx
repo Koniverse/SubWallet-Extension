@@ -212,7 +212,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </MetaInfo>
           <AlertBox
             className={'alert-box'}
-            description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', {replace: {number: 0.00005}})}
+            description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', { replace: { number: 0.00005 } })}
             title={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee')}
             type='info'
           />

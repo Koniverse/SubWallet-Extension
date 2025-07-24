@@ -1,18 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {POLKADOT_LEDGER_SCHEME} from '@subwallet/extension-base/background/KoniTypes';
-import {BasicInputWrapper} from '@subwallet/extension-koni-ui/components';
+import { POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
+import { detectTranslate } from '@subwallet/extension-base/utils';
+import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import {useSelectModalInputHelper} from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
-import {ChainItemType, ThemeProps} from '@subwallet/extension-koni-ui/types';
-import {Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block} from '@subwallet/react-ui';
+import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
+import { ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {CaretDown} from 'phosphor-react';
-import React, {ForwardedRef, forwardRef, useCallback, useContext, useMemo} from 'react';
+import { CaretDown } from 'phosphor-react';
+import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import styled from 'styled-components';
-import {Trans} from "react-i18next";
-import {detectTranslate} from "@subwallet/extension-base/utils";
 
 export interface LedgerPolkadotAccountItemType extends ChainItemType {
   scheme: POLKADOT_LEDGER_SCHEME;
