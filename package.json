@@ -15,10 +15,10 @@
     "packages/*"
   ],
   "bin": {
-    "i18n-combined-data": "scripts/i18n/i18n-combined.mjs",
-    "i18n-mapping-generator": "scripts/i18n/i18n-mapping-generator.mjs",
-    "i18n-text-replacer": "scripts/i18n/i18n-text-replacer.mjs",
-    "i18n-update-translation-files": "scripts/i18n/i18n-update-translation-files.mjs",
+    "i18n-combined-data": "scripts/i18n/koni-i18n-combined.mjs",
+    "i18n-mapping-generator": "scripts/i18n/koni-i18n-mapping-generator.mjs",
+    "i18n-text-replacer": "scripts/i18n/koni-i18n-text-replacer.mjs",
+    "i18n-update-translation-files": "scripts/i18n/koni-i18n-update-translation-files.mjs",
     "koni-ci-build-dev": "./scripts/koni-ci-build-dev.mjs",
     "koni-ci-build-i18n": "./scripts/koni-ci-build-i18n.mjs",
     "koni-ci-build-webapp": "./scripts/koni-ci-build-webapp.mjs",
