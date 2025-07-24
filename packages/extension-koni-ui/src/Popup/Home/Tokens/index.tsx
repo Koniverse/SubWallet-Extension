@@ -165,7 +165,7 @@ const Component = (): React.ReactElement => {
     };
 
     const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
-      return accountProxies.some((account) => isSupportAccount(account));
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
     };
 
     if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
