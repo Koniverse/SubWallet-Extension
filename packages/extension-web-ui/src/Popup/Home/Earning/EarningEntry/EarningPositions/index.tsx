@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { APIItemState, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, BaseModal, EarningInstructionModal, EarningPositionDesktopItem, EarningPositionItem, EmptyList, FilterModal, Layout } from '@subwallet/extension-web-ui/components';
 import { FilterTabsNode } from '@subwallet/extension-web-ui/components/FilterTabsNode';
 import BannerGenerator from '@subwallet/extension-web-ui/components/StaticContent/BannerGenerator';
-import { ASTAR_PORTAL_URL, BN_TEN, CANCEL_UN_STAKE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, EARNING_INSTRUCTION_MODAL, EARNING_WARNING_ANNOUNCEMENT, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { ASTAR_PORTAL_URL, BN_TEN, CANCEL_UN_STAKE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, EARNING_INSTRUCTION_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
-import { useAlert, useFilterModal, useGetBannerByScreen, useGetYieldPositionForSpecificAccount, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useAlert, useFilterModal, useGetBannerByScreen, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron } from '@subwallet/extension-web-ui/messaging';
 import EarningPositionBalance from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningEntry/EarningPositions/EarningPositionsBalance';
 import { Toolbar } from '@subwallet/extension-web-ui/Popup/Home/Earning/shared/desktop/Toolbar';
@@ -20,13 +20,13 @@ import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transacti
 import CancelUnstake from '@subwallet/extension-web-ui/Popup/Transaction/variants/CancelUnstake';
 import Unbond from '@subwallet/extension-web-ui/Popup/Transaction/variants/Unbond';
 import { EarningEntryView, EarningPositionDetailParam, ExtraYieldPositionInfo, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getTransactionFromAccountProxyValue, isAccountAll, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isRelatedToAstar, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, ModalContext, SwIconProps, SwList } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsClockwise, CirclesThreePlus, Database, FadersHorizontal, HandsClapping, Leaf, Plus, PlusCircle, SquaresFour, Users, Vault } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
-import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -76,7 +76,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const { currencyData, priceMap } = useSelector((state) => state.price);
   const { assetRegistry: assetInfoMap } = useSelector((state) => state.assetRegistry);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const accounts = useSelector((state) => state.accountState.accounts);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
   const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
@@ -91,8 +90,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
   const [, setCancelUnStakeStorage] = useLocalStorage(CANCEL_UN_STAKE_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS);
-  const [announcement, setAnnouncement] = useLocalStorage(EARNING_WARNING_ANNOUNCEMENT, 'nonConfirmed');
-  const specificList = useGetYieldPositionForSpecificAccount();
 
   const { inactiveModal } = useContext(ModalContext);
 
@@ -181,102 +178,6 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           getValue(secondItem) - getValue(firstItem);
       });
   }, [assetInfoMap, chainInfoMap, currencyData, earningPositions, priceMap]);
-
-  const chainStakingBoth = useMemo(() => {
-    if (!currentAccountProxy) {
-      return null;
-    }
-
-    const chains = ['polkadot', 'kusama'];
-
-    const findChainWithStaking = (list: YieldPositionInfo[]) => {
-      const hasNativeStaking = (chain: string) => list.some((item) => item.chain === chain && item.type === YieldPoolType.NATIVE_STAKING);
-      const hasNominationPool = (chain: string) => list.some((item) => item.chain === chain && item.type === YieldPoolType.NOMINATION_POOL);
-
-      for (const chain of chains) {
-        if (hasNativeStaking(chain) && hasNominationPool(chain)) {
-          return chain;
-        }
-      }
-
-      return null;
-    };
-
-    if (isAccountAll(currentAccountProxy.id)) {
-      return findChainWithStaking(specificList);
-    }
-
-    for (const acc of accounts) {
-      if (isAccountAll(acc.address)) {
-        continue;
-      }
-
-      const listStaking = specificList.filter((item) => item.address === acc.address);
-      const chain = findChainWithStaking(listStaking);
-
-      if (chain) {
-        return chain;
-      }
-    }
-
-    return null;
-  }, [accounts, currentAccountProxy, specificList]);
-
-  const learnMore = useCallback(() => {
-    window.open('https://support.polkadot.network/support/solutions/articles/65000188140-changes-for-nomination-pool-members-and-opengov-participation');
-  }, []);
-
-  const onCancel = useCallback(() => {
-    closeAlert();
-    setAnnouncement('confirmed');
-  }, [closeAlert, setAnnouncement]);
-
-  useEffect(() => {
-    if (chainStakingBoth && announcement.includes('nonConfirmed')) {
-      const chainInfo = chainStakingBoth && chainInfoMap[chainStakingBoth];
-
-      const symbol = (!!chainInfo && chainInfo?.substrateInfo?.symbol) || '';
-      const originChain = (!!chainInfo && chainInfo?.name) || '';
-
-      openAlert({
-        type: NotificationType.WARNING,
-        onCancel: onCancel,
-        content:
-          (<>
-            <div className={CN(className, 'earning-alert-content')}>
-              <span>{t('You’re dual staking via both direct nomination and nomination pool, which')}&nbsp;</span>
-              <span className={'__info-highlight'}>{t('will not be supported')}&nbsp;</span>
-              <span>{t(`in the upcoming ${originChain} runtime upgrade. Read more to learn about the upgrade, and`)}&nbsp;</span>
-              <a
-                href={'https://docs.subwallet.app/main/mobile-app-user-guide/manage-staking/unstake'}
-                rel='noreferrer'
-                style={{ textDecoration: 'underline' }}
-                target={'_blank'}
-              >{(`unstake your ${symbol}`)}
-              </a>
-              <span>&nbsp;{t('from one of the methods to avoid issues')}</span>
-            </div>
-
-          </>),
-        title: t(`Unstake your ${symbol} now!`),
-        okButton: {
-          text: t('Read update'),
-          onClick: () => {
-            learnMore();
-            setAnnouncement('confirmed');
-            closeAlert();
-          }
-        },
-        cancelButton: {
-          text: t('Dismiss'),
-          onClick: () => {
-            closeAlert();
-            setAnnouncement('confirmed');
-          }
-        }
-      });
-    }
-  }, [announcement, chainInfoMap, chainStakingBoth, className, closeAlert, learnMore, onCancel, openAlert, setAnnouncement, t]);
 
   const filterOptions = [
     { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
