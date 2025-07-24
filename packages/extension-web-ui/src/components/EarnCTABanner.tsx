@@ -1,21 +1,74 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { _getMultiChainAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { SHOW_BANNER_TOKEN_GROUPS } from '@subwallet/extension-web-ui/constants';
+import { useSelector } from '@subwallet/extension-web-ui/hooks';
+import { RootState } from '@subwallet/extension-web-ui/stores';
+import { EarningPoolsParam, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import { Coins, Vault } from 'phosphor-react';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  title: string,
-  content: string,
-  onClickEarnNow: VoidFunction;
+  tokenGroupSlug: string;
 };
 
-const Component: React.FC<Props> = ({ className, content, onClickEarnNow, title }: Props) => {
+const Component: React.FC<Props> = ({ className, tokenGroupSlug }: Props) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const assetRegistryMap = useSelector((root: RootState) => root.assetRegistry.assetRegistry);
+  const multiChainAssetMap = useSelector((state: RootState) => state.assetRegistry.multiChainAssetMap);
+
+  const symbol = useMemo<string>(() => {
+    if (tokenGroupSlug) {
+      if (multiChainAssetMap[tokenGroupSlug]) {
+        return multiChainAssetMap[tokenGroupSlug].symbol;
+      }
+
+      if (assetRegistryMap[tokenGroupSlug]) {
+        return assetRegistryMap[tokenGroupSlug].symbol;
+      }
+    }
+
+    return '';
+  }, [tokenGroupSlug, assetRegistryMap, multiChainAssetMap]);
+
+  const multiChainAssetSlug = useMemo(() => {
+    if (multiChainAssetMap[tokenGroupSlug]) {
+      return tokenGroupSlug;
+    }
+
+    if (assetRegistryMap[tokenGroupSlug]) {
+      return _getMultiChainAsset(assetRegistryMap[tokenGroupSlug]);
+    }
+
+    return undefined;
+  }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
+
+  const onClickEarnNow = useCallback(() => {
+    if (!tokenGroupSlug || !symbol || !multiChainAssetSlug) {
+      return;
+    }
+
+    navigate('/home/earning/pools', { state: {
+      poolGroup: multiChainAssetSlug,
+      symbol
+    } as EarningPoolsParam });
+  }, [multiChainAssetSlug, navigate, symbol, tokenGroupSlug]);
+
+  const isShowBanner = useMemo(() => {
+    return SHOW_BANNER_TOKEN_GROUPS.some((slug) => {
+      return slug === multiChainAssetSlug;
+    });
+  }, [multiChainAssetSlug]);
+
+  if (!isShowBanner) {
+    return null;
+  }
 
   return (
     <div className={className}>
@@ -28,11 +81,11 @@ const Component: React.FC<Props> = ({ className, content, onClickEarnNow, title 
           />
 
           <div className={'__title'}>
-            {title}
+            {t('Earn yield on your {{symbol}}', { replace: { symbol: symbol } })}
           </div>
         </div>
 
-        <div className={'__content'}>{content}</div>
+        <div className={'__content'}>{t('There are multiple ways to earn with your {{symbol}}, such as native staking, liquid staking, or lending. Check out Earning for curated options with competitive APY to earn yield on your DOT.', { replace: { symbol: symbol } })}</div>
       </div>
 
       <Button
@@ -57,8 +110,9 @@ const Component: React.FC<Props> = ({ className, content, onClickEarnNow, title 
   );
 };
 
-const Banner = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const EarnCTABanner = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    marginTop: 24,
     borderTop: `2px solid ${token.colorBgDivider}`,
     display: 'flex',
     gap: token.size,
@@ -66,6 +120,7 @@ const Banner = styled(Component)<Props>(({ theme: { token } }: Props) => {
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     paddingTop: token.sizeLG,
+    marginInline: 44,
     paddingBottom: 32,
     background: token.colorBgDefault,
     opacity: 1,
@@ -138,4 +193,4 @@ const Banner = styled(Component)<Props>(({ theme: { token } }: Props) => {
   };
 });
 
-export default Banner;
+export default EarnCTABanner;
