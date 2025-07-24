@@ -2227,37 +2227,22 @@ export default class KoniExtension {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
-    const validationMethod = [
-      {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-        method: () => tokenContract.methods.ownerOf(1).call()
-      },
-      {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-        method: () => tokenContract.methods.tokenURI(1).call()
-      },
-      {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-        method: () => tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call(),
-        isErrorValid: (error: Error) => error.message.includes('index out of bounds')
-      }
-    ];
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await tokenContract.methods.tokenURI(1).call();
 
-    for (const method of validationMethod) {
-      try {
-        await method.method();
+      return true;
+    } catch (err) {
+      const error = err as Error;
 
+      if (error.message.includes('index out of bounds')) {
         return true;
-      } catch (err) {
-        const error = err as Error;
-
-        if (method.isErrorValid && method.isErrorValid(error)) {
-          return true;
-        }
+      } else {
+        return false;
       }
     }
-
-    return false;
   }
 
   private async upsertCustomToken (data: _ChainAsset): Promise<ResponseNftImport> {
