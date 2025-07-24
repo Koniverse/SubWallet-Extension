@@ -242,6 +242,7 @@ export default class WalletConnectService {
 
     this.#checkClient();
 
+    // The purpose of designing a timeout for pairing is to prevent the promise from not being resolved if there are issues during the pairing process.
     await Promise.race([
       this.#client?.pair({ uri }),
       wait(WALLET_CONNECT_SESSION_TIMEOUT).then(() => {
