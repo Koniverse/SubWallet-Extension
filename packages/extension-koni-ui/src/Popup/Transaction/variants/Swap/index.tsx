@@ -1419,7 +1419,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }, [allowedChainAndExcludedTokenForTargetAccountProxy, assetRegistryMap, finalDefaultSlug, swappableSlugsSet]);
 
   const isUnsupportedDefaultSlug = useMemo(() => {
-    return (finalDefaultSlug !== '' &&
+    return (!!finalDefaultSlug &&
       !swappableSlugsSet.has(finalDefaultSlug) &&
       !multiAssetOfAccountSwappable);
   }, [finalDefaultSlug, multiAssetOfAccountSwappable, swappableSlugsSet]);
