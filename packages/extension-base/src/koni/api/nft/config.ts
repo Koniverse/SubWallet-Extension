@@ -79,7 +79,7 @@ export const IPFS_FLEEK = 'https://ipfs.fleek.co/ipfs/';
 export const W3S_IPFS = 'https://w3s.link/ipfs/'; // 400
 export const IPFS2_RMRK = 'https://ipfs2.rmrk.link/ipfs/'; // ????
 export const IPFS_ETH_ARAGON = 'https://ipfs.eth.aragon.network/ipfs/'; // 400
-export const SUBWALLET_IPFS = 'https://ipfs.subwallet.app/ipfs/'; // ???
+export const SUBWALLET_IPFS = 'https://ipfs-files.subwallet.app/ipfs/'; // ???
 
 export enum SUPPORTED_NFT_NETWORKS {
   karura = 'karura',
