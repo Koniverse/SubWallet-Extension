@@ -5484,22 +5484,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/ui-settings@npm:2.9.14":
-  version: 2.9.14
-  resolution: "@polkadot/ui-settings@npm:2.9.14"
-  dependencies:
-    "@babel/runtime": ^7.20.6
-    "@polkadot/networks": ^10.2.1
-    "@polkadot/util": ^10.2.1
-    eventemitter3: ^4.0.7
-    store: ^2.0.12
-  peerDependencies:
-    "@polkadot/networks": "*"
-    "@polkadot/util": "*"
-  checksum: 5877dfdda7b2a3fc6274520f9d3ea7c4836dd2b4a58fc75f55fd2b2311f9dafb24882e3e9ae6bf003f0e90dd426e5dce87c4d313b2bf6cde2cc52c47e153af5a
-  languageName: node
-  linkType: hard
-
 "@polkadot/ui-settings@npm:3.15.2, @polkadot/ui-settings@npm:^3.15.2":
   version: 3.15.2
   resolution: "@polkadot/ui-settings@npm:3.15.2"
@@ -6794,9 +6778,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.48-2
     "@subwallet/extension-inject": ^1.3.48-2
     "@subwallet/extension-mocks": ^1.3.48-2
-    "@subwallet/keyring": ^0.1.12
+    "@subwallet/keyring": ^0.1.13
     "@subwallet/subwallet-api-sdk": ^1.3.48-2
-    "@subwallet/ui-keyring": ^0.1.12
+    "@subwallet/ui-keyring": ^0.1.13
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
     "@ton/ton": ^15.0.0
@@ -6899,7 +6883,7 @@ __metadata:
     "@polkadot/util": ^13.5.3
     "@polkadot/util-crypto": ^13.5.3
     "@polkadot/x-global": ^13.5.3
-    "@subwallet/keyring": ^0.1.12
+    "@subwallet/keyring": ^0.1.13
     "@types/chrome": ^0.0.254
     "@types/firefox-webext-browser": ^120.0.0
     web3-core: ^1.10.0
@@ -6936,9 +6920,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.48-2
     "@subwallet/extension-inject": ^1.3.48-2
     "@subwallet/extension-mocks": ^1.3.48-2
-    "@subwallet/keyring": ^0.1.12
+    "@subwallet/keyring": ^0.1.13
     "@subwallet/react-ui": 5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.12
+    "@subwallet/ui-keyring": ^0.1.13
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7078,9 +7062,9 @@ __metadata:
     "@subwallet/extension-dapp": ^1.3.48-2
     "@subwallet/extension-inject": ^1.3.48-2
     "@subwallet/extension-mocks": ^1.3.48-2
-    "@subwallet/keyring": ^0.1.12
+    "@subwallet/keyring": ^0.1.13
     "@subwallet/react-ui": ^5.1.2-b77
-    "@subwallet/ui-keyring": ^0.1.12
+    "@subwallet/ui-keyring": ^0.1.13
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7143,17 +7127,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.12":
-  version: 0.1.12
-  resolution: "@subwallet/keyring@npm:0.1.12"
+"@subwallet/keyring@npm:^0.1.13":
+  version: 0.1.13
+  resolution: "@subwallet/keyring@npm:0.1.13"
   dependencies:
     "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@ethereumjs/tx": ^5.0.0
     "@metamask/eth-sig-util": ^7.0.3
     "@metamask/eth-simple-keyring": ^6.0.1
-    "@polkadot/util": ^12.2.1
-    "@polkadot/util-crypto": ^12.2.1
+    "@polkadot/util": ^13.5.3
+    "@polkadot/util-crypto": ^13.5.3
     "@ton/core": ^0.56.3
     "@ton/crypto": ^3.2.0
     "@ton/ton": ^15.0.0
@@ -7167,7 +7151,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: 2b75624a11d7f218dfbd8e899fe5ec3e702d8afd8d9636b5d3b0b827f31124cff036353fc8a95380392804fac4b4ddf9f1f242b67dd7dff550160a7d2c3dbdb0
+  checksum: fedcacb62c2474224fd7bd3cb9ed8c6ac884192fe8b26627fe6c83adfc3b4a0e237dffce921c3c694f005966ba86077600bef2bf2359956862eec4d28a82a8c9
   languageName: node
   linkType: hard
 
@@ -7258,19 +7242,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/ui-keyring@npm:^0.1.12":
-  version: 0.1.12
-  resolution: "@subwallet/ui-keyring@npm:0.1.12"
+"@subwallet/ui-keyring@npm:^0.1.13":
+  version: 0.1.13
+  resolution: "@subwallet/ui-keyring@npm:0.1.13"
   dependencies:
     "@babel/runtime": ^7.20.1
-    "@polkadot/ui-settings": 2.9.14
-    "@polkadot/util": ^12.2.1
-    "@polkadot/util-crypto": ^12.2.1
-    "@subwallet/keyring": ^0.1.12
+    "@polkadot/ui-settings": ^3.15.2
+    "@polkadot/util": ^13.5.3
+    "@polkadot/util-crypto": ^13.5.3
+    "@subwallet/keyring": ^0.1.13
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: bc6084ce38e73ddd1a23dc8765b72a36f8ba71293e8ffa3fbbc0a462ee1189f2ae3f46d0697f6001aabff763c464957bd85de5155bc79037aecd48b645a3df5f
+  checksum: bcccd5fdddf7cb0db06d63e299a5b7c955085fdb3e56417eece2d9aa3033780d48e9fc62b0efd803a11ba83f9507563c3a76e454d369099280031ccf047feba4
   languageName: node
   linkType: hard
 
