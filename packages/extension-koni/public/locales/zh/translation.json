@@ -2260,5 +2260,7 @@
   "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.yourValidators": "Your validators",
   "ui.EARNING.components.Modal.Earning.ValidatorDetail.delegator": "Delegator",
   "ui.EARNING.components.Modal.Earning.ValidatorDetail.nominator": "Nominator",
-  "ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo": "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>"
+  "ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo": "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>",
+  "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts": "Export {{getNumberAccount}} accounts",
+  "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount": "Export {{getNumberAccount}} account"
 }

@@ -206,7 +206,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )}
             onClick={exportAllAccounts}
           >
-            {getNumberAccount > 1 ? t(`Export ${getNumberAccount} accounts`) : t(`Export ${getNumberAccount} account`)}
+            {getNumberAccount > 1 ? t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts', { replace: { getNumberAccount: getNumberAccount } }) : t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount', { replace: { getNumberAccount: getNumberAccount } })}
           </Button>
         )}
         id={id}

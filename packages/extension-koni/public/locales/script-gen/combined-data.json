@@ -1,4 +1,34 @@
 {
+  "Export {{getNumberAccount}} accounts": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+        "key": "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts"
+      }
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} accounts",
+      "ja": "Export {{getNumberAccount}} accounts",
+      "vi": "Export {{getNumberAccount}} accounts",
+      "zh": "Export {{getNumberAccount}} accounts",
+      "ru": "Export {{getNumberAccount}} accounts"
+    }
+  },
+  "Export {{getNumberAccount}} account": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
+        "key": "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount"
+      }
+    ],
+    "translations": {
+      "en": "Export {{getNumberAccount}} account",
+      "ja": "Export {{getNumberAccount}} account",
+      "vi": "Export {{getNumberAccount}} account",
+      "zh": "Export {{getNumberAccount}} account",
+      "ru": "Export {{getNumberAccount}} account"
+    }
+  },
   "Create buy order fail": {
     "locations": [
       {
@@ -22123,36 +22153,6 @@
       "vi": "Export and back up accounts",
       "zh": "Export and back up accounts",
       "ru": "Export and back up accounts"
-    }
-  },
-  "Export {{getNumberAccount}} accounts": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
-        "key": "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts"
-      }
-    ],
-    "translations": {
-      "en": "Export {{getNumberAccount}} accounts",
-      "ja": "Export {{getNumberAccount}} accounts",
-      "vi": "Export {{getNumberAccount}} accounts",
-      "zh": "Export {{getNumberAccount}} accounts",
-      "ru": "Export {{getNumberAccount}} accounts"
-    }
-  },
-  "Export {{getNumberAccount}} account": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Layout/parts/SelectAccount/ExportAllSelector.tsx",
-        "key": "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount"
-      }
-    ],
-    "translations": {
-      "en": "Export {{getNumberAccount}} account",
-      "ja": "Export {{getNumberAccount}} account",
-      "vi": "Export {{getNumberAccount}} account",
-      "zh": "Export {{getNumberAccount}} account",
-      "ru": "Export {{getNumberAccount}} account"
     }
   },
   "Attach account": {
