@@ -188,9 +188,9 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     };
   }
 
-  private async init (): Promise<void> {
+  private async init (forceRefresh = false): Promise<void> {
     try {
-      if (this.isInit || !this.substrateApi) {
+      if ((this.isInit && !forceRefresh) || !this.substrateApi) {
         return;
       }
 
@@ -241,12 +241,11 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
   /* Subscribe pool info */
 
   override async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
-    await this.init();
-
+    await this.substrateApi.isReady;
     let cancel = false;
 
     const updateStakingInfo = async () => {
-      await this.substrateApi.isReady;
+      await this.init(true);
 
       if (cancel) {
         return;

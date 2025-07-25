@@ -15,7 +15,7 @@ import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
-import { combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
@@ -246,8 +246,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   protected bittensorCache: BittensorCache;
 
   protected async getMinBond (netuid?: number): Promise<BigN> {
-    const onlineData = await fetchPoolsData();
-
     // @ts-ignore
     if (this.type === YieldPoolType.SUBNET_STAKING) {
       if (!netuid) {
@@ -255,14 +253,33 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       }
 
       const subnetSlug = `${this.slug}__subnet_${netuid.toString().padStart(2, '0')}`;
-      const _poolInfo = onlineData[subnetSlug];
 
-      return new BigN(_poolInfo?.metadata?.minValidate || DEFAULT_DTAO_MINBOND);
-    } else {
-      const _poolInfo = onlineData[this.slug];
+      const cachedPool = await this.getPoolInfo(subnetSlug);
 
-      return new BigN(_poolInfo?.metadata.minValidate || _poolInfo?.statistic?.earningThreshold.join || 0);
+      console.log('cachedPool', cachedPool);
+
+      if (cachedPool?.metadata?.minValidate) {
+        return new BigN(cachedPool.metadata.minValidate);
+      }
+
+      // If can't get from cached -> get data online
+      const onlineData = await fetchPoolsData();
+      const onlinePool = onlineData[subnetSlug];
+
+      return new BigN(onlinePool?.metadata?.minValidate || DEFAULT_DTAO_MINBOND);
     }
+
+    const cachedPool = await this.getPoolInfo(this.slug);
+
+    if (cachedPool?.metadata?.minValidate || cachedPool?.statistic?.earningThreshold?.join) {
+      return new BigN(cachedPool.metadata?.minValidate || cachedPool.statistic?.earningThreshold?.join || 0);
+    }
+
+    // If can get from cached -> get data online
+    const onlineData = await fetchPoolsData();
+    const onlinePool = onlineData[this.slug];
+
+    return new BigN(onlinePool?.metadata?.minValidate || onlinePool?.statistic?.earningThreshold?.join || 0);
   }
 
   constructor (state: KoniState, chain: string) {
@@ -295,7 +312,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
 
-    let apr = 0;
+    const aprSubject = new BehaviorSubject<number>(0);
 
     const fetchAPR = async () => {
       try {
@@ -303,7 +320,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         const validators = _topValidator.data;
         const highestApr = validators?.[0];
 
-        apr = this.chain === 'bittensor' ? Number(highestApr?.thirty_day_apy || 0) * 100 : 0;
+        const apr = this.chain === 'bittensor' ? Number(highestApr?.thirty_day_apy || 0) * 100 : 0;
+
+        aprSubject.next(apr);
       } catch (e) {
         console.error('Fetch APR error:', e);
       }
@@ -319,8 +338,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const rxMinDelegatorStake = substrateApi.api.rx.query.subtensorModule.nominatorMinRequiredStake();
     const rxMaxValidators = substrateApi.api.rx.query.subtensorModule.maxAllowedValidators(0);
 
-    const subscription = combineLatest([rxMinDelegatorStake, rxMaxValidators, rxSubnetTAO]).subscribe({
-      next: ([minDelegatorStake, maxValidators, taoIn]) => {
+    const subscription = combineLatest([rxMinDelegatorStake, rxMaxValidators, rxSubnetTAO, aprSubject]).subscribe({
+      next: ([minDelegatorStake, maxValidators, taoIn, apr]) => {
         if (cancel) {
           return;
         }
@@ -363,6 +382,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     return () => {
       cancel = true;
+      aprSubject.complete();
       subscription.unsubscribe();
       clearInterval(interval);
     };
@@ -687,6 +707,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
+    console.log('Hmm', [selectedTarget, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed()]);
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(
       selectedTarget,
       netuid,
