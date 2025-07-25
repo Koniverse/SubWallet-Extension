@@ -206,6 +206,32 @@ function Component (): React.ReactElement {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
+  const isSwapSupported = useMemo(() => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
+
+      return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
+    };
+
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
+    };
+
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAccount(accountProxies);
+    } else {
+      return isSupportAccount(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
   const isReadonlyAccount = useMemo(() => {
     return currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
   }, [currentAccountProxy]);
@@ -493,7 +519,7 @@ function Component (): React.ReactElement {
           isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
-          isSupportSwap={true}
+          isSupportSwap={isSwapSupported}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
