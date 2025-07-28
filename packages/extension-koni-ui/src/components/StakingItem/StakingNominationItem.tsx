@@ -73,7 +73,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         <>
                             -
                           <div className='middle-item__apy'>
-                            &nbsp;{t('APY')}: {nominationInfo.expectedReturn ? formatBalance(nominationInfo.expectedReturn, 0) : '0'}%
+                            &nbsp;{t('ui.EARNING.components.StakingItem.Nomination.apy')}: {nominationInfo.expectedReturn ? formatBalance(nominationInfo.expectedReturn, 0) : '0'}%
                           </div>
                         </>
                       </div>
@@ -87,7 +87,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   : (
                     new BigN(nominationInfo.activeStake).gt(0) && (
                       <div className={'middle-item__active-stake'}>
-                        <span>{t('Staked:')}</span>
+                        <span>{t('ui.EARNING.components.StakingItem.Nomination.staked')}</span>
                         <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
                         <span>{subnetSymbol || symbol}</span>
                       </div>

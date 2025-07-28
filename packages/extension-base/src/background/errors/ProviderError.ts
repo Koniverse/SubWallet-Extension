@@ -4,22 +4,23 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { ProviderErrorType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 const defaultErrorMap: Record<ProviderErrorType, { message: string, code?: number }> = {
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
     code: undefined
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
     code: undefined
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
     code: undefined
   },
   USER_REJECT: {
-    message: detectTranslate('Rejected by user'),
+    message: detectTranslate('bg.NETWORK.background.error.Provider.rejectedByUser'),
     code: undefined
   }
 };
@@ -30,7 +31,7 @@ export class ProviderError extends SWError {
   constructor (errorType: ProviderErrorType, errMessage?: string, data?: unknown, errorCode?: number) {
     const { code, message } = defaultErrorMap[errorType];
 
-    super(errorType, errMessage || message, errorCode || code, data);
+    super(errorType, errMessage || t(message), errorCode || code, data);
 
     this.errorType = errorType;
   }

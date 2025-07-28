@@ -55,7 +55,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const renderContent = () => {
     if (!value) {
-      return placeholder || (t('Select') + ' ' + t(validatorLabel));
+      return placeholder || (t('ui.EARNING.components.SelectValidatorInput.select') + ' ' + t(validatorLabel));
     }
 
     // Hot fix for validator have ',' in name (Bittensor only)
@@ -69,7 +69,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const valueList = value.split(',');
 
     if (valueList.length > 1) {
-      return t('Select') + ` ${valueList.length} ` + t(validatorLabel);
+      return t('ui.EARNING.components.SelectValidatorInput.select') + ` ${valueList.length} ` + t(validatorLabel);
     }
 
     return valueList[0].split('___')[1] || toShort(valueList[0].split('___')[0]);

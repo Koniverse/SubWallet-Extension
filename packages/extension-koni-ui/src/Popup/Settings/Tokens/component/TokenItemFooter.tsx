@@ -44,14 +44,14 @@ function Component ({ assetSetting, className = '', navigate, tokenInfo }: Props
           .then((result) => {
             if (!result) {
               showNotification({
-                message: t('Error'),
+                message: t('ui.SETTINGS.screen.Setting.Tokens.ItemFooter.error'),
                 type: 'error'
               });
             }
           })
           .catch(() => {
             showNotification({
-              message: t('Error'),
+              message: t('ui.SETTINGS.screen.Setting.Tokens.ItemFooter.error'),
               type: 'error'
             });
           })

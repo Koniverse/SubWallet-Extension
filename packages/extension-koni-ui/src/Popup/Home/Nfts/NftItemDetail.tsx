@@ -70,7 +70,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       if (owner?.isReadOnly) {
         notify({
-          message: t('The NFT owner is a watch-only account, you cannot send the NFT with it'),
+          message: t('ui.NFT.screen.NftsItemDetail.nftOwnerIsWatchOnly'),
           type: 'info',
           duration: 3
         });
@@ -93,7 +93,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const subHeaderRightButton: ButtonProps[] = [
     {
-      children: t<string>('Send'),
+      children: t<string>('ui.NFT.screen.NftsItemDetail.send'),
       onClick: onClickSend
     }
   ];
@@ -219,7 +219,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           </div>
 
           <div className={'nft_item_detail__info_container'}>
-            <div className={'nft_item_detail__section_title'}>{t<string>('NFT details')}</div>
+            <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT.screen.NftsItemDetail.nftDetails')}</div>
             {
               nftItem.description && (
                 <div
@@ -237,7 +237,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type='phosphor'
                       weight={'fill'}
                     />
-                    <div>{t<string>('Description')}</div>
+                    <div>{t<string>('ui.NFT.screen.NftsItemDetail.description')}</div>
                   </div>
                 </div>
               )
@@ -245,26 +245,26 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
             <Field
               content={collectionInfo.collectionName || collectionInfo.collectionId}
-              label={t<string>('NFT collection name')}
+              label={t<string>('ui.NFT.screen.NftsItemDetail.nftCollectionName')}
               suffix={nftItem.externalUrl && externalInfoIcon('collection')}
             />
 
             <Field
               content={ownerInfo()}
-              label={t<string>('Owned by')}
+              label={t<string>('ui.NFT.screen.NftsItemDetail.ownedBy')}
               prefix={nftItem.owner && ownerPrefix()}
               suffix={externalInfoIcon('account')}
             />
 
             <Field
               content={originChainInfo.name}
-              label={t<string>('Network')}
+              label={t<string>('ui.NFT.screen.NftsItemDetail.network')}
               prefix={originChainLogo()}
             />
           </div>
 
           <div className={'nft_item_detail__prop_section'}>
-            <div className={'nft_item_detail__section_title'}>{t<string>('Properties')}</div>
+            <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT.screen.NftsItemDetail.properties')}</div>
             <div className={'nft_item_detail__atts_container'}>
               <Field
                 className={'nft_item_detail__id_field'}
@@ -308,7 +308,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             />}
             onClick={onClickSend}
           >
-            <span className={'nft_item_detail__send_text'}>{t('Send')}</span>
+            <span className={'nft_item_detail__send_text'}>{t('ui.NFT.screen.NftsItemDetail.send')}</span>
           </Button>
         </div>
 
@@ -317,7 +317,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('Description')}
+          title={t<string>('ui.NFT.screen.NftsItemDetail.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>

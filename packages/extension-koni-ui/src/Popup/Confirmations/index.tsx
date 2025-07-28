@@ -28,24 +28,24 @@ import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, Bi
 type Props = ThemeProps
 
 const titleMap: Record<ConfirmationType, string> = {
-  addNetworkRequest: detectTranslate('Add network request'),
-  addTokenRequest: detectTranslate('Add token request'),
-  authorizeRequest: detectTranslate('Connect with SubWallet'),
-  evmSendTransactionRequest: detectTranslate('Transaction request'),
-  evmSignatureRequest: detectTranslate('Signature request'),
-  cardanoSignatureRequest: detectTranslate('Signature request'),
-  cardanoSignTransactionRequest: detectTranslate('Transaction request'),
-  bitcoinSignatureRequest: detectTranslate('Signature request'),
-  bitcoinSendTransactionRequest: detectTranslate('Transaction request'),
-  bitcoinSendTransactionRequestAfterConfirmation: detectTranslate('Transaction request'),
-  bitcoinWatchTransactionRequest: detectTranslate('Transaction request'),
-  bitcoinSignPsbtRequest: detectTranslate('Sign PSBT request'),
-  metadataRequest: detectTranslate('Update metadata'),
-  signingRequest: detectTranslate('Signature request'),
-  connectWCRequest: detectTranslate('WalletConnect'),
-  notSupportWCRequest: detectTranslate('WalletConnect'),
-  errorConnectNetwork: detectTranslate('Transaction request'),
-  submitApiRequest: detectTranslate('Approve request')
+  addNetworkRequest: detectTranslate('ui.Confirmations.addNetworkRequest'),
+  addTokenRequest: detectTranslate('ui.Confirmations.addTokenRequest'),
+  authorizeRequest: detectTranslate('ui.Confirmations.connectWithSubWallet'),
+  evmSendTransactionRequest: detectTranslate('ui.Confirmations.transactionRequest'),
+  evmSignatureRequest: detectTranslate('ui.Confirmations.signatureRequest'),
+  cardanoSignatureRequest: detectTranslate('ui.Confirmations.signatureRequest'),
+  cardanoSignTransactionRequest: detectTranslate('ui.Confirmations.transactionRequest'),
+  bitcoinSignatureRequest: detectTranslate('ui.Confirmations.signatureRequest'),
+  bitcoinSendTransactionRequest: detectTranslate('ui.Confirmations.transactionRequest'),
+  bitcoinSendTransactionRequestAfterConfirmation: detectTranslate('ui.Confirmations.transactionRequest'),
+  bitcoinWatchTransactionRequest: detectTranslate('ui.Confirmations.transactionRequest'),
+  bitcoinSignPsbtRequest: detectTranslate('ui.Confirmations.signPsbtRequest'),
+  metadataRequest: detectTranslate('ui.Confirmations.updateMetadata'),
+  signingRequest: detectTranslate('ui.Confirmations.signatureRequest'),
+  connectWCRequest: detectTranslate('ui.Confirmations.walletConnect'),
+  notSupportWCRequest: detectTranslate('ui.Confirmations.walletConnect'),
+  errorConnectNetwork: detectTranslate('ui.Confirmations.transactionRequest'),
+  submitApiRequest: detectTranslate('ui.Confirmations.approveRequest')
 } as Record<ConfirmationType, string>;
 
 const alertModalId = 'confirmation-alert-modal';
@@ -288,7 +288,7 @@ const Component = function ({ className }: Props) {
            * TODO: REFACTOR THIS TO SCALE
            * */
           if (request.payload.processId) {
-            return t('Swap confirmation');
+            return t('ui.Confirmations.swapConfirmation');
           }
         }
 
@@ -298,10 +298,10 @@ const Component = function ({ className }: Props) {
       if (transaction.process) {
         switch (transaction.process.type) {
           case ProcessType.SWAP:
-            return t('Swap confirmation');
+            return t('ui.Confirmations.swapConfirmation');
           case ProcessType.EARNING:
             // TODO: Replace message
-            return t('Earning confirmation');
+            return t('ui.Confirmations.earningConfirmation');
         }
       }
 
@@ -310,78 +310,78 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.TRANSFER_TOKEN:
         case ExtrinsicType.TRANSFER_XCM:
         case ExtrinsicType.SEND_NFT:
-          return t('Transfer confirmation');
+          return t('ui.Confirmations.transferConfirmation');
         case ExtrinsicType.STAKING_JOIN_POOL:
         case ExtrinsicType.STAKING_BOND:
         case ExtrinsicType.JOIN_YIELD_POOL:
-          return t('Add to stake confirm');
+          return t('ui.Confirmations.addToStakeConfirm');
         case ExtrinsicType.STAKING_LEAVE_POOL:
         case ExtrinsicType.STAKING_UNBOND:
-          return t('Unstake confirm');
+          return t('ui.Confirmations.unstakeConfirm');
         case ExtrinsicType.STAKING_WITHDRAW:
         case ExtrinsicType.STAKING_POOL_WITHDRAW:
-          return t('Withdrawal confirm');
+          return t('ui.Confirmations.withdrawalConfirm');
         case ExtrinsicType.STAKING_CLAIM_REWARD:
-          return t('Claim rewards confirm');
+          return t('ui.Confirmations.claimRewardsConfirm');
         case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
-          return t('Cancel unstake confirm');
+          return t('ui.Confirmations.cancelUnstakeConfirm');
 
         case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
           if ((transaction.data as SubmitBittensorChangeValidatorStaking)?.isMovePartialStake) {
-            return t('Move your stake confirm');
+            return t('ui.Confirmations.moveStakeConfirm');
           }
 
-          return t('Change validator confirm');
+          return t('ui.Confirmations.changeValidatorConfirm');
         case ExtrinsicType.MINT_VDOT:
-          return t('Mint vDOT confirm');
+          return t('ui.Confirmations.mintVDotConfirm');
         case ExtrinsicType.MINT_VMANTA:
-          return t('Mint vMANTA confirm');
+          return t('ui.Confirmations.mintVMantaConfirm');
         case ExtrinsicType.MINT_LDOT:
-          return t('Mint LDOT confirm');
+          return t('ui.Confirmations.mintLDotConfirm');
         case ExtrinsicType.MINT_SDOT:
-          return t('Mint sDOT confirm');
+          return t('ui.Confirmations.mintSDotConfirm');
         case ExtrinsicType.MINT_QDOT:
-          return t('Mint qDOT confirm');
+          return t('ui.Confirmations.mintQDotConfirm');
         case ExtrinsicType.MINT_STDOT:
-          return t('Mint stDOT confirm');
+          return t('ui.Confirmations.mintStDotConfirm');
         case ExtrinsicType.REDEEM_VDOT:
-          return t('Redeem vDOT confirm');
+          return t('ui.Confirmations.redeemVDotConfirm');
         case ExtrinsicType.REDEEM_VMANTA:
-          return t('Redeem vMANTA confirm');
+          return t('ui.Confirmations.redeemVMantaConfirm');
         case ExtrinsicType.REDEEM_LDOT:
-          return t('Redeem LDOT confirm');
+          return t('ui.Confirmations.redeemLDotConfirm');
         case ExtrinsicType.REDEEM_SDOT:
-          return t('Redeem sDOT confirm');
+          return t('ui.Confirmations.redeemSDotConfirm');
         case ExtrinsicType.REDEEM_QDOT:
-          return t('Redeem qDOT confirm');
+          return t('ui.Confirmations.redeemQDotConfirm');
         case ExtrinsicType.REDEEM_STDOT:
-          return t('Redeem stDOT confirm');
+          return t('ui.Confirmations.redeemStDotConfirm');
         case ExtrinsicType.UNSTAKE_VDOT:
-          return t('Unstake vDOT confirm');
+          return t('ui.Confirmations.unstakeVDotConfirm');
         case ExtrinsicType.UNSTAKE_VMANTA:
-          return t('Unstake vMANTA confirm');
+          return t('ui.Confirmations.unstakeVMantaConfirm');
         case ExtrinsicType.UNSTAKE_LDOT:
-          return t('Unstake LDOT confirm');
+          return t('ui.Confirmations.unstakeLDotConfirm');
         case ExtrinsicType.UNSTAKE_SDOT:
-          return t('Unstake sDOT confirm');
+          return t('ui.Confirmations.unstakeSDotConfirm');
         case ExtrinsicType.UNSTAKE_STDOT:
-          return t('Unstake qDOT confirm');
+          return t('ui.Confirmations.unstakeQDotConfirm');
         case ExtrinsicType.UNSTAKE_QDOT:
-          return t('Unstake stDOT confirm');
+          return t('ui.Confirmations.unstakeStDotConfirm');
         case ExtrinsicType.STAKING_COMPOUNDING:
-          return t('Stake compound confirm');
+          return t('ui.Confirmations.stakeCompoundConfirm');
         case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:
-          return t('Cancel compound confirm');
+          return t('ui.Confirmations.cancelCompoundConfirm');
         case ExtrinsicType.TOKEN_SPENDING_APPROVAL:
-          return t('Token approve');
+          return t('ui.Confirmations.tokenApprove');
         case ExtrinsicType.SWAP:
-          return t('Swap confirmation');
+          return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
-          return t('Claim confirmation');
+          return t('ui.Confirmations.claimConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
-          return t('Transaction confirm');
+          return t('ui.Confirmations.transactionConfirm');
       }
     } else {
       return t(titleMap[confirmation.type] || '');

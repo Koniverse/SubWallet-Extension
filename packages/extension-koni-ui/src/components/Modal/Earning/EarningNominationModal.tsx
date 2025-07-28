@@ -32,7 +32,7 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
       className={className}
       id={EARNING_NOMINATION_MODAL}
       onCancel={onCancel}
-      title={t('Nomination info')}
+      title={t('ui.EARNING.components.Modal.Earning.Nomination.nominationInfo')}
     >
       {
         !!item?.nominations?.length && (

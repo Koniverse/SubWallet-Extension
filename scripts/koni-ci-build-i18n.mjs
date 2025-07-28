@@ -6,6 +6,7 @@ import fs from "fs";
 
 import execSync from '@polkadot/dev/scripts/execSync.mjs';
 
+// TODO: Research how to integrate this script into `yarn i18n:scan`
 
 function runBuild() {
   execSync('yarn i18next-scanner --config i18next-scanner.config.js');
@@ -38,5 +39,5 @@ function cloneTrans() {
 // runTest();
 runBuild();
 
-// Web runner
-cloneTrans();
+// Web runner, Web app
+// cloneTrans();

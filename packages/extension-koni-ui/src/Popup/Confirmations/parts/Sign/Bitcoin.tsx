@@ -290,7 +290,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'primary'}
           >
-            {t('I understand')}
+            {t('ui.DAPP.Confirmations.Sign.Bitcoin.iUnderstand')}
           </Button>
           : <Button
             disabled={loading}
@@ -303,7 +303,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.DAPP.Confirmations.Sign.Bitcoin.cancel')}
           </Button>
       }
       {!isErrorTransaction && <Button
@@ -317,7 +317,7 @@ const Component: React.FC<Props> = (props: Props) => {
         loading={loading}
         onClick={onConfirm}
       >
-        {t('Approve')}
+        {t('ui.DAPP.Confirmations.Sign.Bitcoin.approve')}
       </Button> }
       {/* { */}
       {/*   signMode === AccountSignMode.QR && ( */}

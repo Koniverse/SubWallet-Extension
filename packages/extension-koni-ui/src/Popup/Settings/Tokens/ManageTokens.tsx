@@ -66,9 +66,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [assetSettingMap, selectedFilters]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('Enabled tokens'), value: FilterValue.ENABLED },
-    { label: t('Disabled tokens'), value: FilterValue.DISABLED },
-    { label: t('Custom tokens'), value: FilterValue.CUSTOM }
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.enabledTokens'), value: FilterValue.ENABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.disabledTokens'), value: FilterValue.DISABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.customTokens'), value: FilterValue.CUSTOM }
   ]), [t]);
 
   const searchToken = useCallback((token: _ChainAsset, searchText: string) => {
@@ -125,7 +125,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage tokens')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.manageTokens')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -149,7 +149,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.searchToken')}
           showActionBtn={true}
         />
 

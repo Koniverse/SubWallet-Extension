@@ -57,13 +57,13 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const filterOptions = useMemo(() => [
-    { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('Lending'), value: YieldPoolType.LENDING },
-    { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.EARNING.screen.EarningPools.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.EARNING.screen.EarningPools.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.EARNING.screen.EarningPools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('ui.EARNING.screen.EarningPools.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
   ], [t]);
 
   const positionSlugs = useMemo(() => {
@@ -266,8 +266,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Change your search and try again')}
-        emptyTitle={t('No earning option found')}
+        emptyMessage={t('ui.EARNING.screen.EarningPools.changeYourSearchAndTryAgain')}
+        emptyTitle={t('ui.EARNING.screen.EarningPools.noEarningOptionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -317,7 +317,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('{{symbol}} earning options', { replace: { symbol: symbol } })}
+        title={t('ui.EARNING.screen.EarningPools.symbolEarningOptions', { replace: { symbol: symbol } })}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -330,18 +330,18 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.EARNING.screen.EarningPools.searchToken')}
           showActionBtn
         />
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningPools.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.EARNING.screen.EarningPools.filter')}
         />
       </Layout.Base>
     </ChainConnectionWrapper>

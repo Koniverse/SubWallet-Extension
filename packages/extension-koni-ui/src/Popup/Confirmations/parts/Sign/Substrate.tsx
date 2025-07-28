@@ -149,7 +149,7 @@ const Component: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (isOpenAlert) {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation'),
         type: NotificationType.WARNING,
         content: (
           <Trans
@@ -162,11 +162,11 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate("{{networkName}} network's metadata is out of date, which may cause the transaction to fail. Update metadata using <highlight>this guide</highlight> or approve transaction at your own risk")}
+            i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
             values={{ networkName }}
           />),
         okButton: {
-          text: t('I understand'),
+          text: t('ui.DAPP.Confirmations.Sign.Substrate.iUnderstand'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: closeAlert
@@ -183,7 +183,7 @@ const Component: React.FC<Props> = (props: Props) => {
         if (requireMetadata) {
           return {
             type: 'error',
-            title: t('Error!'),
+            title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
             description: (
               <Trans
                 components={{
@@ -195,7 +195,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate("{{networkName}} network's metadata is out of date. Update metadata using <highlight>this guide</highlight> and try again")}
+                i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.metadataOutOfDateUpdateAndRetry')}
                 values={{ networkName }}
               />
             )
@@ -206,8 +206,8 @@ const Component: React.FC<Props> = (props: Props) => {
           if (requireMetadata && isMissingData && !addExtraData) {
             return {
               type: 'error',
-              title: t('Error!'),
-              description: t('Unable to sign this transaction on Ledger because the dApp is out of date')
+              title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+              description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToSignLedgerDappOutOfDate')
             };
           }
 
@@ -217,7 +217,7 @@ const Component: React.FC<Props> = (props: Props) => {
             if (NotNeedMigrationGens.includes(gens)) {
               return {
                 type: 'info',
-                title: t('Helpful tip'),
+                title: t('ui.DAPP.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -229,14 +229,14 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('To sign this transaction, open “Polkadot” app on Ledger, hit Refresh and Approve again. For a better experience, re-attach your Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.ledgerSignWithPolkadotApp')}
                   />
                 )
               };
             } else {
               return {
                 type: 'info',
-                title: t('Helpful tip'),
+                title: t('ui.DAPP.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -248,7 +248,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('To sign this transaction, open “Polkadot Migration” app on Ledger, hit Refresh and Approve again. For a better experience, move your assets on {{networkName}} network to the Polkadot new account using <highlight>this guide</highlight>')}
+                    i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.ledgerSignWithMigrationApp')}
                     values={{ networkName }}
                   />
                 )
@@ -259,8 +259,8 @@ const Component: React.FC<Props> = (props: Props) => {
           if (signMode === AccountSignMode.GENERIC_LEDGER || signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
             return {
               type: 'error',
-              title: t('Error!'),
-              description: t('Unable to sign this transaction on Ledger because the {{networkName}} network is out of date', { replace: { networkName } })
+              title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+              description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToSignLedgerNetworkOutOfDate', { replace: { networkName } })
             };
           }
         }
@@ -448,7 +448,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('Transaction expired'),
+          message: t('ui.DAPP.Confirmations.Sign.Substrate.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -539,7 +539,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.DAPP.Confirmations.Sign.Substrate.cancel')}
         </Button>
         <Button
           disabled={showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
@@ -554,10 +554,10 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           {
             !isLedger
-              ? t('Approve')
+              ? t('ui.DAPP.Confirmations.Sign.Substrate.approve')
               : !isLedgerConnected
-                ? t('Refresh')
-                : t('Approve')
+                ? t('ui.DAPP.Confirmations.Sign.Substrate.refresh')
+                : t('ui.DAPP.Confirmations.Sign.Substrate.approve')
           }
         </Button>
         {

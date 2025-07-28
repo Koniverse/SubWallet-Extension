@@ -28,10 +28,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <MetaInfo className={CN(className)}>
-      <MetaInfo.Data label={t('Raw data')}>
+      <MetaInfo.Data label={t('ui.DAPP.Confirmations.Detail.Substrate.Message.rawData')}>
         {bytes}
       </MetaInfo.Data>
-      <MetaInfo.Data label={t('Message')}>
+      <MetaInfo.Data label={t('ui.DAPP.Confirmations.Detail.Substrate.Message.message')}>
         {message}
       </MetaInfo.Data>
     </MetaInfo>
