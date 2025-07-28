@@ -252,6 +252,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
       return false;
     });
 
+    // Cancel redirect if we're already on the correct page
     if (redirectObj.redirect === activePriorityPathInfo?.target) {
       redirectObj.redirect = activePriorityPathInfo?.pathName !== pathName ? redirectObj.redirect : null;
     } else {
