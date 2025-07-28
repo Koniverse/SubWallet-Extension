@@ -416,7 +416,7 @@
       "ru": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>."
     }
   },
-  "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}": {
+  "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}": {
     "locations": [
       {
         "filepath": "packages/extension-koni-ui/src/Popup/BuyTokens.tsx",
@@ -424,11 +424,11 @@
       }
     ],
     "translations": {
-      "en": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
-      "ja": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
-      "vi": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
-      "zh": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
-      "ru": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}"
+      "en": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
+      "ja": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
+      "vi": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
+      "zh": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
+      "ru": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}"
     }
   },
   "Go to home": {

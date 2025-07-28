@@ -58,7 +58,7 @@
   "ui.BUY.screen.BuyTokens.privacyPolicy": "Chính sách bảo mật",
   "ui.BUY.screen.BuyTokens.supportSite": "support site",
   "ui.BUY.screen.BuyTokens.leavingSubwalletDisclaimer": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-  "ui.BUY.screen.BuyTokens.regionalTokenWarning": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
+  "ui.BUY.screen.BuyTokens.regionalTokenWarning": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
   "ui.screen.CreateDone.goToHome": "Về trang chính",
   "ui.screen.CreateDone.successful": "Thành công",
   "ui.ACCOUNT.screen.Account.Export.successful": "Thành công",

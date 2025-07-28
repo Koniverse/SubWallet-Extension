@@ -552,8 +552,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           <Trans
             i18nKey={detectTranslate('ui.BUY.screen.BuyTokens.regionalTokenWarning')}
             values={{
-              service: serviceName,
-              action: ('buying')
+              service: serviceName
             }}
           />
         </SwModal>

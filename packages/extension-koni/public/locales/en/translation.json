@@ -58,7 +58,6 @@
   "ui.BUY.screen.BuyTokens.privacyPolicy": "Privacy Policy",
   "ui.BUY.screen.BuyTokens.supportSite": "support site",
   "ui.BUY.screen.BuyTokens.leavingSubwalletDisclaimer": "You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}'s <termUrl/> and <policyUrl/>. For any question related to {{service}}'s services, please visit {{service}}'s <contactUrl/>.",
-  "ui.BUY.screen.BuyTokens.regionalTokenWarning": "Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}",
   "ui.screen.CreateDone.goToHome": "Go to home",
   "ui.screen.CreateDone.successful": "Successful",
   "ui.ACCOUNT.screen.Account.Export.successful": "Successful",
@@ -2262,5 +2261,6 @@
   "ui.EARNING.components.Modal.Earning.ValidatorDetail.nominator": "Nominator",
   "ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo": "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>",
   "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts": "Export {{getNumberAccount}} accounts",
-  "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount": "Export {{getNumberAccount}} account"
+  "ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount": "Export {{getNumberAccount}} account",
+  "ui.BUY.screen.BuyTokens.regionalTokenWarning": "Note that some tokens may not be available for buying depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}"
 }
