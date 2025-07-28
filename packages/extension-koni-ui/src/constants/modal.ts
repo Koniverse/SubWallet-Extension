@@ -41,6 +41,7 @@ export const TON_WALLET_CONTRACT_SELECTOR_MODAL = 'ton-wallet-contract-selector-
 export const TON_ACCOUNT_SELECTOR_MODAL = 'ton-account-selector-modal';
 export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
 export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
+export const ADDRESS_GROUP_MODAL = 'address-group-modal';
 export const ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL = 'account-migration-in-progress-warning-modal';
 
 /* Campaign */
@@ -91,6 +92,8 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
+
 export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
 export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';
 /* Other */

@@ -6,3 +6,4 @@ export * from './evm';
 export * from './option';
 export * from './subscription';
 export * from './substrate';
+export * from './bitcoin';

@@ -13,7 +13,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -33,7 +33,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   processing: Spinner,
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
-  swap: ArrowsLeftRight
+  swap: ArrowsLeftRight,
+  nominate: Pencil
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -57,6 +58,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
     return IconMap.claim_reward;
   }
 
+  if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
+    return IconMap.nominate;
+  }
+
   if (item.type === ExtrinsicType.SWAP) {
     return IconMap.swap;
   }
@@ -70,7 +75,8 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
 function getDisplayData (item: TransactionHistoryItem, nameMap: Record<string, string>, titleMap: Record<string, string>): TransactionHistoryDisplayData {
   let displayData: TransactionHistoryDisplayData;
-  const time = customFormatDate(item.time, '#hhhh#:#mm#');
+  const displayTime = item.blockTime || item.time;
+  const time = customFormatDate(displayTime, '#hhhh#:#mm#');
 
   const displayStatus = item.status === ExtrinsicStatus.FAIL ? 'fail' : '';
 
@@ -176,6 +182,12 @@ function filterDuplicateItems (items: TransactionHistoryItem[]): TransactionHist
 
   return result;
 }
+
+const PROCESSING_STATUSES: ExtrinsicStatus[] = [
+  ExtrinsicStatus.QUEUED,
+  ExtrinsicStatus.SUBMITTING,
+  ExtrinsicStatus.PROCESSING
+];
 
 const modalId = HISTORY_DETAIL_MODAL;
 const remindSeedPhraseModalId = REMIND_BACKUP_SEED_PHRASE_MODAL;
@@ -288,6 +300,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake'),
     [ExtrinsicType.STAKING_BOND]: t('Stake'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Nominate'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw'),
@@ -333,6 +346,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake transaction'),
     [ExtrinsicType.STAKING_BOND]: t('Stake transaction'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake transaction'),
+    [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('Stake transaction'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward transaction'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw transaction'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw transaction'),
@@ -374,8 +388,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       const fromName = accountMap[quickFormatAddressToCompare(item.from) || ''];
       const toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
       const key = getHistoryItemKey(item);
+      const displayTime = item.blockTime || item.time;
 
-      finalHistoryMap[key] = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap) };
+      finalHistoryMap[key] = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap), displayTime };
     });
 
     return finalHistoryMap;
@@ -384,7 +399,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [currentItemDisplayCount, setCurrentItemDisplayCount] = useState<number>(DEFAULT_ITEMS_COUNT);
 
   const getHistoryItems = useCallback((count: number) => {
-    return Object.values(historyMap).filter(filterFunction).sort((a, b) => (b.time - a.time)).slice(0, count);
+    return Object.values(historyMap).filter(filterFunction)
+      .sort((a, b) => {
+        if (PROCESSING_STATUSES.includes(a.status) && !PROCESSING_STATUSES.includes(b.status)) {
+          return -1;
+        } else if (PROCESSING_STATUSES.includes(b.status) && !PROCESSING_STATUSES.includes(a.status)) {
+          return 1;
+        } else if ((!!b.displayTime && !!a.displayTime) && (b.displayTime !== a.displayTime)) {
+          return b.displayTime - a.displayTime;
+        } else {
+          return (a.apiTxIndex ?? 0) - (b.apiTxIndex ?? 0);
+        }
+      })
+      .slice(0, count);
   }, [filterFunction, historyMap]);
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
@@ -482,9 +509,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [onOpenDetail]
   );
 
-  const groupBy = useCallback((item: TransactionHistoryItem) => {
-    return formatHistoryDate(item.time, language, 'list');
-  }, [language]);
+  const groupBy = useCallback((item: TransactionHistoryDisplayItem) => {
+    if (PROCESSING_STATUSES.includes(item.status)) {
+      return t('Processing');
+    }
+
+    return formatHistoryDate(item.displayTime, language, 'list');
+  }, [language, t]);
 
   const groupSeparator = useCallback((group: TransactionHistoryItem[], idx: number, groupLabel: string) => {
     return (
@@ -517,6 +548,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       {
         (isAllAccount || accountAddressItems.length > 1) && (
           <AccountAddressSelector
+            autoSelectFirstItem={true}
             className={'__history-address-selector'}
             items={accountAddressItems}
             onChange={onSelectAccount}
@@ -589,6 +621,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   useEffect(() => {
     let id: string;
     let isSubscribed = true;
+
+    if (!selectedChain) {
+      setLoading(false);
+
+      return;
+    }
 
     setLoading(true);
 

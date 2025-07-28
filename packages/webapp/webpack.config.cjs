@@ -58,10 +58,9 @@ const _additionalEnv = {
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
-  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
-  CHAINFLIP_BROKER_TESTNET_API: JSON.stringify(process.env.CHAINFLIP_BROKER_TESTNET_API),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
   SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
+  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN),
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false)
