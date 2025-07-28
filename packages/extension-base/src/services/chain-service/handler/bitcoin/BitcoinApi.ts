@@ -42,15 +42,15 @@ export class BitcoinApi implements _BitcoinApi {
     return this.isApiConnectedSubject.getValue();
   }
 
-  private createApiStrategy (_apiUrl: string): BitcoinApiStrategy {
-    const apiUrl = 'https://blockstream.info/testnet/api/'; // todo: for test
+  private createApiStrategy (apiUrl: string): BitcoinApiStrategy {
+    const _apiUrl = 'https://blockstream.info/testnet/api/'; // todo: for test
     const isTestnet = apiUrl.includes('testnet');
     const isBlockstreamUrl = apiUrl.includes('blockstream');
 
     if (isTestnet) {
       return isBlockstreamUrl
-        ? new BlockStreamTestnetRequestStrategy(apiUrl)
-        : new MempoolTestnetRequestStrategy(apiUrl);
+        ? new BlockStreamTestnetRequestStrategy(_apiUrl)
+        : new MempoolTestnetRequestStrategy(_apiUrl);
     }
 
     return new SubWalletMainnetRequestStrategy(apiUrl);
