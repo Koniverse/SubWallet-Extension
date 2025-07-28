@@ -262,6 +262,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       return [];
     }
 
+    const substrateIdentityApi = this.substrateIdentityApi;
     const validatorList = nominations.targets;
 
     await Promise.all(validatorList.map(async (validatorAddress) => {
@@ -271,7 +272,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
       if (substrateApi.api.query.staking.erasStakersPaged) { // todo: review all relaychains later
         const [[_identity], _eraStaker] = await Promise.all([
-          parseIdentity(substrateApi, validatorAddress),
+          parseIdentity(substrateIdentityApi, validatorAddress),
           substrateApi.api.query.staking.erasStakersPaged.entries(currentEra, validatorAddress)
         ]);
 
@@ -279,7 +280,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
         eraStakerOtherList = _eraStaker.flatMap((paged) => (paged[1].toPrimitive() as unknown as SpStakingExposurePage).others);
       } else {
         const [[_identity], _eraStaker] = await Promise.all([
-          parseIdentity(substrateApi, validatorAddress),
+          parseIdentity(substrateIdentityApi, validatorAddress),
           substrateApi.api.query.staking.erasStakers(currentEra, validatorAddress)
         ]);
 
@@ -410,6 +411,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const chainApi = await this.substrateApi.isReady;
+    const substrateIdentityApi = this.substrateIdentityApi;
     const poolInfo = await this.getPoolInfo();
 
     if (!poolInfo || !poolInfo.statistic) {
@@ -481,7 +483,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const [_commissionInfo, [identity, isVerified]] = await Promise.all([
         chainApi.api.query.staking.validators(address),
-        parseIdentity(chainApi, address)
+        parseIdentity(substrateIdentityApi, address)
       ]);
 
       const commissionInfo = _commissionInfo.toHuman() as Record<string, any>;

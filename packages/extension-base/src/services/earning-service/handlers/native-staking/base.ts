@@ -4,6 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
@@ -40,6 +41,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     this.slug = `${symbol}___native_staking___${_chainInfo.slug}`;
     this.name = `${_chainInfo.name} Native Staking`;
     this.shortName = _chainInfo.name.replaceAll(' Relay Chain', '');
+    this.canOverrideIdentity = !!STAKING_IDENTITY_API_SLUG[chain];
   }
 
   protected getDescription (amount = '0'): string {
