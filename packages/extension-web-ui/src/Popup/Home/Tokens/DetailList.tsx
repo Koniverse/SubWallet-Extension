@@ -739,6 +739,11 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       '.__banner-area': {
         paddingLeft: token.padding,
         paddingRight: token.padding
+      },
+
+      '.ton-solo-acc-alert-area': {
+        marginTop: 0,
+        marginInline: token.margin
       }
     }
   });
