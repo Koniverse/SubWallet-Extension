@@ -5,19 +5,23 @@ import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
+import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { _reformatAddressWithChain, fetchFromProxyService } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
+import * as bitcoin from 'bitcoinjs-lib';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+
+import { SWTransaction } from '../../transaction-service/types';
 
 const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
 const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
@@ -99,7 +103,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   }
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const { address, quote, recipient, slippage } = params;
+    const { address, currentStep, process, quote, recipient, slippage } = params;
 
     const pair = quote.pair;
     const fromAsset = this.chainService.getAssetBySlug(pair.from);
@@ -113,7 +117,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
-    const processMetadata = params.process.steps[params.currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
+    const processMetadata = process.steps[currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
     const quoteMetadata = processMetadata as ChainFlipMetadata;
 
     if (!processMetadata || !quoteMetadata) {
@@ -170,20 +174,19 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const txData: ChainflipSwapTxData = {
       address,
       provider: this.providerInfo,
-      quote: params.quote,
-      slippage: params.slippage,
+      quote,
+      slippage,
       recipient,
-      depositChannelId: depositChannelId,
-      depositAddress: depositAddress,
-      process: params.process
+      depositChannelId,
+      depositAddress,
+      process
     };
 
-    let extrinsic: TransactionData;
+    let extrinsic: SWTransaction['transaction'];
 
     if (chainType === ChainType.SUBSTRATE) {
-      const chainApi = this.chainService.getSubstrateApi(chainInfo.slug);
-
-      const substrateApi = await chainApi.isReady;
+      const _substrateApi = this.chainService.getSubstrateApi(chainInfo.slug);
+      const substrateApi = await _substrateApi.isReady;
 
       const [submittableExtrinsic] = await createSubstrateExtrinsic({
         from: address,
@@ -196,9 +199,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       });
 
       extrinsic = submittableExtrinsic as SubmittableExtrinsic<'promise'>;
-    } else {
-      const id = getId();
-      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(id, chainInfo.slug, 'evm');
+    } else if (chainType === ChainType.EVM) {
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), chainInfo.slug, 'evm');
 
       if (_isNativeToken(fromAsset)) {
         const [transactionConfig] = await getEVMTransactionObject({
@@ -226,6 +228,27 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
         extrinsic = transactionConfig;
       }
+    } else if (chainType === ChainType.BITCOIN) {
+      const _bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
+      const bitcoinApi = await _bitcoinApi.isReady;
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), chainInfo.slug, 'bitcoin');
+      const network = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+
+      const [transaction] = await createBitcoinTransaction({
+        bitcoinApi,
+        chain: chainInfo.slug,
+        from: address,
+        feeInfo,
+        to: depositAddress,
+        transferAll: false,
+        value: quote.fromAmount,
+        network
+      });
+
+      extrinsic = transaction;
+    } else {
+      // todo: update this when support new chainType rather than substrate, evm, bitcoin
+      throw new Error('Unknown swap chain type');
     }
 
     return {
