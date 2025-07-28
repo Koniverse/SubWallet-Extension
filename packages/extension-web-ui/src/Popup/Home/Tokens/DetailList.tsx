@@ -8,18 +8,17 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, LoadingScreen, ReceiveModal } from '@subwallet/extension-web-ui/components';
 import PageWrapper from '@subwallet/extension-web-ui/components/Layout/PageWrapper';
 import { TokenBalanceDetailItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenBalanceDetailItem';
-import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SHOW_BANNER_TOKEN_GROUPS, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useCoreReceiveModalHelper, useDefaultNavigate, useGetChainSlugsByAccount, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { canShowChart } from '@subwallet/extension-web-ui/messaging';
-import Banner from '@subwallet/extension-web-ui/Popup/Home/Tokens/Banner';
 import { DetailModal } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/DetailUpperBlock';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { AccountAddressItemType, EarningPoolsParam, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
 import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
@@ -522,27 +521,6 @@ function Component (): React.ReactElement {
     setDetailTitle?.(detailTitle);
   }, [detailTitle, setDetailTitle]);
 
-  const isShowBanner = useMemo(() => {
-    return SHOW_BANNER_TOKEN_GROUPS.some((item) => {
-      return tokenGroupSlug && (item === tokenGroupSlug || tokenGroupMap[item]?.includes(tokenGroupSlug));
-    });
-  }, [tokenGroupMap, tokenGroupSlug]);
-
-  const onClickEarnNow = useCallback(() => {
-    if (!tokenGroupSlug || !symbol) {
-      return;
-    }
-
-    const poolGroup = SHOW_BANNER_TOKEN_GROUPS.find((i) => i === tokenGroupSlug || tokenGroupMap[i]?.includes(tokenGroupSlug));
-
-    if (poolGroup) {
-      navigate('/home/earning/pools', { state: {
-        poolGroup,
-        symbol
-      } as EarningPoolsParam });
-    }
-  }, [navigate, symbol, tokenGroupMap, tokenGroupSlug]);
-
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -609,15 +587,6 @@ function Component (): React.ReactElement {
             tokenGroupSlug={tokenGroupSlug}
           />
         )
-      }
-
-      {isShowBanner &&
-        <Banner
-          className={'__banner-area'}
-          content={t('There are multiple ways to earn with your {{symbol}}, such as native staking, liquid staking, or lending. Check out Earning for curated options with competitive APY to earn yield on your DOT.', { replace: { symbol: symbol } })}
-          onClickEarnNow={onClickEarnNow}
-          title={t('Earn yield on your {{symbol}}', { replace: { symbol: symbol } })}
-        />
       }
 
       {
@@ -758,7 +727,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       marginBottom: token.sizeXS
     },
 
-    '.__banner-area': {
+    '.ton-solo-acc-alert-area': {
       marginTop: 24
     },
 
@@ -770,6 +739,11 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       '.__banner-area': {
         paddingLeft: token.padding,
         paddingRight: token.padding
+      },
+
+      '.ton-solo-acc-alert-area': {
+        marginTop: 0,
+        marginInline: token.margin
       }
     }
   });

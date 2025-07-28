@@ -83,72 +83,74 @@ function Component ({ className = '',
             <NoContent pageType={PAGE_TYPE.TOKEN} />
           )
           : (
-            <DetailTable
-              className={'__table'}
-              columns={[
-                {
-                  title: 'Token name',
-                  dataIndex: 'name',
-                  key: 'name',
-                  render: (_, row) => {
-                    return (
-                      <TokenItem
-                        chain={row.chain}
-                        logoKey={row.logoKey}
-                        slug={row.slug}
-                        subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
-                        symbol={row.symbol}
-                        tokenGroupSlug={tokenGroupSlug}
-                      />
-                    );
+            <div className='__table-wrapper'>
+              <DetailTable
+                className={'__table'}
+                columns={[
+                  {
+                    title: 'Token name',
+                    dataIndex: 'name',
+                    key: 'name',
+                    render: (_, row) => {
+                      return (
+                        <TokenItem
+                          chain={row.chain}
+                          logoKey={row.logoKey}
+                          slug={row.slug}
+                          subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
+                          symbol={row.symbol}
+                          tokenGroupSlug={tokenGroupSlug}
+                        />
+                      );
+                    }
+                  },
+                  {
+                    title: 'Transferable',
+                    dataIndex: 'percentage',
+                    key: 'percentage',
+                    render: (_, row) => {
+                      return (
+                        <TokenBalance
+                          convertedValue={row.free.convertedValue}
+                          symbol={row.symbol}
+                          value={row.free.value}
+                        />
+                      );
+                    }
+                  },
+                  {
+                    title: 'Locked',
+                    dataIndex: 'price',
+                    key: 'price',
+                    render: (_, row) => {
+                      return (
+                        <TokenBalance
+                          convertedValue={row.locked.convertedValue}
+                          symbol={row.symbol}
+                          value={row.locked.value}
+                        />
+                      );
+                    }
+                  },
+                  {
+                    title: 'Balance',
+                    dataIndex: 'balance',
+                    key: 'balance',
+                    render: (_, row) => {
+                      return (
+                        <TokenBalance
+                          convertedValue={row.total.convertedValue}
+                          symbol={row.symbol}
+                          value={row.total.value}
+                        />
+                      );
+                    }
                   }
-                },
-                {
-                  title: 'Transferable',
-                  dataIndex: 'percentage',
-                  key: 'percentage',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.free.convertedValue}
-                        symbol={row.symbol}
-                        value={row.free.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Locked',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.locked.convertedValue}
-                        symbol={row.symbol}
-                        value={row.locked.value}
-                      />
-                    );
-                  }
-                },
-                {
-                  title: 'Balance',
-                  dataIndex: 'balance',
-                  key: 'balance',
-                  render: (_, row) => {
-                    return (
-                      <TokenBalance
-                        convertedValue={row.total.convertedValue}
-                        symbol={row.symbol}
-                        value={row.total.value}
-                      />
-                    );
-                  }
-                }
-              ]}
-              dataSource={tokenBalanceItems}
-              onClick={onClickRow}
-            />
+                ]}
+                dataSource={tokenBalanceItems}
+                onClick={onClickRow}
+              />
+            </div>
           )
         }
       </div>
@@ -189,10 +191,12 @@ export const DetailListDesktopContent = styled(Component)<ThemeProps>(({ theme: 
       color: token.colorTextLight1
     },
 
-    '.__table': {
+    '.__table-wrapper': {
       marginLeft: -token.marginSM,
-      marginRight: -token.marginSM,
+      marginRight: -token.marginSM
+    },
 
+    '.__table': {
       'tr.ant-table-row:hover > td': {
         background: `${token.colorBgInput} !important`
       },

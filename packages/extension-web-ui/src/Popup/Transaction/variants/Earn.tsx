@@ -20,7 +20,7 @@ import { EarningInstructionModal } from '@subwallet/extension-web-ui/components/
 import { CREATE_RETURN, DEFAULT_ROUTER_PATH, EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, EVM_ACCOUNT_TYPE, STAKE_ALERT_DATA, SUBSTRATE_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
-import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetSelectedAccountTypes, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
+import { useChainConnection, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useInitValidateTransaction, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetSelectedAccountTypes, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess } from '@subwallet/extension-web-ui/messaging';
 // import { unlockDotCheckCanMint } from '@subwallet/extension-web-ui/messaging/campaigns';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-web-ui/reducer';
@@ -118,7 +118,6 @@ const Component = ({ className }: ComponentProps) => {
   const submitStepType = processState.steps?.[!currentStep ? currentStep + 1 : currentStep]?.type;
 
   const { compound } = useYieldPositionDetail(slug);
-  const specificList = useGetYieldPositionForSpecificAccount(fromValue);
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const { checkChainConnected, turnOnChain } = useChainConnection();
   const [isConnectingChainSuccess, setIsConnectingChainSuccess] = useState<boolean>(false);
@@ -151,26 +150,6 @@ const Component = ({ className }: ComponentProps) => {
     () => !!poolType && [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType),
     [poolType]
   );
-
-  const chainStakingBoth = useMemo(() => {
-    const hasNativeStaking = (chain: string) => specificList.some((item) => item.chain === chain && item.type === YieldPoolType.NATIVE_STAKING);
-    const hasNominationPool = (chain: string) => specificList.some((item) => item.chain === chain && item.type === YieldPoolType.NOMINATION_POOL);
-
-    const chains = ['polkadot', 'kusama'];
-    let chainStakingInBoth;
-
-    for (const chain of chains) {
-      if (hasNativeStaking(chain) && hasNominationPool(chain) && [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolType) && chain === chainValue) {
-        chainStakingInBoth = chain;
-        break;
-      } else if (((hasNativeStaking(chain) && poolType === YieldPoolType.NOMINATION_POOL) || (hasNominationPool(chain) && poolType === YieldPoolType.NATIVE_STAKING)) && chain === chainValue) {
-        chainStakingInBoth = chain;
-        break;
-      }
-    }
-
-    return chainStakingInBoth;
-  }, [specificList, poolType, chainValue]);
 
   const balanceTokens = useMemo(() => {
     const result: Array<{ chain: string; token: string }> = [];
@@ -617,48 +596,8 @@ const Component = ({ className }: ComponentProps) => {
       });
     };
 
-    const checkStakingWarningModal = (): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        if (chainStakingBoth) {
-          const chainInfo = chainStakingBoth && chainInfoMap[chainStakingBoth];
-
-          const symbol = (!!chainInfo && chainInfo?.substrateInfo?.symbol) || '';
-          const originChain = (!!chainInfo && chainInfo?.name) || '';
-
-          openAlert({
-            type: NotificationType.WARNING,
-            content:
-              (<>
-                <div className={'earning-alert-content'}>
-                  {t(`You're currently staking ${symbol} via direct nomination. Due to ${originChain}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)`)}
-                </div>
-              </>),
-            title: t('Continue staking?'),
-            okButton: {
-              text: t('Continue'),
-              onClick: () => {
-                closeAlert();
-                resolve();
-              }
-            },
-            cancelButton: {
-              text: t('Cancel'),
-              onClick: () => {
-                closeAlert();
-                // eslint-disable-next-line prefer-promise-reject-errors
-                reject();
-              }
-            }
-          });
-        } else {
-          resolve();
-        }
-      });
-    };
-
     const runSequentialChecks = async () => {
       try {
-        await checkStakingWarningModal();
         await checkValidatorConfirmationModal();
         await submitData(currentStep);
       } catch (error) {
@@ -673,7 +612,7 @@ const Component = ({ className }: ComponentProps) => {
         console.error('Error occurred during sequential checks:', error);
       });
     }, 300);
-  }, [chainInfoMap, chainStakingBoth, chainValue, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargetValue, poolTargets, processState.feeStructure, processState.processId, processState.steps, t]);
+  }, [chainValue, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargetValue, poolTargets, processState.feeStructure, processState.processId, processState.steps, t]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
