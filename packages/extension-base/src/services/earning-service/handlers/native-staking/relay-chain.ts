@@ -181,7 +181,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
   /* Subscribe pool position */
 
-  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN, _deriveSessionProgress: DeriveSessionProgress): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chain = chainInfo.slug;
 
     const [_nominations, _bonded, _activeEra] = await Promise.all([
@@ -333,7 +333,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       }
 
       if (ledgers) {
-        const [_currentEra, _minimumActiveStake, _minNominatorBond, _deriveSessionProgress] = await Promise.all([
+        const [_currentEra, _minimumActiveStake, _minNominatorBond] = await Promise.all([
           substrateApi.api.query?.staking?.currentEra(),
           substrateApi.api.query?.staking?.minimumActiveStake && substrateApi.api.query?.staking?.minimumActiveStake(),
           substrateApi.api.query?.staking?.minNominatorBond(),
@@ -352,7 +352,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
           const ledger = _ledger.toPrimitive() as unknown as PalletStakingStakingLedger;
 
           if (ledger) {
-            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake, _deriveSessionProgress);
+            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake);
 
             resultCallback({
               ...defaultInfo,
@@ -396,7 +396,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
         const address = useAddresses[i];
         const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
 
-        if (_ledger.total > 0) {
+        if (_ledger && _ledger.total > 0) {
           result.push(address);
         }
       }
