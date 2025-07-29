@@ -9,7 +9,7 @@ import { createBitcoinTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken, _isPureBitcoinChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
@@ -110,7 +110,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const toAsset = this.chainService.getAssetBySlug(pair.to);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
-    const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : ChainType.EVM;
+    const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : _isPureBitcoinChain(chainInfo) ? ChainType.BITCOIN : ChainType.EVM; // todo: improve throw error for unknown chain
     const receiver = _reformatAddressWithChain(recipient ?? address, toChainInfo);
     const fromAssetId = _getAssetSymbol(fromAsset);
     const toAssetId = _getAssetSymbol(toAsset);
