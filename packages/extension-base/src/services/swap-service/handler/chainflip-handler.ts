@@ -229,8 +229,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
         extrinsic = transactionConfig;
       }
     } else if (chainType === ChainType.BITCOIN) {
-      const _bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
-      const bitcoinApi = await _bitcoinApi.isReady;
+      const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), chainInfo.slug, 'bitcoin');
       const network = chainInfo.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
 
