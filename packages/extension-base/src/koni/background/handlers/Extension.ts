@@ -2222,9 +2222,10 @@ export default class KoniExtension {
 
   private async validateERC721Token (data: _ChainAsset): Promise<boolean> {
     const evmApi = this.#koniState.getEvmApi(data.originChain);
+    const contractAddress = data.metadata?.contractAddress;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, data.metadata?.contractAddress);
+    const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -2234,7 +2235,7 @@ export default class KoniExtension {
     } catch (err) {
       const error = err as Error;
 
-      if (error.message.includes('ERC721Enumerable: owner index out of bounds')) {
+      if (error.message.includes('index out of bounds')) {
         return true;
       } else {
         return false;
