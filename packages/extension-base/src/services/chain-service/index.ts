@@ -879,14 +879,19 @@ export class ChainService {
       : [];
 
     for (const assetSlug of priorityTokensList) {
-      const assetState = assetSettings[assetSlug];
       const assetInfo = this.getAssetBySlug(assetSlug);
 
+      // This can occur if the assetSlug is not present in the current chainlist version
+      if (!assetInfo) {
+        continue;
+      }
+
+      const assetState = assetSettings[assetSlug];
       const chainState = chainStateMap[assetInfo.originChain];
 
       if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
         if (!chainState || !chainState.manualTurnOff) {
-          await this.updateAssetSetting(assetSlug, { visible: true }, true);
+          await this.updateAssetSetting(assetSlug, { visible: true }, false);
         }
       }
     }
