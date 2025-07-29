@@ -256,8 +256,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
       const cachedPool = await this.getPoolInfo(subnetSlug);
 
-      console.log('cachedPool', cachedPool);
-
       if (cachedPool?.metadata?.minValidate) {
         return new BigN(cachedPool.metadata.minValidate);
       }
