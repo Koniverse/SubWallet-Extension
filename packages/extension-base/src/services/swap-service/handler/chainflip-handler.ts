@@ -11,9 +11,9 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
-import { getAssetsUrl, getChainflipSwap } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { _reformatAddressWithChain, fetchFromProxyService } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 
@@ -21,8 +21,6 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 
 const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
 const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
-
-export const CHAINFLIP_BROKER_API = process.env.CHAINFLIP_BROKER_API || '';
 
 interface DepositAddressResponse {
   id: number;
@@ -55,8 +53,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private readonly isTestnet: boolean;
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
-  private baseUrl: string;
-  private assetsUrl: string;
+  // private baseUrl: string;
+  // private assetsUrl: string;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
@@ -68,8 +66,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     });
     this.isTestnet = isTestnet;
     this.providerSlug = isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET;
-    this.baseUrl = getChainflipSwap(isTestnet);
-    this.assetsUrl = getAssetsUrl(isTestnet);
+    // this.baseUrl = getChainflipSwap(isTestnet);
+    // this.assetsUrl = getAssetsUrl(isTestnet);
   }
 
   get chainService () {
@@ -126,7 +124,13 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       throw new Error('Metadata for Chainflip not found');
     }
 
-    const assetsResponse = await fetch(this.assetsUrl);
+    const assetsResponse = await fetchFromProxyService(ProxyServiceRoute.CHAINFLIP,
+      '/assets',
+      {
+        method: 'GET'
+      },
+      this.isTestnet);
+
     const _allAssets = await assetsResponse.json() as { assets: ChainFlipAsset[] };
     const allAssets = _allAssets.assets;
 
@@ -146,10 +150,13 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       retryDurationInBlocks: '100' // 100 blocks * 6 seconds = 10 minutes before deposits are refunded
     };
 
-    const url = `${this.baseUrl}&${new URLSearchParams(depositParams).toString()}`;
-    const response = await fetch(url, {
-      method: 'GET'
-    });
+    const path = `/swap?${new URLSearchParams(depositParams).toString()}`;
+    const response = await fetchFromProxyService(ProxyServiceRoute.CHAINFLIP,
+      path,
+      {
+        method: 'GET'
+      },
+      this.isTestnet);
 
     const data = await response.json() as DepositAddressResponse;
 

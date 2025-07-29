@@ -28,7 +28,6 @@ import { t } from 'i18next';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { createAcrossBridgeExtrinsic } from '../../balance-service/transfer/xcm';
-import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;

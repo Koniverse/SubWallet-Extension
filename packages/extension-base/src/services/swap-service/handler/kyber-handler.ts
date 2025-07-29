@@ -6,7 +6,8 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { estimateTxFee, getERC20Allowance, getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, HandleYieldStepData, OptimalSwapPathParamsV2, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TokenSpendingApprovalParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, combineEthFee } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { _reformatAddressWithChain, combineEthFee, fetchFromProxyService } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
@@ -76,10 +77,6 @@ export interface KyberSwapQuoteMetadata {
   priceImpact?: string;
 }
 
-export const KYBER_CLIENT_ID = process.env.KYBER_CLIENT_ID || '';
-
-const kyberUrl = 'https://aggregator-api.kyberswap.com';
-
 type BuildTxForSwapResult = { data?: TransactionConfig; error?: SwapError | TransactionError };
 
 async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string): Promise<BuildTxForSwapResult> {
@@ -103,14 +100,13 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     gasInclude: 'true'
   });
 
-  const url = `${kyberUrl}/${chain}/api/v1/routes?${queryParams.toString()}`;
+  const path = `/${chain}/api/v1/routes?${queryParams.toString()}`;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetchFromProxyService(ProxyServiceRoute.KYBER, path, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': KYBER_CLIENT_ID,
         accept: 'application/json'
       }
     });
@@ -143,14 +139,11 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     enableGasEstimation: true
   };
 
-  console.log('routeSummary2', routeSummary);
-
   try {
-    const res = await fetch(`${kyberUrl}/${chain}/api/v1/route/build`, {
+    const res = await fetchFromProxyService(ProxyServiceRoute.KYBER, `/${chain}/api/v1/route/build`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-client-id': KYBER_CLIENT_ID,
         accept: 'application/json'
       },
       body: JSON.stringify(body)
