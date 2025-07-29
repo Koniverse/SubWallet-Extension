@@ -11,6 +11,8 @@ import { ArrowsClockwise, ArrowsLeftRight, CopySimple, Eye, EyeSlash, PaperPlane
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
+import { ActionButtonsContainer } from './ActionButtonsContainer';
+
 type Props = ThemeProps & {
   totalValue: SwNumberProps['value'];
   totalChangeValue: SwNumberProps['value'];
@@ -136,7 +138,7 @@ function Component (
           />
         </div>
       )}
-      <div className={'__action-button-container'}>
+      <ActionButtonsContainer className={'__action-buttons-container'}>
         <Button
           icon={(
             <Icon
@@ -195,7 +197,7 @@ function Component (
           size={isShrink ? 'xs' : 'sm'}
           tooltip={t('Buy token')}
         />
-      </div>
+      </ActionButtonsContainer>
     </div>
   );
 }
@@ -265,10 +267,10 @@ export const UpperBlock = styled(Component)<Props>(({ theme: { token } }: Props)
       }
     },
 
-    '.__action-button-container': {
+    '.__action-buttons-container': {
       display: 'flex',
       justifyContent: 'center',
-      padding: '26px 8px 0 8px'
+      padding: '16px 8px 0 8px'
     },
 
     '.__button-space': {
@@ -337,7 +339,7 @@ export const UpperBlock = styled(Component)<Props>(({ theme: { token } }: Props)
         display: 'none'
       },
 
-      '.__action-button-container': {
+      '.__action-buttons-container': {
         paddingTop: 0
       },
 

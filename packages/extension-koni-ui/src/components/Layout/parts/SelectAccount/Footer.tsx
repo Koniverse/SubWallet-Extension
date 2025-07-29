@@ -36,6 +36,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     <div className={className}>
       <Button
         block={true}
+        className={'__create-new-account-button'}
         icon={(
           <Icon
             phosphorIcon={PlusCircle}
@@ -78,6 +79,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 const SelectAccountFooter = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     display: 'flex',
+
+    '.__create-new-account-button': {
+      overflow: 'hidden',
+
+      '.ant-btn-content-wrapper': {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }
+    },
 
     '.btn-min-width': {
       minWidth: token.controlHeightLG + token.sizeSM

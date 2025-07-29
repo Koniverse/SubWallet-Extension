@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import {_ChainAsset, _ChainInfo} from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 

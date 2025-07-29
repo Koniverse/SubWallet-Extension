@@ -7,12 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import {
-  buildXcm, DryRunNodeResult,
-  dryRunXcm,
-  isChainNotSupportDryRun,
-  isChainNotSupportPolkadotApi
-} from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, DryRunNodeResult, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -225,12 +220,15 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
 
-    // todo: validate data before sending
+    if (!data) {
+      throw new Error('Failed to fetch Across Bridge Data. Please try again later');
+    }
+
     const transactionConfig: TransactionConfig = {
-      from: data?.sender,
-      to: data?.to,
-      value: data?.value,
-      data: data?.transferEncodedCall,
+      from: data.sender,
+      to: data.to,
+      value: data.value,
+      data: data.transferEncodedCall,
       ...feeCombine
     };
 

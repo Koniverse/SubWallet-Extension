@@ -7,6 +7,7 @@ import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -17,7 +18,6 @@ import { t } from 'i18next';
 import { BN, BN_TEN, BN_ZERO, noop } from '@polkadot/util';
 
 import BasePoolHandler from './base';
-import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 
 export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHandler {
   protected abstract altInputAsset: string;
@@ -271,6 +271,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const altChainInfo = this.state.getChainInfo(altInputTokenInfo.originChain);
           const symbol = altInputTokenInfo.symbol;
           const networkName = altChainInfo.name;
+
           // TODO: calculate fee for destination chain
           const xcmFeeInfo = await estimateXcmFee({
             fromChainInfo: altChainInfo,
