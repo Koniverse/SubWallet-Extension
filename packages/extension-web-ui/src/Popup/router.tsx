@@ -3,6 +3,8 @@
 
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import { PageWrapper } from '@subwallet/extension-web-ui/components';
+import { AppOnlineContentContextProvider } from '@subwallet/extension-web-ui/contexts/AppOnlineContentProvider';
+import { MktCampaignModalContextProvider } from '@subwallet/extension-web-ui/contexts/MktCampaignModalContext';
 import ErrorFallback from '@subwallet/extension-web-ui/Popup/ErrorFallback';
 import { Root } from '@subwallet/extension-web-ui/Popup/Root';
 import { i18nPromise } from '@subwallet/extension-web-ui/utils';
@@ -25,7 +27,13 @@ export class LazyLoader {
       this.loadPromise = new Promise<ComponentType<any>>((resolve, reject) => {
         this.elemLoader().then((module) => {
           resolve(module.default);
-        }).catch(reject);
+        }).catch((e) => {
+          if (/Loading chunk .*? failed/.test((e as Error).message)) {
+            window.location.reload();
+          } else {
+            reject(e);
+          }
+        });
       });
     }
 
@@ -53,7 +61,9 @@ export class LazyLoader {
 const PhishingDetected = new LazyLoader('PhishingDetected', () => import('@subwallet/extension-web-ui/Popup/PhishingDetected'));
 const Welcome = new LazyLoader('Welcome', () => import('@subwallet/extension-web-ui/Popup/Welcome'));
 const CreateDone = new LazyLoader('CreateDone', () => import('@subwallet/extension-web-ui/Popup/CreateDone'));
+const RedirectHandler = new LazyLoader('RedirectHandler', () => import('@subwallet/extension-web-ui/Popup/RedirectHandler'));
 const BuyTokens = new LazyLoader('BuyTokens', () => import('@subwallet/extension-web-ui/Popup/BuyTokens'));
+const OffRampLoading = new LazyLoader('OffRampLoading', () => import('@subwallet/extension-web-ui/Popup/OffRampLoading'));
 
 const Tokens = new LazyLoader('Tokens', () => import('@subwallet/extension-web-ui/Popup/Home/Tokens'));
 const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwallet/extension-web-ui/Popup/Home/Tokens/DetailList'));
@@ -62,6 +72,7 @@ const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/e
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollectionDetail'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftImport'));
+const NftEntry = new LazyLoader('NftEntry', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftEntry'));
 
 const InscriptionItems = new LazyLoader('InscriptionItems', () => import('@subwallet/extension-web-ui/Popup/Home/Inscriptions/InscriptionItemList'));
 const InscriptionItemDetail = new LazyLoader('InscriptionItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Inscriptions/InscriptionItemDetail'));
@@ -74,6 +85,7 @@ const Statistics = new LazyLoader('Statistics', () => import('@subwallet/extensi
 const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-web-ui/Popup/Settings'));
 const GeneralSetting = new LazyLoader('GeneralSetting', () => import('@subwallet/extension-web-ui/Popup/Settings/GeneralSetting'));
 const ManageAddressBook = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-web-ui/Popup/Settings/AddressBook'));
+const AccountSettings = new LazyLoader('ManageAddressBook', () => import('@subwallet/extension-web-ui/Popup/Settings/AccountSettings'));
 
 const ManageChains = new LazyLoader('ManageChains', () => import('@subwallet/extension-web-ui/Popup/Settings/Chains/ManageChains'));
 const ChainImport = new LazyLoader('ChainImport', () => import('@subwallet/extension-web-ui/Popup/Settings/Chains/ChainImport'));
@@ -87,6 +99,8 @@ const TokenDetail = new LazyLoader('TokenDetail', () => import('@subwallet/exten
 const SecurityList = new LazyLoader('SecurityList', () => import('@subwallet/extension-web-ui/Popup/Settings/Security'));
 const ManageWebsiteAccess = new LazyLoader('ManageWebsiteAccess', () => import('@subwallet/extension-web-ui/Popup/Settings/Security/ManageWebsiteAccess'));
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-web-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
+const Notifications = new LazyLoader('Notification', () => import('@subwallet/extension-web-ui/Popup/Settings/Notifications/Notification'));
+const NotificationSetting = new LazyLoader('NotificationSetting', () => import('@subwallet/extension-web-ui/Popup/Settings/Notifications/NotificationSetting'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-web-ui/Popup/Account/NewSeedPhrase'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-web-ui/Popup/Account/ImportSeedPhrase'));
@@ -97,6 +111,7 @@ const AttachReadOnly = new LazyLoader('AttachReadOnly', () => import('@subwallet
 const ConnectPolkadotVault = new LazyLoader('ConnectPolkadotVault', () => import('@subwallet/extension-web-ui/Popup/Account/ConnectQrSigner/ConnectPolkadotVault'));
 const ConnectKeystone = new LazyLoader('ConnectKeystone', () => import('@subwallet/extension-web-ui/Popup/Account/ConnectQrSigner/ConnectKeystone'));
 const ConnectLedger = new LazyLoader('ConnectLedger', () => import('@subwallet/extension-web-ui/Popup/Account/ConnectLedger'));
+const ExportAllDone = new LazyLoader('ExportAllDone', () => import('@subwallet/extension-web-ui/Popup/Account/ExportAllDone'));
 
 const Login = new LazyLoader('Login', () => import('@subwallet/extension-web-ui/Popup/Keyring/Login'));
 const CreatePassword = new LazyLoader('CreatePassword', () => import('@subwallet/extension-web-ui/Popup/Keyring/CreatePassword'));
@@ -108,6 +123,7 @@ const AccountExport = new LazyLoader('AccountExport', () => import('@subwallet/e
 
 const Transaction = new LazyLoader('Transaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/Transaction'));
 const TransactionDone = new LazyLoader('TransactionDone', () => import('@subwallet/extension-web-ui/Popup/TransactionDone'));
+const TransactionSubmission = new LazyLoader('TransactionSubmission', () => import('@subwallet/extension-web-ui/Popup/TransactionSubmission'));
 const SendFund = new LazyLoader('SendFund', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/SendFund'));
 const SendNFT = new LazyLoader('SendNFT', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/SendNFT'));
 const Earn = new LazyLoader('Stake', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Earn'));
@@ -115,6 +131,9 @@ const Unstake = new LazyLoader('Unstake', () => import('@subwallet/extension-web
 const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/CancelUnstake'));
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Withdraw'));
+const SwapTransaction = new LazyLoader('SwapTransaction', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/Swap'));
+const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-web-ui/Popup/Transaction/variants/ClaimBridge'));
+const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-web-ui/Popup/MigrateAccount'));
 
 // Wallet Connect
 const ConnectWalletConnect = new LazyLoader('ConnectWalletConnect', () => import('@subwallet/extension-web-ui/Popup/WalletConnect/ConnectWalletConnect'));
@@ -128,6 +147,9 @@ const DApps = new LazyLoader('DApps', () => import('@subwallet/extension-web-ui/
 const EarningEntry = new LazyLoader('EarningEntry', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningEntry'));
 const EarningPools = new LazyLoader('EarningPools', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningPools'));
 const EarningPositionDetail = new LazyLoader('EarningPositionDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail'));
+const EarningPreviewOptions = new LazyLoader('EarningPreviewOptions', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningPreview/EarningPreviewOptions'));
+const EarningPreviewPools = new LazyLoader('EarningPreviewPools', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningPreview/EarningPreviewPools'));
+const EarningPreviewOutlet = new LazyLoader('EarningPreviewOutlet', () => import('@subwallet/extension-web-ui/Popup/Home/Earning/EarningPreview/EarningPreviewOutlet'));
 
 // const EarningDoneOutlet = new LazyLoader('EarningDoneOutlet', () => import('@subwallet/extension-web-ui/Popup/EarningDone/Outlet'));
 // const EarningDoneContent = new LazyLoader('EarningDoneContent', () => import('@subwallet/extension-web-ui/Popup/EarningDone/Content'));
@@ -154,6 +176,16 @@ export function Example () {
   </PageWrapper>;
 }
 
+export function RootWrapper () {
+  return (
+    <MktCampaignModalContextProvider>
+      <AppOnlineContentContextProvider>
+        <Root />
+      </AppOnlineContentContextProvider>
+    </MktCampaignModalContextProvider>
+  );
+}
+
 export function NestedOutlet () {
   return <Outlet context={useOutletContext()} />;
 }
@@ -162,7 +194,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     loader: () => i18nPromise,
-    element: <Root />,
+    element: <RootWrapper />,
     errorElement: <ErrorFallback />,
     children: [
       {
@@ -171,7 +203,9 @@ export const router = createBrowserRouter([
       },
       Welcome.generateRouterObject('/welcome', true),
       BuyTokens.generateRouterObject('/buy-tokens'),
+      OffRampLoading.generateRouterObject('/off-ramp-loading'),
       CreateDone.generateRouterObject('/create-done'),
+      RedirectHandler.generateRouterObject('/redirect-handler/:feature'),
       {
         ...Home.generateRouterObject('/home'),
         children: [
@@ -179,8 +213,7 @@ export const router = createBrowserRouter([
           Statistics.generateRouterObject('statistics'),
           TokenDetailList.generateRouterObject('tokens/detail/:slug'),
           {
-            path: 'nfts',
-            element: <NestedOutlet />,
+            ...NftEntry.generateRouterObject('nfts'),
             children: [
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
@@ -221,6 +254,8 @@ export const router = createBrowserRouter([
           CancelUnstake.generateRouterObject('cancel-unstake'),
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
+          SwapTransaction.generateRouterObject('swap'),
+          ClaimBridge.generateRouterObject('claim-bridge'),
           {
             path: 'compound',
             element: <Example />
@@ -228,14 +263,18 @@ export const router = createBrowserRouter([
         ]
       },
       {
+        ...TransactionSubmission.generateRouterObject('transaction-submission')
+      },
+      {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
       },
-      // {
-      //   ...EarningDoneOutlet.generateRouterObject('earning-done'),
-      //   children: [
-      //     EarningDoneContent.generateRouterObject(':address/:chain/:transactionId')
-      //   ]
-      // },
+      {
+        ...EarningPreviewOutlet.generateRouterObject('/earning-preview'),
+        children: [
+          EarningPreviewOptions.generateRouterObject(''),
+          EarningPreviewPools.generateRouterObject('pools')
+        ]
+      },
       {
         path: '/keyring',
         element: <Outlet />,
@@ -251,10 +290,13 @@ export const router = createBrowserRouter([
         children: [
           Settings.generateRouterObject('/settings'),
           Settings.generateRouterObject('list'),
+          AccountSettings.generateRouterObject('account-settings'),
           GeneralSetting.generateRouterObject('general'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
+          Notifications.generateRouterObject('notification'),
+          NotificationSetting.generateRouterObject('notification-config'),
           ManageWebsiteAccessDetail.generateRouterObject('dapp-access-edit'),
           {
             path: 'chains',
@@ -291,9 +333,13 @@ export const router = createBrowserRouter([
           ConnectPolkadotVault.generateRouterObject('connect-polkadot-vault'),
           ConnectKeystone.generateRouterObject('connect-keystone'),
           ConnectLedger.generateRouterObject('connect-ledger'),
-          AccountDetail.generateRouterObject('detail/:accountAddress'),
-          AccountExport.generateRouterObject('export/:accountAddress')
+          AccountDetail.generateRouterObject('detail/:accountProxyId'),
+          AccountExport.generateRouterObject('export/:accountProxyId'),
+          ExportAllDone.generateRouterObject('export-all-done')
         ]
+      },
+      {
+        ...MigrateAccount.generateRouterObject('migrate-account')
       },
       {
         path: 'wallet-connect',
@@ -304,12 +350,6 @@ export const router = createBrowserRouter([
           ConnectionDetail.generateRouterObject('detail/:topic')
         ]
       },
-      // {
-      //   ...EarningOutlet.generateRouterObject('earning-demo'),
-      //   children: [
-      //     EarningDemo.generateRouterObject('')
-      //   ]
-      // },
       {
         ...CrowdloanUnlockCampaign.generateRouterObject('/crowdloan-unlock-campaign'),
         children: [

@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountProxy } from '@subwallet/extension-base/types';
 import { stripUrl } from '@subwallet/extension-base/utils';
-import { AccountItemWithName, EmptyList, GeneralEmptyList, Layout, MetaInfo, PageWrapper, WCNetworkAvatarGroup } from '@subwallet/extension-web-ui/components';
+import { AccountProxyItem, EmptyList, GeneralEmptyList, Layout, MetaInfo, PageWrapper, WCNetworkAvatarGroup } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { WALLET_CONNECT_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { useConfirmModal, useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { disconnectWalletConnectConnection } from '@subwallet/extension-web-ui/messaging';
 import { ReduxStatus } from '@subwallet/extension-web-ui/stores/types';
-import { Theme, ThemeProps, WalletConnectChainInfo } from '@subwallet/extension-web-ui/types';
-import { chainsToWalletConnectChainInfos, getWCAccountList, noop } from '@subwallet/extension-web-ui/utils';
+import { ThemeProps, WalletConnectChainInfo } from '@subwallet/extension-web-ui/types';
+import { chainsToWalletConnectChainInfos, getWCAccountProxyList, noop } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Image, ModalContext, NetworkItem, SwList, SwModalFuncProps } from '@subwallet/react-ui';
 import { SwModalProps } from '@subwallet/react-ui/es/sw-modal/SwModal';
 import { SessionTypes } from '@walletconnect/types';
@@ -20,7 +20,7 @@ import { Info, MagnifyingGlass, Plugs } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 interface ComponentProps {
   isModal?: boolean;
@@ -40,7 +40,6 @@ const Component: React.FC<ComponentProps> = (props) => {
   const { t } = useTranslation();
   const notification = useNotification();
   const navigate = useNavigate();
-  const { token } = useTheme() as Theme;
 
   const domain = useMemo(() => {
     try {
@@ -55,7 +54,7 @@ const Component: React.FC<ComponentProps> = (props) => {
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const { chainInfoMap } = useSelector((state) => state.chainStore);
-  const { accounts } = useSelector((state) => state.accountState);
+  const accountProxies = useSelector((state) => state.accountState.accountProxies);
 
   const chains = useMemo((): WalletConnectChainInfo[] => {
     const chains = Object.values(namespaces).map((namespace) => namespace.chains || []).flat();
@@ -63,7 +62,7 @@ const Component: React.FC<ComponentProps> = (props) => {
     return chainsToWalletConnectChainInfos(chainInfoMap, chains);
   }, [namespaces, chainInfoMap]);
 
-  const accountItems = useMemo((): AbstractAddressJson[] => getWCAccountList(accounts, namespaces), [accounts, namespaces]);
+  const accountProxyItems = useMemo((): AccountProxy[] => getWCAccountProxyList(accountProxies, namespaces), [accountProxies, namespaces]);
 
   const modalProps = useMemo((): Partial<SwModalFuncProps> => ({
     id: disconnectModalId,
@@ -110,16 +109,16 @@ const Component: React.FC<ComponentProps> = (props) => {
     navigate('/wallet-connect/list');
   }, [navigate]);
 
-  const renderAccountItem = useCallback((item: AccountJson) => {
+  const renderAccountProxyItem = useCallback((item: AccountProxy) => {
     return (
-      <AccountItemWithName
-        accountName={item.name}
-        address={item.address}
-        avatarSize={token.sizeLG}
-        key={item.address}
+      <AccountProxyItem
+        accountProxy={item}
+        accountProxyName={item.name}
+        className={'__account-proxy-connect-item'}
+        key={item.id}
       />
     );
-  }, [token.sizeLG]);
+  }, []);
 
   const renderChainItem = useCallback((item: WalletConnectChainInfo) => {
     return (
@@ -199,15 +198,13 @@ const Component: React.FC<ComponentProps> = (props) => {
         </MetaInfo.Default>
       </MetaInfo>
       <div className='total-account'>
-        {t('{{number}} account connected', { replace: { number: accountItems.length } })}
+        {t('{{number}} {{account}} connected', { replace: { number: accountProxyItems.length, account: accountProxyItems.length > 1 ? 'accounts' : 'account' } })}
       </div>
       <SwList.Section
         className='account-list'
-        displayRow
-        list={accountItems}
-        renderItem={renderAccountItem}
+        list={accountProxyItems}
+        renderItem={renderAccountProxyItem}
         renderWhenEmpty={renderAccountEmpty}
-        rowGap='var(--row-gap)'
       />
       <BaseModal
         className={CN(className, 'network-modal')}
@@ -412,6 +409,12 @@ const ConnectionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) =>
 
       '.ant-sw-list-wrapper': {
         flexBasis: 'auto'
+      },
+
+      '.ant-sw-list': {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8
       }
     },
 
@@ -429,6 +432,15 @@ const ConnectionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) =>
         flexDirection: 'column',
         display: 'flex'
       }
+    },
+
+    '.__account-proxy-connect-item .__item-middle-part': {
+      textWrap: 'nowrap',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      fontWeight: 600,
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6
     },
 
     '&.-modal': {

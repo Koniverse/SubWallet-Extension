@@ -3,20 +3,18 @@
 
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { PageWrapper, WalletConnect } from '@subwallet/extension-koni-ui/components';
-import { EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { CONTACT_SUPPORT_URL, EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
+import { useExtensionDisplayModes, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useUILock from '@subwallet/extension-koni-ui/hooks/common/useUILock';
-import useIsPopup from '@subwallet/extension-koni-ui/hooks/dom/useIsPopup';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
-import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { computeStatus, openInNewTab } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, ButtonProps, Icon, Image, ModalContext, SettingItem, SwHeader, SwIconProps, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowsOut, ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, FrameCorners, Globe, GlobeHemisphereEast, Lock, Parachute, ShareNetwork, ShieldCheck, X } from 'phosphor-react';
+import { ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin, EnvelopeSimple, Globe, GlobeHemisphereEast, Lock, Rocket, ShareNetwork, ShieldCheck, UserCircleGear, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -74,7 +72,7 @@ const modalId = 'about-subwallet-modal';
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const navigate = useNavigate();
   const { token } = useTheme() as Theme;
-  const isPopup = useIsPopup();
+  const { isPopupMode } = useExtensionDisplayModes();
   const notify = useNotification();
   const { goHome } = useDefaultNavigate();
   const { t } = useTranslation();
@@ -83,7 +81,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { missions } = useSelector((state: RootState) => state.missionPool);
 
   const liveMissionsCount = useMemo(() => {
-    return missions.filter((item) => computeStatus(item) === 'live').length;
+    return missions?.filter ? missions.filter((item) => computeStatus(item) === 'live').length : 0;
   }, [missions]);
 
   const { isUILocked, lock, unlock } = useUILock();
@@ -114,17 +112,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     {
       key: 'general',
       items: [
-        {
-          key: 'expand-view',
-          leftIcon: FrameCorners,
-          leftIconBgColor: token.colorPrimary,
-          rightIcon: ArrowsOut,
-          title: t('Expand view'),
-          onClick: () => {
-            windowOpen({ allowedPath: '/' }).catch(console.error);
-          },
-          isHidden: !isPopup
-        },
+        // {
+        //   key: 'expand-view',
+        //   leftIcon: FrameCorners,
+        //   leftIconBgColor: token.colorPrimary,
+        //   rightIcon: ArrowsOut,
+        //   title: t('Expand view'),
+        //   onClick: () => {
+        //     windowOpen({ allowedPath: '/' }).catch(console.error);
+        //   },
+        //   isHidden: !isPopup
+        // },
         {
           key: 'general-settings',
           leftIcon: GlobeHemisphereEast,
@@ -146,13 +144,24 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         },
         {
-          key: 'mission-pools',
-          leftIcon: Parachute,
+          key: 'account-settings',
+          leftIcon: UserCircleGear,
+          leftIconBgColor: token['purple-8'],
+          rightIcon: CaretRight,
+          title: t('Account settings'),
+          onClick: () => {
+            navigate('/settings/account-settings');
+          },
+          isHidden: !isPopupMode
+        },
+        {
+          key: 'crowdloans',
+          leftIcon: Rocket,
           leftIconBgColor: token['cyan-5'],
           rightIcon: CaretRight,
-          title: t('Mission pools'),
+          title: t('Crowdloans'),
           onClick: () => {
-            navigate('/settings/mission-pools', { state: true });
+            navigate('/settings/crowdloans', { state: true });
           }
         }
       ]
@@ -234,9 +243,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIconBgColor: token['geekblue-6'],
           rightIcon: ArrowSquareOut,
           title: t('Contact support'),
-          onClick: () => {
-            window.open(`${SUPPORT_MAIL}?subject=[Extension - In-app support]`, '_self');
-          }
+          onClick: openInNewTab(CONTACT_SUPPORT_URL)
         },
         {
           key: 'user-manual',
@@ -277,7 +284,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       ]
     }
-  ]), [activeModal, isPopup, navigate, t, token]);
+  ]), [activeModal, isPopupMode, navigate, t, token]);
 
   const aboutSubwalletType = useMemo<SettingItemType[]>(() => {
     return [

@@ -5,11 +5,10 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getAssetDecimals, _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { fakeAddress } from '@subwallet/extension-base/services/earning-service/constants';
+import { CHANNEL_ID, fakeAddress } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseYieldStepDetail, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, LiquidYieldPositionInfo, OptimalYieldPath, OptimalYieldPathParams, RuntimeDispatchInfo, SubmitYieldJoinData, TokenBalanceRaw, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
-import fetch from 'cross-fetch';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
@@ -48,7 +47,7 @@ interface BifrostUnlockInfo {
   era: number
 }
 
-const STATS_URL = 'https://api.bifrost.app/api/site';
+const STATS_URL = 'https://dapi.bifrost.io/api/site';
 const BIFROST_GRAPHQL_ENDPOINT = 'https://bifrost-subsql.liebi.com/v1/graphql';
 const BIFROST_EXCHANGE_RATE_REQUEST = 'query MyQuery{slp_polkadot_ratio(limit:1 where:{key:{_eq:"0"}} order_by:{timestamp:desc_nulls_first}){ratio key timestamp total_issuance token_pool}}';
 
@@ -265,10 +264,9 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
         }
       }
 
-      const unstakingList: UnstakingInfo[] = [];
-
       useAddresses.forEach((address) => {
         const formattedAddress = reformatAddress(address);
+        const unstakingList: UnstakingInfo[] = [];
 
         const bnActiveBalance = activeBalanceMap[formattedAddress];
         const unlockings = unlockingMap[formattedAddress];
@@ -339,7 +337,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
     const defaultFeeTokenSlug = this.feeAssets[0];
 
     if (new BN(params.amount).gt(BN_ZERO)) {
-      const _mintFeeInfo = await poolOriginSubstrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), params.amount, undefined, undefined).paymentInfo(fakeAddress);
+      const _mintFeeInfo = await poolOriginSubstrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), params.amount, undefined, CHANNEL_ID).paymentInfo(fakeAddress);
       const mintFeeInfo = _mintFeeInfo.toPrimitive() as unknown as RuntimeDispatchInfo;
 
       return {
@@ -358,7 +356,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
     const substrateApi = await this.substrateApi.isReady;
     const inputTokenSlug = this.inputAsset;
     const inputTokenInfo = this.state.getAssetBySlug(inputTokenSlug);
-    const extrinsic = substrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), data.amount, undefined, undefined);
+    const extrinsic = substrateApi.api.tx.vtokenMinting.mint(_getTokenOnChainInfo(inputTokenInfo), data.amount, undefined, CHANNEL_ID);
 
     return {
       txChain: this.chain,
@@ -387,7 +385,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
     const chainApi = await this.substrateApi.isReady;
     const derivativeTokenSlug = this.derivativeAssets[0];
     const derivativeTokenInfo = this.state.getAssetBySlug(derivativeTokenSlug);
-    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(_getTokenOnChainInfo(derivativeTokenInfo), amount);
+    const extrinsic = chainApi.api.tx.vtokenMinting.redeem(null, _getTokenOnChainInfo(derivativeTokenInfo), amount);
 
     return [ExtrinsicType.UNSTAKE_VDOT, extrinsic];
   }

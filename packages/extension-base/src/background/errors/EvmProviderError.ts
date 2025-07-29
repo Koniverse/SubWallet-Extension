@@ -27,6 +27,10 @@ const defaultErrorMap: Record<EvmProviderErrorType, { message: string, code?: nu
     message: detectTranslate('Network is disconnected'),
     code: 4901
   },
+  NETWORK_NOT_SUPPORTED: {
+    message: detectTranslate('This network is currently not supported'),
+    code: 4902
+  },
   INVALID_PARAMS: {
     message: detectTranslate('Undefined error. Please contact SubWallet support'),
     code: -32602
@@ -40,11 +44,11 @@ const defaultErrorMap: Record<EvmProviderErrorType, { message: string, code?: nu
 export class EvmProviderError extends SWError {
   override errorType: EvmProviderErrorType;
 
-  constructor (errorType: EvmProviderErrorType, errMessage?: string, data?: unknown) {
+  constructor (errorType: EvmProviderErrorType, errMessage?: string, data?: unknown, name?: string) {
     const { code, message } = defaultErrorMap[errorType];
     const finalMessage = errMessage || t(message || '') || errorType;
 
-    super(errorType, finalMessage, code, data);
+    super(errorType, finalMessage, code, data, name);
     this.errorType = errorType;
   }
 }

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { Avatar } from '@subwallet/extension-web-ui/components';
 import AvatarGroup from '@subwallet/extension-web-ui/components/Account/Info/AvatarGroup';
 import useChainInfo from '@subwallet/extension-web-ui/hooks/chain/useChainInfo';
@@ -20,7 +20,7 @@ interface Props extends ThemeProps {
 const Component: React.FC<Props> = ({ account, className }: Props) => {
   const { t } = useTranslation();
   const isAll = useMemo((): boolean => isAccountAll(account.address), [account.address]);
-  const networkInfo = useChainInfo(undefined, account?.originGenesisHash ?? account?.genesisHash);
+  const networkInfo = useChainInfo(undefined, account?.genesisHash);
   const address = useMemo((): string => formatAccountAddress(account, networkInfo), [account, networkInfo]);
 
   return (

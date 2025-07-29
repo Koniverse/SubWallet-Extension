@@ -7,42 +7,66 @@ import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AccountExternalError, AccountExternalErrorCode, AccountsWithCurrentAddress, AddressBookInfo, AmountData, AmountDataWithId, AssetSetting, AssetSettingUpdateReq, BasicTxErrorType, BasicTxWarningCode, BondingOptionParams, BrowserConfirmationType, CampaignBanner, CampaignData, CampaignDataType, ChainType, CreateDeriveAccountInfo, CronReloadRequest, CrowdloanJson, CurrentAccountInfo, DeriveAccountInfo, ExternalRequestPromiseStatus, ExtrinsicType, KeyringState, MantaPayEnableMessage, MantaPayEnableParams, MantaPayEnableResponse, MantaPaySyncState, NftCollection, NftJson, NftTransactionRequest, NftTransactionResponse, OptionInputAddress, PriceJson, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateSuriV2, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestAccountMeta, RequestAddInjectedAccounts, RequestApproveConnectWalletSession, RequestApproveWalletConnectNotSupport, RequestAuthorization, RequestAuthorizationBlock, RequestAuthorizationPerAccount, RequestAuthorizationPerSite, RequestAuthorizeApproveV2, RequestBatchRestoreV2, RequestBondingSubmit, RequestCameraSettings, RequestCampaignBannerComplete, RequestChangeEnableChainPatrol, RequestChangeLanguage, RequestChangeMasterPassword, RequestChangeShowBalance, RequestChangeShowZeroBalance, RequestChangeTimeAutoLock, RequestCheckPublicAndSecretKey, RequestConfirmationComplete, RequestConnectWalletConnect, RequestCrossChainTransfer, RequestCrowdloanContributions, RequestDeleteContactAccount, RequestDeriveCreateMultiple, RequestDeriveCreateV2, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestDisconnectWalletConnectSession, RequestEditContactAccount, RequestFindRawMetadata, RequestForgetSite, RequestFreeBalance, RequestGetDeriveAccounts, RequestGetTransaction, RequestJsonRestoreV2, RequestKeyringExportMnemonic, RequestMaxTransferable, RequestMigratePassword, RequestParseEvmContractInput, RequestParseTransactionSubstrate, RequestPassPhishingPage, RequestQrParseRLP, RequestQrSignEvm, RequestQrSignSubstrate, RequestRejectConnectWalletSession, RequestRejectExternalRequest, RequestRejectWalletConnectNotSupport, RequestRemoveInjectedAccounts, RequestResetWallet, RequestResolveExternalRequest, RequestSaveRecentAccount, RequestSeedCreateV2, RequestSeedValidateV2, RequestSettingsType, RequestSigningApprovePasswordV2, RequestStakePoolingBonding, RequestStakePoolingUnbonding, RequestSubscribeHistory, RequestSubstrateNftSubmitTransaction, RequestTransfer, RequestTransferCheckReferenceCount, RequestTransferCheckSupporting, RequestTransferExistentialDeposit, RequestTuringCancelStakeCompound, RequestTuringStakeCompound, RequestUnbondingSubmit, RequestUnlockKeyring, RequestUnlockType, ResolveAddressToDomainRequest, ResolveDomainRequest, ResponseAccountCreateSuriV2, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseAccountMeta, ResponseChangeMasterPassword, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseFindRawMetadata, ResponseGetDeriveAccounts, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponseParseEvmContractInput, ResponseParseTransactionSubstrate, ResponsePrivateKeyValidateV2, ResponseQrParseRLP, ResponseQrSignEvm, ResponseQrSignSubstrate, ResponseRejectExternalRequest, ResponseResetWallet, ResponseResolveExternalRequest, ResponseSeedCreateV2, ResponseSeedValidateV2, ResponseSubscribeHistory, ResponseUnlockKeyring, StakingJson, StakingRewardJson, StakingTxErrorType, StakingType, SupportTransferResponse, ThemeNames, TransactionHistoryItem, TransactionResponse, TransferTxErrorType, ValidateNetworkRequest, ValidateNetworkResponse, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountAuthType, AccountJson, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountChangePassword, RequestAccountCreateExternal, RequestAccountCreateHardware, RequestAccountCreateSuri, RequestAccountEdit, RequestAccountExport, RequestAccountForget, RequestAccountShow, RequestAccountTie, RequestAccountValidate, RequestAuthorizeCancel, RequestAuthorizeReject, RequestBatchRestore, RequestCurrentAccountAddress, RequestDeriveCreate, RequestDeriveValidate, RequestJsonRestore, RequestMetadataApprove, RequestMetadataReject, RequestSeedCreate, RequestSeedValidate, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseDeriveValidate, ResponseJsonGetAccountInfo, ResponseSeedCreate, ResponseSeedValidate, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
+import { AccountExternalError, AddressBookInfo, AmountData, AmountDataWithId, AssetSetting, AssetSettingUpdateReq, BondingOptionParams, BrowserConfirmationType, CampaignBanner, CampaignData, CampaignDataType, ChainType, CronReloadRequest, CrowdloanJson, ExternalRequestPromiseStatus, ExtrinsicType, HistoryTokenPriceJSON, KeyringState, MantaPayEnableMessage, MantaPayEnableParams, MantaPayEnableResponse, MantaPaySyncState, NftCollection, NftJson, NftTransactionRequest, NftTransactionResponse, PriceJson, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestAddInjectedAccounts, RequestApproveConnectWalletSession, RequestApproveWalletConnectNotSupport, RequestAuthorization, RequestAuthorizationBlock, RequestAuthorizationPerAccount, RequestAuthorizationPerSite, RequestAuthorizeApproveV2, RequestBondingSubmit, RequestCameraSettings, RequestCampaignBannerComplete, RequestChangeEnableChainPatrol, RequestChangeLanguage, RequestChangeMasterPassword, RequestChangePriceCurrency, RequestChangeShowBalance, RequestChangeShowZeroBalance, RequestChangeTimeAutoLock, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestConnectWalletConnect, RequestCrowdloanContributions, RequestDeleteContactAccount, RequestDisconnectWalletConnectSession, RequestEditContactAccount, RequestFindRawMetadata, RequestForgetSite, RequestFreeBalance, RequestGetHistoryTokenPriceData, RequestGetTransaction, RequestKeyringExportMnemonic, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestParseEvmContractInput, RequestParseTransactionSubstrate, RequestPassPhishingPage, RequestPingSession, RequestQrParseRLP, RequestQrSignEvm, RequestQrSignSubstrate, RequestRejectConnectWalletSession, RequestRejectExternalRequest, RequestRejectWalletConnectNotSupport, RequestRemoveInjectedAccounts, RequestResetWallet, RequestResolveExternalRequest, RequestSaveAppConfig, RequestSaveBrowserConfig, RequestSaveMigrationAcknowledgedStatus, RequestSaveOSConfig, RequestSaveRecentAccount, RequestSaveUnifiedAccountMigrationInProgress, RequestSettingsType, RequestSigningApprovePasswordV2, RequestStakePoolingBonding, RequestStakePoolingUnbonding, RequestSubscribeHistory, RequestSubstrateNftSubmitTransaction, RequestSwitchCurrentNetworkAuthorization, RequestTuringCancelStakeCompound, RequestTuringStakeCompound, RequestUnbondingSubmit, RequestUnlockKeyring, RequestUnlockType, ResolveAddressToDomainRequest, ResolveDomainRequest, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseFindRawMetadata, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseNftImport, ResponseParseEvmContractInput, ResponseParseTransactionSubstrate, ResponseQrParseRLP, ResponseQrSignEvm, ResponseQrSignSubstrate, ResponseRejectExternalRequest, ResponseResetWallet, ResponseResolveExternalRequest, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, ResponseUnlockKeyring, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, StakingType, ThemeNames, TokenPriorityDetails, TransactionHistoryItem, TransactionResponse, UiSettings, ValidateNetworkRequest, ValidateNetworkResponse, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountAuthType, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountExport, RequestAuthorizeCancel, RequestAuthorizeReject, RequestCurrentAccountAddress, RequestMetadataApprove, RequestMetadataReject, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
-import { ALL_ACCOUNT_KEY, ALL_GENESIS_HASH, XCM_FEE_RATIO, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, LATEST_SESSION } from '@subwallet/extension-base/constants';
+import { additionalValidateTransferForRecipient, validateTransferRequest, validateXcmMinAmountToMythos, validateXcmTransferRequest } from '@subwallet/extension-base/core/logic-validation/transfer';
+import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { ALLOWED_PATH } from '@subwallet/extension-base/defaults';
+import { getERC20SpendingApprovalTx } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
+import { _ERC721_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { resolveAzeroAddressToDomain, resolveAzeroDomainToAddress } from '@subwallet/extension-base/koni/api/dotsama/domain';
 import { parseSubstrateTransaction } from '@subwallet/extension-base/koni/api/dotsama/parseTransaction';
-import { checkReferenceCount, checkSupportTransfer, createTransferExtrinsic } from '@subwallet/extension-base/koni/api/dotsama/transfer';
+import { UNSUPPORTED_TRANSFER_EVM_CHAIN_NAME } from '@subwallet/extension-base/koni/api/nft/config';
 import { getNftTransferExtrinsic, isRecipientSelf } from '@subwallet/extension-base/koni/api/nft/transfer';
 import { getBondingExtrinsic, getCancelWithdrawalExtrinsic, getClaimRewardExtrinsic, getNominationPoolsInfo, getUnbondingExtrinsic, getValidatorsInfo, validateBondingCondition, validateUnbondingCondition } from '@subwallet/extension-base/koni/api/staking/bonding';
 import { getTuringCancelCompoundingExtrinsic, getTuringCompoundExtrinsic } from '@subwallet/extension-base/koni/api/staking/bonding/paraChain';
 import { getPoolingBondingExtrinsic, getPoolingUnbondingExtrinsic, validatePoolBondingCondition, validateRelayUnbondingCondition } from '@subwallet/extension-base/koni/api/staking/bonding/relayChain';
-import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject } from '@subwallet/extension-base/koni/api/tokens/evm/transfer';
-import { getPSP34TransferExtrinsic } from '@subwallet/extension-base/koni/api/tokens/wasm';
-import { createXcmExtrinsic } from '@subwallet/extension-base/koni/api/xcm';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { _API_OPTIONS_CHAIN_GROUP, _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
+import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
+import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
+import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
+import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
+import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
+import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { _isAcrossChainBridge, AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
+import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _getSubstrateGenesisHash, _getTokenMinAmount, _isAssetSmartContractNft, _isChainEvmCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isTokenEvmSmartContract, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
-import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
+import { calculateToAmountByReservePool } from '@subwallet/extension-base/services/fee-service/utils';
+import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
+import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
-import { SWTransaction, SWTransactionResponse, SWTransactionResult, TransactionEmitter, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
-import { WALLET_CONNECT_EIP155_NAMESPACE } from '@subwallet/extension-base/services/wallet-connect-service/constants';
+import { SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
+import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountsStore } from '@subwallet/extension-base/stores';
-import { BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardJson, NominationPoolInfo, OptimalYieldPathParams, RequestEarlyValidateYield, RequestGetYieldPoolTargets, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseGetYieldPoolTargets, ValidateYieldProcessParams, YieldPoolType } from '@subwallet/extension-base/types';
-import { BN_ZERO, convertSubjectInfoToAddresses, createTransactionFromRLP, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeInfo, HandleYieldStepData, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningSlippage, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
+import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, getAccountSignMode, isSameAddress, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
-import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils/number';
+import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
-import { createPair } from '@subwallet/keyring';
-import { KeyringPair, KeyringPair$Json, KeyringPair$Meta } from '@subwallet/keyring/types';
+import { getKeypairTypeByAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { KeyringAddress, KeyringJson$Meta } from '@subwallet/ui-keyring/types';
@@ -51,38 +75,16 @@ import { SessionTypes } from '@walletconnect/types/dist/types/sign-client/sessio
 import { getSdkError } from '@walletconnect/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
+import { combineLatest, Subject } from 'rxjs';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { TypeRegistry } from '@polkadot/types';
-import { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
-import { assert, BN, hexStripPrefix, hexToU8a, isAscii, isHex, u8aToHex, u8aToString } from '@polkadot/util';
-import { addressToEvm, base64Decode, decodeAddress, isAddress, isEthereumAddress, jsonDecrypt, keyExtractSuri, mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
-import { EncryptedJson, KeypairType, Prefix } from '@polkadot/util-crypto/types';
+import { Registry, SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
+import { assert, hexStripPrefix, hexToU8a, isAscii, isHex, noop, u8aToHex } from '@polkadot/util';
+import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
-const ETH_DERIVE_DEFAULT = '/m/44\'/60\'/0\'/0/0';
-
-function getSuri (seed: string, type?: KeypairType): string {
-  return type === 'ethereum'
-    ? `${seed}${ETH_DERIVE_DEFAULT}`
-    : seed;
-}
-
-function transformAccounts (accounts: SubjectInfo): AccountJson[] {
-  return Object.values(accounts).map(({ json: { address, meta }, type }): AccountJson => ({
-    address,
-    ...meta,
-    type
-  }));
-}
-
-const ACCOUNT_ALL_JSON: AccountJson = {
-  address: ALL_ACCOUNT_KEY,
-  name: 'All'
-};
-
-export const SEED_DEFAULT_LENGTH = 12;
-export const SEED_LENGTHS = [12, 15, 18, 21, 24];
+import { getSuitableRegistry, RegistrySource, setupApiRegistry, setupDappRegistry, setupDatabaseRegistry } from '../utils';
 
 export function isJsonPayload (value: SignerPayloadJSON | SignerPayloadRaw): value is SignerPayloadJSON {
   return (value as SignerPayloadJSON).genesisHash !== undefined;
@@ -93,8 +95,14 @@ export default class KoniExtension {
   readonly #koniState: KoniState;
   #timeAutoLock: number = DEFAULT_AUTO_LOCK_TIME;
   #skipAutoLock = false;
-  #alwaysLock = false;
   #firstTime = true;
+  #alwaysLock = false;
+  /**
+   * Use for heartbeat.
+   * When auto-lock runs, the value changes, and it stops the heartbeat.
+   * With MV3, when the lifecycle ends, this extension Object will be destroyed, so #keyringLockSubject will be destroyed too.
+   * */
+  #keyringLockSubject = new Subject<boolean>();
 
   constructor (state: KoniState) {
     this.#koniState = state;
@@ -110,11 +118,13 @@ export default class KoniExtension {
           this.#lockTimeOut = setTimeout(() => {
             if (!this.#skipAutoLock) {
               this.keyringLock();
+              updateLatestSession(Date.now());
             }
           }, this.#timeAutoLock * 60 * 1000);
         } else if (this.#alwaysLock) {
           if (!this.#firstTime) {
             this.keyringLock();
+            updateLatestSession(Date.now());
           }
         }
       }
@@ -124,104 +134,30 @@ export default class KoniExtension {
       }
     };
 
+    const updateLatestSession = (time: number) => {
+      SWStorage.instance.setItem(LATEST_SESSION, JSON.stringify({ remind: true, timeCalculate: time })).catch(console.error);
+    };
+
     this.#koniState.settingService.getSettings(updateTimeAutoLock);
     this.#koniState.settingService.getSubject().subscribe({
       next: updateTimeAutoLock
     });
   }
 
-  /// Clone from PolkadotJs
-  private accountsCreateExternal ({ address, genesisHash, name }: RequestAccountCreateExternal): boolean {
-    keyring.addExternal(address, { genesisHash, name });
-
-    return true;
+  private accountsEdit (request: RequestAccountProxyEdit): boolean {
+    return this.#koniState.keyringService.context.accountsEdit(request);
   }
 
-  private accountsCreateHardware ({ accountIndex,
-    address,
-    addressOffset,
-    genesisHash,
-    hardwareType,
-    name }: RequestAccountCreateHardware): boolean {
-    keyring.addHardware(address, hardwareType, { accountIndex, addressOffset, genesisHash, name });
-
-    return true;
+  private tonGetAllTonWalletContractVersion (request: RequestGetAllTonWalletContractVersion): ResponseGetAllTonWalletContractVersion {
+    return this.#koniState.keyringService.context.tonGetAllTonWalletContractVersion(request);
   }
 
-  private accountsCreateSuri ({ genesisHash, name, suri, type }: RequestAccountCreateSuri): boolean {
-    keyring.addUri(getSuri(suri, type), { genesisHash, name }, type);
-
-    return true;
-  }
-
-  private accountsChangePassword ({ address, newPass, oldPass }: RequestAccountChangePassword): boolean {
-    const pair = keyring.getPair(address);
-
-    assert(pair, t('Unable to find account'));
-
-    try {
-      if (!pair.isLocked) {
-        pair.lock();
-      }
-
-      pair.decodePkcs8(oldPass);
-    } catch (error) {
-      throw new Error(t('Wrong password'));
-    }
-
-    keyring.encryptAccount(pair, newPass);
-
-    return true;
-  }
-
-  private accountsEdit ({ address, name }: RequestAccountEdit): boolean {
-    const pair = keyring.getPair(address);
-
-    assert(pair, t('Unable to find account'));
-
-    keyring.saveAccountMeta(pair, { ...pair.meta, name });
-
-    return true;
+  private tonAccountChangeWalletContractVersion (request: RequestChangeTonWalletContractVersion): string {
+    return this.#koniState.keyringService.context.tonAccountChangeWalletContractVersion(request);
   }
 
   private accountsExport ({ address, password }: RequestAccountExport): ResponseAccountExport {
     return { exportedJson: keyring.backupAccount(keyring.getPair(address), password) };
-  }
-
-  private accountsShow ({ address, isShowing }: RequestAccountShow): boolean {
-    const pair = keyring.getPair(address);
-
-    assert(pair, t('Unable to find account'));
-
-    keyring.saveAccountMeta(pair, { ...pair.meta, isHidden: !isShowing });
-
-    return true;
-  }
-
-  private accountsValidate ({ address, password }: RequestAccountValidate): boolean {
-    try {
-      keyring.backupAccount(keyring.getPair(address), password);
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // FIXME This looks very much like what we have in Tabs
-  private accountsSubscribe (id: string, port: chrome.runtime.Port): boolean {
-    const cb = createSubscription<'pri(accounts.subscribe)'>(id, port);
-    const accountSubject = this.#koniState.keyringService.accountSubject;
-    const subscription = accountSubject.subscribe((accounts: SubjectInfo): void =>
-      cb(transformAccounts(accounts))
-    );
-
-    port.onDisconnect.addListener((): void => {
-      this.cancelSubscription(id);
-      subscription.unsubscribe();
-    });
-
-    return true;
   }
 
   private metadataApprove ({ id }: RequestMetadataApprove): boolean {
@@ -272,73 +208,15 @@ export default class KoniExtension {
     return this.#koniState.metaSubject.value;
   }
 
-  private jsonRestore ({ file, password }: RequestJsonRestore): void {
-    try {
-      keyring.restoreAccount(file, password, true);
-    } catch (error) {
-      throw new Error((error as Error).message);
-    }
-  }
-
-  private batchRestore ({ file, password }: RequestBatchRestore): void {
-    try {
-      keyring.restoreAccounts(file, password);
-    } catch (error) {
-      throw new Error((error as Error).message);
-    }
-  }
-
-  private jsonGetAccountInfo (json: KeyringPair$Json): ResponseJsonGetAccountInfo {
-    try {
-      const { address, meta: { genesisHash, name }, type } = keyring.createFromJson(json);
-
-      return {
-        address,
-        genesisHash,
-        name,
-        type
-      } as ResponseJsonGetAccountInfo;
-    } catch (e) {
-      console.error(e);
-      throw new Error((e as Error).message);
-    }
-  }
-
-  private seedCreate ({ length = SEED_DEFAULT_LENGTH, seed: _seed, type }: RequestSeedCreate): ResponseSeedCreate {
-    const seed = _seed || mnemonicGenerate(length);
-
-    return {
-      address: keyring.createFromUri(getSuri(seed, type), {}, type).address,
-      seed
-    };
-  }
-
-  private seedValidate ({ suri, type }: RequestSeedValidate): ResponseSeedValidate {
-    const { phrase } = keyExtractSuri(suri);
-
-    if (isHex(phrase)) {
-      assert(isHex(phrase, 256), t('Invalid seed phrase. Please try again.'));
-    } else {
-      // sadly isHex detects as string, so we need a cast here
-      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('Seed phrase needs to contain {{x}} words', { replace: { x: SEED_LENGTHS.join(', ') } }));
-      assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
-    }
-
-    return {
-      address: keyring.createFromUri(getSuri(suri, type), {}, type).address,
-      suri
-    };
-  }
-
   // TODO: move to request service
-  private signingApproveSignature ({ id, signature }: RequestSigningApproveSignature): boolean {
+  private signingApproveSignature ({ id, signature, signedTransaction }: RequestSigningApproveSignature): boolean {
     const queued = this.#koniState.getSignRequest(id);
 
     assert(queued, t('Unable to proceed. Please try again'));
 
     const { resolve } = queued;
 
-    resolve({ id, signature });
+    resolve({ id, signature, signedTransaction });
 
     return true;
   }
@@ -401,44 +279,6 @@ export default class KoniExtension {
     return true;
   }
 
-  private derive (parentAddress: string, suri: string, password: string, metadata: KeyringPair$Meta): KeyringPair {
-    const parentPair = keyring.getPair(parentAddress);
-
-    try {
-      parentPair.decodePkcs8(password);
-    } catch (e) {
-      throw new Error(t('Wrong password'));
-    }
-
-    try {
-      return parentPair.derive(suri, metadata);
-    } catch (err) {
-      throw new Error(t('"{{suri}}" is not a valid derivation path', { replace: { suri } }));
-    }
-  }
-
-  private derivationValidate ({ parentAddress, parentPassword, suri }: RequestDeriveValidate): ResponseDeriveValidate {
-    const childPair = this.derive(parentAddress, suri, parentPassword, {});
-
-    return {
-      address: childPair.address,
-      suri
-    };
-  }
-
-  private derivationCreate ({ genesisHash, name, parentAddress, parentPassword, suri }: RequestDeriveCreate): boolean {
-    const childPair = this.derive(parentAddress, suri, parentPassword, {
-      genesisHash,
-      name,
-      parentAddress,
-      suri
-    });
-
-    keyring.addPair(childPair, true);
-
-    return true;
-  }
-
   ///
 
   private cancelSubscription (id: string): boolean {
@@ -449,56 +289,47 @@ export default class KoniExtension {
     this.#koniState.createUnsubscriptionHandle(id, unsubscribe);
   }
 
-  public decodeAddress = (key: string | Uint8Array, ignoreChecksum?: boolean, ss58Format?: Prefix): Uint8Array => {
-    return keyring.decodeAddress(key, ignoreChecksum, ss58Format);
-  };
-
-  public encodeAddress = (key: string | Uint8Array, ss58Format?: Prefix): string => {
-    return keyring.encodeAddress(key, ss58Format);
-  };
-
-  private accountExportPrivateKey ({ address,
-    password }: RequestAccountExportPrivateKey): ResponseAccountExportPrivateKey {
-    return this.#koniState.accountExportPrivateKey({ address, password });
+  private accountExportPrivateKey (request: RequestAccountExportPrivateKey): ResponseAccountExportPrivateKey {
+    return this.#koniState.accountExportPrivateKey(request);
   }
 
   private checkPublicAndSecretKey (request: RequestCheckPublicAndSecretKey): ResponseCheckPublicAndSecretKey {
     return this.#koniState.checkPublicAndSecretKey(request);
   }
 
+  private checkNameExists (request: RequestAccountNameValidate): ResponseAccountNameValidate {
+    return this.#koniState.keyringService.context.checkNameExists(request);
+  }
+
   private async accountsGetAllWithCurrentAddress (id: string, port: chrome.runtime.Port): Promise<AccountsWithCurrentAddress> {
-    const cb = createSubscription<'pri(accounts.subscribeWithCurrentAddress)'>(id, port);
+    const cb = createSubscription<'pri(accounts.subscribeWithCurrentProxy)'>(id, port);
     const keyringService = this.#koniState.keyringService;
 
     await this.#koniState.eventService.waitAccountReady;
     await this.#koniState.eventService.waitInjectReady;
 
-    const currentAccount = keyringService.currentAccount;
-    const transformedAccounts = transformAccounts(keyringService.accounts);
+    const currentAccount = keyringService.context.currentAccount;
+    const accounts = keyringService.context.accounts;
+    const transformedAccounts = Object.values(accounts);
     const responseData: AccountsWithCurrentAddress = {
-      accounts: transformedAccounts?.length ? [{ ...ACCOUNT_ALL_JSON }, ...transformedAccounts] : [],
-      currentAddress: currentAccount?.address,
-      currentGenesisHash: currentAccount?.currentGenesisHash
+      accounts: transformedAccounts?.length ? [combineAllAccountProxy(transformedAccounts), ...transformedAccounts] : [],
+      currentAccountProxy: currentAccount?.proxyId
     };
 
-    const subscriptionAccounts = keyringService.accountSubject.subscribe((storedAccounts: SubjectInfo): void => {
-      const transformedAccounts = transformAccounts(storedAccounts);
+    const accountProxyMapObservable = keyringService.context.observable.accounts;
+    const currentAccountInfoObservable = keyringService.context.observable.currentAccount;
 
-      responseData.accounts = transformedAccounts?.length ? [{ ...ACCOUNT_ALL_JSON }, ...transformedAccounts] : [];
+    const subscriptionAccountGroups = combineLatest({ accountProxies: accountProxyMapObservable, currentAccount: currentAccountInfoObservable }).subscribe(({ accountProxies, currentAccount }) => {
+      const transformedAccounts = Object.values(accountProxies);
 
-      cb(responseData);
-    });
-
-    const subscriptionCurrentAccount = keyringService.currentAccountSubject.subscribe((currentAccountData) => {
-      responseData.currentAddress = currentAccountData.address;
-      responseData.currentGenesisHash = currentAccountData.currentGenesisHash;
+      responseData.accounts = transformedAccounts?.length ? [combineAllAccountProxy(transformedAccounts), ...transformedAccounts] : [];
+      responseData.currentAccountProxy = currentAccount?.proxyId;
 
       cb(responseData);
     });
 
     this.createUnsubscriptionHandle(id, () => {
-      subscriptionAccounts.unsubscribe();
-      subscriptionCurrentAccount.unsubscribe();
+      subscriptionAccountGroups.unsubscribe();
     });
 
     port.onDisconnect.addListener((): void => {
@@ -508,31 +339,58 @@ export default class KoniExtension {
     return responseData;
   }
 
-  private accountsGetAll (id: string, port: chrome.runtime.Port): string {
-    const cb = createSubscription<'pri(accounts.subscribeAccountsInputAddress)'>(id, port);
-    const subscription = keyring.keyringOption.optionsSubject.subscribe((options): void => {
-      const optionsInputAddress: OptionInputAddress = {
-        options
-      };
+  private async subscribeInputAddressData (request: RequestInputAccountSubscribe, id: string, port: chrome.runtime.Port): Promise<ResponseInputAccountSubscribe> {
+    const { chain, data } = request;
 
-      cb(optionsInputAddress);
+    const cb = createSubscription<'pri(accounts.subscribeAccountsInputAddress)'>(id, port);
+
+    const combineFunction = async (chainInfoMap: Record<string, _ChainInfo>, accountProxyMap: AccountProxyMap, _contacts: SubjectInfo): Promise<ResponseInputAccountSubscribe> => {
+      const accountProxies = Object.values(accountProxyMap);
+      const contacts = transformAddresses(_contacts);
+      const chainInfo = chainInfoMap[chain];
+      const substrateApi = this.#koniState.chainService.getSubstrateApi(chain);
+      const rs = await _analyzeAddress(data, accountProxies, contacts, chainInfo, substrateApi);
+
+      return {
+        id,
+        ...rs
+      };
+    };
+
+    const accountObservable = this.#koniState.keyringService.context.observable.accounts;
+    const contactObservable = this.#koniState.keyringService.context.observable.contacts;
+    const chainInfoMapObservable = this.#koniState.chainService.subscribeChainInfoMap().asObservable();
+
+    const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts }) => {
+      combineFunction(chainInfoMap, accountProxies, contacts)
+        .then((rs) => cb(rs))
+        .catch(console.error);
     });
 
-    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+    this.createUnsubscriptionHandle(id, () => {
+      subscription.unsubscribe();
+    });
 
     port.onDisconnect.addListener((): void => {
       this.cancelSubscription(id);
     });
 
-    return id;
+    const accountProxyMap = this.#koniState.keyringService.context.value.accounts;
+    const contacts = this.#koniState.keyringService.context.value.contacts;
+    const chainInfoMap = this.#koniState.chainService.getChainInfoMap();
+
+    return combineFunction(chainInfoMap, accountProxyMap, contacts);
   }
 
+  /**
+   * @todo: move to keyring context
+   * */
   private subscribeAddresses (id: string, port: chrome.runtime.Port): AddressBookInfo {
-    const _cb = createSubscription<'pri(accounts.subscribeAddresses)'>(id, port);
+    const _cb = createSubscription<'pri(addressBook.subscribe)'>(id, port);
     let old = '';
 
-    const subscription = this.#koniState.keyringService.addressesSubject.subscribe((subjectInfo: SubjectInfo): void => {
-      const addresses = convertSubjectInfoToAddresses(subjectInfo);
+    const subscription = this.#koniState.keyringService.context.observable.contacts.subscribe((subjectInfo: SubjectInfo): void => {
+      const addresses = transformAddresses(subjectInfo);
       const _new = JSON.stringify(addresses);
 
       if (old !== _new) {
@@ -544,19 +402,24 @@ export default class KoniExtension {
       }
     });
 
-    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+    this.createUnsubscriptionHandle(id, () => {
+      subscription.unsubscribe();
+    });
 
     port.onDisconnect.addListener((): void => {
       this.cancelSubscription(id);
     });
 
-    const subjectInfo = this.#koniState.keyringService.addresses;
+    const subjectInfo = this.#koniState.keyringService.context.contacts;
 
     return {
-      addresses: convertSubjectInfoToAddresses(subjectInfo)
+      addresses: transformAccounts(subjectInfo)
     };
   }
 
+  /**
+   * @todo: move to keyring context
+   * */
   private saveRecentAccount ({ accountId, chain }: RequestSaveRecentAccount): KeyringAddress {
     if (isAddress((accountId))) {
       const address = reformatAddress(accountId);
@@ -590,7 +453,7 @@ export default class KoniExtension {
 
         metadata.recentChainSlugs = recentChainSlugs;
 
-        const result = keyring.addresses.add(new AccountsStore(), address, { address: address, meta: metadata });
+        const result = keyring.addresses.add(new AccountsStore(), address, address, { address: address, meta: metadata });
 
         return { ...result.json, publicKey: decodeAddress(address) };
       }
@@ -599,6 +462,9 @@ export default class KoniExtension {
     }
   }
 
+  /**
+   * @todo: move to keyring context
+   * */
   private editContactAccount ({ address, meta }: RequestEditContactAccount): boolean {
     if (isAddress((address))) {
       const _address = reformatAddress(address);
@@ -611,6 +477,9 @@ export default class KoniExtension {
     }
   }
 
+  /**
+   * @todo: move to keyring context
+   * */
   private deleteContactAccount ({ address }: RequestDeleteContactAccount): boolean {
     if (isAddress((address))) {
       const _address = reformatAddress(address);
@@ -628,7 +497,7 @@ export default class KoniExtension {
 
     return new Promise<AuthUrls>((resolve, reject) => {
       this.#koniState.getAuthorize((rs: AuthUrls) => {
-        const addressList = Object.keys(keyringService.accounts);
+        const addressList = Object.keys(keyringService.context.pairs);
         const urlList = Object.keys(rs);
 
         if (Object.keys(rs[urlList[0]].isAllowedMap).toString() !== addressList.toString()) {
@@ -764,45 +633,57 @@ export default class KoniExtension {
     return true;
   }
 
-  private getAccounts (): string[] {
-    const storedAccounts = this.#koniState.keyringService.accounts;
-    const transformedAccounts = transformAccounts(storedAccounts);
+  private getPairs (): AccountJson[] {
+    const storedAccounts = this.#koniState.keyringService.context.pairs;
 
-    return transformedAccounts.map((a) => a.address);
+    return transformAccounts(storedAccounts);
   }
 
-  private isAddressValidWithAuthType (address: string, accountAuthType?: AccountAuthType): boolean {
-    if (accountAuthType === 'substrate') {
-      return !isEthereumAddress(address);
-    } else if (accountAuthType === 'evm') {
-      return isEthereumAddress(address);
-    }
+  private isAddressValidWithAuthType (address: string, accountAuthTypes?: AccountAuthType[]): boolean {
+    const type = getKeypairTypeByAddress(address);
 
-    return true;
+    const validTypes = {
+      evm: EthereumKeypairTypes,
+      substrate: SubstrateKeypairTypes,
+      ton: TonKeypairTypes,
+      cardano: CardanoKeypairTypes
+    };
+
+    return !!accountAuthTypes && accountAuthTypes.some((authType) => validTypes[authType]?.includes(type));
   }
 
-  private filterAccountsByAccountAuthType (accounts: string[], accountAuthType?: AccountAuthType): string[] {
-    if (accountAuthType === 'substrate') {
-      return accounts.filter((address) => !isEthereumAddress(address));
-    } else if (accountAuthType === 'evm') {
-      return accounts.filter((address) => isEthereumAddress(address));
-    } else {
-      return accounts;
+  private filterAccountsByAccountAuthType (accounts: AccountJson[], accountAuthTypes?: AccountAuthType[]): string[] {
+    if (!accountAuthTypes) {
+      return [];
     }
+
+    return accountAuthTypes.reduce<string[]>((list, accountAuthType) => {
+      if (accountAuthType === 'evm') {
+        accounts.forEach(({ address }) => isEthereumAddress(address) && list.push(address));
+      } else if (accountAuthType === 'substrate') {
+        accounts.forEach(({ address }) => isSubstrateAddress(address) && list.push(address));
+      } else if (accountAuthType === 'ton') {
+        accounts.forEach(({ address }) => isTonAddress(address) && list.push(address));
+      } else if (accountAuthType === 'cardano') {
+        accounts.forEach(({ address }) => isCardanoAddress(address) && list.push(address));
+      }
+
+      return list;
+    }, []);
   }
 
   private _changeAuthorizationAll (connectValue: boolean, callBack?: (value: AuthUrls) => void) {
     this.#koniState.getAuthorize((value) => {
       assert(value, 'The source is not known');
 
-      const accounts = this.getAccounts();
+      const pairs = this.getPairs();
 
       Object.keys(value).forEach((url) => {
         if (!value[url].isAllowed) {
           return;
         }
 
-        const targetAccounts = this.filterAccountsByAccountAuthType(accounts, value[url].accountAuthType);
+        const targetAccounts = this.filterAccountsByAccountAuthType(pairs, value[url].accountAuthTypes);
 
         targetAccounts.forEach((address) => {
           value[url].isAllowedMap[address] = connectValue;
@@ -832,12 +713,13 @@ export default class KoniExtension {
     this.#koniState.getAuthorize((value) => {
       assert(value[url], 'The source is not known');
 
-      const accounts = this.getAccounts();
-      const targetAccounts = this.filterAccountsByAccountAuthType(accounts, value[url].accountAuthType);
+      const pairs = this.getPairs();
+      const targetAccounts = this.filterAccountsByAccountAuthType(pairs, value[url].accountAuthTypes);
 
       targetAccounts.forEach((address) => {
         value[url].isAllowedMap[address] = connectValue;
       });
+
       this.#koniState.setAuthorize(value, () => {
         callBack && callBack(value);
       });
@@ -858,6 +740,47 @@ export default class KoniExtension {
     });
   }
 
+  private async switchCurrentNetworkAuthorization ({ authSwitchNetworkType, networkKey, url }: RequestSwitchCurrentNetworkAuthorization): Promise<ResponseAuthorizeList> {
+    const authUrls = await this.#koniState.getAuthList();
+    const chainInfo = this.#koniState.chainService.getChainInfoByKey(networkKey);
+    const chainState = this.#koniState.getChainStateByKey(networkKey);
+    const { promise, resolve } = createPromiseHandler<ResponseAuthorizeList>();
+
+    const typeInfoMap: Record<AccountAuthType, keyof _ChainInfo> = {
+      substrate: 'substrateInfo',
+      evm: 'evmInfo',
+      cardano: 'cardanoInfo',
+      ton: 'tonInfo'
+    };
+
+    const typeInfoKey = typeInfoMap[authSwitchNetworkType];
+
+    if (!typeInfoKey || !chainInfo[typeInfoKey]) {
+      throw new Error(t('Network {{networkKey}} is not {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+    }
+
+    const authUrl = authUrls[url];
+
+    if (!authUrl) {
+      throw new Error(t('Not found {{url}} in auth list', { replace: { url } }));
+    }
+
+    if (chainInfo && !_isChainEnabled(chainState)) {
+      await this.enableChainWithPriorityAssets({ chainSlug: networkKey, enableTokens: true });
+    }
+
+    if (!authUrl.accountAuthTypes.includes(authSwitchNetworkType)) {
+      throw new Error(t('Network {{networkKey}} is not supported by {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+    }
+
+    authUrl.currentNetworkMap[authSwitchNetworkType] = networkKey;
+    this.#koniState.setAuthorize(authUrls, () => {
+      resolve({ list: authUrls });
+    });
+
+    return promise;
+  }
+
   private changeAuthorization (data: RequestAuthorization, id: string, port: chrome.runtime.Port): boolean {
     const cb = createSubscription<'pri(authorize.changeSite)'>(id, port);
 
@@ -876,7 +799,7 @@ export default class KoniExtension {
     this.#koniState.getAuthorize((value) => {
       assert(value, 'The source is not known');
 
-      if (this.isAddressValidWithAuthType(address, value[url].accountAuthType)) {
+      if (this.isAddressValidWithAuthType(address, value[url].accountAuthTypes)) {
         value[url].isAllowedMap[address] = connectValue;
 
         this.#koniState.setAuthorize(value, () => {
@@ -1033,6 +956,30 @@ export default class KoniExtension {
     return true;
   }
 
+  private saveNotificationSetup (request: NotificationSetup) {
+    this.#koniState.updateSetting('notificationSetup', request);
+
+    return true;
+  }
+
+  private saveMigrationAcknowledgedStatus ({ isAcknowledgedUnifiedAccountMigration }: RequestSaveMigrationAcknowledgedStatus) {
+    this.#koniState.updateSetting('isAcknowledgedUnifiedAccountMigration', isAcknowledgedUnifiedAccountMigration);
+
+    return true;
+  }
+
+  private saveUnifiedAccountMigrationInProgress ({ isUnifiedAccountMigrationInProgress }: RequestSaveUnifiedAccountMigrationInProgress) {
+    this.#koniState.updateSetting('isUnifiedAccountMigrationInProgress', isUnifiedAccountMigrationInProgress);
+
+    return true;
+  }
+
+  private pingUnifiedAccountMigrationDone (): boolean {
+    this.#koniState.updateSetting('isUnifiedAccountMigrationInProgress', false);
+
+    return true;
+  }
+
   private setShowZeroBalance ({ show }: RequestChangeShowZeroBalance) {
     this.#koniState.updateSetting('isShowZeroBalance', show);
 
@@ -1047,6 +994,12 @@ export default class KoniExtension {
 
   private setShowBalance ({ enable }: RequestChangeShowBalance) {
     this.#koniState.updateSetting('isShowBalance', enable);
+
+    return true;
+  }
+
+  private setAllowOneSign ({ allowOneSign }: RequestChangeAllowOneSign) {
+    this.#koniState.updateSetting('allowOneSign', allowOneSign);
 
     return true;
   }
@@ -1069,46 +1022,10 @@ export default class KoniExtension {
     return await this.#koniState.getAuthList();
   }
 
-  private _saveCurrentAccountAddress (address: string, callback?: (data: CurrentAccountInfo) => void) {
-    let accountInfo = this.#koniState.keyringService.currentAccount;
-
-    if (!accountInfo) {
-      accountInfo = {
-        address,
-        currentGenesisHash: ALL_GENESIS_HASH,
-        allGenesisHash: ALL_GENESIS_HASH || undefined
-      };
-    } else {
-      accountInfo.address = address;
-
-      if (address !== ALL_ACCOUNT_KEY) {
-        try {
-          const currentKeyPair = keyring.getPair(address);
-
-          accountInfo.currentGenesisHash = currentKeyPair?.meta.genesisHash as string || ALL_GENESIS_HASH;
-        } catch {
-          accountInfo.currentGenesisHash = ALL_GENESIS_HASH;
-        }
-      } else {
-        accountInfo.currentGenesisHash = accountInfo.allGenesisHash || ALL_GENESIS_HASH;
-      }
-    }
-
-    this.#koniState.setCurrentAccount(accountInfo, () => {
-      callback && callback(accountInfo);
-    });
-  }
-
-  private updateCurrentAccountAddress (address: string): boolean {
-    this._saveCurrentAccountAddress(address);
-
-    return true;
-  }
-
-  private async saveCurrentAccountAddress (data: RequestCurrentAccountAddress): Promise<CurrentAccountInfo> {
-    return new Promise<CurrentAccountInfo>((resolve) => {
-      this._saveCurrentAccountAddress(data.address, (currentInfo) => {
-        resolve(currentInfo);
+  private async saveCurrentAccountProxy (data: RequestCurrentAccountAddress): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.#koniState.keyringService.context.saveCurrentAccountProxyId(data.address, () => {
+        resolve(true);
       });
     });
   }
@@ -1149,6 +1066,32 @@ export default class KoniExtension {
     return this.#koniState.priceService.getPrice();
   }
 
+  private async getHistoryTokenPrice ({ priceId, timeframe }: RequestGetHistoryTokenPriceData): Promise<HistoryTokenPriceJSON> {
+    return this.#koniState.priceService.getHistoryTokenPriceData(priceId, timeframe);
+  }
+
+  private checkCoinGeckoPriceSupport (priceId: string): boolean {
+    return this.#koniState.priceService.checkCoinGeckoPriceSupport(priceId);
+  }
+
+  private subscribeCurrentTokenPrice (priceId: string, id: string, port: chrome.runtime.Port): ResponseSubscribeCurrentTokenPrice {
+    const cb = createSubscription<'pri(price.subscribeCurrentTokenPrice)'>(id, port);
+
+    const { currentPrice, unsubscribe } = this.#koniState.priceService.subscribeCurrentTokenPrice(priceId, cb);
+
+    this.createUnsubscriptionHandle(id, unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return { id, price: currentPrice };
+  }
+
+  private async setPriceCurrency ({ currency }: RequestChangePriceCurrency): Promise<boolean> {
+    return await this.#koniState.priceService.setPriceCurrency(currency);
+  }
+
   private subscribePrice (id: string, port: chrome.runtime.Port): Promise<PriceJson> {
     const cb = createSubscription<'pri(price.getSubscription)'>(id, port);
 
@@ -1167,13 +1110,13 @@ export default class KoniExtension {
   }
 
   private async getBalance (reset?: boolean) {
-    return this.#koniState.getBalance(reset);
+    return this.#koniState.balanceService.getBalance(reset);
   }
 
   private async subscribeBalance (id: string, port: chrome.runtime.Port) {
     const cb = createSubscription<'pri(balance.getSubscription)'>(id, port);
 
-    const balanceSubscription = this.#koniState.subscribeBalance().subscribe({
+    const balanceSubscription = this.#koniState.balanceService.subscribeBalanceMap().subscribe({
       next: (rs) => {
         const data = { details: rs } as BalanceJson;
 
@@ -1216,122 +1159,8 @@ export default class KoniExtension {
     return this.getCrowdloan(true);
   }
 
-  private validatePassword (json: KeyringPair$Json, password: string): boolean {
-    const cryptoType = Array.isArray(json.encoding.content) ? json.encoding.content[1] : 'ed25519';
-    const encType = Array.isArray(json.encoding.type) ? json.encoding.type : [json.encoding.type];
-    const pair = createPair(
-      { toSS58: this.encodeAddress, type: cryptoType as KeypairType },
-      { publicKey: this.decodeAddress(json.address, true) },
-      json.meta,
-      isHex(json.encoded) ? hexToU8a(json.encoded) : base64Decode(json.encoded),
-      encType
-    );
-
-    // unlock then lock (locking cleans secretKey, so needs to be last)
-    try {
-      pair.decodePkcs8(password);
-      pair.lock();
-
-      return true;
-    } catch (e) {
-      console.error(e);
-
-      return false;
-    }
-  }
-
-  private validatedAccountsPassword (json: EncryptedJson, password: string): boolean {
-    try {
-      u8aToString(jsonDecrypt(json, password));
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  private _addAddressToAuthList (address: string, isAllowed: boolean): void {
-    this.#koniState.getAuthorize((value) => {
-      if (value && Object.keys(value).length) {
-        Object.keys(value).forEach((url) => {
-          if (this.isAddressValidWithAuthType(address, value[url].accountAuthType)) {
-            value[url].isAllowedMap[address] = isAllowed;
-          }
-        });
-
-        this.#koniState.setAuthorize(value);
-      }
-    });
-  }
-
-  private _addAddressesToAuthList (addresses: string[], isAllowed: boolean): void {
-    this.#koniState.getAuthorize((value) => {
-      if (value && Object.keys(value).length) {
-        Object.keys(value).forEach((url) => {
-          addresses.forEach((address) => {
-            if (this.isAddressValidWithAuthType(address, value[url].accountAuthType)) {
-              value[url].isAllowedMap[address] = isAllowed;
-            }
-          });
-        });/**/
-
-        this.#koniState.setAuthorize(value);
-      }
-    });
-  }
-
-  private async accountsCreateSuriV2 ({ genesisHash,
-    isAllowed,
-    name,
-    password,
-    suri: _suri,
-    types }: RequestAccountCreateSuriV2): Promise<ResponseAccountCreateSuriV2> {
-    const addressDict = {} as Record<KeypairType, string>;
-    let changedAccount = false;
-    const hasMasterPassword = keyring.keyring.hasMasterPassword;
-
-    if (!hasMasterPassword) {
-      if (!password) {
-        throw Error(t('The password of each account is needed to set up master password'));
-      } else {
-        keyring.changeMasterPassword(password);
-        this.#koniState.updateKeyringState();
-      }
-    }
-
-    const currentAccount = this.#koniState.keyringService.currentAccount;
-    const allGenesisHash = currentAccount?.allGenesisHash || undefined;
-
-    types?.forEach((type) => {
-      const suri = getSuri(_suri, type);
-      const address = keyring.createFromUri(suri, {}, type).address;
-
-      addressDict[type] = address;
-      const newAccountName = type === 'ethereum' ? `${name} - EVM` : name;
-
-      keyring.addUri(suri, { genesisHash, name: newAccountName }, type);
-      this._addAddressToAuthList(address, isAllowed);
-
-      if (!changedAccount) {
-        if (types.length === 1) {
-          this.#koniState.setCurrentAccount({ address, currentGenesisHash: genesisHash || null, allGenesisHash });
-        } else {
-          this.#koniState.setCurrentAccount({
-            address: ALL_ACCOUNT_KEY,
-            currentGenesisHash: allGenesisHash || null,
-            allGenesisHash
-          }, undefined, true);
-        }
-
-        changedAccount = true;
-      }
-    });
-
-    await new Promise<void>((resolve) => {
-      this.#koniState.addAccountRef(Object.values(addressDict), () => {
-        resolve();
-      });
-    });
+  private accountsCreateSuriV2 (request: RequestAccountCreateSuriV2): ResponseAccountCreateSuriV2 {
+    const addressDict = this.#koniState.keyringService.context.accountsCreateSuriV2(request);
 
     if (this.#alwaysLock) {
       this.keyringLock();
@@ -1340,20 +1169,17 @@ export default class KoniExtension {
     return addressDict;
   }
 
-  private async accountsForgetOverride ({ address, lockAfter }: RequestAccountForget): Promise<boolean> {
-    keyring.forgetAccount(address);
-    await new Promise<void>((resolve) => {
-      this.#koniState.removeAccountRef(address, () => {
-        resolve();
-      });
-    });
+  private async accountsForgetOverride (request: RequestAccountProxyForget): Promise<boolean> {
+    const addresses = await this.#koniState.keyringService.context.accountProxyForget(request);
 
     // Remove from auth list
     await new Promise<void>((resolve) => {
       this.#koniState.getAuthorize((value) => {
         if (value && Object.keys(value).length) {
           Object.keys(value).forEach((url) => {
-            delete value[url].isAllowedMap[address];
+            for (const address of addresses) {
+              delete value[url].isAllowedMap[address];
+            }
           });
 
           this.#koniState.setAuthorize(value, resolve);
@@ -1363,167 +1189,61 @@ export default class KoniExtension {
       });
     });
 
-    // Set current account to all account
-    await new Promise<void>((resolve) => {
-      const currentAccountInfo = this.#koniState.keyringService.currentAccount;
+    for (const address of addresses) {
+      await this.#koniState.disableMantaPay(address);
+    }
 
-      this.#koniState.setCurrentAccount({
-        currentGenesisHash: currentAccountInfo?.allGenesisHash || null,
-        address: ALL_ACCOUNT_KEY
-      }, resolve);
-    });
-
-    await this.#koniState.disableMantaPay(address);
-
-    if (lockAfter) {
+    if (request.lockAfter) {
       this.checkLockAfterMigrate();
     }
 
     return true;
   }
 
-  private seedCreateV2 ({ length = SEED_DEFAULT_LENGTH,
-    seed: _seed,
-    types }: RequestSeedCreateV2): ResponseSeedCreateV2 {
-    const seed = _seed || mnemonicGenerate(length);
-    const rs = { seed: seed, addressMap: {} } as ResponseSeedCreateV2;
-
-    types?.forEach((type) => {
-      rs.addressMap[type] = keyring.createFromUri(getSuri(seed, type), {}, type).address;
-    });
-
-    return rs;
+  private seedCreateV2 (request: RequestMnemonicCreateV2): Promise<ResponseMnemonicCreateV2> {
+    return this.#koniState.keyringService.context.mnemonicCreateV2(request);
   }
 
-  private seedValidateV2 ({ suri, types }: RequestSeedValidateV2): ResponseSeedValidateV2 {
-    const { phrase } = keyExtractSuri(suri);
-
-    if (isHex(phrase)) {
-      assert(isHex(phrase, 256), t('Invalid seed phrase. Please try again.'));
-    } else {
-      // sadly isHex detects as string, so we need a cast here
-      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('Seed phrase needs to contain {{x}} words', { replace: { x: SEED_LENGTHS.join(', ') } }));
-      assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
-    }
-
-    const rs = { seed: suri, addressMap: {} } as ResponseSeedValidateV2;
-
-    types && types.forEach((type) => {
-      rs.addressMap[type] = keyring.createFromUri(getSuri(suri, type), {}, type).address;
-    });
-
-    return rs;
+  private seedValidateV2 (request: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+    return this.#koniState.keyringService.context.mnemonicValidateV2(request);
   }
 
-  private _checkValidatePrivateKey ({ suri,
-    types }: RequestSeedValidateV2, autoAddPrefix = false): ResponsePrivateKeyValidateV2 {
-    const { phrase } = keyExtractSuri(suri);
-    const rs = { autoAddPrefix: autoAddPrefix, addressMap: {} } as ResponsePrivateKeyValidateV2;
-
-    types && types.forEach((type) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      rs.addressMap[type] = '';
-    });
-
-    if (isHex(phrase) && isHex(phrase, 256)) {
-      types && types.forEach((type) => {
-        rs.addressMap[type] = keyring.createFromUri(getSuri(suri, type), {}, type).address;
-      });
-    } else {
-      rs.autoAddPrefix = false;
-      assert(false, t('Invalid private key. Please try again.'));
-    }
-
-    return rs;
+  private privateKeyValidateV2 (request: RequestPrivateKeyValidateV2): ResponsePrivateKeyValidateV2 {
+    return this.#koniState.keyringService.context.privateKeyValidateV2(request);
   }
 
-  private metamaskPrivateKeyValidateV2 ({ suri, types }: RequestSeedValidateV2): ResponsePrivateKeyValidateV2 {
-    const isValidSuri = suri.startsWith('0x');
+  /* JSON */
 
-    if (isValidSuri) {
-      return this._checkValidatePrivateKey({ suri, types });
-    } else {
-      return this._checkValidatePrivateKey({ suri: `0x${suri}`, types }, true);
-    }
+  private parseInfoSingleJson (request: RequestJsonGetAccountInfo): ResponseJsonGetAccountInfo {
+    return this.#koniState.keyringService.context.parseInfoSingleJson(request);
   }
 
-  private deriveV2 (parentAddress: string, suri: string, metadata: KeyringPair$Meta): KeyringPair {
-    const parentPair = keyring.getPair(parentAddress);
-
-    if (parentPair.isLocked) {
-      keyring.unlockPair(parentPair.address);
-    }
-
-    try {
-      return parentPair.derive(suri, metadata);
-    } catch (err) {
-      throw new Error(t('"{{suri}}" is not a valid derivation path', { replace: { suri } }));
-    }
-  }
-
-  private derivationCreateV2 ({ genesisHash,
-    isAllowed,
-    name,
-    parentAddress,
-    suri }: RequestDeriveCreateV2): boolean {
-    const childPair = this.deriveV2(parentAddress, suri, {
-      genesisHash,
-      name,
-      parentAddress,
-      suri
-    });
-
-    const address = childPair.address;
-
-    this._saveCurrentAccountAddress(address, () => {
-      keyring.addPair(childPair, true);
-      this._addAddressToAuthList(address, isAllowed);
-    });
-
-    return true;
-  }
-
-  private jsonRestoreV2 ({ address, file, isAllowed, password, withMasterPassword }: RequestJsonRestoreV2): void {
-    const isPasswordValidated = this.validatePassword(file, password);
-
-    if (isPasswordValidated) {
-      try {
-        this._saveCurrentAccountAddress(address, () => {
-          keyring.restoreAccount(file, password, withMasterPassword);
-          this._addAddressToAuthList(address, isAllowed);
-        });
-
+  private async jsonRestoreV2 (request: RequestJsonRestoreV2): Promise<string[]> {
+    return await this.#koniState.keyringService.context.jsonRestoreV2(request,
+      () => {
         if (this.#alwaysLock) {
           this.keyringLock();
         }
-      } catch (error) {
-        throw new Error((error as Error).message);
       }
-    } else {
-      throw new Error(t('Wrong password'));
-    }
+    );
   }
 
-  private batchRestoreV2 ({ accountsInfo, file, isAllowed, password }: RequestBatchRestoreV2): void {
-    const addressList: string[] = accountsInfo.map((acc) => acc.address);
-    const isPasswordValidated = this.validatedAccountsPassword(file, password);
+  private parseInfoMultiJson (request: RequestBatchJsonGetAccountInfo): ResponseBatchJsonGetAccountInfo {
+    return this.#koniState.keyringService.context.parseInfoMultiJson(request);
+  }
 
-    if (isPasswordValidated) {
-      try {
-        this._saveCurrentAccountAddress(ALL_ACCOUNT_KEY, () => {
-          keyring.restoreAccounts(file, password);
-          this._addAddressesToAuthList(addressList, isAllowed);
-        });
+  private batchRestoreV2 (request: RequestBatchRestoreV2): Promise<string[]> {
+    return this.#koniState.keyringService.context.batchRestoreV2(request);
+  }
 
-        // if (this.#alwaysLock) {
-        //   this.keyringLock();
-        // }
-      } catch (error) {
-        throw new Error((error as Error).message);
-      }
-    } else {
-      throw new Error(t('Wrong password'));
-    }
+  private async batchExportV2 (request: RequestAccountBatchExportV2): Promise<ResponseAccountBatchExportV2> {
+    return this.#koniState.keyringService.context.batchExportV2(request);
+  }
+
+  /* JSON */
+
+  private exportAccountProxyMnemonic (request: RequestExportAccountProxyMnemonic): ResponseExportAccountProxyMnemonic {
+    return this.#koniState.keyringService.context.exportAccountProxyMnemonic(request);
   }
 
   private getNftCollection (): Promise<NftCollection[]> {
@@ -1655,98 +1375,149 @@ export default class KoniExtension {
     };
   }
 
-  // Save address to contact
-  // private addContact (to: string) {
-  //   const toAddress = reformatAddress(to);
-  //   const account = keyring.getAccount(toAddress);
-  //   const contact = keyring.getAddress(toAddress);
-  //
-  //   if (!account && (!contact || contact.meta.isRecent)) {
-  //     keyring.saveAddress(toAddress, {});
-  //   }
-  // }
-
-  private validateTransfer (tokenSlug: string, from: string, to: string, value: string | undefined, transferAll: boolean | undefined): [TransactionError[], KeyringPair | undefined, BN | undefined, _ChainAsset] {
-    const errors: TransactionError[] = [];
-    const keypair = keyring.getPair(from);
-    let transferValue;
-
-    if (!transferAll) {
-      if (value === undefined) {
-        errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Transfer amount is required')));
-      }
-
-      if (value) {
-        transferValue = new BN(value);
-      }
-    }
-
-    const tokenInfo = this.#koniState.getAssetBySlug(tokenSlug);
-
-    if (!tokenInfo) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found token from registry')));
-    }
-
-    if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenEvmSmartContract(tokenInfo) && _getContractAddressOfToken(tokenInfo).length === 0) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Not found ERC20 address for this token')));
-    }
-
-    return [errors, keypair, transferValue, tokenInfo];
+  private async getOptimalTransferProcess (params: RequestOptimalTransferProcess): Promise<CommonOptimalTransferPath> {
+    return this.#koniState.balanceService.getOptimalTransferProcess(params);
   }
 
-  private async makeTransfer (inputData: RequestTransfer): Promise<SWTransactionResponse> {
-    const { from, networkKey, to, tokenSlug, transferAll, value } = inputData;
-    const [errors, , , tokenInfo] = this.validateTransfer(tokenSlug, from, to, value, transferAll);
+  private async approveSpending (params: TokenSpendingApprovalParams): Promise<SWTransactionResponse> {
+    const { amount, chain, contractAddress, owner, spenderAddress } = params;
 
+    // if (!isSnowBridgeGatewayContract(spenderAddress) && !isAvailBridgeGatewayContract(spenderAddress)) {
+    //   throw new Error('Only SnowBridge and AvailBridge is supported'); // todo: support all ERC20 spending approval
+    // }
+
+    const evmApi = this.#koniState.getEvmApi(chain);
+    const transactionConfig = await getERC20SpendingApprovalTx(spenderAddress, owner, contractAddress, evmApi, amount);
+
+    return this.#koniState.transactionService.handleTransaction({
+      errors: [],
+      warnings: [],
+      address: owner,
+      chain,
+      chainType: ChainType.EVM,
+      transferNativeAmount: '0',
+      transaction: transactionConfig,
+      data: params,
+      resolveOnDone: true, // todo: double-check this for other transactions
+      extrinsicType: ExtrinsicType.TOKEN_SPENDING_APPROVAL,
+      isTransferAll: false
+    });
+  }
+
+  private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
+    const { chain, feeCustom, feeOption, from, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
+    const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
-    const evmApiMap = this.#koniState.getEvmApiMap();
-    const chainInfo = this.#koniState.getChainInfo(networkKey);
 
-    const nativeTokenInfo = this.#koniState.getNativeTokenInfo(networkKey);
+    const nativeTokenInfo = this.#koniState.getNativeTokenInfo(chain);
     const nativeTokenSlug: string = nativeTokenInfo.slug;
     const isTransferNativeToken = nativeTokenSlug === tokenSlug;
+    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNativeToken && tokenPayFeeSlug === tokenSlug;
+    const isCustomTokenPayFeeAssetHub = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain);
+    const isCustomTokenPayFeeHydration = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain);
+
+    const extrinsicType = isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN;
     let chainType = ChainType.SUBSTRATE;
 
-    const tokenBaseAmount: AmountData = { value: '0', symbol: tokenInfo.symbol, decimals: tokenInfo.decimals || 0 };
-    const transferAmount: AmountData = { ...tokenBaseAmount };
+    const transferAmount: AmountData = { value: '0', symbol: _getAssetSymbol(transferTokenInfo), decimals: _getAssetDecimals(transferTokenInfo) };
 
-    let transaction: ValidateTransactionResponseInput['transaction'];
+    let transaction: SWTransaction['transaction'] | null | undefined;
 
-    // Get native token amount
-    const freeBalance = await this.getAddressFreeBalance({ address: from, networkKey, token: tokenSlug });
+    const transferTokenAvailable = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug, extrinsicType });
 
     try {
-      if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenTransferredByEvm(tokenInfo)) { // TODO: review this
+      if (isEthereumAddress(from) && isEthereumAddress(to) && _isTokenTransferredByEvm(transferTokenInfo)) {
         chainType = ChainType.EVM;
-        const txVal: string = transferAll ? freeBalance.value : (value || '0');
+        const txVal: string = transferAll ? transferTokenAvailable.value : (value || '0');
+        const evmApi = this.#koniState.getEvmApi(chain);
+        const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'evm');
 
+        // todo: refactor: merge getERC20TransactionObject & getEVMTransactionObject
         // Estimate with EVM API
-        if (_isTokenEvmSmartContract(tokenInfo) || _isLocalToken(tokenInfo)) {
+        if (_isTokenEvmSmartContract(transferTokenInfo) || _isLocalToken(transferTokenInfo)) {
           [
             transaction,
             transferAmount.value
-          ] = await getERC20TransactionObject(_getContractAddressOfToken(tokenInfo), chainInfo, from, to, txVal, !!transferAll, evmApiMap);
+          ] = await getERC20TransactionObject({
+            assetAddress: _getContractAddressOfToken(transferTokenInfo),
+            chain,
+            evmApi,
+            feeCustom,
+            feeInfo,
+            feeOption,
+            from,
+            to,
+            transferAll,
+            value: txVal
+          });
         } else {
           [
             transaction,
             transferAmount.value
-          ] = await getEVMTransactionObject(chainInfo, from, to, txVal, !!transferAll, evmApiMap);
+          ] = await getEVMTransactionObject({
+            chain,
+            evmApi,
+            feeCustom,
+            feeInfo,
+            feeOption,
+            from,
+            to,
+            transferAll,
+            value: txVal
+          });
         }
-      } else if (_isMantaZkAsset(tokenInfo)) { // TODO
+      } else if (_isMantaZkAsset(transferTokenInfo)) {
         transaction = undefined;
         transferAmount.value = '0';
-      } else {
-        const substrateApi = this.#koniState.getSubstrateApi(networkKey);
+      } else if (isTonAddress(from) && isTonAddress(to) && _isTokenTransferredByTon(transferTokenInfo)) {
+        chainType = ChainType.TON;
+        const tonApi = this.#koniState.getTonApi(chain);
 
-        [transaction, transferAmount.value] = await createTransferExtrinsic({
+        [transaction, transferAmount.value] = await createTonTransaction({
+          tokenInfo: transferTokenInfo,
+          from,
+          to,
+          networkKey: chain,
+          value: value || '0',
+          transferAll: !!transferAll, // currently not used
+          tonApi
+        });
+      } else if (isCardanoAddress(from) && isCardanoAddress(to) && _isTokenTransferredByCardano(transferTokenInfo)) {
+        chainType = ChainType.CARDANO;
+        const cardanoApi = this.#koniState.getCardanoApi(chain);
+
+        [transaction, transferAmount.value] = await createCardanoTransaction({
+          tokenInfo: transferTokenInfo,
+          from,
+          to,
+          networkKey: chain,
+          value: value || '0',
+          cardanoTtlOffset: DEFAULT_CARDANO_TTL_OFFSET,
+          transferAll: !!transferAll,
+          cardanoApi,
+          nativeTokenInfo
+        });
+      } else {
+        const substrateApi = this.#koniState.getSubstrateApi(chain);
+
+        [transaction, transferAmount.value] = await createSubstrateExtrinsic({
           transferAll: !!transferAll,
           value: value || '0',
           from: from,
-          networkKey,
-          tokenInfo,
+          networkKey: chain,
+          tokenInfo: transferTokenInfo,
           to: to,
           substrateApi
         });
+
+        if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
+          const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
+          const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
+          const feeSetting = _feeSetting.toPrimitive() as number | null;
+
+          transaction = batchExtrinsicSetFeeHydration(substrateApi, transaction, feeSetting, hydrationFeeAssetId);
+        }
       }
     } catch (e) {
       const error = e as Error;
@@ -1760,113 +1531,265 @@ export default class KoniExtension {
 
     const transferNativeAmount = isTransferNativeToken ? transferAmount.value : '0';
 
-    // this.addContact(to);
-
     const additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
-      const minAmount = tokenInfo.minAmount || '0';
+      let senderSendingTokenTransferable: bigint | undefined;
+      let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
-      // Check ed for sender
-      if (!isTransferNativeToken) {
-        const { value: balance } = await this.getAddressFreeBalance({ address: from, networkKey, token: tokenSlug });
+      if (chainType !== ChainType.SUBSTRATE) {
+        return undefined;
+      }
 
-        if (new BigN(balance).minus(transferAmount.value).lt(minAmount)) {
-          inputTransaction.warnings.push(new TransactionWarning(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT));
+      // Check enough free local to pay fee local
+      if (isCustomTokenPayFeeAssetHub || isCustomTokenPayFeeHydration) {
+        const nonNativeFee = BigInt(inputTransaction.estimateFee?.value || '0'); // todo: estimateFee should be must-have, need to refactor interface
+        const nonNativeTokenPayFeeInfo = await this.#koniState.balanceService.getTokensHasBalance(reformatAddress(from), chain, tokenPayFeeSlug);
+        const nonNativeTokenPayFeeBalance = BigInt(nonNativeTokenPayFeeInfo[tokenPayFeeSlug]?.free || '0');
+
+        if (nonNativeFee > nonNativeTokenPayFeeBalance) {
+          inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
         }
       }
 
-      const { value: receiverBalance } = await this.getAddressFreeBalance({ address: to, networkKey, token: tokenSlug });
+      // Check ed for sender
+      if (!isTransferNativeToken) {
+        const [_senderSendingTokenTransferable, _receiverNativeTotal] = await Promise.all([
+          this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug, extrinsicType }),
+          this.getAddressTotalBalance({ address: to, networkKey: chain, token: nativeTokenSlug, extrinsicType: ExtrinsicType.TRANSFER_BALANCE })
+        ]);
 
-      // Check ed for receiver
-      if (new BigN(receiverBalance).plus(transferAmount.value).lt(minAmount)) {
-        const atLeast = new BigN(minAmount).minus(receiverBalance).plus((tokenInfo.decimals || 0) === 0 ? 0 : 1);
-
-        const atLeastStr = formatNumber(atLeast, tokenInfo.decimals || 0, balanceFormatter, { maxNumberFormat: tokenInfo.decimals || 6 });
-
-        inputTransaction.errors.push(new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: tokenInfo.symbol } })));
+        senderSendingTokenTransferable = BigInt(_senderSendingTokenTransferable.value);
+        receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
       }
+
+      const { value: _receiverSendingTokenKeepAliveBalance } = await this.getAddressTotalBalance({ address: to, networkKey: chain, token: tokenSlug, extrinsicType }); // todo: shouldn't be just transferable, locked also counts
+      const receiverSendingTokenKeepAliveBalance = BigInt(_receiverSendingTokenKeepAliveBalance);
+
+      const amount = BigInt(transferAmount.value);
+
+      const substrateApi = this.#koniState.getSubstrateApi(chain);
+      const sufficientChain = this.#koniState.chainService.value.sufficientChains;
+
+      const isSendingTokenSufficient = await _isSufficientToken(transferTokenInfo, substrateApi, sufficientChain);
+
+      const [warnings, errors] = additionalValidateTransferForRecipient(transferTokenInfo, nativeTokenInfo, extrinsicType, receiverSendingTokenKeepAliveBalance, amount, senderSendingTokenTransferable, receiverSystemAccountInfo, isSendingTokenSufficient);
+
+      warnings.length && inputTransaction.warnings.push(...warnings);
+      errors.length && inputTransaction.errors.push(...errors);
     };
+
+    const ignoreWarnings: BasicTxWarningCode[] = [];
+
+    if (transferAll) {
+      ignoreWarnings.push(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT);
+    }
+
+    if (transferBounceable) {
+      ignoreWarnings.push(BasicTxWarningCode.IS_BOUNCEABLE_ADDRESS);
+    }
 
     return this.#koniState.transactionService.handleTransaction({
       errors,
       warnings,
       address: from,
-      chain: networkKey,
+      chain,
+      feeCustom,
+      feeOption,
+      tokenPayFeeSlug,
       chainType,
       transferNativeAmount,
       transaction,
       data: inputData,
-      extrinsicType: isTransferNativeToken ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.TRANSFER_TOKEN,
-      ignoreWarnings: transferAll,
+      extrinsicType,
+      ignoreWarnings,
       isTransferAll: isTransferNativeToken ? transferAll : false,
+      isTransferLocalTokenAndPayThatTokenAsFee,
       edAsWarning: isTransferNativeToken,
       additionalValidator: additionalValidator
     });
   }
 
-  private validateCrossChainTransfer (
-    destinationNetworkKey: string,
-    sendingTokenSlug: string,
-    sender: string,
-    sendingValue: string): [TransactionError[], KeyringPair | undefined, BN | undefined, _ChainAsset, _ChainAsset | undefined] {
-    const errors = [] as TransactionError[];
-    const keypair = keyring.getPair(sender);
-    const transferValue = new BN(sendingValue);
-
-    const originTokenInfo = this.#koniState.getAssetBySlug(sendingTokenSlug);
-    const destinationTokenInfo = this.#koniState.getXcmEqualAssetByChain(destinationNetworkKey, sendingTokenSlug);
-
-    if (!destinationTokenInfo) {
-      errors.push(new TransactionError(TransferTxErrorType.INVALID_TOKEN, t('Not found token from registry')));
-    }
-
-    return [errors, keypair, transferValue, originTokenInfo, destinationTokenInfo];
-  }
-
   private async makeCrossChainTransfer (inputData: RequestCrossChainTransfer): Promise<SWTransactionResponse> {
-    const { destinationNetworkKey, from, originNetworkKey, to, tokenSlug, value } = inputData;
-    const [errors, fromKeyPair, , originTokenInfo, destinationTokenInfo] = this.validateCrossChainTransfer(destinationNetworkKey, tokenSlug, from, value);
-    let extrinsic: SubmittableExtrinsic<'promise'> | null = null;
+    const { destinationNetworkKey, feeCustom, feeOption, from, isPassConfirmation, originNetworkKey, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+
+    const originTokenInfo = this.#koniState.getAssetBySlug(tokenSlug);
+    const destinationTokenInfo = this.#koniState.getXcmEqualAssetByChain(destinationNetworkKey, tokenSlug);
+
+    const destinationNativeTokenInfo = this.#koniState.getNativeTokenInfo(destinationNetworkKey);
+    const destinationNativeTokenSlug: string = destinationNativeTokenInfo.slug;
+
+    const [errors, fromKeyPair] = validateXcmTransferRequest(destinationTokenInfo, from, value);
+    let extrinsic: SubmittableExtrinsic<'promise'> | TransactionConfig | undefined | null;
 
     if (errors.length > 0) {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors(errors);
     }
 
+    const chainInfoMap = this.#koniState.getChainInfoMap();
+    const isAvailBridgeFromEvm = _isPureEvmChain(chainInfoMap[originNetworkKey]) && isAvailChainBridge(destinationNetworkKey);
+    const isAvailBridgeFromAvail = isAvailChainBridge(originNetworkKey) && _isPureEvmChain(chainInfoMap[destinationNetworkKey]);
+    const isSnowBridgeEvmTransfer = _isPureEvmChain(chainInfoMap[originNetworkKey]) && _isSnowBridgeXcm(chainInfoMap[originNetworkKey], chainInfoMap[destinationNetworkKey]) && !isAvailBridgeFromEvm;
+    const isPolygonBridgeTransfer = _isPolygonChainBridge(originNetworkKey, destinationNetworkKey);
+    const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
+    const isAcrossBridgeTransfer = _isAcrossChainBridge(originNetworkKey, destinationNetworkKey);
+    const extrinsicType = ExtrinsicType.TRANSFER_XCM;
+    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
+
+    const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
+    const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
+
+    let xcmFeeDryRun: string | undefined;
+
     let additionalValidator: undefined | ((inputTransaction: SWTransactionResponse) => Promise<void>);
     let eventsHandler: undefined | ((eventEmitter: TransactionEmitter) => void);
 
     if (fromKeyPair && destinationTokenInfo) {
+      const evmApi = this.#koniState.getEvmApi(originNetworkKey);
       const substrateApi = this.#koniState.getSubstrateApi(originNetworkKey);
-      const chainInfoMap = this.#koniState.getChainInfoMap();
 
-      extrinsic = await createXcmExtrinsic({
+      let funcCreateExtrinsic: FunctionCreateXcmExtrinsic;
+      let type: FeeChainType;
+
+      if (isPosBridgeTransfer || isPolygonBridgeTransfer) {
+        funcCreateExtrinsic = createPolygonBridgeExtrinsic;
+        type = 'evm';
+      } else if (isAcrossBridgeTransfer) {
+        funcCreateExtrinsic = createAcrossBridgeExtrinsic;
+        type = 'evm';
+      } else if (isSnowBridgeEvmTransfer) {
+        funcCreateExtrinsic = createSnowBridgeExtrinsic;
+        type = 'evm';
+      } else if (isAvailBridgeFromEvm) {
+        funcCreateExtrinsic = createAvailBridgeTxFromEth;
+        type = 'evm';
+      } else if (isAvailBridgeFromAvail) {
+        funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
+        type = 'substrate';
+      } else {
+        funcCreateExtrinsic = createXcmExtrinsicV2;
+        type = 'substrate';
+      }
+
+      const feeInfo: FeeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), originNetworkKey, type);
+
+      const params: CreateXcmExtrinsicProps = {
         destinationTokenInfo,
         originTokenInfo,
         sendingValue: value,
+        sender: from,
         recipient: to,
-        chainInfoMap,
-        substrateApi
-      });
+        destinationChain: chainInfoMap[destinationTokenInfo.originChain],
+        originChain: chainInfoMap[originTokenInfo.originChain],
+        substrateApi,
+        evmApi,
+        feeCustom,
+        feeOption,
+        feeInfo
+      };
+
+      extrinsic = await funcCreateExtrinsic(params);
+
+      if (isSubstrateXcm) {
+        const xcmFeeInfo = await estimateXcmFee({
+          fromChainInfo: params.originChain,
+          fromTokenInfo: params.originTokenInfo,
+          toChainInfo: params.destinationChain,
+          recipient: params.recipient,
+          sender: params.sender,
+          value: params.sendingValue
+        });
+
+        xcmFeeDryRun = xcmFeeInfo?.origin.fee || '0';
+      }
+
+      if (isAcrossBridgeTransfer) {
+        const data = await getAcrossQuote(params);
+        const metadata = data.metadata as AcrossQuote;
+
+        inputData.metadata = {
+          amountOut: metadata.outputAmount,
+          rate: metadata.rate,
+          destChainSlug: destinationTokenInfo.slug
+        };
+      }
+
+      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(originNetworkKey)) {
+        const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
+        const _feeSetting = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(from);
+        const feeSetting = _feeSetting.toPrimitive() as number | null;
+        const _extrinsic = extrinsic as SubmittableExtrinsic<'promise'> | null;
+
+        extrinsic = batchExtrinsicSetFeeHydration(substrateApi, _extrinsic, feeSetting, hydrationFeeAssetId);
+      }
 
       additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
-        const destMinAmount = destinationTokenInfo.minAmount || '0';
-        const atLeast = new BigN(destMinAmount).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+        // hotfix xcm mythos to mythos chain
+        const mythosError = validateXcmMinAmountToMythos(destinationNetworkKey, destinationTokenInfo.slug, value);
 
-        // Check ed for receiver
-        if (new BigN(value).lt(atLeast)) {
-          const atLeastStr = formatNumber(atLeast, destinationTokenInfo.decimals || 0, balanceFormatter, { maxNumberFormat: destinationTokenInfo.decimals || 6 });
-
-          inputTransaction.errors.push(new TransactionError(TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT, t('You must transfer at least {{amount}} {{symbol}} to keep the destination account alive', { replace: { amount: atLeastStr, symbol: originTokenInfo.symbol } })));
+        if (mythosError) {
+          inputTransaction.errors.push(mythosError);
         }
 
-        const srcMinAmount = originTokenInfo.minAmount || '0';
-        const isTransferNativeToken = originTokenInfo.assetType === _AssetType.NATIVE;
+        let isSendingTokenSufficient = false;
+        let receiverSystemAccountInfo: FrameSystemAccountInfo | undefined;
 
-        // Check ed for sender
-        if (!isTransferNativeToken) {
-          const { value: balance } = await this.getAddressFreeBalance({ address: from, networkKey: originNetworkKey, token: originTokenInfo.slug });
+        if (_isChainSubstrateCompatible(chainInfoMap[destinationNetworkKey])) {
+          const setting = { visible: true };
 
-          if (new BigN(balance).minus(value).lt(srcMinAmount)) {
-            inputTransaction.warnings.push(new TransactionWarning(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT));
+          await this.#koniState.chainService.updateAssetSetting(destinationTokenInfo.slug, setting, true);
+
+          const { value: _senderTransferable } = await this.getAddressTransferableBalance({
+            address: from,
+            networkKey: originNetworkKey,
+            token: originTokenInfo.slug
+          });
+          const senderTransferable = BigInt(_senderTransferable);
+
+          const sendingAmount = BigInt(value);
+
+          const { value: _receiverDestinationTokenKeepAliveBalance } = await this.getAddressTotalBalance({
+            address: to,
+            networkKey: destinationNetworkKey,
+            token: destinationTokenInfo.slug,
+            extrinsicType
+          });
+          const receiverDestinationTokenKeepAliveBalance = BigInt(_receiverDestinationTokenKeepAliveBalance);
+
+          if (!_isNativeToken(destinationTokenInfo)) {
+            const _receiverNativeTotal = await this.getAddressTotalBalance({
+              address: to,
+              networkKey: destinationNetworkKey,
+              token: destinationNativeTokenSlug,
+              extrinsicType
+            });
+
+            receiverSystemAccountInfo = _receiverNativeTotal.metadata as FrameSystemAccountInfo;
+          }
+
+          const substrateApi = this.#koniState.getSubstrateApi(destinationNetworkKey);
+          const sufficientChain = this.#koniState.chainService.value.sufficientChains;
+
+          isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
+
+          const [warning, error] = additionalValidateTransferForRecipient(
+            destinationTokenInfo,
+            destinationNativeTokenInfo,
+            extrinsicType,
+            receiverDestinationTokenKeepAliveBalance,
+            sendingAmount,
+            senderTransferable, // different from sendingTokenInfo being passed in
+            receiverSystemAccountInfo,
+            isSendingTokenSufficient
+          );
+
+          warning.length && inputTransaction.warnings.push(...warning);
+          error.length && inputTransaction.errors.push(...error);
+        }
+
+        if (isSubstrateXcm) {
+          const isDryRunSuccess = await dryRunXcmExtrinsicV2(params);
+
+          if (!isDryRunSuccess) {
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));
           }
         }
       };
@@ -1889,7 +1812,15 @@ export default class KoniExtension {
       };
     }
 
-    // this.addContact(to);
+    const ignoreWarnings: BasicTxWarningCode[] = [];
+
+    if (transferAll) {
+      ignoreWarnings.push(BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT);
+    }
+
+    if (transferBounceable) {
+      ignoreWarnings.push(BasicTxWarningCode.IS_BOUNCEABLE_ADDRESS);
+    }
 
     return await this.#koniState.transactionService.handleTransaction({
       url: EXTENSION_REQUEST_URL,
@@ -1897,15 +1828,92 @@ export default class KoniExtension {
       chain: originNetworkKey,
       transaction: extrinsic,
       data: inputData,
-      extrinsicType: ExtrinsicType.TRANSFER_XCM,
-      chainType: ChainType.SUBSTRATE,
+      extrinsicType,
+      chainType: !isSnowBridgeEvmTransfer && !isAvailBridgeFromEvm && !isPolygonBridgeTransfer && !isPosBridgeTransfer && !isAcrossBridgeTransfer ? ChainType.SUBSTRATE : ChainType.EVM,
       transferNativeAmount: _isNativeToken(originTokenInfo) ? value : '0',
-      ignoreWarnings: inputData.transferAll,
-      isTransferAll: inputData.transferAll,
+      ignoreWarnings,
+      tokenPayFeeSlug,
+      isTransferAll: transferAll,
+      isTransferLocalTokenAndPayThatTokenAsFee,
+      isPassConfirmation,
+      xcmFeeDryRun,
       errors,
       additionalValidator: additionalValidator,
       eventsHandler: eventsHandler
     });
+  }
+
+  private async getTokensCanPayFee (request: RequestGetTokensCanPayFee): Promise<TokenPayFeeInfo> {
+    const { address: _address, chain, feeAmount } = request;
+    const chainService = this.#koniState.chainService;
+    const substrateApi = this.#koniState.getSubstrateApi(chain);
+    const address = reformatAddress(_address);
+
+    const tokensHasBalanceInfoMap = await this.#koniState.balanceService.getTokensHasBalance(address, chain);
+    const nativeTokenInfo = chainService.getNativeTokenInfo(chain);
+    const nativeBalanceInfo = {
+      slug: nativeTokenInfo.slug,
+      free: tokensHasBalanceInfoMap[nativeTokenInfo.slug]?.free || '0',
+      rate: '1'
+    } as TokenHasBalanceInfo;
+
+    let tokensCanPayFee: TokenHasBalanceInfo[] = [nativeBalanceInfo];
+    let defaultTokenSlug: string = nativeBalanceInfo.slug;
+
+    if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain)) {
+      tokensCanPayFee = await getAssetHubTokensCanPayFee({
+        substrateApi,
+        chainService,
+        nativeTokenInfo,
+        nativeBalanceInfo,
+        tokensHasBalanceInfoMap,
+        feeAmount
+      });
+    } else if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
+      const _assetId = await substrateApi.api.query.multiTransactionPayment.accountCurrencyMap(address);
+      const assetId = _assetId.toPrimitive() as number | null;
+      const hydrationAssets = this.#koniState.chainService.getHydrationAssetIdMap(chain);
+
+      for (const [key, value] of Object.entries(hydrationAssets)) {
+        if (assetId && assetId.toString() === value) {
+          defaultTokenSlug = key;
+          break;
+        }
+      }
+
+      tokensCanPayFee = await getHydrationTokensCanPayFee({
+        substrateApi,
+        chainService,
+        nativeTokenInfo,
+        nativeBalanceInfo,
+        tokensHasBalanceInfoMap,
+        address,
+        feeAmount
+      });
+
+      if (!tokensCanPayFee.map((token) => token.slug).includes(defaultTokenSlug)) {
+        defaultTokenSlug = nativeBalanceInfo.slug;
+      }
+    }
+
+    return {
+      tokensCanPayFee,
+      defaultTokenSlug
+    };
+  }
+
+  private async getAmountForPair (request: RequestGetAmountForPair) {
+    const { nativeTokenFeeAmount, nativeTokenSlug, toTokenSlug } = request;
+
+    if (nativeTokenSlug === toTokenSlug) {
+      return nativeTokenFeeAmount;
+    }
+
+    const nativeTokenInfo = this.#koniState.chainService.getAssetBySlug(nativeTokenSlug);
+    const toTokenInfo = this.#koniState.chainService.getAssetBySlug(toTokenSlug);
+    const substrateApi = this.#koniState.chainService.getSubstrateApi(nativeTokenInfo.originChain);
+
+    return await calculateToAmountByReservePool(substrateApi.api, nativeTokenInfo, toTokenInfo, nativeTokenFeeAmount);
   }
 
   private async evmNftSubmitTransaction (inputData: NftTransactionRequest): Promise<SWTransactionResponse> {
@@ -1913,7 +1921,20 @@ export default class KoniExtension {
     const contractAddress = params.contractAddress as string;
     const tokenId = params.tokenId as string;
 
-    const transaction = await getERC721Transaction(this.#koniState.getEvmApi(networkKey), networkKey, contractAddress, senderAddress, recipientAddress, tokenId);
+    if (UNSUPPORTED_TRANSFER_EVM_CHAIN_NAME.includes(networkKey)) {
+      return await this.#koniState.transactionService.handleTransaction({
+        address: senderAddress,
+        chain: networkKey,
+        chainType: ChainType.EVM,
+        data: inputData,
+        extrinsicType: ExtrinsicType.SEND_NFT,
+        transaction: null,
+        url: EXTENSION_REQUEST_URL
+      });
+    }
+
+    const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), networkKey, 'evm');
+    const transaction = await getERC721Transaction(this.#koniState.getEvmApi(networkKey), networkKey, contractAddress, senderAddress, recipientAddress, tokenId, feeInfo);
 
     // this.addContact(recipientAddress);
 
@@ -1950,6 +1971,10 @@ export default class KoniExtension {
     return await this.#koniState.enableChain(chainSlug, enableTokens);
   }
 
+  private async enableChainWithPriorityAssets ({ chainSlug, enableTokens }: EnableChainParams): Promise<boolean> {
+    return await this.#koniState.enableChainWithPriorityAssets(chainSlug, enableTokens);
+  }
+
   private async reconnectChain (chainSlug: string): Promise<boolean> {
     return this.#koniState.chainService.reconnectChain(chainSlug);
   }
@@ -1973,15 +1998,54 @@ export default class KoniExtension {
     }
   }
 
-  private async upsertCustomToken (data: _ChainAsset) {
+  private async validateERC721Token (data: _ChainAsset): Promise<boolean> {
+    const evmApi = this.#koniState.getEvmApi(data.originChain);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, data.metadata?.contractAddress);
+
     try {
-      await this.#koniState.upsertCustomToken(data);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
 
       return true;
+    } catch (err) {
+      const error = err as Error;
+
+      if (error.message.includes('ERC721Enumerable: owner index out of bounds')) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  private async upsertCustomToken (data: _ChainAsset): Promise<ResponseNftImport> {
+    try {
+      if (data.assetType === _AssetType.ERC721) {
+        const isCompatible = await this.validateERC721Token(data);
+
+        if (!isCompatible) {
+          return {
+            success: false,
+            error: 'incompatibleNFT'
+          };
+        }
+      }
+
+      await this.#koniState.upsertCustomToken(data);
+
+      return {
+        success: true,
+        error: ''
+      };
     } catch (e) {
       console.error(e);
 
-      return false;
+      return {
+        success: false,
+        error: 'Error'
+      };
     }
   }
 
@@ -2005,7 +2069,7 @@ export default class KoniExtension {
     return await this.#koniState.validateCustomAsset(data);
   }
 
-  private async getAddressFreeBalance ({ address, networkKey, token }: RequestFreeBalance): Promise<AmountData> {
+  private async getAddressTransferableBalance ({ address, extrinsicType, networkKey, token }: RequestFreeBalance): Promise<AmountData> {
     if (token && _MANTA_ZK_CHAIN_GROUP.includes(networkKey)) {
       const tokenInfo = this.#koniState.chainService.getAssetBySlug(token);
 
@@ -2014,105 +2078,106 @@ export default class KoniExtension {
       }
     }
 
-    return await this.#koniState.balanceService.getTokenFreeBalance(address, networkKey, token);
+    return await this.#koniState.balanceService.getTransferableBalance(address, networkKey, token, extrinsicType);
   }
 
-  private async transferGetMaxTransferable ({ address, destChain, isXcmTransfer, networkKey, token }: RequestMaxTransferable): Promise<AmountData> {
-    const freeBalance = await this.getAddressFreeBalance({ address, networkKey, token });
-    const tokenInfo = token ? this.#koniState.chainService.getAssetBySlug(token) : this.#koniState.chainService.getNativeTokenInfo(networkKey);
+  private async getAddressTotalBalance ({ address, extrinsicType, networkKey, token }: RequestFreeBalance): Promise<AmountData> {
+    return await this.#koniState.balanceService.getTotalBalance(address, networkKey, token, extrinsicType);
+  }
 
-    if (!_isNativeToken(tokenInfo)) {
-      return freeBalance;
-    } else {
-      const substrateApi = this.#koniState.chainService.getSubstrateApi(networkKey);
-      let estimatedFee: string;
-      let maxTransferable = new BigN(freeBalance.value);
+  private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, token, tokenPayFeeSlug, value } = request;
+    const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
-      try {
-        if (isXcmTransfer) {
-          const chainInfoMap = this.#koniState.chainService.getChainInfoMap();
-          const destinationTokenInfo = this.#koniState.getXcmEqualAssetByChain(destChain, tokenInfo.slug);
+    const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
+    const isTransferLocalTokenAndPayThatTokenAsFee = !_isNativeToken(transferTokenInfo) && !!tokenPayFeeSlug && tokenPayFeeSlug === token;
+    const isTransferNativeTokenAndPayLocalTokenAsFee = _isNativeToken(transferTokenInfo) && !!tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug);
+    const srcToken = token ? this.#koniState.chainService.getAssetBySlug(token) : this.#koniState.chainService.getNativeTokenInfo(chain);
+    const destToken = _destChain !== chain ? this.#koniState.getXcmEqualAssetByChain(_destChain, srcToken.slug) as _ChainAsset : srcToken;
+    const srcChain = this.#koniState.chainService.getChainInfoByKey(chain);
+    const destChain = this.#koniState.chainService.getChainInfoByKey(_destChain);
+    const nativeToken = this.#koniState.chainService.getNativeTokenInfo(chain);
+    const extrinsicType = srcChain.slug !== destChain.slug ? ExtrinsicType.TRANSFER_XCM : ExtrinsicType.TRANSFER_BALANCE;
 
-          if (!destinationTokenInfo) {
-            estimatedFee = '0';
-          } else {
-            maxTransferable = maxTransferable.minus(new BigN(tokenInfo.minAmount || '0').multipliedBy(XCM_MIN_AMOUNT_RATIO));
-            const desChainInfo = chainInfoMap[destChain];
-            const orgChainInfo = chainInfoMap[networkKey];
-            const recipient = !isEthereumAddress(address) && _isChainEvmCompatible(desChainInfo) && !_isChainEvmCompatible(orgChainInfo)
-              ? u8aToHex(addressToEvm(address))
-              : address
-            ;
+    const freeBalanceSubject = new Subject<AmountData>();
+    const feeSubject = new Subject<FeeInfo>();
+    const feeChainType: FeeChainType = detectTransferTxType(srcToken, srcChain, destChain);
 
-            const mockTx = await createXcmExtrinsic({
-              chainInfoMap,
-              destinationTokenInfo,
-              originTokenInfo: tokenInfo,
-              recipient: recipient,
-              sendingValue: '1000000000000000000',
-              substrateApi
-            });
-
-            try {
-              const paymentInfo = await mockTx.paymentInfo(address);
-
-              estimatedFee = paymentInfo?.partialFee?.toString() || '0';
-            } catch (e) {
-              estimatedFee = tokenInfo.minAmount || '0';
-            }
-          }
-        } else {
-          const chainInfo = this.#koniState.chainService.getChainInfoByKey(networkKey);
-
-          if (_isChainEvmCompatible(chainInfo) && _isTokenTransferredByEvm(tokenInfo)) {
-            const web3 = this.#koniState.chainService.getEvmApi(networkKey);
-
-            const transaction: TransactionConfig = {
-              value: 0,
-              to: '0x0000000000000000000000000000000000000000', // null address
-              from: address
-            };
-            const gasLimit = await web3.api.eth.estimateGas(transaction);
-            const priority = await calculateGasFeeParams(web3, networkKey);
-
-            if (priority.baseGasFee) {
-              const maxFee = priority.maxFeePerGas;
-
-              estimatedFee = maxFee.multipliedBy(gasLimit).toFixed(0);
-            } else {
-              estimatedFee = new BigN(priority.gasPrice).multipliedBy(gasLimit).toFixed(0);
-            }
-          } else {
-            const [mockTx] = await createTransferExtrinsic({
-              from: address,
-              networkKey,
-              substrateApi,
-              to: address,
-              tokenInfo,
-              transferAll: true,
-              value: '1000000000000000000'
-            });
-
-            const paymentInfo = await mockTx?.paymentInfo(address);
-
-            estimatedFee = paymentInfo?.partialFee?.toString() || '0';
-          }
-        }
-      } catch (e) {
-        estimatedFee = '0';
-        console.warn('Unable to estimate fee', e);
-      }
-
-      maxTransferable = maxTransferable.minus(new BigN(estimatedFee).multipliedBy(isXcmTransfer ? XCM_FEE_RATIO : 1));
-
-      return {
-        ...freeBalance,
-        value: maxTransferable.gt(BN_ZERO) ? (maxTransferable.toFixed(0) || '0') : '0'
-      } as AmountData;
+    if (!destToken) {
+      throw new Error('Destination token not found');
     }
+
+    const _request: CalculateMaxTransferable = {
+      address: address,
+      value, // todo: lazy subscribe to improve performance
+      cardanoApi: this.#koniState.chainService.getCardanoApi(chain),
+      destChain,
+      destToken,
+      evmApi: this.#koniState.chainService.getEvmApi(chain),
+      feeCustom,
+      feeOption,
+      srcChain,
+      srcToken,
+      substrateApi: this.#koniState.chainService.getSubstrateApi(chain),
+      tonApi: this.#koniState.chainService.getTonApi(chain),
+      isTransferLocalTokenAndPayThatTokenAsFee,
+      isTransferNativeTokenAndPayLocalTokenAsFee,
+      nativeToken
+    };
+
+    const subscription = combineLatest({
+      freeBalance: freeBalanceSubject,
+      fee: feeSubject
+    })
+      .subscribe({
+        next: ({ fee, freeBalance }) => {
+          calculateMaxTransferable(id, _request, freeBalance, fee)
+            .then(cb)
+            .catch(console.error);
+        }
+      });
+
+    const [unsubBalance, freeBalance] = await (async () => {
+      try {
+        return await this.#koniState.balanceService.subscribeBalance(address, chain, token, 'transferable', extrinsicType, (data) => {
+          freeBalanceSubject.next(data); // Must be called after subscription
+        });
+      } catch (e) {
+        const fallBackValue: AmountData = {
+          value: '0',
+          decimals: srcToken.decimals || 0,
+          symbol: srcToken.symbol
+        };
+
+        freeBalanceSubject.next(fallBackValue);
+
+        return [noop, fallBackValue];
+      }
+    })();
+
+    const fee = await this.#koniState.feeService.subscribeChainFee(id, chain, feeChainType, (data) => {
+      feeSubject.next(data); // Must be called after subscription
+    });
+
+    const unsub = () => {
+      subscription.unsubscribe();
+      unsubBalance();
+      this.#koniState.feeService.unsubscribeChainFee(id, chain, feeChainType);
+    };
+
+    this.createUnsubscriptionHandle(
+      id,
+      unsub
+    );
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return calculateMaxTransferable(id, _request, freeBalance, fee);
   }
 
-  private async subscribeAddressFreeBalance ({ address, networkKey, token }: RequestFreeBalance, id: string, port: chrome.runtime.Port): Promise<AmountData> {
+  private async subscribeAddressTransferableBalance ({ address, extrinsicType, networkKey, token }: RequestFreeBalance, id: string, port: chrome.runtime.Port): Promise<AmountData> {
     const cb = createSubscription<'pri(freeBalance.subscribe)'>(id, port);
 
     const convertData = (data: AmountData): AmountDataWithId => {
@@ -2124,7 +2189,7 @@ export default class KoniExtension {
       cb(convertData(data));
     };
 
-    const [unsub, currentFreeBalance] = await this.#koniState.balanceService.subscribeTokenFreeBalance(address, networkKey, token, _cb);
+    const [unsub, currentFreeBalance] = await this.#koniState.balanceService.subscribeTransferableBalance(address, networkKey, token, extrinsicType, _cb);
 
     this.createUnsubscriptionHandle(
       id,
@@ -2138,25 +2203,6 @@ export default class KoniExtension {
     return convertData(currentFreeBalance);
   }
 
-  private async transferCheckReferenceCount ({ address,
-    networkKey }: RequestTransferCheckReferenceCount): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return
-    return await checkReferenceCount(networkKey, address, this.#koniState.getSubstrateApiMap(), this.#koniState.getChainInfo(networkKey));
-  }
-
-  private async transferCheckSupporting ({ networkKey,
-    tokenSlug }: RequestTransferCheckSupporting): Promise<SupportTransferResponse> {
-    const tokenInfo = this.#koniState.getAssetBySlug(tokenSlug);
-
-    return await checkSupportTransfer(networkKey, tokenInfo, this.#koniState.getSubstrateApiMap(), this.#koniState.getChainInfo(networkKey));
-  }
-
-  private transferGetExistentialDeposit ({ tokenSlug }: RequestTransferExistentialDeposit): string {
-    const tokenInfo = this.#koniState.getAssetBySlug(tokenSlug);
-
-    return _getTokenMinAmount(tokenInfo);
-  }
-
   private async substrateNftSubmitTransaction (inputData: RequestSubstrateNftSubmitTransaction): Promise<NftTransactionResponse> {
     const { params, recipientAddress, senderAddress } = inputData;
     const isSendingSelf = isRecipientSelf(senderAddress, recipientAddress);
@@ -2168,7 +2214,7 @@ export default class KoniExtension {
     const apiProps = this.#koniState.getSubstrateApi(networkKey);
     const extrinsic = !isPSP34
       ? await getNftTransferExtrinsic(networkKey, apiProps, senderAddress, recipientAddress, params || {})
-      : await getPSP34TransferExtrinsic(networkKey, apiProps, senderAddress, recipientAddress, params || {});
+      : await getPSP34TransferExtrinsic(apiProps, senderAddress, recipientAddress, params || {});
 
     // this.addContact(recipientAddress);
 
@@ -2194,268 +2240,26 @@ export default class KoniExtension {
     return true;
   }
 
-  private getAccountMeta ({ address }: RequestAccountMeta): ResponseAccountMeta {
-    const pair = keyring.getPair(address);
-
-    assert(pair, t('Unable to find account'));
-
-    return {
-      meta: pair.meta
-    };
+  private async accountsCreateExternalV2 (request: RequestAccountCreateExternalV2): Promise<AccountExternalError[]> {
+    return this.#koniState.keyringService.context.accountsCreateExternalV2(request);
   }
 
-  private accountsTie2 ({ address, genesisHash }: RequestAccountTie): boolean {
-    return this.#koniState.setAccountTie(address, genesisHash);
+  private async accountsCreateHardwareV2 (request: RequestAccountCreateHardwareV2): Promise<boolean> {
+    return this.#koniState.keyringService.context.accountsCreateHardwareV2(request);
   }
 
-  private async accountsCreateExternalV2 ({ address,
-    genesisHash,
-    isAllowed,
-    isEthereum,
-    isReadOnly,
-    name }: RequestAccountCreateExternalV2): Promise<AccountExternalError[]> {
-    try {
-      let result: KeyringPair;
-
-      try {
-        const exists = keyring.getPair(address);
-
-        if (exists) {
-          if (exists.type === (isEthereum ? 'ethereum' : 'sr25519')) {
-            return [{ code: AccountExternalErrorCode.INVALID_ADDRESS, message: t('Account exists') }];
-          }
-        }
-      } catch (e) {
-
-      }
-
-      if (isEthereum) {
-        const chainInfoMap = this.#koniState.getChainInfoMap();
-        let _gen = '';
-
-        if (genesisHash) {
-          for (const network of Object.values(chainInfoMap)) {
-            if (_getEvmChainId(network) === parseInt(genesisHash)) {
-              // TODO: pure EVM chains do not have genesisHash
-              _gen = _getSubstrateGenesisHash(network);
-            }
-          }
-        }
-
-        result = keyring.keyring.addFromAddress(address, {
-          name,
-          isExternal: true,
-          isReadOnly,
-          genesisHash: _gen
-        }, null, 'ethereum');
-
-        keyring.saveAccount(result);
-      } else {
-        result = keyring.addExternal(address, { genesisHash, name, isReadOnly }).pair;
-      }
-
-      const _address = result.address;
-
-      await new Promise<void>((resolve) => {
-        this.#koniState.addAccountRef([_address], () => {
-          resolve();
-        });
-      });
-
-      await new Promise<void>((resolve) => {
-        this._saveCurrentAccountAddress(_address, () => {
-          this._addAddressToAuthList(_address, isAllowed);
-          resolve();
-        });
-      });
-
-      return [];
-    } catch (e) {
-      return [{ code: AccountExternalErrorCode.KEYRING_ERROR, message: (e as Error).message }];
-    }
+  private async accountsCreateHardwareMultiple (request: RequestAccountCreateHardwareMultiple): Promise<boolean> {
+    return this.#koniState.keyringService.context.accountsCreateHardwareMultiple(request);
   }
 
-  private async accountsCreateHardwareV2 ({ accountIndex,
-    address,
-    addressOffset,
-    genesisHash,
-    hardwareType,
-    isAllowed,
-    name }: RequestAccountCreateHardwareV2): Promise<boolean> {
-    const key = keyring.addHardware(address, hardwareType, {
-      accountIndex,
-      addressOffset,
-      genesisHash,
-      name,
-      originGenesisHash: genesisHash
-    });
+  private async accountsCreateWithSecret (request: RequestAccountCreateWithSecretKey): Promise<ResponseAccountCreateWithSecretKey> {
+    const result = await this.#koniState.keyringService.context.accountsCreateWithSecret(request);
 
-    const result = key.pair;
-
-    const _address = result.address;
-
-    await new Promise<void>((resolve) => {
-      this.#koniState.addAccountRef([_address], () => {
-        resolve();
-      });
-    });
-
-    await new Promise<void>((resolve) => {
-      this._saveCurrentAccountAddress(_address, () => {
-        this._addAddressToAuthList(_address, isAllowed || false);
-        resolve();
-      });
-    });
-
-    return true;
-  }
-
-  private async accountsCreateHardwareMultiple ({ accounts }: RequestAccountCreateHardwareMultiple): Promise<boolean> {
-    const addresses: string[] = [];
-
-    if (!accounts.length) {
-      throw new Error(t("Can't find an account. Please try again"));
+    if (this.#alwaysLock) {
+      this.keyringLock();
     }
 
-    const slugMap: Record<string, string> = {};
-
-    for (const account of accounts) {
-      const { accountIndex, address, addressOffset, genesisHash, hardwareType, isEthereum, name } = account;
-
-      let result: KeyringPair;
-
-      const baseMeta: KeyringPair$Meta = {
-        name,
-        hardwareType,
-        accountIndex,
-        addressOffset,
-        genesisHash,
-        originGenesisHash: genesisHash
-      };
-
-      if (isEthereum) {
-        result = keyring.keyring.addFromAddress(address, {
-          ...baseMeta,
-          isExternal: true,
-          isHardware: true
-        }, null, 'ethereum');
-
-        keyring.saveAccount(result);
-        slugMap.ethereum = 'ethereum';
-      } else {
-        result = keyring.addHardware(address, hardwareType, {
-          ...baseMeta,
-          availableGenesisHashes: [genesisHash]
-        }).pair;
-
-        const [slug] = this.#koniState.findNetworkKeyByGenesisHash(genesisHash);
-
-        if (slug) {
-          slugMap[slug] = slug;
-        }
-      }
-
-      const _address = result.address;
-
-      addresses.push(_address);
-
-      await new Promise<void>((resolve) => {
-        this._addAddressToAuthList(_address, true);
-        resolve();
-      });
-    }
-
-    const currentAccount = this.#koniState.keyringService.currentAccount;
-    const allGenesisHash = currentAccount?.allGenesisHash || undefined;
-
-    if (addresses.length <= 1) {
-      this.#koniState.setCurrentAccount({ address: addresses[0], currentGenesisHash: null, allGenesisHash });
-    } else {
-      this.#koniState.setCurrentAccount({
-        address: ALL_ACCOUNT_KEY,
-        currentGenesisHash: allGenesisHash || null,
-        allGenesisHash
-      });
-    }
-
-    await new Promise<void>((resolve) => {
-      this.#koniState.addAccountRef(addresses, () => {
-        resolve();
-      });
-    });
-
-    if (Object.keys(slugMap).length) {
-      this.enableChains({ chainSlugs: Object.keys(slugMap), enableTokens: true }).catch(console.error);
-    }
-
-    return true;
-  }
-
-  private async accountsCreateWithSecret ({ isAllow,
-    isEthereum,
-    name,
-    publicKey,
-    secretKey }: RequestAccountCreateWithSecretKey): Promise<ResponseAccountCreateWithSecretKey> {
-    try {
-      let keyringPair: KeyringPair | null = null;
-
-      if (isEthereum) {
-        const _secret = hexStripPrefix(secretKey);
-
-        if (_secret.length === 64) {
-          const suri = `0x${_secret}`;
-          const { phrase } = keyExtractSuri(suri);
-
-          if (isHex(phrase) && isHex(phrase, 256)) {
-            const type: KeypairType = 'ethereum';
-
-            keyringPair = keyring.addUri(getSuri(suri, type), { name: name }, type).pair;
-          }
-        }
-      } else {
-        keyringPair = keyring.keyring.addFromPair({
-          publicKey: hexToU8a(publicKey),
-          secretKey: hexToU8a(secretKey)
-        }, { name });
-        keyring.addPair(keyringPair, true);
-      }
-
-      if (!keyringPair) {
-        return {
-          success: false,
-          errors: [{ code: AccountExternalErrorCode.KEYRING_ERROR, message: t('Cannot create account') }]
-        };
-      }
-
-      const _address = keyringPair.address;
-
-      await new Promise<void>((resolve) => {
-        this.#koniState.addAccountRef([_address], () => {
-          resolve();
-        });
-      });
-
-      await new Promise<void>((resolve) => {
-        this._saveCurrentAccountAddress(_address, () => {
-          this._addAddressToAuthList(_address, isAllow);
-          resolve();
-        });
-      });
-
-      if (this.#alwaysLock) {
-        this.keyringLock();
-      }
-
-      return {
-        errors: [],
-        success: true
-      };
-    } catch (e) {
-      return {
-        success: false,
-        errors: [{ code: AccountExternalErrorCode.KEYRING_ERROR, message: (e as Error).message }]
-      };
-    }
+    return result;
   }
 
   /// External account
@@ -2510,8 +2314,44 @@ export default class KoniExtension {
     return this.#koniState.getConfirmationsQueueSubject().getValue();
   }
 
+  private subscribeConfirmationsTon (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(confirmationsTon.subscribe)'>(id, port);
+
+    const subscription = this.#koniState.getConfirmationsQueueSubjectTon().subscribe(cb);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.getConfirmationsQueueSubjectTon().getValue();
+  }
+
+  private subscribeConfirmationsCardano (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(confirmationsCardano.subscribe)'>(id, port);
+
+    const subscription = this.#koniState.getConfirmationsQueueSubjectCardano().subscribe(cb);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.getConfirmationsQueueSubjectCardano().getValue();
+  }
+
   private async completeConfirmation (request: RequestConfirmationComplete) {
     return await this.#koniState.completeConfirmation(request);
+  }
+
+  private async completeConfirmationTon (request: RequestConfirmationCompleteTon) {
+    return await this.#koniState.completeConfirmationTon(request);
+  }
+
+  private async completeConfirmationCardano (request: RequestConfirmationCompleteCardano) {
+    return await this.#koniState.completeConfirmationCardano(request);
   }
 
   /// Sign Qr
@@ -2614,7 +2454,7 @@ export default class KoniExtension {
         data = `0x${message}`;
       }
 
-      signed = await pair.evmSigner.signMessage(data, 'personal_sign');
+      signed = await pair.evm.signMessage(data, 'personal_sign');
     } else {
       const tx: QrTransaction | null = createTransactionFromRLP(message);
 
@@ -2640,7 +2480,7 @@ export default class KoniExtension {
       // @ts-ignore
       const transaction = new LegacyTransaction(txObject, { common });
 
-      const signedTranaction = LegacyTransaction.fromSerializedTx(hexToU8a(pair.evmSigner.signTransaction(transaction)));
+      const signedTranaction = LegacyTransaction.fromSerializedTx(hexToU8a(pair.evm.signTransaction(transaction)));
 
       signed = signatureToHex({
         r: signedTranaction.r?.toString(16) || '',
@@ -2945,10 +2785,7 @@ export default class KoniExtension {
 
   private keyringStateSubscribe (id: string, port: chrome.runtime.Port): KeyringState {
     const cb = createSubscription<'pri(keyring.subscribe)'>(id, port);
-    const keyringStateSubject = this.#koniState.keyringService.keyringStateSubject;
-    const subscription = keyringStateSubject.subscribe((value): void =>
-      cb(value)
-    );
+    const subscription = this.#koniState.keyringService.keyringStateSubscribe(cb);
 
     this.createUnsubscriptionHandle(id, subscription.unsubscribe);
 
@@ -2961,53 +2798,16 @@ export default class KoniExtension {
 
   // Change master password
 
-  private keyringChangeMasterPassword ({ createNew,
-    newPassword,
-    oldPassword }: RequestChangeMasterPassword): ResponseChangeMasterPassword {
-    try {
-      // Remove isMasterPassword meta if createNew
-      if (createNew && !keyring.keyring.hasMasterPassword) {
-        const pairs = keyring.getPairs();
+  private keyringChangeMasterPassword (request: RequestChangeMasterPassword): ResponseChangeMasterPassword {
+    const createNew = request.createNew;
 
-        for (const pair of pairs) {
-          if (pair.meta.isInjected) {
-            // Empty
-          } else {
-            const meta: KeyringPair$Meta = {
-              ...pair.meta,
-              isMasterPassword: false
-            };
-
-            if (!meta.originGenesisHash) {
-              meta.genesisHash = '';
-            }
-
-            pair.setMeta(meta);
-            keyring.saveAccountMeta(pair, pair.meta);
-          }
-        }
+    const callback = () => {
+      if (this.#alwaysLock && !createNew) {
+        this.keyringLock();
       }
-
-      keyring.changeMasterPassword(newPassword, oldPassword);
-    } catch (e) {
-      console.error(e);
-
-      return {
-        errors: [t((e as Error).message)],
-        status: false
-      };
-    }
-
-    this.#koniState.updateKeyringState();
-
-    if (this.#alwaysLock && !createNew) {
-      this.keyringLock();
-    }
-
-    return {
-      status: true,
-      errors: []
     };
+
+    return this.#koniState.keyringService.context.keyringChangeMasterPassword(request, callback);
   }
 
   // Migrate password
@@ -3027,24 +2827,12 @@ export default class KoniExtension {
     }
   }
 
-  private keyringMigrateMasterPassword ({ address, password }: RequestMigratePassword): ResponseMigratePassword {
-    try {
-      keyring.migrateWithMasterPassword(address, password);
-
+  private keyringMigrateMasterPassword (request: RequestMigratePassword): ResponseMigratePassword {
+    const cb = () => {
       this.checkLockAfterMigrate();
-    } catch (e) {
-      console.error(e);
-
-      return {
-        errors: [(e as Error).message],
-        status: false
-      };
-    }
-
-    return {
-      status: true,
-      errors: []
     };
+
+    return this.#koniState.keyringService.context.keyringMigrateMasterPassword(request, cb);
   }
 
   // Unlock wallet
@@ -3073,7 +2861,12 @@ export default class KoniExtension {
 
   private keyringLock (): void {
     this.#koniState.keyringService.lock();
+    this.#keyringLockSubject.next(true);
     clearTimeout(this.#lockTimeOut);
+  }
+
+  public keyringLockSubscribe (cb: (state: boolean) => void): any {
+    this.#keyringLockSubject.subscribe(cb);
   }
 
   // Export mnemonic
@@ -3104,18 +2897,18 @@ export default class KoniExtension {
     }
   }
 
-  /// Signing substrate request
-  private signingApprovePasswordV2 ({ id }: RequestSigningApprovePasswordV2): boolean {
+  // Signing substrate request
+  private async signingApprovePasswordV2 ({ id }: RequestSigningApprovePasswordV2): Promise<boolean> {
     const queued = this.#koniState.getSignRequest(id);
 
     assert(queued, t('Unable to proceed. Please try again'));
 
     const { reject, request, resolve } = queued;
-    const pair = keyring.getPair(queued.account.address);
+    const pair = keyring.getPair(queued.address);
 
     // unlike queued.account.address the following
     // address is encoded with the default prefix
-    // which what is used for password caching mapping
+    // which is used for password caching mapping
     const { address } = pair;
 
     if (!pair) {
@@ -3130,38 +2923,23 @@ export default class KoniExtension {
 
     const { payload } = request;
 
-    let registry = new TypeRegistry();
-
-    let isEvm = false;
+    let registry: Registry = new TypeRegistry();
 
     if (isJsonPayload(payload)) {
-      // Get the metadata for the genesisHash
-      const currentMetadata = this.#koniState.knownMetadata.find((meta: MetadataDef) =>
-        meta.genesisHash === payload.genesisHash);
-
-      // set the registry before calling the sign function
-      registry.setSignedExtensions(payload.signedExtensions, currentMetadata?.userExtensions);
-
-      if (currentMetadata) {
-        registry.register(currentMetadata?.types);
-      }
-
       const [, chainInfo] = this.#koniState.findNetworkKeyByGenesisHash(payload.genesisHash);
 
-      if (chainInfo && (_API_OPTIONS_CHAIN_GROUP.avail.includes(chainInfo.slug) || _API_OPTIONS_CHAIN_GROUP.goldberg.includes(chainInfo.slug))) {
-        const isChainActive = this.#koniState.getChainStateByKey(chainInfo.slug).active;
+      const registries = await Promise.all([
+        setupApiRegistry(chainInfo, this.#koniState),
+        setupDatabaseRegistry(chainInfo, payload, this.#koniState),
+        setupDappRegistry(payload, this.#koniState)
+      ]);
 
-        if (!isChainActive) {
-          reject(new Error('Please activate {{chain}} network before signing'.replaceAll('{{chain}}', chainInfo.name)));
+      const validRegistries = registries.filter((item): item is RegistrySource => !!item?.registry);
 
-          return false;
-        } else {
-          registry = this.#koniState.getSubstrateApi(chainInfo.slug).api.registry as unknown as TypeRegistry;
-        }
-      }
-
-      if (chainInfo) {
-        isEvm = _isChainEvmCompatible(chainInfo);
+      if (validRegistries.length === 0) {
+        registry.setSignedExtensions(payload.signedExtensions);
+      } else {
+        registry = getSuitableRegistry(validRegistries, payload);
       }
     }
 
@@ -3170,7 +2948,7 @@ export default class KoniExtension {
     resolve({
       id,
       // In case evm chain, must be cut 2 character after 0x
-      signature: isEvm ? `0x${result.signature.slice(4)}` : result.signature
+      signature: result.signature
     });
 
     if (this.#alwaysLock) {
@@ -3182,186 +2960,30 @@ export default class KoniExtension {
 
   /// Derive account
 
-  private derivationCreateMultiple ({ isAllowed, items, parentAddress }: RequestDeriveCreateMultiple): boolean {
-    const parentPair = keyring.getPair(parentAddress);
-    const isEvm = parentPair.type === 'ethereum';
-
-    if (parentPair.isLocked) {
-      keyring.unlockPair(parentPair.address);
-    }
-
-    const createChild = ({ name, suri }: CreateDeriveAccountInfo): KeyringPair => {
-      const meta: KeyringPair$Meta = {
-        name: name,
-        parentAddress
-      };
-
-      if (isEvm) {
-        let index = 0;
-
-        try {
-          const reg = /^\d+$/;
-          const path = suri.split('//')[1];
-
-          if (reg.test(path)) {
-            index = parseInt(path);
-          }
-        } catch (e) {
-
-        }
-
-        if (!index) {
-          throw Error(t('Invalid derive path'));
-        }
-
-        meta.suri = `//${index}`;
-
-        return parentPair.deriveEvm(index, meta);
-      } else {
-        meta.suri = suri;
-
-        return parentPair.derive(suri, meta);
-      }
-    };
-
-    const result: KeyringPair[] = [];
-
-    for (const item of items) {
-      try {
-        const childPair = createChild(item);
-        const address = childPair.address;
-
-        keyring.addPair(childPair, true);
-        this._addAddressToAuthList(address, isAllowed);
-        result.push(childPair);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    if (result.length === 1) {
-      this._saveCurrentAccountAddress(result[0].address);
-    } else {
-      this.#koniState.setCurrentAccount({ address: ALL_ACCOUNT_KEY, currentGenesisHash: null });
-    }
-
-    return true;
+  private derivationCreateMultiple (request: RequestDeriveCreateMultiple): boolean {
+    return this.#koniState.keyringService.context.derivationCreateMultiple(request);
   }
 
-  private derivationCreateV3 ({ address: parentAddress }: RequestDeriveCreateV3): boolean {
-    const parentPair = keyring.getPair(parentAddress);
-    const isEvm = parentPair.type === 'ethereum';
-
-    if (parentPair.isLocked) {
-      keyring.unlockPair(parentPair.address);
-    }
-
-    const pairs = keyring.getPairs();
-    const children = pairs.filter((p) => p.meta.parentAddress === parentAddress);
-    const name = `Account ${pairs.length}`;
-
-    let index = isEvm ? 1 : 0;
-    let valid = false;
-
-    do {
-      const exist = children.find((p) => p.meta.suri === `//${index}`);
-
-      if (exist) {
-        index++;
-      } else {
-        valid = true;
-      }
-    } while (!valid);
-
-    const meta = {
-      name,
-      parentAddress,
-      suri: `//${index}`
-    };
-    const childPair = isEvm ? parentPair.deriveEvm(index, meta) : parentPair.derive(meta.suri, meta);
-    const address = childPair.address;
-
-    this._saveCurrentAccountAddress(address, () => {
-      keyring.addPair(childPair, true);
-      this._addAddressToAuthList(address, true);
-    });
+  private derivationCreateV3 (request: RequestDeriveCreateV3): boolean {
+    const rs = this.#koniState.keyringService.context.derivationAccountProxyCreate(request);
 
     if (this.#alwaysLock) {
       this.keyringLock();
     }
 
-    return true;
+    return rs;
   }
 
-  private validateDerivePath ({ parentAddress, suri }: RequestDeriveValidateV2): ResponseDeriveValidateV2 {
-    const parentPair = keyring.getPair(parentAddress);
-    const isEvm = parentPair.type === 'ethereum';
-
-    if (parentPair.isLocked) {
-      keyring.unlockPair(parentPair.address);
-    }
-
-    const meta: KeyringPair$Meta = {
-      parentAddress
-    };
-
-    let childPair: KeyringPair;
-
-    if (isEvm) {
-      let index = 0;
-
-      try {
-        const reg = /^\d+$/;
-        const path = suri.split('//')[1];
-
-        if (reg.test(path)) {
-          index = parseInt(path);
-        }
-      } catch (e) {
-
-      }
-
-      if (!index) {
-        throw Error(t('Invalid derive path'));
-      }
-
-      meta.suri = `//${index}`;
-
-      childPair = parentPair.deriveEvm(index, meta);
-    } else {
-      meta.suri = suri;
-      childPair = parentPair.derive(suri, meta);
-    }
-
-    return {
-      address: childPair.address,
-      suri: meta.suri as string
-    };
+  private validateDerivePath (request: RequestDeriveValidateV2): ResponseDeriveValidateV2 {
+    return this.#koniState.keyringService.context.validateDerivePath(request);
   }
 
-  private getListDeriveAccounts ({ limit, page, parentAddress }: RequestGetDeriveAccounts): ResponseGetDeriveAccounts {
-    const parentPair = keyring.getPair(parentAddress);
-    const isEvm = parentPair.type === 'ethereum';
+  private getDeriveSuggestion (request: RequestGetDeriveSuggestion): ResponseGetDeriveSuggestion {
+    return this.#koniState.keyringService.context.getDeriveSuggestion(request);
+  }
 
-    if (parentPair.isLocked) {
-      keyring.unlockPair(parentPair.address);
-    }
-
-    const start = (page - 1) * limit + (isEvm ? 1 : 0);
-    const end = start + limit;
-
-    const result: DeriveAccountInfo[] = [];
-
-    for (let i = start; i < end; i++) {
-      const suri = `//${i}`;
-      const pair = isEvm ? parentPair.deriveEvm(i, {}) : parentPair.derive(suri, {});
-
-      result.push({ address: pair.address, suri: suri });
-    }
-
-    return {
-      result: result
-    };
+  private getListDeriveAccounts (request: RequestGetDeriveAccounts): ResponseGetDeriveAccounts {
+    return this.#koniState.keyringService.context.getListDeriveAccounts(request);
   }
 
   // ChainService -------------------------------------------------
@@ -3424,12 +3046,12 @@ export default class KoniExtension {
 
   private async subscribeAssetRegistry (id: string, port: chrome.runtime.Port): Promise<Record<string, _ChainAsset>> {
     const cb = createSubscription<'pri(chainService.subscribeAssetRegistry)'>(id, port);
-    let ready = false;
+
+    await this.#koniState.eventService.waitAssetOnlineReady;
+
     const assetRegistrySubscription = this.#koniState.subscribeAssetRegistry().subscribe({
       next: (rs) => {
-        if (ready) {
-          cb(rs);
-        }
+        cb(rs);
       }
     });
 
@@ -3438,9 +3060,6 @@ export default class KoniExtension {
     port.onDisconnect.addListener((): void => {
       this.cancelSubscription(id);
     });
-
-    await this.#koniState.eventService.waitAssetReady;
-    ready = true;
 
     return this.#koniState.getAssetRegistry();
   }
@@ -3484,33 +3103,48 @@ export default class KoniExtension {
   }
 
   private getTransaction ({ id }: RequestGetTransaction): SWTransactionResult {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { transaction, ...transactionResult } = this.#koniState.transactionService.getTransaction(id);
 
     return transactionResult;
   }
 
-  private subscribeTransactions (id: string, port: chrome.runtime.Port): Record<string, SWTransactionResult> {
+  private async subscribeTransactions (id: string, port: chrome.runtime.Port): Promise<Record<string, SWTransactionResult>> {
     const cb = createSubscription<'pri(transactions.subscribe)'>(id, port);
 
-    function convertRs (rs: Record<string, SWTransaction>): Record<string, SWTransactionResult> {
+    function convertRs (rs: Record<string, SWTransactionBase>, processMap: Record<string, ProcessTransactionData>): Record<string, SWTransactionResult> {
       return Object.fromEntries(Object.entries(rs).map(([key, value]) => {
-        const { additionalValidator, eventsHandler, transaction, ...transactionResult } = value;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { additionalValidator, eventsHandler, step, transaction, ..._transactionResult } = value;
+        const transactionResult = _transactionResult as SWTransactionResult;
+
+        if (step?.processId) {
+          const process = processMap[step.processId];
+
+          if (process) {
+            transactionResult.process = process;
+          }
+        }
 
         return [key, transactionResult];
       }));
     }
 
     const transactionsSubject = this.#koniState.transactionService.getTransactionSubject();
-    const transactionsSubscription = transactionsSubject.subscribe((rs) => {
-      cb(convertRs(rs));
+    const transactionsObservable = transactionsSubject.asObservable();
+    const processTransactionObservable = this.#koniState.dbService.observableProcessTransactions();
+
+    const subscription = combineLatest({ transactions: transactionsObservable, processMap: processTransactionObservable }).subscribe(({ processMap,
+      transactions }) => {
+      cb(convertRs(transactions, processMap));
     });
 
     port.onDisconnect.addListener((): void => {
-      transactionsSubscription.unsubscribe();
+      subscription.unsubscribe();
       this.cancelSubscription(id);
     });
 
-    return convertRs(transactionsSubject.getValue());
+    return convertRs(transactionsSubject.getValue(), await this.#koniState.dbService.getProcessTransactions());
   }
 
   private subscribeNotifications (id: string, port: chrome.runtime.Port) {
@@ -3552,10 +3186,56 @@ export default class KoniExtension {
     };
   }
 
-  // Phishing detect
+  private subscribeAssetLogoMap (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(settings.logo.assets.subscribe)'>(id, port);
+    const subscription = this.#koniState.chainService.subscribeAssetLogoMap().subscribe((rs) => {
+      cb(rs);
+    });
 
+    port.onDisconnect.addListener((): void => {
+      subscription.unsubscribe();
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.chainService.getAssetLogoMap();
+  }
+
+  private subscribeChainLogoMap (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(settings.logo.chains.subscribe)'>(id, port);
+    const subscription = this.#koniState.chainService.subscribeChainLogoMap().subscribe((rs) => {
+      cb(rs);
+    });
+
+    port.onDisconnect.addListener((): void => {
+      subscription.unsubscribe();
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.chainService.getChainLogoMap();
+  }
+
+  // Phishing detect
   private async passPhishingPage ({ url }: RequestPassPhishingPage) {
     return await this.#koniState.approvePassPhishingPage(url);
+  }
+
+  // Set environment config
+  private saveAppConfig (request: RequestSaveAppConfig) {
+    this.#koniState.saveEnvConfig('appConfig', request.appConfig);
+
+    return true;
+  }
+
+  private saveBrowserConfig (request: RequestSaveBrowserConfig) {
+    this.#koniState.saveEnvConfig('browserConfig', request.browserConfig);
+
+    return true;
+  }
+
+  private saveOSConfig (request: RequestSaveOSConfig) {
+    this.#koniState.saveEnvConfig('osConfig', request.osConfig);
+
+    return true;
   }
 
   /// Wallet connect
@@ -3647,13 +3327,13 @@ export default class KoniExtension {
     Object.entries(availableNamespaces)
       .forEach(([key, namespace]) => {
         if (namespace.chains) {
-          const accounts: string[] = [];
+          const accounts: string[] = selectedAccounts.filter((address) => {
+            const [_namespace] = address.split(':');
+
+            return _namespace === key;
+          });
 
           const chains = uniqueStringArray(namespace.chains);
-
-          chains.forEach((chain) => {
-            accounts.push(...(selectedAccounts.filter((address) => isEthereumAddress(address) === (key === WALLET_CONNECT_EIP155_NAMESPACE)).map((address) => `${chain}:${address}`)));
-          });
 
           namespaces[key] = {
             accounts,
@@ -3765,7 +3445,7 @@ export default class KoniExtension {
       const result = await this.#koniState.enableMantaPay(true, address, password, mnemonic.result);
 
       this.#skipAutoLock = true;
-      await this.saveCurrentAccountAddress({ address });
+      await this.saveCurrentAccountProxy({ address });
       const unsubSyncProgress = await this.#koniState.chainService?.mantaPay?.subscribeSyncProgress();
 
       console.debug('Start initial sync for MantaPay');
@@ -3811,7 +3491,7 @@ export default class KoniExtension {
     }
 
     this.#skipAutoLock = true;
-    await this.saveCurrentAccountAddress({ address });
+    await this.saveCurrentAccountProxy({ address });
     const unsubSyncProgress = await this.#koniState.chainService?.mantaPay?.subscribeSyncProgress();
 
     console.debug('Start initial sync for MantaPay');
@@ -3842,6 +3522,22 @@ export default class KoniExtension {
 
   private async disableMantaPay (address: string) {
     return this.#koniState.disableMantaPay(address);
+  }
+
+  private async isTonBounceableAddress ({ address, chain }: RequestBounceableValidate) {
+    try {
+      const tonApi = this.#koniState.getTonApi(chain);
+      const state = await tonApi.getAccountState(address);
+
+      const isActive = state === 'active';
+      const isBounceable = isBounceableAddress(address);
+
+      return !isActive && isBounceable;
+    } catch (error) {
+      console.error(`Failed to validate address ${address} on chain ${chain}:`, error);
+
+      return false;
+    }
   }
 
   private subscribeMantaPayConfig (id: string, port: chrome.runtime.Port) {
@@ -3883,16 +3579,36 @@ export default class KoniExtension {
     };
   }
 
-  /// Metadata
+  /* Metadata */
 
   private async findRawMetadata ({ genesisHash }: RequestFindRawMetadata): Promise<ResponseFindRawMetadata> {
-    const { metadata, specVersion } = await this.#koniState.findMetadata(genesisHash);
+    const { metadata, specVersion, types, userExtensions } = await this.#koniState.findMetadata(genesisHash);
 
     return {
       rawMetadata: metadata,
-      specVersion
+      specVersion,
+      types,
+      userExtensions
     };
   }
+
+  private async calculateMetadataHash ({ chain }: RequestMetadataHash): Promise<ResponseMetadataHash> {
+    const hash = await this.#koniState.calculateMetadataHash(chain);
+
+    return {
+      metadataHash: hash || ''
+    };
+  }
+
+  private async shortenMetadata ({ chain, txBlob }: RequestShortenMetadata): Promise<ResponseShortenMetadata> {
+    const shorten = await this.#koniState.shortenMetadata(chain, txBlob);
+
+    return {
+      txMetadata: shorten || ''
+    };
+  }
+
+  /* Metadata */
 
   private async resolveDomainByAddress (request: ResolveDomainRequest) {
     const chainApi = this.#koniState.getSubstrateApi(request.chain);
@@ -3908,13 +3624,13 @@ export default class KoniExtension {
 
   /// Inject account
   private addInjects (request: RequestAddInjectedAccounts): boolean {
-    this.#koniState.keyringService.addInjectAccounts(request.accounts);
+    this.#koniState.keyringService.context.addInjectAccounts(request.accounts);
 
     return true;
   }
 
   private removeInjects (request: RequestRemoveInjectedAccounts): boolean {
-    this.#koniState.keyringService.removeInjectAccounts(request.addresses);
+    this.#koniState.keyringService.context.removeInjectAccounts(request.addresses);
 
     return true;
   }
@@ -3947,10 +3663,25 @@ export default class KoniExtension {
   }
 
   private async handleYieldStep (inputData: RequestYieldStepSubmit): Promise<SWTransactionResponse> {
-    const { data, path } = inputData;
+    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId } = inputData;
     const { address } = data;
 
+    let step: BriefProcessStep | undefined;
+
+    if (processId) {
+      const _step = path.steps[inputData.currentStep];
+
+      step = {
+        processId,
+        stepId: _step.id
+      };
+    }
+
     if (!data) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
     }
@@ -3960,15 +3691,104 @@ export default class KoniExtension {
     const yieldValidation: TransactionError[] = await this.#koniState.earningService.validateYieldJoin({ data, path }); // TODO: validate, set to fail upon submission
 
     if (yieldValidation.length > 0) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors(yieldValidation);
     }
 
+    let submitData: HandleYieldStepData;
+
+    try {
+      submitData = await this.#koniState.earningService.handleYieldJoin(inputData);
+    } catch (e) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      throw e;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = await this.#koniState.earningService.handleYieldJoin(inputData);
+    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = submitData;
+
     const isPoolSupportAlternativeFee = this.#koniState.earningService.isPoolSupportAlternativeFee(inputData.data.slug);
+    const poolHandler = this.#koniState.earningService.getPoolHandler(data.slug);
 
     const isMintingStep = YIELD_EXTRINSIC_TYPES.includes(extrinsicType);
+
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      if (onSend) {
+        eventEmitter.on('send', onSend);
+      }
+    };
+
+    if (processId && poolHandler) {
+      const convertFee = (fee: YieldTokenBaseInfo): CommonStepFeeInfo => {
+        return {
+          feeComponent: [{
+            amount: fee.amount || '0',
+            // TODO: Add fee type
+            feeType: SwapFeeType.NETWORK_FEE,
+            tokenSlug: fee.slug
+          }],
+          defaultFeeToken: fee.slug,
+          feeOptions: [fee.slug]
+        };
+      };
+
+      if (!this.#koniState.transactionService.checkProcessExist(processId) && step) {
+        const lastStep = path.steps[path.steps.length - 1];
+        const combineInfo: SummaryEarningProcessData = {
+          // In real case, only `YIELD` have multiple steps
+          type: lastStep.type === YieldStepType.JOIN_NOMINATION_POOL
+            ? EarningProcessType.NOMINATION_POOL
+            : lastStep.type === YieldStepType.NOMINATE
+              ? EarningProcessType.NATIVE_STAKING
+              : EarningProcessType.YIELD,
+          data,
+          brief: {
+            amount: data.amount,
+            chain: poolHandler.chain,
+            token: poolHandler.metadataInfo.inputAsset,
+            method: poolHandler.type
+          }
+        };
+
+        await this.#koniState.transactionService.createProcessIfNeed({
+          id: processId,
+          address: reformatAddress(address),
+          type: ProcessType.EARNING,
+          combineInfo,
+          currentStepId: step.stepId,
+          steps: path.steps
+            .map((step, index): ProcessStep => {
+              const fee = convertFee(path.totalFee[index]);
+
+              if (![YieldStepType.XCM, YieldStepType.DEFAULT, YieldStepType.TOKEN_APPROVAL].includes(step.type)) {
+                const metadata = data;
+
+                return {
+                  ...step,
+                  status: StepStatus.QUEUED,
+                  fee,
+                  metadata: metadata as unknown as Record<string, unknown>
+                };
+              }
+
+              return {
+                ...step,
+                fee,
+                status: StepStatus.QUEUED
+              };
+            })
+            .filter((step) => step.type !== YieldStepType.DEFAULT),
+          status: StepStatus.QUEUED
+        });
+      }
+    }
 
     return await this.#koniState.transactionService.handleTransaction({
       address,
@@ -3980,7 +3800,11 @@ export default class KoniExtension {
       chainType,
       resolveOnDone: !isLastStep,
       transferNativeAmount,
-      skipFeeValidation: isMintingStep && isPoolSupportAlternativeFee
+      skipFeeValidation: isMintingStep && isPoolSupportAlternativeFee,
+      errorOnTimeOut,
+      ...this.createPassConfirmationParams(isPassConfirmation),
+      eventsHandler,
+      step
     });
   }
 
@@ -4158,6 +3982,20 @@ export default class KoniExtension {
     });
   }
 
+  private async yieldGetEarningSlippage (params: RequestEarningSlippage) {
+    const { slug } = params;
+
+    const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
+
+    if (!poolHandler) {
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INVALID_PARAMS)]);
+    }
+
+    const slippage = await this.#koniState.earningService.yieldGetEarningSlippage(params);
+
+    return slippage;
+  }
+
   /* Campaign */
 
   private unlockDotCheckCanMint ({ address, network, slug }: RequestUnlockDotCheckCanMint) {
@@ -4223,6 +4061,94 @@ export default class KoniExtension {
     return true;
   }
 
+  private async subscribeCampaignPopupVisibility (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(campaign.popup.subscribeVisibility)'>(id, port);
+
+    const popupVisibilitySubscription = this.#koniState.campaignService.subscribeCampaignPopupVisibility().subscribe((rs) => {
+      cb(rs);
+    });
+
+    this.createUnsubscriptionHandle(id, popupVisibilitySubscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return Promise.resolve(this.#koniState.campaignService.getIsPopupVisible());
+  }
+
+  private toggleCampaignPopup (value: ShowCampaignPopupRequest) {
+    this.#koniState.campaignService.toggleCampaignPopup(value);
+
+    return null;
+  }
+
+  private subscribeAppPopupData (id: string, port: chrome.runtime.Port): AppPopupData[] {
+    const cb = createSubscription<'pri(campaign.popups.subscribe)'>(id, port);
+    let ready = false;
+
+    const callback = (rs: AppPopupData[]) => {
+      if (ready) {
+        cb(rs);
+      }
+    };
+
+    const subscription = this.#koniState.mktCampaignService.subscribePopupsData(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+    ready = true;
+
+    return this.#koniState.mktCampaignService.getAppPopupsData();
+  }
+
+  private subscribeAppBannerData (id: string, port: chrome.runtime.Port): AppBannerData[] {
+    const cb = createSubscription<'pri(campaign.banners.subscribe)'>(id, port);
+    let ready = false;
+
+    const callback = (rs: AppBannerData[]) => {
+      if (ready) {
+        cb(rs);
+      }
+    };
+
+    const subscription = this.#koniState.mktCampaignService.subscribeBannersData(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+    ready = true;
+
+    return this.#koniState.mktCampaignService.getAppBannersData();
+  }
+
+  private subscribeAppConfirmationData (id: string, port: chrome.runtime.Port): AppConfirmationData[] {
+    const cb = createSubscription<'pri(campaign.confirmations.subscribe)'>(id, port);
+    let ready = false;
+
+    const callback = (rs: AppConfirmationData[]) => {
+      if (ready) {
+        cb(rs);
+      }
+    };
+
+    const subscription = this.#koniState.mktCampaignService.subscribeConfirmationsData(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+    ready = true;
+
+    return this.#koniState.mktCampaignService.getAppConfirmationsData();
+  }
+
   /* Campaign */
 
   /* Buy service */
@@ -4277,6 +4203,596 @@ export default class KoniExtension {
 
   /* Buy service */
 
+  /* Swap service */
+  private async subscribeSwapPairs (id: string, port: chrome.runtime.Port): Promise<SwapPair[]> {
+    const cb = createSubscription<'pri(swapService.subscribePairs)'>(id, port);
+    let ready = false;
+
+    await this.#koniState.swapService.waitForStarted();
+
+    const callback = (rs: SwapPair[]) => {
+      if (ready) {
+        cb(rs);
+      }
+    };
+
+    const subscription = this.#koniState.swapService.subscribeSwapPairs(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    ready = true;
+
+    return this.#koniState.swapService.getSwapPairs();
+  }
+
+  private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
+    // @ts-ignore
+    return Promise.resolve(null);
+  }
+
+  private async handleSwapRequestV2 (request: SwapRequestV2): Promise<SwapRequestResult> {
+    return this.#koniState.swapService.handleSwapRequestV2(request);
+  }
+
+  private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {
+    const { swapQuoteResponse } = await this.#koniState.swapService.getLatestQuoteFromSwapRequest(swapRequest);
+
+    return swapQuoteResponse;
+  }
+
+  private async validateSwapProcess (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
+    return this.#koniState.swapService.validateSwapProcessV2(params);
+  }
+
+  private async handleSwapStep (inputData: SwapSubmitParams): Promise<SWTransactionResponse> {
+    const { address, errorOnTimeOut, isPassConfirmation, onSend, process, processId, quote, recipient } = inputData;
+    let step: BriefProcessStep | undefined;
+
+    if (processId) {
+      const _step = process.steps[inputData.currentStep];
+
+      step = {
+        processId,
+        stepId: _step.id
+      };
+    }
+
+    if (!quote || !address || !process) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      return this.#koniState.transactionService
+        .generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
+    }
+
+    const isLastStep = inputData.currentStep + 1 === process.steps.length;
+
+    const swapValidations: TransactionError[] = await this.#koniState.swapService.validateSwapProcessV2({ address, process, selectedQuote: quote, recipient, currentStep: inputData.currentStep });
+
+    if (swapValidations.length > 0) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      return this.#koniState.transactionService
+        .generateBeforeHandleResponseErrors(swapValidations);
+    }
+
+    let submitData: SwapSubmitStepData;
+
+    try {
+      submitData = await this.#koniState.swapService.handleSwapProcess(inputData);
+    } catch (e) {
+      if (step) {
+        this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
+      }
+
+      console.log('Error handling process step', e);
+
+      throw e;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { chainType, extrinsic, extrinsicType, isDutch, isPermit, transferNativeAmount, txChain, txData } = submitData;
+
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      if (onSend) {
+        eventEmitter.on('send', onSend);
+      }
+    };
+
+    if (processId) {
+      if (!this.#koniState.transactionService.checkProcessExist(processId) && step) {
+        const combineInfo: SwapBaseTxData = {
+          provider: quote.provider,
+          slippage: inputData.slippage,
+          address,
+          recipient,
+          quote,
+          process
+        };
+
+        await this.#koniState.transactionService.createProcessIfNeed({
+          id: processId,
+          address: reformatAddress(address),
+          type: ProcessType.SWAP,
+          currentStepId: step.stepId,
+          combineInfo,
+          steps: inputData.process.steps
+            .map((step, index): ProcessStep => {
+              const fee = inputData.process.totalFee[index];
+
+              return {
+                ...step,
+                fee,
+                status: StepStatus.QUEUED
+              };
+            })
+            .filter((step) => step.type !== CommonStepType.DEFAULT),
+          status: StepStatus.QUEUED
+        });
+      }
+    }
+
+    if (isPermit) {
+      return await this.#koniState.transactionService.handlePermitTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic as unknown as SWPermitTransaction['transaction'],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        eventsHandler,
+        step
+      });
+    }
+
+    if (isDutch) {
+      return await this.#koniState.transactionService.handleDutchTransaction({
+        address,
+        chain: txChain,
+        transaction: extrinsic as unknown as SWDutchTransaction['transaction'],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: txData,
+        extrinsicType, // change this depends on step
+        chainType,
+        resolveOnDone: !isLastStep,
+        transferNativeAmount,
+        ...this.createPassConfirmationParams(isPassConfirmation),
+        errorOnTimeOut,
+        eventsHandler,
+        step
+      });
+    }
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain: txChain,
+      transaction: extrinsic,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      data: txData,
+      extrinsicType, // change this depends on step
+      chainType,
+      resolveOnDone: !isLastStep,
+      transferNativeAmount,
+      ...this.createPassConfirmationParams(isPassConfirmation),
+      errorOnTimeOut,
+      eventsHandler,
+      step
+      // skipFeeValidation: chosenFeeToken && allowSkipValidation
+    });
+  }
+
+  /* Swap service */
+
+  /* Notification service */
+  private async subscribeUnreadNotificationCountMap (id: string, port: chrome.runtime.Port): Promise<Record<string, number>> {
+    const cb = createSubscription<'pri(inappNotification.subscribeUnreadNotificationCountMap)'>(id, port);
+
+    const callback = (rs: Record<string, number>) => {
+      cb(rs);
+    };
+
+    const subscription = this.#koniState.inappNotificationService.subscribeUnreadNotificationsCountMap(callback);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return await this.#koniState.inappNotificationService.getUnreadNotificationsCountMap();
+  }
+
+  private markAllReadNotification (proxyId: string) {
+    return this.#koniState.inappNotificationService.markAllRead(proxyId);
+  }
+
+  private switchReadNotificationStatus (params: RequestSwitchStatusParams) {
+    return this.#koniState.inappNotificationService.switchReadStatus(params);
+  }
+
+  private async fetchInappNotifications (params: GetNotificationParams) {
+    return this.#koniState.inappNotificationService.fetchNotificationsByParams(params);
+  }
+
+  private async getInappNotification (id: string) {
+    const result = await this.#koniState.inappNotificationService.getNotificationById(id);
+
+    if (!result) {
+      throw new Error('Notification not found');
+    }
+
+    return result;
+  }
+
+  /* Notification service */
+
+  private async submitClaimAvailBridge (data: RequestClaimBridge) {
+    const { address, chain, notification } = data;
+    const extrinsicType = ExtrinsicType.CLAIM_BRIDGE;
+
+    let transaction: SubmittableExtrinsic<'promise'> | TransactionConfig | null = null;
+    let chainType: ChainType;
+
+    if (isSubstrateAddress(address)) {
+      const substrateApi = this.#koniState.getSubstrateApi(chain);
+
+      transaction = await getClaimTxOnAvail(notification, substrateApi);
+      chainType = ChainType.SUBSTRATE;
+    } else {
+      const evmApi = this.#koniState.getEvmApi(chain);
+      const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'evm') as EvmFeeInfo;
+
+      transaction = await getClaimTxOnEthereum(chain, notification, evmApi, feeInfo);
+      chainType = ChainType.EVM;
+    }
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      transaction,
+      data,
+      extrinsicType,
+      chainType
+    });
+  }
+
+  private async getIsClaimedPolygonBridge (data: RequestIsClaimedPolygonBridge) {
+    const evmApi = this.#koniState.getEvmApi(data.chainslug);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const isClaimed: boolean = await isClaimedPolygonBridge(data.chainslug, data.counter, data.sourceNetwork, evmApi);
+
+    return isClaimed;
+  }
+
+  private async submitClaimPolygonBridge (data: RequestClaimBridge) {
+    const { address, chain, notification } = data;
+    const extrinsicType = ExtrinsicType.CLAIM_BRIDGE;
+
+    let transaction: SubmittableExtrinsic<'promise'> | TransactionConfig | null = null;
+
+    const evmApi = this.#koniState.getEvmApi(chain);
+    const metadata = notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+    const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'evm') as EvmFeeInfo;
+
+    if (metadata.bridgeType === 'POS') {
+      transaction = await getClaimPosBridge(chain, notification, evmApi, feeInfo);
+    } else {
+      transaction = await getClaimPolygonBridge(chain, notification, evmApi, feeInfo);
+    }
+
+    const chainType: ChainType = ChainType.EVM;
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      transaction,
+      data,
+      extrinsicType,
+      chainType
+    });
+  }
+
+  /* Ledger */
+
+  private async subscribeLedgerGenericAllowChains (id: string, port: chrome.runtime.Port): Promise<string[]> {
+    const cb = createSubscription<'pri(ledger.generic.allow)'>(id, port);
+
+    await this.#koniState.eventService.waitLedgerReady;
+
+    const subscription = this.#koniState.chainService.observable.ledgerGenericAllowChains.subscribe(cb);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.chainService.value.ledgerGenericAllowChains;
+  }
+
+  /* Ledger */
+
+  /* Popular tokens */
+
+  private subscribePriorityTokens (id: string, port: chrome.runtime.Port): TokenPriorityDetails {
+    const cb = createSubscription<'pri(tokens.subscribePriority)'>(id, port);
+
+    const subscription = this.#koniState.chainService.observable.priorityTokens.subscribe(cb);
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.chainService.value.priorityTokens;
+  }
+
+  /* Popular tokens */
+
+  /* Multi process */
+
+  private async handleSubmitProcessTransaction (_request: RequestSubmitProcessTransaction): Promise<SWTransactionResponse> {
+    const { address, id: processId, request: requestData, type } = _request;
+
+    const pair = keyring.getPair(address);
+
+    if (!pair) {
+      throw new Error('Pair not found');
+    }
+
+    const signMode = getAccountSignMode(address, pair.meta);
+
+    if (signMode !== AccountSignMode.PASSWORD) {
+      throw new Error('Account can not use this feature');
+    }
+
+    const setting = await new Promise<UiSettings>((resolve) => this.#koniState.settingService.getSettings(resolve));
+
+    if (!setting.allowOneSign) {
+      throw new Error('Wallet not enable this feature');
+    }
+
+    switch (type) {
+      case ProcessType.EARNING:
+
+      // eslint-disable-next-line no-fallthrough
+      case ProcessType.SWAP: {
+        const currentStep = requestData.currentStep;
+
+        type SubmitFunction = (step: number, callback?: (rs: SWTransactionResponse) => void) => Promise<SWTransactionResponse>;
+
+        let stepNums: number;
+        let submitData: SubmitFunction;
+        let waitXcmData: { chain: string, token: string, targetAmount: string, nextTxType: ExtrinsicType } | undefined;
+
+        if (type === ProcessType.EARNING) {
+          const data = requestData as RequestYieldStepSubmit;
+
+          const poolHandler = this.#koniState.earningService.getPoolHandler(data.data.slug);
+
+          if (poolHandler) {
+            waitXcmData = {
+              targetAmount: data.data.amount,
+              chain: poolHandler.chain,
+              token: poolHandler.metadataInfo.inputAsset,
+              // TODO: Change this depends on pool
+              nextTxType: ExtrinsicType.JOIN_YIELD_POOL
+            };
+          }
+
+          submitData = async (step: number, callback?: (rs: SWTransactionResponse) => void): Promise<SWTransactionResponse> => {
+            const isPassConfirmation = !callback;
+            const onSend = callback
+              // eslint-disable-next-line node/no-callback-literal
+              ? (rs: TransactionEventResponse) => callback(rs as SWTransactionResponse)
+              : undefined;
+
+            return this.handleYieldStep({
+              ...data,
+              currentStep: step,
+              isPassConfirmation,
+              onSend,
+              errorOnTimeOut: true,
+              processId
+            });
+          };
+
+          stepNums = data.path.steps.length;
+        } else {
+          const data = requestData as SwapSubmitParams;
+
+          stepNums = data.process.steps.length;
+
+          const inputAsset = this.#koniState.chainService.getAssetBySlug(data.quote.pair.from);
+
+          waitXcmData = {
+            targetAmount: data.quote.fromAmount,
+            chain: inputAsset.originChain,
+            token: inputAsset.slug,
+            nextTxType: ExtrinsicType.SWAP
+          };
+
+          submitData = async (step: number, callback?: (rs: SWTransactionResponse) => void): Promise<SWTransactionResponse> => {
+            const isPassConfirmation = !callback;
+
+            const onSend = callback
+              // eslint-disable-next-line node/no-callback-literal
+              ? (rs: TransactionEventResponse) => callback(rs as SWTransactionResponse)
+              : undefined;
+
+            return this.handleSwapStep({
+              ...data,
+              currentStep: step,
+              isPassConfirmation,
+              onSend,
+              errorOnTimeOut: true,
+              processId
+            });
+          };
+        }
+
+        if (stepNums < 3) {
+          throw new Error('Not need to use this feature');
+        }
+
+        const loopSubmit = async (submitFunc: SubmitFunction, step: number, callback?: (rs: SWTransactionResponse) => void): Promise<SWTransactionResponse> => {
+          const isLastStep = step === stepNums - 1;
+
+          const rs = await submitFunc(step, callback);
+
+          if (isLastStep) {
+            return rs;
+          } else {
+            if (rs.errors.length || rs.warnings.length) {
+              return rs;
+            }
+
+            if (rs.extrinsicType === ExtrinsicType.TRANSFER_XCM) {
+              await new Promise<void>((resolve) => {
+                setTimeout(resolve, 60 * 1000);
+
+                if (waitXcmData) {
+                  let unsub = noop;
+
+                  const onRs = (rs: AmountData) => {
+                    if ((BigN(rs.value)).gte(BigN(waitXcmData?.targetAmount || '0'))) {
+                      unsub();
+
+                      resolve();
+                    }
+                  };
+
+                  this.#koniState.balanceService.subscribeTransferableBalance(address, waitXcmData.chain, waitXcmData.token, waitXcmData.nextTxType, onRs)
+                    .then(([_unsub, rs]) => {
+                      unsub = _unsub;
+                      onRs(rs);
+                    })
+                    .catch(console.error);
+                }
+              });
+            }
+
+            return loopSubmit(submitFunc, step + 1);
+          }
+        };
+
+        return new Promise<SWTransactionResponse>((resolve, reject) => {
+          loopSubmit(submitData, currentStep, resolve)
+            .then(resolve)
+            .catch(reject);
+        });
+      }
+    }
+  }
+
+  private createPassConfirmationParams (pass = false): Pick<SWTransactionInput, 'isPassConfirmation' | 'signAfterCreate'> {
+    if (pass) {
+      return {
+        isPassConfirmation: true,
+        signAfterCreate: (id: string) => {
+          this.signingApprovePasswordV2({ id }).catch(console.log);
+        }
+      };
+    } else {
+      return {
+        isPassConfirmation: false
+      };
+    }
+  }
+
+  private async subscribeProcessById (request: RequestSubscribeProcessById, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeProcessById> {
+    const cb = createSubscription<'pri(process.subscribe.id)'>(id, port);
+    const observable = this.#koniState.dbService.observableProcessTransactionById(request.processId);
+    const subscription = observable.subscribe((rs) => {
+      // eslint-disable-next-line node/no-callback-literal
+      cb({
+        process: rs,
+        id
+      });
+    });
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return {
+      process: await this.#koniState.dbService.getProcessTransactionById(request.processId),
+      id
+    };
+  }
+
+  private subscribeProcessAlive (id: string, port: chrome.runtime.Port): ResponseSubscribeProcessAlive {
+    const cb = createSubscription<'pri(process.subscribe.alive)'>(id, port);
+    const observable = this.#koniState.transactionService.observables.aliveProcess;
+
+    const convertData = (rs: Record<string, ProcessTransactionData>): ResponseSubscribeProcessAlive => {
+      return {
+        processes: rs
+      };
+    };
+
+    const subscription = observable.subscribe((rs) => {
+      cb(convertData(rs));
+    });
+
+    this.createUnsubscriptionHandle(id, subscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    const value = this.#koniState.transactionService.values.aliveProcess;
+
+    return convertData(value);
+  }
+
+  /* Multi process */
+
+  /* Migrate Unified Account */
+  private async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
+    const setMigratingMode = () => {
+      this.saveUnifiedAccountMigrationInProgress({ isUnifiedAccountMigrationInProgress: true });
+    };
+
+    return await this.#koniState.keyringService.context.migrateUnifiedAndFetchEligibleSoloAccounts(request, setMigratingMode);
+  }
+
+  private migrateSoloAccount (request: RequestMigrateSoloAccount): ResponseMigrateSoloAccount {
+    const proxyIds = request.soloAccounts.map((account) => account.proxyId);
+
+    const response = this.#koniState.keyringService.context.migrateSoloAccount(request);
+    const newProxyId = response.migratedUnifiedAccountId; // get from response to ensure account migration is done.
+    const newName = request.accountName;
+
+    try {
+      this.#koniState.inappNotificationService.migrateNotificationProxyId(proxyIds, newProxyId, newName);
+    } catch (error) {
+      console.error('Error on migrating notification for unified account migration', error);
+    }
+
+    return response;
+  }
+
+  private pingSession (request: RequestPingSession): boolean {
+    return this.#koniState.keyringService.context.pingSession(request);
+  }
+  /* Migrate Unified Account */
+
   // --------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], port: chrome.runtime.Port): Promise<ResponseType<TMessageType>> {
@@ -4291,30 +4807,11 @@ export default class KoniExtension {
     }
 
     switch (type) {
+      case 'pri(ping)':
+        return 'pong';
       /// Clone from PolkadotJs
-      case 'pri(accounts.create.external)':
-        return this.accountsCreateExternal(request as RequestAccountCreateExternal);
-
-      case 'pri(accounts.create.hardware)':
-        return this.accountsCreateHardware(request as RequestAccountCreateHardware);
-
-      case 'pri(accounts.create.suri)':
-        return this.accountsCreateSuri(request as RequestAccountCreateSuri);
-
-      case 'pri(accounts.changePassword)':
-        return this.accountsChangePassword(request as RequestAccountChangePassword);
-
-      case 'pri(accounts.export)':
+      case 'pri(accounts.export.json)':
         return this.accountsExport(request as RequestAccountExport);
-
-      case 'pri(accounts.show)':
-        return this.accountsShow(request as RequestAccountShow);
-
-      case 'pri(accounts.subscribe)':
-        return this.accountsSubscribe(id, port);
-
-      case 'pri(accounts.validate)':
-        return this.accountsValidate(request as RequestAccountValidate);
 
       case 'pri(metadata.approve)':
         return this.metadataApprove(request as RequestMetadataApprove);
@@ -4330,27 +4827,6 @@ export default class KoniExtension {
 
       case 'pri(metadata.requests)':
         return this.metadataSubscribe(id, port);
-
-      case 'pri(derivation.create)':
-        return this.derivationCreate(request as RequestDeriveCreate);
-
-      case 'pri(derivation.validate)':
-        return this.derivationValidate(request as RequestDeriveValidate);
-
-      case 'pri(json.restore)':
-        return this.jsonRestore(request as RequestJsonRestore);
-
-      case 'pri(json.batchRestore)':
-        return this.batchRestore(request as RequestBatchRestore);
-
-      case 'pri(json.account.info)':
-        return this.jsonGetAccountInfo(request as KeyringPair$Json);
-
-      case 'pri(seed.create)':
-        return this.seedCreate(request as RequestSeedCreate);
-
-      case 'pri(seed.validate)':
-        return this.seedValidate(request as RequestSeedValidate);
 
       case 'pri(signing.approve.signature)':
         return this.signingApproveSignature(request as RequestSigningApproveSignature);
@@ -4391,6 +4867,8 @@ export default class KoniExtension {
         return this.getAuthListV2();
       case 'pri(authorize.toggle)':
         return this.toggleAuthorization2(request as string);
+      case 'pri(authorize.switchCurrentNetwork)':
+        return this.switchCurrentNetworkAuthorization(request as RequestSwitchCurrentNetworkAuthorization);
       case 'pri(settings.changeBalancesVisibility)':
         return await this.toggleBalancesVisibility();
 
@@ -4411,17 +4889,35 @@ export default class KoniExtension {
         return this.setUnlockType(request as RequestUnlockType);
       case 'pri(settings.saveEnableChainPatrol)':
         return this.setEnableChainPatrol(request as RequestChangeEnableChainPatrol);
+      case 'pri(settings.saveNotificationSetup)':
+        return this.saveNotificationSetup(request as NotificationSetup);
+      case 'pri(settings.saveMigrationAcknowledgedStatus)':
+        return this.saveMigrationAcknowledgedStatus(request as RequestSaveMigrationAcknowledgedStatus);
+      case 'pri(settings.saveUnifiedAccountMigrationInProgress)':
+        return this.saveUnifiedAccountMigrationInProgress(request as RequestSaveUnifiedAccountMigrationInProgress);
+      case 'pri(settings.pingUnifiedAccountMigrationDone)':
+        return this.pingUnifiedAccountMigrationDone();
       case 'pri(settings.saveShowZeroBalance)':
         return this.setShowZeroBalance(request as RequestChangeShowZeroBalance);
       case 'pri(settings.saveLanguage)':
         return this.setLanguage(request as RequestChangeLanguage);
       case 'pri(settings.saveShowBalance)':
         return this.setShowBalance(request as RequestChangeShowBalance);
+      case 'pri(settings.update.allowOneSign)':
+        return this.setAllowOneSign(request as RequestChangeAllowOneSign);
 
       case 'pri(price.getPrice)':
         return await this.getPrice();
       case 'pri(price.getSubscription)':
         return await this.subscribePrice(id, port);
+      case 'pri(price.getHistory)':
+        return await this.getHistoryTokenPrice(request as RequestGetHistoryTokenPriceData);
+      case 'pri(price.checkCoinGeckoPriceSupport)':
+        return this.checkCoinGeckoPriceSupport(request as string);
+      case 'pri(price.subscribeCurrentTokenPrice)':
+        return this.subscribeCurrentTokenPrice(request as string, id, port);
+      case 'pri(settings.savePriceCurrency)':
+        return await this.setPriceCurrency(request as RequestChangePriceCurrency);
       case 'pri(balance.getBalance)':
         return await this.getBalance();
       case 'pri(balance.getSubscription)':
@@ -4432,12 +4928,6 @@ export default class KoniExtension {
         return this.getCrowdloanContributions(request as RequestCrowdloanContributions);
       case 'pri(crowdloan.getSubscription)':
         return this.subscribeCrowdloan(id, port);
-      case 'pri(derivation.createV2)':
-        return this.derivationCreateV2(request as RequestDeriveCreateV2);
-      case 'pri(json.restoreV2)':
-        return this.jsonRestoreV2(request as RequestJsonRestoreV2);
-      case 'pri(json.batchRestoreV2)':
-        return this.batchRestoreV2(request as RequestBatchRestoreV2);
       case 'pri(nft.getNft)':
         return await this.getNft();
       case 'pri(nft.getSubscription)':
@@ -4503,6 +4993,8 @@ export default class KoniExtension {
         return await this.yieldSubmitCancelWithdrawal(request as RequestStakeCancelWithdrawal);
       case 'pri(yield.claimReward.submit)':
         return await this.yieldSubmitClaimReward(request as RequestStakeClaimReward);
+      case 'pri(yield.getEarningSlippage)':
+        return await this.yieldGetEarningSlippage(request as RequestEarningSlippage);
 
         /* Others */
 
@@ -4513,7 +5005,7 @@ export default class KoniExtension {
       /* Account management */
       // Add account
       case 'pri(accounts.create.suriV2)':
-        return await this.accountsCreateSuriV2(request as RequestAccountCreateSuriV2);
+        return this.accountsCreateSuriV2(request as RequestAccountCreateSuriV2);
       case 'pri(accounts.create.externalV2)':
         return await this.accountsCreateExternalV2(request as RequestAccountCreateExternalV2);
       case 'pri(accounts.create.hardwareV2)':
@@ -4522,51 +5014,72 @@ export default class KoniExtension {
         return await this.accountsCreateHardwareMultiple(request as RequestAccountCreateHardwareMultiple);
       case 'pri(accounts.create.withSecret)':
         return await this.accountsCreateWithSecret(request as RequestAccountCreateWithSecretKey);
+
+      case 'pri(accounts.json.info)':
+        return this.parseInfoSingleJson(request as RequestJsonGetAccountInfo);
+      case 'pri(accounts.json.restoreV2)':
+        return this.jsonRestoreV2(request as RequestJsonRestoreV2);
+
+      case 'pri(accounts.json.batchInfo)':
+        return this.parseInfoMultiJson(request as RequestBatchJsonGetAccountInfo);
+      case 'pri(accounts.json.batchRestoreV2)':
+        return this.batchRestoreV2(request as RequestBatchRestoreV2);
       case 'pri(seed.createV2)':
-        return this.seedCreateV2(request as RequestSeedCreateV2);
+        return this.seedCreateV2(request as RequestMnemonicCreateV2);
 
       // Remove account
       case 'pri(accounts.forget)':
-        return await this.accountsForgetOverride(request as RequestAccountForget);
+        return await this.accountsForgetOverride(request as RequestAccountProxyForget);
 
       // Validate account
-      case 'pri(seed.validateV2)':
-        return this.seedValidateV2(request as RequestSeedValidateV2);
-      case 'pri(privateKey.validateV2)':
-        return this.metamaskPrivateKeyValidateV2(request as RequestSeedValidateV2);
-      case 'pri(accounts.checkPublicAndSecretKey)':
+      case 'pri(accounts.validate.seed)':
+        return this.seedValidateV2(request as RequestMnemonicValidateV2);
+      case 'pri(accounts.validate.privateKey)':
+        return this.privateKeyValidateV2(request as RequestPrivateKeyValidateV2);
+      case 'pri(accounts.validate.substrate.publicAndPrivateKey)':
         return this.checkPublicAndSecretKey(request as RequestCheckPublicAndSecretKey);
+      case 'pri(accounts.validate.name)':
+        return this.checkNameExists(request as RequestAccountNameValidate);
+      case 'pri(accounts.validate.bounceable)':
+        return this.isTonBounceableAddress(request as RequestBounceableValidate);
 
       // Export account
-      case 'pri(accounts.exportPrivateKey)':
+      case 'pri(accounts.export.privateKey)':
         return this.accountExportPrivateKey(request as RequestAccountExportPrivateKey);
+      case 'pri(accounts.export.json.batch)':
+        return this.batchExportV2(request as RequestAccountBatchExportV2);
+      case 'pri(accounts.export.mnemonic)':
+        return this.exportAccountProxyMnemonic(request as RequestExportAccountProxyMnemonic);
 
       // Subscribe account
-      case 'pri(accounts.subscribeWithCurrentAddress)':
+      case 'pri(accounts.subscribeWithCurrentProxy)':
         return await this.accountsGetAllWithCurrentAddress(id, port);
       case 'pri(accounts.subscribeAccountsInputAddress)':
-        return this.accountsGetAll(id, port);
+        return this.subscribeInputAddressData(request as RequestInputAccountSubscribe, id, port);
 
       // Save current account
-      case 'pri(currentAccount.saveAddress)':
-        return await this.saveCurrentAccountAddress(request as RequestCurrentAccountAddress);
-      case 'pri(accounts.updateCurrentAddress)':
-        return this.updateCurrentAccountAddress(request as string);
+      case 'pri(accounts.saveCurrentProxy)':
+        return await this.saveCurrentAccountProxy(request as RequestCurrentAccountAddress);
 
       // Edit account
       case 'pri(accounts.edit)':
-        return this.accountsEdit(request as RequestAccountEdit);
+        return this.accountsEdit(request as RequestAccountProxyEdit);
+      // Ton change wallet contract version
+      case 'pri(accounts.ton.version.map)':
+        return this.tonGetAllTonWalletContractVersion(request as RequestGetAllTonWalletContractVersion);
+      case 'pri(accounts.ton.version.change)':
+        return this.tonAccountChangeWalletContractVersion(request as RequestChangeTonWalletContractVersion);
 
       // Save contact address
-      case 'pri(accounts.saveRecent)':
+      case 'pri(addressBook.saveRecent)':
         return this.saveRecentAccount(request as RequestSaveRecentAccount);
-      case 'pri(accounts.editContact)':
+      case 'pri(addressBook.edit)':
         return this.editContactAccount(request as RequestEditContactAccount);
-      case 'pri(accounts.deleteContact)':
+      case 'pri(addressBook.delete)':
         return this.deleteContactAccount(request as RequestDeleteContactAccount);
 
       // Subscribe address
-      case 'pri(accounts.subscribeAddresses)':
+      case 'pri(addressBook.subscribe)':
         return this.subscribeAddresses(id, port);
 
       case 'pri(accounts.resolveDomainToAddress)':
@@ -4595,6 +5108,8 @@ export default class KoniExtension {
         return this.getSupportedSmartContractTypes();
       case 'pri(chainService.enableChain)':
         return await this.enableChain(request as EnableChainParams);
+      case 'pri(chainService.enableChainWithPriorityAssets)':
+        return await this.enableChainWithPriorityAssets(request as EnableChainParams);
       case 'pri(chainService.reconnectChain)':
         return await this.reconnectChain(request as string);
       case 'pri(chainService.disableChain)':
@@ -4624,27 +5139,17 @@ export default class KoniExtension {
       case 'pri(assetSetting.update)':
         return await this.updateAssetSetting(request as AssetSettingUpdateReq);
 
-      case 'pri(transfer.checkReferenceCount)':
-        return await this.transferCheckReferenceCount(request as RequestTransferCheckReferenceCount);
-      case 'pri(transfer.checkSupporting)':
-        return await this.transferCheckSupporting(request as RequestTransferCheckSupporting);
-      case 'pri(transfer.getExistentialDeposit)':
-        return this.transferGetExistentialDeposit(request as RequestTransferExistentialDeposit);
-      case 'pri(transfer.getMaxTransferable)':
-        return this.transferGetMaxTransferable(request as RequestMaxTransferable);
-      case 'pri(transfer.subscribeMaxTransferable)':
-        return this.transferGetMaxTransferable(request as RequestMaxTransferable);
+      case 'pri(transfer.subscribe)':
+        return this.subscribeMaxTransferable(request as RequestSubscribeTransfer, id, port);
+
       case 'pri(freeBalance.get)':
-        return this.getAddressFreeBalance(request as RequestFreeBalance);
+        return this.getAddressTransferableBalance(request as RequestFreeBalance);
       case 'pri(freeBalance.subscribe)':
-        return this.subscribeAddressFreeBalance(request as RequestFreeBalance, id, port);
+        return this.subscribeAddressTransferableBalance(request as RequestFreeBalance, id, port);
       case 'pri(subscription.cancel)':
         return this.cancelSubscription(request as string);
       case 'pri(chainService.recoverSubstrateApi)':
         return this.recoverDotSamaApi(request as string);
-
-      case 'pri(accounts.get.meta)':
-        return this.getAccountMeta(request as RequestAccountMeta);
 
       /// Send NFT
       case 'pri(evmNft.submitTransaction)':
@@ -4654,9 +5159,17 @@ export default class KoniExtension {
 
       /// Transfer
       case 'pri(accounts.transfer)':
-        return await this.makeTransfer(request as RequestTransfer);
+        return await this.makeTransfer(request as RequestSubmitTransfer);
       case 'pri(accounts.crossChainTransfer)':
         return await this.makeCrossChainTransfer(request as RequestCrossChainTransfer);
+      case 'pri(accounts.getOptimalTransferProcess)':
+        return await this.getOptimalTransferProcess(request as RequestOptimalTransferProcess);
+      case 'pri(accounts.approveSpending)':
+        return await this.approveSpending(request as TokenSpendingApprovalParams);
+      case 'pri(customFee.getTokensCanPayFee)':
+        return this.getTokensCanPayFee(request as RequestGetTokensCanPayFee);
+      case 'pri(customFee.getAmountForPair)':
+        return this.getAmountForPair(request as RequestGetAmountForPair);
 
       /// Sign QR
       case 'pri(qr.transaction.parse.substrate)':
@@ -4674,12 +5187,18 @@ export default class KoniExtension {
       case 'pri(account.external.resolve)':
         return this.resolveQrTransfer(request as RequestResolveExternalRequest);
 
-      case 'pri(accounts.tie)':
-        return this.accountsTie2(request as RequestAccountTie);
       case 'pri(confirmations.subscribe)':
         return this.subscribeConfirmations(id, port);
+      case 'pri(confirmationsTon.subscribe)':
+        return this.subscribeConfirmationsTon(id, port);
+      case 'pri(confirmationsCardano.subscribe)':
+        return this.subscribeConfirmationsCardano(id, port);
       case 'pri(confirmations.complete)':
         return await this.completeConfirmation(request as RequestConfirmationComplete);
+      case 'pri(confirmationsTon.complete)':
+        return await this.completeConfirmationTon(request as RequestConfirmationCompleteTon);
+      case 'pri(confirmationsCardano.complete)':
+        return await this.completeConfirmationCardano(request as RequestConfirmationCompleteCardano);
 
       /// Stake
       case 'pri(bonding.getBondingOptions)':
@@ -4719,6 +5238,14 @@ export default class KoniExtension {
       case 'pri(phishing.pass)':
         return await this.passPhishingPage(request as RequestPassPhishingPage);
 
+      // Set Environment config
+      case 'pri(settings.saveAppConfig)':
+        return this.saveAppConfig(request as RequestSaveAppConfig);
+      case 'pri(settings.saveBrowserConfig)':
+        return this.saveBrowserConfig(request as RequestSaveBrowserConfig);
+      case 'pri(settings.saveOSConfig)':
+        return this.saveOSConfig(request as RequestSaveOSConfig);
+
       /// Keyring state
       case 'pri(keyring.subscribe)':
         return this.keyringStateSubscribe(id, port);
@@ -4740,14 +5267,16 @@ export default class KoniExtension {
         return this.signingApprovePasswordV2(request as RequestSigningApprovePasswordV2);
 
       /// Derive account
-      case 'pri(derivation.validateV2)':
+      case 'pri(accounts.derive.validateV2)':
         return this.validateDerivePath(request as RequestDeriveValidateV2);
-      case 'pri(derivation.getList)':
+      case 'pri(accounts.derive.getList)':
         return this.getListDeriveAccounts(request as RequestGetDeriveAccounts);
-      case 'pri(derivation.create.multiple)':
+      case 'pri(accounts.derive.create.multiple)':
         return this.derivationCreateMultiple(request as RequestDeriveCreateMultiple);
-      case 'pri(derivation.createV3)':
+      case 'pri(accounts.derive.createV3)':
         return this.derivationCreateV3(request as RequestDeriveCreateV3);
+      case 'pri(accounts.derive.suggestion)':
+        return this.getDeriveSuggestion(request as RequestGetDeriveSuggestion);
 
       // Transaction
       case 'pri(transactions.getOne)':
@@ -4764,6 +5293,10 @@ export default class KoniExtension {
 
       case 'pri(settings.getLogoMaps)':
         return await this.getLogoMap();
+      case 'pri(settings.logo.assets.subscribe)':
+        return this.subscribeAssetLogoMap(id, port);
+      case 'pri(settings.logo.chains.subscribe)':
+        return this.subscribeChainLogoMap(id, port);
 
       /// Wallet Connect
       case 'pri(walletConnect.connect)':
@@ -4805,14 +5338,28 @@ export default class KoniExtension {
         return this.unlockDotCheckCanMint(request as RequestUnlockDotCheckCanMint);
       case 'pri(campaign.unlockDot.subscribe)':
         return this.unlockDotSubscribeMintedData(id, port, request as RequestUnlockDotSubscribeMintedData);
+      case 'pri(campaign.popup.subscribeVisibility)':
+        return this.subscribeCampaignPopupVisibility(id, port);
+      case 'pri(campaign.popup.toggle)':
+        return this.toggleCampaignPopup(request as ShowCampaignPopupRequest);
+      case 'pri(campaign.popups.subscribe)':
+        return this.subscribeAppPopupData(id, port);
+      case 'pri(campaign.banners.subscribe)':
+        return this.subscribeAppBannerData(id, port);
+      case 'pri(campaign.confirmations.subscribe)':
+        return this.subscribeAppConfirmationData(id, port);
 
         /* Campaign */
 
       // Metadata
       case 'pri(metadata.find)':
         return this.findRawMetadata(request as RequestFindRawMetadata);
+      case 'pri(metadata.hash)':
+        return this.calculateMetadataHash(request as RequestMetadataHash);
+      case 'pri(metadata.transaction.shorten)':
+        return this.shortenMetadata(request as RequestShortenMetadata);
 
-        /* Campaign */
+      /* Campaign */
       case 'pri(campaign.banner.subscribe)':
         return this.subscribeProcessingBanner(id, port);
       case 'pri(campaign.banner.complete)':
@@ -4835,7 +5382,78 @@ export default class KoniExtension {
         return this.#koniState.dbService.getExportJson();
       case 'pri(database.migrateLocalStorage)':
         return this.#koniState.migrateMV3LocalStorage(request as string);
+      case 'pri(database.setLocalStorage)':
+        return this.#koniState.setStorageFromWS(request as StorageDataInterface);
+      case 'pri(database.getLocalStorage)':
+        return this.#koniState.getStorageFromWS(request as string);
         /* Database */
+
+        /* Swap service */
+      case 'pri(swapService.subscribePairs)':
+        return this.subscribeSwapPairs(id, port);
+      case 'pri(swapService.handleSwapRequest)':
+        return this.handleSwapRequest(request as SwapRequest);
+      case 'pri(swapService.handleSwapRequestV2)':
+        return this.handleSwapRequestV2(request as SwapRequest);
+      case 'pri(swapService.getLatestQuote)':
+        return this.getLatestSwapQuote(request as SwapRequest);
+      case 'pri(swapService.validateSwapProcess)':
+        return this.validateSwapProcess(request as ValidateSwapProcessParams);
+      case 'pri(swapService.handleSwapStep)':
+        return this.handleSwapStep(request as SwapSubmitParams);
+        /* Swap service */
+
+        /* Notification service */
+      case 'pri(inappNotification.subscribeUnreadNotificationCountMap)':
+        return await this.subscribeUnreadNotificationCountMap(id, port);
+      case 'pri(inappNotification.markAllReadNotification)':
+        return this.markAllReadNotification(request as string);
+      case 'pri(inappNotification.switchReadNotificationStatus)':
+        return this.switchReadNotificationStatus(request as RequestSwitchStatusParams);
+      case 'pri(inappNotification.fetch)':
+        return this.fetchInappNotifications(request as GetNotificationParams);
+      case 'pri(inappNotification.get)':
+        return this.getInappNotification(request as string);
+      case 'pri(inappNotification.isClaimedPolygonBridge)':
+        return this.getIsClaimedPolygonBridge(request as RequestIsClaimedPolygonBridge);
+        /* Notification service */
+
+        /* Avail Bridge */
+      case 'pri(availBridge.submitClaimAvailBridgeOnAvail)':
+        return this.submitClaimAvailBridge(request as RequestClaimBridge);
+        /* Avail Bridge */
+
+        /* Polygon Bridge */
+      case 'pri(polygonBridge.submitClaimPolygonBridge)':
+        return this.submitClaimPolygonBridge(request as RequestClaimBridge);
+        /* Polygon Bridge */
+
+        /* Ledger */
+      case 'pri(ledger.generic.allow)':
+        return this.subscribeLedgerGenericAllowChains(id, port);
+        /* Ledger */
+
+        /* Priority tokens */
+      case 'pri(tokens.subscribePriority)':
+        return this.subscribePriorityTokens(id, port);
+        /* Priority tokens */
+
+        /* Multi process */
+      case 'pri(process.transaction.submit)':
+        return this.handleSubmitProcessTransaction(request as RequestSubmitProcessTransaction);
+      case 'pri(process.subscribe.id)':
+        return this.subscribeProcessById(request as RequestSubscribeProcessById, id, port);
+      case 'pri(process.subscribe.alive)':
+        return this.subscribeProcessAlive(id, port);
+        /* Multi process */
+
+        /* Migrate Unified Account */
+      case 'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)':
+        return await this.migrateUnifiedAndFetchEligibleSoloAccounts(request as RequestMigrateUnifiedAndFetchEligibleSoloAccounts);
+      case 'pri(migrate.migrateSoloAccount)':
+        return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
+      case 'pri(migrate.pingSession)':
+        return this.pingSession(request as RequestPingSession);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

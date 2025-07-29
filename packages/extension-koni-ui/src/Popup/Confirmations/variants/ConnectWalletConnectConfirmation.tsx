@@ -3,15 +3,17 @@
 
 import { WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_POLKADOT_NAMESPACE } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AlertBox, ConfirmationGeneralInfo, WCAccountSelect, WCNetworkSelected, WCNetworkSupported } from '@subwallet/extension-koni-ui/components';
+import { AccountChainType } from '@subwallet/extension-base/types';
+import { AddNetworkWCModal, AlertBox, ConfirmationGeneralInfo, WCAccountSelect, WCNetworkSelected, WCNetworkSupported } from '@subwallet/extension-koni-ui/components';
+import { ADD_NETWORK_WALLET_CONNECT_MODAL, TIME_OUT_RECORD } from '@subwallet/extension-koni-ui/constants';
 import { useNotification, useSelectWalletConnectAccount, useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveWalletConnectSession, rejectWalletConnectSession } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertKeyTypes, isAccountAll } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon } from '@subwallet/react-ui';
+import { convertKeyTypes, detectChanInfo, isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, PlusCircle, XCircle } from 'phosphor-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -33,20 +35,38 @@ async function handleCancel ({ id }: WalletConnectSessionRequest) {
   });
 }
 
+const timeOutWCMissingKey = 'unsuccessful_connect_wc_modal';
+const wcMissingModalId = 'WALLET_CONNECT_CONFIRM_MODAL';
+
 function Component ({ className, request }: Props) {
   const { params } = request.request;
-
   const { t } = useTranslation();
   const navigate = useNavigate();
   const notification = useNotification();
+
+  // todo: deprecated, recheck usage
   const setSelectedAccountTypes = useSetSelectedAccountTypes(true);
 
-  const nameSpaceNameMap = useMemo((): Record<string, string> => ({
-    [WALLET_CONNECT_EIP155_NAMESPACE]: t('EVM networks'),
-    [WALLET_CONNECT_POLKADOT_NAMESPACE]: t('Substrate networks')
-  }), [t]);
+  const [blockAddNetwork, setBlockAddNetwork] = useState(false);
+  const [networkNeedToImport, setNetworkNeedToImport] = useState<string[]>([]);
 
-  const { isExpired,
+  const accountTypeNameMap = useMemo((): Record<string, string> => ({
+    [AccountChainType.ETHEREUM]: t('EVM accounts'),
+    [AccountChainType.SUBSTRATE]: t('Substrate accounts')
+  }), [t]);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+
+  useEffect(() => {
+    const timeOut = JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
+
+    inactiveModal(wcMissingModalId);
+    clearTimeout(timeOut[timeOutWCMissingKey]);
+    delete timeOut[timeOutWCMissingKey];
+    localStorage.setItem(TIME_OUT_RECORD, JSON.stringify(timeOut));
+  }, [inactiveModal]);
+
+  const { isExitedAnotherUnsupportedNamespace,
+    isExpired,
     isUnSupportCase,
     missingType,
     namespaceAccounts,
@@ -54,14 +74,50 @@ function Component ({ className, request }: Props) {
     onApplyAccounts,
     onCancelSelectAccounts,
     onSelectAccount,
+    supportOneAccountType,
     supportOneChain,
-    supportOneNamespace,
     supportedChains } = useSelectWalletConnectAccount(params);
 
   const allowSubmit = useMemo(() => {
     return Object.values(namespaceAccounts).every(({ appliedAccounts }) => appliedAccounts.length);
   }, [namespaceAccounts]);
 
+  const checkNetworksConnected = useMemo((): string[] => {
+    let needConnectedNetwork: string[] = [];
+
+    Object.values(namespaceAccounts).forEach((value) => {
+      const { networks } = value;
+      const [unsupportedNetworks, supportedNetworks] = networks.reduce<[string[], string[]]>(([unsupportedNetworks_, supportedNetworks_], { slug, supported }) => {
+        if (supported) {
+          supportedNetworks_.push(slug);
+        } else {
+          const chainData = slug.split(':');
+
+          if (chainData.length > 1) {
+            const [namespace, chainId] = chainData;
+
+            if (namespace === WALLET_CONNECT_EIP155_NAMESPACE) {
+              unsupportedNetworks_.push(chainId);
+            } else if (namespace === WALLET_CONNECT_POLKADOT_NAMESPACE) {
+              setBlockAddNetwork(true);
+            }
+          }
+        }
+
+        return [unsupportedNetworks_, supportedNetworks_];
+      }, [[], []]);
+
+      // When the network to be imported is a required network, only one network import is allowed.
+      if (isUnSupportCase && unsupportedNetworks.length === 1) {
+        needConnectedNetwork = [...unsupportedNetworks];
+      } else if (!isUnSupportCase && supportedNetworks.length === 0) {
+        // When networks to be imported are optional networks, and only allow the import if there is no network required by the Dapp that the extension supports.
+        needConnectedNetwork = [...unsupportedNetworks];
+      }
+    });
+
+    return needConnectedNetwork;
+  }, [isUnSupportCase, namespaceAccounts]);
   const [loading, setLoading] = useState(false);
 
   const _onSelectAccount = useCallback((namespace: string): ((address: string, applyImmediately?: boolean) => VoidFunction) => {
@@ -75,13 +131,17 @@ function Component ({ className, request }: Props) {
   const onCancel = useCallback(() => {
     setLoading(true);
     handleCancel(request).finally(() => {
+      navigate('/wallet-connect/list');
       setLoading(false);
     });
-  }, [request]);
+  }, [navigate, request]);
 
   const onConfirm = useCallback(() => {
     setLoading(true);
-    const selectedAccounts = Object.values(namespaceAccounts).map(({ appliedAccounts }) => appliedAccounts).flat();
+    const selectedAccounts = Object.values(namespaceAccounts)
+      .flatMap(({ appliedAccounts, networks }) => {
+        return networks.flatMap(({ wcChain }) => appliedAccounts.map((address) => `${wcChain}:${address}`));
+      });
 
     handleConfirm(request, selectedAccounts)
       .catch((e) => {
@@ -92,12 +152,14 @@ function Component ({ className, request }: Props) {
         });
       })
       .finally(() => {
+        navigate('/wallet-connect/list');
         setLoading(false);
       });
-  }, [namespaceAccounts, notification, request]);
+  }, [namespaceAccounts, navigate, notification, request]);
 
   const onAddAccount = useCallback(() => {
     setSelectedAccountTypes(convertKeyTypes(missingType));
+    setLoading(true);
     navigate('/accounts/new-seed-phrase', { state: { useGoBack: true } });
   }, [setSelectedAccountTypes, missingType, navigate]);
 
@@ -115,12 +177,27 @@ function Component ({ className, request }: Props) {
 
   const isSupportCase = !isUnSupportCase && !isExpired && !noNetwork;
 
+  useEffect(() => {
+    if (checkNetworksConnected.length > 0 && !blockAddNetwork && !isExitedAnotherUnsupportedNamespace) {
+      detectChanInfo(checkNetworksConnected).then((rs) => {
+        if (rs) {
+          setNetworkNeedToImport([rs]);
+          activeModal(ADD_NETWORK_WALLET_CONNECT_MODAL);
+        } else {
+          setBlockAddNetwork(true);
+        }
+      }).catch(() => {
+        setBlockAddNetwork(true);
+      });
+    }
+  }, [activeModal, blockAddNetwork, checkNetworksConnected, isExitedAnotherUnsupportedNamespace]);
+
   return (
     <>
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         {
-          isUnSupportCase && (
+          (isUnSupportCase || blockAddNetwork) && (
             <>
               <AlertBox
                 description={t('There is at least 1 chosen network unavailable')}
@@ -157,21 +234,21 @@ function Component ({ className, request }: Props) {
           )
         }
         {
-          isSupportCase && (
+          isSupportCase && !blockAddNetwork && (
             <div className='namespaces-list'>
               {
                 Object.entries(namespaceAccounts).map(([namespace, value]) => {
-                  const { appliedAccounts, availableAccounts, networks, selectedAccounts } = value;
+                  const { accountType, appliedAccounts, availableAccounts, networks, selectedAccounts } = value;
 
                   return (
                     <div
-                      className={CN('namespace-container', { 'space-xs': !supportOneNamespace })}
+                      className={CN('namespace-container', { 'space-xs': !supportOneAccountType })}
                       key={namespace}
                     >
                       {!supportOneChain && (
                         <>
                           <div className='namespace-title'>
-                            {supportOneNamespace ? t('Networks') : nameSpaceNameMap[namespace]}
+                            {supportOneAccountType ? t('Networks') : accountTypeNameMap[namespace]}
                           </div>
                           <WCNetworkSelected
                             id={`${namespace}-networks`}
@@ -180,13 +257,14 @@ function Component ({ className, request }: Props) {
                         </>
                       )}
                       {
-                        supportOneNamespace && (
+                        supportOneAccountType && (
                           <div className='account-list-title'>
                             {t('Choose the account(s) you’d like to connect')}
                           </div>
                         )
                       }
                       <WCAccountSelect
+                        accountType={accountType}
                         appliedAccounts={appliedAccounts}
                         availableAccounts={availableAccounts}
                         id={`${namespace}-accounts`}
@@ -195,7 +273,7 @@ function Component ({ className, request }: Props) {
                         onCancel={onCancelModal(namespace)}
                         onSelectAccount={_onSelectAccount(namespace)}
                         selectedAccounts={selectedAccounts}
-                        useModal={!supportOneNamespace}
+                        useModal={!supportOneAccountType}
                       />
                     </div>
                   );
@@ -289,6 +367,11 @@ function Component ({ className, request }: Props) {
             )
         }
       </div>
+      <AddNetworkWCModal
+        cancelRequest={onCancel}
+        networkToAdd={networkNeedToImport}
+        requestId={request.id}
+      />
     </>
   );
 }

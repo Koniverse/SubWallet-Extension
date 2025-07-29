@@ -5,7 +5,6 @@ import type { Chain } from '@subwallet/extension-chains/types';
 import type { Call, ExtrinsicEra, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import type { AnyJson, SignerPayloadJSON } from '@polkadot/types/types';
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetChainInfoByGenesisHash from '@subwallet/extension-koni-ui/hooks/chain/useGetChainInfoByGenesisHash';
 import useMetadata from '@subwallet/extension-koni-ui/hooks/transaction/confirmation/useMetadata';
@@ -26,7 +25,8 @@ interface Decoded {
 interface Props extends ThemeProps {
   payload: ExtrinsicPayload;
   request: SignerPayloadJSON;
-  account: AccountJson;
+  address: string;
+  accountName?: string;
 }
 
 const displayDecodeVersion = (message: string, chain: Chain, specVersion: BN): string => {
@@ -102,9 +102,9 @@ const mortalityAsString = (era: ExtrinsicEra, hexBlockNumber: string, t: TFuncti
   });
 };
 
-const Component: React.FC<Props> = ({ account, className, payload: { era, nonce, tip }, request: { blockNumber, genesisHash, method, specVersion: hexSpec } }: Props) => {
+const Component: React.FC<Props> = ({ accountName, address, className, payload: { era, nonce, tip }, request: { blockNumber, genesisHash, method, specVersion: hexSpec } }: Props) => {
   const { t } = useTranslation();
-  const chain = useMetadata(genesisHash);
+  const { chain } = useMetadata(genesisHash);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
   const specVersion = useRef(bnToBn(hexSpec)).current;
   const decoded = useMemo(
@@ -113,6 +113,8 @@ const Component: React.FC<Props> = ({ account, className, payload: { era, nonce,
       : { args: null, method: null },
     [method, chain, specVersion]
   );
+
+  console.debug('tip', tip);
 
   return (
     <MetaInfo className={className}>
@@ -133,9 +135,10 @@ const Component: React.FC<Props> = ({ account, className, payload: { era, nonce,
           )
       }
       <MetaInfo.Account
-        address={account.address}
+        address={address}
+        className={'account-info-item'}
         label={t('From')}
-        name={account.name}
+        name={accountName}
         networkPrefix={chain?.ss58Format ?? chainInfo?.substrateInfo?.addressPrefix}
       />
       <MetaInfo.Number
@@ -151,7 +154,7 @@ const Component: React.FC<Props> = ({ account, className, payload: { era, nonce,
           decimals={chainInfo?.substrateInfo?.decimals || 0}
           label={t<string>('Tip')}
           suffix={chainInfo?.substrateInfo?.symbol}
-          value={tip.toNumber()}
+          value={tip.toPrimitive() as string | number}
         />
       )}
       {renderMethod(method, decoded, t)}
@@ -192,6 +195,12 @@ const SubstrateExtrinsic = styled(Component)<Props>(({ theme: { token } }: Props
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-all'
         }
+      }
+    },
+
+    '.account-info-item': {
+      '.__account-item-address': {
+        textAlign: 'right'
       }
     }
   };

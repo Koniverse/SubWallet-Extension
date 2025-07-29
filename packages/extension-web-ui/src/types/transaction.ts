@@ -3,7 +3,18 @@
 
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
 
+export interface OffRampParams {
+  orderId: string,
+  slug: string,
+  partnerCustomerId: string
+  cryptoCurrency: string
+  numericCryptoAmount: number
+  walletAddress: string
+  network: string
+}
+
 export interface TransactionFormBaseProps {
+  fromAccountProxy: string;
   from: string,
   chain: string
   asset: string
@@ -14,6 +25,9 @@ export interface TransferParams extends TransactionFormBaseProps {
   destChain: string;
   value: string;
   defaultSlug: string;
+  orderId?: string;
+  service?: string;
+  isReadonly?: boolean;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {
@@ -35,6 +49,8 @@ export interface EarnParams extends TransactionFormBaseProps {
   slug: string;
   target: string;
   value: string;
+  redirectFromPreview: boolean;
+  hasPreSelectTarget: boolean;
 }
 
 export interface UnStakeParams extends TransactionFormBaseProps {
@@ -56,4 +72,16 @@ export interface WithdrawParams extends TransactionFormBaseProps {
 export interface ClaimRewardParams extends TransactionFormBaseProps {
   slug: string;
   bondReward: boolean;
+}
+
+export interface SwapParams extends TransactionFormBaseProps {
+  fromAmount: string,
+  fromTokenSlug: string;
+  toTokenSlug: string;
+  recipient?: string;
+  defaultSlug: string;
+}
+
+export interface ClaimBridgeParams extends TransactionFormBaseProps {
+  notificationId: string;
 }

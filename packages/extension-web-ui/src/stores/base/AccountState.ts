@@ -3,15 +3,19 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AddressBookInfo, KeyringState } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson, AccountsContext } from '@subwallet/extension-base/background/types';
+import { AccountsContext } from '@subwallet/extension-base/background/types';
+import { AccountJson, AccountProxy } from '@subwallet/extension-base/types';
 import { AccountState, ReduxStatus } from '@subwallet/extension-web-ui/stores/types';
-import { isAccountAll, isNoAccount } from '@subwallet/extension-web-ui/utils';
+import { isAccountAll } from '@subwallet/extension-web-ui/utils';
 
 const initialState: AccountState = {
   // CurrentAccount
   currentAccount: null,
   isAllAccount: false,
   isNoAccount: true,
+
+  currentAccountProxy: null,
+  accountProxies: [],
 
   // KeyringState
   isReady: false,
@@ -41,16 +45,17 @@ const accountStateSlice = createSlice({
         reduxStatus: ReduxStatus.READY
       };
     },
+    // deprecated
     updateAccountsContext (state, action: PayloadAction<AccountsContext>) {
       const payload = action.payload;
 
       return {
         ...state,
         ...payload,
-        isNoAccount: isNoAccount(payload.accounts),
         reduxStatus: ReduxStatus.READY
       };
     },
+    // deprecated
     updateCurrentAccount (state, action: PayloadAction<AccountJson>) {
       const payload = action.payload;
 
@@ -58,6 +63,28 @@ const accountStateSlice = createSlice({
         ...state,
         currentAccount: payload,
         isAllAccount: isAccountAll(payload?.address),
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updateCurrentAccountProxy (state, action: PayloadAction<AccountProxy>) {
+      const payload = action.payload;
+
+      return {
+        ...state,
+        currentAccountProxy: payload,
+        isAllAccount: isAccountAll(payload?.id),
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updateAccountProxies (state, action: PayloadAction<AccountProxy[]>) {
+      const payload = action.payload;
+      const accounts = payload.reduce((accounts, ap) => [...accounts, ...ap.accounts], [] as AccountJson[]);
+
+      return {
+        ...state,
+        accounts,
+        isNoAccount: !accounts.length,
+        accountProxies: payload,
         reduxStatus: ReduxStatus.READY
       };
     },

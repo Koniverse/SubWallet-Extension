@@ -15,14 +15,14 @@ if (!global.chrome) {
 if (!global.chrome.extension) {
   // @ts-ignore
   global.chrome.extension = {
-    getURL: (input: string) => input
+    getURL: (input: string) => `${input}`
   };
 }
 
 // @ts-ignore
 global.chrome.runtime = {
   lastError: undefined,
-  getURL: (input: string) => input
+  getURL: (input: string) => `/${input}`
 };
 
 global.chrome.windows = {

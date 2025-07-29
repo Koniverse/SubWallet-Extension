@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit/dist';
-import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
 import { ThemeNames, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { LANGUAGE } from '@subwallet/extension-base/constants';
+import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_SETTING } from '@subwallet/extension-base/services/setting-service/constants';
 import { AppSettings, ReduxStatus } from '@subwallet/extension-koni-ui/stores/types';
 
@@ -98,10 +98,32 @@ const settingsSlice = createSlice({
         browserConfirmationType: action.payload
       };
     },
-    updateLogoMaps (state, action: PayloadAction<AppSettings['logoMaps']>) {
+    updateChainLogoMaps (state, action: PayloadAction<Record<string, string>>) {
+      const chainLogoMap = action.payload;
+
       return {
         ...state,
-        logoMaps: action.payload
+        logoMaps: {
+          chainLogoMap: {
+            ...state.logoMaps.chainLogoMap,
+            ...chainLogoMap
+          },
+          assetLogoMap: state.logoMaps.assetLogoMap
+        }
+      };
+    },
+    updateAssetLogoMaps (state, action: PayloadAction<Record<string, string>>) {
+      const assetLogoMap = action.payload;
+
+      return {
+        ...state,
+        logoMaps: {
+          chainLogoMap: state.logoMaps.chainLogoMap,
+          assetLogoMap: {
+            ...state.logoMaps.assetLogoMap,
+            ...assetLogoMap
+          }
+        }
       };
     }
   }

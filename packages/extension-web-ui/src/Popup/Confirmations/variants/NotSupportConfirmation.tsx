@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationResult } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson, ConfirmationRequestBase } from '@subwallet/extension-base/background/types';
-import { AccountItemWithName, ConfirmationGeneralInfo } from '@subwallet/extension-web-ui/components';
+import { ConfirmationRequestBase } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
+import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo } from '@subwallet/extension-web-ui/components';
 import { NEED_SIGN_CONFIRMATION } from '@subwallet/extension-web-ui/constants';
 import { useGetAccountTitleByAddress } from '@subwallet/extension-web-ui/hooks';
 import { cancelSignRequest, completeConfirmation } from '@subwallet/extension-web-ui/messaging';
@@ -11,7 +13,7 @@ import { EvmSignatureSupportType, ThemeProps } from '@subwallet/extension-web-ui
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -73,17 +75,21 @@ const Component: React.FC<Props> = (props: Props) => {
           { isMessage ? t('Signature required') : t('Transaction request')}
         </div>
         <div className='description'>
-          <span>{t('This feature is not available for')}</span>
-          <span className='highlight'>&nbsp;{accountTitle}</span>
-          <span>.&nbsp;{t('Please change to another account type.')}</span>
+          <Trans
+            components={{
+              highlight: (
+                <span className='highlight' />
+              )
+            }}
+            i18nKey={detectTranslate('Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.')}
+            values={{ accountTitle }}
+          />
         </div>
-        <AccountItemWithName
-          accountName={account?.name}
-          address={account?.address || ''}
-          avatarSize={24}
+        {account && <AccountItemWithProxyAvatar
+          account={account}
           className='account-item'
           showUnselectIcon={true}
-        />
+        />}
       </div>
       <div className='confirmation-footer'>
         <Button
@@ -104,14 +110,12 @@ const NotSupportConfirmation = styled(Component)<Props>(({ theme: { token } }: P
     },
 
     '.account-item': {
-      '.ant-web3-block': {
-        cursor: 'not-allowed',
-        opacity: token.opacityDisable
-      },
+      cursor: 'not-allowed',
+      opacity: token.opacityDisable,
+      background: token.colorBgSecondary,
 
-      '.ant-web3-block:hover': {
-        cursor: 'not-allowed',
-        background: token.colorBgSecondary
+      '&:hover': {
+        cursor: 'not-allowed'
       }
     }
   };

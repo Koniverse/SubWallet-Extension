@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { PREDEFINED_STAKING_POOL } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { StakingPoolItem } from '@subwallet/extension-web-ui/components';
+import { YieldPoolType } from '@subwallet/extension-base/types';
+import { fetchStaticData } from '@subwallet/extension-base/utils';
+import { BaseSelectModal, StakingPoolItem } from '@subwallet/extension-web-ui/components';
 import EmptyValidator from '@subwallet/extension-web-ui/components/Account/EmptyValidator';
 import { Avatar } from '@subwallet/extension-web-ui/components/Avatar';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components/Field/Base';
@@ -11,11 +12,11 @@ import { EarningPoolDetailModal } from '@subwallet/extension-web-ui/components/M
 import { EarningPoolDetailModalId } from '@subwallet/extension-web-ui/components/Modal/Earning/EarningPoolDetailModal';
 import { FilterModal } from '@subwallet/extension-web-ui/components/Modal/FilterModal';
 import { SortingModal } from '@subwallet/extension-web-ui/components/Modal/SortingModal';
-import { useFilterModal, useGetPoolTargetList, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
+import { useFilterModal, useGetPoolTargetList, useSelector, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { NominationPoolDataType, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { ActivityIndicator, Badge, Button, Icon, InputRef, ModalContext, SelectModal, useExcludeModal } from '@subwallet/react-ui';
+import { Badge, Button, Icon, InputRef, ModalContext, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
-import { Book, CaretLeft, FadersHorizontal, Lightning, SortAscending } from 'phosphor-react';
+import { Book, CaretLeft, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -50,13 +51,11 @@ interface FilterOption {
 const SORTING_MODAL_ID = 'pool-sorting-modal';
 const FILTER_MODAL_ID = 'pool-filter-modal';
 
-const defaultPoolMap = Object.assign({}, PREDEFINED_STAKING_POOL);
-
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', defaultValue, disabled,
+  const { chain, className = '', defaultValue: cachedValue, disabled,
     from,
     id = 'pool-selector',
-    label, loading, onChange,
+    label, onChange,
     onClickBookButton,
     placeholder,
     setForceFetchValidator,
@@ -68,12 +67,26 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { t } = useTranslation();
 
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const isActive = checkActive(id);
 
   const items = useGetPoolTargetList(slug) as NominationPoolDataType[];
+  const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
   const { compound } = useYieldPositionDetail(slug, from);
+  const { poolInfoMap } = useSelector((state) => state.earning);
+  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, number[]>>({});
+
+  const maxPoolMembersValue = useMemo(() => {
+    const poolInfo = poolInfoMap[slug];
+
+    if (poolInfo.type === YieldPoolType.NOMINATION_POOL) {
+      return poolInfo.maxPoolMembers;
+    }
+
+    return undefined;
+  }, [poolInfoMap, slug]);
 
   const sortingOptions: SortOption[] = useMemo(() => {
     return [
@@ -84,7 +97,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       },
       {
         desc: true,
-        label: t('Highest total bonded'),
+        label: t('Highest total staked'),
         value: SortKey.TOTAL_POOLED
       }
     ];
@@ -102,6 +115,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     {
       label: t('Destroying'),
       value: 'Destroying'
+    },
+    {
+      label: t('Blocked'),
+      value: 'Blocked'
     }
   ]), [t]);
 
@@ -112,10 +129,23 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return compound?.nominations.map((item) => item.validatorAddress) || [];
   }, [compound?.nominations]);
 
-  const defaultSelectPool = defaultPoolMap[chain];
+  const stakedPool = useMemo(() => nominationPoolValueList[0], [nominationPoolValueList]);
+
+  const recommendPool = useMemo(() => {
+    const recommendPools: number[] = defaultPoolMap?.[chain] || [];
+
+    if (recommendPools.length) {
+      return recommendPools[0].toString();
+    } else {
+      return '';
+    }
+  }, [defaultPoolMap, chain]);
 
   const resultList = useMemo((): NominationPoolDataType[] => {
-    return [...items]
+    const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSessionHeader: true, disabled: true };
+    const othersSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -2, idStr: '-2', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Others', isSessionHeader: true, disabled: true };
+
+    const filteredItems = [...items]
       .filter((value) => {
         const filters = selectedFilters as NominationPoolDataType['state'][];
 
@@ -125,18 +155,64 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           return true;
         }
       })
+      .map((item) => {
+        const disabled = item.isCrowded || item.state === 'Blocked';
+
+        return { ...item, disabled };
+      })
       .sort((a: NominationPoolDataType, b: NominationPoolDataType) => {
         switch (sortSelection) {
           case SortKey.MEMBER:
             return a.memberCounter - b.memberCounter;
           case SortKey.TOTAL_POOLED:
             return new BigN(b.bondedAmount).minus(a.bondedAmount).toNumber();
-          case SortKey.DEFAULT:
+
           default:
-            return 0;
+            if (sortSelection === SortKey.DEFAULT) {
+              if (defaultPoolMap?.[chain] && defaultPoolMap?.[chain].length) {
+                const isRecommendedA = defaultPoolMap?.[chain].includes(a.id);
+                const isRecommendedB = defaultPoolMap?.[chain].includes(b.id);
+
+                if (isRecommendedA && !isRecommendedB) {
+                  return -1;
+                } else if (!isRecommendedA && isRecommendedB) {
+                  return 1;
+                }
+              }
+
+              if (a.disabled && !b.disabled) {
+                return 1;
+              } else if (!a.disabled && b.disabled) {
+                return -1;
+              }
+
+              return 0;
+            } else {
+              return 0;
+            }
         }
+      })
+      .map((item) => {
+        if (defaultPoolMap?.[chain] && defaultPoolMap?.[chain].includes(item.id)) {
+          return { ...item, isRecommend: true };
+        }
+
+        return item;
       });
-  }, [items, selectedFilters, sortSelection]);
+
+    const recommendedExistedLength = filteredItems.filter((item) => item.isRecommend).length;
+    const otherExistedLength = filteredItems.filter((item) => !item.isRecommend).length;
+
+    if (recommendedExistedLength > 0 && otherExistedLength > 0) {
+      return [recommendedSessionHeader, ...filteredItems.filter((item) => item.isRecommend), othersSessionHeader, ...filteredItems.filter((item) => !item.isRecommend)];
+    } else if (recommendedExistedLength > 0) {
+      return [...filteredItems.filter((item) => item.isRecommend)];
+    } else if (otherExistedLength > 0) {
+      return [...filteredItems.filter((item) => !item.isRecommend)];
+    } else {
+      return [];
+    }
+  }, [chain, defaultPoolMap, items, selectedFilters, sortSelection]);
 
   const isDisabled = useMemo(() =>
     disabled ||
@@ -153,10 +229,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
-      item.address.toLowerCase().includes(searchTextLowerCase) ||
-      (item.name
-        ? item.name.toLowerCase().includes(searchTextLowerCase)
-        : false)
+      item.id >= 0 && (item.address.toLowerCase().includes(searchTextLowerCase) || (item.name ? item.name.toLowerCase().includes(searchTextLowerCase) : false))
     );
   }, []);
 
@@ -169,14 +242,81 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal]);
 
   const renderItem = useCallback((item: NominationPoolDataType) => {
+    if (item.isSessionHeader) {
+      return (
+        <div
+          className={'__session-header'}
+          key={item.name}
+        >{item.name?.toUpperCase()}
+          {item.name?.includes('Recommended')
+            ? (
+              <Icon
+                className={'__selected-icon'}
+                iconColor='#4cd9ac'
+                phosphorIcon={ThumbsUp }
+                size='xs'
+                weight='fill'
+              />
+            )
+            : null}
+        </div>
+      );
+    }
+
     return (
-      <StakingPoolItem
-        {...item}
-        className={'pool-item'}
-        onClickMoreBtn={onClickMore(item)}
-      />
+      item.isCrowded
+        ? (
+          <Tooltip
+            key={item.id}
+            placement={'top'}
+            title={t('This pool has reached the maximum number of members. Select another to continue')}
+          >
+            <div
+              className={'__pool-item-wrapper'}
+              key={item.id}
+            >
+              <StakingPoolItem
+                {...item}
+                className={'pool-item'}
+                onClickMoreBtn={onClickMore(item)}
+                prefixAddress={networkPrefix}
+              />
+            </div>
+          </Tooltip>
+        )
+        : (
+          item.state === 'Blocked'
+            ? (
+              <Tooltip
+                key={item.id}
+                placement={'top'}
+                title={t('This pool is blocked. Select another to continue')}
+              >
+                <div
+                  className={'__pool-item-wrapper'}
+                  key={item.id}
+                >
+                  <StakingPoolItem
+                    {...item}
+                    className={'pool-item'}
+                    onClickMoreBtn={onClickMore(item)}
+                    prefixAddress={networkPrefix}
+                  />
+                </div>
+              </Tooltip>
+            )
+            : (
+              <StakingPoolItem
+                {...item}
+                className={'pool-item'}
+                key={item.id}
+                onClickMoreBtn={onClickMore(item)}
+                prefixAddress={networkPrefix}
+              />
+            )
+        )
     );
-  }, [onClickMore]);
+  }, [networkPrefix, onClickMore, t]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -189,14 +329,25 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [chain, items.length, setForceFetchValidator, t]);
 
   const renderSelected = useCallback((item: NominationPoolDataType) => {
+    const isCheckRecommend = defaultPoolMap?.[chain]?.includes(item.id);
+
     return (
       <div className={'__selected-item'}>
         <div className={'__selected-item-name common-text'}>
-          {item.name || `Pool #${item.id}`}
+          {isCheckRecommend
+            ? (
+              <>
+                {item.name}
+                <div className={'__title-suffix'}>&nbsp;(Recommended)</div>
+              </>
+            )
+            : (
+              item.name || `Pool #${item.id}`
+            )}
         </div>
       </div>
     );
-  }, []);
+  }, [chain, defaultPoolMap]);
 
   const onChangeSortOpt = useCallback((value: string) => {
     setSortSelection(value as SortKey);
@@ -214,23 +365,18 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     inactiveModal(EarningPoolDetailModalId);
   }, [inactiveModal]);
 
-  const onClickLightningButton = useCallback((e: SyntheticEvent) => {
-    e.stopPropagation();
-    const poolId = defaultSelectPool;
-
-    if (poolId !== undefined) {
-      onChange?.({ target: { value: `${poolId}` } });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  useEffect(() => {
+    fetchStaticData<Record<string, number[]>>('nomination-pool-recommendation').then((earningPoolRecommendation) => {
+      setDefaultPoolMap(earningPoolRecommendation);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
-    const defaultSelectedPool = defaultValue || nominationPoolValueList[0] || `${defaultSelectPool || ''}`;
+    const defaultSelectedPool = stakedPool || value || cachedValue || recommendPool;
 
     onChange && onChange({ target: { value: defaultSelectedPool } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominationPoolValueList, items]);
+  }, [stakedPool, recommendPool, items]);
 
   useEffect(() => {
     if (!isActive) {
@@ -246,13 +392,16 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   return (
     <>
-      <SelectModal
+      <BaseSelectModal
         actionBtnIcon={(
-          <Badge dot={!!selectedFilters.length}>
+          <Badge
+            className={'g-filter-badge'}
+            dot={!!selectedFilters.length}
+          >
             <Icon phosphorIcon={FadersHorizontal} />
           </Badge>
         )}
-        className={`${className} modal-full`}
+        className={`${className}`}
         closeIcon={(
           <Icon
             phosphorIcon={CaretLeft}
@@ -265,7 +414,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         itemKey={'idStr'}
         items={resultList}
         label={label}
-        loading={loading}
+        loading={false}
         onClickActionBtn={onClickActionBtn}
         onSelect={_onSelectItem}
         placeholder={placeholder || t('Select pool')}
@@ -281,7 +430,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         rightIconProps={{
           icon: (
-            <Badge dot={sortSelection !== SortKey.DEFAULT}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={sortSelection !== SortKey.DEFAULT}
+            >
               <Icon phosphorIcon={SortAscending} />
             </Badge>
           ),
@@ -295,45 +447,23 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         selected={value || ''}
         showActionBtn
         statusHelp={statusHelp}
-        suffix={loading
-          ? (
-            <div>
-              <ActivityIndicator size={20} />
-            </div>
-          )
-          : (
-            <div className='select-pool-suffix'>
-              <Button
-                disabled={isDisabled}
-                icon={(
-                  <Icon
-                    phosphorIcon={Book}
-                    size='sm'
-                  />
-                )}
-                onClick={onClickBookButton}
-                size='xs'
-                type='ghost'
-              />
-              {
-                !!defaultSelectPool && (
-                  <Button
-                    disabled={isDisabled}
-                    icon={(
-                      <Icon
-                        phosphorIcon={Lightning}
-                        size='sm'
-                      />
-                    )}
-                    onClick={onClickLightningButton}
-                    size='xs'
-                    type='ghost'
-                  />
-                )
-              }
-            </div>
-          )}
-        title={label || placeholder || t('Select pool')}
+        suffix={(
+          <div className='select-pool-suffix'>
+            <Button
+              disabled={isDisabled}
+              icon={(
+                <Icon
+                  phosphorIcon={Book}
+                  size='sm'
+                />
+              )}
+              onClick={onClickBookButton}
+              size='xs'
+              type='ghost'
+            />
+          </div>
+        )}
+        title={t('Select pool')}
       />
 
       <FilterModal
@@ -354,7 +484,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       />
 
       <EarningPoolDetailModal
+        chain={chain}
         detailItem={viewDetailItem}
+        maxPoolMembersValue={maxPoolMembersValue}
         onCancel={onCloseDetail}
       />
     </>
@@ -363,11 +495,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
 const EarningPoolSelector = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
-    '.ant-sw-modal-header': {
-      paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
-    },
-
     '.ant-sw-modal-content': {
       paddingBottom: token.padding
     },
@@ -390,6 +517,32 @@ const EarningPoolSelector = styled(forwardRef(Component))<Props>(({ theme: { tok
         paddingTop: 0,
         paddingBottom: token.paddingXXS
       }
+    },
+    '.__session-header': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextSecondary,
+      fontWeight: token.fontWeightStrong,
+      marginBottom: -token.marginXXS,
+      marginTop: token.marginXXS,
+      lineHeight: token.lineHeightSM
+    },
+
+    '.__selected-icon': {
+      paddingLeft: token.paddingXXS
+    },
+
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingXS
+    },
+    '.__title-suffix': {
+      fontSize: token.fontSizeSM,
+      fontWeight: token.bodyFontWeight,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextTertiary
+    },
+    '.__selected-item-name.common-text': {
+      display: 'flex',
+      alignItems: 'baseline'
     },
 
     '.ant-select-modal-input-wrapper': {

@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { ApiMap, ServiceInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { CRON_REFRESH_NFT_INTERVAL } from '@subwallet/extension-base/constants';
+import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_MKT_CAMPAIGN_INTERVAL, CRON_REFRESH_NFT_INTERVAL, CRON_SYNC_MANTA_PAY } from '@subwallet/extension-base/constants';
 import { KoniSubscription } from '@subwallet/extension-base/koni/background/subscription';
 import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
@@ -78,7 +78,7 @@ export class KoniCron {
 
     await Promise.all([this.state.eventService.waitKeyringReady, this.state.eventService.waitAssetReady]);
 
-    const currentAccountInfo = this.state.keyringService.currentAccount;
+    const currentAccountInfo = this.state.keyringService.context.currentAccount;
 
     const commonReloadEvents: EventType[] = [
       'account.add',
@@ -88,9 +88,16 @@ export class KoniCron {
       'asset.updateState'
     ];
 
+    const mktCampaignReloadEvents: EventType[] = [
+      'account.add',
+      'account.remove'
+    ];
+
     this.eventHandler = (events, eventTypes) => {
       const serviceInfo = this.state.getServiceInfo();
       const commonReload = eventTypes.some((eventType) => commonReloadEvents.includes(eventType));
+
+      const mktCampaignNeedReload = eventTypes.some((eventType) => mktCampaignReloadEvents.includes(eventType));
 
       const chainUpdated = eventTypes.includes('chain.updateState');
       const reloadMantaPay = eventTypes.includes('mantaPay.submitTransaction') || eventTypes.includes('mantaPay.enable');
@@ -110,7 +117,7 @@ export class KoniCron {
         return;
       }
 
-      const address = serviceInfo.currentAccountInfo?.address;
+      const address = serviceInfo.currentAccountInfo?.proxyId;
 
       if (!address) {
         return;
@@ -121,7 +128,7 @@ export class KoniCron {
       const needUpdateNft = this.needUpdateNft(chainInfoMap, updatedChains);
 
       // MantaPay
-      // reloadMantaPay && this.removeCron('syncMantaPay');
+      reloadMantaPay && this.removeCron('syncMantaPay');
       commonReload && this.removeCron('refreshPoolingStakingReward');
 
       // NFT
@@ -129,24 +136,39 @@ export class KoniCron {
       (commonReload || needUpdateNft) && this.removeCron('refreshNft');
       commonReload && this.removeCron('refreshPoolingStakingReward');
 
+      if (mktCampaignNeedReload) {
+        this.removeCron('fetchMktCampaignData');
+        this.addCron('fetchMktCampaignData', this.fetchMktCampaignData, CRON_REFRESH_MKT_CAMPAIGN_INTERVAL);
+      }
+
+      if (chainUpdated) {
+        this.stopPoolInfo();
+        this.removeCron('fetchPoolInfo');
+        this.addCron('fetchPoolInfo', this.fetchPoolInfo, CRON_REFRESH_CHAIN_STAKING_METADATA);
+      }
+
       // Chains
       if (this.checkNetworkAvailable(serviceInfo)) { // only add cron jobs if there's at least 1 active network
         (commonReload || needUpdateNft) && this.addCron('refreshNft', this.refreshNft(address, serviceInfo.chainApiMap, this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
-        // reloadMantaPay && this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
+        reloadMantaPay && this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
       }
     };
 
     this.state.eventService.onLazy(this.eventHandler);
 
-    if (!currentAccountInfo?.address) {
+    this.addCron('fetchPoolInfo', this.fetchPoolInfo, CRON_REFRESH_CHAIN_STAKING_METADATA);
+
+    this.addCron('fetchMktCampaignData', this.fetchMktCampaignData, CRON_REFRESH_MKT_CAMPAIGN_INTERVAL);
+
+    if (!currentAccountInfo?.proxyId) {
       return;
     }
 
     if (Object.keys(this.state.getSubstrateApiMap()).length !== 0 || Object.keys(this.state.getEvmApiMap()).length !== 0) {
-      this.resetNft(currentAccountInfo.address);
-      this.addCron('refreshNft', this.refreshNft(currentAccountInfo.address, this.state.getApiMap(), this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
+      this.resetNft(currentAccountInfo.proxyId);
+      this.addCron('refreshNft', this.refreshNft(currentAccountInfo.proxyId, this.state.getApiMap(), this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
       // this.addCron('refreshStakingReward', this.refreshStakingReward(currentAccountInfo.address), CRON_REFRESH_STAKING_REWARD_INTERVAL);
-      // this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
+      this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
     }
 
     this.status = 'running';
@@ -169,6 +191,7 @@ export class KoniCron {
     }
 
     this.removeAllCrons();
+    this.stopPoolInfo();
 
     this.status = 'stopped';
 
@@ -179,6 +202,18 @@ export class KoniCron {
     if (this.state.isMantaPayEnabled) {
       this.state.syncMantaPay().catch(console.warn);
     }
+  };
+
+  fetchPoolInfo = () => {
+    this.state.earningService.runSubscribePoolsInfo().catch(console.error);
+  };
+
+  fetchMktCampaignData = () => {
+    this.state.mktCampaignService.fetchMktCampaignData();
+  };
+
+  stopPoolInfo = () => {
+    this.state.earningService.runUnsubscribePoolsInfo();
   };
 
   refreshNft = (address: string, apiMap: ApiMap, smartContractNfts: _ChainAsset[], chainInfoMap: Record<string, _ChainInfo>) => {
@@ -196,7 +231,7 @@ export class KoniCron {
   };
 
   public async reloadNft () {
-    const address = this.state.keyringService.currentAccount.address;
+    const address = this.state.keyringService.context.currentAccount.proxyId;
     const serviceInfo = this.state.getServiceInfo();
 
     this.resetNft(address);
@@ -209,7 +244,7 @@ export class KoniCron {
   }
 
   public async reloadStaking () {
-    const address = this.state.keyringService.currentAccount.address;
+    const address = this.state.keyringService.context.currentAccount.proxyId;
 
     console.log('reload staking', address);
 

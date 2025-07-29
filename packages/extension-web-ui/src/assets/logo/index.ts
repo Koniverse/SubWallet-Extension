@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY } from '@subwallet/extension-web-ui/constants';
+
 export const DefaultLogosMap: Record<string, string> = {
   subwallet: '/images/projects/subwallet.png',
   parity: '/images/projects/parity.png',
@@ -33,7 +35,28 @@ export const DefaultLogosMap: Record<string, string> = {
   talisman: '/images/projects/talisman.png',
   talisman_mc: '/images/projects/talisman-monochrome.svg',
   nova: '/images/projects/nova-wallet.png',
-  nova_mc: '/images/projects/nova-wallet-monochrome.svg'
+  nova_mc: '/images/projects/nova-wallet-monochrome.svg',
+  xtwitter: '/images/projects/xtwitter.png',
+  xtwitter_transparent: '/images/projects/xtwitter_transparent.png',
+  chain_flip: '/images/projects/chainflip-mainnet.png',
+  hydradx: '/images/projects/hydradx.png',
+  simple_swap: '/images/projects/simple-swap.png',
+  uniswap: '/images/projects/uniswap.png',
+  kyber: '/images/projects/kyber.png',
+  polkadot_assethub: '/images/projects/polkadot-asset-hub.png',
+  kusama_assethub: '/images/projects/kusama-asset-hub.png',
+  rococo_assethub: '/images/projects/rococo-asset-hub.png',
+  currency_brl: '/images/projects/CurrencyBRL.png',
+  currency_cny: '/images/projects/CurrencyCNY.png',
+  currency_hkd: '/images/projects/CurrencyHKD.png',
+  currency_vnd: '/images/projects/CurrencyVND.png',
+  [SUBSTRATE_GENERIC_KEY]: '/images/projects/polkadot.png',
+  [SUBSTRATE_MIGRATION_KEY]: '/images/projects/polkadot-migration.png',
+  ton: '/images/projects/ton.png',
+  ...Object.fromEntries( // Can use image from chain-list instead of local image
+    Array.from({ length: 86 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
+  ),
+  meld: '/images/projects/meld.png'
 };
 
 export const IconMap = {

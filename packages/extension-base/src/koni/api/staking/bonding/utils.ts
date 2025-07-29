@@ -5,9 +5,10 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NominationInfo, NominatorMetadata, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { getAstarWithdrawable } from '@subwallet/extension-base/koni/api/staking/bonding/astar';
 import { _KNOWN_CHAIN_INFLATION_PARAMS, _SUBSTRATE_DEFAULT_INFLATION_PARAMS, _SubstrateInflationParams } from '@subwallet/extension-base/services/chain-service/constants';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { EarningStatus, UnstakingStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { EarningStatus, PalletStakingEraRewardPoints, PalletStakingValidatorPrefs, UnstakingStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils/number';
 import BigNumber from 'bignumber.js';
@@ -189,18 +190,21 @@ export function calculateChainStakedReturn (inflation: number, totalEraStake: BN
   return stakedReturn;
 }
 
-export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, isCompound?: boolean) {
-  const DAYS_PER_YEAR = 365;
-  // @ts-ignore
-  const DECIMAL = chainInfo.substrateInfo.decimals;
+export async function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+  if (chainInfo.slug === 'analog_timechain') {
+    return await calculateAnalogChainStakedReturn();
+  }
 
-  const lastTotalStakedUnit = (new BigNumber(lastTotalStaked)).dividedBy(new BigNumber(10 ** DECIMAL));
-  const totalIssuanceUnit = (new BigNumber(totalIssuance)).dividedBy(new BigNumber(10 ** DECIMAL));
+  const DAYS_PER_YEAR = 365;
+  const { decimals } = _getChainNativeTokenBasicInfo(chainInfo);
+
+  const lastTotalStakedUnit = (new BigNumber(lastTotalStaked)).dividedBy(new BigNumber(10 ** decimals));
+  const totalIssuanceUnit = (new BigNumber(totalIssuance)).dividedBy(new BigNumber(10 ** decimals));
   const supplyStaked = lastTotalStakedUnit.dividedBy(totalIssuanceUnit);
 
   const dayRewardRate = validatorEraReward.multipliedBy(erasPerDay).dividedBy(totalIssuance).multipliedBy(100);
 
-  let inflationToStakers: BigNumber = new BigNumber(0);
+  let inflationToStakers: BigNumber;
 
   if (!isCompound) {
     inflationToStakers = dayRewardRate.multipliedBy(DAYS_PER_YEAR);
@@ -210,7 +214,7 @@ export function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuan
     inflationToStakers = new BigNumber(100).multipliedBy(multiplier).minus(100);
   }
 
-  const averageRewardRate = inflationToStakers.dividedBy(supplyStaked);
+  const averageRewardRate = (['avail_mainnet', 'dentnet'].includes(chainInfo.slug) ? inflation : inflationToStakers).dividedBy(supplyStaked);
 
   return averageRewardRate.toNumber();
 }
@@ -228,10 +232,41 @@ export function calculateTernoaValidatorReturn (rewardPerValidator: number, vali
   return stakeRatio * 365 * 100;
 }
 
+export async function calculateAnalogChainStakedReturn (): Promise<number | undefined> {
+  const url = 'https://explorer-api.analog.one/api/nominations?projection=apy,rewardsClaimed,eraEndsTime';
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      throw new Error(`API error: ${response.status} - ${errorText}`);
+    }
+
+    const apyInfo = await response.json() as {
+      data: {
+        apy: number;
+      }
+    };
+
+    return apyInfo?.data?.apy as number | undefined;
+  } catch (e) {
+    console.error('Fetch error:', e);
+
+    return undefined;
+  }
+}
+
 export function calculateValidatorStakedReturn (chainStakedReturn: number, totalValidatorStake: BN, avgStake: BN, commission: number) {
   const bnAdjusted = avgStake.mul(BN_HUNDRED).div(totalValidatorStake);
   const adjusted = bnAdjusted.toNumber() * chainStakedReturn;
-
+  // todo: should calculated in bignumber instead number?
   const stakedReturn = (adjusted > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : adjusted) / 100;
 
   return stakedReturn * (100 - commission) / 100; // Deduct commission
@@ -365,6 +400,10 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
     return [YieldAction.START_EARNING, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
   }
 
+  if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    return [YieldAction.STAKE, YieldAction.UNSTAKE];
+  }
+
   return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
 }
 
@@ -374,17 +413,17 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
   if ([YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(yieldPoolInfo.type)) {
     result.push(YieldAction.STAKE);
 
-    const bnActiveStake = new BN(yieldPosition.activeStake);
+    const bnActiveStake = new BigNumber(yieldPosition.activeStake);
 
-    if (yieldPosition.activeStake && bnActiveStake.gt(BN_ZERO)) {
+    if (yieldPosition.activeStake && bnActiveStake.gt('0')) {
       result.push(YieldAction.UNSTAKE);
 
       const isAstarNetwork = _STAKING_CHAIN_GROUP.astar.includes(yieldPosition.chain);
       const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(yieldPosition.chain);
-      const bnUnclaimedReward = new BN(unclaimedReward || '0');
+      const bnUnclaimedReward = new BigNumber(unclaimedReward || '0');
 
       if (
-        ((yieldPosition.type === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+        ((yieldPosition.type === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork) && bnUnclaimedReward.gt('0')) ||
         isAstarNetwork
       ) {
         result.push(YieldAction.CLAIM_REWARD);
@@ -402,9 +441,9 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
   } else if (yieldPoolInfo.type === YieldPoolType.LIQUID_STAKING) {
     result.push(YieldAction.START_EARNING);
 
-    const activeBalance = new BN(yieldPosition.activeStake || '0');
+    const activeBalance = new BigNumber(yieldPosition.activeStake);
 
-    if (activeBalance.gt(BN_ZERO)) {
+    if (activeBalance.gt('0')) {
       result.push(YieldAction.UNSTAKE);
     }
 
@@ -412,6 +451,14 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
 
     if (hasWithdrawal) {
       result.push(YieldAction.WITHDRAW);
+    }
+  } else if (yieldPoolInfo.type === YieldPoolType.SUBNET_STAKING) {
+    result.push(YieldAction.STAKE);
+
+    const activeBalance = new BigNumber(yieldPosition.activeStake);
+
+    if (activeBalance.gt('0')) {
+      result.push(YieldAction.UNSTAKE);
     }
 
     // TODO: check has unstakings to withdraw
@@ -541,7 +588,7 @@ export function getEarningStatusByNominations (bnTotalActiveStake: BN, nominatio
 export function getValidatorLabel (chain: string) {
   if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
     return 'dApp';
-  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain)) {
+  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
     return 'Validator';
   }
 
@@ -567,19 +614,123 @@ export function getAvgValidatorEraReward (supportedDays: number, eraRewardHistor
   return sumEraReward.dividedBy(new BigNumber(supportedDays - failEra));
 }
 
-export function getSupportedDaysByHistoryDepth (erasPerDay: number, maxSupportedEras: number) {
-  if (maxSupportedEras / erasPerDay > 30) {
+export function getSupportedDaysByHistoryDepth (erasPerDay: number, maxSupportedEras: number, liveDay?: number) {
+  const maxSupportDay = Math.floor(maxSupportedEras / erasPerDay);
+
+  if (liveDay && liveDay <= 30) {
+    return Math.min(Math.floor(liveDay - 1), maxSupportDay);
+  }
+
+  if (maxSupportDay > 30) {
     return 30;
   } else {
-    return 15;
+    return maxSupportDay;
   }
+}
+
+export function getRelayValidatorPointsMap (eraRewardMap: Record<string, PalletStakingEraRewardPoints>) {
+  // mapping store validator and totalPoints
+  const validatorTotalPointsMap: Record<string, BigNumber> = {};
+
+  Object.values(eraRewardMap).forEach((info) => {
+    const individual = info.individual;
+
+    Object.entries(individual).forEach(([validator, points]) => {
+      if (!validatorTotalPointsMap[validator]) {
+        validatorTotalPointsMap[validator] = new BigNumber(points);
+      } else {
+        validatorTotalPointsMap[validator] = validatorTotalPointsMap[validator].plus(points);
+      }
+    });
+  });
+
+  return validatorTotalPointsMap;
+}
+
+export function getRelayTopValidatorByPoints (validatorPointsList: Record<string, BigNumber>) {
+  const sortValidatorPointsList = Object.fromEntries(
+    Object.entries(validatorPointsList)
+      .sort(
+        (
+          a: [string, BigNumber],
+          b: [string, BigNumber]
+        ) => a[1].minus(b[1]).toNumber()
+      )
+      .reverse()
+  );
+
+  // keep 50% first validator
+  const entries = Object.entries(sortValidatorPointsList);
+  const endIndex = Math.ceil(entries.length / 2);
+  const top50PercentEntries = entries.slice(0, endIndex);
+  const top50PercentRecord = Object.fromEntries(top50PercentEntries);
+
+  return Object.keys(top50PercentRecord);
+}
+
+export function getRelayBlockedValidatorList (validators: any[]) {
+  const blockValidatorList: string[] = [];
+
+  for (const validator of validators) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorAddress = validator[0].toHuman()[0] as string;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorPrefs = validator[1].toHuman() as unknown as PalletStakingValidatorPrefs;
+
+    const isBlocked = validatorPrefs.blocked;
+
+    if (isBlocked) {
+      blockValidatorList.push(validatorAddress);
+    }
+  }
+
+  return blockValidatorList;
+}
+
+export function getRelayWaitingValidatorList (validators: any[]) {
+  const waitingValidators: string[] = [];
+
+  for (const validator of validators) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorAddress = validator[0].toHuman()[0] as string;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorPrefs = validator[1].toHuman() as unknown as PalletStakingValidatorPrefs;
+
+    const isBlocked = validatorPrefs.blocked;
+
+    if (!isBlocked) {
+      waitingValidators.push(validatorAddress);
+    }
+  }
+
+  return waitingValidators;
+}
+
+export function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForPoints: number) {
+  const eraRewardMap: Record<string, PalletStakingEraRewardPoints> = {};
+
+  for (const item of eraRewardPointArray) {
+    eraRewardMap[startEraForPoints] = item.toPrimitive() as unknown as PalletStakingEraRewardPoints;
+    startEraForPoints++;
+  }
+
+  return eraRewardMap;
+}
+
+export async function getRelayMaxNominations (substrateApi: _SubstrateApi) {
+  await substrateApi.isReady;
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || '16';
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0); // todo: review param. Currently return constant for all param.
+  const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
+
+  return maxNominationsByNominationQuota || maxNominations;
 }
 
 export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): string => {
   const tokenInfo = _getChainNativeTokenBasicInfo(chainInfo);
   const number = formatNumber(bnMinStake.toString(), tokenInfo.decimals || 0, balanceFormatter);
 
-  return t('Insufficient stake. Please stake at least {{number}} {{tokenSymbol}} to get rewards', { replace: { tokenSymbol: tokenInfo.symbol, number } });
+  return t('Insufficient stake. You need to stake at least {{number}} {{tokenSymbol}} to earn rewards', { replace: { tokenSymbol: tokenInfo.symbol, number } });
 };
 
 export const getMaxValidatorErrorMessage = (chainInfo: _ChainInfo, max: number): string => {

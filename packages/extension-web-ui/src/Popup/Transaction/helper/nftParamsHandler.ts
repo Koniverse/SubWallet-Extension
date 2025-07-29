@@ -51,7 +51,8 @@ function statemineParser (nftItem: NftItem) {
   return {
     collectionId,
     itemId,
-    networkKey: nftItem.chain
+    networkKey: nftItem.chain,
+    assetHubType: nftItem.assetHubType
   };
 }
 
@@ -107,5 +108,7 @@ export default function nftParamsHandler (nftItem: NftItem, chain: string) {
     }
   }
 
-  return {};
+  return {
+    networkKey: nftItem.chain
+  };
 }

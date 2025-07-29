@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import EarnCTABanner from '@subwallet/extension-web-ui/components/EarnCTABanner';
 import Headers from '@subwallet/extension-web-ui/components/Layout/parts/Header';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { HeaderType, WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
@@ -8,8 +9,10 @@ import { useDefaultNavigate, useTranslation } from '@subwallet/extension-web-ui/
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import CN from 'classnames';
 import React, { useContext, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { TransactionProcessWarning } from '../..';
 import SideMenu from '../parts/SideMenu';
 
 export interface LayoutBaseWebProps {
@@ -139,9 +142,34 @@ const StyledLayout = styled('div')<ThemeProps>(({ theme: { extendToken, token } 
           fontSize: 30
         }
       }
+    },
+
+    '.transaction-process-warning-container': {
+      padding: '24px 44px'
     }
   };
 });
+
+const EarnCTABannerArea = () => {
+  const { pathname } = useLocation();
+  const tokenGroupSlug = useMemo(() => {
+    if (pathname.startsWith('/home/tokens/detail')) {
+      return pathname.split('/').pop();
+    }
+
+    return undefined;
+  }, [pathname]);
+
+  if (!tokenGroupSlug) {
+    return null;
+  }
+
+  return (
+    <EarnCTABanner
+      tokenGroupSlug={tokenGroupSlug}
+    />
+  );
+};
 
 const BaseWeb = ({ children }: LayoutBaseWebProps) => {
   const { t } = useTranslation();
@@ -200,6 +228,10 @@ const BaseWeb = ({ children }: LayoutBaseWebProps) => {
         <div className={CN('web-layout-content', { '__with-padding': showSidebar })}>
           {children}
         </div>
+
+        <EarnCTABannerArea />
+
+        <TransactionProcessWarning />
       </div>
     </StyledLayout>
   );

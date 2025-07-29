@@ -2,17 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { EarningRewardHistoryItem, EarningStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { EarningRewardHistoryItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-web-ui/components';
-import { BN_ZERO, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS, StakingStatusUi } from '@subwallet/extension-web-ui/constants';
-import { useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
+import { ASTAR_PORTAL_URL, BN_ZERO, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
+import { useReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { customFormatDate, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { ActivityIndicator, Button, Icon, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareOut } from 'phosphor-react';
+import { ArrowSquareOut, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -35,45 +37,31 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
   const navigate = useNavigate();
 
   const { slug, type } = compound;
-  const { currentAccount } = useSelector((state) => state.accountState);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
 
   const total = useYieldRewardTotal(slug);
+  const getReformatAddress = useReformatAddress();
 
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
+  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);
 
   const canClaim = useMemo((): boolean => {
     switch (type) {
       case YieldPoolType.LENDING:
       case YieldPoolType.LIQUID_STAKING:
         return false;
+      case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NATIVE_STAKING:
-        return isDAppStaking;
+        return isDAppStaking || isMythosStaking;
       case YieldPoolType.NOMINATION_POOL:
         return true;
+      default:
+        return false;
     }
-  }, [isDAppStaking, type]);
-
-  const earningStatus = useMemo(() => {
-    const stakingStatusUi = StakingStatusUi;
-    const status = compound.status;
-
-    if (status === EarningStatus.EARNING_REWARD) {
-      return stakingStatusUi.active;
-    }
-
-    if (status === EarningStatus.PARTIALLY_EARNING) {
-      return stakingStatusUi.partialEarning;
-    }
-
-    if (status === EarningStatus.WAITING) {
-      return stakingStatusUi.waiting;
-    }
-
-    return stakingStatusUi.inactive;
-  }, [compound.status]);
+  }, [isDAppStaking, isMythosStaking, type]);
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
@@ -85,7 +73,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
 
   const onClaimReward = useCallback(() => {
     if (type === YieldPoolType.NATIVE_STAKING && isDAppStaking) {
-      openInNewTab('https://portal.astar.network/astar/dapp-staking/discover')();
+      openInNewTab(ASTAR_PORTAL_URL)();
 
       return;
     }
@@ -101,24 +89,33 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
     } else {
       openAlert({
         title: t('Rewards unavailable'),
+        type: NotificationType.ERROR,
         content: t("You don't have any rewards to claim at the moment. Try again later."),
         okButton: {
           text: t('I understand'),
-          onClick: closeAlert
+          onClick: closeAlert,
+          icon: CheckCircle
         }
       });
     }
   }, [type, isDAppStaking, total, setClaimRewardStorage, slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onClickViewExplore = useCallback(() => {
-    if (currentAccount) {
+    if (currentAccountProxy && currentAccountProxy.accounts.length > 0) {
       const subscanSlug = chainInfoMap[compound.chain]?.extraInfo?.subscanSlug;
+      const accountJson = currentAccountProxy.accounts.find((account) => isSameAddress(account.address, compound.address));
 
-      if (subscanSlug) {
-        openInNewTab(`https://${subscanSlug}.subscan.io/account/${currentAccount.address}?tab=reward`)();
+      if (!subscanSlug || !accountJson) {
+        return;
+      }
+
+      const formatAddress = getReformatAddress(accountJson, chainInfoMap[compound.chain]);
+
+      if (formatAddress) {
+        openInNewTab(`https://${subscanSlug}.subscan.io/account/${formatAddress}?tab=reward`)();
       }
     }
-  }, [chainInfoMap, compound.chain, currentAccount]);
+  }, [chainInfoMap, compound.address, compound.chain, currentAccountProxy, getReformatAddress]);
 
   return (
     <div
@@ -128,19 +125,17 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         <MetaInfo>
           <MetaInfo.Status
             label={title}
-            statusIcon={earningStatus.icon}
-            statusName={earningStatus.name}
-            valueColorSchema={earningStatus.schema}
+            statusIcon={EarningStatusUi[compound.status].icon}
+            statusName={EarningStatusUi[compound.status].name}
+            valueColorSchema={EarningStatusUi[compound.status].schema}
           />
         </MetaInfo>
       </div>
 
-      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && isDAppStaking)) && (
+      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking))) && (
         <>
-          <div className={'__separator'}></div>
-
           <div className={'__claim-reward-area'}>
-            { type === YieldPoolType.NOMINATION_POOL
+            { type === YieldPoolType.NOMINATION_POOL || isMythosStaking
               ? total
                 ? (
                   <Number
@@ -242,6 +237,7 @@ export const RewardInfoPart = styled(Component)<Props>(({ theme: { token } }: Pr
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: token.paddingSM,
+    paddingTop: token.paddingSM,
     paddingLeft: token.padding,
     paddingRight: token.padding
   },

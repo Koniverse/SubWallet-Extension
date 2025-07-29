@@ -1,11 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { KeypairType } from '@polkadot/util-crypto/types';
+import type { KeypairType } from '@subwallet/keyring/types';
 
-export interface NewSeedPhraseState {
-  accountTypes: KeypairType[];
-}
+import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
 
 export interface WordItem {
   index: number;
@@ -22,9 +20,26 @@ export enum AccountAddressType {
 export enum AccountSignMode {
   PASSWORD = 'password',
   QR = 'qr',
-  LEDGER = 'ledger',
+  LEGACY_LEDGER = 'legacy-ledger',
+  GENERIC_LEDGER = 'generic-ledger',
   READ_ONLY = 'readonly',
   ALL_ACCOUNT = 'all',
   INJECTED = 'injected',
   UNKNOWN = 'unknown'
+}
+
+export type AccountChainAddress = {
+  name: string;
+  slug: string;
+  address: string;
+  accountType: KeypairType;
+}
+
+export type AccountAddressItemType = {
+  accountName: string;
+  accountProxyId: string;
+  accountProxyType: AccountProxyType;
+  accountType: KeypairType;
+  address: string;
+  accountActions?: AccountActions[]
 }

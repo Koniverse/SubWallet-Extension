@@ -8,6 +8,7 @@ import storage from 'redux-persist/lib/storage';
 import AccountStateReducer from './base/AccountState';
 import RequestStateReducer from './base/RequestState';
 import SettingsReducer from './base/Settings';
+import StaticContentReducer from './base/StaticContent';
 import UIViewStateReducer from './base/UIViewState';
 import BalanceReducer from './feature/Balance';
 import BondingReducer from './feature/Bonding';
@@ -21,7 +22,9 @@ import EarningReducer from './feature/Earning';
 import MantaPayReducer from './feature/MantaPay';
 import MissionPoolReducer from './feature/MissionPool';
 import NftReducer from './feature/Nft';
+import NotificationReducer from './feature/Notification';
 import PriceReducer from './feature/Price';
+import SwapReducer from './feature/Swap';
 import TransactionHistoryReducer from './feature/TransactionHistory';
 import WalletConnectReducer from './feature/WalletConnect';
 
@@ -34,7 +37,9 @@ const persistConfig = {
     'uiViewState',
     'staking',
     'campaign',
-    'buyService'
+    'buyService',
+    'staticContent',
+    'price'
   ]
 };
 
@@ -50,6 +55,7 @@ const rootReducers = combineReducers({
   campaign: CampaignReducer,
   buyService: BuyServiceReducer,
   earning: EarningReducer,
+  swap: SwapReducer,
 
   // common
   chainStore: ChainStoreReducer,
@@ -60,6 +66,7 @@ const rootReducers = combineReducers({
   settings: SettingsReducer,
   accountState: AccountStateReducer,
   uiViewState: UIViewStateReducer,
+  staticContent: StaticContentReducer,
 
   // wallet connect
   walletConnect: WalletConnectReducer,
@@ -68,7 +75,10 @@ const rootReducers = combineReducers({
   dApp: DAppReducer,
 
   // mission pool
-  missionPool: MissionPoolReducer
+  missionPool: MissionPoolReducer,
+
+  // inapp notification
+  notification: NotificationReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);

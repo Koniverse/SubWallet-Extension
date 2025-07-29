@@ -10,8 +10,8 @@ import styled from 'styled-components';
 export type MenuItemType = {
   label: string;
   value: string;
-  icon: SwIconProps['phosphorIcon'];
-
+  icon: SwIconProps;
+  disabled?: boolean;
 };
 
 type Props = MenuItemType & ThemeProps & {
@@ -20,24 +20,33 @@ type Props = MenuItemType & ThemeProps & {
   onClick: (key: string) => void;
 };
 
-function Component ({ className = '', icon, isActivated, label, onClick, showToolTip, value }: Props): React.ReactElement<Props> {
+function Component ({ className = '', disabled, icon, isActivated, label, onClick, showToolTip, value }: Props): React.ReactElement<Props> {
   const _onClick = useCallback(() => {
+    if (disabled) {
+      return;
+    }
+
     onClick(value);
-  }, [value, onClick]);
+  }, [disabled, onClick, value]);
 
   return (
     <div
       className={CN(className, {
-        '-activated': isActivated
+        '-activated': isActivated,
+        '-disabled': disabled,
+        '-can-hover': !(isActivated || disabled)
       })}
       onClick={_onClick}
       tabIndex={-1}
     >
+
       <Icon
         className={'__icon'}
-        phosphorIcon={icon}
-        weight='fill'
+        size={'md'}
+        weight={'fill'}
+        {...icon}
       />
+
       <div className={'__label'}>
         {label}
       </div>
@@ -98,11 +107,24 @@ export const MenuItem = styled(Component)<Props>(({ theme: { token } }: Props) =
       'white-space': 'nowrap'
     },
 
-    '&:hover': {
-      backgroundColor: token.colorBgInput
+    '.__active-count': {
+      borderRadius: '50%',
+      color: token.colorWhite,
+      fontSize: token.sizeXS,
+      fontWeight: token.bodyFontWeight,
+      lineHeight: token.lineHeightLG,
+      paddingTop: 0,
+      paddingBottom: 0,
+      backgroundColor: token.colorError,
+      position: 'absolute',
+      right: 194,
+      top: 14,
+      minWidth: '12px'
     },
 
-    '&:not(.-activated):hover': {
+    '&.-can-hover:hover': {
+      backgroundColor: token.colorBgInput,
+
       '.__icon': {
         color: token.colorTextLight1
       },
@@ -122,6 +144,11 @@ export const MenuItem = styled(Component)<Props>(({ theme: { token } }: Props) =
       '.__label': {
         color: token.colorTextLight1
       }
+    },
+
+    '&.-disabled': {
+      opacity: 0.4,
+      cursor: 'not-allowed'
     }
   });
 });

@@ -1,15 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { MetaInfo } from '@subwallet/extension-koni-ui/components';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
+import { InfoItemBase, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { NetworkGroup } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
+import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { missionCategoryMap, MissionCategoryType } from '@subwallet/extension-koni-ui/Popup/Settings/MissionPool/predefined';
+import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
+import { missionCategoryMap, MissionCategoryType, tagMap } from '@subwallet/extension-koni-ui/Popup/Settings/MissionPool/predefined';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { MissionInfo, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { capitalize, customFormatDate, openInNewTab } from '@subwallet/extension-koni-ui/utils';
-import { Button, ButtonProps, Icon, Image, ModalContext, SwModal } from '@subwallet/react-ui';
-import { CaretLeft, GlobeHemisphereWest, PlusCircle, TwitterLogo } from 'phosphor-react';
+import { Button, ButtonProps, Icon, Image, ModalContext, SwModal, Tag } from '@subwallet/react-ui';
+import { CaretLeft, GlobeHemisphereWest, PlusCircle } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useMemo } from 'react';
+import Markdown from 'react-markdown';
 import styled, { ThemeContext } from 'styled-components';
 
 type Props = ThemeProps & {
@@ -23,7 +28,9 @@ const modalId = PoolDetailModalId;
 function Component ({ className = '', data }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
+  const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const logoMap = useContext<Theme>(ThemeContext as Context<Theme>).logoMap;
+  const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('missionPools');
   const timeline = useMemo<string>(() => {
     if (!data?.start_time && !data?.end_time) {
       return t('TBD');
@@ -35,20 +42,37 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
     return `${start} - ${end}`;
   }, [data?.end_time, data?.start_time, t]);
 
-  const onClickGlobalIcon: ButtonProps['onClick'] = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const currentConfirmation = useMemo(() => {
+    if (data) {
+      return getCurrentConfirmation([data.id.toString()]);
+    } else {
+      return undefined;
+    }
+  }, [getCurrentConfirmation, data]);
+
+  const onClickGlobalIcon: ButtonProps['onClick'] = useCallback(() => {
     data?.campaign_url && openInNewTab(data.campaign_url)();
   }, [data?.campaign_url]);
 
-  const onClickTwitterIcon: ButtonProps['onClick'] = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const onClickTwitterIcon: ButtonProps['onClick'] = useCallback(() => {
     data?.twitter_url && openInNewTab(data.twitter_url)();
   }, [data?.twitter_url]);
 
-  const onClickJoinNow: ButtonProps['onClick'] = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    data?.url && openInNewTab(data.url)();
-  }, [data?.url]);
+  const onClickJoinNow: ButtonProps['onClick'] = useCallback(() => {
+    if (currentConfirmation) {
+      mktCampaignModalContext.openModal({
+        type: 'confirmation',
+        title: currentConfirmation.name,
+        message: currentConfirmation.content,
+        externalButtons: renderConfirmationButtons(mktCampaignModalContext.hideModal, () => {
+          mktCampaignModalContext.hideModal();
+          data?.url && openInNewTab(data.url)();
+        })
+      });
+    } else {
+      data?.url && openInNewTab(data.url)();
+    }
+  }, [currentConfirmation, data?.url, mktCampaignModalContext, renderConfirmationButtons]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
@@ -74,6 +98,18 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
 
     return '';
   }, [data?.status, t]);
+
+  const valueColorSchema = useMemo<InfoItemBase['valueColorSchema']>(() => {
+    const missionStatus = data?.status;
+
+    if (missionStatus != null && tagMap[missionStatus]?.theme) {
+      const statusColorSchema = tagMap[missionStatus]?.theme as InfoItemBase['valueColorSchema'];
+
+      return statusColorSchema;
+    } else {
+      return 'default';
+    }
+  }, [data?.status]);
 
   return (
     <SwModal
@@ -118,7 +154,7 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
                   <MetaInfo.Default
                     label={t('Network')}
                   >
-                    {/* <NetworkGroup chains={data.chains} /> */}
+                    <NetworkGroup chains={data.chains} />
                   </MetaInfo.Default>
                 )
               }
@@ -134,24 +170,45 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
               <MetaInfo.Default
                 className={'__status-pool'}
                 label={t('Status')}
-                valueColorSchema={data.status === MissionCategoryType.ARCHIVED ? 'warning' : 'success'}
+                valueColorSchema={valueColorSchema}
               >
                 {status}
               </MetaInfo.Default>
+              {data?.categories && data.categories.length > 0 && (
+                <MetaInfo.Default
+                  className='__category-pool'
+                  label={t('Categories')}
+                >
+                  {data.categories.map((category, index) => (
+                    <Tag
+                      className='__item-tag'
+                      color={category.color}
+                      key={index}
+                    >
+                      <Icon
+                        className='__item-tag-icon'
+                        customSize='12px'
+                      />
+                      {category.name}
+                    </Tag>
+                  ))}
+                </MetaInfo.Default>
+              )}
+
               <MetaInfo.Default
                 className={'-vertical'}
                 label={t('Description')}
                 valueColorSchema={'gray'}
               >
-                {data.description}
+                <Markdown>{data.description}</Markdown>
               </MetaInfo.Default>
-              <MetaInfo.Default
+              {!!data.total_supply && <MetaInfo.Default
                 className={'__total-token-supply'}
                 label={t('Total token supply')}
                 valueColorSchema={'gray'}
               >
                 {data.total_supply}
-              </MetaInfo.Default>
+              </MetaInfo.Default>}
               <MetaInfo.Default
                 label={t('Total rewards')}
                 valueColorSchema={'gray'}
@@ -192,10 +249,11 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
                 <Button
                   className={'__modal-icon-button'}
                   icon={(
-                    <Icon
-                      phosphorIcon={TwitterLogo}
-                      size={'sm'}
-                      weight={'fill'}
+                    <Image
+                      height={18}
+                      shape='square'
+                      src={DefaultLogosMap.xtwitter_transparent}
+                      width={20}
                     />
                   )}
                   onClick={onClickTwitterIcon}
@@ -234,8 +292,15 @@ export const MissionDetailModal = styled(Component)<Props>(({ theme: { token } }
       maxHeight: 600,
       borderRadius: 0
     },
+    '.__item-tag:last-child': {
+      marginRight: 0
+    },
     '.ant-sw-modal-header': {
       borderBottom: 0
+    },
+    '.__modal-icon-button .ant-image': {
+      display: 'flex',
+      alignItems: 'end'
     },
     '.__total-token-supply .__value': {
       fontWeight: token.fontWeightStrong
@@ -317,7 +382,7 @@ export const MissionDetailModal = styled(Component)<Props>(({ theme: { token } }
       backgroundColor: token.colorBgLayout,
       paddingTop: token.paddingMD,
       position: 'sticky',
-      bottom: -token.size,
+      bottom: -17,
       zIndex: 10
     }
   });

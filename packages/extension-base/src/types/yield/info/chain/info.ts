@@ -115,6 +115,10 @@ export interface BaseYieldPoolMetadata {
   availableMethod: YieldPoolMethodInfo;
 
   /* Special info */
+  subnetData?: {
+    netuid: number;
+    subnetSymbol: string;
+  };
 }
 
 /**
@@ -307,6 +311,7 @@ export interface NominationYieldPoolInfo extends AbstractYieldPoolInfo {
   type: YieldPoolType.NOMINATION_POOL;
   metadata: NormalYieldPoolMetadata;
   statistic?: NormalYieldPoolStatistic;
+  maxPoolMembers?: number;
 }
 
 /**
@@ -316,9 +321,10 @@ export interface NominationYieldPoolInfo extends AbstractYieldPoolInfo {
  * @prop {NormalYieldPoolStatistic} [statistic] - Pool's metadata
  * */
 export interface NativeYieldPoolInfo extends AbstractYieldPoolInfo {
-  type: YieldPoolType.NATIVE_STAKING;
+  type: YieldPoolType.NATIVE_STAKING | YieldPoolType.SUBNET_STAKING;
   metadata: NormalYieldPoolMetadata;
   statistic?: NormalYieldPoolStatistic;
+  maxPoolMembers?: number;
 }
 
 /**

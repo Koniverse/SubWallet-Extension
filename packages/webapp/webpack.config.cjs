@@ -43,7 +43,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-web-ui'
+  'extension-web-ui',
+  'subwallet-api-sdk'
 ];
 
 const polkadotDevOptions = require('@polkadot/dev/config/babel-config-webpack.cjs');
@@ -56,7 +57,14 @@ const _additionalEnv = {
   TRANSAK_TEST_MODE: JSON.stringify(false),
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
-  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET)
+  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
+  CHAINFLIP_BROKER_TESTNET_API: JSON.stringify(process.env.CHAINFLIP_BROKER_TESTNET_API),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
+  MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
+  MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
+  MELD_TEST_MODE: JSON.stringify(false)
 };
 
 const createConfig = (entry, alias = {}) => {
@@ -151,8 +159,13 @@ const createConfig = (entry, alias = {}) => {
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: 'public/index.html'
-      })
+        template: 'public/index.html',
+        meta: { 'app-version': pkgJson.buildNumber }
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({
@@ -162,9 +175,9 @@ const createConfig = (entry, alias = {}) => {
         ...alias,
         'react/jsx-runtime': require.resolve('react/jsx-runtime')
       }),
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      extensions: ['.js', '.mjs', '.jsx', '.ts', '.tsx'],
       fallback: {
-        crypto: require.resolve('crypto-browserify'),
+        crypto: false,
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         os: require.resolve('os-browserify/browser'),
@@ -191,7 +204,27 @@ const createConfig = (entry, alias = {}) => {
         }
       }
     },
-    watch: false
+    watch: false,
+    experiments: {
+      asyncWebAssembly: true
+    }
+  };
+
+  result.optimization = {
+    splitChunks: {
+      chunks: 'all',
+      maxSize: 2000000,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
   };
 
   return result;

@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Avatar } from '@subwallet/extension-web-ui/components';
+import { AccountProxyAvatar } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { ADD_ADDRESS_BOOK_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useNotification, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { editContactAddress } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { simpleCheckForm, toShort } from '@subwallet/extension-web-ui/utils';
+import { isAddress } from '@subwallet/keyring';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { PlusCircle } from 'phosphor-react';
@@ -15,8 +16,6 @@ import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import { isAddress } from '@polkadot/util-crypto';
 
 type Props = ThemeProps;
 
@@ -150,7 +149,8 @@ const Component: React.FC<Props> = (props: Props) => {
           <Input
             label={t('Contact name')}
             prefix={(
-              <Avatar
+              <AccountProxyAvatar
+                className={'__account-avatar'}
                 size={20}
                 value={address}
               />

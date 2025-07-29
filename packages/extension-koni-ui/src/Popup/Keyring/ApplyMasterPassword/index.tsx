@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate, useDeleteAccount, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useUnlockChecker from '@subwallet/extension-koni-ui/hooks/common/useUnlockChecker';
@@ -82,11 +82,11 @@ const intersectionArray = (array1: AccountJson[], array2: AccountJson[]): Accoun
 };
 
 const filterAccountMigrated = (acc: AccountJson) => {
-  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && acc.isMasterPassword && !acc.isInjected;
+  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && acc.isMasterPassword && !acc.isInjected && !acc.pendingMigrate;
 };
 
 const filterAccountCanMigrate = (acc: AccountJson) => {
-  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected;
+  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected && !acc.pendingMigrate;
 };
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -368,7 +368,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 ]}
                 statusHelpAsTooltip={true}
               >
-                <Input
+                <Input.Password
                   label={t('Current password')}
                   type='password'
                 />

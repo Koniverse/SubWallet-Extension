@@ -3,7 +3,10 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicType, TransactionAdditionalInfo, TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
+import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { RequestClaimBridge } from '@subwallet/extension-base/types';
+import { AccountProxyAvatar } from '@subwallet/extension-web-ui/components';
 import { HistoryStatusMap } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -12,7 +15,6 @@ import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-web-ui/types';
 import { customFormatDate, isAbleToShowFee, openInNewTab, toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo, Number, Tag, Typography, Web3Block } from '@subwallet/react-ui';
-import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretRight } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useMemo } from 'react';
@@ -49,14 +51,36 @@ function Component (
   const { isWebUI } = useContext(ScreenContext);
   const { isShowBalance } = useSelector((state) => state.settings);
 
+  let amountValue = item?.amount?.value;
+  let symbol = item?.amount?.symbol;
+
+  if (item.type === ExtrinsicType.CLAIM_BRIDGE) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo.notification.actionType === NotificationActionType.CLAIM_POLYGON_BRIDGE) {
+      const metadata = additionalInfo.notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+
+      amountValue = metadata.amounts[0];
+    }
+  }
+
+  if (item.type === ExtrinsicType.STAKING_UNBOND) {
+    const additionalInfo = item.additionalInfo as RequestClaimBridge;
+
+    if (additionalInfo?.symbol) {
+      symbol = additionalInfo.symbol;
+    }
+  }
+
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const priceMap = useSelector((state: RootState) => state.price.priceMap);
   const chainAssetMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
+  const { currencyData } = useSelector((state: RootState) => state.price);
 
   const time = customFormatDate(item.time, '#hhhh#:#mm#');
   const link = getLink(item, chainInfoMap);
 
-  const showAmount = useMemo(() => item.type !== ExtrinsicType.TOKEN_APPROVE, [item.type]);
+  const showAmount = useMemo(() => item.type !== ExtrinsicType.TOKEN_SPENDING_APPROVAL, [item.type]);
 
   const handleOnClick = useCallback(
     (e?: SyntheticEvent) => {
@@ -102,7 +126,7 @@ function Component (
                 hide={!isShowBalance}
                 intOpacity={showAmount ? 1 : 0}
                 suffix={item?.amount?.symbol}
-                value={item?.amount?.value || '0'}
+                value={amountValue || '0'}
               />
               <Number
                 className={CN('__fee', {
@@ -130,7 +154,7 @@ function Component (
   }
 
   const chainAsset = Object.values(chainAssetMap).find((ca) => {
-    return item.chain === ca.originChain && item.amount?.symbol === ca.symbol;
+    return item.chain === ca.originChain && symbol === ca.symbol;
   });
 
   const price = chainAsset?.priceId ? priceMap[chainAsset?.priceId] : 0;
@@ -144,7 +168,8 @@ function Component (
       onClick={onClick}
     >
       <div className='account-wrapper'>
-        <SwAvatar
+        <AccountProxyAvatar
+          className={'__account-avatar'}
           size={30}
           value={item.address}
         />
@@ -180,7 +205,7 @@ function Component (
           decimal={0}
           decimalOpacity={0.45}
           hide={!isShowBalance}
-          suffix={item?.amount?.symbol}
+          suffix={symbol}
           value={balanceValue.isNaN() ? '0' : balanceValue}
         />
         <Number
@@ -189,7 +214,7 @@ function Component (
           decimalOpacity={0.45}
           hide={!isShowBalance}
           intOpacity={0.45}
-          prefix='$'
+          prefix={(currencyData?.isPrefix && currencyData?.symbol) || ''}
           unitOpacity={0.45}
           value={convertedBalanceValue.isNaN() ? '0' : convertedBalanceValue}
         />

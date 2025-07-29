@@ -9,7 +9,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-extension-manifest-plugin');
 
 const pkgJson = require('./package.json');
-const manifest = require('./manifest.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -36,7 +35,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui'
+  'extension-koni-ui',
+  'subwallet-api-sdk'
 ];
 
 const _additionalEnv = {
@@ -46,21 +46,25 @@ const _additionalEnv = {
   TRANSAK_TEST_MODE: JSON.stringify(false),
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
-  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET)
+  INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
+  SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
+  MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
+  MELD_TEST_MODE: JSON.stringify(false)
 };
 
 const additionalEnvDict = {
   extension: _additionalEnv
 };
 
-module.exports = (entry, alias = {}, compileWithHtml = false) => {
+module.exports = (entry, alias = {}, isFirefox = false) => {
   const additionalEnv = {};
 
   Object.keys(entry).forEach((key) => {
     Object.assign(additionalEnv, additionalEnvDict[key] || {});
   });
 
-  return {
+  const webpackConfig = {
     context: __dirname,
     devtool: false,
     entry,
@@ -95,7 +99,7 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       chunkFilename: '[name].js',
       filename: '[name].js',
       globalObject: '(typeof self !== \'undefined\' ? self : this)',
-      path: path.join(__dirname, 'build'),
+      path: path.join(__dirname, isFirefox ? 'build-firefox' : 'build'),
       publicPath: ''
     },
     performance: {
@@ -133,7 +137,7 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       }),
       new ManifestPlugin({
         config: {
-          base: manifest,
+          base: isFirefox ? require('./manifest-firefox.json') : require('./manifest.json'),
           extend: {
             version: pkgJson.version.split('-')[0] // remove possible -beta.xx
           }
@@ -145,10 +149,19 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
         chunks: ['extension']
       }),
       new HtmlWebpackPlugin({
+        filename: 'side-panel.html',
+        template: 'public/side-panel.html',
+        chunks: ['extension']
+      }),
+      new HtmlWebpackPlugin({
         filename: 'notification.html',
         template: 'public/notification.html',
         chunks: ['extension']
-      })
+      }),
+      new webpack.NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-browser'
+      )
     ],
     resolve: {
       alias: packages.reduce((alias, p) => ({
@@ -156,11 +169,13 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
         [`@subwallet/${p}`]: path.resolve(__dirname, `../${p}/src`)
       }), {
         ...alias,
-        'react/jsx-runtime': require.resolve('react/jsx-runtime')
+        'react/jsx-runtime': require.resolve('react/jsx-runtime'),
+        axios_raw: path.resolve(__dirname, '../../node_modules/axios'),
+        axios: path.resolve(__dirname, 'axios.global.js')
       }),
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        crypto: require.resolve('crypto-browserify'),
+        crypto: false,
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         os: require.resolve('os-browserify/browser'),
@@ -176,8 +191,8 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
     },
     optimization: {
       splitChunks: {
-        chunks: (chunk) => (chunk.name === 'extension'),
-        maxSize: 3000000,
+        chunks: (chunk) => (chunk.name === 'extension' || (isFirefox && chunk.name === 'background')),
+        maxSize: 3600000,
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/,
@@ -195,4 +210,15 @@ module.exports = (entry, alias = {}, compileWithHtml = false) => {
       asyncWebAssembly: true
     }
   };
+
+  if (isFirefox) {
+    webpackConfig.plugins.push(new HtmlWebpackPlugin({
+      filename: 'background.html',
+      template: 'public/background.html',
+      chunks: ['background']
+    })
+    );
+  }
+
+  return webpackConfig;
 };

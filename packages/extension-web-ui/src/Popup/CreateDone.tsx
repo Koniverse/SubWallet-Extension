@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { Layout, SocialButtonGroup } from '@subwallet/extension-web-ui/components';
 import { CREATE_RETURN, DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -28,11 +28,12 @@ const Component: React.FC<Props> = (props: Props) => {
   const locationState = useLocation().state as CreateDoneParam;
   const [accounts] = useState<AccountJson[] | undefined>(locationState?.accounts);
   const [returnPath, setReturnStorage] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
+  const [isDefaultReturnPath] = useState(returnPath === DEFAULT_ROUTER_PATH);
 
   const { className } = props;
 
   const onDone = useCallback(() => {
-    navigate(returnPath);
+    navigate(returnPath, { state: { from: returnPath } });
     setReturnStorage(DEFAULT_ROUTER_PATH);
   }, [navigate, returnPath, setReturnStorage]);
 
@@ -75,12 +76,14 @@ const Component: React.FC<Props> = (props: Props) => {
     <Layout.WithSubHeaderOnly
       rightFooterButton={!isWebUI
         ? {
-          children: t('Go to home'),
+          children: isDefaultReturnPath ? t('Go to home') : t('Finish'),
           onClick: onDone,
-          icon: <Icon
-            phosphorIcon={ArrowCircleRight}
-            weight={'fill'}
-          />
+          icon: (
+            <Icon
+              phosphorIcon={ArrowCircleRight}
+              weight={'fill'}
+            />
+          )
         }
         : undefined}
       showBackButton={false}
@@ -118,14 +121,14 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__button'}
                 icon={(
                   <Icon
-                    phosphorIcon={Wallet}
+                    phosphorIcon={isDefaultReturnPath ? Wallet : ArrowCircleRight}
                     weight='fill'
                   />
                 )}
                 onClick={onDone}
                 schema={'primary'}
               >
-                {t('Go to portfolio')}
+                {isDefaultReturnPath ? t('Go to portfolio') : t('Finish')}
               </Button>
             </div>
           )

@@ -1,25 +1,24 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
-import { AccountJson } from '@subwallet/extension-base/background/types';
-import { AccountItemWithName, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components/Modal/ActionModal';
+import { AccountAuthType } from '@subwallet/extension-base/background/types';
+import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
+import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
+import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
-import { changeAuthorization, changeAuthorizationPerAccount, forgetSite, toggleAuthorization } from '@subwallet/extension-koni-ui/messaging';
+import { changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
-import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-koni-ui/types/navigation';
+import { convertAuthorizeTypeToChainTypes } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
-import { GearSix, MagnifyingGlass, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } from 'phosphor-react';
+import { GearSix, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
-
-import { isEthereumAddress } from '@polkadot/util-crypto';
+import styled from 'styled-components';
 
 type Props = ThemeProps & ManageWebsiteAccessDetailParam & {
   authInfo: AuthUrlInfo;
@@ -28,110 +27,63 @@ type Props = ThemeProps & ManageWebsiteAccessDetailParam & {
 
 type WrapperProps = ThemeProps;
 
-const ActionModalId = 'actionModalId';
-// const FilterModalId = 'filterModalId';
+const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?: AccountAuthType[]): boolean => {
+  if (!accountAuthTypes) {
+    return false;
+  }
 
-function Component ({ accountAuthType, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
-  const accounts = useSelector((state: RootState) => state.accountState.accounts);
+  switch (chainType) {
+    case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
+    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm');
+    case AccountChainType.TON: return accountAuthTypes.includes('ton');
+    case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
+  }
+
+  return false;
+};
+
+const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
+
+function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin, siteName }: Props): React.ReactElement<Props> {
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const [pendingMap, setPendingMap] = useState<Record<string, boolean>>({});
-  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { activeModal } = useContext(ModalContext);
   const { t } = useTranslation();
-  const { token } = useTheme() as Theme;
-  const accountItems = useMemo(() => {
-    const accountListWithoutAll = accounts.filter((opt) => opt.address !== 'ALL');
+  const accountProxyItems = useMemo(() => {
+    return accountProxies.filter((ap) => ap.id !== 'ALL' && ap.chainTypes.some((chainType) => checkAccountAddressValid(chainType, accountAuthTypes)));
+  }, [accountAuthTypes, accountProxies]);
 
-    if (accountAuthType === 'substrate') {
-      return accountListWithoutAll.filter((acc) => !isEthereumAddress(acc.address));
-    } else if (accountAuthType === 'evm') {
-      return accountListWithoutAll.filter((acc) => isEthereumAddress(acc.address));
-    } else {
-      return accountListWithoutAll;
-    }
-  }, [accountAuthType, accounts]);
-
-  const onOpenActionModal = useCallback(() => {
-    activeModal(ActionModalId);
+  const onOpenDAppConfigurationModal = useCallback(() => {
+    activeModal(dAppConfigurationModalId);
   }, [activeModal]);
 
-  const onCloseActionModal = useCallback(() => {
-    inactiveModal(ActionModalId);
-  }, [inactiveModal]);
-
-  const actions: ActionItemType[] = useMemo(() => {
-    const isAllowed = authInfo.isAllowed;
-
-    const result: ActionItemType[] = [
-      {
-        key: isAllowed ? 'block' : 'unblock',
-        icon: isAllowed ? ShieldSlash : ShieldCheck,
-        iconBackgroundColor: isAllowed ? token.colorError : token.colorSuccess,
-        title: isAllowed ? t('Block this site') : t('Unblock this site'),
-        onClick: () => {
-          toggleAuthorization(origin)
-            .then(({ list }) => {
-              updateAuthUrls(list);
-            })
-            .catch(console.error);
-          onCloseActionModal();
-        }
-      },
-      {
-        key: 'forget-site',
-        icon: X,
-        iconBackgroundColor: token.colorWarning,
-        title: t('Forget this site'),
-        onClick: () => {
-          forgetSite(origin, updateAuthUrls).catch(console.error);
-          onCloseActionModal();
-        }
-      }
-    ];
-
-    if (isAllowed) {
-      result.push(
-        {
-          key: 'disconnect-all',
-          icon: Plugs,
-          iconBackgroundColor: token['gray-3'],
-          title: t('Disconnect all accounts'),
-          onClick: () => {
-            changeAuthorization(false, origin, updateAuthUrls).catch(console.error);
-            onCloseActionModal();
-          }
-        },
-        {
-          key: 'connect-all',
-          icon: PlugsConnected,
-          iconBackgroundColor: token['green-6'],
-          title: t('Connect all accounts'),
-          onClick: () => {
-            changeAuthorization(true, origin, updateAuthUrls).catch(console.error);
-            onCloseActionModal();
-          }
-        }
-      );
-    }
-
-    return result;
-  }, [authInfo.isAllowed, onCloseActionModal, origin, t, token]);
-
-  const renderItem = useCallback((item: AccountJson) => {
-    const isEnabled: boolean = authInfo.isAllowedMap[item.address];
+  const renderItem = useCallback((item: AccountProxy) => {
+    const isEnabled: boolean = item.accounts.some((account) => authInfo.isAllowedMap[account.address]);
 
     const onClick = () => {
       setPendingMap((prevMap) => {
         return {
           ...prevMap,
-          [item.address]: !isEnabled
+          [item.id]: !isEnabled
         };
       });
-      changeAuthorizationPerAccount(item.address, !isEnabled, origin, updateAuthUrls)
+      const newAllowedMap = { ...authInfo.isAllowedMap };
+
+      item.accounts.forEach((account) => {
+        if (checkAccountAddressValid(account.chainType, authInfo.accountAuthTypes)) {
+          newAllowedMap[account.address] = !isEnabled;
+        }
+      });
+
+      changeAuthorizationPerSite({ values: newAllowedMap, id: authInfo.id })
         .catch(console.log)
         .finally(() => {
           setPendingMap((prevMap) => {
             const newMap = { ...prevMap };
 
-            delete newMap[item.address];
+            if (newMap[item.id]) {
+              delete newMap[item.id];
+            }
 
             return newMap;
           });
@@ -139,31 +91,30 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
     };
 
     return (
-      <AccountItemWithName
-        accountName={item.name}
-        address={item.address}
-        avatarSize={token.sizeLG}
-        key={item.address}
-        rightItem={(
+      <AccountProxyItem
+        accountProxy={item}
+        chainTypes={convertAuthorizeTypeToChainTypes(authInfo.accountAuthTypes, item.chainTypes)}
+        className={'__account-proxy-connect-item'}
+        key={item.id}
+        rightPartNode={(
           <Switch
-            checked={pendingMap[item.address] === undefined ? isEnabled : pendingMap[item.address]}
-            disabled={!authInfo.isAllowed || pendingMap[item.address] !== undefined}
+            checked={pendingMap[item.id] === undefined ? isEnabled : pendingMap[item.id]}
+            disabled={!authInfo.isAllowed || pendingMap[item.id] !== undefined}
             {...{ onClick }}
             style={{ marginRight: 8 }}
           />
         )}
       />
     );
-  }, [authInfo.isAllowed, authInfo.isAllowedMap, origin, pendingMap, token.sizeLG]);
+  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, pendingMap]);
 
   const searchFunc = useCallback((item: AccountJson, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
-      item.address.toLowerCase().includes(searchTextLowerCase) ||
-      (item.name
+      item.name
         ? item.name.toLowerCase().includes(searchTextLowerCase)
-        : false)
+        : false
     );
   }, []);
 
@@ -201,29 +152,24 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
                 weight='bold'
               />
             ),
-            onClick: onOpenActionModal
+            onClick: onOpenDAppConfigurationModal
           }
         ]}
         title={siteName || authInfo.id}
       >
         <SwList.Section
-          displayRow
+          className={'list-account-item'}
           enableSearchInput
-          list={accountItems}
+          list={accountProxyItems}
           renderItem={renderItem}
           renderWhenEmpty={renderEmptyList}
-          rowGap = {'8px'}
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
           searchPlaceholder={t<string>('Search account')}
         />
 
-        <ActionModal
-          actions={actions}
-          className={`${className} action-modal`}
-          id={ActionModalId}
-          onCancel={onCloseActionModal}
-          title={t('dApp configuration')}
+        <DAppConfigurationModal
+          authInfo={authInfo}
         />
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
@@ -232,7 +178,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
 
 function WrapperComponent (props: WrapperProps) {
   const location = useLocation();
-  const { accountAuthType, origin, siteName } = location.state as ManageWebsiteAccessDetailParam;
+  const { accountAuthTypes, origin, siteName } = location.state as ManageWebsiteAccessDetailParam;
   const authInfo: undefined | AuthUrlInfo = useSelector((state: RootState) => state.settings.authUrls[origin]);
   const goBack = useDefaultNavigate().goBack;
 
@@ -247,7 +193,7 @@ function WrapperComponent (props: WrapperProps) {
       {!!authInfo && (
         <Component
           {...props}
-          accountAuthType={accountAuthType}
+          accountAuthTypes={accountAuthTypes}
           authInfo={authInfo}
           goBack={goBack}
           origin={origin}
@@ -267,14 +213,22 @@ const ManageWebsiteAccessDetail = styled(WrapperComponent)<Props>(({ theme: { to
       backgroundColor: token.colorBgDefault
     },
 
+    '.__account-proxy-connect-item .__item-middle-part': {
+      textWrap: 'nowrap',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      fontWeight: 600,
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6
+    },
     '.ant-sw-screen-layout-body': {
       paddingTop: token.paddingSM
     },
 
-    '&.action-modal': {
-      '.__action-item.block .ant-setting-item-name': {
-        color: token.colorError
-      }
+    '.list-account-item .ant-sw-list': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8
     }
   });
 });

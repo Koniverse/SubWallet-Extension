@@ -1,27 +1,28 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReceiveQrModal, TokensSelectorModal } from '@subwallet/extension-web-ui/components/Modal';
-import { AccountSelectorModal } from '@subwallet/extension-web-ui/components/Modal/AccountSelectorModal';
+import { AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
+import { balanceNoPrefixFormater, formatNumber } from '@subwallet/extension-base/utils';
+import { ReceiveModal } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { BUY_TOKEN_MODAL, DEFAULT_TRANSFER_PARAMS, TRANSACTION_TRANSFER_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { BackgroundColorMap, WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
-import { useNotification, useReceiveQR, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCoreReceiveModalHelper, useGetChainSlugsByAccount, useNotification, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron, saveShowBalance } from '@subwallet/extension-web-ui/messaging';
 import BuyTokens from '@subwallet/extension-web-ui/Popup/BuyTokens';
 import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transaction';
 import SendFund from '@subwallet/extension-web-ui/Popup/Transaction/variants/SendFund';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { BuyTokenInfo, PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getAccountType, isAccountAll } from '@subwallet/extension-web-ui/utils';
-import { Button, Icon, ModalContext, Number, Tag, Typography } from '@subwallet/react-ui';
+import { PhosphorIcon, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { getTransactionFromAccountProxyValue, isSoloTonAccountProxy } from '@subwallet/extension-web-ui/utils';
+import { Button, Icon, ModalContext, Number, Tag, Tooltip, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowFatLinesDown, ArrowsClockwise, Eye, EyeSlash, PaperPlaneTilt, ShoppingCartSimple } from 'phosphor-react';
+import { ArrowsClockwise, CopySimple, Eye, EyeSlash, PaperPlaneTilt, PlusMinus } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -42,7 +43,9 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const locationPathname = useLocation().pathname;
   const tokenGroupSlug = useParams()?.slug;
   const isShowBalance = useSelector((state: RootState) => state.settings.isShowBalance);
+  const { currencyData } = useSelector((state: RootState) => state.price);
   const [reloading, setReloading] = useState(false);
+  const allowedChains = useGetChainSlugsByAccount();
 
   const onChangeShowBalance = useCallback(() => {
     saveShowBalance(!isShowBalance).catch(console.error);
@@ -61,18 +64,13 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { accountBalance: { totalBalanceInfo }, tokenGroupStructure: { tokenGroupMap } } = useContext(HomeContext);
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const { accountSelectorItems,
-    onOpenReceive,
-    openSelectAccount,
-    openSelectToken,
-    selectedAccount,
-    selectedNetwork,
-    tokenSelectorItems } = useReceiveQR(_tokenGroupSlug);
+  const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper(_tokenGroupSlug);
 
-  const currentAccount = useSelector((state) => state.accountState.currentAccount);
+  const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
   const { tokens } = useSelector((state) => state.buyService);
-  const [sendFundKey, setSendFundKey] = useState<string>('sendFundKey');
-  const [buyTokensKey, setBuyTokensKey] = useState<string>('buyTokensKey');
+  const [isSendFundVisible, setIsSendFundVisible] = useState<boolean>(false);
+  // const [isSendFundOffRampVisible, setIsSendFundOffRampVisible] = useState<boolean>(false);
+  const [isBuyTokensVisible, setIsBuyTokensVisible] = useState<boolean>(false);
   const [buyTokenSymbol, setBuyTokenSymbol] = useState<string>('');
   const notify = useNotification();
 
@@ -81,7 +79,6 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const totalChangeValue = totalBalanceInfo.change.value;
   const totalValue = totalBalanceInfo.convertedValue;
 
-  const accounts = useSelector((state) => state.accountState.accounts);
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
 
   const buyInfos = useMemo(() => {
@@ -90,29 +87,20 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     }
 
     const slug = tokenGroupSlug || '';
+    // @ts-ignore
     const slugs = tokenGroupMap[slug] ? tokenGroupMap[slug] : [slug];
     const result: BuyTokenInfo[] = [];
 
-    for (const [slug, buyInfo] of Object.entries(tokens)) {
-      if (slugs.includes(slug)) {
-        const supportType = buyInfo.support;
-
-        if (isAccountAll(currentAccount?.address || '')) {
-          const support = accounts.some((account) => supportType === getAccountType(account.address));
-
-          if (support) {
-            result.push(buyInfo);
-          }
-        } else {
-          if (currentAccount?.address && (supportType === getAccountType(currentAccount?.address))) {
-            result.push(buyInfo);
-          }
-        }
+    Object.values(tokens).forEach((item) => {
+      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug)) {
+        return;
       }
-    }
+
+      result.push(item);
+    });
 
     return result;
-  }, [accounts, currentAccount?.address, locationPathname, tokenGroupMap, tokenGroupSlug, tokens]);
+  }, [allowedChains, locationPathname, tokenGroupMap, tokenGroupSlug, tokens]);
 
   const onOpenBuyTokens = useCallback(() => {
     let symbol = '';
@@ -128,14 +116,15 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     setBuyTokenSymbol(symbol);
 
     activeModal(BUY_TOKEN_MODAL);
+    setIsBuyTokensVisible(true);
   }, [activeModal, buyInfos]);
 
-  useEffect(() => {
-    dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance']).catch(console.error);
-  }, [dataContext]);
-
   const onOpenSendFund = useCallback(() => {
-    if (currentAccount && currentAccount.isReadOnly) {
+    if (!currentAccountProxy) {
+      return;
+    }
+
+    if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
         message: t('The account you are using is read-only, you cannot send assets with it'),
         type: 'info',
@@ -145,46 +134,40 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       return;
     }
 
-    const address = currentAccount ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : '';
-
     setStorage({
       ...DEFAULT_TRANSFER_PARAMS,
-      from: address,
+      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy),
       defaultSlug: tokenGroupSlug || ''
     });
+    setIsSendFundVisible(true);
     activeModal(TRANSACTION_TRANSFER_MODAL);
   },
-  [currentAccount, setStorage, tokenGroupSlug, activeModal, notify, t]
+  [currentAccountProxy, setStorage, tokenGroupSlug, activeModal, notify, t]
   );
 
-  useEffect(() => {
-    setSendFundKey(`sendFundKey-${Date.now()}`);
-    setBuyTokensKey(`buyTokensKey-${Date.now()}`);
-  }, [locationPathname]);
-
-  useEffect(() => {
-    const backgroundColor = isTotalBalanceDecrease ? BackgroundColorMap.DECREASE : BackgroundColorMap.INCREASE;
-
-    setBackground(backgroundColor);
-  }, [isTotalBalanceDecrease, setBackground]);
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openBuyTokens = searchParams.get('openBuyTokens') || '';
   const handleCancelTransfer = useCallback(() => {
     inactiveModal(TRANSACTION_TRANSFER_MODAL);
-    setSendFundKey(`sendFundKey-${Date.now()}`);
+    setIsSendFundVisible(false);
   }, [inactiveModal]);
 
   const handleCancelBuy = useCallback(() => {
     inactiveModal(BUY_TOKEN_MODAL);
-    setBuyTokensKey(`buyTokensKey-${Date.now()}`);
+    setIsBuyTokensVisible(false);
   }, [inactiveModal]);
 
   const isSupportBuyTokens = useMemo(() => {
+    if (isSoloTonAccountProxy(currentAccountProxy)) {
+      return false;
+    }
+
     if (!locationPathname.includes('/home/tokens/detail/')) {
       return true;
     }
 
     return !!buyInfos.length;
-  }, [buyInfos.length, locationPathname]);
+  }, [buyInfos.length, currentAccountProxy, locationPathname]);
 
   const reloadBalance = useCallback(() => {
     setReloading(true);
@@ -199,7 +182,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     {
       label: 'Receive',
       type: 'receive',
-      icon: ArrowFatLinesDown,
+      icon: CopySimple,
       onClick: onOpenReceive
     },
     {
@@ -209,13 +192,42 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       onClick: onOpenSendFund
     },
     {
-      label: 'Buy',
+      label: 'Buy & Sell',
       type: 'buys',
-      icon: ShoppingCartSimple,
+      icon: PlusMinus,
       onClick: onOpenBuyTokens,
       disabled: !isSupportBuyTokens
     }
   ];
+
+  useEffect(() => {
+    dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance']).catch(console.error);
+  }, [dataContext]);
+
+  const openSendFund = searchParams.get('openSendFund') || '';
+
+  useEffect(() => {
+    if (openSendFund === 'true') {
+      setIsSendFundVisible(true);
+      activeModal(TRANSACTION_TRANSFER_MODAL);
+      searchParams.delete('openSendFund');
+      setSearchParams(searchParams);
+    }
+  }, [openSendFund, activeModal, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (openBuyTokens === 'true' && isSupportBuyTokens && isWebUI) {
+      onOpenBuyTokens();
+      searchParams.delete('openBuyTokens');
+      setSearchParams(searchParams);
+    }
+  }, [openBuyTokens, isSupportBuyTokens, onOpenBuyTokens, searchParams, setSearchParams, buyInfos, isWebUI]);
+
+  useEffect(() => {
+    const backgroundColor = isTotalBalanceDecrease ? BackgroundColorMap.DECREASE : BackgroundColorMap.INCREASE;
+
+    setBackground(backgroundColor);
+  }, [isTotalBalanceDecrease, setBackground]);
 
   return (
     <div className={CN(className, 'flex-row')}>
@@ -250,15 +262,27 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         </div>
 
         <div className={'__block-content'}>
-          <Number
-            className={'__balance-value'}
-            decimal={0}
-            decimalOpacity={0.45}
-            hide={!isShowBalance}
-            prefix='$'
-            subFloatNumber
-            value={totalValue}
-          />
+          <div className={'__balance-value-wrapper'}>
+            <Tooltip
+              overlayClassName={CN({
+                'ant-tooltip-hidden': !isShowBalance
+              })}
+              placement={'top'}
+              title={currencyData.symbol + ' ' + formatNumber(totalValue, 0, balanceNoPrefixFormater)}
+            >
+              <div>
+                <Number
+                  className={'__balance-value'}
+                  decimal={0}
+                  decimalOpacity={0.45}
+                  hide={!isShowBalance}
+                  prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+                  subFloatNumber
+                  value={totalValue}
+                />
+              </div>
+            </Tooltip>
+          </div>
 
           <div className={'__balance-change-container'}>
             <Number
@@ -266,7 +290,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
               decimal={0}
               decimalOpacity={1}
               hide={!isShowBalance}
-              prefix={isTotalBalanceDecrease ? '- $' : '+ $'}
+              prefix={isTotalBalanceDecrease ? `- ${currencyData?.symbol}` : `+ ${currencyData?.symbol}`}
               value={totalChangeValue}
             />
             <Tag
@@ -295,18 +319,26 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         <div className='__block-title-wrapper'>
           <div className={'__block-title'}>{t('Transferable balance')}</div>
         </div>
+        <Tooltip
+          overlayClassName={CN({
+            'ant-tooltip-hidden': !isShowBalance
+          })}
+          placement={'top'}
+          title={currencyData.symbol + ' ' + formatNumber(totalBalanceInfo.freeValue, 0, balanceNoPrefixFormater)}
+        >
+          <div className={'__block-content'}>
+            <Number
+              className='__balance-value'
+              decimal={0}
+              decimalOpacity={0.45}
+              hide={!isShowBalance}
+              prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+              subFloatNumber
+              value={totalBalanceInfo.freeValue}
+            />
+          </div>
+        </Tooltip>
 
-        <div className={'__block-content'}>
-          <Number
-            className='__balance-value'
-            decimal={0}
-            decimalOpacity={0.45}
-            hide={!isShowBalance}
-            prefix='$'
-            subFloatNumber
-            value={totalBalanceInfo.freeValue}
-          />
-        </div>
       </div>
 
       <div
@@ -317,18 +349,25 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         <div className='__block-title-wrapper'>
           <div className={'__block-title'}>{t('Locked balance')}</div>
         </div>
-
-        <div className={'__block-content'}>
-          <Number
-            className='__balance-value'
-            decimal={0}
-            decimalOpacity={0.45}
-            hide={!isShowBalance}
-            prefix='$'
-            subFloatNumber
-            value={totalBalanceInfo.lockedValue}
-          />
-        </div>
+        <Tooltip
+          overlayClassName={CN({
+            'ant-tooltip-hidden': !isShowBalance
+          })}
+          placement={'top'}
+          title={currencyData.symbol + ' ' + formatNumber(totalBalanceInfo.lockedValue, 0, balanceNoPrefixFormater)}
+        >
+          <div className={'__block-content'}>
+            <Number
+              className='__balance-value'
+              decimal={0}
+              decimalOpacity={0.45}
+              hide={!isShowBalance}
+              prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+              subFloatNumber
+              value={totalBalanceInfo.lockedValue}
+            />
+          </div>
+        </Tooltip>
       </div>
 
       <div
@@ -366,52 +405,47 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         </div>
       </div>
 
-      <BaseModal
-        className={'right-side-modal'}
-        destroyOnClose={true}
-        id={TRANSACTION_TRANSFER_MODAL}
-        onCancel={handleCancelTransfer}
-        title={t('Transfer')}
-      >
-        <Transaction
-          key={sendFundKey}
-          modalContent={isWebUI}
-        >
-          <SendFund
-            modalContent={isWebUI}
-            tokenGroupSlug={_tokenGroupSlug}
-          />
-        </Transaction>
-      </BaseModal>
+      {
+        isSendFundVisible && (
+          <BaseModal
+            className={'right-side-modal'}
+            destroyOnClose={true}
+            id={TRANSACTION_TRANSFER_MODAL}
+            onCancel={handleCancelTransfer}
+            title={t('Transfer')}
+          >
+            <Transaction
+              modalContent={isWebUI}
+              modalId={TRANSACTION_TRANSFER_MODAL}
+            >
+              <SendFund
+                modalContent={isWebUI}
+                tokenGroupSlug={_tokenGroupSlug}
+              />
+            </Transaction>
+          </BaseModal>
+        )
+      }
 
-      <BaseModal
-        className={'right-side-modal'}
-        destroyOnClose={true}
-        id={BUY_TOKEN_MODAL}
-        onCancel={handleCancelBuy}
-        title={t('Buy token')}
-      >
-        <BuyTokens
-          key={buyTokensKey}
-          modalContent={isWebUI}
-          slug={buyTokenSymbol}
-        />
-      </BaseModal>
+      {
+        isBuyTokensVisible && (
+          <BaseModal
+            className={'right-side-modal'}
+            destroyOnClose={true}
+            id={BUY_TOKEN_MODAL}
+            onCancel={handleCancelBuy}
+            title={t('Buy & sell tokens')}
+          >
+            <BuyTokens
+              modalContent={isWebUI}
+              slug={buyTokenSymbol}
+            />
+          </BaseModal>
+        )
+      }
 
-      <AccountSelectorModal
-        items={accountSelectorItems}
-        onSelectItem={openSelectAccount}
-      />
-
-      <TokensSelectorModal
-        address={selectedAccount}
-        items={tokenSelectorItems}
-        onSelectItem={openSelectToken}
-      />
-
-      <ReceiveQrModal
-        address={selectedAccount}
-        selectedNetwork={selectedNetwork}
+      <ReceiveModal
+        {...receiveModalProps}
       />
     </div>
   );
@@ -443,6 +477,10 @@ const Balance = styled(Component)<Props>(({ theme: { token } }: Props) => ({
     }
   },
 
+  '.__balance-value-wrapper': {
+    display: 'flex'
+  },
+
   '.__block-divider': {
     height: 116,
     width: 1,
@@ -458,7 +496,13 @@ const Balance = styled(Component)<Props>(({ theme: { token } }: Props) => ({
     display: 'flex',
     justifyContent: 'start',
     alignItems: 'center',
-    marginTop: token.marginSM
+    marginTop: token.marginSM,
+
+    '.ant-typography': {
+      lineHeight: 'inherit',
+      color: 'inherit !important',
+      fontSize: 'inherit !important'
+    }
   },
 
   '.__balance-change-value': {

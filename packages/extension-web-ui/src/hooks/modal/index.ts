@@ -4,6 +4,8 @@
 export { default as useConfirmModal } from './useConfirmModal';
 export { default as useGoBackSelectAccount } from './useGoBackSelectAccount';
 export { default as useSwitchModal } from './useSwitchModal';
+export { default as useIsModalInactive } from './useCheckInactiveModal';
 
 export * from './useFilterModal';
 export * from './useSelectValidators';
+export * from './useSelectAccount';

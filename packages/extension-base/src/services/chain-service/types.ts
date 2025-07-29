@@ -3,20 +3,28 @@
 
 /* eslint @typescript-eslint/no-empty-interface: "off" */
 
+import type { ApiInterfaceRx } from '@polkadot/api/types';
+
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _CrowdloanFund } from '@subwallet/chain-list/types';
+import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { AccountState, TxByMsgResponse } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/types';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
-import { BehaviorSubject } from 'rxjs';
+import { TonWalletContract } from '@subwallet/keyring/types';
+import { Cell } from '@ton/core';
+import { Address, Contract, OpenedContract } from '@ton/ton';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import Web3 from 'web3';
 
 import { ApiPromise } from '@polkadot/api';
+import { Getters } from '@polkadot/api/base/Getters';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/promise/types';
-import { ChainProperties, ChainType } from '@polkadot/types/interfaces';
-import { Registry } from '@polkadot/types/types';
+import { ChainProperties, ChainType, RuntimeVersion } from '@polkadot/types/interfaces';
+import { AnyJson, Registry } from '@polkadot/types/types';
 
 export interface _DataMap {
   chainInfoMap: Record<string, _ChainInfo>,
-  chainStateMap: Record<string, _ChainState>,
   assetRegistry: Record<string, _ChainAsset>,
+  chainStateMap: Record<string, _ChainState>,
   assetRefMap: Record<string, _AssetRef>
 }
 
@@ -27,10 +35,17 @@ export enum _ChainConnectionStatus {
   CONNECTING = 'CONNECTING',
 }
 
+export interface ReportRpc {
+  runningRpc: Record<string, string>,
+  unstableRpc: Record<string, string>,
+  dieRpc: Record<string, string>
+}
+
 export interface _ChainState {
-  slug: string,
-  active: boolean,
-  currentProvider: string
+  slug: string;
+  active: boolean;
+  currentProvider: string;
+  manualTurnOff: boolean;
 }
 
 export interface _ChainApiStatus {
@@ -79,22 +94,73 @@ export interface _SubstrateApiState {
   defaultFormatBalance?: _SubstrateDefaultFormatBalance;
 }
 
-export interface _SubstrateApi extends _SubstrateApiState, _ChainBaseApi {
+export interface _SubstrateApi extends _SubstrateApiState, _ChainBaseApi, _SubstrateApiAdapter {
   api: ApiPromise;
   isReady: Promise<_SubstrateApi>;
+  connect: (_callbackUpdateMetadata?: (substrateApi: _SubstrateApi) => void) => void;
 
   specName: string;
   specVersion: string;
   systemChain: string;
   systemName: string;
   systemVersion: string;
-  registry: Registry;
+  registry?: Registry;
+
+  useLightClient: boolean;
+}
+
+export interface _SubstrateAdapterQueryArgs {
+  section: keyof Getters<'promise'>,
+  module?: string,
+  method?: string,
+  args?: unknown[]
+}
+
+export interface _SubstrateAdapterSubscriptionArgs extends Omit<Required<_SubstrateAdapterQueryArgs>, 'section'> {
+  section: keyof Pick<ApiInterfaceRx, 'query'>,
+  isMultiQuery?: boolean
+}
+
+export interface _SubstrateApiAdapter {
+  makeRpcQuery<T extends AnyJson | `0x${string}` | Registry | RuntimeVersion>(params: _SubstrateAdapterQueryArgs): Promise<T>,
+  subscribeDataWithMulti(params: _SubstrateAdapterSubscriptionArgs[], callback: (rs: Record<string, AnyJson[]>) => void): Subscription
 }
 
 export interface _EvmApi extends _ChainBaseApi {
   api: Web3;
 
   isReady: Promise<_EvmApi>;
+}
+
+export interface _TonApi extends _ChainBaseApi, _TonUtilsApi {
+  isReady: Promise<_TonApi>;
+}
+
+interface _TonUtilsApi {
+  getBalance (address: Address): Promise<bigint>;
+  open<T extends Contract>(src: T): OpenedContract<T>;
+  estimateExternalMessageFee (walletContract: TonWalletContract, body: Cell, isInit: boolean, ignoreSignature?: boolean): Promise<EstimateExternalMessageFee>;
+  sendTonTransaction (boc: string): Promise<string>;
+  getTxByInMsg (extMsgHash: string): Promise<TxByMsgResponse>;
+  getStatusByExtMsgHash (extMsgHash: string): Promise<[boolean, string]>;
+  getAccountState (address: string): Promise<AccountState>;
+}
+
+export interface _CardanoApi extends _ChainBaseApi, _CardanoUtilsApi {
+  isReady: Promise<_CardanoApi>;
+}
+
+interface _CardanoUtilsApi {
+  getBalanceMap (address: string): Promise<CardanoBalanceItem[]>
+}
+
+export interface EstimateExternalMessageFee {
+  source_fees: {
+    in_fwd_fee: number,
+    storage_fee: number,
+    gas_fee: number,
+    fwd_fee: number
+  }
 }
 
 export type _NetworkUpsertParams = {
@@ -141,10 +207,11 @@ export interface EnableMultiChainParams {
 }
 
 export interface _ValidateCustomAssetRequest {
-  contractAddress: string,
+  contractAddress?: string,
   originChain: string,
   type: _AssetType,
-  contractCaller?: string
+  contractCaller?: string,
+  assetId?: string,
 }
 
 export interface _SmartContractTokenInfo {
@@ -161,7 +228,9 @@ export interface _ValidateCustomAssetResponse extends _SmartContractTokenInfo {
 
 export const _FUNGIBLE_CONTRACT_STANDARDS = [
   _AssetType.ERC20,
-  _AssetType.PSP22
+  _AssetType.PSP22,
+  _AssetType.GRC20,
+  _AssetType.VFT
 ];
 
 export const _NFT_CONTRACT_STANDARDS = [

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { BasicTxErrorType, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
 
@@ -62,7 +62,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
 
         try {
           const rs = await this.state.subscanService.getRewardHistoryList(this.chain, address);
-          const items = rs.list;
+          const items = rs?.list;
 
           if (items) {
             for (const item of items) {
@@ -112,16 +112,21 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     ];
   }
 
-  abstract createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest?: string): Promise<[TransactionData, YieldTokenBaseInfo]>
+  abstract createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]>
 
   protected async getSubmitStep (params: OptimalYieldPathParams): Promise<YieldStepBaseInfo> {
-    const { address, amount, slug, targets } = params;
+    const { address, amount, netuid, slug, targets } = params;
+
     const selectedValidators = !targets ? [] : targets as ValidatorInfo[];
     const data: SubmitJoinNativeStaking = {
       amount,
       address,
       slug,
-      selectedValidators
+      selectedValidators,
+      subnetData: {
+        netuid: netuid || 0,
+        slippage: 0
+      }
     };
     const positionInfo = await this.getPoolPosition(address);
     const [, fee] = await this.createJoinExtrinsic(data, positionInfo);
@@ -134,8 +139,8 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
 
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNativeStaking;
-    const { address, amount, selectedValidators } = data;
-    const positionInfo = await this.getPoolPosition(address);
+    const { address, amount, selectedValidators, slug } = data;
+    const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
     const bondingData: RequestBondingSubmit = {

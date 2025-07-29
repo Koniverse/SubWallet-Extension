@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AbstractAddressJson } from '@subwallet/extension-base/background/types';
+import { AbstractAddressJson } from '@subwallet/extension-base/types';
 import { findNetworkJsonByGenesisHash, reformatAddress } from '@subwallet/extension-web-ui/utils';
 import { useCallback } from 'react';
 
@@ -17,9 +17,9 @@ const useFormatAddress = (addressPrefix?: number) => {
       addPrefix = addressPrefix;
     }
 
-    if ('originGenesisHash' in item) {
-      const originGenesisHash = item.originGenesisHash as string;
-      const network = findNetworkJsonByGenesisHash(chainInfoMap, originGenesisHash);
+    if ('genesisHash' in item) {
+      const genesisHash = item.genesisHash as string;
+      const network = findNetworkJsonByGenesisHash(chainInfoMap, genesisHash);
 
       if (network) {
         addPrefix = network.substrateInfo?.addressPrefix ?? addPrefix;

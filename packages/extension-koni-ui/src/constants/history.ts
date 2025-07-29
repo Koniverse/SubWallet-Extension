@@ -42,7 +42,10 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('Withdraw'),
   [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('Cancel compound'),
   [ExtrinsicType.EVM_EXECUTE]: detectTranslate('EVM Execute'),
-  [ExtrinsicType.TOKEN_APPROVE]: detectTranslate('Token approve'),
+  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('Token approve'),
+  [ExtrinsicType.SWAP]: detectTranslate('Swap'),
+  [ExtrinsicType.SET_FEE_TOKEN]: detectTranslate('Fee token'),
+  [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('Claim token'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('Unknown')
 };
 

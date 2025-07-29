@@ -19,6 +19,7 @@ export const CONFIRMATION_QR_MODAL = 'confirmation-qr-modal';
 export const CONFIRMATION_SCAN_MODAL = 'confirmation-scan-modal';
 export const REQUEST_CAMERA_ACCESS_MODAL = 'request-camera-access-modal';
 export const VALIDATOR_DETAIL_MODAL = 'validator-detail-modal';
+export const VALIDATOR_DETAIL_RW_MODAL = 'validator-detail-modal-rw';
 export const HISTORY_DETAIL_MODAL = 'history-detail-modal';
 export const RECEIVE_TOKEN_SELECTOR_MODAL = 'receive-tokens-selector-modal';
 export const CONNECT_EXTENSION = 'connect-extension';
@@ -30,10 +31,12 @@ export const EDIT_UNLOCK_TYPE_MODAL = 'edit-unlock-type-modal';
 export const RESET_WALLET_MODAL = 'reset-wallet-modal';
 export const SEED_PHRASE_MODAL = 'seed-phrase-modal';
 export const ADD_CONNECTION_MODAL = 'add-connection-modal';
+export const ADD_NETWORK_WALLET_CONNECT_MODAL = 'add-network-wallet-connect-modal';
 
 export const TRANSFER_NFT_MODAL = 'transfer-nft-modal';
 
 export const ACCOUNT_EXPORT_MODAL = 'account-export-modal';
+export const ACCOUNT_EXPORT_ALL_MODAL = 'account-export-modal';
 
 export const WALLET_CONNECT_CREATE_MODAL = 'wallet-connect-create-modal';
 export const WALLET_CONNECT_DETAIL_MODAL = 'wallet-connect-detail-modal';
@@ -41,6 +44,24 @@ export const WALLET_CONNECT_LIST_MODAL = 'wallet-connect-list-modal';
 
 export const CONFIRMATION_MODAL = 'confirmation-modal';
 export const BUY_TOKEN_MODAL = 'buy-token-modal';
+
+export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
+export const NOTIFICATION_MODAL = 'notification-modal';
+export const NOTIFICATION_SETTING_MODAL = 'notification-setting-modal';
+export const RECEIVE_MODAL_TOKEN_SELECTOR = 'receive-modal-token-selector';
+export const RECEIVE_MODAL_ACCOUNT_SELECTOR = 'receive-modal-account-selector';
+
+export const REMIND_DUPLICATE_ACCOUNT_NAME_MODAL = 'remind-duplicate-account-name-modal';
+export const ADDRESS_QR_MODAL = 'address-qr-modal';
+export const ACCOUNT_CHAIN_ADDRESSES_MODAL = 'account-chain-addresses-modal';
+export const ACCOUNT_NAME_MODAL = 'account-name-modal';
+export const GLOBAL_ALERT_MODAL = 'global-alert-modal';
+export const TON_WALLET_CONTRACT_SELECTOR_MODAL = 'ton-wallet-contract-selector-modal';
+export const TON_ACCOUNT_SELECTOR_MODAL = 'ton-account-selector-modal';
+
+export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
+export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
+export const ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL = 'account-migration-in-progress-warning-modal';
 
 /* Token */
 
@@ -52,8 +73,13 @@ export const IMPORT_NFT_MODAL = 'import-nft-modal';
 
 export const DISCONNECT_EXTENSION_MODAL = 'disconnect-extension-modal';
 export const SELECT_EXTENSION_MODAL = 'select-extension-modal';
+export const EXPORT_ACCOUNTS_PASSWORD_MODAL = 'export-accounts-password-modal';
 
 /* Extension  */
+
+/* Ledger */
+export const WARNING_LEDGER_RECEIVE_MODAL = 'warning-ledger-receive-modal';
+/* Ledger */
 
 /* Earning */
 
@@ -73,15 +99,22 @@ export const STAKING_NETWORK_DETAIL_MODAL = 'staking-network-detail-modal';
 
 /* Transaction */
 export const TRANSACTION_TRANSFER_MODAL = 'transfer-fund-modal';
+export const OFF_RAMP_TRANSACTION_TRANSFER_MODAL = 'off-ramp-transfer-fund-modal';
 export const TRANSACTION_YIELD_UNSTAKE_MODAL = 'transaction-yield-unstake-modal';
 export const TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL = 'transaction-yield-cancel-unstake-modal';
 export const TRANSACTION_YIELD_WITHDRAW_MODAL = 'transaction-yield-withdraw-modal';
 export const TRANSACTION_YIELD_FAST_WITHDRAW_MODAL = 'transaction-yield-fast-withdraw-modal';
 export const TRANSACTION_YIELD_CLAIM_MODAL = 'transaction-yield-claim-modal';
+export const TRANSACTION_CLAIM_BRIDGE = 'transaction-claim-bridge-modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
 /* Campaign */
+
+/* AppPopup */
+export const APP_POPUP_MODAL = 'app-popup-modal';
+export const APP_INSTRUCTION_MODAL = 'app-instruction-modal';
+/* AppPopup */
 
 /* Terms and Conditions */
 export const GENERAL_TERM_AND_CONDITION_MODAL = 'general-term-and-condition-modal';
@@ -90,3 +123,26 @@ export const TERM_AND_CONDITION_SEED_PHRASE_MODAL = 'term-and-condition-seed-phr
 
 export const EARNING_INSTRUCTION_MODAL = 'earning-instruction-modal';
 export const EARNING_NOMINATION_MODAL = 'earning-nomination-modal';
+export const SWAP_SLIPPAGE_MODAL = 'swap-slippage-modal';
+export const SWAP_ALL_QUOTES_MODAL = 'swap-all-quotes-modal';
+export const SWAP_MORE_BALANCE_MODAL = 'swap-more-balance-modal';
+export const SWAP_CHOOSE_FEE_TOKEN_MODAL = 'swap-choose-fee-token-modal';
+export const SWAP_TERMS_OF_SERVICE_MODAL = 'swap-terms-of-service-modal';
+export const SWAP_IDLE_WARNING_MODAL = 'swap-idle-warning-modal';
+export const SWAP_FEES_MODAL = 'swap-fees-modal';
+
+/* Derive */
+export const DERIVE_ACCOUNT_LIST_MODAL = 'derive-account-list-modal';
+export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
+/* Derive */
+
+/* Process */
+export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
+export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
+/* Process */
+
+/* Other */
+export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
+export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';
+/* Other */

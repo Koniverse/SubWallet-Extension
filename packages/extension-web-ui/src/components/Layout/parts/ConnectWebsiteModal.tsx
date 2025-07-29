@@ -1,23 +1,25 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
-import { isAccountAll } from '@subwallet/extension-base/utils';
-import { BaseModal } from '@subwallet/extension-web-ui/components';
-import AccountItemWithName from '@subwallet/extension-web-ui/components/Account/Item/AccountItemWithName';
+import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
+import { AccountProxy } from '@subwallet/extension-base/types';
+import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
+import { AccountProxyItem, BaseModal, DAppConfigurationModal } from '@subwallet/extension-web-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-web-ui/components/Confirmation/ConfirmationGeneralInfo';
+import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-web-ui/constants';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
+import { updateAuthUrls } from '@subwallet/extension-web-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon } from '@subwallet/react-ui';
+import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-web-ui/utils';
+import { Button, Icon, ModalContext, NetworkItem } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { CaretRight, CheckCircle, GearSix, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
-
-import { isEthereumAddress } from '@polkadot/util-crypto';
 
 type Props = ThemeProps & {
   id: string;
@@ -33,25 +35,55 @@ type ConnectIcon = {
   linkIconBg?: string;
 };
 
+const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
+
 function Component ({ authInfo, className = '', id, isBlocked = true, isNotConnected = false, onCancel, url }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-
+  const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
+  const { activeModal } = useContext(ModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
-  const accounts = useSelector((state: RootState) => state.accountState.accounts);
-  const currentAccount = useSelector((state: RootState) => state.accountState.currentAccount);
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   // const [oldConnected, setOldConnected] = useState(0);
   const [isSubmit, setIsSubmit] = useState(false);
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const { token } = useTheme() as Theme;
   const _isNotConnected = isNotConnected || !authInfo;
+  const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
+  const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap?.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap?.evm, chainInfoMap]);
 
-  const handlerUpdateMap = useCallback((address: string, oldValue: boolean) => {
+  const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
-      setAllowedMap((values) => ({
-        ...values,
-        [address]: !oldValue
-      }));
+      setAllowedMap((values) => {
+        const newValues = { ...values };
+        const listAddress = accountProxy.accounts.map(({ address }) => address);
+
+        listAddress.forEach((address) => {
+          const addressIsValid = isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []);
+
+          addressIsValid && (newValues[address] = !oldValue);
+        });
+
+        return newValues;
+      });
     };
-  }, []);
+  }, [authInfo?.accountAuthTypes]);
+
+  const onOpenDAppConfigurationModal = useCallback(() => {
+    activeModal(dAppConfigurationModalId);
+  }, [activeModal]);
+
+  const openSwitchNetworkAuthorizeModal = useCallback(() => {
+    authInfo && switchNetworkAuthorizeModal.open(
+      {
+        authUrlInfo: authInfo,
+        onComplete: (list) => {
+          updateAuthUrls(list);
+        },
+        needsTabAuthCheck: true
+      }
+    );
+  }, [authInfo, switchNetworkAuthorizeModal]);
 
   const handlerSubmit = useCallback(() => {
     if (!isSubmit && authInfo?.id) {
@@ -78,20 +110,14 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   }, [authInfo?.id, isSubmit]);
 
   useEffect(() => {
-    if (!!authInfo?.isAllowedMap && !!authInfo?.accountAuthType) {
+    if (!!authInfo?.isAllowedMap && !!authInfo?.accountAuthTypes) {
       // const connected = Object.values(authInfo.isAllowedMap).filter((s) => s).length;
 
-      const type = authInfo.accountAuthType;
+      const types = authInfo.accountAuthTypes;
       const allowedMap = authInfo.isAllowedMap;
 
       const filterType = (address: string) => {
-        if (type === 'both') {
-          return true;
-        }
-
-        const _type = type || 'substrate';
-
-        return _type === 'substrate' ? !isEthereumAddress(address) : isEthereumAddress(address);
+        return isAddressAllowedWithAuthType(address, types);
       };
 
       const result: Record<string, boolean> = {};
@@ -108,7 +134,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       // setOldConnected(0);
       setAllowedMap({});
     }
-  }, [authInfo?.accountAuthType, authInfo?.isAllowedMap]);
+  }, [authInfo?.accountAuthTypes, authInfo?.isAllowedMap]);
 
   const actionButtons = useMemo(() => {
     if (_isNotConnected) {
@@ -247,15 +273,21 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       );
     }
 
-    const list = Object.entries(allowedMap).map(([address, value]) => ({ address, value }));
+    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || []).map((proxy) => {
+      const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 
-    const current = list.find(({ address }) => address === currentAccount?.address);
+      return {
+        ...proxy,
+        value
+      };
+    });
+    const current = listAccountProxy.find(({ id }) => isSameAddress(id, currentAccountProxy?.id || ''));
 
     if (current) {
-      const idx = list.indexOf(current);
+      const idx = listAccountProxy.indexOf(current);
 
-      list.splice(idx, 1);
-      list.unshift(current);
+      listAccountProxy.splice(idx, 1);
+      listAccountProxy.unshift(current);
     }
 
     return (
@@ -266,26 +298,23 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
 
         <div className={'__account-item-container'}>
           {
-            list.map(({ address, value }) => {
-              const account = accounts.find((acc) => acc.address === address);
-
-              if (!account || isAccountAll(account.address)) {
+            listAccountProxy.map((ap) => {
+              if (isAccountAll(ap.id)) {
                 return null;
               }
 
-              const isCurrent = account.address === currentAccount?.address;
+              const isCurrent = ap.id === currentAccountProxy?.id;
 
               return (
-                <AccountItemWithName
-                  accountName={account.name}
-                  address={account.address}
-                  avatarSize={24}
+                <AccountProxyItem
+                  accountProxy={ap}
+                  chainTypes={convertAuthorizeTypeToChainTypes(authInfo?.accountAuthTypes, ap.chainTypes)}
                   className={CN({
                     '-is-current': isCurrent
-                  })}
-                  isSelected={value}
-                  key={account.address}
-                  onClick={handlerUpdateMap(address, value)}
+                  }, '__account-proxy-connect-item')}
+                  isSelected={ap.value}
+                  key={ap.id}
+                  onClick={handlerUpdateMap(ap, ap.value)}
                   showUnselectIcon
                 />
               );
@@ -297,23 +326,68 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   };
 
   return (
-    <BaseModal
-      center={true}
-      className={className}
-      footer={actionButtons}
-      id={id}
-      onCancel={onCancel}
-      title={t('Connect website')}
-    >
-      <ConfirmationGeneralInfo
-        request={{
-          id: url,
-          url: url
-        }}
-        {...connectIconProps}
-      />
-      {renderContent()}
-    </BaseModal>
+    <>
+      <BaseModal
+        center={true}
+        className={className}
+        footer={actionButtons}
+        id={id}
+        onCancel={onCancel}
+        rightIconProps={
+          authInfo
+            ? {
+              icon: (
+                <Icon
+                  phosphorIcon={GearSix}
+                  size='md'
+                  type='phosphor'
+                  weight='bold'
+                />
+              ),
+              onClick: onOpenDAppConfigurationModal
+            }
+            : undefined
+        }
+        title={t('Connect website')}
+      >
+        {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
+          <div className={'__switch-network-authorize-label'}>
+            {t('Switch network')}
+          </div>
+          <NetworkItem
+            name={currentEvmNetworkInfo.name}
+            networkKey={currentEvmNetworkInfo.slug}
+            networkMainLogoShape='circle'
+            networkMainLogoSize={20}
+            onPressItem={openSwitchNetworkAuthorizeModal}
+            rightItem={<div className={'__check-icon'}>
+              <Icon
+                className='__right-icon'
+                customSize={'16px'}
+                phosphorIcon={CaretRight}
+                type='phosphor'
+              />
+            </div>}
+          />
+        </div>}
+
+        <ConfirmationGeneralInfo
+          request={{
+            id: url,
+            url: url
+          }}
+          {...connectIconProps}
+        />
+        {renderContent()}
+      </BaseModal>
+      {
+        !!authInfo && (
+          <DAppConfigurationModal
+            authInfo={authInfo}
+          />
+        )
+      }
+    </>
   );
 }
 
@@ -354,6 +428,25 @@ export const ConnectWebsiteModal = styled(Component)<Props>(({ theme: { token } 
       marginTop: token.margin
     },
 
+    '.__account-item-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeXS,
+
+      '.__account-proxy-connect-item': {
+        minHeight: 52,
+
+        '.__item-middle-part': {
+          textWrap: 'nowrap',
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          fontWeight: 600,
+          fontSize: token.fontSizeHeading6,
+          lineHeight: token.lineHeightHeading6
+        }
+      }
+    },
+
     '.account-item-with-name': {
       position: 'relative',
       cursor: 'pointer',
@@ -382,6 +475,56 @@ export const ConnectWebsiteModal = styled(Component)<Props>(({ theme: { token } 
 
       '.ant-btn + .ant-btn.ant-btn': {
         marginInlineStart: token.sizeSM
+      }
+    },
+
+    '.__switch-network-authorize-item': {
+      display: 'flex',
+      gap: token.sizeXS,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: token.margin,
+
+      '.__switch-network-authorize-label': {
+        fontWeight: 500,
+        fontSize: token.fontSizeHeading6,
+        lineHeight: token.lineHeightHeading6
+      },
+
+      '.ant-network-item': {
+        borderRadius: token.borderRadiusXL,
+
+        '.ant-web3-block-middle-item': {
+          width: 'fit-content'
+        },
+
+        '.ant-network-item-content': {
+          paddingLeft: token.paddingSM,
+          paddingRight: token.paddingSM,
+          paddingTop: token.paddingXS,
+          paddingBottom: token.paddingXS,
+          borderRadius: token.borderRadiusXL
+        },
+
+        '.ant-network-item-name': {
+          fontWeight: 600,
+          fontSize: token.fontSizeHeading6,
+          marginRight: token.marginXXS
+        },
+
+        '.ant-web3-block-left-item': {
+          paddingRight: token.paddingXXS,
+
+          '.ant-image': {
+            height: 20,
+            display: 'flex',
+            alignItems: 'center'
+          }
+        },
+
+        '.ant-web3-block-right-item': {
+          marginRight: 0
+        }
       }
     }
   });

@@ -1,11 +1,21 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+export { default as DeriveAccountActionModal } from './DeriveAccountActionModal';
+export { default as ReceiveModal } from './ReceiveModalNew';
+export { default as RemindDuplicateAccountNameModal } from './RemindDuplicateAccountNameModal';
 export { default as RequestCameraAccessModal } from './RequestCameraAccessModal';
 export { default as RequestCreatePasswordModal } from './RequestCreatePasswordModal';
 export { default as ResetWalletModal } from './ResetWalletModal';
+export { default as AddNetworkWCModal } from './AddNetworkWCModal';
 export { SortingModal } from './SortingModal';
+export { default as TonWalletContractSelectorModal } from './TonWalletContractSelectorModal';
+export { default as TransactionProcessDetailModal } from './TransactionProcessDetailModal';
+export { default as TransactionStepsModal } from './TransactionStepsModal';
+export { default as SwitchNetworkAuthorizeModal } from './SwitchNetworkAuthorizeModal';
+export { DAppConfigurationModal } from './DAppConfigurationModal';
 
+export * from './Global';
 export * from './Account';
 export * from './ActionModal';
 export * from './AddressBook';
@@ -17,6 +27,7 @@ export * from './Customize/CustomizeModal';
 export * from './Earning';
 export * from './FilterModal';
 export * from './GlobalSearchTokenModal';
-export * from './ReceiveModal';
 export * from './Wallet';
 export * from './Common';
+export * from './Swap';
+export * from './Selector';

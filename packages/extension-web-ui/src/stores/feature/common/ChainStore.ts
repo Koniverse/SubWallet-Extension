@@ -3,6 +3,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { TokenPriorityDetails } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { ChainStore, ReduxStatus } from '@subwallet/extension-web-ui/stores/types';
 
@@ -10,6 +11,9 @@ const initialState: ChainStore = {
   chainInfoMap: {},
   chainStateMap: {},
   chainStatusMap: {},
+  ledgerGenericAllowNetworks: [],
+  priorityTokens: { tokenGroup: {}, token: {} },
+  chainOldPrefixMap: {},
   reduxStatus: ReduxStatus.INIT
 };
 
@@ -41,6 +45,33 @@ const chainStoreSlice = createSlice({
       return {
         ...state,
         chainStatusMap: payload,
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updateLedgerGenericAllowNetworks (state, action: PayloadAction<string[]>) {
+      const { payload } = action;
+
+      return {
+        ...state,
+        ledgerGenericAllowNetworks: payload,
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updatePriorityTokens (state, action: PayloadAction<TokenPriorityDetails>) {
+      const { payload } = action;
+
+      return {
+        ...state,
+        priorityTokens: payload,
+        reduxStatus: ReduxStatus.READY
+      };
+    },
+    updateChainOldPrefixMap (state, action: PayloadAction<Record<string, number>>) {
+      const { payload } = action;
+
+      return {
+        ...state,
+        chainOldPrefixMap: payload,
         reduxStatus: ReduxStatus.READY
       };
     }

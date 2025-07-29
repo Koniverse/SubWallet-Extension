@@ -1,14 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AbstractAddressJson } from '@subwallet/extension-base/background/types';
 import { CHAINS_SUPPORTED_DOMAIN, isAzeroDomain } from '@subwallet/extension-base/koni/api/dotsama/domain';
+import { AbstractAddressJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { AddressBookModal } from '@subwallet/extension-koni-ui/components';
 import { useForwardInputRef, useOpenQrScanner, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { resolveAddressToDomain, resolveDomainToAddress, saveRecentAccount } from '@subwallet/extension-koni-ui/messaging';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ScannerResult } from '@subwallet/extension-koni-ui/types/scanner';
+import { ScannerResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findContactByAddress, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Input, InputRef, ModalContext, SwQrScanner } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -37,6 +35,9 @@ const defaultScannerModalId = 'input-account-address-scanner-modal';
 const defaultAddressBookModalId = 'input-account-address-book-modal';
 
 const addressLength = 9;
+
+// todo:
+//  - Deprecated, will remove after migrating all usages
 
 function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
   const { addressPrefix, allowDomain,
@@ -140,6 +141,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     activeModal(addressBookId);
   }, [activeModal, addressBookId]);
 
+  // @ts-ignore
   const onSelectAddressBook = useCallback((value: string) => {
     inputRef?.current?.focus();
     parseAndChangeValue(value);
@@ -302,18 +304,18 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           />
         )
       }
-      {
-        showAddressBook &&
-        (
-          <AddressBookModal
-            addressPrefix={addressPrefix}
-            id={addressBookId}
-            networkGenesisHash={networkGenesisHash}
-            onSelect={onSelectAddressBook}
-            value={value}
-          />
-        )
-      }
+      {/* { */}
+      {/*  showAddressBook && */}
+      {/*  ( */}
+      {/*    <AddressBookModal */}
+      {/*      addressPrefix={addressPrefix} */}
+      {/*      id={addressBookId} */}
+      {/*      networkGenesisHash={networkGenesisHash} */}
+      {/*      onSelect={onSelectAddressBook} */}
+      {/*      value={value} */}
+      {/*    /> */}
+      {/*  ) */}
+      {/* } */}
     </>
   );
 }

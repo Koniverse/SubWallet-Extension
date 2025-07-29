@@ -405,6 +405,12 @@ textarea {
     border-color: #212845;
 }
 
+.ant-tooltip .ant-tooltip-inner {
+  text-align: center;
+  font-size: 12px;
+  line-height: 20px;
+}
+
 .account-info-container.-light {
     border-color: #eee;
 }
@@ -628,28 +634,23 @@ div#popup-container {
     border-radius: 8px;
 }
 
-.ant-sw-modal .ant-sw-header-container-center .ant-sw-header-center-part {
-    width: auto;
-    margin-left: 48px;
-    margin-right: 48px;
-}
 
 .ant-sw-modal .ant-sw-modal-footer .ant-btn + .ant-btn:not(.ant-dropdown-trigger) {
     margin-inline-start: 12px;
 }
 
-.ant-sw-list-section .ant-sw-list-wrapper {
+.ant-sw-screen-layout-body .ant-sw-list-section .ant-sw-list-wrapper {
   position: relative;
 }
 
-.ant-sw-list-section .ant-sw-list-wrapper .empty-list {
+.ant-sw-screen-layout-body .ant-sw-list-section .empty-list {
   position: absolute;
   inset: 0;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.ant-sw-list-section .ant-sw-list-wrapper .empty-list-inner {
+.ant-sw-screen-layout-body .ant-sw-list-section .empty-list-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;

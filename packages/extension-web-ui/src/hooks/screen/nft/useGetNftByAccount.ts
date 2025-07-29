@@ -2,15 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { findNetworkJsonByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-
-import { isEthereumAddress } from '@polkadot/util-crypto';
 
 interface NftData {
   nftCollections: NftCollection[]
@@ -59,6 +57,7 @@ function filterNftByAccount (currentAccount: AccountJson | null, nftCollections:
   return { nftCollections: filteredNftCollections, nftItems: filteredNftItems };
 }
 
+// todo: recheck this hook, it may work but the logic is outdate
 export default function useGetNftByAccount () {
   const nftCollections = useSelector((state: RootState) => state.nft.nftCollections);
   const nftItems = useSelector((state: RootState) => state.nft.nftItems);
@@ -67,9 +66,7 @@ export default function useGetNftByAccount () {
 
   const accountNetwork = useMemo(() => {
     if (currentAccount?.isHardware) {
-      const isEthereum = isEthereumAddress(currentAccount.address || '');
-
-      if (isEthereum) {
+      if (currentAccount?.isGeneric) {
         return undefined;
       } else {
         const availableGen: string[] = currentAccount.availableGenesisHashes || [];

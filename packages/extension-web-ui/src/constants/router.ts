@@ -3,3 +3,9 @@
 
 export const DEFAULT_ROUTER_PATH = '/';
 export const WELCOME_PATH = '/welcome';
+export const SWAP_PATH = '/transaction/swap';
+
+export const NOTIFICATION_MODAL_WHITELIST_PATHS = [
+  '/migrate-account',
+  '/home/tokens'
+];

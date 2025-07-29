@@ -5,6 +5,8 @@ import { isSupportWindow } from '@subwallet/extension-base/utils/mv3';
 import Bowser from 'bowser';
 
 import { EnvironmentSupport, RuntimeEnvironment, RuntimeEnvironmentInfo, TargetEnvironment } from '../background/KoniTypes';
+import { SW_EXTERNAL_SERVICES_API } from '../constants';
+import { ProxyServiceRoute } from '../types/environment';
 
 function detectRuntimeEnvironment (): RuntimeEnvironmentInfo {
   if (isSupportWindow && typeof document !== 'undefined') {
@@ -65,9 +67,17 @@ export const RuntimeInfo: RuntimeEnvironmentInfo = detectRuntimeEnvironment();
 
 // Todo: Support more in backend case
 export const BowserParser = Bowser.getParser(typeof navigator !== 'undefined' ? navigator?.userAgent + '' : '');
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+export const isBrave = navigator.brave !== undefined && navigator.brave.isBrave.name === 'isBrave';
 export const isFirefox = BowserParser.getBrowserName(true) === 'firefox';
+export const browserName = isBrave ? 'brave' : BowserParser.getBrowserName(true);
+export const browserVersion = BowserParser.getBrowserVersion();
 export const osName = BowserParser.getOSName();
+export const osVersion = BowserParser.getOSVersion();
 export const isMobile = BowserParser.getPlatform().type === 'mobile';
+export const platformType = BowserParser.getPlatform().type;
+export const platformModel = BowserParser.getPlatform().model;
 
 export const TARGET_ENV = (process.env.TARGET_ENV || 'extension') as TargetEnvironment;
 export const targetIsExtension = TARGET_ENV === 'extension';
@@ -77,3 +87,33 @@ export const targetIsMobile = TARGET_ENV === 'mobile';
 export const MODULE_SUPPORT: EnvironmentSupport = {
   MANTA_ZK: false
 };
+
+enum HEADERS {
+  PLATFORM = 'Platform'
+}
+
+function formatExternalServiceApi (url: string, isTestnet?: boolean): string {
+  if (isTestnet === true) {
+    return `${url}/testnet`;
+  }
+
+  if (isTestnet === false) {
+    return `${url}/mainnet`;
+  }
+
+  return url;
+}
+
+export async function fetchFromProxyService (service: ProxyServiceRoute, path: string, options: RequestInit, isTestnet?: boolean) {
+  const baseUrl = formatExternalServiceApi(`${SW_EXTERNAL_SERVICES_API}${service}`, isTestnet);
+  const url = `${baseUrl}${path}`;
+  const headers = {
+    [HEADERS.PLATFORM]: TARGET_ENV,
+    ...(options.headers || {})
+  };
+
+  return fetch(url, {
+    ...options,
+    headers
+  });
+}

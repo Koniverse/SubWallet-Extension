@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressJson } from '@subwallet/extension-base/background/types';
-import { AccountItemBase, AccountItemWithName, AddContactModal, BackIcon, EditContactModal, FilterModal, GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { AddressJson } from '@subwallet/extension-base/types';
+import { AddContactModal, AddressSelectorItem, BackIcon, EditContactModal, FilterModal, GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { ADD_ADDRESS_BOOK_MODAL, EDIT_ADDRESS_BOOK_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useFilterModal, useFormatAddress, useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -168,11 +168,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
     if (item.group === AccountGroup.RECENT) {
       return (
-        <AccountItemBase
+        <AddressSelectorItem
           address={address}
-          addressPreLength={8}
-          addressSufLength={8}
-          avatarSize={24}
+          avatarValue={address}
+          className={'address-item'}
           key={item.address}
           onClick={onSelectItem(item)}
         />
@@ -180,11 +179,12 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return (
-      <AccountItemWithName
-        accountName={item.name}
+      <AddressSelectorItem
         address={address}
-        avatarSize={24}
+        avatarValue={address}
+        className={'address-item'}
         key={item.address}
+        name={item.name}
         onClick={onSelectItem(item)}
       />
     );
@@ -203,7 +203,10 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <SwList.Section
           actionBtnIcon={(
-            <Badge dot={!!selectedFilters.length}>
+            <Badge
+              className={'g-filter-badge'}
+              dot={!!selectedFilters.length}
+            >
               <Icon
                 phosphorIcon={FadersHorizontal}
                 size='sm'
@@ -253,6 +256,10 @@ const ManageAddressBook = styled(Component)<Props>(({ theme: { token } }: Props)
       height: '100%',
       display: 'flex',
       flexDirection: 'column'
+    },
+
+    '.address-item.address-item': {
+      display: 'flex'
     },
 
     '.ant-sw-list-section': {

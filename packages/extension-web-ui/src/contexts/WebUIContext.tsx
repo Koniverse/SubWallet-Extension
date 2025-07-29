@@ -62,12 +62,14 @@ function checkEarningDonePage (pathname: string) {
 
 const simplePages = [
   '/',
+  '/migrate-account',
   '/welcome',
   '/keyring/login',
   '/keyring/create-password',
   '/keyring/migrate-password',
   '/create-done',
-  '/earning-demo',
+  '/earning-preview',
+  '/earning-preview/pools',
   '/crowdloan-unlock-campaign/check-contributions',
   '/crowdloan-unlock-campaign/contributions-result',
   '/not-found',
@@ -90,6 +92,12 @@ export const WebUIContextProvider = ({ children }: WebUIContextProviderProps) =>
   const isPortfolio = useMemo(() => checkPortfolioPage(pathname), [pathname]);
 
   const setOnBack = useCallback((func?: VoidFunction) => {
+    if (!func) {
+      _setOnBack(undefined);
+
+      return;
+    }
+
     _setOnBack(() => {
       return func;
     });
@@ -106,7 +114,9 @@ export const WebUIContextProvider = ({ children }: WebUIContextProviderProps) =>
       setShowSidebar(true);
       !isPortfolio && setBackground(BackgroundColorMap.COMMON);
 
-      if (pathName.startsWith('/home') ||
+      if (isPortfolio) {
+        setHeaderType(HeaderType.COMMON);
+      } else if (pathName.startsWith('/home') ||
         pathName === '/settings' ||
         pathName === '/settings/list' ||
         pathName === '/dapps' ||

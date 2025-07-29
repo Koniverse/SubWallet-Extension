@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConfirmationsQueue } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
+import { ProcessTransactionData } from '@subwallet/extension-base/types';
 import { ReduxStatus, RequestState } from '@subwallet/extension-web-ui/stores/types';
 
 const initialState: RequestState = {
@@ -21,10 +22,22 @@ const initialState: RequestState = {
   // Type of confirmation requets
   addNetworkRequest: {},
   addTokenRequest: {},
-  switchNetworkRequest: {},
   evmSignatureRequest: {},
   evmSendTransactionRequest: {},
   evmWatchTransactionRequest: {},
+  errorConnectNetwork: {},
+  submitApiRequest: {},
+
+  tonSignatureRequest: {},
+  tonSendTransactionRequest: {},
+  tonWatchTransactionRequest: {},
+
+  cardanoSignatureRequest: {},
+  cardanoSendTransactionRequest: {},
+  cardanoWatchTransactionRequest: {},
+  cardanoSignTransactionRequest: {},
+
+  aliveProcess: {},
 
   // Summary Info
   reduxStatus: ReduxStatus.INIT,
@@ -39,11 +52,20 @@ export const CONFIRMATIONS_FIELDS: Array<keyof RequestState> = [
   'signingRequest',
   'addNetworkRequest',
   'addTokenRequest',
-  'switchNetworkRequest',
   'evmSignatureRequest',
   'evmSendTransactionRequest',
   'evmWatchTransactionRequest',
+  'errorConnectNetwork',
+  'submitApiRequest',
+  'tonSignatureRequest',
+  'tonSendTransactionRequest',
+  'tonWatchTransactionRequest',
+  'cardanoSignatureRequest',
+  'cardanoSendTransactionRequest',
+  'cardanoSignTransactionRequest',
+  'tonWatchTransactionRequest',
   'connectWCRequest',
+  'errorConnectNetwork',
   'notSupportWCRequest'
 ];
 
@@ -59,6 +81,8 @@ const readyMap = {
   updateMetadataRequests: false,
   updateSigningRequests: false,
   updateConfirmationRequests: false,
+  updateConfirmationRequestsTon: false,
+  updateConfirmationRequestCardano: false,
   updateConnectWalletConnect: false,
   updateNotSupportWalletConnect: false
 };
@@ -89,25 +113,28 @@ const requestStateSlice = createSlice({
   initialState,
   name: 'requestState',
   reducers: {
+    updateAliveProcess (state, { payload }: PayloadAction<Record<string, ProcessTransactionData>>) {
+      state.aliveProcess = payload;
+    },
     updateAuthorizeRequests (state, { payload }: PayloadAction<Record<string, AuthorizeRequest>>) {
       state.authorizeRequest = payload;
       readyMap.updateAuthorizeRequests = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     },
     updateMetadataRequests (state, { payload }: PayloadAction<Record<string, MetadataRequest>>) {
       state.metadataRequest = payload;
       readyMap.updateMetadataRequests = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     },
     updateSigningRequests (state, { payload }: PayloadAction<Record<string, SigningRequest>>) {
       state.signingRequest = payload;
       readyMap.updateSigningRequests = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     },
     updateConfirmationRequests (state, action: PayloadAction<Partial<ConfirmationsQueue>>) {
       Object.assign(state, action.payload);
       readyMap.updateConfirmationRequests = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     },
     updateTransactionRequests (state, { payload }: PayloadAction<Record<string, SWTransactionResult>>) {
       state.transactionRequest = payload;
@@ -115,13 +142,22 @@ const requestStateSlice = createSlice({
     updateConnectWCRequests (state, { payload }: PayloadAction<Record<string, WalletConnectSessionRequest>>) {
       state.connectWCRequest = payload;
       readyMap.updateConnectWalletConnect = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     },
-
+    updateConfirmationRequestsTon (state, action: PayloadAction<Partial<ConfirmationsQueueTon>>) {
+      Object.assign(state, action.payload);
+      readyMap.updateConfirmationRequestsTon = true;
+      computeStateSummary(state as RequestState);
+    },
+    updateConfirmationRequestsCardano (state, action: PayloadAction<Partial<ConfirmationsQueueCardano>>) {
+      Object.assign(state, action.payload);
+      readyMap.updateConfirmationRequestCardano = true;
+      computeStateSummary(state as RequestState);
+    },
     updateWCNotSupportRequests (state, { payload }: PayloadAction<Record<string, WalletConnectNotSupportRequest>>) {
       state.notSupportWCRequest = payload;
       readyMap.updateNotSupportWalletConnect = true;
-      computeStateSummary(state);
+      computeStateSummary(state as RequestState);
     }
   }
 });

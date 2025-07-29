@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountJson, YieldPoolType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { ALL_KEY } from '@subwallet/extension-koni-ui/constants';
 
@@ -12,7 +11,7 @@ import { isEthereumAddress } from '@polkadot/util-crypto';
 
 const defaultAccountFilter = (poolType: YieldPoolType, chain?: _ChainInfo): ((account: AccountJson) => boolean) => {
   return (account: AccountJson) => {
-    if (account.originGenesisHash && chain && _getSubstrateGenesisHash(chain) !== account.originGenesisHash) {
+    if (account.genesisHash && chain && _getSubstrateGenesisHash(chain) !== account.genesisHash) {
       return false;
     }
 

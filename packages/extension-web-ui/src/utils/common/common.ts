@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ChainLogoMap } from '@subwallet/chain-list';
+
 export const notDef = (x: any) => x === null || typeof x === 'undefined';
 export const isDef = (x: any) => !notDef(x);
 export const nonEmptyArr = (x: any) => Array.isArray(x) && x.length > 0;
@@ -23,3 +25,17 @@ export const capitalize = (s: string): string => s && s[0].toUpperCase() + s.sli
 export const simpleDeepClone = <T>(s: T) => {
   return JSON.parse(JSON.stringify(s)) as T;
 };
+
+export function shuffle<T = any> (array: T[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+export const getLogoByNetworkKey = (networkKey: string, defaultLogo = 'default'): string => {
+  return ChainLogoMap[networkKey] || ChainLogoMap[defaultLogo] || ChainLogoMap.default;
+};
+
+export const delay = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));

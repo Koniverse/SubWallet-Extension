@@ -1,31 +1,27 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
-import { AccountSelector, BasicInputEvent, ChainSelector, FilterModal, HistoryItem, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { AccountAddressSelector, BasicInputEvent, ChainSelector, FilterModal, HistoryItem, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-web-ui/components/FilterTabs';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { HISTORY_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useChainInfoWithState, useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
+import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-web-ui/messaging';
-import { ChainItemType, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-web-ui/types';
-import { customFormatDate, findAccountByAddress, findNetworkJsonByGenesisHash, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-web-ui/utils';
+import { ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-web-ui/types';
+import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Aperture, ArrowDownLeft, ArrowUpRight, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, ClockCounterClockwise, Database, FadersHorizontal, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-
-import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { HistoryDetailModal } from './Detail';
 
@@ -39,12 +35,18 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   crowdloan: Rocket,
   nft: Aperture,
   processing: Spinner,
-  default: ClockCounterClockwise
+  default: ClockCounterClockwise,
+  timeout: ClockCounterClockwise,
+  swap: ArrowsLeftRight
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
   if (item.status === ExtrinsicStatus.PROCESSING || item.status === ExtrinsicStatus.SUBMITTING) {
     return IconMap.processing;
+  }
+
+  if (item.status === ExtrinsicStatus.TIMEOUT) {
+    return IconMap.timeout;
   }
 
   if (item.type === ExtrinsicType.SEND_NFT) {
@@ -57,6 +59,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (item.type === ExtrinsicType.STAKING_CLAIM_REWARD) {
     return IconMap.claim_reward;
+  }
+
+  if (item.type === ExtrinsicType.SWAP) {
+    return IconMap.swap;
   }
 
   if (isTypeStaking(item.type)) {
@@ -107,6 +113,11 @@ function getDisplayData (item: TransactionHistoryItem, nameMap: Record<string, s
     displayData.typeName = nameMap.processing;
   }
 
+  if (item.status === ExtrinsicStatus.TIMEOUT) {
+    displayData.className = '-processing';
+    displayData.typeName = nameMap.timeout;
+  }
+
   if (item.status === ExtrinsicStatus.SUBMITTING) {
     displayData.className = '-processing';
     displayData.typeName = nameMap.submitting;
@@ -128,42 +139,12 @@ enum FilterValue {
   CROWDLOAN = 'crowdloan',
   SUCCESSFUL = 'successful',
   FAILED = 'failed',
-  EARN = 'earn'
+  EARN = 'earn',
+  SWAP = 'swap'
 }
 
 function getHistoryItemKey (item: Pick<TransactionHistoryItem, 'chain' | 'address' | 'extrinsicHash' | 'transactionId'>) {
   return `${item.chain}-${item.address}-${item.transactionId || item.extrinsicHash}`;
-}
-
-function findLedgerChainOfSelectedAccount (
-  address: string,
-  accounts: AccountJson[],
-  chainInfoMap: Record<string, _ChainInfo>
-): string | undefined {
-  if (!address) {
-    return undefined;
-  }
-
-  const isAccountEthereum = isEthereumAddress(address);
-
-  const account = findAccountByAddress(accounts, address);
-
-  if (isAccountEthereum && account?.isHardware) {
-    return 'ethereum';
-  }
-
-  if (!account || !account.isHardware) {
-    return undefined;
-  }
-
-  const validGen: string[] = account.availableGenesisHashes || [];
-  const validLedgerNetworks = validGen.map((genesisHash) => findNetworkJsonByGenesisHash(chainInfoMap, genesisHash)?.slug).filter((i) => !!i);
-
-  if (validLedgerNetworks.length) {
-    return validLedgerNetworks[0];
-  }
-
-  return undefined;
 }
 
 function filterDuplicateItems (items: TransactionHistoryItem[]): TransactionHistoryItem[] {
@@ -172,11 +153,15 @@ function filterDuplicateItems (items: TransactionHistoryItem[]): TransactionHist
   const exclusionMap: Record<string, boolean> = {};
 
   const getExclusionKey = (i: TransactionHistoryItem): string => {
+    if (i.type === ExtrinsicType.TRANSFER_TOKEN) {
+      return `${i.direction}_${i.blockNumber}_${ExtrinsicType.TRANSFER_BALANCE}_${i.from}_${i.to}`.toLowerCase();
+    }
+
     return `${i.direction}_${i.blockNumber}_${i.type}_${i.from}_${i.to}`.toLowerCase();
   };
 
   items.forEach((i) => {
-    if (i.origin === 'app' && i.blockNumber > 0 && i.type === ExtrinsicType.TRANSFER_BALANCE) {
+    if (i.origin === 'app' && i.blockNumber > 0 && (i.type === ExtrinsicType.TRANSFER_BALANCE || i.type === ExtrinsicType.TRANSFER_TOKEN)) {
       exclusionMap[getExclusionKey(i)] = true;
     }
   });
@@ -206,9 +191,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const dataContext = useContext(DataContext);
   const { isWebUI } = useContext(ScreenContext);
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
-  const { accounts, currentAccount, isAllAccount } = useSelector((root) => root.accountState);
+  const { accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
   const { chainInfoMap } = useSelector((root) => root.chainStore);
-  const chainInfoList = useChainInfoWithState();
   const { language } = useSelector((root) => root.settings);
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(FilterValue.ALL);
   const [loading, setLoading] = useState<boolean>(true);
@@ -247,6 +231,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         } else if (filter === FilterValue.CROWDLOAN) {
           if (item.type === ExtrinsicType.CROWDLOAN) {
+            return true;
+          }
+        } else if (filter === FilterValue.SWAP) {
+          if (item.type === ExtrinsicType.SWAP) {
             return true;
           }
         } else if (filter === FilterValue.SUCCESSFUL) {
@@ -301,12 +289,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       { label: t('Send token'), value: FilterValue.SEND },
       { label: t('Receive token'), value: FilterValue.RECEIVED },
       { label: t('NFT transaction'), value: FilterValue.NFT },
-      { label: t('Stake transaction'), value: FilterValue.STAKE },
-      { label: t('Claim staking reward'), value: FilterValue.CLAIM },
+      { label: t('Earning transaction'), value: FilterValue.STAKE },
+      { label: t('Claim reward'), value: FilterValue.CLAIM },
+      { label: t('Swap'), value: FilterValue.SWAP },
       // { label: t('Crowdloan transaction'), value: FilterValue.CROWDLOAN }, // support crowdloan later
       { label: t('Successful'), value: FilterValue.SUCCESSFUL },
-      { label: t('Failed'), value: FilterValue.FAILED },
-      { label: t('Start earning'), value: FilterValue.EARN }
+      { label: t('Failed'), value: FilterValue.FAILED }
     ];
   }, [t]);
 
@@ -318,7 +306,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }, {} as Record<string, string>);
   }, [accounts]);
 
-  const typeNameMap: Record<string, string> = useMemo((): Record<string, string> => ({
+  const typeNameMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'submitting' | 'processing' | 'timeout' | 'send' | 'received', string> => ({
     default: t('Transaction'),
     submitting: t('Submitting...'),
     processing: t('Processing...'),
@@ -332,7 +320,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.CROWDLOAN]: t('Crowdloan'),
     [ExtrinsicType.STAKING_JOIN_POOL]: t('Stake'),
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake'),
-    [ExtrinsicType.STAKING_BOND]: t('Bond'),
+    [ExtrinsicType.STAKING_BOND]: t('Stake'),
     [ExtrinsicType.STAKING_UNBOND]: t('Unstake'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw'),
@@ -346,22 +334,28 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.MINT_SDOT]: t('Mint sDOT'),
     [ExtrinsicType.MINT_LDOT]: t('Mint LDOT'),
     [ExtrinsicType.MINT_VDOT]: t('Mint vDOT'),
+    [ExtrinsicType.MINT_VMANTA]: t('Mint vMANTA'),
     [ExtrinsicType.MINT_STDOT]: t('Mint stDOT'),
     [ExtrinsicType.REDEEM_QDOT]: t('Redeem qDOT'),
     [ExtrinsicType.REDEEM_SDOT]: t('Redeem sDOT'),
     [ExtrinsicType.REDEEM_LDOT]: t('Redeem LDOT'),
     [ExtrinsicType.REDEEM_VDOT]: t('Redeem vDOT'),
+    [ExtrinsicType.REDEEM_VMANTA]: t('Redeem vMANTA'),
     [ExtrinsicType.REDEEM_STDOT]: t('Redeem stDOT'),
     [ExtrinsicType.UNSTAKE_QDOT]: t('Unstake qDOT'),
     [ExtrinsicType.UNSTAKE_VDOT]: t('Unstake vDOT'),
+    [ExtrinsicType.UNSTAKE_VMANTA]: t('Unstake vMANTA'),
     [ExtrinsicType.UNSTAKE_LDOT]: t('Unstake LDOT'),
     [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT'),
     [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT'),
-    [ExtrinsicType.TOKEN_APPROVE]: t('Token approve'),
+    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve'),
+    [ExtrinsicType.SWAP]: t('Swap'),
+    [ExtrinsicType.SET_FEE_TOKEN]: t('Fee token'),
+    [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
-  const typeTitleMap: Record<string, string> = useMemo(() => ({
+  const typeTitleMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'send' | 'received', string> => ({
     default: t('Transaction'),
     send: t('Send token'),
     received: t('Receive token'),
@@ -372,8 +366,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.CROWDLOAN]: t('Crowdloan transaction'),
     [ExtrinsicType.STAKING_JOIN_POOL]: t('Stake transaction'),
     [ExtrinsicType.STAKING_LEAVE_POOL]: t('Unstake transaction'),
-    [ExtrinsicType.STAKING_BOND]: t('Bond transaction'),
-    [ExtrinsicType.STAKING_UNBOND]: t('Unbond transaction'),
+    [ExtrinsicType.STAKING_BOND]: t('Stake transaction'),
+    [ExtrinsicType.STAKING_UNBOND]: t('Unstake transaction'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('Claim Reward transaction'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('Withdraw transaction'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('Withdraw transaction'),
@@ -386,18 +380,24 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.MINT_SDOT]: t('Mint sDOT transaction'),
     [ExtrinsicType.MINT_LDOT]: t('Mint LDOT transaction'),
     [ExtrinsicType.MINT_VDOT]: t('Mint vDOT transaction'),
+    [ExtrinsicType.MINT_VMANTA]: t('Mint vMANTA transaction'),
     [ExtrinsicType.MINT_STDOT]: t('Mint stDOT transaction'),
     [ExtrinsicType.REDEEM_QDOT]: t('Redeem qDOT transaction'),
     [ExtrinsicType.REDEEM_SDOT]: t('Redeem sDOT transaction'),
     [ExtrinsicType.REDEEM_LDOT]: t('Redeem LDOT transaction'),
     [ExtrinsicType.REDEEM_VDOT]: t('Redeem vDOT transaction'),
+    [ExtrinsicType.REDEEM_VMANTA]: t('Redeem vMANTA transaction'),
     [ExtrinsicType.REDEEM_STDOT]: t('Redeem stDOT transaction'),
     [ExtrinsicType.UNSTAKE_QDOT]: t('Unstake qDOT tranasction'),
     [ExtrinsicType.UNSTAKE_VDOT]: t('Unstake vDOT tranasction'),
+    [ExtrinsicType.UNSTAKE_VMANTA]: t('Unstake vMANTA tranasction'),
     [ExtrinsicType.UNSTAKE_LDOT]: t('Unstake LDOT tranasction'),
     [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT tranasction'),
     [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT tranasction'),
-    [ExtrinsicType.TOKEN_APPROVE]: t('Token approve transaction'),
+    [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve transaction'),
+    [ExtrinsicType.SWAP]: t('Swap transaction'),
+    [ExtrinsicType.SET_FEE_TOKEN]: t('Fee token'),
+    [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 
@@ -425,7 +425,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
 
-  const [curAdr] = useState(currentAccount?.address);
+  const [currentAccountProxyid] = useState(currentAccountProxy?.id);
 
   // Handle detail modal
   const { chain, extrinsicHashOrId } = useParams();
@@ -475,13 +475,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [isActive, historyMap]);
 
   useEffect(() => {
-    if (currentAccount?.address !== curAdr) {
+    if (currentAccountProxy?.id !== currentAccountProxyid) {
       inactiveModal(modalId);
       setSelectedItem(null);
     }
-  }, [curAdr, currentAccount?.address, inactiveModal]);
+  }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
 
-  const { selectedAddress, selectedChain, setSelectedAddress, setSelectedChain } = useHistorySelection();
+  const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress,
+    setSelectedChain } = useHistorySelection();
 
   const emptyList = useCallback(() => {
     return <NoContent pageType={PAGE_TYPE.HISTORY} />;
@@ -536,25 +537,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     ];
   }, [t]);
 
-  const chainItems = useMemo<ChainItemType[]>(() => {
-    if (!selectedAddress) {
-      return [];
-    }
-
-    const result: ChainItemType[] = [];
-
-    chainInfoList.forEach((c) => {
-      if (_isChainEvmCompatible(c) === isEthereumAddress(selectedAddress)) {
-        result.push({
-          name: c.name,
-          slug: c.slug
-        });
-      }
-    });
-
-    return result;
-  }, [chainInfoList, selectedAddress]);
-
   const onSelectAccount = useCallback((event: BasicInputEvent) => {
     setSelectedAddress(event.target.value);
   }, [setSelectedAddress]);
@@ -563,47 +545,30 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setSelectedChain(event.target.value);
   }, [setSelectedChain]);
 
-  const currentLedgerChainOfSelectedAccount = useMemo(() => {
-    return findLedgerChainOfSelectedAccount(selectedAddress,
-      accounts,
-      chainInfoMap);
-  }, [accounts, chainInfoMap, selectedAddress]);
-
   const isChainSelectorEmpty = !chainItems.length;
-
-  const chainSelectorDisabled = useMemo(() => {
-    if (!selectedAddress || isChainSelectorEmpty) {
-      return true;
-    }
-
-    if (!isEthereumAddress(selectedAddress)) {
-      return !!currentLedgerChainOfSelectedAccount;
-    }
-
-    return false;
-  }, [isChainSelectorEmpty, currentLedgerChainOfSelectedAccount, selectedAddress]);
 
   const historySelectorsNode = (
     <>
-      {
-        isAllAccount && (
-          <AccountSelector
-            className={'__history-address-selector'}
-            onChange={onSelectAccount}
-            value={selectedAddress}
-          />
-        )
-      }
-
       <ChainSelector
         className={'__history-chain-selector'}
-        disabled={chainSelectorDisabled}
+        disabled={isChainSelectorEmpty}
         items={chainItems}
         loading={loading}
         onChange={onSelectChain}
         title={t('Select chain')}
         value={selectedChain}
       />
+
+      {
+        (isAllAccount || accountAddressItems.length > 1) && (
+          <AccountAddressSelector
+            className={'__history-address-selector'}
+            items={accountAddressItems}
+            onChange={onSelectAccount}
+            value={selectedAddress}
+          />
+        )
+      }
     </>
   );
 
@@ -704,34 +669,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       }
     };
   }, [isSelectedChainEvm, selectedAddress, selectedChain]);
-
-  useEffect(() => {
-    if (chainItems.length) {
-      setSelectedChain((prevChain) => {
-        const _isEthereumAddress = isEthereumAddress(selectedAddress);
-
-        if (currentLedgerChainOfSelectedAccount) {
-          if (!_isEthereumAddress) {
-            return currentLedgerChainOfSelectedAccount;
-          }
-        }
-
-        if (prevChain && chainInfoMap[prevChain]) {
-          const _isPrevChainEvm = _isChainEvmCompatible(chainInfoMap[prevChain]);
-
-          if (_isEthereumAddress && !_isPrevChainEvm && currentLedgerChainOfSelectedAccount) {
-            return currentLedgerChainOfSelectedAccount;
-          }
-
-          if (_isPrevChainEvm === _isEthereumAddress) {
-            return prevChain;
-          }
-        }
-
-        return chainItems[0].slug;
-      });
-    }
-  }, [chainInfoMap, chainItems, currentLedgerChainOfSelectedAccount, selectedAddress, setSelectedChain]);
 
   useEffect(() => {
     setHistoryItems(getHistoryItems(currentItemDisplayCount));
@@ -878,6 +815,16 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
       '.__history-address-selector': {
         '.__selected-item-address': {
           display: 'none'
+        },
+
+        '.ant-field-container:before': {
+          display: 'none'
+        },
+
+        '.ant-field-wrapper': {
+          minHeight: 40,
+          paddingTop: 0,
+          paddingBottom: 0
         }
       }
     },

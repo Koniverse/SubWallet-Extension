@@ -3,16 +3,16 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { MantaPayConfig } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountSelectorModalId } from '@subwallet/extension-web-ui/components/Modal/AccountSelectorModal';
-import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
+import { AccountJson } from '@subwallet/extension-base/types';
+import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL, WARNING_LEDGER_RECEIVE_MODAL } from '@subwallet/extension-web-ui/constants/modal';
+import { useConfirmModal, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-web-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { findAccountByAddress, isAccountAll as checkIsAccountAll } from '@subwallet/extension-web-ui/utils';
+import { findAccountByAddress, isAccountAll as checkIsAccountAll, ledgerMustCheckNetwork } from '@subwallet/extension-web-ui/utils';
 import { findNetworkJsonByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
-import { ModalContext } from '@subwallet/react-ui';
+import { ModalContext, SwModalFuncProps } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -62,16 +62,38 @@ function isMantaPayEnabled (account: AccountJson | null, configs: MantaPayConfig
   return false;
 }
 
+const AccountSelectorModalId = 'accountSelectorModalId';
+
+// todo: deprecated, will remove
 export default function useReceiveQR (tokenGroupSlug?: string) {
+  const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state: RootState) => state.chainStore);
+  const mantaPayConfigs = useSelector((state: RootState) => state.mantaPay.configs);
   const { accounts, currentAccount, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const assetRegistryMap = useChainAssets().chainAssetRegistry;
-  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
   const [tokenSelectorItems, setTokenSelectorItems] = useState<_ChainAsset[]>([]);
   const [{ selectedAccount, selectedNetwork }, setReceiveSelectedResult] = useState<ReceiveSelectedResult>(
     { selectedAccount: isAllAccount ? undefined : currentAccount?.address }
   );
-  const mantaPayConfigs = useSelector((state: RootState) => state.mantaPay.configs);
+
+  const confirmModalProps = useMemo((): SwModalFuncProps => ({
+    id: WARNING_LEDGER_RECEIVE_MODAL,
+    title: t<string>('Unsupported network'),
+    maskClosable: true,
+    closable: true,
+    subTitle: t<string>('Do you still want to get the address?'),
+    okText: t<string>('Get address'),
+    okCancel: true,
+    type: 'warn',
+    cancelButtonProps: {
+      children: t<string>('Cancel'),
+      schema: 'secondary'
+    },
+    className: 'ledger-warning-modal'
+  }), [t]);
+
+  const { handleSimpleConfirmModal } = useConfirmModal(confirmModalProps);
 
   const accountSelectorItems = useMemo<AccountJson[]>(() => {
     if (!isAllAccount) {
@@ -90,37 +112,27 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
         }
 
         if (account.isHardware) {
-          if (!isEvm) {
-            const availableGen: string[] = account.availableGenesisHashes || [];
-            const networks = availableGen
-              .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
-              .filter((slug) => slug) as string[];
+          if (!account.isGeneric) {
+            if (!isEvm) {
+              const availableGen: string[] = account.availableGenesisHashes || [];
+              const networks = availableGen
+                .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
+                .filter((slug) => slug) as string[];
 
-            return networks.some((n) => chains.includes(n));
-          } else {
-            return chains.some((chain) => {
-              const info = chainInfoMap[chain];
-
-              if (info) {
-                return _isChainEvmCompatible(info);
-              } else {
-                return false;
-              }
-            });
-          }
-        } else {
-          for (const chain of chains) {
-            const info = chainInfoMap[chain];
-
-            if (info) {
-              if (isEvm === _isChainEvmCompatible(info)) {
-                return true;
-              }
+              return networks.some((n) => chains.includes(n));
             }
           }
-
-          return false;
         }
+
+        return chains.some((chain) => {
+          const info = chainInfoMap[chain];
+
+          if (info) {
+            return isEvm === _isChainEvmCompatible(info);
+          } else {
+            return false;
+          }
+        });
       });
     }
 
@@ -144,7 +156,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
     return Object.values(assetRegistryMap).filter((asset) => {
       const availableGen: string[] = acc?.availableGenesisHashes || [];
 
-      if (acc?.isHardware && !isEvmAddress && !availableGen.includes(chainInfoMap[asset.originChain].substrateInfo?.genesisHash || '')) {
+      if (acc?.isHardware && !acc?.isGeneric && !availableGen.includes(chainInfoMap[asset.originChain].substrateInfo?.genesisHash || '')) {
         return false;
       }
 
@@ -176,7 +188,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
     } else {
       // if currentAccount is ledger type
       if (currentAccount.isHardware) {
-        if (!isEthereumAddress(currentAccount.address)) {
+        if (!currentAccount.isGeneric) {
           const availableGen: string[] = currentAccount.availableGenesisHashes || [];
           const networks = availableGen
             .map((gen) => findNetworkJsonByGenesisHash(chainInfoMap, gen)?.slug)
@@ -197,6 +209,30 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
 
       if (tokenGroupSlug) {
         if (_tokenSelectorItems.length === 1) {
+          const firstToken = _tokenSelectorItems[0];
+          const ledgerCheck = ledgerMustCheckNetwork(currentAccount);
+
+          if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(firstToken.originChain)) {
+            handleSimpleConfirmModal({
+              content: t<string>(
+                'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
+                {
+                  replace: {
+                    ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+                    networkName: chainInfoMap[firstToken.originChain]?.name
+                  }
+                }
+              )
+            })
+              .then(() => {
+                setReceiveSelectedResult((prev) => ({ ...prev, selectedNetwork: _tokenSelectorItems[0].originChain }));
+                activeModal(RECEIVE_QR_MODAL);
+              })
+              .catch(console.error);
+
+            return;
+          }
+
           setReceiveSelectedResult((prev) => ({ ...prev, selectedNetwork: _tokenSelectorItems[0].originChain }));
           activeModal(RECEIVE_QR_MODAL);
 
@@ -206,7 +242,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
 
       activeModal(RECEIVE_TOKEN_SELECTOR_MODAL);
     }
-  }, [activeModal, chainInfoMap, currentAccount, getTokenSelectorItems, tokenGroupSlug]);
+  }, [activeModal, chainInfoMap, currentAccount, getTokenSelectorItems, handleSimpleConfirmModal, ledgerGenericAllowNetworks, t, tokenGroupSlug]);
 
   const openSelectAccount = useCallback((account: AccountJson) => {
     setReceiveSelectedResult({ selectedAccount: account.address });
@@ -216,6 +252,31 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
 
     if (tokenGroupSlug) {
       if (_tokenSelectorItems.length === 1) {
+        const first = _tokenSelectorItems[0];
+        const ledgerCheck = ledgerMustCheckNetwork(account);
+
+        if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(first.originChain)) {
+          handleSimpleConfirmModal({
+            content: t<string>(
+              'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
+              {
+                replace: {
+                  ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+                  networkName: chainInfoMap[first.originChain]?.name
+                }
+              }
+            )
+          })
+            .then(() => {
+              setReceiveSelectedResult((prev) => ({ ...prev, selectedNetwork: _tokenSelectorItems[0].originChain }));
+              activeModal(RECEIVE_QR_MODAL);
+              inactiveModal(AccountSelectorModalId);
+            })
+            .catch(console.error);
+
+          return;
+        }
+
         setReceiveSelectedResult((prev) => ({ ...prev, selectedNetwork: _tokenSelectorItems[0].originChain }));
         activeModal(RECEIVE_QR_MODAL);
         inactiveModal(AccountSelectorModalId);
@@ -226,7 +287,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
 
     activeModal(RECEIVE_TOKEN_SELECTOR_MODAL);
     inactiveModal(AccountSelectorModalId);
-  }, [activeModal, getTokenSelectorItems, inactiveModal, tokenGroupSlug]);
+  }, [activeModal, chainInfoMap, getTokenSelectorItems, handleSimpleConfirmModal, inactiveModal, ledgerGenericAllowNetworks, t, tokenGroupSlug]);
 
   const openSelectToken = useCallback((item: _ChainAsset) => {
     setReceiveSelectedResult((prevState) => ({ ...prevState, selectedNetwork: item.originChain }));

@@ -3,7 +3,6 @@
 
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceItem } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -48,6 +47,7 @@ interface FormState {
   view: ViewValue
 }
 
+// todo: need to recheck account balance logic again
 function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalanceMap }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
 
@@ -55,7 +55,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
   const isActive = checkActive(id);
 
-  const { currentAccount, isAllAccount } = useSelector((state) => state.accountState);
+  const { accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const { balanceMap } = useSelector((state) => state.balance);
 
   const [form] = Form.useForm<FormState>();
@@ -103,22 +103,22 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   }, [currentTokenInfo, t, tokenBalanceMap]);
 
   const accountItems = useMemo((): BalanceItem[] => {
-    if (!currentTokenInfo?.slug) {
+    if (!currentAccountProxy || !currentTokenInfo?.slug) {
       return [];
     }
 
     const result: BalanceItem[] = [];
 
-    const filterAddress = (address: string) => {
+    const filterAccountId = (accountId: string) => {
       if (isAllAccount) {
-        return !isAccountAll(address);
+        return !isAccountAll(accountId) && accounts.some((a) => a.address === accountId);
       } else {
-        return isSameAddress(address, currentAccount?.address || '');
+        return currentAccountProxy.accounts.some((a) => a.address === accountId);
       }
     };
 
-    for (const [address, info] of Object.entries(balanceMap)) {
-      if (filterAddress(address)) {
+    for (const [accountId, info] of Object.entries(balanceMap)) {
+      if (filterAccountId(accountId)) {
         const item = info[currentTokenInfo.slug];
 
         if (item && item.state === APIItemState.READY) {
@@ -133,7 +133,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
       return bTotal.minus(aTotal).toNumber();
     });
-  }, [balanceMap, currentAccount?.address, currentTokenInfo?.slug, isAllAccount]);
+  }, [accounts, balanceMap, currentAccountProxy, currentTokenInfo?.slug, isAllAccount]);
 
   const symbol = currentTokenInfo?.symbol || '';
 
@@ -174,27 +174,29 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       <div className='content-container'>
         {
           view === ViewValue.OVERVIEW && (
-            <div className={'__container'}>
-              {items.map((item) => (
-                <div
-                  className={'__row'}
-                  key={item.key}
-                >
-                  <div className={'__label'}>{item.label}</div>
+            <>
+              <div className={'__container'}>
+                {items.map((item) => (
+                  <div
+                    className={'__row'}
+                    key={item.key}
+                  >
+                    <div className={'__label'}>{item.label}</div>
 
-                  <Number
-                    className={'__value'}
-                    decimal={0}
-                    decimalOpacity={0.45}
-                    intOpacity={0.85}
-                    size={14}
-                    suffix={item.symbol}
-                    unitOpacity={0.85}
-                    value={item.value}
-                  />
-                </div>
-              ))}
-            </div>
+                    <Number
+                      className={'__value'}
+                      decimal={0}
+                      decimalOpacity={0.45}
+                      intOpacity={0.85}
+                      size={14}
+                      suffix={item.symbol}
+                      unitOpacity={0.85}
+                      value={item.value}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
           )
         }
         {
@@ -263,6 +265,10 @@ export const DetailModal = styled(Component)<Props>(({ theme: { token } }: Props
       borderRadius: token.borderRadiusLG,
       backgroundColor: token.colorBgSecondary,
       padding: '12px 12px 4px'
+    },
+
+    '.__explorer-link': {
+      marginTop: token.margin
     },
 
     '.__row': {

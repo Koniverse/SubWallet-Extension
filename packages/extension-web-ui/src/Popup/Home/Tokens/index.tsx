@@ -1,33 +1,34 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EmptyList, PageWrapper, TokenBalance, TokenItem, TokenPrice } from '@subwallet/extension-web-ui/components';
-import NetworkGroup from '@subwallet/extension-web-ui/components/MetaInfo/parts/NetworkGroup';
-import { AccountSelectorModal } from '@subwallet/extension-web-ui/components/Modal/AccountSelectorModal';
-import ReceiveQrModal from '@subwallet/extension-web-ui/components/Modal/ReceiveModal/ReceiveQrModal';
-import { TokensSelectorModal } from '@subwallet/extension-web-ui/components/Modal/ReceiveModal/TokensSelectorModal';
+import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
+import { AccountSelectorModal, AlertBox, EmptyList, PageWrapper, ReceiveModal, TokenBalance, TokenItem, TokenPrice } from '@subwallet/extension-web-ui/components';
+import AnimatedNetworkGroup from '@subwallet/extension-web-ui/components/MetaInfo/parts/AnimatedNetworkGroup';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { TokenGroupBalanceItem } from '@subwallet/extension-web-ui/components/TokenItem/TokenGroupBalanceItem';
-import { DEFAULT_TRANSFER_PARAMS, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
+import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
-import useReceiveQR from '@subwallet/extension-web-ui/hooks/screen/home/useReceiveQR';
 import { UpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/UpperBlock';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
+import { AccountAddressItemType, ThemeProps, TransferParams } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { isAccountAll, sortTokenByValue } from '@subwallet/extension-web-ui/utils';
-import { Button, Icon, Number, Typography } from '@subwallet/react-ui';
+import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
+import { isTonAddress } from '@subwallet/keyring';
+import { Button, Icon, ModalContext, Number, Typography } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import classNames from 'classnames';
 import { Coins, FadersHorizontal, SlidersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -44,6 +45,8 @@ const searchFunc = (item: TokenBalanceItemType, searchText: string) => {
   return symbol.includes(searchTextLowerCase);
 };
 
+const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;
+
 const Component = (): React.ReactElement => {
   useSetCurrentPage('/home/tokens');
   const { t } = useTranslation();
@@ -52,11 +55,26 @@ const Component = (): React.ReactElement => {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+  const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { accountBalance: { tokenGroupBalanceMap,
     totalBalanceInfo }, tokenGroupStructure: { sortedTokenGroups } } = useContext(HomeContext);
-  const currentAccount = useSelector((state: RootState) => state.accountState.currentAccount);
+  const notify = useNotification();
+  const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
+  const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
+
+  const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
+  const allowedChains = useGetChainSlugsByAccount();
+  const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
+  const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
+  const tonAddress = useMemo(() => {
+    return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
+  }, [currentAccountProxy]);
 
   const outletContext: {
     searchInput: string,
@@ -67,20 +85,6 @@ const Component = (): React.ReactElement => {
   const searchInput = outletContext?.searchInput;
   const setSearchPlaceholder = outletContext?.setSearchPlaceholder;
   const setShowSearchInput = outletContext?.setShowSearchInput;
-
-  useEffect(() => {
-    setSearchPlaceholder?.(t('Token name'));
-    setShowSearchInput?.(true);
-  }, [setSearchPlaceholder, setShowSearchInput, t]);
-
-  const notify = useNotification();
-  const { accountSelectorItems,
-    onOpenReceive,
-    openSelectAccount,
-    openSelectToken,
-    selectedAccount,
-    selectedNetwork,
-    tokenSelectorItems } = useReceiveQR();
 
   const { isWebUI } = useContext(ScreenContext);
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
@@ -157,6 +161,72 @@ const Component = (): React.ReactElement => {
 
   const isTotalBalanceDecrease = totalBalanceInfo.change.status === 'decrease';
 
+  const isSupportBuyTokens = useMemo(() => {
+    if (isSoloTonAccountProxy(currentAccountProxy)) {
+      return false;
+    }
+
+    return Object.values(buyTokenInfos).some((item) => allowedChains.includes(item.network));
+  }, [allowedChains, buyTokenInfos, currentAccountProxy]);
+
+  const isHaveOnlyTonSoloAcc = useMemo(() => {
+    const checkValidAcc = (currentAcc: AccountProxy) => {
+      return currentAcc?.accountType === AccountProxyType.SOLO && currentAcc?.chainTypes.includes(AccountChainType.TON);
+    };
+
+    if (isAllAccount) {
+      return accountProxies.filter((a) => a.accountType !== AccountProxyType.ALL_ACCOUNT).every((acc) => checkValidAcc(acc));
+    } else {
+      return currentAccountProxy && checkValidAcc(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
+  const tonAccountList: AccountAddressItemType[] = useMemo(() => {
+    return accountProxies.filter((acc) => acc?.accountType === AccountProxyType.SOLO && acc?.chainTypes.includes(AccountChainType.TON)).map((item) => ({
+      accountName: item.name,
+      accountProxyId: item.id,
+      accountProxyType: item.accountType,
+      accountType: item.accounts[0].type,
+      address: item.accounts[0].address,
+      accountActions: item.accountActions
+    }));
+  }, [accountProxies]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openBuyTokens = searchParams.get('openBuyTokens') || '';
+
+  const onCloseAccountSelector = useCallback(() => {
+    setIsShowTonWarning(false);
+    inactiveModal(tonAccountSelectorModalId);
+  }, [inactiveModal, setIsShowTonWarning]);
+
+  const onSelectAccountSelector = useCallback((item: AccountAddressItemType) => {
+    tonWalletContractSelectorModal.open({
+      address: item.address,
+      chainSlug: 'ton',
+      onCancel: () => {
+        setIsShowTonWarning(false);
+        inactiveModal(tonAccountSelectorModalId);
+        tonWalletContractSelectorModal.close();
+      },
+      onBack: tonWalletContractSelectorModal.close
+    });
+  }, [inactiveModal, setIsShowTonWarning, tonWalletContractSelectorModal]);
+
+  const onOpenTonWalletContactModal = useCallback(() => {
+    if (isAllAccount) {
+      activeModal(tonAccountSelectorModalId);
+    } else {
+      if (tonAddress) {
+        tonWalletContractSelectorModal.open({
+          address: tonAddress,
+          chainSlug: 'ton',
+          onCancel: tonWalletContractSelectorModal.close
+        });
+      }
+    }
+  }, [activeModal, isAllAccount, tonAddress, tonWalletContractSelectorModal]);
+
   const onClickItem = useCallback((item: TokenBalanceItemType) => {
     navigate(`/home/tokens/detail/${item.slug}`);
   }, [navigate]);
@@ -166,7 +236,11 @@ const Component = (): React.ReactElement => {
   }, [navigate]);
 
   const onOpenSendFund = useCallback(() => {
-    if (currentAccount && currentAccount.isReadOnly) {
+    if (!currentAccountProxy) {
+      return;
+    }
+
+    if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
         message: t('The account you are using is watch-only, you cannot send assets with it'),
         type: 'info',
@@ -176,15 +250,13 @@ const Component = (): React.ReactElement => {
       return;
     }
 
-    const address = currentAccount ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : '';
-
     setStorage({
       ...DEFAULT_TRANSFER_PARAMS,
-      from: address
+      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
     navigate('/transaction/send-fund');
   },
-  [currentAccount, navigate, notify, t, setStorage]
+  [currentAccountProxy, setStorage, navigate, notify, t]
   );
 
   const onOpenBuyTokens = useCallback(() => {
@@ -193,11 +265,49 @@ const Component = (): React.ReactElement => {
   [navigate]
   );
 
+  const onOpenSwap = useCallback(() => {
+    if (!currentAccountProxy) {
+      return;
+    }
+
+    if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
+      notify({
+        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        type: 'info',
+        duration: 3
+      });
+
+      return;
+    }
+
+    const filteredAccounts = accountProxies.filter((ap) => !isAccountAll(ap.id));
+
+    const isAllLedger = currentAccountProxy.accountType === AccountProxyType.LEDGER || (filteredAccounts.length > 0 && filteredAccounts.every((ap) => ap.accountType === AccountProxyType.LEDGER));
+
+    if (isAllLedger) {
+      notify({
+        message: 'The account you are using is Ledger account, you cannot use this feature with it',
+        type: 'error',
+        duration: 3
+      });
+
+      return;
+    }
+
+    setSwapStorage({
+      ...DEFAULT_SWAP_PARAMS,
+      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
+    });
+    navigate('/transaction/swap');
+  }, [accountProxies, currentAccountProxy, navigate, notify, setSwapStorage, t]);
+
+  const debouncedTokenGroupBalanceMap = useDebouncedValue<Record<string, TokenBalanceItemType>>(tokenGroupBalanceMap, 300);
+
   const tokenGroupBalanceItems = useMemo<TokenBalanceItemType[]>(() => {
     const result: TokenBalanceItemType[] = [];
 
     sortedTokenGroups.forEach((tokenGroupSlug) => {
-      const item = tokenGroupBalanceMap[tokenGroupSlug];
+      const item = debouncedTokenGroupBalanceMap[tokenGroupSlug];
 
       if (!item) {
         return;
@@ -212,16 +322,10 @@ const Component = (): React.ReactElement => {
       }
     });
 
-    return result.sort(sortTokenByValue);
-  }, [sortedTokenGroups, tokenGroupBalanceMap, searchInput]);
+    sortTokensByStandard(result, priorityTokens, true);
 
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [handleResize]);
+    return result;
+  }, [sortedTokenGroups, priorityTokens, debouncedTokenGroupBalanceMap, searchInput]);
 
   const tokenBalanceClick = useCallback((item: TokenBalanceItemType) => {
     return () => {
@@ -247,7 +351,7 @@ const Component = (): React.ReactElement => {
             {`${relatedChains.length} ${t('networks')}`}
           </Typography.Text>
 
-          <NetworkGroup chains={relatedChains} />
+          <AnimatedNetworkGroup chains={relatedChains} />
         </div>
       );
     }
@@ -256,6 +360,26 @@ const Component = (): React.ReactElement => {
       <Typography.Text className={'token-item-information__sub-title'}></Typography.Text>
     );
   }, [chainInfoMap, t]);
+
+  useEffect(() => {
+    setSearchPlaceholder?.(t('Token name'));
+    setShowSearchInput?.(true);
+  }, [setSearchPlaceholder, setShowSearchInput, t]);
+
+  useEffect(() => {
+    if (openBuyTokens === 'true' && isSupportBuyTokens && !isWebUI) {
+      searchParams.delete('openBuyTokens');
+      onOpenBuyTokens();
+    }
+  }, [openBuyTokens, onOpenBuyTokens, searchParams, navigate, setSearchParams, isSupportBuyTokens, isWebUI]);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
 
   if (isWebUI) {
     const isTotalZero = totalBalanceInfo.convertedValue.eq(BN_0);
@@ -378,11 +502,15 @@ const Component = (): React.ReactElement => {
           ref={topBlockRef}
         >
           <UpperBlock
+            className={'__upper-block'}
             isPriceDecrease={isTotalBalanceDecrease}
             isShrink={isShrink}
+            isSupportBuyTokens={isSupportBuyTokens}
+            isSupportSwap={true}
             onOpenBuyTokens={onOpenBuyTokens}
             onOpenReceive={onOpenReceive}
             onOpenSendFund={onOpenSendFund}
+            onOpenSwap={onOpenSwap}
             totalChangePercent={totalBalanceInfo.change.percent}
             totalChangeValue={totalBalanceInfo.change.value}
             totalValue={totalBalanceInfo.convertedValue}
@@ -392,6 +520,34 @@ const Component = (): React.ReactElement => {
         <div
           className={'__scroll-container'}
         >
+          {
+            isHaveOnlyTonSoloAcc && isShowTonWarning && (
+              <>
+                <AlertBox
+                  className={classNames('ton-solo-acc-alert-area')}
+                  description={<Trans
+                    components={{
+                      highlight: (
+                        <a
+                          className='link'
+                          onClick={onOpenTonWalletContactModal}
+                        />
+                      )
+                    }}
+                    i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  />}
+                  title={t('Change wallet address & version')}
+                  type={'warning'}
+                />
+                <AccountSelectorModal
+                  items={tonAccountList}
+                  modalId={tonAccountSelectorModalId}
+                  onCancel={onCloseAccountSelector}
+                  onSelectItem={onSelectAccountSelector}
+                />
+              </>
+            )
+          }
           {
             tokenGroupBalanceItems.map((item) => {
               return (
@@ -426,23 +582,9 @@ const Component = (): React.ReactElement => {
         </div>
         {
           !isWebUI && (
-            <>
-              <AccountSelectorModal
-                items={accountSelectorItems}
-                onSelectItem={openSelectAccount}
-              />
-
-              <TokensSelectorModal
-                address={selectedAccount}
-                items={tokenSelectorItems}
-                onSelectItem={openSelectToken}
-              />
-
-              <ReceiveQrModal
-                address={selectedAccount}
-                selectedNetwork={selectedNetwork}
-              />
-            </>
+            <ReceiveModal
+              {...receiveModalProps}
+            />
           )
         }
       </div>
@@ -461,7 +603,7 @@ const WrapperComponent = ({ className = '' }: WrapperProps): React.ReactElement<
     <PageWrapper
       className={`tokens ${className}`}
       hideLoading={true}
-      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance'])}
+      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'swap'])}
     >
       <Component />
     </PageWrapper>
@@ -480,6 +622,11 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       '.ant-table-row': {
         cursor: 'pointer'
       }
+    },
+
+    '.link': {
+      color: token.colorLink,
+      cursor: 'pointer'
     },
 
     'td.__percentage-col': {
@@ -511,7 +658,7 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingTop: 210
+      paddingTop: 206
     },
 
     '.__scroll-container': {
@@ -523,27 +670,48 @@ const Tokens = styled(WrapperComponent)<WrapperProps>(({ theme: { extendToken, t
       backgroundColor: token.colorBgDefault,
       position: 'absolute',
       paddingTop: '32px',
-      height: 210,
+      height: 206,
       zIndex: 10,
       top: 0,
       left: 0,
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
       transition: 'opacity, padding-top 0.27s ease',
 
-      '&.-is-shrink': {
-        height: 104
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 180,
+        backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
+        display: 'block',
+        zIndex: 1
       },
 
-      '&.-decrease': {
+      '&.-decrease:before': {
         backgroundImage: extendToken.tokensScreenDangerBackgroundColor
+      },
+
+      '&.-is-shrink': {
+        height: 104,
+
+        '&:before': {
+          height: 80
+        }
       }
     },
 
+    '.ton-solo-acc-alert-area': {
+      marginBottom: token.marginXS
+    },
+
     '.tokens-upper-block': {
-      flex: 1
+      flex: 1,
+      position: 'relative',
+      zIndex: 5
     },
 
     '.__scroll-footer': {

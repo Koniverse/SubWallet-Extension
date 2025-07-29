@@ -6,7 +6,7 @@ import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { CONFIRM_TERM_SEED_PHRASE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
-import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { SeedPhraseTermStorage, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Checkbox, Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
 import { CheckboxChangeEvent } from '@subwallet/react-ui/es/checkbox';
 import CN from 'classnames';
@@ -15,9 +15,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-interface Props extends ThemeProps {
-  onOk?: () => void
-}
+type Props = ThemeProps
 
 const modalId = TERM_AND_CONDITION_SEED_PHRASE_MODAL;
 
@@ -34,11 +32,12 @@ const valueStateTermDefault: Record<TermSeedPhrase, boolean> = {
   [TermSeedPhrase.TERM_3]: false,
   [TermSeedPhrase.TERM_4]: false
 };
+const SeedPhraseTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', useDefaultContent: false };
 
 const Component = ({ className }: Props) => {
   const { inactiveModal } = useContext(ModalContext);
   const { t } = useTranslation();
-  const [, setIsConfirmTermSeedPhrase] = useLocalStorage(CONFIRM_TERM_SEED_PHRASE, 'nonConfirmed');
+  const [{ useDefaultContent }, setConfirmTermSeedPhrase] = useLocalStorage<SeedPhraseTermStorage>(CONFIRM_TERM_SEED_PHRASE, SeedPhraseTermLocalDefault);
   const [isCheckDontShow, setIsCheckDontShow] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -99,8 +98,12 @@ const Component = ({ className }: Props) => {
 
   const onConfirm = useCallback(() => {
     inactiveModal(modalId);
-    setIsConfirmTermSeedPhrase(isCheckDontShow ? 'confirmed' : 'nonConfirmed');
-  }, [inactiveModal, isCheckDontShow, setIsConfirmTermSeedPhrase]);
+    setConfirmTermSeedPhrase({ state: isCheckDontShow ? 'confirmed' : 'nonConfirmed', useDefaultContent: false });
+  }, [inactiveModal, isCheckDontShow, setConfirmTermSeedPhrase]);
+
+  const subTitle = useMemo(() => {
+    return useDefaultContent ? t('Tap on all checkboxes to confirm you understand the importance of your seed phrase') : t('This seed phrase creates a unified account that can be used for Polkadot, Ethereum, Bitcoin and TON ecosystem. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.');
+  }, [useDefaultContent, t]);
 
   return (
     <BaseModal
@@ -118,7 +121,7 @@ const Component = ({ className }: Props) => {
         ref={scrollRef}
       >
         <div className={'annotation'}>
-          {t('Tap on all checkboxes to confirm you understand the importance of your seed phrase')}
+          {subTitle}
         </div>
         <SwList
           className={'term-list'}
@@ -181,6 +184,7 @@ export const SeedPhraseTermModal = styled(Component)<Props>(({ theme: { token } 
 
     '.annotation': {
       fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
       color: token.colorTextLight5,
       textAlign: 'center'
     },
@@ -245,7 +249,15 @@ export const SeedPhraseTermModal = styled(Component)<Props>(({ theme: { token } 
       },
 
       '.term-footer': {
-        marginTop: -token.margin
+
+        '.term-footer-button': {
+          marginBottom: token.marginXS
+        },
+
+        '.term-footer-checkbox': {
+          alignItems: 'center',
+          marginLeft: 0
+        }
       },
 
       '.annotation': {

@@ -3,13 +3,12 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { YieldPositionInfo } from '@subwallet/extension-base/types';
-import { Avatar, MetaInfo } from '@subwallet/extension-web-ui/components';
+import { SubnetYieldPositionInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { Avatar, BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { EARNING_NOMINATION_MODAL } from '@subwallet/extension-web-ui/constants';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { toShort } from '@subwallet/extension-web-ui/utils';
-import { SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -24,9 +23,10 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
   const { t } = useTranslation();
 
   const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(item?.chain || ''), [item?.chain]);
+  const symbol = (item as SubnetYieldPositionInfo)?.subnetData?.subnetSymbol || inputAsset?.symbol || '';
 
   return (
-    <SwModal
+    <BaseModal
       className={className}
       id={EARNING_NOMINATION_MODAL}
       onCancel={onCancel}
@@ -59,7 +59,7 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
                       </div>
                     </>
                   )}
-                  suffix={inputAsset?.symbol}
+                  suffix={symbol}
                   value={nomination.activeStake}
                   valueColorSchema='even-odd'
                 />
@@ -68,7 +68,7 @@ function Component ({ className, inputAsset, item, onCancel }: Props): React.Rea
           </MetaInfo>
         )
       }
-    </SwModal>
+    </BaseModal>
   );
 }
 
@@ -84,10 +84,6 @@ const EarningPoolDetailModal = styled(Component)<Props>(({ theme: { token } }: P
         alignItems: 'center',
         gap: token.sizeXS,
         overflow: 'hidden'
-      },
-
-      '.__value-col': {
-        flex: '0 1 auto'
       }
     },
 
@@ -99,7 +95,8 @@ const EarningPoolDetailModal = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__nomination-name': {
       textOverflow: 'ellipsis',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      color: token.colorWhite
     }
   });
 });

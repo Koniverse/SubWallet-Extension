@@ -1,29 +1,23 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson, CurrentAccountInfo } from '@subwallet/extension-base/background/types';
-import { BaseSelectModal, SimpleQrModal } from '@subwallet/extension-web-ui/components/Modal';
-import { DISCONNECT_EXTENSION_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
-import { useDefaultNavigate, useGetCurrentAuth, useGetCurrentTab, useGoBackSelectAccount, useIsPopup, useTranslation } from '@subwallet/extension-web-ui/hooks';
-import { saveCurrentAccountAddress } from '@subwallet/extension-web-ui/messaging';
+import { AccountJson } from '@subwallet/extension-base/types';
+import { AccountProxyBriefInfo } from '@subwallet/extension-web-ui/components';
+import { SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
+import { useGetCurrentAuth, useGetCurrentTab, useIsPopup, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { Theme } from '@subwallet/extension-web-ui/themes';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { findAccountByAddress, funcSortByName, isAccountAll, searchAccountFunction } from '@subwallet/extension-web-ui/utils';
+import { funcSortByName, isAccountAll, isAddressAllowedWithAuthType } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Icon, ModalContext, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CaretDown, Plug, Plugs, PlugsConnected, SignOut } from 'phosphor-react';
+import { CaretDown, Plug, Plugs, PlugsConnected } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
-import { isEthereumAddress } from '@polkadot/util-crypto';
-
-import { AccountBriefInfo, AccountCardItem, AccountItemWithName } from '../../../Account';
-import { GeneralEmptyList } from '../../../EmptyList';
 import { ConnectWebsiteModal } from '../ConnectWebsiteModal';
-import SelectAccountFooter from '../SelectAccount/Footer';
+import { AccountSelectorModal } from './AccountSelectorModal';
 
 type Props = ThemeProps
 
@@ -45,19 +39,13 @@ const iconMap = {
 
 const ConnectWebsiteId = 'connectWebsiteId';
 
-const renderEmpty = () => <GeneralEmptyList />;
-
 const modalId = SELECT_ACCOUNT_MODAL;
-const simpleQrModalId = 'simple-qr-modal-id';
 
 function Component ({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { goHome } = useDefaultNavigate();
 
-  const { accounts: _accounts, currentAccount, isAllAccount } = useSelector((state: RootState) => state.accountState);
+  const { accounts: _accounts, currentAccount, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
 
   const [connected, setConnected] = useState(0);
   const [canConnect, setCanConnect] = useState(0);
@@ -66,7 +54,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const isCurrentTabFetched = !!currentTab;
   const currentAuth = useGetCurrentAuth();
   const isPopup = useIsPopup();
-  const [selectedQrAddress, setSelectedQrAddress] = useState<string | undefined>();
+  const { token } = useTheme() as Theme;
+  const [isAccountSelectorOpen, setIsAccountSelectorOpen] = useState(false);
 
   const accounts = useMemo((): AccountJson[] => {
     const result = [..._accounts].sort(funcSortByName);
@@ -95,112 +84,25 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     return result;
   }, [_accounts, currentAccount?.address]);
 
+  // todo: migrate this logic for export all account feature after unified account feature
+  // @ts-ignore
+  const filteredListExportAccount = useMemo(() => {
+    const accountList = accounts.filter((accountExport) => !accountExport.isInjected);
+
+    if (accountList.length === 1 && isAccountAll(accountList[0].address)) {
+      return [];
+    }
+
+    if (accountList.length === 2) {
+      return accountList.filter((acc) => !isAccountAll(acc.address));
+    }
+
+    return accountList;
+  }, [accounts]);
+
   const noAllAccounts = useMemo(() => {
     return accounts.filter(({ address }) => !isAccountAll(address));
   }, [accounts]);
-
-  const showAllAccount = useMemo(() => {
-    return noAllAccounts.length > 1;
-  }, [noAllAccounts]);
-
-  const _onSelect = useCallback((address: string) => {
-    if (address) {
-      const accountByAddress = findAccountByAddress(accounts, address);
-
-      if (accountByAddress) {
-        const accountInfo = {
-          address: address
-        } as CurrentAccountInfo;
-
-        saveCurrentAccountAddress(accountInfo).then(() => {
-          const pathName = location.pathname;
-          const locationPaths = location.pathname.split('/');
-
-          if (locationPaths) {
-            if (locationPaths[1] === 'home') {
-              if (locationPaths.length >= 3) {
-                if (pathName.startsWith('/home/nfts')) {
-                  navigate('/home/nfts/collections');
-                } else if (pathName.startsWith('/home/tokens/detail')) {
-                  navigate('/home/tokens');
-                } else {
-                  navigate(`/home/${locationPaths[2]}`);
-                }
-              }
-            } else {
-              goHome();
-            }
-          }
-        }).catch((e) => {
-          console.error('Failed to switch account', e);
-        });
-      } else {
-        console.error('Failed to switch account');
-      }
-    }
-  }, [accounts, location.pathname, navigate, goHome]);
-
-  const onClickDetailAccount = useCallback((address: string) => {
-    return () => {
-      inactiveModal(modalId);
-      setTimeout(() => {
-        navigate(`/accounts/detail/${address}`);
-      }, 100);
-    };
-  }, [navigate, inactiveModal]);
-
-  const openDisconnectExtensionModal = useCallback(() => {
-    activeModal(DISCONNECT_EXTENSION_MODAL);
-  }, [activeModal]);
-
-  const onClickItemQrButton = useCallback((address: string) => {
-    setSelectedQrAddress(address);
-    activeModal(simpleQrModalId);
-  }, [activeModal]);
-
-  const onQrModalBack = useGoBackSelectAccount(simpleQrModalId);
-
-  const renderItem = useCallback((item: AccountJson, _selected: boolean): React.ReactNode => {
-    const currentAccountIsAll = isAccountAll(item.address);
-
-    if (currentAccountIsAll) {
-      if (showAllAccount) {
-        return (
-          <AccountItemWithName
-            address={item.address}
-            className='all-account-selection'
-            isSelected={_selected}
-          />
-        );
-      } else {
-        return null;
-      }
-    }
-
-    const isInjected = !!item.isInjected;
-
-    return (
-      <AccountCardItem
-        accountName={item.name || ''}
-        address={item.address}
-        className={className}
-        genesisHash={item.genesisHash}
-        isSelected={_selected}
-        moreIcon={!isInjected ? undefined : SignOut}
-        onClickQrButton={onClickItemQrButton}
-        onPressMoreButton={isInjected ? openDisconnectExtensionModal : onClickDetailAccount(item.address)}
-        source={item.source}
-      />
-    );
-  }, [className, onClickDetailAccount, openDisconnectExtensionModal, onClickItemQrButton, showAllAccount]);
-
-  const renderSelectedItem = useCallback((item: AccountJson): React.ReactNode => {
-    return (
-      <div className='selected-account'>
-        <AccountBriefInfo account={item} />
-      </div>
-    );
-  }, []);
 
   useEffect(() => {
     if (currentAuth) {
@@ -209,56 +111,59 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         setConnected(0);
         setConnectionState(ConnectionStatement.BLOCKED);
       } else {
-        const type = currentAuth.accountAuthType;
+        const types = currentAuth.accountAuthTypes || ['substrate'];
         const allowedMap = currentAuth.isAllowedMap;
 
         const filterType = (address: string) => {
-          if (type === 'both') {
-            return true;
-          }
-
-          const _type = type || 'substrate';
-
-          return _type === 'substrate' ? !isEthereumAddress(address) : isEthereumAddress(address);
+          return isAddressAllowedWithAuthType(address, types);
         };
 
-        if (!isAllAccount) {
-          const _allowedMap: Record<string, boolean> = {};
+        let accountToCheck = noAllAccounts;
 
-          Object.entries(allowedMap)
-            .filter(([address]) => filterType(address))
-            .forEach(([address, value]) => {
-              _allowedMap[address] = value;
-            });
+        if (!isAllAccount && currentAccountProxy) {
+          accountToCheck = [...(currentAccountProxy.accounts)];
+        }
 
-          const isAllowed = _allowedMap[currentAccount?.address || ''];
+        const idProxiesCanConnect = new Set<string>();
+        const allowedIdProxies = new Set<string>();
 
+        accountToCheck.forEach(({ address, proxyId }) => {
+          if (filterType(address) && proxyId) {
+            idProxiesCanConnect.add(proxyId);
+          }
+        });
+        Object.entries(allowedMap)
+          .forEach(([address, value]) => {
+            if (filterType(address)) {
+              const account = accountToCheck.find(({ address: accAddress }) => accAddress === address);
+
+              if (account?.proxyId && value) {
+                allowedIdProxies.add(account.proxyId);
+              }
+            }
+          });
+
+        const numberAllowedAccountProxies = allowedIdProxies.size;
+        const numberAllAccountProxiesCanConnect = idProxiesCanConnect.size;
+
+        if (numberAllAccountProxiesCanConnect === 0) {
           setCanConnect(0);
           setConnected(0);
+          setConnectionState(ConnectionStatement.NOT_CONNECTED);
 
-          if (isAllowed === undefined) {
-            setConnectionState(ConnectionStatement.NOT_CONNECTED);
-          } else {
-            setConnectionState(isAllowed ? ConnectionStatement.CONNECTED : ConnectionStatement.DISCONNECTED);
-          }
+          return;
+        }
+
+        setConnected(numberAllowedAccountProxies);
+        setCanConnect(numberAllAccountProxiesCanConnect);
+
+        if (numberAllowedAccountProxies === 0) {
+          setConnectionState(ConnectionStatement.DISCONNECTED);
         } else {
-          const numberAccounts = noAllAccounts.filter(({ address }) => filterType(address)).length;
-          const numberAllowedAccounts = Object.entries(allowedMap)
-            .filter(([address]) => filterType(address))
-            .filter(([, value]) => value)
-            .length;
-
-          setConnected(numberAllowedAccounts);
-          setCanConnect(numberAccounts);
-
-          if (numberAllowedAccounts === 0) {
-            setConnectionState(ConnectionStatement.DISCONNECTED);
+          if (numberAllowedAccountProxies > 0 && numberAllowedAccountProxies < numberAllAccountProxiesCanConnect) {
+            setConnectionState(ConnectionStatement.PARTIAL_CONNECTED);
           } else {
-            if (numberAllowedAccounts > 0 && numberAllowedAccounts < numberAccounts) {
-              setConnectionState(ConnectionStatement.PARTIAL_CONNECTED);
-            } else {
-              setConnectionState(ConnectionStatement.CONNECTED);
-            }
+            setConnectionState(ConnectionStatement.CONNECTED);
           }
         }
       }
@@ -267,7 +172,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       setConnected(0);
       setConnectionState(ConnectionStatement.NOT_CONNECTED);
     }
-  }, [currentAccount?.address, currentAuth, isAllAccount, noAllAccounts]);
+  }, [currentAccountProxy, currentAuth, isAllAccount, noAllAccounts]);
 
   const visibleText = useMemo((): string => {
     switch (connectionState) {
@@ -302,6 +207,35 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     inactiveModal(ConnectWebsiteId);
   }, [inactiveModal]);
 
+  const onOpenSelectAccountModal = useCallback(() => {
+    setIsAccountSelectorOpen(true);
+    activeModal(modalId);
+  }, [activeModal]);
+
+  const selectedAccountNode = (() => {
+    if (!currentAccountProxy) {
+      return null;
+    }
+
+    return (
+      <div
+        className={CN('selected-account', {
+          'is-no-all-account': !isAccountAll(currentAccountProxy.id)
+        })}
+        onClick={onOpenSelectAccountModal}
+      >
+        <AccountProxyBriefInfo accountProxy={currentAccountProxy} />
+        <Icon
+          className={'__caret-icon'}
+          customSize={'12px'}
+          iconColor={token.colorTextSecondary}
+          phosphorIcon={CaretDown}
+          weight={'bold'}
+        />
+      </div>
+    );
+  })();
+
   return (
     <div className={CN(className, 'container')}>
       {isPopup && (
@@ -325,34 +259,13 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         </Tooltip>
       )}
 
-      <BaseSelectModal
-        background={'default'}
-        className={className}
-        footer={<SelectAccountFooter />}
-        fullSizeOnMobile
-        id={modalId}
-        ignoreScrollbarMethod='padding'
-        inputWidth={'100%'}
-        itemKey='address'
-        items={accounts}
-        onSelect={_onSelect}
-        renderItem={renderItem}
-        renderSelected={renderSelectedItem}
-        renderWhenEmpty={renderEmpty}
-        searchFunction={searchAccountFunction}
-        searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Account name')}
-        selected={currentAccount?.address || ''}
-        shape='round'
-        size='small'
-        suffix={
-          <Icon
-            phosphorIcon={CaretDown}
-            weight={'bold'}
-          />
-        }
-        title={t('Select account')}
-      />
+      {selectedAccountNode}
+
+      {
+        isAccountSelectorOpen && (
+          <AccountSelectorModal />
+        )
+      }
 
       <ConnectWebsiteModal
         authInfo={currentAuth}
@@ -361,11 +274,6 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         isNotConnected={connectionState === ConnectionStatement.NOT_CONNECTED}
         onCancel={onCloseConnectWebsiteModal}
         url={currentTab?.url || ''}
-      />
-      <SimpleQrModal
-        address={selectedQrAddress}
-        id={simpleQrModalId}
-        onBack={onQrModalBack}
       />
     </div>
   );
@@ -380,6 +288,7 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'row',
+      paddingRight: token.padding,
 
       '.ant-select-modal-input-container.ant-select-modal-input-border-round::before': {
         display: 'none'
@@ -392,6 +301,10 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
       '.ant-select-modal-input-container:hover .account-name': {
         color: token.colorTextLight3
       }
+    },
+    '&.-tooltip-mobile': {
+      left: '193px',
+      top: '46px'
     },
 
     '&.ant-sw-modal': {
@@ -443,6 +356,19 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
         color: token.colorTextLight1
       }
     },
+    '&.-disable-export': {
+      opacity: 0.4,
+      cursor: 'not-allowed'
+    },
+    '.__tooltip-export-wrapper': {
+      display: 'flex',
+      position: 'relative'
+    },
+    '.-icon-highlight': {
+      position: 'absolute',
+      top: '-90%',
+      right: '-40%'
+    },
 
     '.all-account-item': {
       display: 'flex',
@@ -471,13 +397,22 @@ const SelectAccount = styled(Component)<Props>(({ theme }) => {
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8
+      padding: `${token.paddingXS}px`,
+      paddingLeft: token.marginXXS,
+      paddingRight: token.marginXS,
+      overflow: 'hidden',
+      gap: token.sizeXS
+    },
+
+    '.anticon.__export-remind-btn': {
+      height: 23,
+      width: 24
     },
 
     '.connect-icon': {
       color: token.colorTextBase,
-      width: 40,
       height: 40,
+      paddingRight: token.paddingXXS,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',

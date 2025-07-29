@@ -6,7 +6,7 @@ import CN from 'classnames';
 import React from 'react';
 import styled from 'styled-components';
 
-import { AccountGroupItem, AccountItem, ChainItem, DataItem, DefaultItem, DisplayTypeItem, NumberItem, StatusItem, TotalItem, TransferItem } from './parts';
+import { AccountGroupItem, AccountItem, ChainItem, DataItem, DefaultItem, DisplayTypeItem, NumberItem, StatusItem, TotalItem, TransactionProcessItem, TransferItem } from './parts';
 
 interface Props extends ThemeProps {
   children?: React.ReactNode;
@@ -66,11 +66,13 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
     '.__row': {
       display: 'flex',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      gap: token.sizeSM
     },
 
     '.__row.-d-column': {
-      flexDirection: 'column'
+      flexDirection: 'column',
+      gap: 0
     },
 
     '&.-space-size-xxs': {
@@ -91,6 +93,14 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
     '.__row + .__row, .__row.-d-column .__col + .__col': {
       marginTop: 'var(--space-size)'
+    },
+    '.__row.-type-chain .__chain-name, .__row.-type-display-type .__type-name, .__row.-type-status .__status-name': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden'
+    },
+
+    '.__row.-type-default .__value': {
+      wordBreak: 'break-word'
     },
 
     '.__row.-type-total': {
@@ -117,7 +127,6 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.__col': {
-      flex: 1,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -125,12 +134,20 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
       '> div + div': {
         marginTop: token.marginSM
+      },
+      '&.-inline': {
+        whiteSpace: 'nowrap'
       }
     },
 
     '.__col.-to-right': {
       flex: 1,
-      alignItems: 'flex-end'
+      alignItems: 'flex-end',
+      textAlign: 'right'
+    },
+
+    '.__row.-type-transfer .__col': {
+      flex: 1
     },
 
     '.__col.-v-align-top': {
@@ -185,6 +202,10 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
       color: token['green-6']
     },
 
+    '.__value.-schema-blue': {
+      color: token.blue
+    },
+
     '.__value.-schema-even-odd': {
       color: token.colorTextLight2,
 
@@ -204,6 +225,15 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
       maxWidth: '100%'
     },
 
+    '.__value.-clickable': {
+      cursor: 'pointer',
+      userSelect: 'none'
+    },
+
+    '.__value.-disabled': {
+      cursor: 'not-allowed'
+    },
+
     '.__status-item': {
       '&.-completed': {
         color: token.colorSuccess
@@ -218,7 +248,7 @@ const _MetaInfo = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
 
-    '.__account-name': {
+    '.__account-name, .__chain-name': {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap'
@@ -237,6 +267,7 @@ type CompoundedComponent = React.ForwardRefExoticComponent<Omit<Props, 'theme'>>
   Number: typeof NumberItem,
   Total: typeof TotalItem,
   Default: typeof DefaultItem,
+  TransactionProcess: typeof TransactionProcessItem,
 };
 
 const MetaInfo = _MetaInfo as unknown as CompoundedComponent;
@@ -251,5 +282,6 @@ MetaInfo.DisplayType = DisplayTypeItem;
 MetaInfo.Number = NumberItem;
 MetaInfo.Total = TotalItem;
 MetaInfo.Default = DefaultItem;
+MetaInfo.TransactionProcess = TransactionProcessItem;
 
 export default MetaInfo;

@@ -1,18 +1,26 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
-import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, UN_STAKE_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, TRANSACTION_YIELD_UNSTAKE_MODAL, UN_STAKE_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
+import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useAlert, useSelector, useTranslation, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
 import { AccountAndNominationInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/AccountAndNominationInfoPart';
+import AccountInfoDesktopPart from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/desktop/AccountInfoDesktopPart';
+import { EarningInfoDesktopPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/desktop/EarningInfoDesktopPart';
+import HeaderDesktopPart from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/desktop/HeaderDesktopPart';
+import { RewardInfoDesktopPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/desktop/RewardInfoDesktopPart';
+import { WithdrawInfoDesktopPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/desktop/WithdrawInfoDesktopPart';
 import { EarningInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/EarningInfoPart';
 import { RewardInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart';
 import { WithdrawInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/WithdrawInfoPart';
 import { EarningEntryParam, EarningEntryView, EarningPositionDetailParam, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isAccountAll } from '@subwallet/extension-web-ui/utils';
-import { Button, ButtonProps, Icon, Number } from '@subwallet/react-ui';
+import { getTransactionFromAccountProxyValue, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-web-ui/utils';
+import { Button, ButtonProps, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { MinusCircle, Plus, PlusCircle } from 'phosphor-react';
@@ -20,6 +28,8 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+import { SubnetInfoDesktopPart } from './desktop/SubnetInfoDesktopPart';
 
 type Props = ThemeProps;
 
@@ -38,12 +48,32 @@ function Component ({ compound,
   rewardHistories }: ComponentProp) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { activeModal } = useContext(ModalContext);
 
   // @ts-ignore
   const isShowBalance = useSelector((state) => state.settings.isShowBalance);
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
-  const { priceMap } = useSelector((state) => state.price);
-  const { currentAccount, isAllAccount } = useSelector((state) => state.accountState);
+  const { currencyData, priceMap } = useSelector((state) => state.price);
+  const { currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
+  const { chainInfoMap } = useSelector((state) => state.chainStore);
+  const targetAddress = useMemo(() => {
+    if (currentAccountProxy && isAccountAll(currentAccountProxy?.id)) {
+      return ALL_ACCOUNT_KEY;
+    }
+
+    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+      if (chainInfoMap[poolInfo.chain]) {
+        const chainInfo = chainInfoMap[poolInfo.chain];
+
+        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+      }
+
+      return false;
+    });
+
+    return accountAddress?.address;
+  }, [chainInfoMap, currentAccountProxy, poolInfo.chain]);
+  const { isWebUI } = useContext(ScreenContext);
 
   const [, setEarnStorage] = useLocalStorage(EARN_TRANSACTION, DEFAULT_EARN_PARAMS);
   const [, setUnStakeStorage] = useLocalStorage(UN_STAKE_TRANSACTION, DEFAULT_UN_STAKE_PARAMS);
@@ -79,27 +109,25 @@ function Component ({ compound,
     return new BigN(compound.activeStake).multipliedBy(exchangeRate);
   }, [compound.activeStake, exchangeRate]);
 
-  // @ts-ignore
   const convertActiveStake = useMemo(() => {
     return activeStake.div(BN_TEN.pow(inputAsset?.decimals || 0)).multipliedBy(price);
   }, [activeStake, inputAsset?.decimals, price]);
 
-  // @ts-ignore
   const filteredRewardHistories = useMemo(() => {
-    if (!isAllAccount && currentAccount) {
-      return rewardHistories.filter((item) => item.slug === poolInfo.slug && item.address === currentAccount.address);
+    if (!isAllAccount && targetAddress) {
+      return rewardHistories.filter((item) => item.slug === poolInfo.slug && item.address === targetAddress);
     } else {
       return [];
     }
-  }, [currentAccount, isAllAccount, poolInfo.slug, rewardHistories]);
+  }, [targetAddress, isAllAccount, poolInfo.slug, rewardHistories]);
 
   const isActiveStakeZero = useMemo(() => {
     return BN_ZERO.eq(activeStake);
   }, [activeStake]);
 
   const transactionFromValue = useMemo(() => {
-    return currentAccount?.address ? isAccountAll(currentAccount.address) ? '' : currentAccount.address : '';
-  }, [currentAccount?.address]);
+    return targetAddress ? isAccountAll(targetAddress) ? '' : targetAddress : '';
+  }, [targetAddress]);
 
   const transactionChainValue = useMemo(() => {
     return compound.chain || poolInfo.chain || '';
@@ -109,6 +137,7 @@ function Component ({ compound,
     if (isActiveStakeZero) {
       openAlert({
         title: t('Unstaking not available'),
+        type: NotificationType.ERROR,
         content: t("You don't have any staked funds left to unstake. Check withdrawal status (how long left until the unstaking period ends) by checking the Withdraw info. Keep in mind that you need to withdraw manually."),
         okButton: {
           text: t('OK'),
@@ -125,24 +154,42 @@ function Component ({ compound,
       chain: transactionChainValue,
       from: transactionFromValue
     });
-    navigate('/transaction/unstake');
-  }, [closeAlert, isActiveStakeZero, navigate, poolInfo.slug, setUnStakeStorage, openAlert, t, transactionChainValue, transactionFromValue]);
+
+    if (isWebUI) {
+      activeModal(TRANSACTION_YIELD_UNSTAKE_MODAL);
+    } else {
+      navigate('/transaction/unstake');
+    }
+    // todo: open modal is isWebUI
+  }, [isActiveStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, isWebUI, openAlert, t, closeAlert, activeModal, navigate]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({
       ...DEFAULT_EARN_PARAMS,
       slug: compound.slug,
       chain: transactionChainValue,
-      from: transactionFromValue
+      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
     navigate('/transaction/earn');
-  }, [compound.slug, navigate, setEarnStorage, transactionChainValue, transactionFromValue]);
+  }, [compound.slug, currentAccountProxy, navigate, setEarnStorage, transactionChainValue]);
 
   const onBack = useCallback(() => {
     navigate('/home/earning', { state: {
       view: EarningEntryView.POSITIONS
     } as EarningEntryParam });
   }, [navigate]);
+
+  const isChainUnsupported = useMemo(() => {
+    if (poolInfo?.chain === 'parallel' && poolInfo?.type === YieldPoolType.LIQUID_STAKING) {
+      return true;
+    }
+
+    if (poolInfo?.chain === 'interlay' && poolInfo?.type === YieldPoolType.LENDING) {
+      return true;
+    }
+
+    return false;
+  }, [poolInfo?.chain, poolInfo?.type]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
     return [
@@ -154,10 +201,12 @@ function Component ({ compound,
             type='phosphor'
           />
         ),
-        onClick: onEarnMore
+        onClick: onEarnMore,
+        disabled: isChainUnsupported
       }
     ];
-  }, [onEarnMore]);
+  }, [isChainUnsupported, onEarnMore]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <>
@@ -170,92 +219,161 @@ function Component ({ compound,
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning position detail')}
+        title={t<string>('Earning position details')}
       >
-        <div className={'__active-stake-info-area'}>
-          <div className={'__active-stake-title'}>{t('Active stake')}</div>
-          <Number
-            className={'__active-stake-value'}
-            decimal={inputAsset?.decimals || 0}
-            hide={!isShowBalance}
-            subFloatNumber={true}
-            suffix={inputAsset?.symbol}
-            value={activeStake}
-          />
-
-          <Number
-            className={'__active-stake-converted-value'}
-            decimal={0}
-            hide={!isShowBalance}
-            prefix={'$'}
-            value={convertActiveStake}
-          />
-        </div>
-
-        <RewardInfoPart
-          className={'__reward-info-part'}
-          closeAlert={closeAlert}
-          compound={compound}
-          inputAsset={inputAsset}
-          isShowBalance={isShowBalance}
-          openAlert={openAlert}
-          rewardHistories={filteredRewardHistories}
-          transactionChainValue={transactionChainValue}
-          transactionFromValue={transactionFromValue}
-        />
-
-        <div className={'__transaction-buttons'}>
-          <Button
-            block={true}
-            icon={(
-              <Icon
-                phosphorIcon={MinusCircle}
-                weight='fill'
+        {
+          isWebUI && (
+            <>
+              <HeaderDesktopPart
+                activeStake={activeStake}
+                convertActiveStake={convertActiveStake}
+                inputAsset={inputAsset}
+                isShowBalance={isShowBalance}
+                poolInfo={poolInfo}
               />
-            )}
-            onClick={onLeavePool}
-            schema='secondary'
-          >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
-          </Button>
+              <div className={'__middle-part'}>
+                <div className={'__middle-part-item-wrapper'}>
+                  <EarningInfoDesktopPart
+                    compound={compound}
+                    onEarnMore={onEarnMore}
+                    onLeavePool={onLeavePool}
+                    poolInfo={poolInfo}
+                  />
+                </div>
+                <div className={'__middle-part-item-wrapper'}>
+                  <RewardInfoDesktopPart
+                    closeAlert={closeAlert}
+                    compound={compound}
+                    inputAsset={inputAsset}
+                    isShowBalance={isShowBalance}
+                    openAlert={openAlert}
+                    rewardHistories={filteredRewardHistories}
+                    transactionChainValue={transactionChainValue}
+                    transactionFromValue={transactionFromValue}
+                  />
+                </div>
+                <div className={'__middle-part-item-wrapper'}>
+                  {
+                    isSubnetStaking
+                      ? (
+                        <SubnetInfoDesktopPart
+                          poolInfo={poolInfo}
+                        />
+                      )
+                      : (
+                        <WithdrawInfoDesktopPart
+                          inputAsset={inputAsset}
+                          poolInfo={poolInfo}
+                          transactionChainValue={transactionChainValue}
+                          transactionFromValue={transactionFromValue}
+                          unstakings={compound.unstakings}
+                        />
+                      )
+                  }
+                </div>
 
-          <Button
-            block={true}
-            icon={(
-              <Icon
-                phosphorIcon={PlusCircle}
-                weight='fill'
+              </div>
+              <AccountInfoDesktopPart
+                compound={compound}
+                inputAsset={inputAsset}
+                positionItems={list}
               />
-            )}
-            onClick={onEarnMore}
-            schema='secondary'
-          >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more')}
-          </Button>
-        </div>
+            </>
+          )
+        }
 
-        <WithdrawInfoPart
-          className={'__withdraw-info-part'}
-          inputAsset={inputAsset}
-          poolInfo={poolInfo}
-          transactionChainValue={transactionChainValue}
-          transactionFromValue={transactionFromValue}
-          unstakings={compound.unstakings}
-        />
+        {
+          !isWebUI && (
+            <>
+              <div className={'__active-stake-info-area'}>
+                <div className={'__active-stake-title'}>{t('Active stake')}</div>
+                <Number
+                  className={'__active-stake-value'}
+                  decimal={inputAsset?.decimals || 0}
+                  hide={!isShowBalance}
+                  subFloatNumber={true}
+                  suffix={inputAsset?.symbol}
+                  value={activeStake}
+                />
 
-        <AccountAndNominationInfoPart
-          className={'__account-and-nomination-info-part'}
-          compound={compound}
-          inputAsset={inputAsset}
-          list={list}
-          poolInfo={poolInfo}
-        />
+                <Number
+                  className={'__active-stake-converted-value'}
+                  decimal={0}
+                  hide={!isShowBalance}
+                  prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
+                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                  value={convertActiveStake}
+                />
+              </div>
 
-        <EarningInfoPart
-          className={'__earning-info-part'}
-          inputAsset={inputAsset}
-          poolInfo={poolInfo}
-        />
+              <RewardInfoPart
+                className={'__reward-info-part'}
+                closeAlert={closeAlert}
+                compound={compound}
+                inputAsset={inputAsset}
+                isShowBalance={isShowBalance}
+                openAlert={openAlert}
+                rewardHistories={filteredRewardHistories}
+                transactionChainValue={transactionChainValue}
+                transactionFromValue={transactionFromValue}
+              />
+
+              <div className={'__transaction-buttons'}>
+                <Button
+                  block={true}
+                  icon={(
+                    <Icon
+                      phosphorIcon={MinusCircle}
+                      weight='fill'
+                    />
+                  )}
+                  onClick={onLeavePool}
+                  schema='secondary'
+                >
+                  {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+                </Button>
+
+                <Button
+                  block={true}
+                  disabled={isChainUnsupported}
+                  icon={(
+                    <Icon
+                      phosphorIcon={PlusCircle}
+                      weight='fill'
+                    />
+                  )}
+                  onClick={onEarnMore}
+                  schema='secondary'
+                >
+                  {poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more')}
+                </Button>
+              </div>
+
+              <WithdrawInfoPart
+                className={'__withdraw-info-part'}
+                inputAsset={inputAsset}
+                poolInfo={poolInfo}
+                transactionChainValue={transactionChainValue}
+                transactionFromValue={transactionFromValue}
+                unstakings={compound.unstakings}
+              />
+
+              <AccountAndNominationInfoPart
+                className={'__account-and-nomination-info-part'}
+                compound={compound}
+                inputAsset={inputAsset}
+                list={list}
+                poolInfo={poolInfo}
+              />
+
+              <EarningInfoPart
+                className={'__earning-info-part'}
+                inputAsset={inputAsset}
+                poolInfo={poolInfo}
+              />
+            </>
+          )
+        }
       </Layout.Base>
 
       {
@@ -334,6 +452,27 @@ const EarningPositionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Prop
     paddingBottom: 24
   },
 
+  '.__middle-part': {
+    display: 'flex',
+    marginLeft: -8,
+    marginRight: -8
+  },
+
+  '.__middle-part-item-wrapper': {
+    flex: '1 1 384px',
+    display: 'flex',
+    overflow: 'hidden'
+  },
+
+  '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part, .__subnet-info-desktop-part': {
+    marginLeft: 8,
+    marginRight: 8,
+    marginBottom: 16
+  },
+  '.__withdraw-info-desktop-part .-no-content': {
+    marginBottom: 0
+  },
+
   '.__active-stake-title': {
     fontSize: token.sizeSM,
     lineHeight: token.lineHeightSM,
@@ -378,7 +517,17 @@ const EarningPositionDetail = styled(Wrapper)<Props>(({ theme: { token } }: Prop
   '.__transaction-buttons': {
     display: 'flex',
     gap: token.sizeSM
+  },
+
+  '@media (max-width: 1450px)': {
+    '.__middle-part': {
+      flexWrap: 'wrap'
+    },
+    '.__earning-info-desktop-part, .__reward-info-desktop-part, .__withdraw-info-desktop-part': {
+      flexBasis: 384
+    }
   }
+
 }));
 
 export default EarningPositionDetail;

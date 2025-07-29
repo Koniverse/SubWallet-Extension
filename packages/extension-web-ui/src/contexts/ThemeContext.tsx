@@ -12,6 +12,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled, { createGlobalStyle, ThemeProvider as StyledComponentThemeProvider } from 'styled-components';
 
+import { GLOBAL_ALERT_MODAL } from '../constants';
 import { Theme } from '../types';
 
 interface Props {
@@ -27,6 +28,11 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
   applyPreloadStyle(extendToken.bodyBackgroundColor);
 
   return ({
+    '@keyframes swRotate': {
+      '100%': {
+        transform: 'rotate(360deg)'
+      }
+    },
     body: {
       fontFamily: token.fontFamily,
       color: token.colorText,
@@ -42,8 +48,16 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
     },
 
     '.main-page-container': {
-      border: `${token.lineWidth}px ${token.lineType} ${token.colorBgInput}`,
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      display: 'flex',
+      height: '100%',
+      flexDirection: 'column',
+      overflow: 'auto',
+
+      '.main-layout-content': {
+        flex: 1,
+        overflow: 'auto'
+      }
     },
 
     '.main-page-container.web-ui-enable': {
@@ -86,6 +100,14 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         }
       }
     },
+
+    // make sure alert modal is above autocomplete dropdown
+    [`.modal-id-${GLOBAL_ALERT_MODAL}`]: {
+      '.ant-sw-modal-wrap': {
+        zIndex: 11000
+      }
+    },
+
     '.general-modal.-mobile': {
       justifyContent: 'flex-end',
       '.ant-sw-modal-content': {
@@ -93,6 +115,33 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         width: '100%'
       }
     },
+
+    '.__currency-value-detail-tooltip': {
+      paddingBottom: 0,
+
+      '.ant-tooltip-inner': {
+        padding: `${token.paddingXXS}px ${token.paddingXXS + 2}px`,
+        fontSize: token.fontSizeSM,
+        minHeight: 'auto',
+        minWidth: 'auto'
+      },
+
+      '.ant-tooltip-arrow': {
+        transform: 'translateX(-50%) translateY(100%) rotate(180deg) scaleX(0.5)'
+      }
+    },
+
+    '.__tooltip-overlay-remind': {
+      '.ant-tooltip-inner': {
+        fontSize: token.fontSizeXS,
+        lineHeight: token.lineHeightXS,
+        fontWeight: 700,
+        padding: `2px ${token.paddingXS}px`,
+        minHeight: 'auto',
+        marginRight: token.marginSM
+      }
+    },
+
     '.text-secondary': {
       color: token.colorTextSecondary
     },
@@ -180,6 +229,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.ant-badge.g-filter-badge': {
+      '.ant-badge-dot.ant-badge-dot': {
+        width: 8,
+        height: 8,
+        transform: 'none',
+        top: 'auto',
+        bottom: 4,
+        right: 3
+      }
+    },
+
     '.form-row': {
       display: 'flex',
       gap: token.sizeSM,
@@ -237,6 +297,67 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    '.ant-input': {
+      minWidth: 0 // fix issue related to input overflow width
+    },
+
+    // field
+    '.ant-select-modal-input-suffix.ant-select-modal-input-suffix, .ant-field-suffix.ant-field-suffix': {
+      color: token.colorTextLight3
+    },
+
+    '.ant-field-container.-label-horizontal': {
+      flexDirection: 'row',
+      gap: token.sizeXXS,
+      alignItems: 'center',
+
+      '.ant-field-label': {
+        paddingRight: 0,
+        top: 0,
+        paddingTop: 0,
+        minWidth: 46
+      },
+
+      '.ant-field-wrapper': {
+        flex: 1,
+        gap: token.sizeXXS,
+        paddingLeft: 0,
+        paddingBottom: token.paddingXS
+      }
+    },
+
+    '.ant-field-container.is-selectable': {
+      cursor: 'pointer',
+
+      '&:not(.-status-success):not(.-status-warning):not(.-status-error):hover': {
+        '&:before': {
+          borderColor: token['geekblue-4']
+        }
+      }
+    },
+
+    '.ant-field-container.is-readonly': {
+      cursor: 'default'
+    },
+
+    '.ant-field-container.is-disabled': {
+      cursor: 'not-allowed'
+    },
+
+    '.ledger-warning-modal': {
+      '.ant-sw-modal-confirm-btns': {
+        flexDirection: 'row',
+
+        button: {
+          flex: 1,
+
+          '.anticon': {
+            display: 'none'
+          }
+        }
+      }
+    },
+
     '.ant-sw-header-left-part + .ant-sw-header-center-part .ant-sw-sub-header-title': {
       display: 'block',
       textAlign: 'center'
@@ -263,6 +384,18 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
         '.ant-sw-list-section .ant-sw-list-wrapper': {
           flexBasis: 'auto'
         }
+      }
+    },
+    '.ant-btn-ghost.-ghost-type-3': {
+      color: token.colorWhite,
+      '&:hover': {
+        color: token.colorSuccess
+      },
+      '&:active': {
+        color: token['cyan-2']
+      },
+      '&:disabled': {
+        color: token.colorTextLight6
       }
     }
   });

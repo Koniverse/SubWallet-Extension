@@ -64,13 +64,28 @@ export class WorkerMessageCenter {
 
 export class BGMessageCenter {
   emitter: EventEmitter<VMCBGEventMap> = new EventEmitter();
+  private readyHandler = createPromiseHandler<void>();
+
+  get isReady () {
+    return this.readyHandler.promise;
+  }
+
+  setReady () {
+    // console.log('setReady BGMessageCenter');
+    this.readyHandler.resolve();
+  }
+
   ui?: UIMessageCenter;
   setUI (ui: UIMessageCenter) {
     this.ui = ui;
   }
 
   addEventListener (event: 'message', cb: (ev: VirtualEvent) => void) {
-    this.emitter.on(event, cb);
+    // console.log('addEventListener BGMessageCenter');
+
+    this.readyHandler.promise.then(() => {
+      this.emitter.on(event, cb);
+    }).catch(console.error);
   }
 
   postMessage (data: TransportResponseMessage<keyof RequestSignatures>) {
@@ -81,22 +96,46 @@ export class BGMessageCenter {
       _data = JSON.parse(JSON.stringify(data));
     }
 
-    this.ui?.emitter.emit('message', {
-      id: _data.id,
-      data: _data
-    });
+    // console.log('postMessage BGMessageCenter', _data);
+
+    this.readyHandler.promise.then(() => {
+      this.ui?.emitter.emit('message', {
+        id: _data.id,
+        data: _data
+      });
+    }).catch(console.error);
   }
 }
 
 export class UIMessageCenter {
   bg?: BGMessageCenter;
   emitter: EventEmitter<VMCUIEventMap> = new EventEmitter();
+  private readyHandler = createPromiseHandler<void>();
+
+  get isReady () {
+    return this.readyHandler.promise;
+  }
+
+  setReady () {
+    // console.log('setReady UIMessageCenter');
+
+    (async () => {
+      await this.bg?.isReady;
+      await new Promise((resolve) => setTimeout(resolve, 99));
+      this.readyHandler.resolve();
+    })().catch(console.error);
+  }
+
   setBg (bg: BGMessageCenter) {
     this.bg = bg;
   }
 
   addEventListener (event: 'message', cb: (ev: VirtualEvent) => void) {
-    this.emitter.on(event, cb);
+    // console.log('addEventListener UIMessageCenter');
+
+    this.readyHandler.promise.then(() => {
+      this.emitter.on(event, cb);
+    }).catch(console.error);
   }
 
   postMessage (data: any) {
@@ -107,12 +146,16 @@ export class UIMessageCenter {
       _data = JSON.parse(JSON.stringify(data));
     }
 
-    this.bg?.emitter.emit('message', {
-      id: _data.id,
-      origin: 'extension',
-      data: _data,
-      message: _data.message
-    });
+    // console.log('postMessage UIMessageCenter', _data);
+
+    this.readyHandler.promise.then(() => {
+      this.bg?.emitter.emit('message', {
+        id: _data.id,
+        origin: 'extension',
+        data: _data,
+        message: _data.message
+      });
+    }).catch(console.error);
   }
 }
 

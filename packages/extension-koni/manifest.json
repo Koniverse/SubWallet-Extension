@@ -1,15 +1,19 @@
 {
   "author": "SubWallet",
-  "description": "THIS EXTENSION IS FOR BETA TESTING",
+  "description": "Comprehensive Web3 wallet solution for Polkadot, Substrate & Ethereum ecosystems",
   "homepage_url": "https://subwallet.app/",
-  "name": "SubWallet - Polkadot Wallet - BETA",
+  "name": "SubWallet - Polkadot Wallet",
   "short_name": "SubWallet",
   "manifest_version": 3,
   "permissions": [
     "notifications",
     "storage",
-    "tabs"
+    "tabs",
+    "sidePanel"
   ],
+  "side_panel": {
+    "default_path": "side-panel.html"
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -44,7 +48,7 @@
     "128": "images/icon-128.png"
   },
   "web_accessible_resources": [{
-    "resources": ["page.js"],
+    "resources": ["page.js", "images/icons/__error__.png"],
     "use_dynamic_url": false,
     "matches": ["file://*/*", "http://*/*", "https://*/*"]
   }],

@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { AccountJson } from '@subwallet/extension-base/types';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useDefaultNavigate, useDeleteAccount, useNotification } from '@subwallet/extension-web-ui/hooks';
@@ -84,11 +84,11 @@ const intersectionArray = (array1: AccountJson[], array2: AccountJson[]): Accoun
 };
 
 const filterAccountMigrated = (acc: AccountJson) => {
-  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && acc.isMasterPassword && !acc.isInjected;
+  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && acc.isMasterPassword && !acc.isInjected && !acc.pendingMigrate;
 };
 
 const filterAccountCanMigrate = (acc: AccountJson) => {
-  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected;
+  return acc.address !== ALL_ACCOUNT_KEY && !acc.isExternal && !acc.isInjected && !acc.pendingMigrate;
 };
 
 const Component: React.FC<Props> = (props: Props) => {
@@ -403,7 +403,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   ]}
                   statusHelpAsTooltip={isWebUI}
                 >
-                  <Input
+                  <Input.Password
                     label={t('Current password')}
                     type='password'
                   />

@@ -1,39 +1,45 @@
 // Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountJson, Resolver } from '@subwallet/extension-base/background/types';
+import { Resolver } from '@subwallet/extension-base/background/types';
+import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountProxy, AccountProxyType, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
-import { BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
-import { AccountSelector } from '@subwallet/extension-web-ui/components/Field/AccountSelector';
+import { AccountAddressSelector, BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { ServiceSelector } from '@subwallet/extension-web-ui/components/Field/BuyTokens/ServiceSelector';
-import { TokenItemType, TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
+import { SELL_TOKEN_TAB } from '@subwallet/extension-web-ui/constants';
+import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { AccountType, BuyServiceInfo, BuyTokenInfo, CreateBuyOrderFunction, SupportService, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
 import { BuyTokensParam } from '@subwallet/extension-web-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createTransakOrder, findAccountByAddress, noop, openInNewTab } from '@subwallet/extension-web-ui/utils';
-import { getAccountType } from '@subwallet/extension-web-ui/utils/account/account';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
-import { findNetworkJsonByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { Button, Form, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, ShoppingCartSimple, XCircle } from 'phosphor-react';
+import { CheckCircle, ShoppingCartSimple, Tag, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
-import { isEthereumAddress } from '@polkadot/util-crypto';
-
-type Props = ThemeProps & {
+type SharedProps = {
   modalContent?: boolean;
   slug?: string;
+  className?: string;
+};
+
+type WrapperProps = ThemeProps & SharedProps;
+
+type Props = SharedProps & {
+  currentAccountProxy: AccountProxy;
 };
 
 type BuyTokensFormProps = {
   address: string;
-  tokenKey: string;
+  tokenSlug: string;
   service: SupportService;
 }
 
@@ -41,6 +47,8 @@ interface LinkUrlProps {
   url: string;
   content: string;
 }
+
+type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
 
 const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
   if (props.url) {
@@ -59,23 +67,33 @@ const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
 
 const modalId = 'disclaimer-modal';
 
-function Component ({ className, modalContent, slug }: Props) {
+function Component ({ className, currentAccountProxy, modalContent, slug }: Props) {
   const locationState = useLocation().state as BuyTokensParam;
   const [_currentSymbol] = useState<string | undefined>(locationState?.symbol);
+  const [buyTokenTab, setBuyTokenModalTab] = useLocalStorage(SELL_TOKEN_TAB, '');
+
+  const [buyForm, setBuyForm] = useState(buyTokenTab !== 'SELL');
+
   const currentSymbol = slug || _currentSymbol;
 
   const notify = useNotification();
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
-  const { accounts, currentAccount, isAllAccount } = useSelector((state: RootState) => state.accountState);
-  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+
+  const { chainInfoMap, chainStateMap, priorityTokens } = useSelector((root: RootState) => root.chainStore);
   const { assetRegistry } = useSelector((state: RootState) => state.assetRegistry);
   const { walletReference } = useSelector((state: RootState) => state.settings);
   const { services, tokens } = useSelector((state: RootState) => state.buyService);
-  const checkAsset = useAssetChecker();
 
-  const fixedTokenKey = useMemo((): string | undefined => {
+  const getAccountTokenBalance = useGetAccountTokenBalance();
+
+  const checkAsset = useAssetChecker();
+  const allowedChains = useGetChainSlugsByAccount();
+  const getReformatAddress = useReformatAddress();
+
+  const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {
       return Object.values(tokens).filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol)[0]?.slug;
     } else {
@@ -83,15 +101,14 @@ function Component ({ className, modalContent, slug }: Props) {
     }
   }, [currentSymbol, tokens]);
 
-  const [currentAddress] = useState<string | undefined>(currentAccount?.address);
   const { t } = useTranslation();
-  const { goBack } = useDefaultNavigate();
+  const { goHome } = useDefaultNavigate();
   const [form] = Form.useForm<BuyTokensFormProps>();
   const formDefault = useMemo((): BuyTokensFormProps => ({
-    address: isAllAccount ? '' : (currentAccount?.address || ''),
-    tokenKey: fixedTokenKey || '',
+    address: '',
+    tokenSlug: fixedTokenSlug || '',
     service: '' as SupportService
-  }), [currentAccount?.address, fixedTokenKey, isAllAccount]);
+  }), [fixedTokenSlug]);
 
   const promiseRef = useRef<Resolver<void>>({ resolve: noop, reject: noop });
 
@@ -101,17 +118,17 @@ function Component ({ className, modalContent, slug }: Props) {
     banxa: false,
     onramper: false,
     moonpay: false,
-    coinbase: false
+    coinbase: false,
+    meld: false
   });
 
   const selectedAddress = Form.useWatch('address', form);
-  const selectedTokenKey = Form.useWatch('tokenKey', form);
+  const selectedTokenSlug = Form.useWatch('tokenSlug', form);
   const selectedService = Form.useWatch('service', form);
 
   const { contactUrl, name: serviceName, policyUrl, termUrl, url } = useMemo((): BuyServiceInfo => {
     return services[selectedService] || { name: '', url: '', contactUrl: '', policyUrl: '', termUrl: '' };
   }, [selectedService, services]);
-
   const getServiceItems = useCallback((tokenSlug: string): ServiceItem[] => {
     const buyInfo = tokens[tokenSlug];
     const result: ServiceItem[] = [];
@@ -119,14 +136,16 @@ function Component ({ className, modalContent, slug }: Props) {
     for (const serviceItem of baseServiceItems) {
       const temp: ServiceItem = {
         ...serviceItem,
-        disabled: buyInfo ? !buyInfo.services.includes(serviceItem.key) : true
+        disabled: buyInfo
+          ? !buyInfo.services.includes(serviceItem.key) || (!buyForm && !buyInfo.serviceInfo[serviceItem.key]?.supportSell)
+          : true
       };
 
       result.push(temp);
     }
 
     return result;
-  }, [tokens]);
+  }, [tokens, buyForm]);
 
   const onConfirm = useCallback((): Promise<void> => {
     activeModal(modalId);
@@ -153,71 +172,206 @@ function Component ({ className, modalContent, slug }: Props) {
     promiseRef.current.reject(new Error('User reject'));
   }, []);
 
-  const accountType = selectedAddress ? getAccountType(selectedAddress) : '';
-  const ledgerNetwork = useMemo((): string | undefined => {
-    const account = findAccountByAddress(accounts, selectedAddress);
+  const tokenBalanceMap = useMemo(() => {
+    return getAccountTokenBalance(Object.keys(tokens), currentAccountProxy.id);
+  }, [currentAccountProxy.id, getAccountTokenBalance, tokens]);
 
-    if (account?.originGenesisHash) {
-      return findNetworkJsonByGenesisHash(chainInfoMap, account.originGenesisHash)?.slug;
-    }
+  const buyTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
 
-    return undefined;
-  }, [accounts, chainInfoMap, selectedAddress]);
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
 
-  const tokenItems = useMemo<TokenItemType[]>(() => {
-    const result: TokenItemType[] = [];
-
-    const list = [...Object.values(tokens)];
-
-    const filtered = currentSymbol ? list.filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol) : list;
-
-    const convertToItem = (info: BuyTokenInfo): TokenItemType => {
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
-        originChain: info.network
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
       };
     };
 
-    filtered.forEach((info) => {
-      const item = convertToItem(info);
+    Object.values(tokens).forEach((item) => {
+      if (!allowedChains.includes(item.network)) {
+        return;
+      }
 
-      if (ledgerNetwork) {
-        if (info.network === ledgerNetwork) {
-          result.push(item);
-        }
-      } else {
-        if (accountType === 'ALL' || accountType === info.support) {
-          result.push(item);
-        }
+      if (!currentSymbol || (item.slug === currentSymbol || item.symbol === currentSymbol)) {
+        result.push(convertToItem(item));
       }
     });
 
-    return result;
-  }, [accountType, assetRegistry, currentSymbol, ledgerNetwork, tokens]);
+    sortTokensByBalanceInSelector(result, priorityTokens);
 
-  const serviceItems = useMemo(() => getServiceItems(selectedTokenKey), [getServiceItems, selectedTokenKey]);
+    return result;
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
+
+  const sellTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
+    const result: SortableTokenSelectorItemType[] = [];
+
+    const convertToItem = (info: BuyTokenInfo): SortableTokenSelectorItemType => {
+      const tokenBalanceInfo = tokenBalanceMap[info.slug];
+      const balanceInfo = tokenBalanceInfo && chainStateMap[info.network]?.active
+        ? {
+          isReady: tokenBalanceInfo.isReady,
+          isNotSupport: tokenBalanceInfo.isNotSupport,
+          free: tokenBalanceInfo.free,
+          locked: tokenBalanceInfo.locked,
+          total: tokenBalanceInfo.total,
+          currency: tokenBalanceInfo.currency,
+          isTestnet: tokenBalanceInfo.isTestnet
+        }
+        : undefined;
+
+      return {
+        name: assetRegistry[info.slug]?.name || info.symbol,
+        slug: info.slug,
+        symbol: info.symbol,
+        originChain: info.network,
+        balanceInfo,
+        isTestnet: !!balanceInfo?.isTestnet,
+        total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
+      };
+    };
+
+    const sellList = [...Object.values(tokens)].filter((token) => token.supportSell);
+
+    const filtered = currentSymbol
+      ? sellList.filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol)
+      : sellList;
+
+    Object.values(filtered).forEach((item) => {
+      if (!allowedChains.includes(item.network)) {
+        return;
+      }
+
+      result.push(convertToItem(item));
+    });
+
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
+    return result;
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
+
+  const tokenItems = buyForm ? buyTokenItems : sellTokenItems;
+
+  const serviceItems = useMemo(() => getServiceItems(selectedTokenSlug), [getServiceItems, selectedTokenSlug]);
+
+  const isSellTabDisabled = useMemo(() => {
+    if (sellTokenItems.length > 1) {
+      return false;
+    }
+
+    const tokenInfo = sellTokenItems[0]?.slug ? tokens[sellTokenItems[0].slug] : undefined;
+
+    for (const serviceItem of baseServiceItems) {
+      if (tokenInfo?.serviceInfo[serviceItem.key]?.supportSell) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [sellTokenItems, tokens]);
+
+  const handleForm = useCallback((mode: string) => {
+    setBuyForm(mode === 'BUY');
+  }, []);
+
+  const handleBuyForm = useCallback(() => handleForm('BUY'), [handleForm]);
+  const handleSellForm = useCallback(() => {
+    if (isSellTabDisabled) {
+      return;
+    }
+
+    handleForm('SELL');
+  }, [handleForm, isSellTabDisabled]);
+
+  const accountAddressItems = useMemo(() => {
+    const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
+    const chainInfo = chainSlug ? chainInfoMap[chainSlug] : undefined;
+
+    if (!chainInfo) {
+      return [];
+    }
+
+    const result: AccountAddressItemType[] = [];
+
+    const updateResult = (ap: AccountProxy) => {
+      ap.accounts.forEach((a) => {
+        const address = getReformatAddress(a, chainInfo);
+
+        if (address) {
+          result.push({
+            accountName: ap.name,
+            accountProxyId: ap.id,
+            accountProxyType: ap.accountType,
+            accountType: a.type,
+            address
+          });
+        }
+      });
+    };
+
+    if (isAccountAll(currentAccountProxy.id)) {
+      accountProxies.forEach((ap) => {
+        if (isAccountAll(ap.id)) {
+          return;
+        }
+
+        updateResult(ap);
+      });
+    } else {
+      updateResult(currentAccountProxy);
+    }
+
+    return result;
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
-    if (selectedService && selectedAddress && selectedTokenKey) {
-      const buyInfo = tokens[selectedTokenKey];
-      const accountType = getAccountType(selectedAddress);
+    if (selectedService && selectedAddress && selectedTokenSlug) {
+      const buyInfo = tokens[selectedTokenSlug];
 
-      return buyInfo && buyInfo.support === accountType && buyInfo.services.includes(selectedService) && tokenItems.find((item) => item.slug === selectedTokenKey);
+      return buyInfo && buyInfo.services.includes(selectedService) && tokenItems.find((item) => item.slug === selectedTokenSlug);
     }
 
     return false;
-  }, [selectedService, selectedAddress, selectedTokenKey, tokens, tokenItems]);
+  }, [selectedService, selectedAddress, selectedTokenSlug, tokens, tokenItems]);
 
-  const onClickNext = useCallback(() => {
+  const onClickNext = useCallback((action: 'BUY' | 'SELL') => {
+    if (action === 'SELL') {
+      if (currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
+        notify({
+          message: t('Feature not available for watch-only account'),
+          type: 'info',
+          duration: 3
+        });
+
+        setLoading(false);
+
+        return;
+      }
+    }
+
     setLoading(true);
 
-    const { address, service, tokenKey } = form.getFieldsValue();
+    const { address, service, tokenSlug } = form.getFieldsValue();
 
     let urlPromise: CreateBuyOrderFunction | undefined;
 
-    const buyInfo = tokens[tokenKey];
+    const buyInfo = tokens[tokenSlug];
     const { network } = buyInfo;
 
     const serviceInfo = buyInfo.serviceInfo[service];
@@ -235,11 +389,14 @@ function Component ({ className, modalContent, slug }: Props) {
       case 'coinbase':
         urlPromise = createCoinbaseOrder;
         break;
+      case 'meld':
+        urlPromise = createMeldOrder;
+        break;
     }
 
     if (urlPromise && serviceInfo && buyInfo.services.includes(service)) {
       const { network: serviceNetwork, symbol } = serviceInfo;
-
+      const slug = buyInfo.slug;
       const disclaimerPromise = new Promise<void>((resolve, reject) => {
         if (!disclaimerAgree[service]) {
           onConfirm().then(() => {
@@ -255,7 +412,7 @@ function Component ({ className, modalContent, slug }: Props) {
 
       disclaimerPromise.then(() => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return urlPromise!(symbol, walletAddress, serviceNetwork, walletReference);
+        return urlPromise!({ symbol, address: walletAddress, network: serviceNetwork, slug, walletReference, action });
       })
         .then((url) => {
           openInNewTab(url)();
@@ -275,81 +432,55 @@ function Component ({ className, modalContent, slug }: Props) {
     } else {
       setLoading(false);
     }
-  }, [form, tokens, chainInfoMap, disclaimerAgree, onConfirm, walletReference, notify, t]);
-
-  const filterAccountType = useMemo((): AccountType => {
-    if (currentSymbol) {
-      let result: AccountType = '' as AccountType;
-
-      const list = Object.values(tokens).filter((value) => value.slug === currentSymbol || value.symbol === currentSymbol);
-
-      list.forEach((info) => {
-        if (result) {
-          if (result !== info.support) {
-            if (result === 'SUBSTRATE' || result === 'ETHEREUM') {
-              result = 'ALL';
-            }
-          }
-        } else {
-          result = info.support;
-        }
-      });
-
-      return result;
-    } else {
-      return 'ALL';
-    }
-  }, [currentSymbol, tokens]);
-
-  const accountsFilter = useCallback((account: AccountJson) => {
-    if (isAccountAll(account.address)) {
-      return false;
-    }
-
-    if (filterAccountType !== 'ALL') {
-      if (filterAccountType === 'ETHEREUM') {
-        return isEthereumAddress(account.address);
-      } else {
-        return !isEthereumAddress(account.address);
-      }
-    }
-
-    return true;
-  }, [filterAccountType]);
+  }, [form, tokens, chainInfoMap, currentAccountProxy, notify, t, disclaimerAgree, onConfirm, walletReference]);
 
   useEffect(() => {
-    if (currentAddress !== currentAccount?.address) {
-      goBack();
-    }
-  }, [currentAccount?.address, currentAddress, goBack]);
+    if (!fixedTokenSlug && tokenItems.length) {
+      const { tokenSlug } = form.getFieldsValue();
 
-  useEffect(() => {
-    if (!fixedTokenKey && tokenItems.length) {
-      const { tokenKey } = form.getFieldsValue();
-
-      if (!tokenKey) {
-        form.setFieldsValue({ tokenKey: tokenItems[0].slug });
+      if (!tokenSlug) {
+        form.setFieldsValue({ tokenSlug: tokenItems[0].slug });
       } else {
-        const isSelectedTokenInList = tokenItems.some((i) => i.slug === tokenKey);
+        const isSelectedTokenInList = tokenItems.some((i) => i.slug === tokenSlug);
 
         if (!isSelectedTokenInList) {
-          form.setFieldsValue({ tokenKey: tokenItems[0].slug });
+          form.setFieldsValue({ tokenSlug: tokenItems[0].slug });
         }
       }
-    } else if (fixedTokenKey) {
+    } else if (fixedTokenSlug) {
       setTimeout(() => {
-        form.setFieldsValue({ tokenKey: fixedTokenKey });
+        form.setFieldsValue({ tokenSlug: fixedTokenSlug });
       }, 100);
     }
-  }, [tokenItems, fixedTokenKey, form]);
+  }, [tokenItems, fixedTokenSlug, form]);
 
   useEffect(() => {
-    selectedTokenKey && checkAsset(selectedTokenKey);
-  }, [checkAsset, selectedTokenKey]);
+    selectedTokenSlug && checkAsset(selectedTokenSlug);
+  }, [checkAsset, selectedTokenSlug]);
 
   useEffect(() => {
-    if (selectedTokenKey) {
-      const services = getServiceItems(selectedTokenKey);
+    const updateFromValue = () => {
+      if (!accountAddressItems.length) {
+        return;
+      }
+
+      if (accountAddressItems.length === 1) {
+        if (!selectedAddress || accountAddressItems[0].address !== selectedAddress) {
+          form.setFieldValue('address', accountAddressItems[0].address);
+        }
+      } else {
+        if (selectedAddress && !accountAddressItems.some((i) => i.address === selectedAddress)) {
+          form.setFieldValue('address', '');
+        }
+      }
+    };
+
+    updateFromValue();
+  }, [accountAddressItems, form, selectedAddress]);
+
+  useEffect(() => {
+    if (selectedTokenSlug) {
+      const services = getServiceItems(selectedTokenSlug);
       const filtered = services.filter((service) => !service.disabled);
 
       if (filtered.length > 1) {
@@ -358,7 +489,11 @@ function Component ({ className, modalContent, slug }: Props) {
         form.setFieldValue('service', filtered[0]?.key || '');
       }
     }
-  }, [selectedTokenKey, form, getServiceItems]);
+  }, [selectedTokenSlug, form, getServiceItems]);
+
+  useEffect(() => {
+    setBuyTokenModalTab('');
+  }, [setBuyTokenModalTab]);
 
   return (
     <PageWrapper className={CN(className, 'transaction-wrapper', {
@@ -370,17 +505,45 @@ function Component ({ className, modalContent, slug }: Props) {
           background={'transparent'}
           center
           className={'transaction-header'}
-          onBack={goBack}
+          onBack={goHome}
           paddingVertical
           showBackButton
-          title={t('Buy token')}
+          title={t('Buy & sell tokens')}
         />
       )}
       <div className={'__scroll-container'}>
+        <div className='form-row __service-container'>
+          <div style={{
+            position: 'absolute',
+            top: '0.25rem',
+            left: buyForm ? '0.25rem' : 'calc(50% + 0.25rem)',
+            width: 'calc(50% - 0.5rem)',
+            height: 'calc(100% - 0.5rem)',
+            backgroundColor: '#252525',
+            borderRadius: '0.5rem',
+            transition: 'left 0.3s ease-in-out'
+          }}
+          ></div>
+
+          <div
+            className='__service-selector'
+            onClick={handleBuyForm}
+          >
+              Buy
+          </div>
+          <div
+            className={CN('__service-selector', {
+              '-disabled': isSellTabDisabled
+            })}
+            onClick={handleSellForm}
+          >
+              Sell
+          </div>
+        </div>
         <div className='__buy-icon-wrapper'>
           <Icon
             className={'__buy-icon'}
-            phosphorIcon={ShoppingCartSimple}
+            phosphorIcon={buyForm ? ShoppingCartSimple : Tag}
             weight={'fill'}
           />
         </div>
@@ -390,21 +553,8 @@ function Component ({ className, modalContent, slug }: Props) {
           form={form}
           initialValues={formDefault}
         >
-          <Form.Item
-            className={CN({
-              hidden: !isAllAccount
-            })}
-            name={'address'}
-          >
-            <AccountSelector
-              disabled={!isAllAccount}
-              filter={accountsFilter}
-              label={t('Select account')}
-            />
-          </Form.Item>
-
           <div className='form-row'>
-            <Form.Item name={'tokenKey'}>
+            <Form.Item name={'tokenSlug'}>
               <TokenSelector
                 disabled={tokenItems.length < 2}
                 items={tokenItems}
@@ -414,13 +564,26 @@ function Component ({ className, modalContent, slug }: Props) {
 
             <Form.Item name={'service'}>
               <ServiceSelector
-                disabled={!selectedTokenKey}
+                disabled={!selectedTokenSlug}
                 items={serviceItems}
                 placeholder={t('Select supplier')}
                 title={t('Select supplier')}
               />
             </Form.Item>
           </div>
+
+          <Form.Item
+            // className={CN({
+            //   hidden: !isAllAccount && accountAddressItems.length <= 1
+            // })}
+            name={'address'}
+          >
+            <AccountAddressSelector
+              items={accountAddressItems}
+              label={`${t('To')}:`}
+              labelStyle={'horizontal'}
+            />
+          </Form.Item>
         </Form>
 
         <div className={'common-text __note'}>
@@ -431,16 +594,17 @@ function Component ({ className, modalContent, slug }: Props) {
       <div className={'__layout-footer'}>
         <Button
           disabled={!isSupportBuyTokens}
-          icon={ (
+          icon={(
             <Icon
-              phosphorIcon={ShoppingCartSimple}
+              phosphorIcon={buyForm ? ShoppingCartSimple : Tag}
               weight={'fill'}
             />
           )}
           loading={loading}
-          onClick={onClickNext}
+          // eslint-disable-next-line react/jsx-no-bind
+          onClick={() => onClickNext(buyForm ? 'BUY' : 'SELL')}
         >
-          {t('Buy now')}
+          {buyForm ? t('Buy now') : t('Sell now')}
         </Button>
       </div>
       <BaseModal
@@ -516,12 +680,29 @@ function Component ({ className, modalContent, slug }: Props) {
   );
 }
 
-function Wrapper ({ modalContent, ...rest }: Props) {
+const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
+  const { modalContent } = props;
+  const { goHome } = useDefaultNavigate();
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+
+  useEffect(() => {
+    if (!currentAccountProxy) {
+      goHome();
+    }
+  }, [goHome, currentAccountProxy]);
+
+  if (!currentAccountProxy) {
+    return (
+      <></>
+    );
+  }
+
   if (modalContent) {
     return (
       <Component
-        modalContent={modalContent}
-        {...rest}
+        {...props}
+        currentAccountProxy={currentAccountProxy}
+        modalContent={true}
       />
     );
   }
@@ -532,13 +713,14 @@ function Wrapper ({ modalContent, ...rest }: Props) {
       showTabBar={false}
     >
       <Component
-        {...rest}
+        {...props}
+        currentAccountProxy={currentAccountProxy}
       />
     </Layout.Home>
   );
-}
+};
 
-const BuyTokens = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
+const BuyTokens = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return ({
     display: 'flex',
     flexDirection: 'column',
@@ -571,6 +753,30 @@ const BuyTokens = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       overflow: 'auto',
       paddingLeft: token.padding,
       paddingRight: token.padding
+    },
+
+    '.__service-container': {
+      backgroundColor: token.colorBgSecondary,
+      borderRadius: '0.5rem',
+      padding: '0.25rem',
+      height: '2.5rem',
+      position: 'relative',
+      display: 'flex',
+      overflow: 'hidden'
+    },
+
+    '.__service-selector': {
+      cursor: 'pointer',
+      width: '50%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      zIndex: 1
+    },
+
+    '.__service-selector.-disabled': {
+      cursor: 'not-allowed'
     },
 
     '.__buy-icon-wrapper': {

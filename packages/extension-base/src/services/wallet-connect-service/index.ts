@@ -10,14 +10,17 @@ import { IKeyValueStorage } from '@walletconnect/keyvaluestorage';
 import SignClient from '@walletconnect/sign-client';
 import { EngineTypes, SessionTypes, SignClientTypes } from '@walletconnect/types';
 import { getInternalError, getSdkError } from '@walletconnect/utils';
+import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
-import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
+import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
 
 const storage = SWStorage.instance;
+const methodDOTRequire = [POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_MESSAGE, POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_TRANSACTION];
+const methodEVMRequire = [EIP155_SIGNING_METHODS.PERSONAL_SIGN, EIP155_SIGNING_METHODS.ETH_SIGN, EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION];
 
 class WCStorage implements IKeyValueStorage {
   async getEntries<T = any> (): Promise<[string, T][]> {
@@ -83,7 +86,21 @@ export default class WalletConnectService {
     this.#removeListener();
 
     if (force || await this.haveData()) {
-      this.#client = await SignClient.init(this.#option);
+      try {
+        this.#client = await SignClient.init(this.#option);
+      } catch (e) {
+        if (this.#option.relayUrl === RELAY_URL) {
+          this.#option = { ...this.#option, relayUrl: RELAY_FALLBACK_URL };
+
+          try {
+            this.#client = await SignClient.init(this.#option);
+          } catch (e) {
+            throw this.convertWCErrorMessage(e as Error);
+          }
+        } else {
+          throw this.convertWCErrorMessage(e as Error);
+        }
+      }
     }
 
     this.#updateSessions();
@@ -174,10 +191,27 @@ export default class WalletConnectService {
     }
   }
 
+  async #onPingReply ({ topic }: SignClientTypes.EventArguments['session_ping']) {
+    // Doc: https://specs.walletconnect.com/2.0/specs/clients/sign/session-events#session_ping
+
+    this.#checkClient();
+
+    try {
+      const requestSession = this.getSession(topic);
+      const sessionAccounts = (requestSession.namespaces.eip155?.accounts || []).concat(requestSession.namespaces.polkadot?.accounts || []);
+
+      if (sessionAccounts.length > 0 && this.#client) {
+        await this.#client.ping({ topic });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   #createListener () {
     this.#client?.on('session_proposal', this.#onSessionProposal.bind(this));
     this.#client?.on('session_request', this.#onSessionRequest.bind(this));
-    this.#client?.on('session_ping', (data) => console.log('ping', data));
+    this.#client?.on('session_ping', this.#onPingReply.bind(this));
     this.#client?.on('session_event', (data) => console.log('event', data));
     this.#client?.on('session_update', (data) => console.log('update', data));
     this.#client?.on('session_delete', this.#updateSessions.bind(this));
@@ -218,11 +252,27 @@ export default class WalletConnectService {
 
     this.#checkClient();
 
-    await this.#client?.pair({ uri });
+    try {
+      await this.#client?.pair({ uri });
+    } catch (e) {
+      throw this.convertWCErrorMessage(e as Error, true);
+    }
   }
 
   public async approveSession (result: ResultApproveWalletConnectSession) {
     this.#checkClient();
+
+    Object.entries(result.namespaces).forEach(([namespace, { methods }]) => {
+      methods = [
+        ...methods,
+        ...this.findMethodsMissing(WALLET_CONNECT_EIP155_NAMESPACE === namespace
+          ? methodEVMRequire
+          : methodDOTRequire, methods
+        )
+      ];
+      result.namespaces[namespace].methods = methods;
+    });
+
     await this.#client?.approve(result);
     this.#updateSessions();
   }
@@ -295,5 +345,40 @@ export default class WalletConnectService {
     });
 
     this.#updateSessions();
+  }
+
+  public convertWCErrorMessage (e: Error, isConnect?: boolean) {
+    const message = e.message.toLowerCase();
+
+    console.error(e);
+
+    if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
+      return new Error(t('Connection unsuccessful. Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app'));
+    }
+
+    if (message.includes('failed for host')) {
+      return new Error(t('Connection unsuccessful. Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app'));
+    }
+
+    if (message.includes('pairing already exists')) {
+      return new Error(t('Connection already exists'));
+    }
+
+    if (isConnect) {
+      return new Error(t('Fail to add connection'));
+    }
+
+    return e;
+  }
+
+  private findMethodsMissing (methodRequire: (POLKADOT_SIGNING_METHODS | EIP155_SIGNING_METHODS) [], methods: string[]) {
+    const methodMap = methods.reduce((obj, m) =>
+      ({ ...obj, [m]: m }), {} as Record<EIP155_SIGNING_METHODS | POLKADOT_SIGNING_METHODS, string>);
+
+    return methodEVMRequire.reduce((methods, m) => {
+      !methodMap[m] && methods.push(m);
+
+      return methods;
+    }, [] as string[]);
   }
 }
