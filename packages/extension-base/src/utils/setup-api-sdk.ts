@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { APP_VERSION, BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL } from '@subwallet/extension-base/constants';
+import { ChainListVersion } from '@subwallet/extension-base/services/chain-service/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
-import { ChainListVersion } from '../services/chain-service/utils';
 import { TARGET_ENV } from './environment';
 
 export function setupApiSDK () {
