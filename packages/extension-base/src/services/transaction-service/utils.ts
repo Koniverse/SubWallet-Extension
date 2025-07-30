@@ -92,7 +92,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
   }
 
   if (['autonomys'].includes(chainInfo.slug)) {
-    return 'extrinsic';
+    return 'extrinsics';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
