@@ -39,7 +39,8 @@ const persistConfig = {
     'campaign',
     'buyService',
     'staticContent',
-    'price'
+    'price',
+    'earning'
   ]
 };
 

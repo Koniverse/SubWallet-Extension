@@ -23,11 +23,6 @@ export enum EarningEntryView {
   POSITIONS= 'positions',
 }
 
-export enum NetworkType {
-  MAIN_NETWORK = 'MAIN_NETWORK',
-  TEST_NETWORK = 'TEST_NETWORK',
-}
-
 export type ExtraYieldPositionInfo = YieldPositionInfo & {
   asset: _ChainAsset;
   price: number;
@@ -75,6 +70,12 @@ export interface NominationPoolDataType extends NominationPoolInfo {
 export interface ValidatorDataType extends ValidatorInfo {
   symbol: string;
   decimals: number;
+  isMissingInfo?: boolean;
+}
+
+export enum NetworkType {
+  MAIN_NETWORK = 'MAIN_NETWORK',
+  TEST_NETWORK = 'TEST_NETWORK',
 }
 
 export type PoolTargetData = NominationPoolDataType | ValidatorDataType;
