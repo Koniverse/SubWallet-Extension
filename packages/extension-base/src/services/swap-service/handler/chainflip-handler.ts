@@ -47,6 +47,8 @@ interface ChainFlipAsset {
 interface ChainFlipMetadata {
   srcChain: string;
   destChain: string;
+  fromAssetId: string;
+  toAssetId: string;
 }
 
 export class ChainflipSwapHandler implements SwapBaseInterface {
@@ -103,18 +105,17 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const pair = quote.pair;
     const fromAsset = this.chainService.getAssetBySlug(pair.from);
-    const toAsset = this.chainService.getAssetBySlug(pair.to);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : ChainType.EVM;
     const receiver = _reformatAddressWithChain(recipient ?? address, toChainInfo);
-    const fromAssetId = _getAssetSymbol(fromAsset);
-    const toAssetId = _getAssetSymbol(toAsset);
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
     const processMetadata = params.process.steps[params.currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
     const quoteMetadata = processMetadata as ChainFlipMetadata;
+    const fromAssetId = quoteMetadata.fromAssetId;
+    const toAssetId = quoteMetadata.toAssetId;
 
     if (!processMetadata || !quoteMetadata) {
       throw new Error('Metadata for Chainflip not found');
@@ -159,6 +160,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
       this.isTestnet);
 
     const data = await response.json() as DepositAddressResponse;
+
+    console.log('Chainflip channel info:', data);
 
     if (!data.id || !data.address || data.address === '' || !data.issuedBlock || !data.network || !data.channelId) {
       throw new Error('Error get Chainflip data');
@@ -282,6 +285,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
         srcChain: metadata.srcChain,
         destChain: metadata.destChain,
+        fromAssetId: metadata.fromAssetId,
+        toAssetId: metadata.toAssetId,
 
         version: 2
       } as unknown as ChainFlipSwapStepMetadata
