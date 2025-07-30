@@ -187,19 +187,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azns/resolver-core@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@azns/resolver-core@npm:1.4.0"
+"@azns/resolver-core@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@azns/resolver-core@npm:2.1.0"
+  dependencies:
+    bufferutil: ^4.0.9
+    loglevel: ^1.9.2
+    utf-8-validate: ^6.0.5
   peerDependencies:
-    "@polkadot/api": ">=10"
-    "@polkadot/api-contract": ">=10"
-    "@polkadot/types": ">=10"
-    "@polkadot/util": ">=11.1.3"
-    "@polkadot/util-crypto": ">=11.1.3"
-    bufferutil: ">=4.0.1"
-    loglevel: ">=1.8"
-    utf-8-validate: ">=6"
-  checksum: 45e1a43e5258c48c96c5c34a13e7ff58986f78e3d3d1659a2bae97b40232d3c548507dfd1cddcab4135ccedea563c3e0a421aaa9199a2d85c142ffb56cffad1c
+    "@polkadot/api": ">=10 <13"
+    "@polkadot/api-contract": ">=10 <13"
+    "@polkadot/types": ">=10 <13"
+    "@polkadot/util": ">=11.1.3 <14"
+    "@polkadot/util-crypto": ">=11.1.3 <14"
+  checksum: 0c87760ca5c5011503c7c82196eb87ff67c1339f2b136cb604cb79ea294c9fbb0fe5f655e6d5a5c3f5203fbf6e91fc0d1e6fb734753904418affc6e226fae7ed
   languageName: node
   linkType: hard
 
@@ -6711,7 +6712,7 @@ __metadata:
   dependencies:
     "@acala-network/api": ^5.0.2
     "@apollo/client": ^3.7.14
-    "@azns/resolver-core": ^1.4.0
+    "@azns/resolver-core": ^2.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
     "@equilab/api": ~1.14.25
     "@ethereumjs/common": ^4.1.0
@@ -11744,6 +11745,16 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.3.0
   checksum: f75aa87e3d1b99b87a95f60a855e63f70af07b57fb8443e75a2ddfef2e47788d130fdd46e3a78fd7e0c10176082b26dfbed970c5b8632e1cc299cafa0e93ce45
+  languageName: node
+  linkType: hard
+
+"bufferutil@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "bufferutil@npm:4.0.9"
+  dependencies:
+    node-gyp: latest
+    node-gyp-build: ^4.3.0
+  checksum: 51ce9ee19bc4b72c2eb9f9a231dd95e786ca5a00a6bdfcae83f1d5cd8169301c79245ce96913066a5a1bbe45c44e95bc5a1761a18798b835585c1a05af65b209
   languageName: node
   linkType: hard
 
@@ -20675,6 +20686,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"loglevel@npm:^1.9.2":
+  version: 1.9.2
+  resolution: "loglevel@npm:1.9.2"
+  checksum: 896c67b90a507bfcfc1e9a4daa7bf789a441dd70d95cd13b998d6dd46233a3bfadfb8fadb07250432bbfb53bf61e95f2520f9b11f9d3175cc460e5c251eca0af
+  languageName: node
+  linkType: hard
+
 "lolex@npm:^4.2.0":
   version: 4.2.0
   resolution: "lolex@npm:4.2.0"
@@ -28937,6 +28955,16 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.3.0
   checksum: 5579350a023c66a2326752b6c8804cc7b39dcd251bb088241da38db994b8d78352e388dcc24ad398ab98385ba3c5ffcadb6b5b14b2637e43f767869055e46ba6
+  languageName: node
+  linkType: hard
+
+"utf-8-validate@npm:^6.0.5":
+  version: 6.0.5
+  resolution: "utf-8-validate@npm:6.0.5"
+  dependencies:
+    node-gyp: latest
+    node-gyp-build: ^4.3.0
+  checksum: ab6bd5b0db2241a990a9e1c434a29194900f9f8f715158b56d591306634cdd4f748e91b965d91a32fd459c86b082ec0a35d369bbc4efbb243b48f593c14448e8
   languageName: node
   linkType: hard
 
