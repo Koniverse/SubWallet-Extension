@@ -214,10 +214,6 @@ export default class WalletConnectService {
     if (!this.#client) {
       throw new Error(getInternalError('NOT_INITIALIZED').message);
     }
-
-    if (!this.#client?.core.relayer.connected) {
-      throw new Error('Network connection lost while sending request');
-    }
   }
 
   public getSession (topic: string): SessionTypes.Struct {
