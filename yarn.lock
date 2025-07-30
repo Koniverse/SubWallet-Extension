@@ -6693,10 +6693,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet-monorepos/subwallet-services-sdk@npm:^0.1.4":
-  version: 0.1.4
-  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.4"
-  checksum: 28499ed37376af93daadaa506fd24cbdfc63935a31f49fd5238a569b048f63d635e8b908bf3663ff63938c06bafbc93912fa6efae0cfbdeadbc0d0bb951f8c8d
+"@subwallet-monorepos/subwallet-services-sdk@npm:^0.1.5":
+  version: 0.1.5
+  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.5"
+  checksum: d9eb6767afc1c092fcb78c4cde42f0a27f77940b143a5e5a5c1bdd0ab2f3f668a27d3300c6576938dce9ce929633555d5a85eab62890c56b9005bbb42baac7ed
   languageName: node
   linkType: hard
 
@@ -6750,7 +6750,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet-monorepos/subwallet-services-sdk": ^0.1.4
+    "@subwallet-monorepos/subwallet-services-sdk": ^0.1.5
     "@subwallet/chain-list": 0.2.110
     "@subwallet/extension-base": ^1.3.49-0
     "@subwallet/extension-chains": ^1.3.49-0

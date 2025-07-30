@@ -8,7 +8,6 @@ import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { TARGET_ENV } from './environment';
 
 export function setupApiSDK () {
-  // todo: appVersion packageInfo.version
   subwalletApiSdk.updateConfig({
     appVersion: APP_VERSION,
     baseUrl: BACKEND_API_URL,
