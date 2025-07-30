@@ -59,19 +59,19 @@ describe('test chain asset', () => {
         const tmpErrorAsset: Record<string, string> = {};
         //const tnErrorAsset: Record<string, string> = {};
 
-        for (const asset of assets) {
-          let assetInfo: AssetSpec | undefined;
+        for (const assetSW of assets) {
+          let assetOnChain: AssetSpec | undefined;
           const errors: string[] = [];
 
           try {
-            if (asset.assetType === _AssetType.NATIVE) {
-              assetInfo = await getSubstrateNativeInfo(api);
-            } else if (asset.assetType === _AssetType.LOCAL) {
-              assetInfo = await getLocalAssetInfo(chain, asset, api);
+            if (assetSW.assetType === _AssetType.NATIVE) {
+              assetOnChain = await getSubstrateNativeInfo(api);
+            } else if (assetSW.assetType === _AssetType.LOCAL) {
+              assetOnChain = await getLocalAssetInfo(chain, assetSW, api);
 
               if (['moonbeam', 'moonriver', 'moonbase'].includes(chain)) {
-                const assetId = new BigN(_getTokenOnChainAssetId(asset));
-                const address = _getContractAddressOfToken(asset);
+                const assetId = new BigN(_getTokenOnChainAssetId(assetSW));
+                const address = _getContractAddressOfToken(assetSW);
                 const _suffix = assetId.toString(16);
                 const suffix = _suffix.length % 2 === 0 ? _suffix : '0' + _suffix;
                 const calcAddress = '0xFFFFFFFF' + suffix;
@@ -80,24 +80,24 @@ describe('test chain asset', () => {
                   errors.push(`Wrong contract address: current - ${address}, onChain - ${calcAddress}`);
                 }
               }
-            } else if (asset.assetType === _AssetType.PSP22) {
-              assetInfo = await getPsp22AssetInfo(asset, api);
-            } else if ([_AssetType.ERC721, _AssetType.ERC20, _AssetType.UNKNOWN, _AssetType.PSP34].includes(asset.assetType)) {
+            } else if (assetSW.assetType === _AssetType.PSP22) {
+              assetOnChain = await getPsp22AssetInfo(assetSW, api);
+            } else if ([_AssetType.ERC721, _AssetType.ERC20, _AssetType.UNKNOWN, _AssetType.PSP34].includes(assetSW.assetType)) {
               continue;
             }
 
-            if (assetInfo) {
-              compareAsset(assetInfo, asset, errors);
+            if (assetOnChain) {
+              compareAsset(assetOnChain, assetSW, errors);
             } else {
               errors.push('Cannot get info');
             }
 
             if (errors.length) {
-              tmpErrorAsset[asset.slug] = errors.join(' --- ');
+              tmpErrorAsset[assetSW.slug] = errors.join(' --- ');
             }
           } catch (e) {
-            console.error(asset.slug, e);
-            tmpErrorAsset[asset.slug] = 'Fail to get info';
+            console.error(assetSW.slug, e);
+            tmpErrorAsset[assetSW.slug] = 'Fail to get info';
           }
         }
 

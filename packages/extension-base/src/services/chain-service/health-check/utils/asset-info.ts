@@ -402,52 +402,51 @@ export const getErc20AssetInfo = async (asset: _ChainAsset, api: _EvmApi): Promi
 //   'WIFD', 'BORK', 'KOL', 'COMAI', 'ordi', 'sats', 'rats'
 // ]
 
-
 export const compareAsset = (
-  assetInfo: AssetSpec,
-  asset: _ChainAsset,
+  assetOnChain: AssetSpec,
+  assetSW: _ChainAsset,
   errors: string[]
 ) => {
-  const isHasValue = asset.hasValue;
-   //if (!SKIP_ASSETS.includes(asset.slug)) {
+  const isHasValue = assetSW.hasValue;
+  // if (!SKIP_ASSETS.includes(asset.slug)) {
 
-     const {decimals, minAmount, symbol} = assetInfo;
+  const { decimals, minAmount, symbol } = assetOnChain;
 
-     const _minAmount = asset.minAmount || '0';
-     const _decimals = asset.decimals || 0;
+  const _minAmount = assetSW.minAmount || '0';
+  const _decimals = assetSW.decimals || 0;
 
-     if (minAmount !== _minAmount) {
-       const convert = new BigN(minAmount).dividedBy(BN_TEN.pow(decimals)).toFixed();
-       const _convert = new BigN(_minAmount).dividedBy(BN_TEN.pow(_decimals)).toFixed();
-       if (!isHasValue) {
-         errors.push(`Wrong minAmount but it's in Testnet `)
-       } else {
-         errors.push(`Wrong min amount: current - ${asset.minAmount ?? 'null'} (${_convert}), onChain - ${minAmount} (${convert})`);
-       }
-     }
+  if (minAmount !== _minAmount) {
+    const convert = new BigN(minAmount).dividedBy(BN_TEN.pow(decimals)).toFixed();
+    const _convert = new BigN(_minAmount).dividedBy(BN_TEN.pow(_decimals)).toFixed();
 
-     if (symbol !== asset.symbol) {
-       if (!isHasValue) {
-         errors.push(`Wrong symbol but it's in Testnet`)
-       }else
-         //if((!skipAsset.includes(asset.slug)) && (!skipSymbol.includes(asset.symbol)))
-        {
-         const zkSymbol = 'zk' + symbol;
+    if (!isHasValue) {
+      errors.push('Wrong minAmount but it\'s in Testnet ');
+    } else {
+      errors.push(`Wrong min amount: current - ${assetSW.minAmount ?? 'null'} (${_convert}), onChain - ${minAmount} (${convert})`);
+    }
+  }
 
-         if (zkSymbol !== asset.symbol) {
-           errors.push(`Wrong symbol: current - ${asset.symbol}, onChain - ${symbol}`);
-         }
-       }
-     }
+  if (symbol !== assetSW.symbol) {
+    if (!isHasValue) {
+      errors.push('Wrong symbol but it\'s in Testnet');
+    } else {
+    // if((!skipAsset.includes(asset.slug)) && (!skipSymbol.includes(asset.symbol)))
+      const zkSymbol = 'zk' + symbol;
 
-     if (decimals !== _decimals) {
-       if (!isHasValue) {
-         errors.push(`Wrong decimals but it's in Testnet`)
-       } else {
-         errors.push(`Wrong decimals: current - ${asset.decimals ?? 'null'}, onChain - ${decimals}`);
-       }
-     }
-   //}
+      if (zkSymbol !== assetSW.symbol) {
+        errors.push(`Wrong symbol: current - ${assetSW.symbol}, onChain - ${symbol}`);
+      }
+    }
+  }
+
+  if (decimals !== _decimals) {
+    if (!isHasValue) {
+      errors.push('Wrong decimals but it\'s in Testnet');
+    } else {
+      errors.push(`Wrong decimals: current - ${assetSW.decimals ?? 'null'}, onChain - ${decimals}`);
+    }
+  }
+  // }
 };
 
 export const validateAsset = (
