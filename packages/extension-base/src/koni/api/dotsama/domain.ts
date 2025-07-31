@@ -33,14 +33,6 @@ export async function resolveAzeroDomainToAddress (domain: string, chain: string
     chainId = SupportedChainId.AlephZeroTestnet;
   }
 
-  console.log(await resolveDomainToAddress(
-    domain,
-    {
-      chainId,
-      customApi: api
-    }
-  ));
-
   const primaryDomains = await resolveDomainToAddress(
     domain,
     {
@@ -62,12 +54,6 @@ export async function resolveAzeroAddressToDomain (address: string, chain: strin
   if (chain === 'alephTest') {
     chainId = SupportedChainId.AlephZeroTestnet;
   }
-
-  console.log(await resolveAddressToDomain(address,
-    {
-      chainId,
-      customApi: api
-    }));
 
   const primaryDomains = await resolveAddressToDomain(
     address,
