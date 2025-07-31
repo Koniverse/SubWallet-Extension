@@ -7,7 +7,7 @@ import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { findAccountByAddress } from '@subwallet/extension-web-ui/utils';
 import BigN from 'bignumber.js';
 
-export const getYieldRewardTotal = (slug: string, earningRewards: EarningRewardItem[], poolInfoMap: Record<string, YieldPoolInfo>, accounts: AccountJson[], isAllAccount: boolean, currentAccountProxy: AccountProxy | null, chainsByAccountType: string[]): string | undefined => {
+export const getYieldRewardTotal = (slug: string, earningRewards: EarningRewardItem[], poolInfoMap: Record<string, YieldPoolInfo>, accounts: AccountJson[], isAllAccount: boolean, currentAccountProxy: AccountProxy | null, allowedChains: string[], excludedTokens: string[]): string | undefined => {
   const checkAddress = (item: EarningRewardItem) => {
     if (isAllAccount) {
       const account = findAccountByAddress(accounts, item.address);
@@ -28,7 +28,7 @@ export const getYieldRewardTotal = (slug: string, earningRewards: EarningRewardI
         let result = BN_ZERO;
 
         for (const reward of earningRewards) {
-          if (reward.slug === slug && chainsByAccountType.includes(reward.chain) && poolInfoMap[slug]) {
+          if (reward.slug === slug && allowedChains.includes(reward.chain) && !excludedTokens.includes(poolInfo.metadata.inputAsset)) {
             const isValid = checkAddress(reward);
 
             if (isValid) {
@@ -47,7 +47,7 @@ export const getYieldRewardTotal = (slug: string, earningRewards: EarningRewardI
   }
 };
 
-export const getTotalWidrawable = (slug: string, poolInfoMap: Record<string, YieldPoolInfo>, yieldPositions: YieldPositionInfo[], currentAccountProxy: AccountProxy | null, isAllAccount: boolean, chainsByAccountType: string[], currentTimestampMs: number, address?: string): string | BigN => {
+export const getTotalWidrawable = (slug: string, poolInfoMap: Record<string, YieldPoolInfo>, yieldPositions: YieldPositionInfo[], currentAccountProxy: AccountProxy | null, isAllAccount: boolean, allowedChains: string[], excludedTokens: string[], currentTimestampMs: number, address?: string): string | BigN => {
   const checkAddress = (item: YieldPositionInfo) => {
     if (isAllAccount) {
       if (address) {
@@ -67,7 +67,7 @@ export const getTotalWidrawable = (slug: string, poolInfoMap: Record<string, Yie
   const infoList: YieldPositionInfo[] = [];
 
   for (const info of yieldPositions) {
-    if (info.slug === slug && chainsByAccountType.includes(info.chain) && poolInfoMap[info.slug]) {
+    if (info.slug === slug && allowedChains.includes(info.chain) && !excludedTokens.includes(info.balanceToken) && poolInfoMap[info.slug]) {
       const isValid = checkAddress(info);
       const haveStake = new BigN(info.totalStake).gt(0);
 
