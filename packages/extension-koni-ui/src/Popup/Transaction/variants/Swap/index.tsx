@@ -31,8 +31,8 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
-import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsDownUp, Book, CheckCircle } from 'phosphor-react';
@@ -1445,8 +1445,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
         setFetchError(true);
         setLoading(false);
       });
-
-    return;
   }, []);
 
   const handleReloadNotSupportDefault = useCallback(() => {
