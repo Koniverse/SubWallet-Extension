@@ -143,12 +143,19 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return chainValue && destChainValue && chainValue !== destChainValue;
   }, [chainValue, destChainValue]);
 
-  const isEditButton = useMemo(() => {
+  const { isEditButton, isEvmButNoCustomFeeSupport } = useMemo(() => {
     const isSubstrateSupport = !!(chainValue && feeType === 'substrate' && listTokensCanPayFee.length && (isChainSupportTokenPayFee(chainValue)));
     const isEvmSupport = !!(chainValue && feeType === 'evm');
+    const isEvmCustomFeeEditable = isEvmSupport && !!feeOptionsInfo && 'options' in feeOptionsInfo && feeOptionsInfo.options != null;
 
-    return (isSubstrateSupport || isEvmSupport) && !isXcm;
-  }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
+    const isEvmButNoCustomFeeSupport = isEvmSupport && !isEvmCustomFeeEditable;
+    const isEditButton = (isSubstrateSupport || isEvmCustomFeeEditable) && !isXcm;
+
+    return {
+      isEvmButNoCustomFeeSupport,
+      isEditButton
+    };
+  }, [chainValue, feeType, listTokensCanPayFee.length, feeOptionsInfo, isXcm]);
 
   const rateValue = useMemo(() => {
     const selectedToken = listTokensCanPayFee.find((item) => item.slug === tokenPayFeeSlug);
@@ -215,7 +222,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     loading={isLoadingToken}
                     onClick={isEditButton ? onClickEdit : undefined}
                     size='xs'
-                    tooltip={isEditButton ? undefined : t('Coming soon!')}
+                    tooltip={isEditButton ? undefined : (isEvmButNoCustomFeeSupport ? t("Fee customization isn't available for this network.") : t('Coming soon!'))}
                     type='ghost'
                   />
                 </div>
