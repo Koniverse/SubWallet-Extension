@@ -43,6 +43,7 @@ export const DefaultLogosMap: Record<string, string> = {
   simple_swap: '/images/projects/simple-swap.png',
   uniswap: '/images/projects/uniswap.png',
   kyber: '/images/projects/kyber.png',
+  ordinal_rune: '/images/projects/ordinal_rune.png',
   polkadot_assethub: '/images/projects/polkadot-asset-hub.png',
   kusama_assethub: '/images/projects/kusama-asset-hub.png',
   rococo_assethub: '/images/projects/rococo-asset-hub.png',
@@ -54,7 +55,7 @@ export const DefaultLogosMap: Record<string, string> = {
   [SUBSTRATE_MIGRATION_KEY]: '/images/projects/polkadot-migration.png',
   ton: '/images/projects/ton.png',
   ...Object.fromEntries( // Can use image from chain-list instead of local image
-    Array.from({ length: 86 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
+    Array.from({ length: 96 }, (_, i) => [`subnet-${i}`, `/images/bittensor/subnet-${i}.png`])
   ),
   meld: '/images/projects/meld.png'
 };
