@@ -4,7 +4,6 @@
 import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_API_URL } from '@subwallet/extension-base/constants';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
@@ -32,6 +31,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -1426,40 +1426,27 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   const fetchDestinationsMap = useCallback(() => {
     setLoading(true);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
 
-    fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`, { signal: controller.signal })
-      .then((rawResp) => {
-        clearTimeout(timeout);
-
-        if (!rawResp.ok) {
-          throw new Error(`HTTP error! status: ${rawResp.status}`);
-        }
-
-        return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string }>;
-      })
-      .then((resp) => {
+    // todo: handle timeout
+    subwalletApiSdk.swapApi.fetchDestinationsMap()
+      .then((response) => {
         // simple validate
-        if (!resp || typeof resp !== 'object' || !resp.data || typeof resp.data !== 'object') {
+        if (!response || typeof response !== 'object') {
           throw new Error('Invalid response format');
         }
 
-        setPairMap(resp.data);
+        setPairMap(response);
         setFetchError(false);
         setLoading(false);
       })
       .catch((error: Error) => {
-        error.name === 'AbortError' ? console.error('Timout fetching swap destinations') : console.error(`Error while fetching swap destinations: ${error.message}`);
+        console.error(`Error while fetching swap destinations: ${error.message}`);
 
         setFetchError(true);
         setLoading(false);
       });
 
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
+    return;
   }, []);
 
   const handleReloadNotSupportDefault = useCallback(() => {
