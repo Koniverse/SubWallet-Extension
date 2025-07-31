@@ -705,7 +705,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
-    console.log('Hmm', [selectedTarget, netuid, binaryAmount.toFixed(), BNlimitPrice.toFixed()]);
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(
       selectedTarget,
       netuid,
