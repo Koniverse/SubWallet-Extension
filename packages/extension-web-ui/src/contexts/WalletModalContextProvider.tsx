@@ -1,16 +1,17 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, SwitchNetworkAuthorizeModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
+import { AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, SwitchNetworkAuthorizeModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
 import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Account/SeedPhraseModal';
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
+import { AccountTokenAddressModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AccountTokenAddressModal';
 import { AddressQrModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/AddressQrModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-web-ui/components/Modal/Global/SelectAddressFormatModal';
 import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-web-ui/components/Modal/Swap/SwapFeesModal';
 import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-web-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-web-ui/components/Modal/TransactionStepsModal';
-import { ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADDRESS_GROUP_MODAL, ADDRESS_QR_MODAL, BUY_TOKEN_MODAL, CONFIRMATION_MODAL, CREATE_ACCOUNT_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SEED_PHRASE_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants/router';
 import { useAlert, useGetConfig, useSetSessionLatest, useSwitchModal } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -82,6 +83,10 @@ export interface WalletModalContextType {
     open: (props: TonWalletContractSelectorModalProps) => void,
     close: VoidFunction
   },
+  accountTokenAddressModal: {
+    open: (props: AccountTokenAddressModalProps) => void,
+    close: VoidFunction
+  },
   alertModal: {
     open: (props: AlertDialogProps) => void,
     updatePartially: (alertProps: Partial<AlertDialogProps>) => void,
@@ -126,6 +131,12 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
   tonWalletContractSelectorModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: (props) => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
+  },
+  accountTokenAddressModal: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    open: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     close: () => {}
   },
@@ -190,6 +201,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   /* Address QR Modal */
   const [addressQrModalProps, setAddressQrModalProps] = useState<AddressQrModalProps | undefined>();
   const [selectAddressFormatModalProps, setSelectAddressFormatModalProps] = useState<SelectAddressFormatModalProps | undefined>();
+  const [accountTokenAddressModalProps, setAccountTokenAddressModalProps] = useState<AccountTokenAddressModalProps | undefined>();
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
   const [tonWalletContractSelectorModalProps, setTonWalletContractSelectorModalProps] = useState<TonWalletContractSelectorModalProps | undefined>();
   const [transactionProcessId, setTransactionProcessId] = useState('');
@@ -207,6 +219,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     activeModal(SELECT_ADDRESS_FORMAT_MODAL);
   }, [activeModal]);
 
+  const openAccountTokenAddressModal = useCallback((props: AccountTokenAddressModalProps) => {
+    setAccountTokenAddressModalProps(props);
+    activeModal(ADDRESS_GROUP_MODAL);
+  }, [activeModal]);
+
   const checkAddressQrModalActive = useCallback(() => {
     return checkActive(ADDRESS_QR_MODAL);
   }, [checkActive]);
@@ -221,6 +238,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setSelectAddressFormatModalProps(undefined);
   }, [inactiveModal]);
 
+  const closeAccountTokenAddressModal = useCallback(() => {
+    inactiveModal(ADDRESS_GROUP_MODAL);
+    setAccountTokenAddressModalProps(undefined);
+  }, [inactiveModal]);
+
   const onCancelAddressQrModal = useCallback(() => {
     addressQrModalProps?.onCancel?.() || closeAddressQrModal();
   }, [addressQrModalProps, closeAddressQrModal]);
@@ -228,6 +250,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const onCancelSelectAddressFormatModal = useCallback(() => {
     selectAddressFormatModalProps?.onCancel?.() || closeSelectAddressFormatModal();
   }, [closeSelectAddressFormatModal, selectAddressFormatModalProps]);
+
+  const onCancelAccountTokenAddressModal = useCallback(() => {
+    accountTokenAddressModalProps?.onCancel?.() || closeAccountTokenAddressModal();
+  }, [accountTokenAddressModalProps, closeAccountTokenAddressModal]);
 
   /* Address QR Modal */
 
@@ -313,6 +339,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       open: openSelectAddressFormatModal,
       close: closeSelectAddressFormatModal
     },
+    accountTokenAddressModal: {
+      open: openAccountTokenAddressModal,
+      close: closeAccountTokenAddressModal
+    },
     tonWalletContractSelectorModal: {
       open: openTonWalletContractSelectorModal,
       close: onCancelTonWalletContractSelectorModal
@@ -339,7 +369,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       checkActive: checkSwapFeesModalActive,
       update: setSwapFeesModalProps
     }
-  }), [openAddressQrModal, checkAddressQrModalActive, closeAddressQrModal, openSelectAddressFormatModal, closeSelectAddressFormatModal, openTonWalletContractSelectorModal, onCancelTonWalletContractSelectorModal, openAlert, updateAlertProps, closeAlert, openDeriveModal, openProcessModal, openTransactionStepsModal, openSwitchNetworkAuthorizeModal, openSwapFeesModal, checkSwapFeesModalActive]);
+  }), [openAddressQrModal, checkAddressQrModalActive, closeAddressQrModal, openSelectAddressFormatModal, closeSelectAddressFormatModal, openAccountTokenAddressModal, closeAccountTokenAddressModal, openTonWalletContractSelectorModal, onCancelTonWalletContractSelectorModal, openAlert, updateAlertProps, closeAlert, openDeriveModal, openProcessModal, openTransactionStepsModal, openSwitchNetworkAuthorizeModal, openSwapFeesModal, checkSwapFeesModalActive]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -417,6 +447,15 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         id={TON_WALLET_CONTRACT_SELECTOR_MODAL}
         onCancel={onCancelTonWalletContractSelectorModal}
       />
+    }
+
+    {
+      !!accountTokenAddressModalProps && (
+        <AccountTokenAddressModal
+          {...accountTokenAddressModalProps}
+          onCancel={onCancelAccountTokenAddressModal}
+        />
+      )
     }
 
     {

@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { AccountProxyType } from '@subwallet/extension-base/types';
 import { BasicOnChangeFunction } from '@subwallet/extension-web-ui/components';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { isAccountAll } from '@subwallet/extension-web-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 
 // todo: recheck this hook usage and logic
 export function useSelectAccount (getAllAddress: string[], modalId: string, onChange?: BasicOnChangeFunction, isSingleSelect?: boolean) {
@@ -14,6 +15,11 @@ export function useSelectAccount (getAllAddress: string[], modalId: string, onCh
   const [selected, setSelected] = useState<string[]>([]);
   const [changeAccounts, setChangeAccounts] = useState<string[]>([]);
   const { inactiveModal } = useContext(ModalContext);
+  const accountProxiesCanExport = useMemo(() => {
+    return accountProxies.filter((item) => {
+      return item.accountType !== AccountProxyType.LEDGER;
+    });
+  }, [accountProxies]);
 
   const onChangeSelectedAccounts = useCallback((changeVal: string) => {
     setChangeAccounts((changeAccounts) => {
@@ -24,7 +30,7 @@ export function useSelectAccount (getAllAddress: string[], modalId: string, onCh
       let result: string[];
       const isAll = isAccountAll(changeVal);
 
-      if (!changeAccounts.includes(changeVal) && changeAccounts.length === accountProxies.length - 2) {
+      if (!changeAccounts.includes(changeVal) && changeAccounts.length === accountProxiesCanExport.length - 2) {
         result = getAllAddress;
       } else if (!changeAccounts.includes(changeVal)) {
         if (!changeVal) {
@@ -48,7 +54,7 @@ export function useSelectAccount (getAllAddress: string[], modalId: string, onCh
 
       return result;
     });
-  }, [accountProxies.length, getAllAddress, isSingleSelect]);
+  }, [accountProxiesCanExport.length, getAllAddress, isSingleSelect]);
 
   const onApplyChangeAccounts = useCallback(() => {
     onChange && onChange({ target: { value: changeAccounts.join(',') } });
