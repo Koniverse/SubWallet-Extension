@@ -222,7 +222,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     loading={isLoadingToken}
                     onClick={isEditButton ? onClickEdit : undefined}
                     size='xs'
-                    tooltip={isEditButton ? undefined : (isEvmButNoCustomFeeSupport ? t("Fee customization isn't available for this network.") : t('Coming soon!'))}
+                    tooltip={isEditButton ? undefined : (isEvmButNoCustomFeeSupport ? t("This fee can't be edited with the current RPC connection") : t('Coming soon!'))}
                     type='ghost'
                   />
                 </div>
