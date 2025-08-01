@@ -9,6 +9,7 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -21,10 +22,20 @@ import { BaseTransactionConfirmationProps } from './Base';
 
 type Props = BaseTransactionConfirmationProps;
 
-const truncateAddress = (addr?: string) => addr ? `${addr.slice(0, 6)}...${addr.slice(-10)}` : '-';
+type ValidatorAccount = {
+  address: string;
+  identity?: string;
+};
+
+type ValidatorAddressProps = {
+  account: ValidatorAccount;
+  className?: string;
+  label?: string;
+  title?: string;
+};
 
 type ValidatorGroupProps = {
-  addresses: string[];
+  accounts: ValidatorAccount[];
   compound: YieldPositionInfo;
   poolInfo: YieldPoolInfo;
   modalId: string;
@@ -32,21 +43,19 @@ type ValidatorGroupProps = {
   total: number;
   label?: string;
   className?: string;
-  maxValidator?: number
+  maxValidator?: number;
 };
 
-type ValidatorAddressProps = Pick<ValidatorGroupProps, 'addresses' | 'className' | 'label' | 'title'>;
-
-const ValidatorAddress = ({ addresses, className, label, title }: ValidatorAddressProps) => (
+const ValidatorAddress = ({ account, className, label, title }: ValidatorAddressProps) => (
   <MetaInfo.Default
     className={CN('__validator-address', className)}
     label={label || title}
   >
-    {truncateAddress(addresses[0])}
+    {account?.identity || toShort(account.address)}
   </MetaInfo.Default>
 );
 
-const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, modalId, poolInfo, title, total }: ValidatorGroupProps) => {
+const ValidatorGroupModal = ({ accounts, className, compound, maxValidator, modalId, poolInfo, title, total }: ValidatorGroupProps) => {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
 
@@ -79,7 +88,7 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
       </MetaInfo.Default>
 
       <EarningValidatorSelectedModal
-        addresses={addresses}
+        addresses={accounts.map((account) => account.address)}
         chain={poolInfo.chain}
         compound={compound}
         disabled={false}
@@ -121,22 +130,28 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
-  const { deselectedAddresses, newValidatorAddresses, totalSelectedCount } = useMemo(() => {
-    const oldValidatorAddresses = compound?.nominations?.map((item) => item.validatorAddress) || [];
-    const newValidatorAddresses = data.selectedValidators.map((v) => v.address);
+  const { deselectedValidatorAccounts, newValidatorAccounts, totalSelectedCount } = useMemo(() => {
+    const oldValidatorAccounts: ValidatorAccount[] = compound?.nominations?.map((item) => ({
+      address: item.validatorAddress,
+      identity: item.validatorIdentity
+    })) || [];
 
-    const totalSelectedCount = newValidatorAddresses.length;
+    const newValidatorAccounts: ValidatorAccount[] = data.selectedValidators.map((v) => ({
+      address: v.address,
+      identity: v.identity
+    }));
 
-    const deselectedAddresses = oldValidatorAddresses.filter((addr) => !newValidatorAddresses.includes(addr));
-    // const newlySelectedAddresses = newValidatorAddresses.filter((addr) => !oldValidatorAddresses.includes(addr));
+    const totalSelectedCount = newValidatorAccounts.length;
+
+    const deselectedValidatorAccounts = oldValidatorAccounts.filter(
+      (old) => !newValidatorAccounts.find((newValidator) => newValidator.address === old.address)
+    );
 
     return {
-      totalSelectedCount,
-      // deselectedCount: deselectedAddresses.length,
-      // newlySelectedCount: newlySelectedAddresses.length,
-      deselectedAddresses,
-      // newlySelectedAddresses,
-      newValidatorAddresses
+      oldValidatorAccounts,
+      newValidatorAccounts,
+      deselectedValidatorAccounts,
+      totalSelectedCount
     };
   }, [compound?.nominations, data.selectedValidators]);
 
@@ -178,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
           {(compound && !isBittensorChain) && (
             <ValidatorGroupModal
-              addresses={newValidatorAddresses}
+              accounts={newValidatorAccounts}
               compound={compound}
               maxValidator={poolInfo.statistic?.maxCandidatePerFarmer}
               modalId={`${EARNING_SELECTED_VALIDATOR_MODAL}-total`}
@@ -197,14 +212,14 @@ const Component: React.FC<Props> = (props: Props) => {
             hasBackgroundWrapper
           >
             <ValidatorAddress
-              addresses={deselectedAddresses}
+              account={deselectedValidatorAccounts[0]}
               className='deselected'
               label='From validator'
               title='Deselected validators'
             />
 
             <ValidatorAddress
-              addresses={newValidatorAddresses}
+              account={newValidatorAccounts[0]}
               className='newly-selected'
               label='To validator'
               title='Newly selected validators'

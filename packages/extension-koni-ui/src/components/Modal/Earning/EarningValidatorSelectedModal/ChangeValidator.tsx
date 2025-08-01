@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
+import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -15,15 +16,15 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
-import { ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import BigN from 'bignumber.js';
-import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
+import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -80,11 +81,13 @@ const Component = (props: Props) => {
     , isSingleSelect: _isSingleSelect = false,
     items, modalId, nominations
     , onCancel, onChange, setForceFetchValidator, slug } = props;
+  const { token } = useTheme() as Theme;
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
   const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
+  const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
@@ -216,6 +219,34 @@ const Component = (props: Props) => {
     });
   }, [items, sortSelection, sortValidator]);
 
+  const validatorResultList = useMemo(() => {
+    const recommendedHeader = {
+      isSessionHeader: true,
+      identity: 'Recommended'
+    };
+
+    const othersHeader = {
+      isSessionHeader: true,
+      identity: 'Others'
+    };
+
+    const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
+
+    const sortedValidators = resultList.map((item) => ({
+      ...item,
+      isRecommend: recommendedAddresses.includes(item.address)
+    }));
+
+    const recommendedItems = sortedValidators.filter((v) => v.isRecommend);
+    const otherItems = sortedValidators.filter((v) => !v.isRecommend);
+
+    if (recommendedItems.length && otherItems.length) {
+      return [recommendedHeader, ...recommendedItems, othersHeader, ...otherItems];
+    }
+
+    return [...recommendedItems, ...otherItems];
+  }, [resultList, defaultValidatorMap, chain]);
+
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
       if (!selectedFilters.length) {
@@ -316,6 +347,31 @@ const Component = (props: Props) => {
   }, [items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.isSessionHeader) {
+      const isOthers = item.identity === 'Others';
+
+      return (
+        <div
+          className={'__session-header'}
+          key={item.identity}
+          style={{
+            marginTop: isOthers ? token.marginSM : 0
+          }}
+        >
+          {item.identity?.toUpperCase()}
+          {item.identity === 'Recommended' && (
+            <Icon
+              className={'__selected-icon'}
+              iconColor={token.colorSuccess}
+              phosphorIcon={ThumbsUp}
+              size='xs'
+              weight='fill'
+            />
+          )}
+        </div>
+      );
+    }
+
     const key = getValidatorKey(item.address, item.identity);
     const keyBase = key.split('___')[0];
 
@@ -331,11 +387,11 @@ const Component = (props: Props) => {
         key={key}
         onClick={onClickItem}
         onClickMoreBtn={onClickMore(item)}
-        prefixAddress = {networkPrefix}
+        prefixAddress={networkPrefix}
         validatorInfo={item}
       />
     );
-  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore]);
+  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore, token]);
 
   const onClickActionBtn = useCallback(() => {
     activeModal(FILTER_MODAL_ID);
@@ -357,6 +413,12 @@ const Component = (props: Props) => {
 
     onCancel?.();
   }, [onCancelSelectValidator, onCancel]);
+
+  useEffect(() => {
+    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningValidatorRecommendation) => {
+      setDefaultValidatorMap(earningValidatorRecommendation);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     const selected = changeValidators
@@ -441,7 +503,7 @@ const Component = (props: Props) => {
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
           enableSearchInput={true}
           filterBy={filterFunction}
-          list={resultList}
+          list={validatorResultList}
           onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
@@ -510,7 +572,20 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
 
     '.pool-item:not(:last-child)': {
       marginBottom: token.marginXS
+    },
+
+    '.__session-header': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextSecondary,
+      fontWeight: token.fontWeightStrong,
+      marginBottom: token.marginXXS,
+      lineHeight: token.lineHeightSM
+    },
+
+    '.__selected-icon': {
+      paddingLeft: token.paddingXXS
     }
+
   };
 });
 

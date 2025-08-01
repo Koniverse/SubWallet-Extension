@@ -67,6 +67,7 @@ export interface ValidatorDataType extends ValidatorInfo {
   symbol: string;
   decimals: number;
   isMissingInfo?: boolean;
+  isSessionHeader?: boolean;
 }
 export enum NetworkType {
   MAIN_NETWORK = 'MAIN_NETWORK',

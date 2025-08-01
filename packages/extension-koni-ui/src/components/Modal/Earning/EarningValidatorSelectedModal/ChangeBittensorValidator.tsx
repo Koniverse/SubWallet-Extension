@@ -234,7 +234,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setAmountChange(true);
       }
     },
-    [amountChange, form, defaultData.value]
+    [amountChange, defaultData.value, form]
   );
 
   const notifyTooHighAmount = useCallback(() => {
