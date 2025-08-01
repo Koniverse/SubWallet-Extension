@@ -51,7 +51,7 @@ const ValidatorAddress = ({ account, className, label, title }: ValidatorAddress
     className={CN('__validator-address', className)}
     label={label || title}
   >
-    {account?.identity || toShort(account.address)}
+    {account?.identity || (account?.address ? toShort(account.address) : '-')}
   </MetaInfo.Default>
 );
 
@@ -67,6 +67,8 @@ const ValidatorGroupModal = ({ accounts, className, compound, maxValidator, moda
   const totalValidatorSelected = maxValidator
     ? `${total} (max ${maxValidator}) `
     : `${total} `;
+
+  const addresses = useMemo(() => accounts.map((account) => account.address), [accounts]);
 
   return (
     <>
@@ -88,7 +90,7 @@ const ValidatorGroupModal = ({ accounts, className, compound, maxValidator, moda
       </MetaInfo.Default>
 
       <EarningValidatorSelectedModal
-        addresses={accounts.map((account) => account.address)}
+        addresses={addresses}
         chain={poolInfo.chain}
         compound={compound}
         disabled={false}

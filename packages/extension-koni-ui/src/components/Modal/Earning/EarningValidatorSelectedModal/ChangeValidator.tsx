@@ -221,12 +221,12 @@ const Component = (props: Props) => {
 
   const validatorResultList = useMemo(() => {
     const recommendedHeader = {
-      isSessionHeader: true,
+      isSectionHeader: true,
       identity: 'Recommended'
     };
 
     const othersHeader = {
-      isSessionHeader: true,
+      isSectionHeader: true,
       identity: 'Others'
     };
 
@@ -347,12 +347,12 @@ const Component = (props: Props) => {
   }, [items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
-    if (item.isSessionHeader) {
+    if (item.isSectionHeader) {
       const isOthers = item.identity === 'Others';
 
       return (
         <div
-          className={'__session-header'}
+          className={'__section-header'}
           key={item.identity}
           style={{
             marginTop: isOthers ? token.marginSM : 0
@@ -574,7 +574,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
       marginBottom: token.marginXS
     },
 
-    '.__session-header': {
+    '.__section-header': {
       fontSize: token.fontSizeSM,
       color: token.colorTextSecondary,
       fontWeight: token.fontWeightStrong,
