@@ -8,6 +8,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, CurrencyCircleDollar } from 'phosphor-react';
 import React from 'react';
@@ -17,12 +18,13 @@ import styled, { useTheme } from 'styled-components';
 type Props = ThemeProps & {
   nominationInfo: NominationInfo;
   isSelected?: boolean;
+  isSelectable?: boolean;
   poolInfo: YieldPoolInfo
   isChangeValidator?: boolean
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isChangeValidator, isSelected, nominationInfo, poolInfo } = props;
+  const { className, isChangeValidator, isSelectable = true, isSelected, nominationInfo, poolInfo } = props;
   const { chain } = nominationInfo;
   const networkPrefix = useGetChainPrefixBySlug(chain);
 
@@ -56,40 +58,40 @@ const Component: React.FC<Props> = (props: Props) => {
 
             <div className={'middle-item__info'}>
               {
-                isChangeValidator && (nominationInfo.commission || nominationInfo.expectedReturn)
+                isChangeValidator
                   ? (
                     <div className={'middle-item__change-validator'}>
                       <div className={'middle-item'}>
-                        {nominationInfo.commission && (
-                          <span className='middle-item__commission'>
-                            <Icon
-                              phosphorIcon={CurrencyCircleDollar}
-                              size='xs'
-                              weight='fill'
-                            />
-                            &nbsp;: {nominationInfo.commission}%
-                          </span>
-                        )}
-                        {nominationInfo.expectedReturn && (
-                          <>
+                        <span className='middle-item__commission'>
+                          <Icon
+                            phosphorIcon={CurrencyCircleDollar}
+                            size='xs'
+                            weight='fill'
+                          />
+                            &nbsp;: {nominationInfo.commission !== undefined ? `${nominationInfo.commission}%` : 'N/A'}
+                        </span>
+                        <>
                             -
-                            <div className='middle-item__apy'>
-                            &nbsp;APY: {nominationInfo.expectedReturn}%
-                            </div>
-                          </>
-                        )}
+                          <div className='middle-item__apy'>
+                            &nbsp;{t('APY')}: {nominationInfo.expectedReturn ? formatBalance(nominationInfo.expectedReturn, 0) : '0'}%
+                          </div>
+                        </>
                       </div>
-                      <span className={'middle-item__active-stake'}>
-                        {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
-                      </span>
+                      {new BigN(nominationInfo.activeStake).gt(0) && (
+                        <span className={'middle-item__active-stake'}>
+                          {formatBalance(nominationInfo.activeStake, decimals)} {subnetSymbol || symbol}
+                        </span>
+                      )}
                     </div>
                   )
                   : (
-                    <div className={'middle-item__active-stake'}>
-                      <span>{t('Staked:')}</span>
-                      <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
-                      <span>{subnetSymbol || symbol}</span>
-                    </div>
+                    new BigN(nominationInfo.activeStake).gt(0) && (
+                      <div className={'middle-item__active-stake'}>
+                        <span>{t('Staked:')}</span>
+                        <span>&nbsp;{formatBalance(nominationInfo.activeStake, decimals)}&nbsp;</span>
+                        <span>{subnetSymbol || symbol}</span>
+                      </div>
+                    )
                   )
               }
             </div>
@@ -97,17 +99,21 @@ const Component: React.FC<Props> = (props: Props) => {
         }
 
         rightItem={
-          isSelected &&
-          (
-            <Icon
-              className={'right-item__select-icon'}
-              iconColor={token.colorSuccess}
-              phosphorIcon={CheckCircle}
-              size={'sm'}
-              weight={'fill'}
-            />
-          )
-        }
+          isSelectable &&
+            (
+              <div className={'right-item__selected-icon-wrapper'}>
+                {(isSelected && (
+                  <Icon
+                    className={'right-item__select-icon'}
+                    iconColor={token.colorSuccess}
+                    phosphorIcon={CheckCircle}
+                    size={'sm'}
+                    weight={'fill'}
+                  />
+                ))
+                }
+              </div>
+            )}
       />
     </div>
   );
@@ -123,10 +129,6 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
       paddingBottom: '0px',
       paddingTop: '0px',
       minHeight: '58px'
-    },
-
-    '.ant-web3-block-middle-item': {
-      paddingRight: token.padding
     },
 
     '.middle-item__name-wrapper': {
@@ -154,6 +156,13 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
       paddingRight: token.paddingXXS
     },
 
+    '.right-item__selected-icon-wrapper': {
+      minWidth: '40px',
+      display: 'flex',
+      justifyContent: 'center',
+      marginLeft: token.marginXXS
+    },
+
     '.right-item__select-icon': {
       paddingLeft: token.paddingSM - 2,
       paddingRight: token.paddingSM - 2
@@ -165,8 +174,7 @@ const StakingNominationItem = styled(Component)<Props>(({ theme: { token } }: Pr
       width: '100%',
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
-      color: token.colorTextLight4,
-      maxWidth: '236px'
+      color: token.colorTextLight4
     },
 
     '.middle-item': {

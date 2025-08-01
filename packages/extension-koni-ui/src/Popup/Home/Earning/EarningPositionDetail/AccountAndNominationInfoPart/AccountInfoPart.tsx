@@ -306,6 +306,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           chain={poolInfo.chain}
           compound={compound}
           disabled={false}
+          displayType={'nomination'}
           from={selectedAddress}
           modalId={EARNING_SELECTED_VALIDATOR_MODAL}
           nominations={selectedItem?.nominations}

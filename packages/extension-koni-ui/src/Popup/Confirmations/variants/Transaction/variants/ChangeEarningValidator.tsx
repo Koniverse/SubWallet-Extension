@@ -83,6 +83,7 @@ const ValidatorGroupModal = ({ addresses, className, compound, maxValidator, mod
         chain={poolInfo.chain}
         compound={compound}
         disabled={false}
+        displayType={'validator'}
         from={compound.address}
         modalId={modalId}
         nominations={compound.nominations}

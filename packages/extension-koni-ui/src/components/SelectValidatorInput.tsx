@@ -93,6 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
           accounts={isBittensorChain ? [addressList[0]] : addressList}
           className={'select-validator-input__avatar-gr'}
           identPrefix={identPrefix}
+          size={20}
         />)}
         <div className={'select-validator-input__content'}>{renderContent()}</div>
         <div className={'select-validator-input__button-wrapper'}>

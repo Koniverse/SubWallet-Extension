@@ -1714,6 +1714,7 @@ export interface NominationInfo {
 
   commission?: number
   expectedReturn?: number;
+  eraRewardPoint?: string;
 }
 
 export interface UnstakingInfo {

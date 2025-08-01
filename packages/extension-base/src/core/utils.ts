@@ -33,11 +33,15 @@ export function getMaxBigInt (a: bigint, b: bigint): bigint {
 }
 
 export function ledgerMustCheckNetwork (account: AccountJson | null): LedgerMustCheckType {
-  if (account && account.isHardware && account.isGeneric && !isEthereumAddress(account.address)) {
-    return account.originGenesisHash ? 'migration' : 'polkadot';
-  } else {
-    return 'unnecessary';
+  if (account && account.isHardware && account.isGeneric) {
+    if (!isEthereumAddress(account.address)) {
+      return account.originGenesisHash ? 'migration' : 'polkadot';
+    } else if (account.isSubstrateECDSA) {
+      return 'polkadot_ecdsa';
+    }
   }
+
+  return 'unnecessary';
 }
 
 // --- recipient address validation --- //
@@ -171,7 +175,15 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
       const ledgerCheck = ledgerMustCheckNetwork(account);
 
       if (ledgerCheck !== 'unnecessary' && !allowLedgerGenerics.includes(destChainInfo.slug)) {
-        return `Ledger ${ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration'} address is not supported for this transfer`;
+        let ledgerTypeLabel = 'Migration';
+
+        if (ledgerCheck === 'polkadot') {
+          ledgerTypeLabel = 'Polkadot';
+        } else if (ledgerCheck === 'polkadot_ecdsa') {
+          ledgerTypeLabel = 'Polkadot (EVM)';
+        }
+
+        return `Ledger ${ledgerTypeLabel} address is not supported for this transfer`;
       }
     }
   }

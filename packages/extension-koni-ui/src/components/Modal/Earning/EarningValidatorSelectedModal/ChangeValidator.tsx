@@ -171,14 +171,22 @@ const Component = (props: Props) => {
   }, [nominations]);
 
   const sortValidator = useCallback((a: ValidatorDataType, b: ValidatorDataType) => {
-    const aKey = getValidatorKey(a.address, a.identity);
-    const bKey = getValidatorKey(b.address, b.identity);
+    const aKey = getValidatorKey(a.address, a.identity).split('___')[0];
+    const bKey = getValidatorKey(b.address, b.identity).split('___')[0];
 
-    if (nominatorValueList.includes(aKey) && !nominatorValueList.includes(bKey)) {
+    // Compare address only in case nominatorValueList lacks identity but validator keys include it
+    const hasA = nominatorValueList.some((nom) => nom.startsWith(aKey));
+    const hasB = nominatorValueList.some((nom) => nom.startsWith(bKey));
+
+    if (hasA && !hasB) {
       return -1;
     }
 
-    return 1;
+    if (!hasA && hasB) {
+      return 1;
+    }
+
+    return 0;
   }, [nominatorValueList]);
 
   const resultList = useMemo((): ValidatorDataType[] => {
@@ -481,7 +489,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
 
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingSM
     },
     '.__pool-item-wrapper': {
       marginBottom: token.marginXS
@@ -501,7 +509,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
     },
 
     '.pool-item:not(:last-child)': {
-      marginBottom: token.marginXXS
+      marginBottom: token.marginXS
     }
   };
 });
