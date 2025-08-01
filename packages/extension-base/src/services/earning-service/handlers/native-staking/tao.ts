@@ -96,7 +96,7 @@ export interface RateSubnetData {
 
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
-export const DEFAULT_DTAO_MINBOND = '21000000';
+export const DEFAULT_DTAO_MINBOND = '30000000';
 /* Fetch data */
 export class BittensorCache {
   private static instance: BittensorCache | null = null;
