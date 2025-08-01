@@ -28,7 +28,7 @@ type ValidatorAccount = {
 };
 
 type ValidatorAddressProps = {
-  account: ValidatorAccount;
+  account?: ValidatorAccount;
   className?: string;
   label?: string;
   title?: string;
