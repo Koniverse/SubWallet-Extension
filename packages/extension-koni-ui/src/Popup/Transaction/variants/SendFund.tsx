@@ -801,6 +801,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
+  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions;
+
   useEffect(() => {
     const updateFromValue = () => {
       if (!accountAddressItems.length) {
@@ -1142,7 +1144,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         className={`${className} -transaction-footer`}
       >
         <Button
-          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false)}
+          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false) || !isDataReady}
           icon={(
             <Icon
               phosphorIcon={PaperPlaneTilt}
