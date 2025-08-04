@@ -12,7 +12,7 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -794,7 +794,15 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => {
+      if (accountInfo.chainType === AccountChainType.BITCOIN) {
+        const isSegWit = accountInfo.type === 'bitcoin-84' || accountInfo.type === 'bittest-84';
+
+        return isSegWit && _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+      }
+
+      return _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+    });
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;
