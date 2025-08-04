@@ -64,7 +64,7 @@ export async function createCardanoTransaction (params: CardanoTransactionConfig
   let payload: string;
 
   try {
-    payload = await subwalletApiSdk.cardanoApi?.fetchUnsignedPayload({
+    payload = await subwalletApiSdk.cardanoApi.fetchUnsignedPayload({
       sender: from,
       receiver: to,
       unit: cardanoId,

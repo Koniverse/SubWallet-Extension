@@ -15,6 +15,7 @@ import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStep
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { QuoteAskResponse } from '@subwallet/subwallet-api-sdk/modules/swapApi';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
@@ -178,16 +179,22 @@ export class HydradxHandler implements SwapBaseInterface {
       bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
       bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
 
-      const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData({
-        address: sender,
-        pair: {
-          from: swapPairInfo.from,
-          to: swapPairInfo.to,
-          slug: swapPairInfo.slug
-        },
-        fromAmount: bnSendingValue.toFixed(0, 1),
-        slippage: params.request.slippage
-      });
+      let quotes: QuoteAskResponse[] = []; // todo
+
+      try {
+        quotes = await subwalletApiSdk.swapApi.fetchSwapQuoteData({
+          address: sender,
+          pair: {
+            from: swapPairInfo.from,
+            to: swapPairInfo.to,
+            slug: swapPairInfo.slug
+          },
+          fromAmount: bnSendingValue.toFixed(0, 1),
+          slippage: params.request.slippage
+        });
+      } catch (error) {
+        throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
+      }
 
       const quoteAskResponse = quotes?.find((quote) => quote.provider === this.providerSlug);
 

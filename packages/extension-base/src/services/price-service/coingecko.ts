@@ -201,7 +201,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
 
 export const getHistoryPrice = async (priceId: string, type: PriceChartTimeframe): Promise<HistoryTokenPriceJSON> => {
   try {
-    const response = await subwalletApiSdk.priceHistoryApi?.getPriceHistory(priceId, type);
+    const response = await subwalletApiSdk.priceHistoryApi.getPriceHistory(priceId, type);
 
     if (response) {
       return response;

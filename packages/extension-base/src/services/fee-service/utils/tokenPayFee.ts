@@ -156,21 +156,29 @@ export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: 
 }
 
 export async function getHydrationRate (address: string, hdx: _ChainAsset, desToken: _ChainAsset) {
-  const quoteRate = await subwalletApiSdk.swapApi?.getHydrationRate({
-    address,
-    pair: {
-      slug: `${hdx.slug}___${desToken.slug}`,
-      from: hdx.slug,
-      to: desToken.slug
-    }
-  });
+  let quoteRate: number | undefined;
 
-  if (!quoteRate) {
-    return undefined;
-  } else {
+  try {
+    const quote = await subwalletApiSdk.swapApi.getHydrationRate({
+      address,
+      pair: {
+        slug: `${hdx.slug}___${desToken.slug}`,
+        from: hdx.slug,
+        to: desToken.slug
+      }
+    });
+
+    quoteRate = quote.rate;
+  } catch (error) {
+    console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+  }
+
+  if (quoteRate) {
     const hdxDecimal = _getAssetDecimals(hdx);
     const desTokenDecimal = _getAssetDecimals(desToken);
 
-    return new BigN(quoteRate.rate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
+    return new BigN(quoteRate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
   }
+
+  return undefined;
 }
