@@ -63,7 +63,7 @@ export const getAcrossQuote = async ({ destinationChain,
   }
 
   try {
-    const data = await subwalletApiSdk.xcmApi?.fetchXcmData({
+    const data = await subwalletApiSdk.xcmApi.fetchXcmData({
       address: sender,
       from: originTokenInfo.slug,
       to: destinationTokenInfo.slug,
@@ -77,6 +77,10 @@ export const getAcrossQuote = async ({ destinationChain,
 
     return data as XcmApiResponse;
   } catch (error) {
-    return Promise.reject(error);
+    if (error instanceof SyntaxError) {
+      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+    }
+
+    return Promise.reject(new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later'));
   }
 };
