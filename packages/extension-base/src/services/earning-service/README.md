@@ -10,66 +10,227 @@ The Earning Service is a core component of the SubWallet Extension that provides
 
 ```mermaid
 graph LR
-    A[EarningService] --> B[Pool Handlers]
+    %% Core Service
+    A[[EarningService]] --> B[BasePoolHandler]
+    A --> DB[[Database Service]]
+    A --> ES[[Event Service]]
+    A --> KS[Koni State]
+    
+    %% Handler Inheritance Hierarchy
+    B --> BLS[BaseLiquidStakingPoolHandler]
+    B --> NSH[Native Staking Handlers]
+    B --> NPH[Nomination Pool Handlers]
+    B --> LH[Lending Handlers]
+    
+    %% Liquid Staking Implementations
+    BLS --> BLSH[BifrostLiquidStakingPoolHandler]
+    BLS --> BMLS[BifrostMantaLiquidStakingPoolHandler]
+    BLS --> ALSH[AcalaLiquidStakingPoolHandler]
+    BLS --> PLSH[ParallelLiquidStakingPoolHandler]
+    BLS --> SSLS[StellaSwapLiquidStakingPoolHandler]
+    
+    %% Native Staking Implementations
+    NSH --> RNSH[RelayNativeStakingPoolHandler]
+    NSH --> TNSH[TaoNativeStakingPoolHandler]
+    NSH --> SNSH[SubnetTaoStakingPoolHandler]
+    NSH --> ANSH[AstarNativeStakingPoolHandler]
+    NSH --> AMNS[AmplitudeNativeStakingPoolHandler]
+    NSH --> PNSH[ParaNativeStakingPoolHandler]
+    NSH --> MNSH[MythosNativeStakingPoolHandler]
+    
+    %% Other Handler Types
+    NPH --> NPH1[NominationPoolHandler]
+    LH --> ILH[InterlayLendingPoolHandler]
+    
+    %% Data Flow and Management
     A --> C[Pool Info Management]
     A --> D[Position Tracking]
     A --> E[Reward Management]
     
-    B --> F[Native Staking Handlers]
-    B --> G[Liquid Staking Handlers]
-    B --> H[Nomination Pool Handlers]
-    B --> I[Lending Handlers]
-    B --> J[Parachain Staking Handlers]
+    C --> C1[Pool Information Subscription]
+    C --> C2[Pool Statistics & Metadata]
+    C --> C3[Online/Offline Data Sync]
     
-    F --> K[RelayNativeStakingPoolHandler]
-    F --> L[TaoNativeStakingPoolHandler]
-    F --> M[AstarNativeStakingPoolHandler]
+    D --> D1[Position Subscription]
+    D --> D2[Balance Tracking]
+    D3[Unstaking Management] --> D
     
-    G --> N[BifrostLiquidStakingPoolHandler]
-    G --> O[AcalaLiquidStakingPoolHandler]
-    G --> P[ParallelLiquidStakingPoolHandler]
-    G --> Q[StellaSwapLiquidStakingPoolHandler]
+    E --> E1[Reward Calculation]
+    E --> E2[Reward History]
+    E --> E3[APY/APR Tracking]
     
-    H --> R[NominationPoolHandler]
+    %% External Dependencies
+    CHAIN[Blockchain Networks] --> BLSH
+    CHAIN --> ALSH
+    CHAIN --> PLSH
+    CHAIN --> RNSH
+    CHAIN --> NPH1
     
-    I --> S[InterlayLendingPoolHandler]
+    API[External APIs] --> E1
+    API --> E3
+    API --> C2
     
-    C --> T[Pool Information Subscription]
-    C --> U[Pool Statistics]
-    C --> V[Pool Metadata]
+    %% Data Persistence
+    DB --> D
+    DB --> E
+    DB --> C
     
-    D --> W[Position Subscription]
-    D --> X[Balance Tracking]
-    D --> Y[Unstaking Management]
+    %% Event System
+    ES --> A
+    ES --> D1
+    ES --> E1
     
-    E --> Z[Reward Calculation]
-    E --> AA[Reward History]
-    E --> BB[APY/APR Tracking]
+    %% State Management
+    KS --> A
+    KS --> CHAIN
+    
+    class A service
+    class B,BLS,NSH,NPH,LH handler
+    class BLSH,BMLS,ALSH,PLSH,SSLS liquidStaking
+    class RNSH,TNSH,SNSH,ANSH,AMNS,PNSH,MNSH nativeStaking
+    class CHAIN,API external
+    class C,D,E,DB,ES,KS data
 ```
 
 ### Service Components
 
-#### 1. Base Service (`EarningService`)
-- **Role**: Central coordinator for all earning-related operations
+#### 1. Core Service Layer (`EarningService`)
+- **Role**: Central coordinator and orchestrator for all earning-related operations
+- **Dependencies**:
+  - `KoniState`: Global application state management
+  - `DatabaseService`: Data persistence layer
+  - `EventService`: Event-driven communication
 - **Responsibilities**:
-  - Pool handler management and initialization
-  - Data persistence and caching
-  - Event handling and lifecycle management
-  - Service coordination between different pool types
+  - Pool handler lifecycle management and initialization
+  - Data persistence and caching coordination
+  - Event handling and service lifecycle management
+  - Cross-service coordination and state synchronization
 
-#### 2. Pool Handlers
-- **Role**: Type-specific implementations for different earning mechanisms
-- **Base Handler**: `BasePoolHandler` provides common interface and functionality
-- **Specialized Handlers**:
-  - `BaseLiquidStakingPoolHandler`: Base for liquid staking protocols
-  - Native staking handlers for different chains
-  - Lending protocol handlers
-  - Nomination pool handlers
+#### 2. Handler Architecture
 
-#### 3. Data Management
-- **Pool Information**: Manages pool metadata, statistics, and configuration
-- **Position Tracking**: Monitors user positions across all pools
-- **Reward Management**: Calculates and tracks earning rewards and history
+##### Base Handler (`BasePoolHandler`)
+- **Role**: Abstract base class providing common interface and shared functionality
+- **Relationships**: 
+  - Extended by all specialized handlers
+  - Defines contract for pool operations
+  - Provides common utilities and validation logic
+
+##### Liquid Staking Layer (`BaseLiquidStakingPoolHandler`)
+- **Role**: Specialized base for liquid staking protocols
+- **Extends**: `BasePoolHandler`
+- **Extended by**: Protocol-specific implementations (Bifrost, Acala, Parallel, StellaSwap)
+- **Features**: Slippage management, exchange rate handling, derivative token logic
+
+##### Native Staking Handlers
+- **Role**: Direct validator staking implementations for different chains
+- **Extends**: `BasePoolHandler`
+- **Chain-specific**: Each handler optimized for specific blockchain characteristics
+- **Variants**: Relay chains, Parachain staking, Subnet staking, specialized tokenomics
+
+##### Nomination Pool Handlers
+- **Role**: Pooled staking with shared validator nominations
+- **Extends**: `BasePoolHandler`
+- **Features**: Pool member management, shared reward distribution
+
+##### Lending Handlers
+- **Role**: Lending protocol integration for yield generation
+- **Extends**: `BasePoolHandler`
+- **Features**: Supply/borrow mechanics, interest rate calculations
+
+#### 3. Data Management Layer
+
+##### Pool Information Management
+- **Components**: Pool metadata, statistics, configuration
+- **Data Sources**: On-chain queries, external APIs, cached data
+- **Relationships**: Coordinated by EarningService, consumed by handlers
+
+##### Position Tracking
+- **Components**: User balances, staking positions, unstaking queues
+- **Real-time**: Subscription-based updates from blockchain networks
+- **Persistence**: Automatic data persistence with lazy queue optimization
+
+##### Reward Management
+- **Components**: Reward calculations, historical data, APY/APR tracking
+- **Sources**: On-chain reward queries, external yield APIs
+- **Processing**: Aggregated across multiple pools and time periods
+
+#### 4. External Dependencies
+
+##### Blockchain Networks
+- **Role**: Source of truth for on-chain data
+- **Interaction**: Through specialized chain APIs (Substrate, EVM)
+- **Data**: Balances, rewards, validator info, pool statistics
+
+##### External APIs
+- **Role**: Enhanced data and analytics
+- **Purpose**: APY/APR rates, validator identities, pool statistics
+- **Integration**: Fallback and enhancement for on-chain data
+
+#### 5. Cross-Module Relationships
+
+```mermaid
+graph LR
+    subgraph "Service Layer"
+        ES[EarningService]
+        KS[KoniState]
+        DB[DatabaseService]
+        EV[EventService]
+    end
+    
+    subgraph "Handler Layer"
+        BH[BasePoolHandler]
+        LSH[Liquid Staking]
+        NSH[Native Staking]
+        NPH[Nomination Pools]
+        LH[Lending]
+    end
+    
+    subgraph "Data Layer"
+        PI[Pool Info]
+        PT[Position Tracking]
+        RM[Reward Management]
+    end
+    
+    subgraph "External Layer"
+        BC[Blockchain]
+        API[External APIs]
+    end
+    
+    %% Service relationships
+    ES --> KS
+    ES --> DB
+    ES --> EV
+    ES --> BH
+    
+    %% Handler relationships
+    BH --> LSH
+    BH --> NSH
+    BH --> NPH
+    BH --> LH
+    
+    %% Data flow
+    ES --> PI
+    ES --> PT
+    ES --> RM
+    
+    BH --> PI
+    BH --> PT
+    BH --> RM
+    
+    %% External data
+    BH --> BC
+    BH --> API
+    
+    %% Persistence
+    PI --> DB
+    PT --> DB
+    RM --> DB
+    
+    %% Events
+    PT --> EV
+    RM --> EV
+    PI --> EV
+```
 
 ## Props
 

@@ -16,15 +16,23 @@ This document provides instructions for building the service documentation.
   - Roles
   - Types and interfaces.
   - Default values.
+- Flows: Detailed descriptions of the service flows.
+  - Lifecycle of the service.
+  - Sequence diagrams to illustrate the flows.
 - Methods: Detailed descriptions of the service methods.
   - Input parameters.
   - Output responses.
   - Error handling.
-- Flows: Detailed descriptions of the service flows.
-  - How the service interacts with other services.
-  - Sequence diagrams to illustrate the flows.
 - Notes: Additional notes and considerations.
   - Known issues.
   - Future improvements.
+
+
+## Instructions for Building Documentation
+- Mermaid Diagrams:
+  - Ensure all nodes and edges are clearly labeled.
+  - Use class definitions to style nodes appropriately.
+  - Style for dark mode
+  - With graph diagrams please use `[[... Service]]` to highlight the service.
 
 
