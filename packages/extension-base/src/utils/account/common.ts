@@ -65,7 +65,7 @@ export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo
     const isTestnet = chainInfo.isTestnet;
 
     return reformatAddress(address, isTestnet ? 0 : 1);
-  } else {
+  } else { // EVM, Bitcoin
     return address;
   }
 };
