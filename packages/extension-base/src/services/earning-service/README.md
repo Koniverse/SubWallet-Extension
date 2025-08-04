@@ -466,6 +466,11 @@ sequenceDiagram
     participant ES as EarningService
     participant PH as PoolHandler
     participant Chain as Blockchain
+        
+    UI->>ES: getOptimalYieldPath(params)
+    ES->>PH: calculateOptimalPath()
+    PH-->>ES: Optimal path with steps
+    ES-->>UI: Execution path
     
     UI->>ES: validateYieldJoin(params)
     ES->>PH: validateYieldJoin(amount, address)
@@ -473,12 +478,7 @@ sequenceDiagram
     Chain-->>PH: Validation result
     PH-->>ES: Validation errors (if any)
     ES-->>UI: Validation result
-    
-    UI->>ES: getOptimalYieldPath(params)
-    ES->>PH: calculateOptimalPath()
-    PH-->>ES: Optimal path with steps
-    ES-->>UI: Execution path
-    
+
     UI->>ES: handleYieldJoin(stepParams)
     ES->>PH: handleSubmitStep(data, path)
     PH->>Chain: Create transaction
@@ -497,10 +497,10 @@ sequenceDiagram
     participant DB as Database
     
     ES->>PH: subscribePoolPosition(addresses)
-    PH->>Chain: Subscribe to balance changes
+    PH->>Chain: Subscribe to staking balance changes
     
     loop Position Updates
-        Chain->>PH: Balance/position change
+        Chain->>PH: Staking balance change
         PH->>PH: Calculate position info
         PH->>ES: updateYieldPosition(positionInfo)
         ES->>DB: Persist position (lazy)
@@ -540,28 +540,31 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> NOT_INITIALIZED
-    NOT_INITIALIZED --> INITIALIZING: init()
-    INITIALIZING --> INITIALIZED: handlers ready
-    INITIALIZED --> STARTING: start()
-    STARTING --> STARTED: subscriptions active
-    STARTED --> STOPPING: stop()
-    STOPPING --> STOPPED: cleanup complete
-    STOPPED --> STARTING: restart
+   [*] --> NOT_INITIALIZED
+   NOT_INITIALIZED --> INITIALIZING: init()
+   INITIALIZING --> INITIALIZED: handlers ready
+   INITIALIZED --> STARTING: start()
+   STARTING --> STARTED: subscriptions active
+   STARTED --> STOPPING: stop()
+   STOPPING --> STOPPED: cleanup complete
+   STOPPED --> STARTING: restart
     
-    note right of STARTING
-        - Subscribe pool positions
-        - Subscribe pool rewards
-        - Start reward history tracking
-        - Cache validator identities
-    end note
+   note right of STARTING 
+      Note:
+      - Subscribe pool positions
+      - Subscribe pool rewards
+      - Start reward history tracking
+      - Cache validator identities
+   end note
     
-    note right of STOPPING
-        - Unsubscribe all streams
-        - Persist pending data
-        - Clear intervals
-        - Cleanup resources
-    end note
+   note right of STOPPING 
+      Note:
+      - Unsubscribe all streams
+      - Persist pending data
+      - Clear intervals
+      - Cleanup resources
+
+   end note
 ```
 
 ## Notes
