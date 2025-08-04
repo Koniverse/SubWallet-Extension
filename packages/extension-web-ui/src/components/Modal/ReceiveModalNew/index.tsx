@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountSelectorModal } from '@subwallet/extension-web-ui/components';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR } from '@subwallet/extension-web-ui/constants';
 import { ReceiveModalProps } from '@subwallet/extension-web-ui/types';
 import React from 'react';
 
+import { AccountSelectorModal } from './parts/AccountSelector';
 import { TokenSelectorModal } from './parts/TokenSelector';
 
 const ReceiveModal = ({ accountSelectorItems,

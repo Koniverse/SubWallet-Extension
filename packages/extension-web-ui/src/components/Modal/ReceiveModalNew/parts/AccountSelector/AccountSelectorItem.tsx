@@ -1,16 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountProxyAvatar } from '@subwallet/extension-web-ui/components/AccountProxy';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-web-ui/utils';
-import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
+import { toShort } from '@subwallet/extension-web-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-
-import AccountProxyAvatar from './AccountProxyAvatar';
 
 type Props = ThemeProps & {
   name?: string;
@@ -25,16 +23,6 @@ function Component (props: Props): React.ReactElement<Props> {
   const { address,
     avatarValue,
     className, isSelected, name, onClick, showUnselectIcon } = props;
-
-  const bitcoinAttributes = useMemo(() => {
-    if (isBitcoinAddress(address)) {
-      const keyPairType = getKeypairTypeByAddress(address);
-
-      return getBitcoinKeypairAttributes(keyPairType);
-    }
-
-    return undefined;
-  }, [address]);
 
   return (
     <div
@@ -57,16 +45,6 @@ function Component (props: Props): React.ReactElement<Props> {
                 <div className='__name'>
                   {name}
                 </div>
-                {!!bitcoinAttributes && !!bitcoinAttributes.schema
-                  ? (
-                    <>
-                      <div className='__name-label-divider'> &nbsp;-&nbsp; </div>
-                      <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
-                        {bitcoinAttributes.label}
-                      </div>
-                    </>
-                  )
-                  : null}
               </div>
               <div className='__address'>
                 {toShort(address, 9, 10)}
@@ -78,17 +56,7 @@ function Component (props: Props): React.ReactElement<Props> {
               <div className='__address'>
                 {toShort(address, 9, 10)}
               </div>
-              {!!bitcoinAttributes && !!bitcoinAttributes.schema
-                ? (
-                  <>
-                    <div className={CN('__label', `-schema-${bitcoinAttributes.schema}`)}>
-                      {bitcoinAttributes.label}
-                    </div>
-                  </>
-                )
-                : null}
             </div>
-
           )}
       </div>
 
@@ -110,7 +78,7 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const AccountSelectorItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     background: token.colorBgSecondary,
     paddingLeft: token.paddingSM,
@@ -186,28 +154,6 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
 
     '&:hover': {
       background: token.colorBgInput
-    },
-
-    '.__label, .__name-label-divider': {
-      fontSize: token.fontSizeXS,
-      lineHeight: token.lineHeightXS,
-      fontWeight: 700,
-      '&.-schema-orange-7': {
-        color: token['orange-7']
-      },
-      '&.-schema-lime-7': {
-        color: token['lime-7']
-      },
-      '&.-schema-cyan-7': {
-        color: token['cyan-7']
-      }
-    },
-
-    '.__name-label-divider': {
-      color: token.colorTextTertiary
     }
-
   };
 });
-
-export default AddressSelectorItem;
