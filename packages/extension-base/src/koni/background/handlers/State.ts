@@ -149,7 +149,9 @@ export default class KoniState {
   private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
+    // Init subwallet api sdk
     setupApiSDK();
+
     this.providers = providers;
 
     this.eventService = new EventService();
