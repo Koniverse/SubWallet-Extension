@@ -23,7 +23,7 @@ import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, Astar
 
 type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
 
-const fetchPoolsData = async () => {
+export const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
 
   return fetchData.data;
@@ -442,7 +442,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     for (const handler of Object.values(this.handlers)) {
       // Force subscribe onchain data
-      const forceSubscribe = handler.type === YieldPoolType.LIQUID_STAKING || handler.type === YieldPoolType.LENDING || !onlineData[handler.slug];
+      const forceSubscribe =
+      handler.type === YieldPoolType.LIQUID_STAKING ||
+      handler.type === YieldPoolType.LENDING ||
+      // Skip subscribing for subnet staking handlers because subnet staking slugs are not included in the online cache (only slugs with netuid are cached)
+      (!onlineData[handler.slug] && handler.type !== YieldPoolType.SUBNET_STAKING);
 
       if (!this.useOnlineCacheOnly || forceSubscribe) {
         handler.subscribePoolInfo(callback)
