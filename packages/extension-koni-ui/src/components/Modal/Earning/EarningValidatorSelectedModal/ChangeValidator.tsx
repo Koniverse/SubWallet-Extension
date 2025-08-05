@@ -234,18 +234,18 @@ const Component = (props: Props) => {
 
     const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
 
-    const sortedValidators = resultList.map((item) => ({
+    const validatorsWithRecommendation = resultList.map((item) => ({
       ...item,
       isRecommend: recommendedAddresses.includes(item.address)
     }));
 
     // Apply search
     const filteredValidators = searchValue
-      ? sortedValidators.filter((item) =>
+      ? validatorsWithRecommendation.filter((item) =>
         item.identity?.toLowerCase().includes(searchValue.toLowerCase()) ||
         item.address?.toLowerCase().includes(searchValue.toLowerCase())
       )
-      : sortedValidators;
+      : validatorsWithRecommendation;
 
     const recommendedItems = filteredValidators.filter((v) => v.isRecommend);
     const otherItems = filteredValidators.filter((v) => !v.isRecommend);
@@ -600,7 +600,7 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
     },
 
     '.__search-box': {
-      marginBottom: token.marginXS,
+      marginBottom: token.marginSM,
       marginInline: token.margin
     }
 
