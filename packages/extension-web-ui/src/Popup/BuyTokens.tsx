@@ -3,17 +3,17 @@
 
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountProxy, AccountProxyType, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
-import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
+import { AccountProxy, AccountProxyType, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
+import { detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { ServiceSelector } from '@subwallet/extension-web-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-web-ui/components/Field/TokenSelector';
 import { SELL_TOKEN_TAB } from '@subwallet/extension-web-ui/constants';
-import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
 import { BuyTokensParam } from '@subwallet/extension-web-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -90,8 +90,8 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
   const checkAsset = useAssetChecker();
-  const allowedChains = useGetChainSlugsByAccount();
-  const getReformatAddress = useReformatAddress();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {
@@ -209,6 +209,10 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
         return;
       }
 
+      if (excludedTokens.includes(item.slug)) {
+        return;
+      }
+
       if (!currentSymbol || (item.slug === currentSymbol || item.symbol === currentSymbol)) {
         result.push(convertToItem(item));
       }
@@ -217,7 +221,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     sortTokensByBalanceInSelector(result, priorityTokens);
 
     return result;
-  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, priorityTokens, tokenBalanceMap, tokens]);
+  }, [allowedChains, assetRegistry, chainStateMap, currentSymbol, excludedTokens, priorityTokens, tokenBalanceMap, tokens]);
 
   const sellTokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
     const result: SortableTokenSelectorItemType[] = [];
@@ -302,10 +306,13 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
   const accountAddressItems = useMemo(() => {
     const chainSlug = selectedTokenSlug ? _getOriginChainOfAsset(selectedTokenSlug) : undefined;
     const chainInfo = chainSlug ? chainInfoMap[chainSlug] : undefined;
+    const tokenInfo = selectedTokenSlug ? assetRegistry[selectedTokenSlug] : undefined;
 
-    if (!chainInfo) {
+    if (!chainInfo || !tokenInfo) {
       return [];
     }
+
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
 
     const result: AccountAddressItemType[] = [];
 
@@ -331,6 +338,12 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           return;
         }
 
+        const signMode = getSignModeByAccountProxy(ap);
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
+          return;
+        }
+
         updateResult(ap);
       });
     } else {
@@ -338,7 +351,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
+  }, [accountProxies, assetRegistry, chainInfoMap, currentAccountProxy, getReformatAddress, selectedTokenSlug]);
 
   const isSupportBuyTokens = useMemo(() => {
     if (selectedService && selectedAddress && selectedTokenSlug) {
@@ -673,6 +686,14 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           i18nKey={detectTranslate('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
           values={{
             service: serviceName
+          }}
+        />
+        <br />
+        <Trans
+          i18nKey={detectTranslate('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
+          values={{
+            service: serviceName,
+            action: t('buying')
           }}
         />
       </BaseModal>

@@ -12,14 +12,14 @@ import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { _reformatAddressWithChain, detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, HiddenInput } from '@subwallet/extension-web-ui/components';
 import AmountInput from '@subwallet/extension-web-ui/components/Field/AmountInput';
 import { ChainSelector } from '@subwallet/extension-web-ui/components/Field/ChainSelector';
@@ -28,14 +28,15 @@ import { FeeEditor } from '@subwallet/extension-web-ui/components/Field/Transact
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-web-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-web-ui/contexts/MktCampaignModalContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useAlert, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
+import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-web-ui/hooks/campaign/useGetConfirmationByScreen';
 import useHandleSubmitMultiTransaction from '@subwallet/extension-web-ui/hooks/transaction/useHandleSubmitMultiTransaction';
+import useLazyWatchTransaction from '@subwallet/extension-web-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-web-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-web-ui/reducer';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TokenSelectorItemType, TransferParams } from '@subwallet/extension-web-ui/types';
-import { findAccountByAddress, formatBalance, getChainsByAccountAll, getChainsByAccountType, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
@@ -67,43 +68,6 @@ interface TransferOptions {
 }
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
-
-function getTokenItems (
-  accountProxy: AccountProxy,
-  accountProxies: AccountProxy[],
-  chainInfoMap: Record<string, _ChainInfo>,
-  assetRegistry: Record<string, _ChainAsset>,
-  tokenGroupSlug?: string // is ether a token slug or a multiChainAsset slug
-): TokenSelectorItemType[] {
-  let allowedChains: string[];
-
-  if (!isAccountAll(accountProxy.id)) {
-    allowedChains = getChainsByAccountType(chainInfoMap, accountProxy.chainTypes, accountProxy.specialChain);
-  } else {
-    allowedChains = getChainsByAccountAll(accountProxy, accountProxies, chainInfoMap);
-  }
-
-  const items: TokenSelectorItemType[] = [];
-
-  Object.values(assetRegistry).forEach((chainAsset) => {
-    const originChain = _getAssetOriginChain(chainAsset);
-
-    if (!allowedChains.includes(originChain)) {
-      return;
-    }
-
-    if (!tokenGroupSlug || (chainAsset.slug === tokenGroupSlug || _getMultiChainAsset(chainAsset) === tokenGroupSlug)) {
-      items.push({
-        slug: chainAsset.slug,
-        name: _getAssetName(chainAsset),
-        symbol: _getAssetSymbol(chainAsset),
-        originChain
-      });
-    }
-  });
-
-  return items;
-}
 
 function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<string, _AssetRef>, chainInfoMap: Record<string, _ChainInfo>): ChainItemType[] {
   if (!tokenSlug) {
@@ -160,14 +124,14 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
   const toValue = useWatchTransaction('to', form, defaultData);
   const destChainValue = useWatchTransaction('destChain', form, defaultData);
-  const transferAmountValue = useWatchTransaction('value', form, defaultData);
+  const transferAmountValue = useLazyWatchTransaction('value', form, defaultData);
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const assetValue = useWatchTransaction('asset', form, defaultData);
 
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
 
   const { chainInfoMap, chainStateMap, chainStatusMap, ledgerGenericAllowNetworks, priorityTokens } = useSelector((root) => root.chainStore);
@@ -181,6 +145,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const isShowAddressFormatInfoBox = checkIsPolkadotUnifiedChain(chainValue);
   const getAccountTokenBalance = useGetAccountTokenBalance();
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
@@ -203,7 +168,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       return true;
     }
 
-    return !!chainInfo && !!assetInfo && destChainValue === chainValue && _isNativeToken(assetInfo) && (_isChainEvmCompatible(chainInfo) || _isChainCardanoCompatible(chainInfo));
+    return !!chainInfo && !!assetInfo && destChainValue === chainValue && _isNativeToken(assetInfo) && (_isChainEvmCompatible(chainInfo) || _isChainCardanoCompatible(chainInfo) || _isChainBitcoinCompatible(chainInfo));
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
 
   const disabledToAddressInput = useMemo(() => {
@@ -240,6 +205,21 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     return getTokenAvailableDestinations(assetValue, xcmRefMap, chainInfoMap);
   }, [chainInfoMap, assetValue, xcmRefMap]);
 
+  // `destAssetInfo` is the asset sent to the recipient address. For regular transactions,
+  // the received asset is the same as the sent asset. For XCM transactions,
+  // need to check the `xcmRefMap` channel to get the correct destination asset.
+  const destAssetInfo = useMemo(() => {
+    if (chainValue === destChainValue) {
+      return assetInfo;
+    }
+
+    const destChainXCMAsset = Object.values(xcmRefMap).find(
+      (xcm) => xcm.destChain === destChainValue && xcm.srcChain === chainValue && xcm.path === 'XCM'
+    );
+
+    return destChainXCMAsset ? assetRegistry[destChainXCMAsset.destAsset] : assetInfo;
+  }, [assetInfo, assetRegistry, chainValue, destChainValue, xcmRefMap]);
+
   const decimals = useMemo(() => {
     return currentChainAsset ? _getAssetDecimals(currentChainAsset) : 0;
   }, [currentChainAsset]);
@@ -273,6 +253,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       return [];
     }
 
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(assetInfo, chainInfo);
+
     const result: AccountAddressItemType[] = [];
 
     const updateResult = (ap: AccountProxy) => {
@@ -301,6 +283,12 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           return;
         }
 
+        const signMode = getSignModeByAccountProxy(ap);
+
+        if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
+          return;
+        }
+
         updateResult(ap);
       });
     } else {
@@ -308,7 +296,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
+  }, [accountProxies, assetInfo, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
 
   const targetAccountProxyIdForGetBalance = useMemo(() => {
     if (!isAccountAll(targetAccountProxy.id) || !fromValue) {
@@ -321,13 +309,34 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
   }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
   const tokenItems = useMemo<SortableTokenSelectorItemType[]>(() => {
-    const items = getTokenItems(
-      targetAccountProxy,
-      accountProxies,
-      chainInfoMap,
-      assetRegistry,
-      sendFundSlug
-    );
+    const items = (() => {
+      const { allowedChains, excludedTokens } = getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
+
+      const result: TokenSelectorItemType[] = [];
+
+      Object.values(assetRegistry).forEach((chainAsset) => {
+        const originChain = _getAssetOriginChain(chainAsset);
+
+        if (!allowedChains.includes(originChain)) {
+          return;
+        }
+
+        if (excludedTokens.includes(chainAsset.slug)) {
+          return;
+        }
+
+        if (!sendFundSlug || (chainAsset.slug === sendFundSlug || _getMultiChainAsset(chainAsset) === sendFundSlug)) {
+          result.push({
+            slug: chainAsset.slug,
+            name: _getAssetName(chainAsset),
+            symbol: _getAssetSymbol(chainAsset),
+            originChain
+          });
+        }
+      });
+
+      return result;
+    })();
 
     const tokenBalanceMap = getAccountTokenBalance(
       items.map((item) => item.slug),
@@ -359,7 +368,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     sortTokensByBalanceInSelector(tokenItemsSorted, priorityTokens);
 
     return tokenItemsSorted;
-  }, [accountProxies, assetRegistry, chainInfoMap, chainStateMap, getAccountTokenBalance, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
+  }, [assetRegistry, chainStateMap, getAccountTokenBalance, getChainAndExcludedTokenByAccountProxy, priorityTokens, sendFundSlug, targetAccountProxy, targetAccountProxyIdForGetBalance]);
 
   const isAccountSelectorVisible = useMemo(() => {
     if (currentAccountProxy?.id !== targetAccountProxy.id) {
@@ -393,13 +402,14 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
+      assetInfo: destAssetInfo,
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SEND_FUND,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, autoFormatValue, chainInfoMap, form, ledgerGenericAllowNetworks]);
+  }, [accounts, autoFormatValue, chainInfoMap, destAssetInfo, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
     const maxTransfer = transferInfo?.maxTransferable || '0';
@@ -447,6 +457,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         setForceUpdateMaxValue(undefined);
         setSelectedTransactionFee(undefined);
         setCurrentTokenPayFee(values.chain === chain ? defaultTokenPayFee : undefined);
+        setTransferInfo(undefined);
       }
 
       if (part.destChain || part.chain || part.value || part.asset) {
@@ -872,6 +883,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     if (fromValue && assetValue) {
       subscribeMaxTransfer({
         address: fromValue,
+        to: toValue,
         chain: assetRegistry[assetValue].originChain,
         token: assetValue,
         value: transferAmountValue,
@@ -896,7 +908,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1060,6 +1072,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
             validateTrigger={false}
           >
             <AddressInputNew
+              actionType={ActionType.SEND_FUND}
               chainSlug={destChainValue}
               disabled={isReadonly || disabledToAddressInput}
               dropdownHeight={!isAccountSelectorVisible ? 317 : 257}
@@ -1071,6 +1084,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               saveAddress={true}
               showAddressBook={!isReadonly}
               showScanner={!isReadonly}
+              tokenSlug={destAssetInfo?.slug}
             />
           </Form.Item>
 

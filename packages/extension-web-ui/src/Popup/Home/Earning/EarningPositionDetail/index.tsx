@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, TRANSACTION_YIELD_UNSTAKE_MODAL, UN_STAKE_TRANSACTION } from '@subwallet/extension-web-ui/constants';
@@ -19,7 +20,7 @@ import { EarningInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/
 import { RewardInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart';
 import { WithdrawInfoPart } from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningPositionDetail/WithdrawInfoPart';
 import { EarningEntryParam, EarningEntryView, EarningPositionDetailParam, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { getTransactionFromAccountProxyValue, isAccountAll, isChainInfoAccordantAccountChainType } from '@subwallet/extension-web-ui/utils';
+import { getTransactionFromAccountProxyValue, isAccountAll } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -61,11 +62,11 @@ function Component ({ compound,
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find((accountInfo) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return isChainInfoAccordantAccountChainType(chainInfo, chainType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, accountInfo);
       }
 
       return false;

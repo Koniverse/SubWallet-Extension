@@ -7,7 +7,8 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { InfoItemBase } from '@subwallet/extension-web-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-web-ui/components/Modal/Earning';
-import { EARNING_NOMINATION_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
+import EarningValidatorSelectedModal from '@subwallet/extension-web-ui/components/Modal/Earning/EarningValidatorSelectedModal';
+import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
 import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-web-ui/utils';
@@ -85,18 +86,27 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
       return undefined;
     }
   }, [assetRegistry, compound]);
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
   const earningTagType: EarningTagType = useMemo(() => {
     return createEarningTypeTags(compound.chain)[compound.type];
   }, [compound.chain, compound.type]);
-  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(type), [type]);
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
 
   const haveNomination = useMemo(() => {
-    return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING].includes(poolInfo.type);
+    return [YieldPoolType.NOMINATION_POOL].includes(poolInfo.type);
   }, [poolInfo.type]);
+
+  const haveValidator = useMemo(() => {
+    return [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);
+  }, [poolInfo.type]);
+
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
+
   const noNomination = useMemo(
     () => !haveNomination || isAllAccount || !compound.nominations.length,
     [compound.nominations.length, haveNomination, isAllAccount]
@@ -135,6 +145,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     return () => {
       setSelectedAddress(item.address);
       activeModal(EARNING_NOMINATION_MODAL);
+    };
+  }, [activeModal]);
+
+  const createOpenValidator = useCallback((item: YieldPositionInfo) => {
+    return () => {
+      setSelectedAddress(item.address);
+      activeModal(EARNING_SELECTED_VALIDATOR_MODAL);
     };
   }, [activeModal]);
 
@@ -214,7 +231,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               valueColorSchema='even-odd'
             />
           ))}
-          {isAllAccount && haveNomination && (
+          {isAllAccount && (haveNomination || haveValidator) && (
             <>
               <div className='__separator'></div>
 
@@ -223,17 +240,21 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   block={true}
                   className={'__nomination-button'}
                   disabled={disableButton}
-                  onClick={createOpenNomination(item)}
-                  size={'xs'}
-                  type={'ghost'}
+                  onClick={
+                    canChangeValidator
+                      ? createOpenValidator(item)
+                      : createOpenNomination(item)
+                  }
+                  size='xs'
+                  type='ghost'
                 >
-                  <div className={'__nomination-button-label'}>
-                    {t('Nomination info')}
+                  <div className='__nomination-button-label'>
+                    {t(canChangeValidator ? 'Your validators' : 'Nomination info')}
                   </div>
 
                   <Icon
                     phosphorIcon={ArrowSquareOut}
-                    size={'sm'}
+                    size='sm'
                   />
                 </Button>
               </div>
@@ -242,7 +263,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, earningTagType.color, earningTagType.label, haveNomination, inputAsset, isAllAccount, isSpecial, isSubnetStaking, list, poolInfo.chain, renderAccount, t]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination]);
 
   return (
     <>
@@ -277,6 +298,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
+      {selectedItem && (
+        <EarningValidatorSelectedModal
+          chain={poolInfo.chain}
+          compound={compound}
+          disabled={false}
+          displayType={'nomination'}
+          from={selectedAddress}
+          modalId={EARNING_SELECTED_VALIDATOR_MODAL}
+          nominations={selectedItem?.nominations}
+          slug={poolInfo.slug}
+        />)}
     </>
   );
 }
@@ -330,8 +362,9 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
   '.__carousel-container': {
     '.slick-prev, .slick-next': {
       width: 40,
+      height: 0,
       position: 'absolute',
-      top: 0,
+      top: 'calc(50% - 20px)',
       bottom: 0,
       cursor: 'pointer',
       zIndex: 20
@@ -355,7 +388,6 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__left-arrow, .__right-arrow': {
       width: '100%',
-      height: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'

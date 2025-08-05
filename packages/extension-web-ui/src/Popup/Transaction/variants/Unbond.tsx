@@ -451,15 +451,31 @@ const Component: React.FC = () => {
         return ExtrinsicType.UNSTAKE_STDOT;
       }
 
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.UNSTAKE_VMANTA;
+        }
+
+        return ExtrinsicType.UNSTAKE_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.UNSTAKE_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.UNSTAKE_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.UNSTAKE_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_UNBOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   const unstakeAlertData = poolChain === 'bifrost_dot'
     ? UNSTAKE_BIFROST_ALERT_DATA

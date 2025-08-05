@@ -15,7 +15,7 @@ import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CL
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-web-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-web-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-web-ui/messaging/transaction/notification';
@@ -102,7 +102,7 @@ function Component ({ isInModal,
   const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertModal } = useContext(WalletModalContext);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const { claimBridgeModal, claimRewardModal, withdrawModal } = useContext(TransactionModalContext);
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
@@ -296,7 +296,7 @@ function Component ({ isInModal,
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
       const slug = (item.metadata as WithdrawClaimNotificationMetadata).stakingSlug;
-      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs);
+      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs);
       const switchStatusParams: RequestSwitchStatusParams = {
         id: item.id,
         isRead: false
@@ -353,7 +353,7 @@ function Component ({ isInModal,
         }
 
         case NotificationActionType.CLAIM: {
-          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, chainsByAccountType);
+          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, allowedChains, excludedTokens);
           const metadata = item.metadata as WithdrawClaimNotificationMetadata;
           const chainSlug = metadata.stakingSlug.split('___')[2];
 
@@ -497,7 +497,7 @@ function Component ({ isInModal,
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, modalProps, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, openTransactionProcessModal, refreshNotifications]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, isInModal, withdrawModal, modalProps, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, claimRewardModal, setClaimAvailBridgeStorage, claimBridgeModal, openTransactionProcessModal, refreshNotifications]);
 
   const onClickMore = useCallback((item: NotificationInfoItem) => {
     return (e: SyntheticEvent) => {
