@@ -46,14 +46,30 @@ type ValidatorGroupProps = {
   maxValidator?: number;
 };
 
-const ValidatorAddress = ({ account, className, label, title }: ValidatorAddressProps) => (
-  <MetaInfo.Default
-    className={CN('__validator-address', className)}
-    label={label || title}
-  >
-    {account?.identity || (account?.address ? toShort(account.address) : '-')}
-  </MetaInfo.Default>
-);
+const ValidatorAddress = ({ account, className, label, title }: ValidatorAddressProps) => {
+  const validator = useMemo(() => {
+    if (!account) {
+      return '-';
+    }
+
+    const { address, identity } = account;
+
+    if (identity && address && identity === address) {
+      return toShort(address);
+    }
+
+    return identity || (address ? toShort(address) : '-');
+  }, [account]);
+
+  return (
+    <MetaInfo.Default
+      className={CN('__validator-address', className)}
+      label={label || title}
+    >
+      {validator}
+    </MetaInfo.Default>
+  );
+};
 
 const ValidatorGroupModal = ({ accounts, className, compound, maxValidator, modalId, poolInfo, title, total }: ValidatorGroupProps) => {
   const { t } = useTranslation();

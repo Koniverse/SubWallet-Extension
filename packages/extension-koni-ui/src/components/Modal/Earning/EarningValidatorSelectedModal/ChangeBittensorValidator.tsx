@@ -220,7 +220,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setIsChangeData(true);
       }
 
-      if (originValidator) {
+      if (originValidator && originValidator !== form.getFieldValue('originValidator')) {
         form.setFieldsValue({
           target: undefined
         });
