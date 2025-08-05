@@ -6693,6 +6693,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@subwallet-monorepos/subwallet-services-sdk@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.8"
+  checksum: 3c6714a01805e2f067014b02213a034b3da39936612a47b18629e7b4fa660991b4b17b13c003e7f72ca5b0460fa2f4872e62e8a7d737cea9aa443c30fb6eba3c
+  languageName: node
+  linkType: hard
+
 "@subwallet/chain-list@npm:0.2.111-beta.5":
   version: 0.2.111-beta.5
   resolution: "@subwallet/chain-list@npm:0.2.111-beta.5"
@@ -6743,6 +6750,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.1
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
+    "@subwallet-monorepos/subwallet-services-sdk": ^0.1.8
     "@subwallet/chain-list": 0.2.111-beta.5
     "@subwallet/extension-base": ^1.3.51-0
     "@subwallet/extension-chains": ^1.3.51-0
@@ -7204,14 +7212,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/subwallet-api-sdk@^1.3.51-0, @subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk":
-  version: 0.0.0-use.local
-  resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
+"@subwallet/subwallet-api-sdk@npm:^1.3.51-0":
+  version: 1.3.51-0
+  resolution: "@subwallet/subwallet-api-sdk@npm:1.3.51-0"
   dependencies:
     "@polkadot/util": ^13.2.3
     "@subwallet/chain-list": 0.2.109
-  languageName: unknown
-  linkType: soft
+  checksum: 1d9a729c0c2b13f01b227dd3fdff9b28c440193d92ced1e871024bb084368d289dcd838bc9c8b9ce239fa8aada2d4b8dfd98f91d6d521e34e2eb53db2fc5cf77
+  languageName: node
+  linkType: hard
 
 "@subwallet/ui-keyring@npm:^0.1.12":
   version: 0.1.12
