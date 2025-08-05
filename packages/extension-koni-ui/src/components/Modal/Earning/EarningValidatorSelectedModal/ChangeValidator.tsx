@@ -12,6 +12,7 @@ import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field
 import { EarningValidatorDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/FilterModal';
 import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/SortingModal';
+import Search from '@subwallet/extension-koni-ui/components/Search';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
@@ -88,6 +89,7 @@ const Component = (props: Props) => {
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
   const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
   const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
+  const [searchValue, setSearchValue] = useState<string>('');
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
@@ -237,15 +239,30 @@ const Component = (props: Props) => {
       isRecommend: recommendedAddresses.includes(item.address)
     }));
 
-    const recommendedItems = sortedValidators.filter((v) => v.isRecommend);
-    const otherItems = sortedValidators.filter((v) => !v.isRecommend);
+    // Apply search
+    const filteredValidators = searchValue
+      ? sortedValidators.filter((item) =>
+        item.identity?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item.address?.toLowerCase().includes(searchValue.toLowerCase())
+      )
+      : sortedValidators;
+
+    const recommendedItems = filteredValidators.filter((v) => v.isRecommend);
+    const otherItems = filteredValidators.filter((v) => !v.isRecommend);
+
+    const finalList = [];
 
     if (recommendedItems.length && otherItems.length) {
-      return [recommendedHeader, ...recommendedItems, othersHeader, ...otherItems];
+      finalList.push(recommendedHeader, ...recommendedItems, othersHeader, ...otherItems);
+    } else if (recommendedItems.length) {
+      // If only recommended items exist, we still show the header
+      finalList.push(recommendedHeader, ...recommendedItems);
+    } else {
+      finalList.push(...recommendedItems, ...otherItems);
     }
 
-    return [...recommendedItems, ...otherItems];
-  }, [resultList, defaultValidatorMap, chain]);
+    return finalList;
+  }, [resultList, defaultValidatorMap, chain, searchValue]);
 
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
@@ -268,6 +285,10 @@ const Component = (props: Props) => {
 
     return nominatorValueList.every((validator) => selectedSet.has(validator));
   }, [changeValidators, nominatorValueList]);
+
+  const handleSearch = useCallback((value: string) => {
+    setSearchValue(value);
+  }, []);
 
   const submit = useCallback((target: ValidatorInfo[]) => {
     const submitData: SubmitChangeValidatorStaking = {
@@ -397,17 +418,6 @@ const Component = (props: Props) => {
     activeModal(FILTER_MODAL_ID);
   }, [activeModal]);
 
-  const searchFunction = useCallback((item: ValidatorDataType, searchText: string) => {
-    const searchTextLowerCase = searchText.toLowerCase();
-
-    return (
-      item.address.toLowerCase().includes(searchTextLowerCase) ||
-      (item.identity
-        ? item.identity.toLowerCase().includes(searchTextLowerCase)
-        : false)
-    );
-  }, []);
-
   const handleCancel = useCallback(() => {
     onCancelSelectValidator();
 
@@ -499,18 +509,21 @@ const Component = (props: Props) => {
         }}
         title={t('Select validators')}
       >
+        <Search
+          autoFocus={true}
+          className={'__search-box'}
+          onSearch={handleSearch}
+          placeholder={t<string>('Search validator')}
+          searchValue={searchValue}
+        />
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
-          enableSearchInput={true}
           filterBy={filterFunction}
           list={validatorResultList}
           onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
-          searchFunction={searchFunction}
-          searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search validator')}
           // showActionBtn
         />
       </SwModal>
@@ -584,6 +597,11 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
 
     '.__selected-icon': {
       paddingLeft: token.paddingXXS
+    },
+
+    '.__search-box': {
+      marginBottom: token.marginXS,
+      marginInline: token.margin
     }
 
   };
