@@ -59,11 +59,19 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('pdexmon.com')) {
+    return 'holders';
+  }
+
   return 'address';
 }
 
 function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
   if (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)) {
+    return 'tx';
+  }
+
+  if (['moonbeam'].includes(chainInfo.slug)) {
     return 'tx';
   }
 
@@ -79,8 +87,12 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return '#/extrinsics';
   }
 
-  if (['mosaicTest'].includes(chainInfo.slug)) {
+  if (['mosaicTest', 'polkadex'].includes(chainInfo.slug)) {
     return 'transactions';
+  }
+
+  if (['autonomys'].includes(chainInfo.slug)) {
+    return 'extrinsics';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
