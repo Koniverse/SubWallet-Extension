@@ -85,6 +85,10 @@ const defaultErrorMap = {
     message: detectTranslate('Unable to fetch staking data. Re-enable current network and try again'),
     code: undefined
   },
+  [StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW]: {
+    message: detectTranslate('Remaining amount too low'),
+    code: undefined
+  },
   [TransferTxErrorType.RECEIVER_NOT_ENOUGH_EXISTENTIAL_DEPOSIT]: {
     message: detectTranslate('Receiver is not enough existential deposit'),
     code: undefined
