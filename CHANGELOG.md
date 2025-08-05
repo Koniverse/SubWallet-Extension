@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.51
+Build date: Jul 31, 2025.
+
+Features & Update:
+- Support for Bitcoin swap on ChainFlip (#4573)
+
+
 ## 1.3.50
 Build date: Jul 30, 2025.
 
