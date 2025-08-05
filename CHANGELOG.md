@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 1.3.51
+Build date: Jul 31, 2025.
+
+Features & Update:
+- Support for Bitcoin swap on ChainFlip (#4573)
+
+
+## 1.3.50
+Build date: Jul 30, 2025.
+
+Features & Update:
+- Support for New Swap Pairs on Chainflip (#4495)
+
+
+## 1.3.49
+Build date: Jul 28, 2025.
+
+Features & Update:
+- Display On-Chain Identity for Validators (#4449)
+- Re-check and update block action when stake with ledger account (#4464)
+- Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531)
+- Filter "To token" Based on Selected "From token" - Round 1 (#4468)
+
+Bug fixed:
+- Fixed bug import NFT (#3837) (#3818)
+
+
 ## 1.3.48
 Build date: Jul 21, 2025.
 
