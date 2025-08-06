@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.subnetSymbol || '');
   }, [poolInfo.chain, poolInfo.metadata.subnetData?.subnetSymbol]);
 
-  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
+  const isSubnetStaking = useMemo(() => YieldPoolType.SUBNET_STAKING.includes(poolInfo.type), [poolInfo.type]);
 
   return (
     <div
