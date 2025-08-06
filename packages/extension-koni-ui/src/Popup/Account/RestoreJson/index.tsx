@@ -129,8 +129,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return true;
     }
 
-    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password;
-  }, [fileValidateState.status, password, passwordValidateState.status, requirePassword, stepState, accountProxiesSelected]);
+    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password || showNoValidAccountAlert;
+  }, [stepState, accountProxiesSelected.length, fileValidateState.status, requirePassword, passwordValidateState.status, password, showNoValidAccountAlert]);
 
   const onBack_ = useCallback(() => {
     if (stepState === StepState.SELECT_ACCOUNT_IMPORT) {
@@ -202,6 +202,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setAccountProxies([]);
           setPassword('');
           setJsonFile(json);
+          setShowNoValidAccountAlert(false);
           setPasswordValidateState({});
         }
       })
@@ -542,7 +543,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
 
             {
-              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && (
+              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && !showNoValidAccountAlert && (
                 <Form.Item
                   validateStatus={passwordValidateState.status}
                 >
