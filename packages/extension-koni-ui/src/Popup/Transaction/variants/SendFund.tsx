@@ -621,7 +621,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             payload: null
           });
 
-          return await submitData(step + 2);
+          return await submitData(step + 1);
         } else {
           const stepType = processState.steps[step].type;
           const submitPromise: Promise<SWTransactionResponse> | undefined = stepType === CommonStepType.TOKEN_APPROVAL ? handleBridgeSpendingApproval(values) : handleBasicSubmit(values, options);
