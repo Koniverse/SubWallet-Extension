@@ -292,7 +292,7 @@ const Component = (props: Props) => {
   return (
     <>
       <BaseModal
-        className={`${className} ${!readOnly ? 'modal-full' : ''}`}
+        className={className}
         closeIcon={(
           <Icon
             phosphorIcon={CaretLeft}
@@ -315,6 +315,7 @@ const Component = (props: Props) => {
             </Button>
           )
         }
+        fullSizeOnMobile={true}
         id={modalId}
         onCancel={onCancelSelectValidator}
         title={t(title)}
@@ -392,7 +393,8 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ th
     '.ant-sw-modal-body': {
       overflow: 'hidden',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      flex: 1
     },
 
     '.ant-sw-list': {
@@ -401,25 +403,12 @@ const EarningValidatorSelectedModal = styled(forwardRef(Component))<Props>(({ th
     },
 
     '.ant-sw-modal-footer': {
-      margin: 0,
       borderTop: 0,
       marginBottom: token.margin
     },
 
     '.pool-item + .pool-item': {
       marginTop: token.marginXS
-    },
-
-    '&.modal-full': {
-      '.ant-sw-modal-header': {
-        paddingTop: token.paddingXS,
-        paddingBottom: token.paddingSM
-      },
-
-      '.ant-sw-list': {
-        paddingLeft: token.padding,
-        paddingRight: token.padding
-      }
     }
   };
 });

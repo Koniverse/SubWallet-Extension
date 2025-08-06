@@ -397,7 +397,7 @@ const Component = (props: Props) => {
   return (
     <>
       <BaseModal
-        className={`${className} modal-full`}
+        className={className}
         closeIcon={(
           <Icon
             phosphorIcon={CaretLeft}
@@ -420,6 +420,7 @@ const Component = (props: Props) => {
             {t(applyLabel, { number: changeValidators.length })}
           </Button>
         )}
+        fullSizeOnMobile={true}
         id={modalId}
         onCancel={handleCancel}
         rightIconProps={{
@@ -488,24 +489,28 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
     },
 
     '.ant-sw-modal-header': {
-      paddingTop: token.paddingXS,
-      paddingBottom: token.paddingSM
+
     },
+
     '.__pool-item-wrapper': {
       marginBottom: token.marginXS
     },
 
+    '.ant-sw-list': {
+      paddingBottom: 0
+    },
+
     '.ant-sw-modal-body': {
       overflow: 'hidden',
+      flex: 1,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      paddingInline: 0,
+      paddingBottom: 0
     },
 
     '.ant-sw-modal-footer': {
-      margin: 0,
-      marginTop: token.marginXS,
-      borderTop: 0,
-      marginBottom: token.margin
+      borderTop: 0
     },
 
     '.pool-item:not(:last-child)': {

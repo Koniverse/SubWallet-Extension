@@ -298,12 +298,6 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
 export const DetailModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
-    '&.fix-height': {
-      '.ant-sw-modal-body': {
-        height: 470
-      }
-    },
-
     '.ant-sw-modal-body': {
       overflow: 'hidden',
       display: 'flex',

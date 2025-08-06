@@ -367,25 +367,30 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   return (
     <BaseModal
-      className={`${className} modal-full`}
-      closeIcon={<Icon
-        phosphorIcon={CaretLeft}
-        size='md'
-      />}
+      className={className}
+      closeIcon={
+        <Icon
+          phosphorIcon={CaretLeft}
+          size='md'
+        />
+      }
       footer={
         <Button
           block
           disabled={isDisabled}
-          icon={<Icon
-            phosphorIcon={CheckCircle}
-            weight={'fill'}
-          />}
+          icon={
+            <Icon
+              phosphorIcon={CheckCircle}
+              weight={'fill'}
+            />
+          }
           loading={submitLoading}
           onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
         >
           {t('Update validator')}
         </Button>
       }
+      fullSizeOnMobile={true}
       id={modalId}
       onCancel={handleCancel}
       title={t('Change validator')}
@@ -520,8 +525,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-header': {
-      paddingTop: token.paddingXS,
-      paddingBottom: token.paddingSM
+
     },
 
     '.ant-sw-modal-body': {
@@ -529,9 +533,7 @@ const ChangeBittensorValidator = styled(forwardRef(Component))<Props>(({ theme: 
     },
 
     '.ant-sw-modal-footer': {
-      margin: 0,
-      borderTop: 0,
-      marginBottom: token.margin
+      borderTop: 0
     },
 
     '.__amount-part': {

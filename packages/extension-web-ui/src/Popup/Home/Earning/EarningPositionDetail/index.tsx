@@ -277,6 +277,7 @@ function Component ({ compound,
               <AccountInfoDesktopPart
                 compound={compound}
                 inputAsset={inputAsset}
+                poolInfo={poolInfo}
                 positionItems={list}
               />
             </>
