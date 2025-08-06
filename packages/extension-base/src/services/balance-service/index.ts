@@ -15,8 +15,8 @@ import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import keyring from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
@@ -42,6 +42,9 @@ export class BalanceService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   private isReload = false;
+  get isStarted (): boolean {
+    return this.status === ServiceStatus.STARTED;
+  }
 
   private readonly detectAccountBalanceStore = new DetectAccountBalanceStore();
   private readonly balanceDetectSubject: BehaviorSubject<DetectBalanceCache> = new BehaviorSubject<DetectBalanceCache>({});
@@ -69,7 +72,7 @@ export class BalanceService implements StoppableServiceInterface {
     this.status = ServiceStatus.INITIALIZED;
 
     // Start service
-    await this.start();
+    // await this.start(); // Commented out to avoid auto start when app not fully initialized
 
     // Handle events
     this.state.eventService.onLazy(this.handleEvents.bind(this));
@@ -166,7 +169,7 @@ export class BalanceService implements StoppableServiceInterface {
 
     if (needReload) {
       addLazy('reloadBalanceByEvents', () => {
-        if (!this.isReload) {
+        if (!this.isReload && this.isStarted) {
           this.runSubscribeBalances().catch(console.error);
         }
       }, lazyTime, undefined, true);
@@ -223,10 +226,11 @@ export class BalanceService implements StoppableServiceInterface {
       const substrateApiMap = this.state.chainService.getSubstrateApiMap();
       const tonApiMap = this.state.chainService.getTonApiMap();
       const cardanoApiMap = this.state.chainService.getCardanoApiMap();
+      const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
 
       let unsub = noop;
 
-      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
+      unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
         const rs = result[0];
 
         let value: string;
@@ -419,7 +423,7 @@ export class BalanceService implements StoppableServiceInterface {
     const substrateApiMap = this.state.chainService.getSubstrateApiMap();
     const tonApiMap = this.state.chainService.getTonApiMap();
     const cardanoApiMap = this.state.chainService.getCardanoApiMap();
-
+    const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
     const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
     const assetState = this.state.chainService.subscribeAssetSettings().value;
     const assets: string[] = Object.values(assetMap)
@@ -428,7 +432,7 @@ export class BalanceService implements StoppableServiceInterface {
       })
       .map((asset) => asset.slug);
 
-    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, (result) => {
+    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
       !cancel && this.setBalanceItem(result);
     }, ExtrinsicType.TRANSFER_BALANCE);
 
@@ -439,6 +443,46 @@ export class BalanceService implements StoppableServiceInterface {
       unsub && unsub();
       unsub2 && unsub2();
     };
+  }
+
+  async refreshBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
+    // Check if address and chain are valid
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+
+    if (!chainInfoMap[chain]) {
+      console.warn(`Chain ${chain} is not supported`);
+
+      return;
+    }
+
+    // Get necessary data
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const evmApiMap = this.state.chainService.getEvmApiMap();
+    const substrateApiMap = this.state.chainService.getSubstrateApiMap();
+    const tonApiMap = this.state.chainService.getTonApiMap();
+    const cardanoApiMap = this.state.chainService.getCardanoApiMap();
+    const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
+
+    return new Promise<void>((resolve) => {
+      const unsub = subscribeBalance(
+        [address],
+        [chain],
+        [asset],
+        assetMap,
+        chainInfoMap,
+        substrateApiMap,
+        evmApiMap,
+        tonApiMap,
+        cardanoApiMap,
+        bitcoinApiMap,
+        (result) => {
+          this.setBalanceItem(result);
+          unsub();
+          resolve();
+        },
+        extrinsicType || ExtrinsicType.TRANSFER_BALANCE
+      );
+    });
   }
 
   /** Unsubscribe balance subscription */
@@ -488,9 +532,9 @@ export class BalanceService implements StoppableServiceInterface {
             setTimeout(() => _resolve([]), 30000);
           });
 
-          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+          const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
 
-          Promise.race([timeOutPromise, apiPromise])
+          Promise.race([timeOutPromise, balanceDetectionApi.getEvmTokenBalanceSlug(address)])
             .then((result) => resolve(result))
             .catch((error) => {
               console.error(error);

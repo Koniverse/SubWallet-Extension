@@ -61,6 +61,8 @@ export interface AccountLedgerData {
   availableGenesisHashes?: string[];
   /** Is Ledger recovery chain */
   isLedgerRecovery?: boolean;
+  /** Is Ledger substrate ECDSA scheme signature */
+  isSubstrateECDSA?: boolean;
 }
 
 /**
@@ -113,6 +115,7 @@ export enum AccountSignMode {
   QR = 'qr',
   LEGACY_LEDGER = 'legacy-ledger',
   GENERIC_LEDGER = 'generic-ledger',
+  ECDSA_SUBSTRATE_LEDGER = 'ecdsa-substrate-ledger',
   READ_ONLY = 'readonly',
   ALL_ACCOUNT = 'all',
   INJECTED = 'injected',
@@ -135,7 +138,7 @@ export const ACCOUNT_CHAIN_TYPE_ORDINAL_MAP: Record<string, number> = {
   [AccountChainType.BITCOIN]: 5
 };
 
-export const SUPPORTED_ACCOUNT_CHAIN_TYPES = ['substrate', 'ethereum', 'ton', 'cardano'];
+export const SUPPORTED_ACCOUNT_CHAIN_TYPES: AccountChainType[] = [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.CARDANO, AccountChainType.BITCOIN];
 
 export enum AccountActions {
   DERIVE = 'DERIVE',

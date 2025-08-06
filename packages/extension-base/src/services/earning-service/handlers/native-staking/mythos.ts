@@ -58,13 +58,14 @@ function calculateNetworkApy (totalStake: BigN) {
 }
 
 export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  public override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   /* Subscribe pool info */
@@ -172,6 +173,37 @@ export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolH
   /* Subscribe pool info */
 
   /* Subscribe pool position */
+
+  async checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.collatorStaking?.userStake?.multi?.(useAddresses);
+    const _unstakings = await Promise.all(useAddresses.map((stakerAddress: string) => {
+      return substrateApi.api.query.collatorStaking?.releaseQueues?.(stakerAddress);
+    }));
+
+    if (!ledgers || !_unstakings) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const _userStake = ledgers[i];
+      const userStake = _userStake.toPrimitive() as unknown as PalletCollatorStakingUserStakeInfo;
+      const _unstaking = _unstakings[i];
+      const unstakings = _unstaking.toPrimitive() as unknown as PalletCollatorStakingReleaseRequest[];
+
+      // TODO: Need to improve, check if can only load stake info
+      if (userStake && userStake.stake !== '0') {
+        result.push(owner);
+      } else if (unstakings && unstakings.some((unstake) => unstake.amount !== '0')) {
+        result.push(owner);
+      }
+    }
+
+    return result;
+  }
 
   async subscribePoolPosition (useAddresses: string[], resultCallback: (rs: YieldPositionInfo) => void): Promise<VoidFunction> {
     let cancel = false;

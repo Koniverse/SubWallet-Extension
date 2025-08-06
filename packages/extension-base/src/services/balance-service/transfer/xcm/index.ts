@@ -7,7 +7,7 @@ import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subw
 import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, DryRunNodeResult, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
 import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
 import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
@@ -15,7 +15,7 @@ import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -169,21 +169,25 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
   try {
     const dryRunResult = await dryRunXcm(request);
-    const originDryRunResult = dryRunResult.origin;
+    const originDryRunRs = dryRunResult.origin;
 
-    if (originDryRunResult.success) {
-      const destinationDryRunResult = dryRunResult.destination as DryRunNodeResult;
+    if (originDryRunRs.success) {
+      const { assetHub, bridgeHub, destination } = dryRunResult;
 
-      if (destinationDryRunResult.success) {
-        return true;
+      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
+        if (destination?.success === false) {
+          // pass dry-run in these cases
+          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
+        }
+
+        return false;
       }
 
-      // pass dry-run in these cases
-      return isChainNotSupportDryRun(destinationDryRunResult.failureReason) || isChainNotSupportPolkadotApi(destinationDryRunResult.failureReason);
+      return true;
     }
 
     // pass dry-run in these cases
-    return isChainNotSupportDryRun(originDryRunResult.failureReason) || isChainNotSupportPolkadotApi(originDryRunResult.failureReason);
+    return isChainNotSupportDryRun(originDryRunRs.failureReason) || isChainNotSupportPolkadotApi(originDryRunRs.failureReason);
   } catch (e) {
     return false;
   }
@@ -215,7 +219,13 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
   }
 
   try {
-    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+    const data = await subwalletApiSdk.xcmApi.fetchXcmData({
+      address: sender,
+      from: originTokenInfo.slug,
+      to: destinationTokenInfo.slug,
+      recipient,
+      value: sendingValue
+    });
 
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
@@ -238,6 +248,10 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
 
     return transactionConfig;
   } catch (error) {
-    return Promise.reject(error);
+    if (error instanceof SyntaxError) {
+      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+    }
+
+    return Promise.reject(new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later'));
   }
 };

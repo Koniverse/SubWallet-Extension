@@ -4,7 +4,6 @@
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _POLYGON_BRIDGE_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
@@ -16,7 +15,7 @@ import Search from '@subwallet/extension-koni-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useAlert, useDefaultNavigate, useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
@@ -80,7 +79,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
@@ -280,7 +279,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
       const slug = (item.metadata as WithdrawClaimNotificationMetadata).stakingSlug;
-      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs);
+      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs);
       const switchStatusParams: RequestSwitchStatusParams = {
         id: item.id,
         isRead: false
@@ -326,7 +325,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         }
 
         case NotificationActionType.CLAIM: {
-          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, chainsByAccountType);
+          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, allowedChains, excludedTokens);
           const metadata = item.metadata as WithdrawClaimNotificationMetadata;
           const chainSlug = metadata.stakingSlug.split('___')[2];
 
@@ -436,7 +435,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [accounts, showActiveChainModal, chainStateMap, chainsByAccountType, currentAccountProxy, currentTimestampMs, earningRewards, isAllAccount, isTrigger, navigate, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showWarningModal, yieldPositions, openTransactionProcessModal]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, openTransactionProcessModal, isTrigger]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (

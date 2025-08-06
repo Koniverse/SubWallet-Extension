@@ -24,13 +24,14 @@ export default class ParallelLiquidStakingPoolHandler extends BaseLiquidStakingP
   protected readonly feeAssets: string[] = ['parallel-NATIVE-PARA'];
   public override readonly minAmountPercent = 0.96;
   protected readonly rateDecimals = 18;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   constructor (state: KoniState, chain: string) {
