@@ -229,13 +229,12 @@ export class ChainOnlineService {
             for (const storedAsset of Object.values(storedAssetRegistry)) {
               if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedChainMap).includes(storedAsset.originChain) && storedAsset.metadata?.contractAddress) {
                 const newOriginChain = deprecatedChainMap[storedAsset.originChain];
-                const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
+                // const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
 
                 deprecatedAssets.push(storedAsset.slug);
-                parsedStoredAssetRegistry[newSlug] = {
+                parsedStoredAssetRegistry[storedAsset.slug] = {
                   ...storedAsset,
-                  originChain: newOriginChain,
-                  slug: newSlug
+                  originChain: newOriginChain
                 };
               } else {
                 parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;

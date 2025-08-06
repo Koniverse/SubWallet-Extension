@@ -1533,13 +1533,12 @@ export class ChainService {
 
         if (_isCustomAsset(storedAsset.slug) && isFromCustomChain && storedAsset.metadata?.contractAddress) {
           const newOriginChain = deprecatedCustomChainMap[storedAsset.originChain];
-          const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
+          // const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
 
           deprecatedAssets.push(storedAsset.slug);
-          parsedStoredAssetRegistry[newSlug] = {
+          parsedStoredAssetRegistry[storedAsset.slug] = {
             ...storedAsset,
-            originChain: newOriginChain,
-            slug: newSlug
+            originChain: newOriginChain
           };
         } else {
           parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;
