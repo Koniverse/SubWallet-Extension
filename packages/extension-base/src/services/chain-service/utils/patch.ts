@@ -5,7 +5,7 @@ import { _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list
 
 const PRODUCTION_BRANCHES = ['master', 'webapp', 'webapp-dev'];
 const branchName = process.env.BRANCH_NAME || 'subwallet-dev';
-const fetchDomain = PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'https://chain-list-assets.subwallet.app' : 'https://dev.sw-chain-list-assets.pages.dev';
+const fetchDomain = process.env.PATCH_CHAIN_LIST_URL || (PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'https://chain-list-assets.subwallet.app' : 'https://dev.sw-chain-list-assets.pages.dev');
 const fetchFile = PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'list.json' : 'preview.json';
 
 export const ChainListVersion = '0.2.111'; // update this when build chain-list
