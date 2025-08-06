@@ -7,7 +7,8 @@ import { ErrorValidation } from '@subwallet/extension-base/background/KoniTypes'
 import { CardanoTxJson, CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoAssetMetadata, getAdaBelongUtxo, getCardanoTxFee, splitCardanoId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _CardanoApi } from '@subwallet/extension-base/services/chain-service/types';
-import { subwalletApiSdk } from '@subwallet/subwallet-api-sdk';
+import { toUnit } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 export interface CardanoTransactionConfigProps {
   tokenInfo: _ChainAsset;
@@ -33,6 +34,22 @@ export interface CardanoTransactionConfig {
   errors?: ErrorValidation[]
 }
 
+enum POPULAR_CARDANO_ERROR_PHRASE {
+  NOT_MATCH_MIN_AMOUNT = 'less than the minimum UTXO value',
+  INSUFFICIENT_INPUT = 'Insufficient input in transaction'
+}
+
+function getFirstNumberAfterSubstring (inputStr: string, subStr: string) {
+  const regex = new RegExp(`(${subStr})\\D*(\\d+)`);
+  const match = inputStr.match(regex);
+
+  if (match) {
+    return parseInt(match[2], 10);
+  } else {
+    return null;
+  }
+}
+
 export async function createCardanoTransaction (params: CardanoTransactionConfigProps): Promise<[CardanoTransactionConfig | null, string]> {
   const { cardanoTtlOffset, from, networkKey, to, tokenInfo, transferAll, value } = params;
 
@@ -44,15 +61,38 @@ export async function createCardanoTransaction (params: CardanoTransactionConfig
     throw new Error('Missing token policy id metadata');
   }
 
-  const payload = await subwalletApiSdk.fetchUnsignedPayload({
-    tokenDecimals: params.tokenInfo.decimals || 0,
-    nativeTokenSymbol: params.nativeTokenInfo.symbol,
-    cardanoId,
-    from: params.from,
-    to: params.to,
-    value: params.value,
-    cardanoTtlOffset: params.cardanoTtlOffset
-  });
+  let payload: string;
+
+  try {
+    payload = await subwalletApiSdk.cardanoApi.fetchUnsignedPayload({
+      sender: from,
+      receiver: to,
+      unit: cardanoId,
+      quantity: value
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    const tokenDecimals = params.tokenInfo.decimals || 0; // todo: review if should use nativeTokenDecimals?
+    const nativeTokenSymbol = params.nativeTokenInfo.symbol;
+
+    if (errorMessage.includes(POPULAR_CARDANO_ERROR_PHRASE.NOT_MATCH_MIN_AMOUNT)) {
+      const minAdaRequiredRaw = getFirstNumberAfterSubstring(errorMessage, POPULAR_CARDANO_ERROR_PHRASE.NOT_MATCH_MIN_AMOUNT);
+      const minAdaRequired = minAdaRequiredRaw ? toUnit(minAdaRequiredRaw, tokenDecimals) : 1;
+
+      throw new Error(`Amount too low. Increase your amount above ${minAdaRequired} ${nativeTokenSymbol} and try again`);
+    }
+
+    if (errorMessage.includes(POPULAR_CARDANO_ERROR_PHRASE.INSUFFICIENT_INPUT)) {
+      throw new Error(`Insufficient ${nativeTokenSymbol} balance to perform transaction. Top up ${nativeTokenSymbol} and try again`);
+    }
+
+    console.error(`Transaction is not built successfully: ${errorMessage}`);
+    throw new Error('Unable to perform this transaction at the moment. Try again later');
+  }
+
+  if (!payload) {
+    throw new Error('Build cardano payload failed!');
+  }
 
   console.log('Build cardano payload successfully!', payload);
 
