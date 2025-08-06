@@ -6,14 +6,13 @@ import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/exten
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
-import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getSubnetStakingTokenName, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, Info } from 'phosphor-react';
@@ -177,11 +176,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolChain, poolInfo.metadata.subnetData?.subnetSymbol || '');
+  }, [poolChain, poolInfo.metadata.subnetData?.subnetSymbol]);
 
   const renderSubnetStaking = useCallback(() => {
     return (
@@ -193,9 +190,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <Logo
             className='__item-logo'
             isShowSubLogo={false}
-            network={networkKey}
+            network={poolChain}
             shape='circle'
             size={24}
+            token={subnetToken}
           />
           <span
             className='chain-name'
@@ -206,7 +204,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         </div>
       </MetaInfo.Default>
     );
-  }, [networkKey, poolInfo.metadata.shortName, t]);
+  }, [poolChain, poolInfo.metadata.shortName, subnetToken, t]);
 
   const showAmountChangeInput = useCallback(() => {
     setIsShowAmountChange(!isShowAmountChange);
@@ -488,9 +486,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                 prefix={ <Logo
                   className='__item-logo'
                   isShowSubLogo={false}
-                  network={networkKey}
+                  network={poolChain}
                   shape='squircle'
                   size={28}
+                  token={subnetToken}
                 />}
                 showMaxButton={true}
               />

@@ -130,3 +130,7 @@ export const getEarningTimeText = (hours?: number) => {
     return detectTranslate('unknown time');
   }
 };
+
+export function getSubnetStakingTokenName (chain: string, subnetSymbol: string): string {
+  return `${chain}-local-${subnetSymbol}`;
+}
