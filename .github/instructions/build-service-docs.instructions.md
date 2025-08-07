@@ -34,7 +34,7 @@ This document provides instructions for building the service documentation.
 - **CRITICAL**: Every information must be derived 100% from the actual codebase - no assumptions or external knowledge.
 - **CRITICAL**: All information must be accurate with source code and linked to the relevant code sections.
 - **NO CODE GENERATION**: Never generate or create new code examples. Instead, reference existing code from the codebase.
-- **LINKING REQUIREMENT**: When referencing code, always provide direct links to the specific files and line numbers in the codebase.
+- **LINKING REQUIREMENT**: When referencing code, always provide direct links to the specific files and line numbers in the codebase. (Use relative paths for internal links.)
 - **VERIFICATION REQUIREMENT**: Every statement about functionality, methods, properties, or architecture must be verifiable by examining the actual source code.
 - **DOCUMENTATION REFERENCES**: When applicable, link to existing product documentation rather than creating new code examples.
 
