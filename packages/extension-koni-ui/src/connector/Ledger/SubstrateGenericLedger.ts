@@ -8,14 +8,13 @@ import { GenericeResponseAddress } from '@zondax/ledger-substrate/dist/common';
 
 import { LEDGER_SUCCESS_CODE } from '@polkadot/hw-ledger/constants';
 import { AccountOptions, LedgerAddress, LedgerSignature, LedgerVersion } from '@polkadot/hw-ledger/types';
-import { transports } from '@polkadot/hw-ledger-transports';
 import { hexAddPrefix, hexStripPrefix, u8aToHex } from '@polkadot/util';
 
 import { BaseLedger } from './BaseLedger';
 
 interface ResponseSign {
-  returnCode: number;
   errorMessage: string;
+  returnCode: number;
 }
 
 export async function loadWasm () {
@@ -109,13 +108,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
 
   getApp = async (): Promise<PolkadotGenericApp> => {
     if (!this.app) {
-      const def = transports.find(({ type }) => type === this.transport);
-
-      if (!def) {
-        throw new Error(`Unable to find a transport for ${this.transport}`);
-      }
-
-      const transport = await def.create();
+      const transport = await this.transportManager.getTransport();
 
       this.app = new PolkadotGenericApp(transport);
     }

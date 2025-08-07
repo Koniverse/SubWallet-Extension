@@ -5,7 +5,6 @@ import type { AccountOptions, LedgerAddress, LedgerSignature, LedgerVersion } fr
 
 import EthApp from '@ledgerhq/hw-app-eth';
 
-import { transports } from '@polkadot/hw-ledger-transports';
 import { hexStripPrefix, u8aToHex } from '@polkadot/util';
 
 import { BaseLedger } from './BaseLedger';
@@ -87,13 +86,7 @@ export class EVMLedger extends BaseLedger<EthApp> {
 
   getApp = async (): Promise<EthApp> => {
     if (!this.app) {
-      const def = transports.find(({ type }) => type === this.transport);
-
-      if (!def) {
-        throw new Error(`Unable to find a transport for ${this.transport}`);
-      }
-
-      const transport = await def.create();
+      const transport = await this.transportManager.getTransport();
 
       this.app = new EthApp(transport);
     }
