@@ -1,13 +1,13 @@
-// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { SigningRequest } from '@subwallet/extension-base/background/types';
-import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
-import { useGetAccountByAddress, useMetadata, useOpenDetailModal, useParseSubstrateRequestPayload } from '@subwallet/extension-web-ui/hooks';
-import { enableChain } from '@subwallet/extension-web-ui/messaging';
-import { RootState } from '@subwallet/extension-web-ui/stores';
-import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isRawPayload, isSubstrateMessage, noop } from '@subwallet/extension-web-ui/utils';
+import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
+import { useGetAccountByAddress, useMetadata, useOpenDetailModal, useParseSubstrateRequestPayload } from '@subwallet/extension-koni-ui/hooks';
+import { enableChain } from '@subwallet/extension-koni-ui/messaging';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { isRawPayload, isSubstrateMessage, noop } from '@subwallet/extension-koni-ui/utils';
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useEffect, useMemo } from 'react';
@@ -18,8 +18,8 @@ import styled from 'styled-components';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { SignerPayloadJSON } from '@polkadot/types/types';
 
-import useGetChainInfoByGenesisHash from '../../../hooks/chain/useGetChainInfoByGenesisHash';
-import { BaseDetailModal, SubstrateExtrinsic, SubstrateMessageDetail, SubstrateSignArea } from '../parts';
+import useGetChainInfoByGenesisHash from '../../../../hooks/chain/useGetChainInfoByGenesisHash';
+import { BaseDetailModal, SubstrateExtrinsic, SubstrateMessageDetail, SubstrateSignArea } from '../../parts';
 
 interface Props extends ThemeProps {
   request: SigningRequest;

@@ -10,6 +10,7 @@ export const CRON_AUTO_RECOVER_DOTSAMA_INTERVAL = 60000;
 export const CRON_AUTO_RECOVER_WEB3_INTERVAL = 90000;
 export const ACALA_REFRESH_CROWDLOAN_INTERVAL = 300000;
 export const ASTAR_REFRESH_BALANCE_INTERVAL = 60000;
+export const BITCOIN_REFRESH_BALANCE_INTERVAL = 600000;
 export const SUB_TOKEN_REFRESH_BALANCE_INTERVAL = 60000;
 export const CRON_REFRESH_NFT_INTERVAL = 7200000;
 export const CRON_REFRESH_MKT_CAMPAIGN_INTERVAL = 15 * BASE_MINUTE_INTERVAL;
@@ -31,7 +32,6 @@ export const ALL_ACCOUNT_KEY = 'ALL';
 export const ALL_NETWORK_KEY = 'all';
 export const ALL_GENESIS_HASH = null;
 export const IGNORE_GET_SUBSTRATE_FEATURES_LIST: string[] = ['astarEvm', 'ethereum', 'ethereum_goerli', 'binance', 'binance_test', 'boba_rinkeby', 'boba', 'bobabase', 'bobabeam'];
-
 export const ALL_ACCOUNT_AUTH_TYPES: AccountAuthType[] = ['evm', 'substrate', 'ton'];
 
 export const IGNORE_QR_SIGNER: string[] = [];
@@ -73,3 +73,4 @@ export * from './signing';
 export * from './staking';
 export * from './storage';
 export * from './remind-notification-time';
+export * from './bitcoin';

@@ -7,7 +7,7 @@ import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
-import { useAccountBalance, useGetChainSlugsByAccount, useSelector, useTokenGroup } from '@subwallet/extension-web-ui/hooks';
+import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-web-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
 import { isRelatedToAstar } from '@subwallet/extension-web-ui/utils';
 import BigN from 'bignumber.js';
@@ -46,8 +46,8 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
-  const chainsByAccountType = useGetChainSlugsByAccount();
-  const { tokenGroupMap } = useTokenGroup(chainsByAccountType);
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const { tokenGroupMap } = useTokenGroup(allowedChains, excludedTokens);
   const { tokenBalanceMap, tokenGroupBalanceMap } = useAccountBalance(tokenGroupMap, true);
   const { priceMap } = useSelector((state) => state.price);
 
@@ -57,7 +57,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     for (const pool of Object.values(poolInfoMap)) {
       const chain = pool.chain;
 
-      if (chainsByAccountType.includes(chain)) {
+      if (allowedChains.includes(chain)) {
         const group = pool.group;
 
         if (isRelatedToAstar(group)) {
@@ -130,6 +130,12 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
             apy = calculateReward(pool.statistic?.totalApr).apy;
           }
 
+          const inputAsset = pool.metadata.inputAsset;
+
+          if (excludedTokens.includes(inputAsset)) {
+            continue;
+          }
+
           const checkRelatedRelaChain = isRelatedToRelayChain(group, assetRegistry, multiChainAssetMap);
 
           result[group] = {
@@ -155,7 +161,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     }
 
     return Object.values(result);
-  }, [assetRegistry, chainInfoMap, chainsByAccountType, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap, tokenGroupBalanceMap]);
+  }, [allowedChains, assetRegistry, chainInfoMap, excludedTokens, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap, tokenGroupBalanceMap]);
 };
 
 export default useYieldGroupInfo;

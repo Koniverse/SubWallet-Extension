@@ -4,6 +4,7 @@
 import type { BaseSelectRef } from 'rc-select';
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AnalyzeAddress, AnalyzedGroup, ResponseInputAccountSubscribe } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, reformatAddress } from '@subwallet/extension-base/utils';
@@ -14,7 +15,7 @@ import { useFetchChainInfo, useForwardFieldRef, useIsPolkadotUnifiedChain, useOp
 import { cancelSubscription, saveRecentAccount, subscribeAccountsInputAddress } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ScannerResult, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { toShort } from '@subwallet/extension-web-ui/utils';
+import { sortFuncAnalyzeAddress, toShort } from '@subwallet/extension-web-ui/utils';
 import { isAddress } from '@subwallet/keyring';
 import { AutoComplete, Button, Icon, Input, ModalContext, Switch, SwQrScanner } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -41,6 +42,8 @@ type AutoCompleteGroupItem = {
 
 interface Props extends BasicInputWrapper, ThemeProps {
   chainSlug?: string;
+  tokenSlug?: string;
+  actionType?: ActionType;
   showAddressBook?: boolean;
   showScanner?: boolean;
   labelStyle?: 'horizontal' | 'vertical';
@@ -71,9 +74,9 @@ function getInputValueFromGraftedValue (graftedValue: string) {
 //  - Rename to AddressInput, after this component is done
 
 function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.ReactElement<Props> {
-  const { chainSlug, className = '', disabled, dropdownHeight = 240,
-    id, label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly,
-    saveAddress, showAddressBook, showScanner, status, statusHelp, value } = props;
+  const { actionType, chainSlug, className = '', disabled, dropdownHeight = 240, id,
+    label, labelStyle, onBlur, onChange, onFocus, placeholder, readOnly, saveAddress,
+    showAddressBook, showScanner, status, statusHelp, tokenSlug, value } = props;
   const { t } = useTranslation();
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
   const chainOldPrefixMap = useSelector((state: RootState) => state.chainStore.chainOldPrefixMap);
@@ -199,10 +202,10 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     }
 
     const result: AutoCompleteGroupItem[] = [];
-    const walletItems: AutoCompleteItem[] = [];
-    const contactItems: AutoCompleteItem[] = [];
-    const domainItems: AutoCompleteItem[] = [];
-    const recentItems: AutoCompleteItem[] = [];
+    const walletItems: AnalyzeAddress[] = [];
+    const contactItems: AnalyzeAddress[] = [];
+    const domainItems: AnalyzeAddress[] = [];
+    const recentItems: AnalyzeAddress[] = [];
 
     const genAutoCompleteItem = (responseOption: AnalyzeAddress): AutoCompleteItem => {
       return {
@@ -210,7 +213,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         label: (
           <AddressSelectorItem
             address={responseOption.formatedAddress}
-            avatarValue={responseOption.proxyId}
+            avatarValue={responseOption.proxyId || responseOption.address}
             name={responseOption.displayName}
           />
         ),
@@ -227,30 +230,34 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
 
     responseOptions.forEach((ro) => {
       if (ro.analyzedGroup === AnalyzedGroup.WALLET) {
-        walletItems.push(genAutoCompleteItem(ro));
+        walletItems.push(ro);
       } else if (ro.analyzedGroup === AnalyzedGroup.CONTACT) {
-        contactItems.push(genAutoCompleteItem(ro));
+        contactItems.push(ro);
       } else if (ro.analyzedGroup === AnalyzedGroup.DOMAIN) {
-        domainItems.push(genAutoCompleteItem(ro));
+        domainItems.push(ro);
       } else if (ro.analyzedGroup === AnalyzedGroup.RECENT) {
-        recentItems.push(genAutoCompleteItem(ro));
+        recentItems.push(ro);
       }
     });
 
     if (walletItems.length) {
-      result.push(genAutoCompleteGroupItem(t('My wallet'), walletItems));
+      walletItems.sort(sortFuncAnalyzeAddress);
+      result.push(genAutoCompleteGroupItem(t('My wallet'), walletItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (contactItems.length) {
-      result.push(genAutoCompleteGroupItem(t('My contact'), contactItems));
+      contactItems.sort(sortFuncAnalyzeAddress);
+      result.push(genAutoCompleteGroupItem(t('My contact'), contactItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (domainItems.length) {
-      result.push(genAutoCompleteGroupItem(t('Domain name'), domainItems));
+      domainItems.sort(sortFuncAnalyzeAddress);
+      result.push(genAutoCompleteGroupItem(t('Domain name'), domainItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (recentItems.length) {
-      result.push(genAutoCompleteGroupItem(t('Recent'), recentItems));
+      recentItems.sort(sortFuncAnalyzeAddress);
+      result.push(genAutoCompleteGroupItem(t('Recent'), recentItems.map((i) => genAutoCompleteItem(i))));
     }
 
     return result;
@@ -416,8 +423,10 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
       };
 
       subscribeAccountsInputAddress({
+        token: tokenSlug,
         data: inputValue,
-        chain: chainSlug
+        chain: chainSlug,
+        actionType: actionType
       }, handler).then(handler).catch(console.error);
     }
 
@@ -428,7 +437,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         cancelSubscription(id).catch(console.log);
       }
     };
-  }, [chainSlug, inputValue]);
+  }, [actionType, chainSlug, inputValue, tokenSlug]);
 
   return (
     <>
@@ -563,9 +572,11 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         showAddressBook &&
         (
           <AddressBookModal
+            actionType={actionType}
             chainSlug={chainSlug}
             id={addressBookId}
             onSelect={onSelectAddressBook}
+            tokenSlug={tokenSlug}
             value={value}
           />
         )

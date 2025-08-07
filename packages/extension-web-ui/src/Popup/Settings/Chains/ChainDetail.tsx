@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getBlockExplorerFromChain, _getChainNativeTokenBasicInfo, _getChainSubstrateAddressPrefix, _getCrowdloanUrlFromChain, _getEvmChainId, _getSubstrateParaId, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getBlockExplorerFromChain, _getChainNativeTokenBasicInfo, _getChainSubstrateAddressPrefix, _getCrowdloanUrlFromChain, _getEvmChainId, _getSubstrateParaId, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible, _isCustomChain, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { isUrl } from '@subwallet/extension-base/utils';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { ProviderSelector } from '@subwallet/extension-web-ui/components/Field/ProviderSelector';
@@ -63,10 +63,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const [chainInfo] = useState(_chainInfo);
   const [chainState] = useState(_chainState);
-
-  const isPureEvmChain = useMemo(() => {
-    return chainInfo && _isPureEvmChain(chainInfo);
-  }, [chainInfo]);
 
   const { decimals, symbol } = useMemo(() => {
     return _getChainNativeTokenBasicInfo(chainInfo);
@@ -130,6 +126,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     if (_isChainEvmCompatible(chainInfo)) {
       types.push('EVM');
+    }
+
+    if (_isChainTonCompatible(chainInfo)) {
+      types.push('Ton');
+    }
+
+    if (_isChainCardanoCompatible(chainInfo)) {
+      types.push('Cardano');
+    }
+
+    if (_isChainBitcoinCompatible(chainInfo)) {
+      types.push('Bitcoin');
     }
 
     for (let i = 0; i < types.length; i++) {
@@ -264,6 +272,33 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     });
   }, [t]);
 
+  const { isAddressPrefixVisible,
+    isChainIdVisible,
+    isCrowdloanURLVisible,
+    isParaIdVisible } = useMemo(() => {
+    if (!chainInfo) {
+      return {
+        isParaIdVisible: false,
+        isChainIdVisible: false,
+        isAddressPrefixVisible: false,
+        isCrowdloanURLVisible: false
+      };
+    }
+
+    const isPureSubstrateChain = _isPureSubstrateChain(chainInfo);
+    const isPureEvmChain = _isPureEvmChain(chainInfo);
+    // const isPureTonChain = _isPureTonChain(chainInfo);
+    // const isPureCardanoChain = _isPureCardanoChain(chainInfo);
+    // const isPureBitcoinChain = _isPureBitcoinChain(chainInfo);
+
+    return {
+      isParaIdVisible: isPureSubstrateChain,
+      isChainIdVisible: isPureEvmChain,
+      isAddressPrefixVisible: isPureSubstrateChain,
+      isCrowdloanURLVisible: isPureSubstrateChain
+    };
+  }, [chainInfo]);
+
   return (
     <PageWrapper
       className={`chain_detail ${className}`}
@@ -353,8 +388,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 </Col>
               </Row>
 
-              <Row gutter={token.paddingSM}>
-                <Col span={12}>
+              <Row className={'auto-sizing-col-container'}>
+                <Col>
                   <Field
                     content={decimals}
                     placeholder={t('Decimals')}
@@ -362,43 +397,47 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
-                <Col span={12}>
-                  {
-                    !isPureEvmChain
-                      ? (
-                        <Field
-                          content={paraId > -1 ? paraId : undefined}
-                          placeholder={t('ParaId')}
-                          tooltip={isWebUI ? t('ParaId') : undefined}
-                          tooltipPlacement={'topLeft'}
-                        />
-                      )
-                      : (
-                        <Field
-                          content={chainId > -1 ? chainId : 'None'}
-                          placeholder={t('Chain ID')}
-                          tooltip={isWebUI ? t('Chain ID') : undefined}
-                          tooltipPlacement={'topLeft'}
-                        />
-                      )
-                  }
-                </Col>
-              </Row>
 
-              <Row gutter={token.paddingSM}>
                 {
-                  !isPureEvmChain &&
-                  <Col span={12}>
-                    <Field
-                      content={addressPrefix.toString()}
-                      placeholder={t('Address prefix')}
-                      tooltip={isWebUI ? t('Address prefix') : undefined}
-                      tooltipPlacement={'topLeft'}
-                    />
-                  </Col>
+                  isParaIdVisible && (
+                    <Col>
+                      <Field
+                        content={paraId > -1 ? paraId : undefined}
+                        placeholder={t('ParaId')}
+                        tooltip={isWebUI ? t('ParaId') : undefined}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
                 }
 
-                <Col span={!isPureEvmChain ? 12 : 24}>
+                {
+                  isChainIdVisible && (
+                    <Col>
+                      <Field
+                        content={chainId > -1 ? chainId : 'None'}
+                        placeholder={t('Chain ID')}
+                        tooltip={isWebUI ? t('Chain ID') : undefined}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
+                }
+
+                {
+                  isAddressPrefixVisible && (
+                    <Col>
+                      <Field
+                        content={addressPrefix.toString()}
+                        placeholder={t('Address prefix')}
+                        tooltip={isWebUI ? t('Address prefix') : undefined}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
+                }
+
+                <Col>
                   <Field
                     content={chainTypeString()}
                     placeholder={t('Network type')}
@@ -421,7 +460,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               </Form.Item>
 
               {
-                !_isPureEvmChain(chainInfo) && <Form.Item
+                isCrowdloanURLVisible && <Form.Item
                   name={'crowdloanUrl'}
                   rules={[{ validator: crowdloanUrlValidator }]}
                   statusHelpAsTooltip={isWebUI}
@@ -447,6 +486,21 @@ const ChainDetail = styled(Component)<Props>(({ theme: { token } }: Props) => {
       marginTop: 24,
       marginRight: token.margin,
       marginLeft: token.margin
+    },
+
+    '.ant-field-wrapper.ant-field-wrapper': {
+      paddingLeft: token.paddingSM,
+      paddingRight: token.paddingSM
+    },
+
+    '.auto-sizing-col-container': {
+      flexWrap: 'wrap',
+      gap: token.sizeSM,
+
+      '.ant-col': {
+        flexGrow: 1,
+        flexBasis: '35%'
+      }
     },
 
     '.chain_detail__attributes_container': {

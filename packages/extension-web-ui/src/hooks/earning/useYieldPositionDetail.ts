@@ -4,7 +4,7 @@
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AbstractYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-web-ui/hooks';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
@@ -17,7 +17,7 @@ interface Result {
 const useYieldPositionDetail = (slug: string, address?: string): Result => {
   const { poolInfoMap, yieldPositions } = useSelector((state) => state.earning);
   const { currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo(() => {
     const checkAddress = (item: YieldPositionInfo) => {
@@ -39,7 +39,7 @@ const useYieldPositionDetail = (slug: string, address?: string): Result => {
     const infoList: YieldPositionInfo[] = [];
 
     for (const info of yieldPositions) {
-      if (info.slug === slug && chainsByAccountType.includes(info.chain) && poolInfoMap[info.slug]) {
+      if (info.slug === slug && allowedChains.includes(info.chain) && !excludedTokens.includes(info.balanceToken) && poolInfoMap[info.slug]) {
         const isValid = checkAddress(info);
         const haveStake = new BigN(info.totalStake).gt(0);
 
@@ -142,7 +142,7 @@ const useYieldPositionDetail = (slug: string, address?: string): Result => {
         list: infoList
       };
     }
-  }, [isAllAccount, address, currentAccountProxy?.accounts, yieldPositions, slug, chainsByAccountType, poolInfoMap]);
+  }, [isAllAccount, address, currentAccountProxy?.accounts, yieldPositions, slug, allowedChains, excludedTokens, poolInfoMap]);
 };
 
 export default useYieldPositionDetail;

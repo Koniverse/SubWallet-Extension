@@ -18,6 +18,7 @@ export { default as JoinYieldPoolConfirmation } from './JoinYieldPool';
 export { default as TokenApproveConfirmation } from './TokenApprove';
 export { default as SwapTransactionConfirmation } from './Swap';
 export { default as SwapChooseFeeTransactionConfirmation } from './SwapChooseFee';
+export { default as ChangeEarningValidatorTransactionConfirmation } from './ChangeEarningValidator';
 
 export * from './TransferBlock';
 export * from './Process';

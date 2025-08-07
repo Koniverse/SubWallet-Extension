@@ -58,17 +58,17 @@ export const getAccountChainTypeFromKeypairType = (type: KeypairType): AccountCh
     : AccountChainType.SUBSTRATE;
 };
 
-export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType => {
+export const getDefaultKeypairTypeFromAccountChainType = (type: AccountChainType): KeypairType[] => {
   if (type === AccountChainType.ETHEREUM) {
-    return 'ethereum';
+    return ['ethereum'];
   } else if (type === AccountChainType.TON) {
-    return 'ton';
+    return ['ton'];
   } else if (type === AccountChainType.BITCOIN) {
-    return 'bitcoin-84';
+    return ['bitcoin-44', 'bitcoin-84', 'bitcoin-86', 'bittest-44', 'bittest-84', 'bittest-86'];
   } else if (type === AccountChainType.CARDANO) {
-    return 'cardano';
+    return ['cardano'];
   } else {
-    return 'sr25519';
+    return ['sr25519'];
   }
 };
 
@@ -88,6 +88,10 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
       if (meta.isExternal) {
         if (meta.isHardware) {
           if (meta.isGeneric) {
+            if (meta.isSubstrateECDSA) {
+              return AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
+            }
+
             return AccountSignMode.GENERIC_LEDGER;
           } else {
             return AccountSignMode.LEGACY_LEDGER;
@@ -177,7 +181,8 @@ const NATIVE_STAKE_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.STAKING_WITHDRAW,
   // ExtrinsicType.STAKING_COMPOUNDING,
   // ExtrinsicType.STAKING_CANCEL_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_UNSTAKE
+  ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+  ExtrinsicType.CHANGE_EARNING_VALIDATOR
 ];
 
 const POOL_STAKE_ACTIONS: ExtrinsicType[] = [
@@ -274,6 +279,10 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [
           ...BASE_TRANSFER_ACTIONS
         ];
+      case AccountChainType.BITCOIN:
+        return [
+          ...BASE_TRANSFER_ACTIONS
+        ];
     }
   } else if (signMode === AccountSignMode.QR) {
     switch (networkType) {
@@ -310,6 +319,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         return [];
       case AccountChainType.CARDANO:
         return [];
+      case AccountChainType.BITCOIN:
+        return [];
     }
   } else if (signMode === AccountSignMode.GENERIC_LEDGER) {
     switch (networkType) {
@@ -340,6 +351,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...BASE_TRANSFER_ACTIONS
         ];
       case AccountChainType.CARDANO:
+        return [];
+      case AccountChainType.BITCOIN:
         return [];
     }
   } else if (signMode === AccountSignMode.LEGACY_LEDGER) { // Only for Substrate
@@ -378,6 +391,12 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     if (['availTuringTest', 'avail_mainnet'].includes(specialNetwork)) {
       result.push(...CLAIM_AVAIL_BRIDGE);
     }
+
+    return result;
+  } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
+    const result: ExtrinsicType[] = [];
+
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     return result;
   }
@@ -506,6 +525,7 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
   switch (accountSignMode) {
     case AccountSignMode.GENERIC_LEDGER:
     case AccountSignMode.LEGACY_LEDGER:
+    case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
       return AccountProxyType.LEDGER;
     case AccountSignMode.QR:
       return AccountProxyType.QR;
@@ -519,9 +539,9 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
       return AccountProxyType.ALL_ACCOUNT;
     case AccountSignMode.UNKNOWN:
       return AccountProxyType.UNKNOWN;
+    default:
+      return AccountProxyType.UNKNOWN;
   }
-
-  return AccountProxyType.UNKNOWN;
 };
 
 export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPairStoreData, accountProxies: AccountProxyStoreData) => {
@@ -623,6 +643,7 @@ export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPai
           switch (account.signMode) {
             case AccountSignMode.GENERIC_LEDGER:
             case AccountSignMode.LEGACY_LEDGER:
+            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
               specialChain = account.specialChain;
               break;
           }

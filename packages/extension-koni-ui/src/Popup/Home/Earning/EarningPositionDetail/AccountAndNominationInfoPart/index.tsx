@@ -5,11 +5,12 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { AccountInfoPart } from './AccountInfoPart';
 import { NominationInfoPart } from './NominationInfoPart';
+import { SelectedValidatorInfoPart } from './SelectedValidatorInfoPart';
 
 type Props = ThemeProps & {
   compound: YieldPositionInfo;
@@ -19,6 +20,10 @@ type Props = ThemeProps & {
 };
 
 function Component ({ className, compound, inputAsset, list, poolInfo }: Props) {
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
+
   return (
     <div
       className={CN(className)}
@@ -29,11 +34,17 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         list={list}
         poolInfo={poolInfo}
       />
-      <NominationInfoPart
-        compound={compound}
-        inputAsset={inputAsset}
-        poolInfo={poolInfo}
-      />
+      {canChangeValidator
+        ? <SelectedValidatorInfoPart
+          compound={compound}
+          inputAsset={inputAsset}
+          poolInfo={poolInfo}
+        />
+        : <NominationInfoPart
+          compound={compound}
+          inputAsset={inputAsset}
+          poolInfo={poolInfo}
+        />}
     </div>
   );
 }

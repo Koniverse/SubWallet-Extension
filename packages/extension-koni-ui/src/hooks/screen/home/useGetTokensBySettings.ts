@@ -3,17 +3,17 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _isAssetFungibleToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { useGetChainSlugsByAccount } from '@subwallet/extension-koni-ui/hooks/screen/home/useGetChainSlugsByAccount';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 // Get all fungible tokens by active chains, visible tokens and current account
-export default function useGetTokensBySettings (address?: string): Record<string, _ChainAsset> {
+export default function useGetTokensBySettings (): Record<string, _ChainAsset> {
   const chainStateMap = useSelector((state: RootState) => state.chainStore.chainStateMap);
   const chainAssetMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const assetSettingMap = useSelector((state: RootState) => state.assetRegistry.assetSettingMap);
-  const filteredChainSlugs = useGetChainSlugsByAccount(address);
+  const { allowedChains: filteredChainSlugs, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo<Record<string, _ChainAsset>>(() => {
     const filteredChainAssetMap: Record<string, _ChainAsset> = {};
@@ -21,7 +21,7 @@ export default function useGetTokensBySettings (address?: string): Record<string
     Object.values(chainAssetMap).forEach((chainAsset) => {
       const isOriginChainActive = chainStateMap[chainAsset.originChain].active;
 
-      if (filteredChainSlugs.includes(chainAsset.originChain) && isOriginChainActive) {
+      if (filteredChainSlugs.includes(chainAsset.originChain) && isOriginChainActive && !excludedTokens.includes(chainAsset.slug)) {
         const assetSetting = assetSettingMap[chainAsset.slug];
 
         const isAssetVisible = assetSetting && assetSetting.visible;
@@ -34,5 +34,5 @@ export default function useGetTokensBySettings (address?: string): Record<string
     });
 
     return filteredChainAssetMap;
-  }, [assetSettingMap, chainAssetMap, chainStateMap, filteredChainSlugs]);
+  }, [assetSettingMap, chainAssetMap, chainStateMap, excludedTokens, filteredChainSlugs]);
 }

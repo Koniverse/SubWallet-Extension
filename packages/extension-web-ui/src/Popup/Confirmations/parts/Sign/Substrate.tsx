@@ -1,15 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-web-ui/components';
-import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY } from '@subwallet/extension-web-ui/constants';
+import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, SubstrateLedgerSignModeSupport } from '@subwallet/extension-web-ui/constants';
 import { InjectContext } from '@subwallet/extension-web-ui/contexts/InjectContext';
 import { useAlert, useGetAccountByAddress, useGetChainInfoByGenesisHash, useLedger, useMetadata, useNotification, useParseSubstrateRequestPayload, useSelector, useUnlockChecker } from '@subwallet/extension-web-ui/hooks';
 import { approveSignPasswordV2, approveSignSignature, cancelSignRequest, shortenMetadata } from '@subwallet/extension-web-ui/messaging';
-import { AccountSignMode, PhosphorIcon, SubstrateSigData, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { PhosphorIcon, SubstrateSigData, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getSignMode, isRawPayload, isSubstrateMessage, removeTransactionPersist, toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -36,19 +37,31 @@ interface AlertData {
   title: string;
   type: 'info' | 'warning' | 'error';
 }
+
 const alertModalId = 'dapp-alert-modal';
-
-const handleConfirm = async (id: string) => await approveSignPasswordV2({ id });
-
-const handleCancel = async (id: string) => await cancelSignRequest(id);
-
-const handleSignature = async (id: string, { signature, signedTransaction }: SubstrateSigData) => await approveSignSignature(id, signature, signedTransaction);
-
 const metadataFAQUrl = 'https://docs.subwallet.app/main/extension-user-guide/faqs#how-do-i-update-network-metadata';
 const genericFAQUrl = 'https://docs.subwallet.app/main/extension-user-guide/faqs#how-do-i-re-attach-a-new-polkadot-account-on-ledger';
 const migrationFAQUrl = 'https://docs.subwallet.app/main/extension-user-guide/faqs#how-do-i-move-assets-from-a-substrate-network-to-the-new-polkadot-account-on-ledger';
 
-const modeCanSignMessage: AccountSignMode[] = [AccountSignMode.QR, AccountSignMode.PASSWORD, AccountSignMode.INJECTED, AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER];
+const handleConfirm = async (id: string) => await approveSignPasswordV2({ id });
+const handleCancel = async (id: string) => await cancelSignRequest(id);
+const handleSignature = async (id: string, { signature, signedTransaction }: SubstrateSigData) => await approveSignSignature(id, signature, signedTransaction);
+
+const getLedgerChainSlug = (signMode: AccountSignMode, originGenesisHash?: string | null, accountChainInfoSlug?: string) => {
+  if (signMode === AccountSignMode.GENERIC_LEDGER) {
+    return originGenesisHash ? SUBSTRATE_MIGRATION_KEY : SUBSTRATE_GENERIC_KEY;
+  }
+
+  if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+    return SUBSTRATE_GENERIC_KEY;
+  }
+
+  return accountChainInfoSlug || '';
+};
+
+const isRequireMetadata = (signMode: AccountSignMode, isRuntimeUpdated: boolean) => signMode === AccountSignMode.GENERIC_LEDGER || signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER || (signMode === AccountSignMode.LEGACY_LEDGER && isRuntimeUpdated);
+
+const modeCanSignMessage: AccountSignMode[] = [AccountSignMode.QR, AccountSignMode.PASSWORD, AccountSignMode.INJECTED, AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, extrinsicType, id, isInternal, request, txExpirationTime } = props;
@@ -64,6 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
 
   const { chainInfoMap } = useSelector((state) => state.chainStore);
+
   const genesisHash = useMemo(() => {
     const _payload = request.payload;
 
@@ -72,7 +86,7 @@ const Component: React.FC<Props> = (props: Props) => {
       : _payload.genesisHash;
   }, [account?.genesisHash, chainInfoMap.polkadot.substrateInfo?.genesisHash, request.payload]);
   const signMode = useMemo(() => getSignMode(account), [account]);
-  const isLedger = useMemo(() => signMode === AccountSignMode.LEGACY_LEDGER || signMode === AccountSignMode.GENERIC_LEDGER, [signMode]);
+  const isLedger = useMemo(() => SubstrateLedgerSignModeSupport.includes(signMode), [signMode]);
   const isRuntimeUpdated = useMemo(() => {
     const _payload = request.payload;
 
@@ -82,7 +96,7 @@ const Component: React.FC<Props> = (props: Props) => {
       return _isRuntimeUpdated(_payload.signedExtensions);
     }
   }, [request.payload]);
-  const requireMetadata = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER || (signMode === AccountSignMode.LEGACY_LEDGER && isRuntimeUpdated), [isRuntimeUpdated, signMode]);
+  const requireMetadata = useMemo(() => isRequireMetadata(signMode, isRuntimeUpdated), [isRuntimeUpdated, signMode]);
   const requireSpecVersion = useMemo((): number | undefined => {
     const _payload = request.payload;
 
@@ -106,6 +120,7 @@ const Component: React.FC<Props> = (props: Props) => {
         return QrCode;
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return Swatches;
       case AccountSignMode.INJECTED:
         return Wallet;
@@ -113,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
         return CheckCircle;
     }
   }, [signMode]);
-  const chainSlug = useMemo(() => signMode === AccountSignMode.GENERIC_LEDGER ? account?.originGenesisHash ? SUBSTRATE_MIGRATION_KEY : SUBSTRATE_GENERIC_KEY : (accountChainInfo?.slug || ''), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
+  const chainSlug = useMemo(() => getLedgerChainSlug(signMode, account?.originGenesisHash, accountChainInfo?.slug), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
   const networkName = useMemo(() => chainInfo?.name || chain?.name || toShort(genesisHash), [chainInfo, genesisHash, chain]);
 
   const isMetadataOutdated = useMemo(() => {
@@ -161,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [closeAlert, isOpenAlert, networkName, openAlert, t]);
 
   const alertData = useMemo((): AlertData | undefined => {
-    const requireMetadata = signMode === AccountSignMode.GENERIC_LEDGER || (signMode === AccountSignMode.LEGACY_LEDGER && isRuntimeUpdated);
+    const requireMetadata = isRequireMetadata(signMode, isRuntimeUpdated);
 
     if (!isMessage && !loadingChain) {
       if (!chain || !chain.hasMetadata || isMetadataOutdated) {
@@ -261,7 +276,7 @@ const Component: React.FC<Props> = (props: Props) => {
             }
           }
         } else {
-          if (signMode === AccountSignMode.GENERIC_LEDGER) {
+          if (signMode === AccountSignMode.GENERIC_LEDGER || signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
             return {
               type: 'error',
               title: t('Error!'),
@@ -277,6 +292,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const activeLedger = useMemo(() => isLedger && !loadingChain && alertData?.type !== 'error', [isLedger, loadingChain, alertData?.type]);
   const forceUseMigrationApp = useMemo(() => isRuntimeUpdated || (isMessage && chainSlug !== 'avail_mainnet'), [isRuntimeUpdated, isMessage, chainSlug]);
+  const accountSchema = useMemo(() => signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER ? POLKADOT_LEDGER_SCHEME.ECDSA : POLKADOT_LEDGER_SCHEME.ED25519, [signMode]);
 
   const { error: ledgerError,
     isLoading: isLedgerLoading,
@@ -285,7 +301,7 @@ const Component: React.FC<Props> = (props: Props) => {
     refresh: refreshLedger,
     signMessage: ledgerSignMessage,
     signTransaction: ledgerSignTransaction,
-    warning: ledgerWarning } = useLedger(chainSlug, activeLedger, true, forceUseMigrationApp, account?.originGenesisHash, account?.isLedgerRecovery);
+    warning: ledgerWarning } = useLedger(chainSlug, activeLedger, true, forceUseMigrationApp, account?.originGenesisHash, account?.isLedgerRecovery, accountSchema);
 
   const isLedgerConnected = useMemo(() => !isLocked && !isLedgerLoading && !!ledger, [isLedgerLoading, isLocked, ledger]);
 
@@ -465,6 +481,7 @@ const Component: React.FC<Props> = (props: Props) => {
         break;
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         onConfirmLedger();
         break;
       case AccountSignMode.INJECTED:

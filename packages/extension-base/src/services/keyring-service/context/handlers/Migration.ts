@@ -92,7 +92,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         }).result;
 
         const newChainTypes = Object.values(AccountChainType).filter((type) => !unifiedAccount.chainTypes.includes(type) && SUPPORTED_ACCOUNT_CHAIN_TYPES.includes(type));
-        const keypairTypes = newChainTypes.map((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType));
+        const keypairTypes = newChainTypes.flatMap((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType));
 
         keypairTypes.forEach((type) => {
           const suri = getSuri(mnemonic, type);
@@ -208,7 +208,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     try {
       const mnemonic = this.parentService.context.exportAccountProxyMnemonic({ password, proxyId: firstAccountOldProxyId }).result;
 
-      const keypairTypes = SUPPORTED_ACCOUNT_CHAIN_TYPES.map((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType as AccountChainType));
+      const keypairTypes = SUPPORTED_ACCOUNT_CHAIN_TYPES.flatMap((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType));
 
       keypairTypes.forEach((type) => {
         const suri = getSuri(mnemonic, type);

@@ -12,7 +12,7 @@ import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetChainSlugsByAccount, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { UpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/UpperBlock';
@@ -59,7 +59,7 @@ const Component = (): React.ReactElement => {
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const { accountBalance: { tokenGroupBalanceMap,
-    totalBalanceInfo }, tokenGroupStructure: { sortedTokenGroups } } = useContext(HomeContext);
+    totalBalanceInfo }, tokenGroupStructure: { tokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
@@ -67,7 +67,7 @@ const Component = (): React.ReactElement => {
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
-  const allowedChains = useGetChainSlugsByAccount();
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
@@ -306,7 +306,7 @@ const Component = (): React.ReactElement => {
   const tokenGroupBalanceItems = useMemo<TokenBalanceItemType[]>(() => {
     const result: TokenBalanceItemType[] = [];
 
-    sortedTokenGroups.forEach((tokenGroupSlug) => {
+    tokenGroups.forEach((tokenGroupSlug) => {
       const item = debouncedTokenGroupBalanceMap[tokenGroupSlug];
 
       if (!item) {
@@ -325,7 +325,7 @@ const Component = (): React.ReactElement => {
     sortTokensByStandard(result, priorityTokens, true);
 
     return result;
-  }, [sortedTokenGroups, priorityTokens, debouncedTokenGroupBalanceMap, searchInput]);
+  }, [tokenGroups, priorityTokens, debouncedTokenGroupBalanceMap, searchInput]);
 
   const tokenBalanceClick = useCallback((item: TokenBalanceItemType) => {
     return () => {

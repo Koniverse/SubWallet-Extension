@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { PREDEFINED_WALLETS } from '@subwallet/extension-web-ui/constants';
 import useAccountAvatarInfo from '@subwallet/extension-web-ui/hooks/account/useAccountAvatarInfo';
 import useAccountAvatarTheme from '@subwallet/extension-web-ui/hooks/account/useAccountAvatarTheme';
@@ -10,7 +11,6 @@ import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotific
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { Theme } from '@subwallet/extension-web-ui/themes';
 import { PhosphorIcon } from '@subwallet/extension-web-ui/types';
-import { AccountSignMode } from '@subwallet/extension-web-ui/types/account';
 import { Button, Icon, Image, Logo } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
@@ -79,6 +79,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return {
           type: 'icon',
           value: Swatches

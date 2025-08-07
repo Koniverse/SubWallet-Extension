@@ -45,13 +45,14 @@ export default class AcalaLiquidStakingPoolHandler extends BaseLiquidStakingPool
   public override readonly minAmountPercent = 0.98;
   protected readonly rateDecimals = 10;
 
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   public slug: string;

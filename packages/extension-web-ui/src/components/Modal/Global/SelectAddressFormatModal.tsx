@@ -103,19 +103,16 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
 
   const renderItem = useCallback((item: AddressFormatInfo) => {
     return (
-      <>
-        <div className={'item-wrapper'}>
-          <AccountChainAddressWithStatusItem
-            address={item.address}
-            chainName={item.name}
-            isNewFormat={item.isNewFormat}
-            key={`${item.address}-${item.slug}`}
-            onClickCopyButton={onCopyAddress(item)}
-            onClickQrButton={onShowQr(item)}
-            tokenSlug={item.slug}
-          />
-        </div>
-      </>
+      <AccountChainAddressWithStatusItem
+        address={item.address}
+        chainName={item.name}
+        className={'item-wrapper'}
+        isNewFormat={item.isNewFormat}
+        key={`${item.address}-${item.slug}`}
+        onClickCopyButton={onCopyAddress(item)}
+        onClickQrButton={onShowQr(item)}
+        tokenSlug={item.slug}
+      />
     );
   }, [onCopyAddress, onShowQr]);
 

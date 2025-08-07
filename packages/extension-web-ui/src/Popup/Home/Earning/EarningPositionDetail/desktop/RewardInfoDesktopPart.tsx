@@ -10,7 +10,7 @@ import { EarningRewardsHistoryModal } from '@subwallet/extension-web-ui/componen
 import { BN_ZERO, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionModalContext } from '@subwallet/extension-web-ui/contexts/TransactionModalContextProvider';
-import { useReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
+import { useCoreCreateReformatAddress, useSelector, useTranslation, useYieldRewardTotal } from '@subwallet/extension-web-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { ActivityIndicator, Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
@@ -51,7 +51,7 @@ function Component ({ className, closeAlert, compound,
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
 
   const total = useYieldRewardTotal(slug);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);

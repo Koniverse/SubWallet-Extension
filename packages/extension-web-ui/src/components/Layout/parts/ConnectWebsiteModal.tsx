@@ -51,17 +51,15 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   const _isNotConnected = isNotConnected || !authInfo;
   const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
   const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap?.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap?.evm, chainInfoMap]);
-
   const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
       setAllowedMap((values) => {
         const newValues = { ...values };
-        const listAddress = accountProxy.accounts.map(({ address }) => address);
+        const listAddress = accountProxy.accounts
+          .filter(({ address }) => isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []));
 
-        listAddress.forEach((address) => {
-          const addressIsValid = isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []);
-
-          addressIsValid && (newValues[address] = !oldValue);
+        listAddress.forEach(({ address }) => {
+          newValues[address] = !oldValue;
         });
 
         return newValues;
@@ -273,7 +271,10 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       );
     }
 
-    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || []).map((proxy) => {
+    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, {
+      accountAuthTypes: authInfo?.accountAuthTypes || [],
+      canConnectSubstrateEcdsa: authInfo?.canConnectSubstrateEcdsa
+    }).map((proxy) => {
       const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 
       return {

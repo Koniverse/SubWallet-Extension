@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { AccountProxyTypeTag, CloseIcon, InstructionContainer, InstructionContentType, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, InstructionContainer, InstructionContentType, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-web-ui/components/FilterTabs';
 import { ACCOUNT_EXPORT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -17,7 +17,7 @@ import { FormCallbacks, FormFieldData } from '@subwallet/extension-web-ui/types/
 import { convertFieldToObject } from '@subwallet/extension-web-ui/utils/form/form';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CircleNotch, Export, FloppyDiskBack, GitMerge, Trash } from 'phosphor-react';
+import { Export, GitMerge, Trash } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -115,7 +115,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   const [deleting, setDeleting] = useState(false);
   // @ts-ignore
   const [deriving, setDeriving] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
@@ -235,7 +234,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
 
     if (changeMap[FormFieldName.NAME]) {
       clearTimeout(saveTimeOutRef.current);
-      setSaving(true);
 
       const isValidForm = form.getFieldsError().every((field) => !field.errors.length);
 
@@ -243,8 +241,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         saveTimeOutRef.current = setTimeout(() => {
           form.submit();
         }, 1000);
-      } else {
-        setSaving(false);
       }
     }
   }, [form]);
@@ -254,25 +250,18 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
     const name = values[FormFieldName.NAME];
 
     if (name === accountProxy.name) {
-      setSaving(false);
-
       return;
     }
 
     const accountProxyId = accountProxy.id;
 
     if (!accountProxyId) {
-      setSaving(false);
-
       return;
     }
 
     editAccount(accountProxyId, name.trim())
       .catch((error: Error) => {
         form.setFields([{ name: FormFieldName.NAME, errors: [error.message] }]);
-      })
-      .finally(() => {
-        setSaving(false);
       });
   }, [accountProxy.id, accountProxy.name, form]);
 
@@ -461,10 +450,9 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
                   onBlur={form.submit}
                   placeholder={t('Account name')}
                   suffix={(
-                    <Icon
-                      className={CN({ loading: saving })}
-                      phosphorIcon={saving ? CircleNotch : FloppyDiskBack}
-                      size='sm'
+                    <AccountChainTypeLogos
+                      chainTypes={accountProxy.chainTypes}
+                      className={'__account-item-chain-type-logos'}
                     />
                   )}
                 />
@@ -582,6 +570,12 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { extendToken, token } }:
     '.ant-sw-screen-layout-footer-content': {
       display: 'flex',
       gap: token.sizeSM
+    },
+
+    '.__account-item-chain-type-logos': {
+      minHeight: 20,
+      marginRight: 12,
+      marginLeft: 12
     },
 
     '.account-detail-form, .derivation-info-form': {
