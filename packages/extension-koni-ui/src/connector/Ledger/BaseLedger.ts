@@ -10,7 +10,7 @@ import { LedgerTransportManager } from './LedgerTransportManager';
 export abstract class BaseLedger<T> extends Ledger {
   protected app: T | null = null;
   // readonly #chainId: number;
-  readonly transportManager: LedgerTransportManager = LedgerTransportManager.getInstance();
+  static readonly transportManager: LedgerTransportManager = LedgerTransportManager.getInstance();
   readonly slip44: number;
 
   constructor (slip44: number) {
@@ -43,7 +43,7 @@ export abstract class BaseLedger<T> extends Ledger {
 
   disconnect (): Promise<void> {
     return this.withApp(async (app) => {
-      await this.transportManager.closeTransport();
+      await BaseLedger.transportManager.closeTransport();
     });
   }
 

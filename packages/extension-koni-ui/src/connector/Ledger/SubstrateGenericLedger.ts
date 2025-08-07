@@ -108,7 +108,7 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
 
   getApp = async (): Promise<PolkadotGenericApp> => {
     if (!this.app) {
-      const transport = await this.transportManager.getTransport();
+      const transport = await SubstrateGenericLedger.transportManager.getTransport();
 
       this.app = new PolkadotGenericApp(transport);
     }

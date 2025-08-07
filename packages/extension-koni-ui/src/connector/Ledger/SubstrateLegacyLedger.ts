@@ -100,7 +100,7 @@ export class SubstrateLegacyLedger extends BaseLedger<SubstrateApp> {
 
   getApp = async (): Promise<SubstrateApp> => {
     if (!this.app) {
-      const transport = await this.transportManager.getTransport();
+      const transport = await SubstrateLegacyLedger.transportManager.getTransport();
 
       this.app = newSubstrateApp(transport, this.#ledgerName);
     }

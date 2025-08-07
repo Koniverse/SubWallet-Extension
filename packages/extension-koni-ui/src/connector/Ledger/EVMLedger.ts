@@ -86,7 +86,7 @@ export class EVMLedger extends BaseLedger<EthApp> {
 
   getApp = async (): Promise<EthApp> => {
     if (!this.app) {
-      const transport = await this.transportManager.getTransport();
+      const transport = await EVMLedger.transportManager.getTransport();
 
       this.app = new EthApp(transport);
     }
