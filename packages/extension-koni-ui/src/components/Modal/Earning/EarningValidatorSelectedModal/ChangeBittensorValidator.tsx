@@ -9,10 +9,10 @@ import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } 
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useGetChainAssetInfo, useGetSubnetStakingTokenName, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, formatBalance, getSubnetStakingTokenName, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, Info } from 'phosphor-react';
@@ -53,6 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { poolTargetsMap } = useSelector((state) => state.earning);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const { getSubnetStakingTokenName } = useGetSubnetStakingTokenName();
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -177,8 +178,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
   const subnetToken = useMemo(() => {
-    return getSubnetStakingTokenName(poolChain, poolInfo.metadata.subnetData?.subnetSymbol || '');
-  }, [poolChain, poolInfo.metadata.subnetData?.subnetSymbol]);
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   const renderSubnetStaking = useCallback(() => {
     return (

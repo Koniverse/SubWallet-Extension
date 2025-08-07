@@ -5,9 +5,9 @@ import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
 import { NetworkTag } from '@subwallet/extension-koni-ui/components';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetSubnetStakingTokenName, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ExtraYieldPositionInfo, NetworkType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getSubnetStakingTokenName, isRelatedToAstar } from '@subwallet/extension-koni-ui/utils';
+import { isRelatedToAstar } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -32,6 +32,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
+  const { getSubnetStakingTokenName } = useGetSubnetStakingTokenName();
   const poolInfo = poolInfoMap[slug];
 
   const poolName = useMemo(() => {
@@ -57,8 +58,8 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [positionInfo.subnetData?.subnetShortName]);
 
   const subnetToken = useMemo(() => {
-    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.subnetSymbol || '');
-  }, [poolInfo.chain, poolInfo.metadata.subnetData?.subnetSymbol]);
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   const isSubnetStaking = useMemo(() => YieldPoolType.SUBNET_STAKING.includes(poolInfo.type), [poolInfo.type]);
 
