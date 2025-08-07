@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { Context, contextConfigFor, toPolkadotV2 } from '@snowbridge/api';
+import { assetRegistryFor } from '@snowbridge/registry';
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _Address } from '@subwallet/extension-base/background/KoniTypes';
 import { getWeb3Contract } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
@@ -32,7 +34,28 @@ export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originCh
     kind: 1,
     data: _isChainEvmCompatible(destinationChainInfo) ? recipientAddress : u8aToHex(decodeAddress(recipientAddress))
   };
-  const destinationFee = '0';
+  const environment = 'polkadot_mainnet';
+  const context = new Context(contextConfigFor(environment));
+  const registry = assetRegistryFor(environment);
+
+  const deliveryFee = await toPolkadotV2.getDeliveryFee(
+    context,
+    registry,
+    tokenContract,
+    destinationChainParaId
+  );
+
+  console.log('deliveryFee', deliveryFee);
+  console.log('tokenContract', tokenContract);
+  console.log('destinationChainParaId', destinationChainParaId);
+  console.log('deliveryFee', deliveryFee);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+  const totalFee = await snowBridgeContract.methods.quoteSendTokenFee(tokenContract, destinationChainParaId, deliveryFee.destinationDeliveryFeeDOT).call();
+
+  console.log('totalFee', totalFee);
+
+  const destinationFee = deliveryFee.destinationDeliveryFeeDOT.toString();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
   const transferCall = snowBridgeContract.methods.sendToken(tokenContract, destinationChainParaId, recipient, destinationFee, value);

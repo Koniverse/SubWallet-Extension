@@ -52,6 +52,8 @@
     "@polkadot/util-crypto": "^13.4.3",
     "@polkadot/x-global": "^13.4.3",
     "@reduxjs/toolkit": "^1.9.1",
+    "@snowbridge/api": "^0.2.0",
+    "@snowbridge/registry": "^0.2.0",
     "@sora-substrate/type-definitions": "^1.17.7",
     "@substrate/connect": "^0.8.9",
     "@subwallet-monorepos/subwallet-services-sdk": "^0.1.8",
