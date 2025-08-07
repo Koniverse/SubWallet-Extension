@@ -162,7 +162,7 @@ export interface SimpleSwapValidationMetadata{
   chain: _ChainInfo;
 }
 
-export interface QuoteAskResponse {
+export interface ProcessedQuoteAskResponse {
   quote?: SwapQuote;
   error?: SwapError;
 }
