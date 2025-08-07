@@ -1,7 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY } from '@subwallet/extension-web-ui/constants';
+// Hotfix: Define these keys locally to avoid circular dependency between logo/index.ts and constants/index.ts
+// Do NOT import from constants/index.ts — doing so may cause `undefined` values at runtime
+const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
+const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
 
 export const DefaultLogosMap: Record<string, string> = {
   subwallet: '/images/projects/subwallet.png',

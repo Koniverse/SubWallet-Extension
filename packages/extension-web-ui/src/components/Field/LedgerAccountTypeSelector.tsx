@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
-import { BasicInputWrapper } from '@subwallet/extension-web-ui/components';
+import { BaseModal, BasicInputWrapper } from '@subwallet/extension-web-ui/components';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-web-ui/hooks/form/useSelectModalInputHelper';
 import { ChainItemType, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block } from '@subwallet/react-ui';
+import { Field, Icon, InputRef, Logo, ModalContext, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
@@ -121,7 +121,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           suffix={fieldSuffix}
         />
       </div>
-      <SwModal
+      <BaseModal
         className={className}
         closable={true}
         id={id}
@@ -145,7 +145,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
             </div>
           ))}
         </div>
-      </SwModal>
+      </BaseModal>
     </>
   );
 }

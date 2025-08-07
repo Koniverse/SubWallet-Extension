@@ -1,14 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountTokenAddressItem, CloseIcon, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
+import { AccountTokenAddressItem, BaseModal, CloseIcon, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import { ADDRESS_GROUP_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useNotification } from '@subwallet/extension-web-ui/hooks';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { copyToClipboard } from '@subwallet/extension-web-ui/utils';
-import { Icon, SwList, SwModal } from '@subwallet/react-ui';
+import { Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft, FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
@@ -86,7 +86,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
   }, []);
 
   return (
-    <SwModal
+    <BaseModal
       className={CN(className, 'address-group-modal')}
       closeIcon={
         onBack
@@ -128,7 +128,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           renderWhenEmpty={renderEmpty}
         />
       </div>
-    </SwModal>
+    </BaseModal>
   );
 };
 
