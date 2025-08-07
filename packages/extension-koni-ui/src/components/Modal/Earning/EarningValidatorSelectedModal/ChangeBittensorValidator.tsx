@@ -9,7 +9,7 @@ import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } 
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useGetChainAssetInfo, useGetSubnetStakingTokenName, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
@@ -53,7 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { poolTargetsMap } = useSelector((state) => state.earning);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const { getSubnetStakingTokenName } = useGetSubnetStakingTokenName();
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
   const { t } = useTranslation();
   const notify = useNotification();

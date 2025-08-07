@@ -5,7 +5,7 @@ import { calculateReward } from '@subwallet/extension-base/services/earning-serv
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainAssetInfo, useGetSubnetStakingTokenName, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Logo, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -29,7 +29,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const tvl = poolInfo.statistic?.tvl;
 
   const asset = useGetChainAssetInfo(inputAsset);
-  const { getSubnetStakingTokenName } = useGetSubnetStakingTokenName();
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
   const { currencyData, priceMap } = useSelector((state) => state.price);
 
   const apy = useMemo((): number | undefined => {

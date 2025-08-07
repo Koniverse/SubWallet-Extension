@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-function useGetSubnetStakingTokenName () {
+function useCreateGetSubnetStakingTokenName () {
   const assetRegistryMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
 
   const bittensorMapping = useMemo(() => {
@@ -24,17 +24,13 @@ function useGetSubnetStakingTokenName () {
     return mapping;
   }, [assetRegistryMap]);
 
-  const getSubnetStakingTokenName = (chain: string, netuid: number): string | undefined => {
+  return useCallback((chain: string, netuid: number): string | undefined => {
     if (chain === 'bittensor') {
       return bittensorMapping[`dtao-${netuid}`];
     }
 
     return undefined;
-  };
-
-  return {
-    getSubnetStakingTokenName
-  };
+  }, [bittensorMapping]);
 }
 
-export default useGetSubnetStakingTokenName;
+export default useCreateGetSubnetStakingTokenName;
