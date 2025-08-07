@@ -359,11 +359,7 @@ sequenceDiagram
 ### Future Improvements
 
 1. **Enhanced Caching**: Implement more sophisticated caching strategies for historical data
-2. **WebSocket Support**: Add real-time price streaming via WebSocket connections
-3. **Price Alerts**: Implement price threshold notifications
-4. **Performance Optimization**: Reduce memory footprint for historical data storage
-5. **Additional Providers**: Integrate more price data providers for better redundancy
-6. **Rate Limiting**: Implement intelligent rate limiting to avoid API throttling
+2. **Enhanced Structure**: Reduce memory footprint for historical data storage
 
 ### Data Providers
 
