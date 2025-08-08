@@ -34,28 +34,40 @@ export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originCh
     kind: 1,
     data: _isChainEvmCompatible(destinationChainInfo) ? recipientAddress : u8aToHex(decodeAddress(recipientAddress))
   };
-  const environment = 'polkadot_mainnet';
-  const context = new Context(contextConfigFor(environment));
-  const registry = assetRegistryFor(environment);
 
-  const deliveryFee = await toPolkadotV2.getDeliveryFee(
-    context,
-    registry,
-    tokenContract,
-    destinationChainParaId
-  );
+  let destinationFee: string;
 
-  console.log('deliveryFee', deliveryFee);
-  console.log('tokenContract', tokenContract);
-  console.log('destinationChainParaId', destinationChainParaId);
-  console.log('deliveryFee', deliveryFee);
+  try {
+    const environment = 'polkadot_mainnet';
+    const context = new Context(contextConfigFor(environment));
+    const registry = assetRegistryFor(environment);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-  const totalFee = await snowBridgeContract.methods.quoteSendTokenFee(tokenContract, destinationChainParaId, deliveryFee.destinationDeliveryFeeDOT).call();
+    const deliveryFee = await toPolkadotV2.getDeliveryFee(
+      context,
+      registry,
+      tokenContract,
+      destinationChainParaId
+    );
 
-  console.log('totalFee', totalFee);
+    console.log('deliveryFee', deliveryFee);
+    console.log('tokenContract', tokenContract);
+    console.log('destinationChainParaId', destinationChainParaId);
+    console.log('deliveryFee', deliveryFee);
 
-  const destinationFee = deliveryFee.destinationDeliveryFeeDOT.toString();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+    const totalFee = await snowBridgeContract.methods.quoteSendTokenFee(tokenContract, destinationChainParaId, deliveryFee.destinationDeliveryFeeDOT).call();
+
+    console.log('totalFee', totalFee);
+
+    destinationFee = deliveryFee.destinationDeliveryFeeDOT.toString();
+
+    // Clean up all open connections
+    await context.destroyContext();
+  } catch (error) {
+    console.error('Cannot get snow-bridge delivery fees with error:', error);
+
+    destinationFee = '0';
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
   const transferCall = snowBridgeContract.methods.sendToken(tokenContract, destinationChainParaId, recipient, destinationFee, value);
