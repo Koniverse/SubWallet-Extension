@@ -220,7 +220,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setIsChangeData(true);
       }
 
-      if (originValidator) {
+      if (originValidator && originValidator !== form.getFieldValue('originValidator')) {
         form.setFieldsValue({
           target: undefined
         });
@@ -234,7 +234,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setAmountChange(true);
       }
     },
-    [amountChange, form, defaultData.value]
+    [amountChange, defaultData.value, form]
   );
 
   const notifyTooHighAmount = useCallback(() => {
