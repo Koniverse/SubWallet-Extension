@@ -52,6 +52,17 @@ export class LedgerTransportManager {
     }
   }
 
+  public onTransportDisconnect (callback: () => void): void {
+    if (this.transport) {
+      const disconnectListener = () => {
+        callback();
+        this.transport?.off?.('disconnect', disconnectListener);
+      };
+
+      this.transport.on?.('disconnect', disconnectListener);
+    }
+  }
+
   // eslint-disable-next-line no-useless-constructor
   private constructor () {
     // No implementation needed here

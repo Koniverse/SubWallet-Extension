@@ -35,7 +35,14 @@ export abstract class BaseLedger<T> extends Ledger {
 
   protected wrapError = async<V> (promise: Promise<V>): Promise<V> => {
     try {
-      return await promise;
+      return await Promise.race([
+        promise,
+        new Promise<never>((resolve, reject) => {
+          BaseLedger.transportManager.onTransportDisconnect(() => {
+            reject(new Error('Transport disconnected'));
+          });
+        })
+      ]);
     } catch (e) {
       throw Error(this.mappingError(new Error((e as Error).message)));
     }

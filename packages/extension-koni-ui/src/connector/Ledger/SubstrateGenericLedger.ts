@@ -118,7 +118,14 @@ export class SubstrateGenericLedger extends BaseLedger<PolkadotGenericApp> {
 
   protected override wrapError = async<V> (promise: Promise<V>): Promise<V> => {
     try {
-      const result = await promise as ResponseSign;
+      const result = await Promise.race([
+        promise,
+        new Promise<never>((resolve, reject) => {
+          SubstrateGenericLedger.transportManager.onTransportDisconnect(() => {
+            reject(new Error('Transport disconnected'));
+          });
+        })
+      ]) as ResponseSign;
 
       if (!result.returnCode) {
         return result as V;

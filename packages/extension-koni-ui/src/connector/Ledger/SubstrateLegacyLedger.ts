@@ -110,7 +110,14 @@ export class SubstrateLegacyLedger extends BaseLedger<SubstrateApp> {
 
   protected override wrapError = async <V>(promise: Promise<V>): Promise<V> => {
     try {
-      const result = await promise as ResponseSign;
+      const result = await Promise.race([
+        promise,
+        new Promise<never>((resolve, reject) => {
+          SubstrateLegacyLedger.transportManager.onTransportDisconnect(() => {
+            reject(new Error('Transport disconnected'));
+          });
+        })
+      ]) as ResponseSign;
 
       if (!result.return_code) {
         return result as V;
