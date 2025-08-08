@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AssetLogoMap, ChainLogoMap } from '@subwallet/chain-list';
-import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import { LATEST_CHAIN_PATCH_FETCHING_INTERVAL, md5HashChainAsset, md5HashChainInfo } from '@subwallet/extension-base/services/chain-online-service/constants';
 import { ChainService, filterAssetInfoMap } from '@subwallet/extension-base/services/chain-service';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { fetchPatchData, PatchInfo, randomizeProvider } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isCustomAsset, _isCustomChain, _isEqualSmartContractAsset, _isNativeToken, fetchPatchData, PatchInfo, randomizeProvider } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
@@ -26,6 +27,10 @@ export class ChainOnlineService {
     this.settingService = settingService;
     this.eventService = eventService;
     this.dbService = dbService;
+    this.firstApplied = false;
+  }
+
+  public resetFirstApplied (): void {
     this.firstApplied = false;
   }
 
@@ -76,7 +81,7 @@ export class ChainOnlineService {
 
     for (const [slug, _info] of Object.entries(latestChainInfo)) {
       const { providers: _providers, ...info } = _info;
-      const providers = Object.assign(rs[slug]?.providers || {}, _providers);
+      const providers = rs[slug] ? rs[slug]?.providers : _providers;
 
       rs[slug] = {
         ...info,
@@ -85,6 +90,30 @@ export class ChainOnlineService {
     }
 
     return rs;
+  }
+
+  checkExistedPredefinedChain (latestChainInfoMap: Record<string, _ChainInfo>, genesisHash?: string, evmChainId?: number) {
+    let duplicatedSlug = '';
+
+    if (genesisHash) {
+      for (const chainInfo of Object.values(latestChainInfoMap)) {
+        if (chainInfo.substrateInfo && chainInfo.substrateInfo.genesisHash === genesisHash) {
+          duplicatedSlug = chainInfo.slug;
+        }
+      }
+    } else if (evmChainId) {
+      for (const chainInfo of Object.values(latestChainInfoMap)) {
+        if (chainInfo.evmInfo && chainInfo.evmInfo.evmChainId === evmChainId) {
+          duplicatedSlug = chainInfo.slug;
+        }
+      }
+    }
+
+    return duplicatedSlug;
+  }
+
+  generateSlugForSmartContractAsset (originChain: string, assetType: _AssetType, symbol: string, contractAddress: string) {
+    return `${originChain}-${assetType}-${symbol}-${contractAddress}`;
   }
 
   async handleLatestPatch (latestPatch: PatchInfo) {
@@ -104,37 +133,156 @@ export class ChainOnlineService {
       let assetRegistry: Record<string, _ChainAsset> = structuredClone(this.chainService.getAssetRegistry());
       const currentChainStateMap: Record<string, _ChainState> = structuredClone(this.chainService.getChainStateMap());
       const currentChainStatusMap: Record<string, _ChainApiStatus> = structuredClone(this.chainService.getChainStatusMap());
+      const assetSetting: Record<string, AssetSetting> = structuredClone(await this.chainService.getAssetSettings());
+      const migratedAssetSetting: Record<string, AssetSetting> = {};
       let addedChain: string[] = [];
+      const customChains: string[] = [];
+      const deprecatedChains: string[] = [];
+      const deprecatedChainMap: Record<string, string> = {};
+      const deprecatedAssets: string[] = [];
 
       if (isSafePatch && (!this.firstApplied || currentPatchVersion !== latestPatchVersion)) {
         this.firstApplied = true;
 
         // 2. merge data map
         if (latestChainInfo && Object.keys(latestChainInfo).length > 0) {
+          const storedChainSettings = await this.dbService.getAllChainStore();
+          const storedChainSettingMap: Record<string, IChain> = {};
+
+          storedChainSettings.forEach((chainStoredSetting) => {
+            storedChainSettingMap[chainStoredSetting.slug] = chainStoredSetting;
+          });
+
+          if (storedChainSettings.length > 0) {
+            for (const [storedSlug, storedChainInfo] of Object.entries(storedChainSettingMap)) {
+              if (_isCustomChain(storedSlug)) {
+                const duplicatedDefaultSlug = this.checkExistedPredefinedChain(latestChainInfo, storedChainInfo.substrateInfo?.genesisHash, storedChainInfo.evmInfo?.evmChainId);
+
+                if (duplicatedDefaultSlug.length > 0) {
+                  deprecatedChainMap[storedSlug] = duplicatedDefaultSlug;
+                  deprecatedChains.push(storedSlug);
+
+                  const storedChainState = currentChainStateMap[storedSlug];
+                  const storedChainStatus = currentChainStatusMap[storedSlug];
+
+                  currentChainStateMap[duplicatedDefaultSlug] = {
+                    slug: duplicatedDefaultSlug,
+                    active: storedChainState.active,
+                    currentProvider: randomizeProvider(latestChainInfo[duplicatedDefaultSlug].providers).providerKey,
+                    manualTurnOff: storedChainState.manualTurnOff
+                  };
+                  currentChainStatusMap[duplicatedDefaultSlug] = {
+                    slug: duplicatedDefaultSlug,
+                    connectionStatus: storedChainStatus.connectionStatus,
+                    lastUpdated: Date.now()
+                  };
+
+                  customChains.push(duplicatedDefaultSlug);
+
+                  delete oldChainInfoMap[storedSlug];
+                  delete currentChainStateMap[storedSlug];
+                  delete currentChainStatusMap[storedSlug];
+                }
+              }
+            }
+          }
+
           chainInfoMap = this.mergeChainList(oldChainInfoMap, latestChainInfo);
 
           const [currentChainStateKey, newChainKey] = [Object.keys(currentChainStateMap), Object.keys(chainInfoMap)];
 
-          addedChain = newChainKey.filter((chain) => !currentChainStateKey.includes(chain));
+          addedChain = newChainKey.filter((chain) => !currentChainStateKey.includes(chain) || customChains.includes(chain));
 
           addedChain.forEach((key) => {
-            currentChainStateMap[key] = {
-              active: false,
-              currentProvider: randomizeProvider(chainInfoMap[key].providers).providerKey,
-              manualTurnOff: false,
-              slug: key
-            };
+            if (!currentChainStateMap[key] && !currentChainStatusMap[key]) {
+              currentChainStateMap[key] = {
+                active: false,
+                currentProvider: randomizeProvider(chainInfoMap[key].providers).providerKey,
+                manualTurnOff: false,
+                slug: key
+              };
 
-            currentChainStatusMap[key] = {
-              slug: key,
-              connectionStatus: _ChainConnectionStatus.DISCONNECTED,
-              lastUpdated: Date.now()
-            };
+              currentChainStatusMap[key] = {
+                slug: key,
+                connectionStatus: _ChainConnectionStatus.DISCONNECTED,
+                lastUpdated: Date.now()
+              };
+            }
           });
         }
 
         if (latestAssetInfo && Object.keys(latestAssetInfo).length > 0) {
-          assetRegistry = filterAssetInfoMap(oldChainInfoMap, Object.assign({}, oldAssetRegistry, latestAssetInfo), addedChain);
+          const storedAssetRegistry = await this.dbService.getAllAssetStore();
+          const availableChains = Object.values(chainInfoMap)
+            .filter((info) => (info.chainStatus === _ChainStatus.ACTIVE))
+            .map((chainInfo) => chainInfo.slug);
+
+          let finalAssetRegistry: Record<string, _ChainAsset>;
+
+          if (storedAssetRegistry.length === 0) {
+            finalAssetRegistry = oldAssetRegistry;
+          } else {
+            const mergedAssetRegistry: Record<string, _ChainAsset> = oldAssetRegistry;
+            const parsedStoredAssetRegistry: Record<string, _ChainAsset> = {};
+
+            // Update custom assets of merged custom chains
+            for (const storedAsset of Object.values(storedAssetRegistry)) {
+              if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedChainMap).includes(storedAsset.originChain) && storedAsset.metadata?.contractAddress) {
+                const newOriginChain = deprecatedChainMap[storedAsset.originChain];
+                // const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
+
+                deprecatedAssets.push(storedAsset.slug);
+                parsedStoredAssetRegistry[storedAsset.slug] = {
+                  ...storedAsset,
+                  originChain: newOriginChain
+                };
+              } else {
+                parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;
+              }
+            }
+
+            for (const storedAssetInfo of Object.values(parsedStoredAssetRegistry)) {
+              let duplicated = false;
+              let deprecated = false;
+              let defaultSlugForMigration: string | undefined;
+
+              for (const defaultChainAsset of Object.values(latestAssetInfo)) {
+                // case merge custom asset with default asset
+                if (_isEqualSmartContractAsset(storedAssetInfo, defaultChainAsset)) {
+                  duplicated = true;
+                  defaultSlugForMigration = defaultChainAsset.slug;
+                  break;
+                }
+
+                if (availableChains.indexOf(storedAssetInfo.originChain) === -1) {
+                  deprecated = true;
+                  defaultSlugForMigration = defaultChainAsset.slug;
+                  break;
+                }
+              }
+
+              if (duplicated || deprecated) {
+                if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
+                  const isVisible = assetSetting[storedAssetInfo.slug].visible;
+
+                  if (defaultSlugForMigration) {
+                    migratedAssetSetting[defaultSlugForMigration] = { visible: isVisible };
+                    delete assetSetting[storedAssetInfo.slug];
+                  }
+                }
+
+                delete mergedAssetRegistry[storedAssetInfo.slug];
+
+                deprecatedAssets.push(storedAssetInfo.slug);
+              } else {
+                mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
+              }
+            }
+
+            finalAssetRegistry = mergedAssetRegistry;
+          }
+
+          assetRegistry = filterAssetInfoMap(oldChainInfoMap, Object.assign({}, finalAssetRegistry, latestAssetInfo), addedChain);
         }
 
         // 3. validate data before write
@@ -157,6 +305,13 @@ export class ChainOnlineService {
           this.chainService.subscribeChainStateMap().next(currentChainStateMap);
 
           this.chainService.subscribeChainStatusMap().next(currentChainStatusMap);
+          this.chainService.setAssetSettings({
+            ...assetSetting,
+            ...migratedAssetSetting
+          });
+
+          await this.dbService.removeFromChainStore(deprecatedChains);
+          await this.dbService.removeFromAssetStore(deprecatedAssets);
 
           const storedChainInfoList: IChain[] = Object.keys(chainInfoMap).map((chainSlug) => {
             return {

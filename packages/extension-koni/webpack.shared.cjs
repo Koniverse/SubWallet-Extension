@@ -50,7 +50,8 @@ const _additionalEnv = {
   SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false),
-  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
+  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN),
+  PATCH_CHAIN_LIST_URL: JSON.stringify(process.env.PATCH_CHAIN_LIST_URL)
 };
 
 const additionalEnvDict = {
