@@ -462,6 +462,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       if (part.destChain) {
         form.resetFields(['to']);
         setCurrentTokenPayFee(defaultTokenPayFee);
+        setSelectedTransactionFee(undefined);
       }
 
       if (part.from || part.destChain) {
