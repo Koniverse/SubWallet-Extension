@@ -85,15 +85,31 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     return undefined;
-  }, [feeOptionsInfo?.options, selectedFeeOption]);
+  }, [feeOptionsInfo, selectedFeeOption]);
+
+  const minRequiredMaxFeePerGas = useMemo(() => {
+    if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo && feeOptionsInfo.baseGasFee) {
+      const baseGasFee = new BigN(feeOptionsInfo.baseGasFee);
+      const priorityFee = new BigN(feeDefaultValue?.maxPriorityFeePerGas || 0);
+
+      return baseGasFee.multipliedBy(1.5).plus(priorityFee);
+    }
+
+    return undefined;
+  }, [feeOptionsInfo, feeDefaultValue]);
 
   const formDefault = useMemo((): FormProps => {
     return {
       customValue: '',
-      maxFeeValue: feeDefaultValue?.maxFeePerGas,
+      maxFeeValue: (() => {
+        const maxFeeDefault = new BigN(feeDefaultValue?.maxFeePerGas || 0);
+        const minFeeRequired = new BigN(minRequiredMaxFeePerGas || 0);
+
+        return maxFeeDefault.gt(minFeeRequired) ? maxFeeDefault.toString() : minFeeRequired.toString();
+      })(),
       priorityFeeValue: feeDefaultValue?.maxPriorityFeePerGas
     };
-  }, [feeDefaultValue?.maxFeePerGas, feeDefaultValue?.maxPriorityFeePerGas]);
+  }, [feeDefaultValue?.maxFeePerGas, feeDefaultValue?.maxPriorityFeePerGas, minRequiredMaxFeePerGas]);
 
   const maxFeePerGas = Form.useWatch('maxFeeValue', form);
 
@@ -203,12 +219,26 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       return Promise.reject(t('The priority fee must be equal or greater than 0'));
     }
 
+    const fastOption = feeOptionsInfo?.options?.fast as EvmEIP1559FeeOption;
+
+    if (fastOption?.maxPriorityFeePerGas) {
+      const fastPriorityMax = new BigN(fastOption.maxPriorityFeePerGas).multipliedBy(2);
+
+      if (new BigN(value).gt(fastPriorityMax)) {
+        return Promise.reject(t('Priority fee is higher than necessary. You may pay more than needed'));
+      }
+    }
+
     return Promise.resolve();
-  }, [t]);
+  }, [feeOptionsInfo?.options?.fast, t]);
 
   const customMaxFeeValidator = useCallback((rule: Rule, value: string): Promise<void> => {
     if (!value) {
       return Promise.reject(t('Amount is required'));
+    }
+
+    if ((new BigN(value)).lte(BN_ZERO)) {
+      return Promise.reject(t('The maximum fee must be greater than 0'));
     }
 
     const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
@@ -219,14 +249,21 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
 
     if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo) {
       const baseGasFee = feeOptionsInfo.baseGasFee;
-      const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5);
+      const priorityBN = new BigN(priorityFeeValue || 0);
+      const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5).plus(priorityBN);
 
       if (baseGasFee && value && new BigN(value).lte(minFee)) {
         return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minFee, 9, (s) => s) } }));
       }
 
-      if ((new BigN(value)).lte(BN_ZERO)) {
-        return Promise.reject(t('The maximum fee must be greater than 0'));
+      const fastOption = feeOptionsInfo?.options?.fast as EvmEIP1559FeeOption;
+
+      if (fastOption?.maxFeePerGas) {
+        const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
+
+        if (new BigN(value).gt(fastMax) && fastMax.gt(minFee)) {
+          return Promise.reject(t('Max fee is higher than necessary'));
+        }
       }
     }
 
@@ -326,7 +363,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       >
         <AmountInput
           decimals={9}
-          defaultValue={feeDefaultValue?.maxFeePerGas}
+          defaultValue={formDefault.maxFeeValue}
           label='Max fee (GWEI)'
           maxValue={'0'}
           placeholder='Enter amount'
@@ -344,7 +381,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       >
         <AmountInput
           decimals={9}
-          defaultValue={feeDefaultValue?.maxPriorityFeePerGas}
+          defaultValue={formDefault.priorityFeeValue}
           label='Priority fee (GWEI)'
           maxValue={'0'}
           placeholder='Enter amount'
