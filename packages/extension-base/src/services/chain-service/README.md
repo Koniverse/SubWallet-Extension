@@ -10,6 +10,7 @@ The Chain Service centralizes blockchain management by:
 - Coordinating asset registries and metadata
 - Providing subscription mechanisms for real-time updates
 - Managing chain states and connection statuses
+- Integrating with the Chain Online Service for automatic updates from remote data sources
 
 ## Architecture
 
@@ -36,20 +37,28 @@ graph LR
     DataMap --> AssetRegistry[assetRegistry]
     DataMap --> AssetRefMap[assetRefMap]
 
+    ChainOnlineService[ChainOnlineService] --> CS
+    ChainOnlineService --> PatchAPI[Chain Patch API]
+    ChainOnlineService --> SettingService[SettingService]
+    PatchAPI --> RemoteChainData[Remote Chain Data]
+
     classDef service fill:#e1f5fe
     classDef handler fill:#f3e5f5
     classDef api fill:#e8f5e8
     classDef data fill:#fff3e0
+    classDef online fill:#e8f9f5
     
-    class CS,DBService,EventService service
+    class CS,DBService,EventService,SettingService service
     class SubstrateHandler,EvmHandler,BitcoinHandler,TonHandler,CardanoHandler,MantaHandler handler
     class SubstrateApi,EvmApi,BitcoinApi,TonApi,CardanoApi api
     class DataMap,ChainInfoMap,ChainStateMap,AssetRegistry,AssetRefMap data
+    class ChainOnlineService,PatchAPI,RemoteChainData online
 ```
 
 ### Service Components
 
 - **[Chain Service](index.ts)**: Main service orchestrating all chain operations
+- **[Chain Online Service](../chain-online-service/index.ts)**: Manages remote chain data updates and patch synchronization
 - **Chain Handlers**: Type-specific handlers for different blockchain architectures
 - **API Adapters**: Low-level blockchain API interfaces
 - **Data Management**: Centralized state and configuration management
@@ -133,6 +142,137 @@ interface _ChainState {
 ```
 
 **Source**: [types.ts:42-47](types.ts)
+
+## Chain Online Service Integration
+
+The Chain Service integrates with the Chain Online Service to automatically receive updates for chain configurations, asset registries, and provider information from remote data sources.
+
+### Patch Update Architecture
+
+```mermaid
+graph LR
+    PatchAPI[Chain Patch API] --> ChainOnlineService[ChainOnlineService]
+    ChainOnlineService --> ValidationLayer[Patch Validation]
+    ValidationLayer --> DataMerge[Data Merging]
+    DataMerge --> CS[ChainService]
+    CS --> Database[Database Update]
+    CS --> Subscriptions[Subject Updates]
+    
+    ChainOnlineService --> HashValidation[MD5 Hash Validation]
+    ChainOnlineService --> VersionControl[Version Management]
+    
+    classDef online fill:#e8f9f5
+    classDef validation fill:#fff3e0
+    classDef storage fill:#e1f5fe
+    
+    class PatchAPI,ChainOnlineService online
+    class ValidationLayer,HashValidation,VersionControl,DataMerge validation
+    class CS,Database,Subscriptions storage
+```
+
+### Online Update Properties
+
+| Name | Type | Purpose |
+|------|------|---------|
+| `lockChainInfoMap` | `boolean` | Prevents concurrent modifications during patch updates |
+| `refreshLatestChainDataTimeOut` | `NodeJS.Timer` | Periodic timer for checking remote data updates |
+
+**Source**: [index.ts:87](index.ts), [../chain-online-service/index.ts:22](../chain-online-service/index.ts)
+
+### Patch Data Types
+
+```typescript
+interface PatchInfo {
+  patchVersion: string;
+  appliedVersion: string;
+  fetchedDate: string;
+  ChainInfo: Record<string, _ChainInfo>;
+  ChainInfoHashMap: Record<string, string>;
+  ChainAsset: Record<string, _ChainAsset>;
+  ChainAssetHashMap: Record<string, string>;
+  MultiChainAsset: Record<string, _MultiChainAsset>;
+  MultiChainAssetHashMap: Record<string, string>;
+  ChainLogoMap: Record<string, string>;
+  AssetLogoMap: Record<string, string>;
+}
+```
+
+**Source**: [utils/patch.ts:14-25](utils/patch.ts)
+
+### Lock Management Methods
+
+#### `getlockChainInfoMap()`
+Retrieves the current lock status of the chain info map.
+
+**Output Response**: `boolean`
+
+**Source**: [index.ts:211-212](index.ts)
+
+#### `setLockChainInfoMap(isLock: boolean)`
+Sets the lock status for the chain info map to prevent concurrent modifications.
+
+**Input Parameters**:
+- `isLock`: Boolean indicating whether to lock or unlock
+
+**Source**: [index.ts:215-216](index.ts)
+
+### Data Update Methods
+
+#### `checkLatestData()`
+Initiates periodic checking for remote chain data updates.
+
+**Flow**:
+1. Clears existing timeout intervals
+2. Immediately fetches latest data
+3. Sets up recurring interval for continuous updates
+
+**Source**: [index.ts:801-804](index.ts)
+
+#### `handleLatestData()`
+Processes and applies remote chain data updates.
+
+**Flow**:
+1. Locks chain info map for safe updates
+2. Fetches latest chain information
+3. Validates and merges data
+4. Updates database and subscriptions
+5. Unlocks chain info map
+
+**Source**: [index.ts:927-958](index.ts)
+
+### State.ts Orchestration Methods
+
+#### `resumeAllNetworks()`
+Resumes all network connections and triggers online data updates during network recovery.
+
+**Flow**:
+1. Triggers chain online service data check
+2. Resumes all chain API connections
+3. Updates provider configurations with latest online data
+
+**Source**: [../../koni/background/handlers/State.ts:1046-1049](../../koni/background/handlers/State.ts)
+
+#### `resetWallet(resetAll: boolean)`
+Resets wallet state and reinitializes with latest online chain data.
+
+**Flow**:
+1. Resets all services and databases
+2. Reinitializes chain service
+3. Triggers online data updates for fresh configuration
+4. Subscribes to chain info updates
+
+**Source**: [../../koni/background/handlers/State.ts:2180-2207](../../koni/background/handlers/State.ts)
+
+#### `init()`
+Main application initialization that coordinates online service startup.
+
+**Flow**:
+1. Initializes core services
+2. Triggers chain online service data check
+3. Triggers chain service data updates
+4. Sets up chain info subscription monitoring
+
+**Source**: [../../koni/background/handlers/State.ts:302-332](../../koni/background/handlers/State.ts)
 
 ## Methods
 
@@ -338,6 +478,74 @@ sequenceDiagram
     Subject-->>UI: asset registry updated
 ```
 
+### Online Patch Update Flow
+
+```mermaid
+sequenceDiagram
+    participant Timer as Timer
+    participant COS as ChainOnlineService
+    participant API as Patch API
+    participant CS as ChainService
+    participant DB as DatabaseService
+    participant Subject as Subjects
+
+    Timer->>COS: checkLatestData() (periodic)
+    COS->>API: fetchPatchData()
+    API-->>COS: PatchInfo with latest data
+    
+    COS->>COS: validatePatchWithHash()
+    alt Valid Patch
+        COS->>COS: check patch version
+        alt New Version
+            COS->>CS: setLockChainInfoMap(true)
+            COS->>COS: mergeChainList()
+            COS->>COS: validatePatchBeforeStore()
+            alt Valid Data
+                COS->>CS: setChainInfoMap()
+                COS->>CS: setAssetRegistry()
+                COS->>CS: setChainStateMap()
+                CS->>Subject: notify all subjects
+                CS->>DB: bulkUpdateChainStore()
+                CS->>DB: bulkUpdateAssetsStore()
+                COS->>CS: setLockChainInfoMap(false)
+            end
+        end
+    end
+```
+
+### State.ts Orchestrated Online Update Flow
+
+```mermaid
+sequenceDiagram
+    participant State as KoniState
+    participant COS as ChainOnlineService
+    participant CS as ChainService
+    participant API as Patch API
+    participant Providers as Chain Providers
+
+    Note over State: Application Initialization
+    State->>CS: init()
+    State->>COS: checkLatestData()
+    State->>CS: checkLatestData()
+    
+    Note over State: Network Resumption
+    State->>COS: checkLatestData()
+    State->>CS: resumeAllChainApis()
+    CS->>Providers: reconnect with updated configs
+    
+    Note over State: Wallet Reset
+    State->>CS: resetWallet()
+    State->>CS: init()
+    State->>COS: checkLatestData()
+    State->>CS: checkLatestData()
+    
+    Note over COS,CS: Online Data Updates
+    COS->>API: fetchPatchData()
+    API-->>COS: latest provider configs
+    COS->>CS: update chain providers
+    CS->>Providers: apply new provider endpoints
+```
+
 ## Notes
 
 ### Known Issues
@@ -351,19 +559,38 @@ sequenceDiagram
 3. **API Retry Logic**: Connection retry mechanisms may not handle all edge cases for unstable network conditions.
    - **Location**: Chain handler implementations
 
+4. **Patch Update Failures**: Online patch updates may fail due to network issues or data validation errors, requiring manual intervention.
+   - **Location**: [../chain-online-service/index.ts](../chain-online-service/index.ts)
+
+5. **Hash Validation Sensitivity**: MD5 hash validation for patch data is sensitive to minor formatting differences that could cause legitimate updates to be rejected.
+   - **Location**: [../chain-online-service/constants.ts](../chain-online-service/constants.ts)
+
+6. **Coordination Timing**: State.ts triggers multiple online update calls during initialization and reset operations, which could lead to redundant network requests.
+   - **Location**: [../../koni/background/handlers/State.ts](../../koni/background/handlers/State.ts)
+
+7. **Provider Update Race Conditions**: Simultaneous provider updates from online sources and manual configuration changes may cause inconsistent states.
+   - **Location**: Chain service and online service integration points
+
 ### Performance Considerations
 
 - **Concurrent API Initialization**: The service initializes multiple chain APIs concurrently, which can cause resource contention on slower devices.
 - **Memory Usage**: Each active chain maintains its own API instance and metadata cache.
 - **Database Queries**: Frequent chain state updates may create database performance bottlenecks.
+- **Online Patch Updates**: Periodic remote data fetching and validation can consume bandwidth and processing resources.
+- **Lock Contention**: Chain info map locking during patch updates may temporarily block other chain operations.
+- **Multiple Update Triggers**: State.ts triggers online updates during initialization, network resumption, and wallet reset, potentially causing redundant API calls.
+- **Provider Reconfiguration Overhead**: Online provider updates may trigger chain API reconnections, causing temporary service interruptions.
 
 ### Future Improvements
 
 1. **Connection Pooling**: Implement connection pooling for better resource management
 2. **Lazy Loading**: Add lazy loading for chain APIs to reduce initial startup time
-3. **Health Monitoring**: Enhanced chain health monitoring and automatic failover
-4. **Metadata Caching**: Improved metadata caching strategies to reduce network requests
+3. **Health Monitoring**: Enhanced chain health monitoring and automatic failover and re-enable report API
+4. **Lifetime Update**: Update in lifetime without make app stop.
 5. **Error Recovery**: More sophisticated error recovery mechanisms for different failure scenarios
+6. **Smart Update Coordination**: Implement intelligent update coordination in State.ts to avoid redundant online data requests
+7. **Provider Update Debouncing**: Add debouncing mechanism for provider updates to prevent rapid successive reconfigurations
+8. **Graceful Provider Switching**: Implement seamless provider transitions without service interruptions during online updates (Update in chain connections)
 
 ### Dependencies
 
@@ -378,3 +605,6 @@ sequenceDiagram
 - Provides data to `BalanceService`, `EarningService`, and `SwapService`
 - Coordinates with `DatabaseService` for persistent storage
 - Communicates through `EventService` for cross-service notifications
+- Integrates with `ChainOnlineService` for automatic remote data updates
+- Managed by `SettingService` for patch version tracking and configuration
+- Orchestrated by `KoniState` which coordinates online updates during initialization, network resumption, and wallet reset operations
