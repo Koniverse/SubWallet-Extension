@@ -23,6 +23,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'warning',
+      needCloseLedger: true,
       message: t('Please unlock your Ledger')
     };
   }

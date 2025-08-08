@@ -5,6 +5,7 @@ import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-koni-ui/connector';
+import { LedgerTransportManager } from '@subwallet/extension-koni-ui/connector/Ledger/LedgerTransportManager';
 import { SubstrateECDSALedger } from '@subwallet/extension-koni-ui/connector/Ledger/SubstrateECDSALedger';
 import { isLedgerCapable, ledgerIncompatible, NotNeedMigrationGens } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -178,6 +179,10 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
   const handleError = useCallback((error: Error, expandError = true, isGetAddress = false) => {
     const convertedError = convertLedgerError(error, t, appName, isSigning, expandError, isGetAddress);
     const message = convertedError.message;
+
+    if (convertedError.needCloseLedger) {
+      LedgerTransportManager.getInstance().closeTransport().catch(console.error);
+    }
 
     switch (convertedError.status) {
       case 'error':
