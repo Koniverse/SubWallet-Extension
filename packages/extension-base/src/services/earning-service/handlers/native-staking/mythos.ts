@@ -58,13 +58,14 @@ function calculateNetworkApy (totalStake: BigN) {
 }
 
 export default class MythosNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  public override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   /* Subscribe pool info */

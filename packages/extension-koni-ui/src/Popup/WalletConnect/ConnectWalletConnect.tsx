@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WALLET_CONNECT_SESSION_TIMEOUT } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { CloseIcon, Layout, QrScannerErrorNotice, WalletConnect } from '@subwallet/extension-koni-ui/components';
 import { TIME_OUT_RECORD } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useOpenQrScanner } from '@subwallet/extension-koni-ui/hooks';
@@ -76,7 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const timeOutRecord = getTimeOutRecords();
 
     if (loading && !isActiveModal && !timeOutRecord[keyRecords]) {
-      idTimeOut = setTimeout(reOpenModalWhenTimeOut, 20000);
+      idTimeOut = setTimeout(reOpenModalWhenTimeOut, WALLET_CONNECT_SESSION_TIMEOUT);
       setTimeOutRecords({ ...timeOutRecord, [keyRecords]: idTimeOut });
     } else if (timeOutRecord[keyRecords]) {
       setLoading(false);

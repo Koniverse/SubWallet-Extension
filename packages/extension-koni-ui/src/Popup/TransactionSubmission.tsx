@@ -36,9 +36,8 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
 
   const messages = useMemo<string[]>(() => {
     return [
-      t('Transaction in process. Hit "View process" to view step-by-step details'),
-      t('Hanging in there...'),
-      t('Pro tip: You can hit "View process" to view step-by-step details of your transaction')
+      t('Tip: Hit “View process” to view step-by-step details of your swap'),
+      t('Hanging in there...')
     ];
   }, [t]);
 
@@ -63,7 +62,10 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
         />
       </div>
       <div className='title'>
-        {t('Do not close the app!')}
+        {t('Swap in process')}
+      </div>
+      <div className='subtitle'>
+        {t('DO NOT close the app!')}
       </div>
       <div className='description'>
         {messages[messageIndex]}
@@ -185,7 +187,7 @@ const Component: React.FC<Props> = (props: Props) => {
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={t('Submitted')}
+        title={isSwapProcessing ? t('Swap') : t('Submitted')}
       >
         {!processData && (
           <LoadingScreen />
@@ -251,6 +253,18 @@ const TransactionSubmission = styled(Component)<Props>(({ theme: { token } }: Pr
       '.container': {
         paddingLeft: token.padding,
         paddingRight: token.padding
+      },
+
+      '.title': {
+        marginBottom: token.marginXXS
+      },
+
+      '.subtitle': {
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        color: token.colorTextLight1,
+        marginBottom: token.margin,
+        fontWeight: token.headingFontWeight
       },
 
       '.description': {
