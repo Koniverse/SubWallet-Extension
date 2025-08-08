@@ -247,28 +247,22 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       return Promise.reject(t('Max fee cannot be lower than priority fee'));
     }
 
-    if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo) {
-      const baseGasFee = feeOptionsInfo.baseGasFee;
-      const priorityBN = new BigN(priorityFeeValue || 0);
-      const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5).plus(priorityBN);
+    if (minRequiredMaxFeePerGas && value && new BigN(value).lte(minRequiredMaxFeePerGas)) {
+      return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
+    }
 
-      if (baseGasFee && value && new BigN(value).lte(minFee)) {
-        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minFee, 9, (s) => s) } }));
-      }
+    const fastOption = feeOptionsInfo?.options?.fast as EvmEIP1559FeeOption;
 
-      const fastOption = feeOptionsInfo?.options?.fast as EvmEIP1559FeeOption;
+    if (minRequiredMaxFeePerGas && fastOption?.maxFeePerGas) {
+      const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
 
-      if (fastOption?.maxFeePerGas) {
-        const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
-
-        if (new BigN(value).gt(fastMax) && fastMax.gt(minFee)) {
-          return Promise.reject(t('Max fee is higher than necessary'));
-        }
+      if (new BigN(value).gt(fastMax) && fastMax.gt(minRequiredMaxFeePerGas)) {
+        return Promise.reject(t('Max fee is higher than necessary'));
       }
     }
 
     return Promise.resolve();
-  }, [feeOptionsInfo, form, t]);
+  }, [feeOptionsInfo, form, minRequiredMaxFeePerGas, t]);
 
   const onValuesChange: FormCallbacks<FormProps>['onValuesChange'] = useCallback(
     (part: Partial<FormProps>, values: FormProps) => {
