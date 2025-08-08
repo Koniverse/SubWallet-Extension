@@ -14,7 +14,7 @@ import { getInternalError, getSdkError } from '@walletconnect/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
-import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SESSION_TIMEOUT, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
+import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SESSION_TIMEOUT, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
 
@@ -86,7 +86,17 @@ export default class WalletConnectService {
     this.#removeListener();
 
     if (force || await this.haveData()) {
-      this.#client = await SignClient.init(this.#option);
+      try {
+        this.#client = await SignClient.init(this.#option);
+      } catch (e) {
+        if (this.#option.relayUrl === RELAY_URL) {
+          this.#option = { ...this.#option, relayUrl: RELAY_FALLBACK_URL };
+
+          this.#client = await SignClient.init(this.#option);
+        } else {
+          throw e;
+        }
+      }
     }
 
     this.#updateSessions();
