@@ -169,7 +169,6 @@ export class SwapService implements StoppableServiceInterface {
       };
     }
 
-    console.log('optimalProcess', optimalProcess);
     console.groupEnd();
 
     if (JSON.stringify(processStepsToPathActions(optimalProcess.steps)) !== JSON.stringify(optimalProcess.path.map((e) => e.action))) {

@@ -101,8 +101,6 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
 
     const result = depositAddressResponse.result;
 
-    console.log('simpleswapID', result.id);
-
     if (!result?.id || !result.addressFrom || !result.amountTo) {
       return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
     }
