@@ -23,7 +23,7 @@ import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } 
 import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
-import { EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { EvmEIP1559FeeDetail, EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
@@ -554,4 +554,19 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     id: id,
     error
   };
+};
+
+export const isEvmEIP1559FeeDetail = (
+  fee: FeeDetail | undefined
+): fee is EvmEIP1559FeeDetail => {
+  return (
+    !!fee &&
+    fee.type === 'evm' &&
+    'baseGasFee' in fee &&
+    typeof fee.baseGasFee === 'string' &&
+    'options' in fee &&
+    !!fee.options &&
+    typeof fee.options === 'object' &&
+    fee.gasPrice === undefined
+  );
 };
