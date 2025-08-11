@@ -242,11 +242,12 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant D as dApp
+    participant U as User
     participant W as WalletConnectService
     participant R as RequestService
-    participant U as User
     
-    D->>W: connect(uri)
+    D->>U: Create request connect uri
+    U->>W: connect(uri)
     W->>W: initClient(force=true)
     W->>W: client.pair(uri)
     
@@ -256,11 +257,11 @@ sequenceDiagram
     R->>U: Show session approval UI
     
     alt User approves
-        U->>W: approveSession(result)
+        R->>W: approveSession(result)
         W->>W: client.approve(result)
         W-->>D: Session established
     else User rejects
-        U->>W: rejectSession(id)
+        R->>W: rejectSession(id)
         W->>W: client.reject()
         W-->>D: Session rejected
     end
