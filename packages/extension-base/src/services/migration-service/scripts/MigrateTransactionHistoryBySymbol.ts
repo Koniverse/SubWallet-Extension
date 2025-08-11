@@ -13,7 +13,6 @@ export default class MigrateTransactionHistoryBySymbol extends BaseMigrationJob 
         'bifrost_testnet-NATIVE-BNC': 'bifrost_testnet-NATIVE-BFC',
         'energy_web_x_rococo-NATIVE-VT': 'energy_web_x_rococo-NATIVE-EWT',
         'chainflip_dot-NATIVE-DOT': 'chainflip_dot-NATIVE-Unit',
-        'commune-NATIVE-COMAI': 'commune-NATIVE-C',
         'autonomys_taurus-NATIVE-AI3': 'autonomys_taurus-NATIVE-tAI3',
         'fraxtal-NATIVE-frxETH': 'fraxtal-ERC20-frxETH-0xFC00000000000000000000000000000000000006'
       };
