@@ -5,25 +5,45 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { calculateAlephZeroValidatorReturn, calculateChainStakedReturnV2, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getAvgValidatorEraReward, getCommission, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getRelayBlockedValidatorList, getRelayEraRewardMap, getRelayMaxNominations, getRelayTopValidatorByPoints, getRelayValidatorPointsMap, getRelayWaitingValidatorList, getSupportedDaysByHistoryDepth } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, _SUPPORT_CHANGE_VALIDATOR_CHAIN, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
 import { applyDecimal, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
-import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
-import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import BaseNativeStakingPoolHandler from './base';
 
 export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPoolHandler {
+  override availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: true,
+    withdraw: true,
+    claimReward: false,
+    changeValidator: false
+  };
+
+  constructor (state: KoniState, chain: string) {
+    super(state, chain);
+
+    if (_SUPPORT_CHANGE_VALIDATOR_CHAIN.includes(chain)) {
+      this.availableMethod = {
+        ...this.availableMethod,
+        changeValidator: true
+      };
+    }
+  }
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
@@ -160,7 +180,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
   /* Subscribe pool position */
 
-  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN, _deriveSessionProgress: DeriveSessionProgress): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chain = chainInfo.slug;
 
     const [_nominations, _bonded, _activeEra] = await Promise.all([
@@ -241,6 +261,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       return [];
     }
 
+    const substrateIdentityApi = this.substrateIdentityApi;
     const validatorList = nominations.targets;
 
     await Promise.all(validatorList.map(async (validatorAddress) => {
@@ -250,7 +271,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
       if (substrateApi.api.query.staking.erasStakersPaged) { // todo: review all relaychains later
         const [[_identity], _eraStaker] = await Promise.all([
-          parseIdentity(substrateApi, validatorAddress),
+          parseIdentity(substrateIdentityApi, validatorAddress),
           substrateApi.api.query.staking.erasStakersPaged.entries(currentEra, validatorAddress)
         ]);
 
@@ -258,7 +279,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
         eraStakerOtherList = _eraStaker.flatMap((paged) => (paged[1].toPrimitive() as unknown as SpStakingExposurePage).others);
       } else {
         const [[_identity], _eraStaker] = await Promise.all([
-          parseIdentity(substrateApi, validatorAddress),
+          parseIdentity(substrateIdentityApi, validatorAddress),
           substrateApi.api.query.staking.erasStakers(currentEra, validatorAddress)
         ]);
 
@@ -311,7 +332,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       }
 
       if (ledgers) {
-        const [_currentEra, _minimumActiveStake, _minNominatorBond, _deriveSessionProgress] = await Promise.all([
+        const [_currentEra, _minimumActiveStake, _minNominatorBond] = await Promise.all([
           substrateApi.api.query?.staking?.currentEra(),
           substrateApi.api.query?.staking?.minimumActiveStake && substrateApi.api.query?.staking?.minimumActiveStake(),
           substrateApi.api.query?.staking?.minNominatorBond(),
@@ -330,7 +351,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
           const ledger = _ledger.toPrimitive() as unknown as PalletStakingStakingLedger;
 
           if (ledger) {
-            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake, _deriveSessionProgress);
+            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake);
 
             resultCallback({
               ...defaultInfo,
@@ -363,12 +384,33 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.staking?.ledger?.multi?.(useAddresses);
+
+    if (ledgers) {
+      for (let i = 0; i < useAddresses.length; i++) {
+        const address = useAddresses[i];
+        const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
+
+        if (_ledger && _ledger.total > 0) {
+          result.push(address);
+        }
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */
 
   async getPoolTargets (): Promise<ValidatorInfo[]> {
     const chainApi = await this.substrateApi.isReady;
+    const substrateIdentityApi = this.substrateIdentityApi;
     const poolInfo = await this.getPoolInfo();
 
     if (!poolInfo || !poolInfo.statistic) {
@@ -440,7 +482,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const [_commissionInfo, [identity, isVerified]] = await Promise.all([
         chainApi.api.query.staking.validators(address),
-        parseIdentity(chainApi, address)
+        parseIdentity(substrateIdentityApi, address)
       ]);
 
       const commissionInfo = _commissionInfo.toHuman() as Record<string, any>;
@@ -798,15 +840,12 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     if (chainApi.api.tx.staking.withdrawUnbonded.meta.args.length === 1) {
       let slashingSpanCount: string | number;
 
-      if (chainApi.api.query.staking.nominatorSlashInEra) {
-        const currentEra = await chainApi.api.query.staking.currentEra();
-        const slashingSpans = (await chainApi.api.query.staking.nominatorSlashInEra(currentEra.toPrimitive(), address)).toPrimitive() as number;
-
-        slashingSpanCount = slashingSpans !== null ? slashingSpans.toString() : '0';
-      } else {
+      if (chainApi.api.query.staking.slashingSpans) {
         const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
 
         slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      } else {
+        slashingSpanCount = chainApi.api.consts.staking.historyDepth.toPrimitive();
       }
 
       return chainApi.api.tx.staking.withdrawUnbonded(slashingSpanCount);
@@ -816,5 +855,18 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
   }
 
+  override async handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+    const { selectedValidators } = data as SubmitJoinNativeStaking;
+
+    if (!selectedValidators || selectedValidators.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const validatorParamList = selectedValidators.map((validator) => validator.address);
+    const nominateTx = chainApi.api.tx.staking.nominate(validatorParamList);
+
+    return nominateTx;
+  }
   /* Other actions */
 }

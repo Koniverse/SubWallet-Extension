@@ -14,13 +14,9 @@ export const postRequest = (url: string, body: any, headers?: Record<string, str
 };
 
 export const getRequest = (url: string, params?: Record<string, string>, headers?: Record<string, string>) => {
-  const queryString = params
-    ? Object.keys(params)
-      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-      .join('&')
-    : '';
+  const q = new URLSearchParams(params);
 
-  const _url = `${url}?${queryString}`;
+  const _url = `${url}?${q.toString()}`;
 
   return fetch(_url, {
     method: 'GET',
