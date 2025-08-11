@@ -6909,6 +6909,7 @@ __metadata:
     "@subwallet/extension-mocks": ^1.3.52-0
     "@subwallet/keyring": ^0.1.13
     "@subwallet/react-ui": 5.1.2-b77
+    "@subwallet/subsquare-api-sdk": ^1.3.12-1
     "@subwallet/ui-keyring": ^0.1.13
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
@@ -7220,7 +7221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/subsquare-api-sdk@workspace:packages/subsquare-api-sdk":
+"@subwallet/subsquare-api-sdk@^1.3.12-1, @subwallet/subsquare-api-sdk@workspace:packages/subsquare-api-sdk":
   version: 0.0.0-use.local
   resolution: "@subwallet/subsquare-api-sdk@workspace:packages/subsquare-api-sdk"
   dependencies:
@@ -7229,16 +7230,6 @@ __metadata:
     typescript: ^5.9.2
   languageName: unknown
   linkType: soft
-
-"@subwallet/subwallet-api-sdk@npm:^1.3.51-0":
-  version: 1.3.51-0
-  resolution: "@subwallet/subwallet-api-sdk@npm:1.3.51-0"
-  dependencies:
-    "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.109
-  checksum: 1d9a729c0c2b13f01b227dd3fdff9b28c440193d92ced1e871024bb084368d289dcd838bc9c8b9ce239fa8aada2d4b8dfd98f91d6d521e34e2eb53db2fc5cf77
-  languageName: node
-  linkType: hard
 
 "@subwallet/ui-keyring@npm:^0.1.13":
   version: 0.1.13
