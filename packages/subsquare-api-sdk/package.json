@@ -14,9 +14,6 @@
   "types": "build/index.d.ts",
   "version": "1.3.12-1",
   "main": "build/index.js",
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json"
-  },
   "dependencies": {
     "@polkadot/util": "^13.4.3",
     "axios": "^1.11.0"
