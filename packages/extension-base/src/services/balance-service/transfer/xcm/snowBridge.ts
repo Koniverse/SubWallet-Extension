@@ -54,12 +54,12 @@ export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originCh
     console.log('destinationChainParaId', destinationChainParaId);
     console.log('deliveryFee', deliveryFee);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-    const totalFee = await snowBridgeContract.methods.quoteSendTokenFee(tokenContract, destinationChainParaId, deliveryFee.destinationDeliveryFeeDOT).call();
+    // // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+    // const totalFee = await snowBridgeContract.methods.quoteSendTokenFee(tokenContract, destinationChainParaId, deliveryFee.destinationDeliveryFeeDOT + deliveryFee.destinationExecutionFeeDOT).call();
+    //
+    // console.log('totalFee', totalFee);
 
-    console.log('totalFee', totalFee);
-
-    destinationFee = deliveryFee.destinationDeliveryFeeDOT.toString();
+    destinationFee = (deliveryFee.destinationDeliveryFeeDOT + deliveryFee.destinationExecutionFeeDOT).toString();
 
     // Clean up all open connections
     await context.destroyContext();
