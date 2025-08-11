@@ -211,7 +211,7 @@ function Component (): React.ReactElement {
       const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
       const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
       const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
-      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE].includes(currentAcc.chainTypes[0]);
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE, AccountChainType.BITCOIN].includes(currentAcc.chainTypes[0]);
       const invalidSoloAccount = isSoloAccount && !validEcosystem;
 
       return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
