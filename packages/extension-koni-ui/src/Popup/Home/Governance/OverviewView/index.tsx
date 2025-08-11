@@ -2,15 +2,40 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+import { NetworkSelector } from './parts/NetworkSelector';
+import { QuickActionsContainer } from './parts/QuickActionsContainer';
+import { ReferendaList } from './parts/ReferendaList';
+import { Toolbar } from './parts/Toolbar';
 
-const Component = ({ className }: Props): React.ReactElement<Props> => {
+type Props = ThemeProps & {
+  navigateToReferendumDetail: () => void;
+};
+
+const Component = ({ className, navigateToReferendumDetail }: Props): React.ReactElement<Props> => {
+  const onClickReferendumItem = useCallback(() => {
+    navigateToReferendumDetail();
+  }, [navigateToReferendumDetail]);
+
   return (
     <div className={className}>
+      <div>
+        <div>
+          Governance
+        </div>
 
+        <NetworkSelector />
+      </div>
+
+      <QuickActionsContainer />
+
+      <Toolbar />
+
+      <ReferendaList
+        onClickItem={onClickReferendumItem}
+      />
     </div>
   );
 };

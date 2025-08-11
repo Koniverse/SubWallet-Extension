@@ -10,7 +10,7 @@ type Props = ThemeProps;
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   return (
     <div className={className}>
-
+      DescriptionTab
     </div>
   );
 };

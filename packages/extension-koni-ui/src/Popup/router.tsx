@@ -66,6 +66,7 @@ const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/e
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollectionDetail'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftImport'));
+const Governance = new LazyLoader('Governance', () => import('@subwallet/extension-koni-ui/Popup/Home/Governance'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-koni-ui/Popup/Home/History'));
 const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-koni-ui/Popup/Home/Crowdloans'));
@@ -174,6 +175,7 @@ export const router = createHashRouter([
         children: [
           Tokens.generateRouterObject('tokens'),
           TokenDetailList.generateRouterObject('tokens/detail/:slug'),
+          Governance.generateRouterObject('governance'),
           {
             path: 'nfts',
             element: <Outlet />,

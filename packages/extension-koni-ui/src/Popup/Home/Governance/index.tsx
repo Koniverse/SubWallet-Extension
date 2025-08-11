@@ -1,24 +1,44 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import React from 'react';
-import styled from 'styled-components';
+import { OverviewView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/OverviewView';
+import React, { useCallback, useState } from 'react';
 
-type Props = ThemeProps;
+import { ReferendumDetailView } from './ReferendumDetailView';
+import { ScreenView } from './types';
 
-const Component = ({ className }: Props): React.ReactElement<Props> => {
+const Component = () => {
+  const [currentScreenView, setCurrentScreenView] = useState<ScreenView>(ScreenView.OVERVIEW);
+
+  const navigateToReferendumDetail = useCallback(() => {
+    setCurrentScreenView(ScreenView.REFERENDUM_DETAIL);
+  }, []);
+
+  const navigateToOverview = useCallback(() => {
+    setCurrentScreenView(ScreenView.OVERVIEW);
+  }, []);
+
   return (
-    <div className={className}>
+    <>
+      {
+        currentScreenView === ScreenView.OVERVIEW && (
+          <OverviewView
+            navigateToReferendumDetail={navigateToReferendumDetail}
+          />
+        )
+      }
 
-    </div>
+      {
+        currentScreenView === ScreenView.REFERENDUM_DETAIL && (
+          <ReferendumDetailView
+            navigateToOverview={navigateToOverview}
+          />
+        )
+      }
+    </>
   );
 };
 
-const Governance = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {
-
-  };
-});
+const Governance = (Component);
 
 export default Governance;

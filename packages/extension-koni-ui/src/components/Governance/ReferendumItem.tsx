@@ -5,19 +5,26 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React from 'react';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+type Props = ThemeProps & {
+  onClick?: VoidFunction;
+};
 
-const Component = ({ className }: Props): React.ReactElement<Props> => {
+const Component = ({ className, onClick }: Props): React.ReactElement<Props> => {
   return (
-    <div className={className}>
-
+    <div
+      className={className}
+      onClick={onClick}
+    >
+      Referendum Item
     </div>
   );
 };
 
 const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-
+    backgroundColor: token.colorBgSecondary,
+    borderRadius: token.borderRadiusLG,
+    minHeight: 80
   };
 });
 

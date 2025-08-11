@@ -6902,6 +6902,7 @@ __metadata:
     "@subwallet/keyring": ^0.1.12
     "@subwallet/react-ui": 5.1.2-b77
     "@subwallet/ui-keyring": ^0.1.12
+    "@tanstack/react-query": ^5.84.2
     "@types/bn.js": ^5.1.6
     "@types/enzyme": ^3.10.12
     "@types/enzyme-adapter-react-16": ^1.0.6
@@ -7333,6 +7334,24 @@ __metadata:
   dependencies:
     defer-to-connect: ^2.0.1
   checksum: fc9cb993e808806692e4a3337c90ece0ec00c89f4b67e3652a356b89730da98bc824273a6d67ca84d5f33cd85f317dcd5ce39d8cc0a2f060145a608a7cb8ce92
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.83.1":
+  version: 5.83.1
+  resolution: "@tanstack/query-core@npm:5.83.1"
+  checksum: 0c4a2f604de28fd8b97b07ce7ea119c52a8bf7ded877dfd6c2ebff14090d7a66aed4689cf53d78d432733f3845e0c0f9928abbe77d193a55fd92adf6e6ef8986
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.84.2":
+  version: 5.84.2
+  resolution: "@tanstack/react-query@npm:5.84.2"
+  dependencies:
+    "@tanstack/query-core": 5.83.1
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 1284bced0c7acf74a443b359f94cb4700a2ec32dbd2a2a6f9e877eefe0b40e0c76d1cb5bfa2fe04aadac1ba7eae156e4f58b9c6ab70151f6c08492f4c32d4329
   languageName: node
   linkType: hard
 
