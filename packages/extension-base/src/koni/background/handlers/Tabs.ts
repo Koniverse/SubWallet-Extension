@@ -642,12 +642,6 @@ export default class KoniTabs {
       } else {
         await this.#koniState.showUnsupportedNetworkSwitchConfirm(id, url, {
           mode: 'insert',
-          chainEditInfo: {
-            chainType: 'EVM',
-            currentProvider: '',
-            providers: {},
-            slug: ''
-          },
           chainSpec: {
             genesisHash: '',
             paraId: null,
@@ -655,6 +649,12 @@ export default class KoniTabs {
             evmChainId: chainIdDec,
             existentialDeposit: '',
             decimals: 0
+          },
+          chainEditInfo: {
+            chainType: 'EVM',
+            currentProvider: '',
+            providers: {},
+            slug: ''
           },
           unconfirmed: true,
           providerError: _CHAIN_VALIDATION_ERROR.UNSUPPORTED_CHAIN_CANNOT_ADD
