@@ -3,6 +3,7 @@
 
 import { RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { TAO_STAKING_FEE } from '@subwallet/extension-base/services/earning-service/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -67,7 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
+          description={t(`A staking fee of ${TAO_STAKING_FEE} TAO will be deducted from your stake once the transaction is complete`)}
           title={t('TAO staking fee')}
           type='info'
         />

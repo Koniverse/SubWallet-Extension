@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
+import { TAO_STAKING_FEE } from '@subwallet/extension-base/services/earning-service/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -54,7 +55,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {isBittensorChain && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete')}
+          description={t(`An unstaking fee of ${TAO_STAKING_FEE} TAO will be deducted from your unstaked amount once the transaction is complete`)}
           title={t('TAO unstaking fee')}
           type='info'
         />

@@ -156,3 +156,5 @@ export function applyDecimal (bnNumber: BN, decimals: number) {
 
   return bnNumber.div(bnDecimals);
 }
+
+export const TAO_STAKING_FEE = '0.0005';
