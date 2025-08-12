@@ -54,6 +54,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   isTransferLocalTokenAndPayThatTokenAsFee: boolean;
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
+  transferAll?: boolean;
 }
 
 export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo, destChain: _ChainInfo): FeeChainType => {
@@ -106,12 +107,15 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, value } = request;
+  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, transferAll, value } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
   let maxTransferable: BigN;
   let error: string | undefined;
+
+  console.log('--------max-tf-request', request);
+  console.log('--------max-fee', fee);
 
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
   const substrateAddress = fakeAddress; // todo: move this
@@ -139,6 +143,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           value,
           fallbackFee: true
         });
+        console.log('----1-max-transfer-----:-------transaction', transaction);
       } else {
         [transaction, , error] = await getEVMTransactionObject({
           chain: srcChain.slug,
@@ -152,6 +157,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
           value,
           fallbackFee: true
         });
+        console.log('----2-max-transfer-----:-------transaction', transaction);
       }
     } else if (isTonAddress(address) && _isTokenTransferredByTon(srcToken)) {
       [transaction] = await createTonTransaction({
@@ -189,8 +195,9 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         network: network
       });
     } else {
+      console.log('xxx-transferAll', transferAll);
       [transaction] = await createSubstrateExtrinsic({
-        transferAll: false,
+        transferAll: !!transferAll,
         value,
         from: address,
         networkKey: srcChain.slug,
@@ -205,9 +212,15 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       const tx = transaction as TransactionConfig;
 
       const gasLimit = tx.gas?.toString() || (await evmApi.api.eth.estimateGas(tx)).toString();
+      const _gasLimit = (await evmApi.api.eth.estimateGas(tx)).toString();
 
       const _feeCustom = feeCustom as EvmEIP1559FeeOption;
       const combineFee = combineEthFee(fee, feeOption, _feeCustom);
+
+      console.log('--max-transfer.gasLimit', gasLimit);
+      console.log('--max-transfer._gasLimit', _gasLimit);
+      console.log('--max-transfer.tx', tx);
+      console.log('--max-transfer.combineFee', combineFee);
 
       if (combineFee.maxFeePerGas) {
         estimatedFee = new BigN(combineFee.maxFeePerGas).multipliedBy(gasLimit).toFixed(0);
@@ -220,6 +233,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         estimatedFee,
         gasLimit: gasLimit.toString()
       };
+      console.log('--max-transfer.feeOptions', feeOptions);
     } else if (feeChainType === 'substrate') {
       // Calculate fee for substrate transaction
       try {
@@ -236,6 +250,10 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       const tip = combineSubstrateFee(fee, feeOption, _feeCustom).tip;
 
       estimatedFee = new BigN(estimatedFee).plus(tip).toFixed(0);
+      console.log('xxxxxx ========= estimatedFee', estimatedFee);
+      console.log('xxxxxx ========= address', address);
+      console.log('xxxxxx ========= tip', tip);
+      console.log('xxxxxx ========= mockTx === transaction', transaction);
 
       feeOptions = {
         ...fee,

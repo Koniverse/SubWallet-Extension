@@ -2310,7 +2310,7 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, value } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, transferAll, value } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
@@ -2348,7 +2348,8 @@ export default class KoniExtension {
       bitcoinApi: this.#koniState.chainService.getBitcoinApi(chain),
       isTransferLocalTokenAndPayThatTokenAsFee,
       isTransferNativeTokenAndPayLocalTokenAsFee,
-      nativeToken
+      nativeToken,
+      transferAll: transferAll
     };
 
     const subscription = combineLatest({
