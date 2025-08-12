@@ -7,8 +7,8 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
-import { addLazy } from '@subwallet/extension-base/utils';
+import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -18,13 +18,13 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { fetchPoolTarget, getEarningImpact, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getSignModeByAccountProxy, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -80,7 +80,7 @@ const Component = () => {
 
   const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const isClickInfoButtonRef = useRef<boolean>(false);
 
@@ -288,10 +288,18 @@ const Component = () => {
       return [];
     }
 
+    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(inputAsset, chainInfo);
+
     const result: AccountAddressItemType[] = [];
 
     accountProxies.forEach((ap) => {
       if (!(!fromAccountProxy || ap.id === fromAccountProxy)) {
+        return;
+      }
+
+      const signMode = getSignModeByAccountProxy(ap);
+
+      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
         return;
       }
 
@@ -311,7 +319,7 @@ const Component = () => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, poolChain]);
+  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, inputAsset, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
@@ -676,7 +684,7 @@ const Component = () => {
         type: ExtrinsicType.STAKING_BOND
       };
 
-      getEarningSlippage(data)
+      getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
           setEarningSlippage(result.slippage);
@@ -938,15 +946,31 @@ const Component = () => {
         return ExtrinsicType.MINT_STDOT;
       }
 
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.MINT_VMANTA;
+        }
+
+        return ExtrinsicType.MINT_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.MINT_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.MINT_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.MINT_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.MINT_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_BOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -1359,7 +1383,10 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    description={t(
+                      'Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again',
+                      { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                    )}
                     title='Slippage too high!'
                     type='error'
                   />

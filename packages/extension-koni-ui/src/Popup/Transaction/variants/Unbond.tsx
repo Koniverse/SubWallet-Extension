@@ -12,7 +12,7 @@ import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTEN
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
+import { getEarningImpact, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
@@ -135,7 +135,7 @@ const Component: React.FC = () => {
         type: ExtrinsicType.STAKING_UNBOND
       };
 
-      getEarningSlippage(data)
+      getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
           setEarningSlippage(result.slippage);
@@ -472,15 +472,31 @@ const Component: React.FC = () => {
         return ExtrinsicType.UNSTAKE_STDOT;
       }
 
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.UNSTAKE_VMANTA;
+        }
+
+        return ExtrinsicType.UNSTAKE_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.UNSTAKE_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.UNSTAKE_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.UNSTAKE_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_UNBOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chainValue);
@@ -612,7 +628,10 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            description={t(
+                              'Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again',
+                              { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                            )}
                             title='Slippage too high!'
                             type='error'
                           />
