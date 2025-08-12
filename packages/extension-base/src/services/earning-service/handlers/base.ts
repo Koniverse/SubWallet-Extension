@@ -9,12 +9,12 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { DEFAULT_YIELD_FIRST_STEP, STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
 import { createClaimNotification, createWithdrawNotifications } from '@subwallet/extension-base/services/inapp-notification-service/utils';
-import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasePoolInfo, BaseYieldPoolMetadata, EarningRewardHistoryItem, EarningRewardItem, GenStepFunction, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, SubmitChangeValidatorStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
 import { BN, BN_TEN } from '@polkadot/util';
 
-import { EarningSlippageResult } from './native-staking/dtao';
+import { EarningImpactResult } from './native-staking/dtao';
 
 /**
  * @class BasePoolHandler
@@ -382,7 +382,7 @@ export default abstract class BasePoolHandler {
     return this.slug === slug;
   }
 
-  public getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+  public getEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     return Promise.resolve({
       slippage: 0,
       rate: 1
