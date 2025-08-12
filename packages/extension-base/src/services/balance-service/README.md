@@ -9,87 +9,84 @@ The BalanceService is a core service responsible for managing cryptocurrency bal
 ### High-Level Architecture
 
 ```mermaid
-graph LR
+graph TB
     subgraph "[[Balance Service]]"
         BS[BalanceService]
         BMI[BalanceMapImpl]
         DABS[DetectAccountBalanceStore]
-        SB[subscribeBalance Helper]
+        SH[subscribeBalance Helpers]
     end
     
-    subgraph "Core Services"
-        KS[KoniState]
-        ES[EventService]
-        KRS[KeyringService]
-        DBS[DatabaseService]
-    end
-    
-    subgraph "Chain Service Layer"
-        CS[ChainService]
-        SH[SubstrateChainHandler]
-        EH[EvmChainHandler]
-        BH[BitcoinChainHandler]
-        TH[TonChainHandler]
-        CH[CardanoChainHandler]
-        MH[MantaPrivateHandler]
+    subgraph "Chain Handlers"
+        SCH[SubstrateChainHandler]
+        ECH[EvmChainHandler]
+        BCH[BitcoinChainHandler]
+        TCH[TonChainHandler]
+        CCH[CardanoChainHandler]
     end
     
     subgraph "Blockchain APIs"
-        SAPI[SubstrateApi]
-        EAPI[EvmApi]
-        BAPI[BitcoinApi]
-        TAPI[TonApi]
-        CAPI[CardanoApi]
-        MAPI[MantaPay Api]
+        SA[_SubstrateApi]
+        EA[_EvmApi]
+        BA[_BitcoinApi]
+        TA[_TonApi]
+        CA[_CardanoApi]
     end
     
     subgraph "External Services"
-        SSS[SubscanService]
-        SDK[SubWallet SDK]
-        COS[ChainOnlineService]
+        SubS[SubscanService]
+        SDK[SubWallet API SDK]
     end
     
+    subgraph "Balance Subscription Helpers"
+        SSB[subscribeSubstrateBalance]
+        SEB[subscribeEVMBalance]
+        SBB[subscribeBitcoinBalance]
+        STB[subscribeTonBalance]
+        SCB[subscribeCardanoBalance]
+    end
+    
+    %% Balance Service relationships
     BS --> BMI
     BS --> DABS
-    BS --> SB
-    BS --> KS
+    BS --> SH
     
-    KS --> CS
-    KS --> ES
-    KS --> KRS
-    KS --> DBS
+    %% Chain handlers to APIs
+    SCH --> SA
+    ECH --> EA
+    BCH --> BA
+    TCH --> TA
+    CCH --> CA
     
-    CS --> SH
-    CS --> EH
-    CS --> BH
-    CS --> TH
-    CS --> CH
-    CS --> MH
-    
-    SH --> SAPI
-    EH --> EAPI
-    BH --> BAPI
-    TH --> TAPI
-    CH --> CAPI
-    MH --> MAPI
-    
-    BS --> SSS
+    %% External service connections
+    BS --> SubS
     BS --> SDK
-    CS --> COS
     
-    SB --"Get provider"--> CS
+    %% Subscription helper routing
+    SH --> SSB
+    SH --> SEB
+    SH --> SBB
+    SH --> STB
+    SH --> SCB
     
-    classDef serviceClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef coreClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef chainClass fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef apiClass fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef externalClass fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    %% Helper connections to APIs via chain handlers
+    SSB --> SCH
+    SEB --> ECH
+    SBB --> BCH
+    STB --> TCH
+    SCB --> CCH
     
-    class BS,BMI,DABS,SB serviceClass
-    class KS,ES,KRS,DBS coreClass
-    class CS,SH,EH,BH,TH,CH,MH chainClass
-    class SAPI,EAPI,BAPI,TAPI,CAPI,MAPI apiClass
-    class SSS,SDK,COS externalClass
+    classDef serviceClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef chainClass fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef apiClass fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px,color:#000
+    classDef externalClass fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    classDef helperClass fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000
+    
+    class BS,BMI,DABS,SH serviceClass
+    class SCH,ECH,BCH,TCH,CCH chainClass
+    class SA,EA,BA,TA,CA apiClass
+    class SubS,SDK externalClass
+    class SSB,SEB,SBB,STB,SCB helperClass
 ```
 
 ### Service Components Roles
