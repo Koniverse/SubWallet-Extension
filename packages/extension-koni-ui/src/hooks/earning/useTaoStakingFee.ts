@@ -24,12 +24,12 @@ export const useTaoStakingFee = (
   const isBittensorChain = poolInfo?.chain === 'bittensor' || poolInfo?.chain === 'bittensor_testnet';
 
   useEffect(() => {
+    let isSync = true;
+
     const doFunction = () => {
       if (!poolInfo || !isBittensorChain) {
         return;
       }
-
-      let isSync = true;
 
       getEarningImpact({
         slug: poolInfo.slug,
@@ -51,13 +51,13 @@ export const useTaoStakingFee = (
         .catch((error) => {
           console.error('Failed to get earning impact:', error);
         });
-
-      return () => {
-        isSync = false;
-      };
     };
 
-    return doFunction();
+    doFunction();
+
+    return () => {
+      isSync = false;
+    };
   }, [poolInfo, amount, decimals, type, isBittensorChain, netuid]);
 
   return stakingFee;
