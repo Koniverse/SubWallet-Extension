@@ -614,6 +614,13 @@ export default class KoniState {
       });
   }
 
+  public async showUnsupportedNetworkSwitchConfirm (id: string, url: string, networkData: _NetworkUpsertParams) {
+    return this.requestService.addConfirmation(id, url, 'addNetworkRequest', networkData)
+      .then(() => {
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
+      });
+  }
+
   public async addTokenConfirm (id: string, url: string, tokenInfo: AddTokenRequestExternal) {
     return this.requestService.addConfirmation(id, url, 'addTokenRequest', tokenInfo)
       .then(async ({ isApproved }) => {
