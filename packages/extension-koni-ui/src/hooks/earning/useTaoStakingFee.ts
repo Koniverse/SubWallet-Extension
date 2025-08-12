@@ -24,34 +24,40 @@ export const useTaoStakingFee = (
   const isBittensorChain = poolInfo?.chain === 'bittensor' || poolInfo?.chain === 'bittensor_testnet';
 
   useEffect(() => {
-    if (!poolInfo || !isBittensorChain) {
-      return;
-    }
+    const doFunction = () => {
+      if (!poolInfo || !isBittensorChain) {
+        return;
+      }
 
-    let isSync = true;
+      let isSync = true;
 
-    getEarningImpact({
-      slug: poolInfo.slug,
-      value: amount,
-      netuid,
-      type
-    })
-      .then((impact) => {
-        const stakingTaoFee = formatNumber(
-          impact.stakingTaoFee || '0',
-          decimals,
-          balanceNoPrefixFormater
-        );
-
-        if (isSync) {
-          setStakingFee(stakingTaoFee);
-        }
+      getEarningImpact({
+        slug: poolInfo.slug,
+        value: amount,
+        netuid,
+        type
       })
-      .catch((error) => {
-        console.error('Failed to get earning impact:', error);
-      }).finally(() => {
+        .then((impact) => {
+          const stakingTaoFee = formatNumber(
+            impact.stakingTaoFee || '0',
+            decimals,
+            balanceNoPrefixFormater
+          );
+
+          if (isSync) {
+            setStakingFee(stakingTaoFee);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get earning impact:', error);
+        });
+
+      return () => {
         isSync = false;
-      });
+      };
+    };
+
+    return doFunction();
   }, [poolInfo, amount, decimals, type, isBittensorChain, netuid]);
 
   return stakingFee;
