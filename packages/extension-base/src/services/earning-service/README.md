@@ -170,66 +170,181 @@ graph LR
 
 ```mermaid
 graph LR
-    subgraph "Service Layer"
-        ES[EarningService]
-        KS[KoniState]
+    %% Core Service Dependencies
+    subgraph "Main Service Context"
+        KS[["KoniState"]]
+        ES[[EarningService]]
+        KS --> ES
+    end
+
+    %% Direct Service Dependencies
+    subgraph "Core Dependencies"
         DB[DatabaseService]
         EV[EventService]
+        CS[ChainService]
+        TS[TransactionService]
+        NS[NotificationService]
+        
+        ES --> DB
+        ES --> EV
+        ES -.-> CS
+        ES -.-> TS
+        ES -.-> NS
+        
+        %% State provides these services
+        KS --> DB
+        KS --> EV
+        KS --> CS
+        KS --> TS
+        KS --> NS
     end
-    
-    subgraph "Handler Layer"
-        BH[BasePoolHandler]
-        LSH[Liquid Staking]
-        NSH[Native Staking]
-        NPH[Nomination Pools]
-        LH[Lending]
+
+    %% Handler Architecture
+    subgraph "Pool Handler System"
+        BPH[BasePoolHandler]
+        
+        %% Handler Types
+        LSH[Liquid Staking Handlers]
+        NSH[Native Staking Handlers]
+        NPH[Nomination Pool Handlers]
+        LH[Lending Handlers]
+        
+        %% Concrete Implementations
+        ALS[AcalaLiquidStakingPoolHandler]
+        BLS[BifrostLiquidStakingPoolHandler]
+        PLS[ParallelLiquidStakingPoolHandler]
+        SSL[StellaSwapLiquidStakingPoolHandler]
+        
+        RNS[RelayNativeStakingPoolHandler]
+        TNS[TaoNativeStakingPoolHandler]
+        ANS[AstarNativeStakingPoolHandler]
+        
+        NP[NominationPoolHandler]
+        IL[InterlayLendingPoolHandler]
+        
+        %% Handler Dependencies
+        ES --> BPH
+        
+        BPH --> LSH
+        BPH --> NSH
+        BPH --> NPH
+        BPH --> LH
+        
+        LSH --> ALS
+        LSH --> BLS
+        LSH --> PLS
+        LSH --> SSL
+        
+        NSH --> RNS
+        NSH --> TNS
+        NSH --> ANS
+        
+        NPH --> NP
+        LH --> IL
+        
+        %% Handlers access state through base
+        BPH --> KS
     end
-    
-    subgraph "Data Layer"
-        PI[Pool Info]
-        PT[Position Tracking]
-        RM[Reward Management]
+
+    %% Data Flow Management
+    subgraph "Data Streams"
+        %% RxJS Subjects
+        YPI[yieldPoolInfoSubject]
+        YPS[yieldPositionSubject]
+        YPL[yieldPositionListSubject]
+        ERS[earningRewardSubject]
+        ERH[earningRewardHistorySubject]
+        MAP[minAmountPercentSubject]
+        
+        ES --> YPI
+        ES --> YPS
+        ES --> YPL
+        ES --> ERS
+        ES --> ERH
+        ES --> MAP
     end
-    
-    subgraph "External Layer"
-        BC[Blockchain]
-        API[External APIs]
+
+    %% External Data Sources
+    subgraph "External Systems"
+        %% Blockchain Networks
+        BC[Blockchain Networks]
+        SAPI[Substrate APIs]
+        EAPI[EVM APIs]
+        OAPI[Other Chain APIs]
+        
+        %% External Services
+        EXTAPI[External APIs]
+        VALIDAPI[Validator APIs]
+        YIELDAPI[Yield Data APIs]
+        
+        %% Chain Service provides blockchain access
+        CS --> SAPI
+        CS --> EAPI
+        CS --> OAPI
+        
+        %% Handlers access blockchain through chain service
+        BPH -.-> BC
+        BPH -.-> EXTAPI
+        BPH -.-> VALIDAPI
+        BPH -.-> YIELDAPI
     end
-    
-    %% Service relationships
-    ES --> KS
-    ES --> DB
-    ES --> EV
-    ES --> BH
-    
-    %% Handler relationships
-    BH --> LSH
-    BH --> NSH
-    BH --> NPH
-    BH --> LH
-    
-    %% Data flow
-    ES --> PI
-    ES --> PT
-    ES --> RM
-    
-    BH --> PI
-    BH --> PT
-    BH --> RM
-    
-    %% External data
-    BH --> BC
-    BH --> API
-    
-    %% Persistence
-    PI --> DB
-    PT --> DB
-    RM --> DB
-    
-    %% Events
-    PT --> EV
-    RM --> EV
-    PI --> EV
+
+    %% Data Persistence
+    subgraph "Persistence Layer"
+        %% Database Operations
+        YPD[(Yield Position Data)]
+        YPH[(Yield Pool History)]
+        YRM[(Yield Reward Metadata)]
+        
+        DB --> YPD
+        DB --> YPH
+        DB --> YRM
+    end
+
+    %% Event-Driven Communication
+    subgraph "Event System"
+        %% Key Events
+        ESE[earning.ready]
+        ESU[earning.updated]
+        ESR[earning.reward]
+        
+        EV --> ESE
+        EV --> ESU
+        EV --> ESR
+    end
+
+    %% Service Lifecycle Integration
+    subgraph "Service Coordination"
+        %% Other Services that depend on EarningService
+        BS[BalanceService]
+        PS[PriceService]
+        HS[HistoryService]
+        
+        %% Indirect relationships through KoniState
+        KS --> BS
+        KS --> PS
+        KS --> HS
+        
+        %% Data coordination
+        ES -.-> BS
+        ES -.-> PS
+        ES -.-> HS
+    end
+
+    %% Styling
+    classDef service fill:#1976d2,color:#fff,stroke:#0d47a1
+    classDef handler fill:#388e3c,color:#fff,stroke:#1b5e20
+    classDef data fill:#f57c00,color:#fff,stroke:#e65100
+    classDef external fill:#7b1fa2,color:#fff,stroke:#4a148c
+    classDef event fill:#d32f2f,color:#fff,stroke:#b71c1c
+    classDef storage fill:#455a64,color:#fff,stroke:#263238
+
+    class KS,ES,DB,EV,CS,TS,NS,BS,PS,HS service
+    class BPH,LSH,NSH,NPH,LH,ALS,BLS,PLS,SSL,RNS,TNS,ANS,NP,IL handler
+    class YPI,YPS,YPL,ERS,ERH,MAP,YPD,YPH,YRM data
+    class BC,SAPI,EAPI,OAPI,EXTAPI,VALIDAPI,YIELDAPI external
+    class ESE,ESU,ESR event
+    class DB storage
 ```
 
 ## Props
