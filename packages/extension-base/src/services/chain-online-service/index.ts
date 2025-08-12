@@ -156,21 +156,26 @@ export class ChainOnlineService {
           if (storedChainSettings.length > 0) {
             for (const [storedSlug, storedChainInfo] of Object.entries(storedChainSettingMap)) {
               if (_isCustomChain(storedSlug)) {
+                // Check if this custom chain duplicates any of the latest chainInfo from patch based on genesisHash (for Substrate) or EVM chain ID.
                 const duplicatedDefaultSlug = this.checkExistedPredefinedChain(latestChainInfo, storedChainInfo.substrateInfo?.genesisHash, storedChainInfo.evmInfo?.evmChainId);
 
                 if (duplicatedDefaultSlug.length > 0) {
+                  // Add the old custom chain slug to the list of deprecated chains.
                   deprecatedChainMap[storedSlug] = duplicatedDefaultSlug;
                   deprecatedChains.push(storedSlug);
 
                   const storedChainState = currentChainStateMap[storedSlug];
                   const storedChainStatus = currentChainStatusMap[storedSlug];
 
+                  // Update the current chain state to use the new chain slug, inheriting the active/inactive status from custom chain and randomly assigning a provider
                   currentChainStateMap[duplicatedDefaultSlug] = {
                     slug: duplicatedDefaultSlug,
                     active: storedChainState.active,
                     currentProvider: randomizeProvider(latestChainInfo[duplicatedDefaultSlug].providers).providerKey,
                     manualTurnOff: storedChainState.manualTurnOff
                   };
+
+                  // Update the current chain status to use the new chain slug, inheriting the connection status from custom chain and updating the last updated timestamp
                   currentChainStatusMap[duplicatedDefaultSlug] = {
                     slug: duplicatedDefaultSlug,
                     connectionStatus: storedChainStatus.connectionStatus,
@@ -179,6 +184,7 @@ export class ChainOnlineService {
 
                   customChains.push(duplicatedDefaultSlug);
 
+                  // Remove the deprecated custom chain's info from the old chain info map and the current state/status maps.
                   delete oldChainInfoMap[storedSlug];
                   delete currentChainStateMap[storedSlug];
                   delete currentChainStatusMap[storedSlug];
@@ -212,6 +218,7 @@ export class ChainOnlineService {
         }
 
         if (latestAssetInfo && Object.keys(latestAssetInfo).length > 0) {
+          // Get all previously stored asset registry entries from the database.
           const storedAssetRegistry = await this.dbService.getAllAssetStore();
           const availableChains = Object.values(chainInfoMap)
             .filter((info) => (info.chainStatus === _ChainStatus.ACTIVE))
@@ -227,10 +234,12 @@ export class ChainOnlineService {
 
             // Update custom assets of merged custom chains
             for (const storedAsset of Object.values(storedAssetRegistry)) {
+              // If the stored asset is a custom asset and its origin chain is marked as deprecated, and its assetType is ERC20
               if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedChainMap).includes(storedAsset.originChain) && storedAsset.metadata?.contractAddress) {
                 const newOriginChain = deprecatedChainMap[storedAsset.originChain];
                 // const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
 
+                // Mark the old custom asset slug as deprecated.
                 deprecatedAssets.push(storedAsset.slug);
                 parsedStoredAssetRegistry[storedAsset.slug] = {
                   ...storedAsset,
@@ -247,13 +256,14 @@ export class ChainOnlineService {
               let defaultSlugForMigration: string | undefined;
 
               for (const defaultChainAsset of Object.values(latestAssetInfo)) {
-                // case merge custom asset with default asset
+                // case: the stored asset is the same to a smart contract asset from patch
                 if (_isEqualSmartContractAsset(storedAssetInfo, defaultChainAsset)) {
                   duplicated = true;
                   defaultSlugForMigration = defaultChainAsset.slug;
                   break;
                 }
 
+                // case: the origin chain of the stored asset is no longer active (Exp: custom chain is deprecated)
                 if (availableChains.indexOf(storedAssetInfo.originChain) === -1) {
                   deprecated = true;
                   defaultSlugForMigration = defaultChainAsset.slug;
@@ -261,10 +271,12 @@ export class ChainOnlineService {
                 }
               }
 
+              // If the stored asset is a duplicate of a default asset or its origin chain is deprecated.
               if (duplicated || deprecated) {
                 if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
                   const isVisible = assetSetting[storedAssetInfo.slug].visible;
 
+                  // Migrate assetSetting from custom token to token from patch
                   if (defaultSlugForMigration) {
                     migratedAssetSetting[defaultSlugForMigration] = { visible: isVisible };
                     delete assetSetting[storedAssetInfo.slug];
@@ -275,6 +287,7 @@ export class ChainOnlineService {
 
                 deprecatedAssets.push(storedAssetInfo.slug);
               } else {
+                // If the stored asset is not a duplicate and its origin chain is active, keep it in the merged registry.
                 mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
               }
             }
@@ -305,11 +318,13 @@ export class ChainOnlineService {
           this.chainService.subscribeChainStateMap().next(currentChainStateMap);
 
           this.chainService.subscribeChainStatusMap().next(currentChainStatusMap);
+          // Migrate assetSetting
           this.chainService.setAssetSettings({
             ...assetSetting,
             ...migratedAssetSetting
           });
 
+          // Remove all custom chains and custom tokens that is duplicated from chains or tokens in patch
           await this.dbService.removeFromChainStore(deprecatedChains);
           await this.dbService.removeFromAssetStore(deprecatedAssets);
 
