@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { TAO_STAKING_FEE } from '@subwallet/extension-base/services/earning-service/utils';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -10,12 +11,13 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { Icon, ModalContext } from '@subwallet/react-ui';
+import { formatNumber, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -147,6 +149,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { compound } = useYieldPositionDetail(slug, data.address);
   const { poolInfoMap } = useSelector((state) => state.earning);
   const poolInfo = poolInfoMap[slug];
+  const [stakingFee, setStakingFee] = useState<string | undefined>();
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
@@ -185,6 +188,25 @@ const Component: React.FC<Props> = (props: Props) => {
   const isShowAmount = useMemo(() => {
     return new BigN(data.amount).gt(0);
   }, [data.amount]);
+
+  useEffect(() => {
+    if (!poolInfo || !isBittensorChain) {
+      return;
+    }
+
+    getEarningImpact({
+      slug: poolInfo.slug,
+      value: data.amount,
+      netuid: poolInfo.metadata.subnetData?.netuid || 0,
+      type: ExtrinsicType.STAKING_UNBOND
+    }).then((impact) => {
+      const stakingTaoFee = formatNumber(impact.stakingTaoFee || '0', decimals, balanceNoPrefixFormater);
+
+      setStakingFee(stakingTaoFee);
+    }).catch((error) => {
+      console.error('Failed to get earning impact:', error);
+    });
+  }, [poolInfo, data.amount, decimals, isBittensorChain]);
 
   return (
     <div className={CN(className)}>
@@ -248,12 +270,14 @@ const Component: React.FC<Props> = (props: Props) => {
               title='Newly selected validators'
             />
           </MetaInfo>
-          <AlertBox
-            className={'alert-box'}
-            description={t(`A fee equivalent of ${TAO_STAKING_FEE} TAO will be deducted from your stake amount on the new validator once the transaction is complete`)}
-            title={t('Validator change fee')}
-            type='info'
-          />
+          {stakingFee && (
+            <AlertBox
+              className={'alert-box'}
+              description={t('A fee equivalent of {{fee}} TAO will be deducted from your stake amount on the new validator once the transaction is complete', { replace: { fee: stakingFee } })}
+              title={t('Validator change fee')}
+              type='info'
+            />
+          )}
         </>
       )}
     </div>

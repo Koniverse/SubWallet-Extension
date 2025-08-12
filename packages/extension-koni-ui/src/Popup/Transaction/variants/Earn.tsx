@@ -20,7 +20,7 @@ import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } f
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { fetchPoolTarget, getEarningImpact, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -647,7 +647,7 @@ const Component = () => {
 
   // For subnet staking
 
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [EarningImpact, setEarningImpact] = useState<number>(0);
   const [earningRate, setEarningRate] = useState<number>(0);
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
@@ -684,14 +684,14 @@ const Component = () => {
         type: ExtrinsicType.STAKING_BOND
       };
 
-      getEarningSlippage(data)
+      getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
+          setEarningImpact(result.slippage);
           setEarningRate(result.rate);
         })
         .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
+          console.error('Error fetching earning impact:', error);
         })
         .finally(() => {
           setSubmitLoading(false);
@@ -706,12 +706,12 @@ const Component = () => {
   }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (earningSlippage === null || !amountValue) {
+    if (EarningImpact === null || !amountValue) {
       return true;
     }
 
-    return earningSlippage <= maxSlippage.slippage.toNumber();
-  }, [earningSlippage, maxSlippage, amountValue]);
+    return EarningImpact <= maxSlippage.slippage.toNumber();
+  }, [EarningImpact, maxSlippage, amountValue]);
 
   useEffect(() => {
     if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
@@ -1383,7 +1383,7 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    description={`Unable to stake due to a slippage of ${(EarningImpact * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
                     title='Slippage too high!'
                     type='error'
                   />

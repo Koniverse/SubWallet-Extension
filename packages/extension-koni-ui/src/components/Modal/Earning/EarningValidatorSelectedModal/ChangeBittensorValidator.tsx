@@ -11,7 +11,7 @@ import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
-import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
+import { changeEarningValidator, getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
@@ -337,12 +337,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       type: ExtrinsicType.STAKING_BOND
     };
 
-    getEarningSlippage(data)
+    getEarningImpact(data)
       .then((result) => {
         setEarningRate(result.rate);
       })
       .catch((error) => {
-        console.error('Error fetching earning rate:', error);
+        console.error('Error fetching earning impact:', error);
       });
   });
 

@@ -98,6 +98,10 @@ export interface BondingSubmitParams extends BaseRequestSign {
   address: string,
   selectedValidators: ValidatorInfo[],
   lockPeriod?: number // in month
+  subnetData?: {
+    netuid: number,
+    slippage: number
+  }
 }
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;

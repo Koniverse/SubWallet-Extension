@@ -100,7 +100,7 @@ export interface StakeClaimRewardParams extends BaseRequestSign {
 
 export type RequestStakeClaimReward = InternalRequestSign<StakeClaimRewardParams>;
 
-export interface RequestEarningSlippage {
+export interface RequestEarningImpact {
   slug: string;
   value: string;
   netuid: number;

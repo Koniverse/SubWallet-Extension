@@ -12,7 +12,7 @@ import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTEN
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
+import { getEarningImpact, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
@@ -102,7 +102,7 @@ const Component: React.FC = () => {
   // For subnet staking
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
+  const [EarningImpact, setEarningImpact] = useState<number>(0);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
   const [earningRate, setEarningRate] = useState<number>(0);
   const debounce = useRef<NodeJS.Timeout | null>(null);
@@ -135,10 +135,10 @@ const Component: React.FC = () => {
         type: ExtrinsicType.STAKING_UNBOND
       };
 
-      getEarningSlippage(data)
+      getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
+          setEarningImpact(result.slippage);
           setEarningRate(result.rate);
         })
         .catch((error) => {
@@ -157,12 +157,12 @@ const Component: React.FC = () => {
   }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (earningSlippage === null || !amountValue) {
+    if (EarningImpact === null || !amountValue) {
       return true;
     }
 
-    return earningSlippage <= maxSlippage.slippage.toNumber();
-  }, [amountValue, earningSlippage, maxSlippage]);
+    return EarningImpact <= maxSlippage.slippage.toNumber();
+  }, [amountValue, EarningImpact, maxSlippage]);
 
   const alertBoxRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
@@ -628,7 +628,7 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            description={`Unable to unstake due to a slippage of ${(EarningImpact * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
                             title='Slippage too high!'
                             type='error'
                           />
