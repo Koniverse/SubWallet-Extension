@@ -211,10 +211,6 @@ export class BittensorCache {
 
       const rawData = await resp.json() as SubnetRateFeeResponse;
 
-      if (!Array.isArray(rawData.data)) {
-        return '0';
-      }
-
       const subnet = rawData.data.find((item) => item.netuid === netuid);
 
       return subnet?.fee_rate ?? '0.0005';
@@ -676,7 +672,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   ): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const { amount, selectedValidators: targetValidators, subnetData } = data;
 
-    console.log('data', data);
     const chainApi = await this.substrateApi.isReady;
     const binaryAmount = new BigN(amount);
     const selectedValidatorInfo = targetValidators[0];

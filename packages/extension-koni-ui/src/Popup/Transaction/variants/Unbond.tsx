@@ -102,7 +102,7 @@ const Component: React.FC = () => {
   // For subnet staking
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-  const [EarningImpact, setEarningImpact] = useState<number>(0);
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
   const [earningRate, setEarningRate] = useState<number>(0);
   const debounce = useRef<NodeJS.Timeout | null>(null);
@@ -138,7 +138,7 @@ const Component: React.FC = () => {
       getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningImpact(result.slippage);
+          setEarningSlippage(result.slippage);
           setEarningRate(result.rate);
         })
         .catch((error) => {
@@ -157,12 +157,12 @@ const Component: React.FC = () => {
   }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (EarningImpact === null || !amountValue) {
+    if (earningSlippage === null || !amountValue) {
       return true;
     }
 
-    return EarningImpact <= maxSlippage.slippage.toNumber();
-  }, [amountValue, EarningImpact, maxSlippage]);
+    return earningSlippage <= maxSlippage.slippage.toNumber();
+  }, [amountValue, earningSlippage, maxSlippage]);
 
   const alertBoxRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
@@ -628,7 +628,10 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(EarningImpact * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            description={t(
+                              'Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again',
+                              { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                            )}
                             title='Slippage too high!'
                             type='error'
                           />

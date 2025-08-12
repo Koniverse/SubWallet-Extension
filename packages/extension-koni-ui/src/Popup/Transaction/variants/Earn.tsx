@@ -647,7 +647,7 @@ const Component = () => {
 
   // For subnet staking
 
-  const [EarningImpact, setEarningImpact] = useState<number>(0);
+  const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [earningRate, setEarningRate] = useState<number>(0);
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
@@ -687,11 +687,11 @@ const Component = () => {
       getEarningImpact(data)
         .then((result) => {
           console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningImpact(result.slippage);
+          setEarningSlippage(result.slippage);
           setEarningRate(result.rate);
         })
         .catch((error) => {
-          console.error('Error fetching earning impact:', error);
+          console.error('Error fetching earning slippage:', error);
         })
         .finally(() => {
           setSubmitLoading(false);
@@ -706,12 +706,12 @@ const Component = () => {
   }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
-    if (EarningImpact === null || !amountValue) {
+    if (earningSlippage === null || !amountValue) {
       return true;
     }
 
-    return EarningImpact <= maxSlippage.slippage.toNumber();
-  }, [EarningImpact, maxSlippage, amountValue]);
+    return earningSlippage <= maxSlippage.slippage.toNumber();
+  }, [earningSlippage, maxSlippage, amountValue]);
 
   useEffect(() => {
     if (!isSlippageAcceptable && !hasScrolled && alertBoxRef.current) {
@@ -1383,7 +1383,10 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(EarningImpact * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    description={t(
+                      'Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again',
+                      { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                    )}
                     title='Slippage too high!'
                     type='error'
                   />
