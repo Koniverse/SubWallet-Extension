@@ -3,16 +3,14 @@
 
 import { ExtrinsicType, RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
-import { formatNumber } from '@subwallet/react-ui';
+import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import CN from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -29,33 +27,17 @@ const Component: React.FC<Props> = (props: Props) => {
   const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
 
   const poolPosition = data.poolPosition;
-  const [stakingFee, setStakingFee] = useState<string | undefined>();
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
-  const isBittensorChain = useMemo(() => {
-    return data.poolPosition?.chain === 'bittensor' || data.poolPosition?.chain === 'bittensor_testnet';
-  }, [data.poolPosition?.chain]);
-
-  useEffect(() => {
-    if (!poolPosition || !isBittensorChain) {
-      return;
-    }
-
-    getEarningImpact({
-      slug: poolPosition.slug,
-      value: data.amount,
-      netuid: data.subnetData?.netuid || 0,
-      type: ExtrinsicType.STAKING_BOND
-    }).then((impact) => {
-      const stakingTaoFee = formatNumber(impact.stakingTaoFee || '0', decimals, balanceNoPrefixFormater);
-
-      setStakingFee(stakingTaoFee);
-    }).catch((error) => {
-      console.error('Failed to get earning impact:', error);
-    });
-  }, [data.amount, data.subnetData?.netuid, decimals, isBittensorChain, poolPosition]);
+  const stakingFee = useTaoStakingFee(
+    poolPosition,
+    data.amount,
+    decimals,
+    data.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_BOND
+  );
 
   return (
     <div className={CN(className)}>
@@ -88,7 +70,7 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      {stakingFee && (
+      {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
           description={t('A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete', { replace: { fee: stakingFee } })}
