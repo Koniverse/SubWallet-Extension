@@ -1,26 +1,28 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { GovernanceParam, GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-import { GovernanceViewContext, GovernanceViewEvent, ScreenView } from '../../types';
+import { GovernanceViewContext, GovernanceViewEvent } from '../../types';
 import { safeView, transition } from './reduce';
 import { isValidView, parseUrlParams } from './url';
 
 const defaultChainSlug = 'polkadot';
 
 export const useGovernanceView = () => {
+  const locationState = useLocation().state as GovernanceParam | undefined;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initial: GovernanceViewContext = useMemo(() => {
     const p = parseUrlParams(searchParams);
-    const view: ScreenView = p.view && isValidView(p.view) ? p.view : ScreenView.OVERVIEW;
+    const initView = locationState?.view || p.view;
+    const view: GovernanceScreenView = initView && isValidView(initView) ? initView : GovernanceScreenView.OVERVIEW;
 
     return {
-      chainSlug: p.chainSlug || defaultChainSlug,
-      referendumId: p.referendumId || null,
-      delegateId: p.delegateId || null,
+      chainSlug: locationState?.chainSlug || p.chainSlug || defaultChainSlug,
+      referendumId: locationState?.referendumId || p.referendumId || null,
       view
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,7 +35,7 @@ export const useGovernanceView = () => {
     const v = safeView(state);
     const paramsObj: Record<string, string> = { view: v, chainSlug: state.chainSlug };
 
-    if (v === ScreenView.REFERENDUM_DETAIL && state.referendumId) {
+    if (v === GovernanceScreenView.REFERENDUM_DETAIL && state.referendumId) {
       paramsObj.referendumId = state.referendumId;
     }
 

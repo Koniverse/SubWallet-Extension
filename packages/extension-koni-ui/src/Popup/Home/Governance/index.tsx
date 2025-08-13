@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
+import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
 import React, { useMemo } from 'react';
 
 import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
 import { chainSlugToSubsquareNetwork } from './shared';
-import { ScreenView, ViewBaseType } from './types';
+import { ViewBaseType } from './types';
 
 const Component = () => {
   const { chainSlug: currentChainSlug,
@@ -23,7 +24,7 @@ const Component = () => {
   return (
     <>
       {
-        currentScreenView === ScreenView.OVERVIEW && (
+        currentScreenView === GovernanceScreenView.OVERVIEW && (
           <OverviewView
             {...viewProps}
             goReferendumDetail={goReferendumDetail}
@@ -33,7 +34,7 @@ const Component = () => {
       }
 
       {
-        currentScreenView === ScreenView.REFERENDUM_DETAIL && !!referendumId && (
+        currentScreenView === GovernanceScreenView.REFERENDUM_DETAIL && !!referendumId && (
           <ReferendumDetailView
             {...viewProps}
             goOverview={goOverview}

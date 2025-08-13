@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GovernanceViewContext, GovernanceViewEvent, ScreenView } from '../../types';
+import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
+
+import { GovernanceViewContext, GovernanceViewEvent } from '../../types';
 
 // Guards
 function hasReferendumId (ev: GovernanceViewEvent): ev is { type: 'GO_REFERENDUM_DETAIL'; referendumId: string } {
@@ -17,7 +19,7 @@ export function transition (state: GovernanceViewContext, event: GovernanceViewE
       return { ...state, referendumId: event.referendumId };
 
     case 'GO_OVERVIEW':
-      return { ...state, view: ScreenView.OVERVIEW };
+      return { ...state, view: GovernanceScreenView.OVERVIEW };
 
     case 'GO_REFERENDUM_DETAIL':
       if (!hasReferendumId(event)) {
@@ -26,7 +28,7 @@ export function transition (state: GovernanceViewContext, event: GovernanceViewE
 
       return {
         ...state,
-        view: ScreenView.REFERENDUM_DETAIL,
+        view: GovernanceScreenView.REFERENDUM_DETAIL,
         referendumId: event.referendumId || state.referendumId
       };
 
@@ -35,9 +37,9 @@ export function transition (state: GovernanceViewContext, event: GovernanceViewE
   }
 }
 
-export function safeView (ctx: GovernanceViewContext): ScreenView {
-  if (ctx.view === ScreenView.REFERENDUM_DETAIL && !ctx.referendumId) {
-    return ScreenView.OVERVIEW;
+export function safeView (ctx: GovernanceViewContext): GovernanceScreenView {
+  if (ctx.view === GovernanceScreenView.REFERENDUM_DETAIL && !ctx.referendumId) {
+    return GovernanceScreenView.OVERVIEW;
   }
 
   return ctx.view;
