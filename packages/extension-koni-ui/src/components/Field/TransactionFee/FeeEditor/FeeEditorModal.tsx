@@ -263,7 +263,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
-      if (minRequiredMaxFeePerGas && value && new BigN(value).lte(minRequiredMaxFeePerGas)) {
+      if (minRequiredMaxFeePerGas && value && new BigN(value).lt(minRequiredMaxFeePerGas)) {
         return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
       }
 
