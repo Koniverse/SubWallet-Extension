@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { OverviewView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/OverviewView';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
 import { Referendum } from '@subwallet/subsquare-api-sdk/types';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { ReferendumDetailView } from './ReferendumDetailView';
+import { OverviewView } from './views/OverviewView';
+import { ReferendumDetailView } from './views/ReferendumDetailView';
 import { chainSlugToSubsquareNetwork } from './shared';
 import { ScreenView, ViewBaseType } from './types';
 

@@ -5,7 +5,6 @@ import { _GOVERNANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chai
 import { GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { ChainSelectorItem } from '@subwallet/extension-koni-ui/Popup/Home/Governance/OverviewView/parts/ChainSelector/ChainSelectorItem';
 import { GovernanceChainSelectorItemType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -13,6 +12,8 @@ import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+
+import { ChainSelectorItem } from './ChainSelectorItem';
 
 type Props = ThemeProps & {
   modalId: string;
