@@ -57,23 +57,36 @@ export class SwapService implements StoppableServiceInterface {
       isSupportKyberVersion: true
     };
 
-    const quotes = await subwalletApiSdk.swapApi.fetchSwapQuoteData(request);
+    try {
+      const quotes = await subwalletApiSdk.swapApi.fetchSwapQuoteData(request);
 
-    if (Array.isArray(quotes)) {
-      quotes.forEach((quoteData) => {
-        if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
-          return;
-        }
+      if (Array.isArray(quotes)) {
+        quotes.forEach((quoteData) => {
+          if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
+            return;
+          }
 
-        if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
-          return;
-        }
+          if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
+            return;
+          }
 
-        if (!('errorClass' in quoteData.quote)) {
-          availableQuotes.push({ quote: quoteData.quote as SwapQuote | undefined });
-        } else {
-          availableQuotes.push({ error: new SwapError(quoteData.quote.errorType as SwapErrorType, quoteData.quote.message) });
-        }
+          if (!('errorClass' in quoteData.quote)) {
+            availableQuotes.push({
+              quote: quoteData.quote as SwapQuote | undefined
+            });
+          } else {
+            availableQuotes.push({
+              error: new SwapError(
+                quoteData.quote.errorType as SwapErrorType,
+                quoteData.quote.message
+              )
+            });
+          }
+        });
+      }
+    } catch (err) {
+      availableQuotes.push({
+        error: new SwapError(SwapErrorType.ASSET_NOT_SUPPORTED)
       });
     }
 
