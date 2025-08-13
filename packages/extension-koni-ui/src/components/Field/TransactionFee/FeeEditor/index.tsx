@@ -11,7 +11,7 @@ import { BN_TEN, CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/con
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ActivityIndicator, Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
+import { ActivityIndicator, Button, Icon, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PencilSimpleLine } from 'phosphor-react';
@@ -143,12 +143,19 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return chainValue && destChainValue && chainValue !== destChainValue;
   }, [chainValue, destChainValue]);
 
-  const isEditButton = useMemo(() => {
+  const { isEditButton, isEvmButNoCustomFeeSupport } = useMemo(() => {
     const isSubstrateSupport = !!(chainValue && feeType === 'substrate' && listTokensCanPayFee.length && (isChainSupportTokenPayFee(chainValue)));
     const isEvmSupport = !!(chainValue && feeType === 'evm');
+    const isEvmCustomFeeEditable = isEvmSupport && !!feeOptionsInfo && 'options' in feeOptionsInfo && feeOptionsInfo.options != null;
 
-    return (isSubstrateSupport || isEvmSupport) && !isXcm;
-  }, [isXcm, chainValue, feeType, listTokensCanPayFee.length]);
+    const isEvmButNoCustomFeeSupport = isEvmSupport && !isEvmCustomFeeEditable;
+    const isEditButton = (isSubstrateSupport || isEvmSupport) && !isXcm;
+
+    return {
+      isEvmButNoCustomFeeSupport,
+      isEditButton
+    };
+  }, [chainValue, feeType, listTokensCanPayFee.length, feeOptionsInfo, isXcm]);
 
   const rateValue = useMemo(() => {
     const selectedToken = listTokensCanPayFee.find((item) => item.slug === tokenPayFeeSlug);
@@ -186,21 +193,30 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     value={convertedFeeValueToUSD}
                   />
 
-                  <Button
-                    className={'__fee-editor-button'}
-                    disabled={!isDataReady}
-                    icon={
-                      <Icon
-                        phosphorIcon={PencilSimpleLine}
-                        size='sm'
-                      />
-                    }
-                    loading={isLoadingToken}
-                    onClick={isEditButton ? onClickEdit : undefined}
-                    size='xs'
-                    tooltip={isEditButton ? undefined : t('Coming soon!')}
-                    type='ghost'
-                  />
+                  {isEditButton && (
+                    <Tooltip
+                      className={'__not-editable'}
+                      placement='topLeft'
+                      title={isEvmButNoCustomFeeSupport ? t("This fee can't be edited with the current RPC connection") : undefined}
+                    >
+                      <div>
+                        <Button
+                          className={'__fee-editor-button'}
+                          disabled={!isDataReady || isEvmButNoCustomFeeSupport}
+                          icon={
+                            <Icon
+                              phosphorIcon={PencilSimpleLine}
+                              size='sm'
+                            />
+                          }
+                          loading={isLoadingToken}
+                          onClick={isEvmButNoCustomFeeSupport ? undefined : onClickEdit}
+                          size='xs'
+                          type='ghost'
+                        />
+                      </div>
+                    </Tooltip>
+                  )}
                 </div>
               )}
             </div>

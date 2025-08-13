@@ -4,7 +4,6 @@
 import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { BACKEND_API_URL } from '@subwallet/extension-base/constants';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
@@ -12,7 +11,7 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -33,6 +32,7 @@ import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, Theme
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsDownUp, Book, CheckCircle } from 'phosphor-react';
@@ -794,7 +794,15 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => {
+      if (accountInfo.chainType === AccountChainType.BITCOIN) {
+        const isSegWit = accountInfo.type === 'bitcoin-84' || accountInfo.type === 'bittest-84';
+
+        return isSegWit && _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+      }
+
+      return _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+    });
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;
@@ -1426,40 +1434,25 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   const fetchDestinationsMap = useCallback(() => {
     setLoading(true);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
 
-    fetch(`${BACKEND_API_URL}/swap/fetch-destinations-map`, { signal: controller.signal })
-      .then((rawResp) => {
-        clearTimeout(timeout);
-
-        if (!rawResp.ok) {
-          throw new Error(`HTTP error! status: ${rawResp.status}`);
-        }
-
-        return rawResp.json() as Promise<{ data: Record<string, string[]>, fromAppVersion: string }>;
-      })
-      .then((resp) => {
+    // todo: handle timeout
+    subwalletApiSdk.swapApi.fetchDestinationsMap()
+      .then((response) => {
         // simple validate
-        if (!resp || typeof resp !== 'object' || !resp.data || typeof resp.data !== 'object') {
+        if (!response || typeof response !== 'object') {
           throw new Error('Invalid response format');
         }
 
-        setPairMap(resp.data);
+        setPairMap(response);
         setFetchError(false);
         setLoading(false);
       })
       .catch((error: Error) => {
-        error.name === 'AbortError' ? console.error('Timout fetching swap destinations') : console.error(`Error while fetching swap destinations: ${error.message}`);
+        console.error(`Error while fetching swap destinations: ${error.message}`);
 
         setFetchError(true);
         setLoading(false);
       });
-
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
   }, []);
 
   const handleReloadNotSupportDefault = useCallback(() => {
