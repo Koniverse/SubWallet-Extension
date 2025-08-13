@@ -160,41 +160,67 @@ graph LR
 
 ```mermaid
 graph TB
-    subgraph "Request Queues"
-        EQ[EVM Queue]
-        BQ[Bitcoin Queue]
-        CQ[Cardano Queue]
-        TQ[TON Queue]
-        SQ[Substrate Queue]
+    subgraph "Request Sources"
+        DAPP[DApp Requests]
+        WC[WalletConnect]
+        UI[Extension UI]
+    end
+    
+    RS[Request Service] 
+    
+    subgraph "Chain Queues"
+        EVQ[EVM Queue]
+        BTQ[Bitcoin Queue] 
+        SUQ[Substrate Queue]
+        CAQ[Cardano Queue]
+        TNQ[TON Queue]
     end
     
     subgraph "Queue Management"
         QS[Queue Subjects]
-        PM[Promise Map]
-        VL[Validation Logic]
+        PM[Promise Maps]
+        PH[Popup Handler]
     end
     
-    subgraph "Request Lifecycle"
-        RR[Request Received]
-        RV[Request Validation]
-        RQ[Request Queued]
-        PD[Popup Displayed]
-        UC[User Confirmation]
-        RP[Request Processed]
-        RR[Result Returned]
+    subgraph "Request Flow"
+        PENDING[Pending] --> QUEUED[Queued]
+        QUEUED --> DISPLAYED[Displayed]
+        DISPLAYED --> CONFIRMED[Confirmed]
+        DISPLAYED --> REJECTED[Rejected]
+        CONFIRMED --> COMPLETED[Completed]
     end
     
-    RR --> RV
-    RV --> RQ
-    RQ --> PD
-    PD --> UC
-    UC --> RP
-    RP --> RR
+    %% Connections
+    DAPP --> RS
+    WC --> RS
+    UI --> RS
     
-    RQ --> QS
+    RS --> EVQ
+    RS --> BTQ
+    RS --> SUQ
+    RS --> CAQ
+    RS --> TNQ
+    
+    EVQ --> QS
+    BTQ --> QS
+    SUQ --> QS
+    CAQ --> QS
+    TNQ --> QS
+    
     QS --> PM
-    PM --> VL
+    QS --> PH
+    
+    class EVQ,BTQ,SUQ,CAQ,TNQ queue
+    class QS,PM,PH mgmt
+    class PENDING,QUEUED,DISPLAYED,CONFIRMED,REJECTED,COMPLETED state
+    class RS service
 ```
+
+**Key Features:**
+- **Multi-Chain Queues**: Separate queues for each blockchain type
+- **Promise-Based**: Each request creates a promise resolved by user action
+- **Real-time Updates**: BehaviorSubjects provide reactive queue updates
+- **Popup Management**: Automatic popup display for user confirmations
 
 ## Props
 
