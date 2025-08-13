@@ -13,28 +13,28 @@ import { TabsContainer } from './parts/TabsContainer';
 import { VoteArea } from './parts/VoteArea';
 
 type Props = ThemeProps & ViewBaseType & {
-  referendumDetailIndex: number | undefined;
-  navigateToOverview: VoidFunction;
+  referendumId: string;
+  goOverview: VoidFunction;
 };
 
-const Component = ({ chainSlug, className, navigateToOverview, referendumDetailIndex, sdkInstant }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant }: Props): React.ReactElement<Props> => {
   const onBack = useCallback(() => {
-    navigateToOverview();
-  }, [navigateToOverview]);
+    goOverview();
+  }, [goOverview]);
 
   const { data } = useQuery({
-    queryKey: ['subsquare', 'referendumDetail', chainSlug, referendumDetailIndex],
+    queryKey: ['subsquare', 'referendumDetail', chainSlug, referendumId],
     queryFn: async () => {
-      if (!referendumDetailIndex) {
+      if (!referendumId) {
         return undefined;
       }
 
-      return await sdkInstant?.getReferendaDetails(`${referendumDetailIndex}`);
+      return await sdkInstant?.getReferendaDetails(`${referendumId}`);
     },
     staleTime: 60 * 1000
   });
 
-  if (!referendumDetailIndex || !data) {
+  if (!data) {
     return <></>;
   }
 

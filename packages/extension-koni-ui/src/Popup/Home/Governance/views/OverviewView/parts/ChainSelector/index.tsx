@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainSelectorModal } from '@subwallet/extension-koni-ui/Popup/Home/Governance/OverviewView/parts/ChainSelector/ChainSelectorModal';
 import { ModalContext } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useState } from 'react';
 
+import { ChainSelectorModal } from './ChainSelectorModal';
 import { ChainSelectorTrigger } from './ChainSelectorTrigger';
 
 type Props = {

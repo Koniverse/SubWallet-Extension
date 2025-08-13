@@ -23,3 +23,25 @@ export type GovernanceChainSelectorItemType = {
   chainSlug: string;
   chainName: string;
 };
+
+// machine
+// ----------
+export interface GovernanceViewContext {
+  chainSlug: string;
+  referendumId: string | null;
+  view: ScreenView;
+}
+
+export type GovernanceViewEvent =
+  | { type: 'GO_OVERVIEW' }
+  | { type: 'GO_REFERENDUM_DETAIL'; referendumId: string }
+  | { type: 'SET_CHAIN'; chainSlug: string }
+  | { type: 'SET_REFERENDUM'; referendumId: string | null }
+
+export interface GovernanceUrlParams {
+  view?: ScreenView | null;
+  referendumId?: string | null;
+  delegateId?: string | null;
+  chainSlug?: string | null;
+}
+// ----------

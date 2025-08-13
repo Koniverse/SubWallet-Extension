@@ -16,16 +16,16 @@ import { Toolbar } from './parts/Toolbar';
 
 type Props = ThemeProps & ViewBaseType & {
   onChangeChain: (chainSlug: string) => void;
-  navigateToReferendumDetail: (item: Referendum) => void;
+  goReferendumDetail: (id: string) => void;
 };
 
-const Component = ({ chainSlug, className, navigateToReferendumDetail, onChangeChain, sdkInstant }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sdkInstant }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
 
   const onClickReferendumItem = useCallback((item: Referendum) => {
-    navigateToReferendumDetail(item);
-  }, [navigateToReferendumDetail]);
+    goReferendumDetail(`${item.referendumIndex}`);
+  }, [goReferendumDetail]);
 
   const { data } = useQuery({
     queryKey: ['subsquare', 'referendaList', chainSlug],
