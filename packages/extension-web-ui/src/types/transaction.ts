@@ -53,6 +53,10 @@ export interface EarnParams extends TransactionFormBaseProps {
   hasPreSelectTarget: boolean;
 }
 
+export interface ChangeValidatorParams extends EarnParams {
+  originValidator: string;
+}
+
 export interface UnStakeParams extends TransactionFormBaseProps {
   value: string;
   validator: string;

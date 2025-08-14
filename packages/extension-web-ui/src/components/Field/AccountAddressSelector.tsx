@@ -16,12 +16,13 @@ import { AccountSelectorModal } from '../Modal';
 interface Props extends ThemeProps, BasicInputWrapper {
   items: AccountAddressItemType[];
   labelStyle?: 'horizontal' | 'vertical';
+  autoSelectFirstItem?: boolean;
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
-  const { className = '', disabled, id = 'account-selector', items
-    , label, labelStyle, placeholder
-    , readOnly, statusHelp, tooltip, value } = props;
+  const { autoSelectFirstItem, className = '', disabled, id = 'account-selector'
+    , items, label, labelStyle
+    , placeholder, readOnly, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -102,6 +103,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         />
       </div>
       <AccountSelectorModal
+        autoSelectFirstItem={autoSelectFirstItem}
         items={items}
         modalId={id}
         onCancel={onCancelModal}

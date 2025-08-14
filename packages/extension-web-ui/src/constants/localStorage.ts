@@ -21,8 +21,9 @@ export const CANCEL_UN_STAKE_TRANSACTION = 'transaction.cancel-un-stake';
 export const WITHDRAW_TRANSACTION = 'transaction.withdraw';
 export const CLAIM_REWARD_TRANSACTION = 'transaction.claim-reward';
 export const CLAIM_BRIDGE_TRANSACTION = 'transaction.claim-bridge';
+export const CHANGE_VALIDATOR_TRANSACTION = 'transaction.change-validator';
 
-export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION];
+export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION];
 
 export const SELECTED_ACCOUNT_TYPE = 'account.selected-type';
 export const SELECTED_MNEMONIC_TYPE = 'account.selected-mnemonic-type';
@@ -38,7 +39,7 @@ export const APP_INSTRUCTION_DATA = 'static.instruction-data';
 export const EARNING_WARNING_ANNOUNCEMENT = 'announcement.earning-position';
 export const CREATE_RETURN = 'account.create-return';
 export const SELL_TOKEN_TAB = 'sell.token-tab';
-
+export const TIME_OUT_RECORD = 'general.time-out-record';
 export const CROWDLOAN_UNLOCK_TIME = 'event.crowdloan-unlock-time';
 
 export const LATEST_SESSION = 'general.latest-session';

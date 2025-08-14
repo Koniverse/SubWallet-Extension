@@ -5,21 +5,20 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-web-ui/constants/signing';
-import { AccountAddressType, AccountSignMode, AccountType } from '@subwallet/extension-web-ui/types';
+import { AccountAddressType, AccountType, BitcoinAccountInfo } from '@subwallet/extension-web-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-web-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-web-ui/utils/types';
-import { decodeAddress, encodeAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { decodeAddress, encodeAddress, isAddress, isBitcoinAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
-import { isChainInfoAccordantAccountChainType } from '../chain';
 import { getLogoByNetworkKey } from '../common';
 
 export function getAccountType (address: string): AccountType {
@@ -59,6 +58,10 @@ export const findAccountByAddress = (accounts: AccountJson[], address?: string):
 
     return null;
   }
+};
+
+export const getSignModeByAccountProxy = (accountProxy: AccountProxy | null | undefined): AccountSignMode => {
+  return getSignMode(accountProxy?.accounts[0]);
 };
 
 export const getSignMode = (account: AccountJson | null | undefined): AccountSignMode => {
@@ -163,6 +166,60 @@ export const convertKeyTypes = (authTypes: AccountAuthType[]): KeypairType[] => 
   return _rs.length ? _rs : DEFAULT_ACCOUNT_TYPES;
 };
 
+export function getBitcoinAccountDetails (type: KeypairType): BitcoinAccountInfo {
+  const result: BitcoinAccountInfo = {
+    name: 'Unknown',
+    network: 'Unknown',
+    order: 99
+  };
+
+  switch (type) {
+    case 'bitcoin-84':
+      result.logoKey = 'bitcoin';
+      result.name = 'Native SegWit';
+      result.network = 'Bitcoin';
+      result.order = 1;
+      break;
+
+    case 'bittest-84':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Native SegWit';
+      result.network = 'Bitcoin Testnet';
+      result.order = 2;
+      break;
+
+    case 'bitcoin-86':
+      result.logoKey = 'bitcoin';
+      result.name = 'Taproot';
+      result.network = 'Bitcoin';
+      result.order = 3;
+      break;
+
+    case 'bittest-86':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Taproot';
+      result.network = 'Bitcoin Testnet';
+      result.order = 4;
+      break;
+
+    case 'bitcoin-44':
+      result.logoKey = 'bitcoin';
+      result.name = 'Legacy';
+      result.network = 'Bitcoin';
+      result.order = 5;
+      break;
+
+    case 'bittest-44':
+      result.logoKey = 'bitcoinTestnet';
+      result.name = 'Legacy';
+      result.network = 'Bitcoin Testnet';
+      result.order = 6;
+      break;
+  }
+
+  return result;
+}
+
 // todo:
 //  - support bitcoin
 export function getReformatedAddressRelatedToChain (accountJson: AccountJson, chainInfo: _ChainInfo): string | undefined {
@@ -170,7 +227,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return undefined;
   }
 
-  if (!isChainInfoAccordantAccountChainType(chainInfo, accountJson.chainType)) {
+  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson)) {
     return undefined;
   }
 
@@ -182,6 +239,8 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
   } else if (accountJson.chainType === AccountChainType.CARDANO && chainInfo.cardanoInfo) {
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
+  } else if (accountJson.chainType === AccountChainType.BITCOIN && chainInfo.bitcoinInfo) {
+    return accountJson.address;
   }
 
   return undefined;
@@ -222,6 +281,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
     return true;
   }
 
+  if (isBitcoinAddress(address) && authAccountTypes?.includes('bitcoin')) {
+    return true;
+  }
+
   return false;
 };
 
@@ -231,10 +294,27 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
     [AccountChainType.ETHEREUM]: logoMap.network.ethereum as string,
     [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string,
     [AccountChainType.TON]: logoMap.network.ton as string,
-    [AccountChainType.CARDANO]: logoMap.network.cardano as string
+    [AccountChainType.CARDANO]: logoMap.network.cardano as string,
+    [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string
   };
 }
 
 export const shouldShowAccountAll = (list: AccountProxy[]) => {
   return list.filter(({ id }) => !isAccountAll(id)).length > 1;
+};
+
+export const getBitcoinKeypairAttributes = (keyPairType: KeypairType): { label: string; schema: string } => {
+  switch (keyPairType) {
+    case 'bitcoin-44':
+    case 'bittest-44':
+      return { label: 'Legacy', schema: 'orange-7' };
+    case 'bitcoin-86':
+    case 'bittest-86':
+      return { label: 'Taproot', schema: 'cyan-7' };
+    case 'bitcoin-84':
+    case 'bittest-84':
+      return { label: 'Native SegWit', schema: 'lime-7' };
+    default:
+      return { label: '', schema: '' };
+  }
 };

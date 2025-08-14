@@ -3,15 +3,16 @@
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
+import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
 import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtRequest, BitcoinSignPsbtResult, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
-import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import BuyService from '@subwallet/extension-base/services/buy-service';
@@ -46,12 +47,14 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, isSameAddress, reformatAddress, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
+import BigN from 'bignumber.js';
+import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
 import { t } from 'i18next';
 import { interfaces } from 'manta-extension-sdk';
@@ -144,6 +147,7 @@ export default class KoniState {
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
   private waitSleeping: Promise<void> | null = null;
   private waitStarting: Promise<void> | null = null;
+  private waitStartingFull: Promise<void> | null = null;
 
   constructor (providers: Providers = {}) {
     // Init subwallet api sdk
@@ -157,12 +161,14 @@ export default class KoniState {
     this.eventService = new EventService();
     this.dbService = new DatabaseService(this.eventService);
     this.keyringService = new KeyringService(this);
+    this.feeService = new FeeService(this);
+    this.transactionService = new TransactionService(this);
 
     this.notificationService = new NotificationService();
     this.chainService = new ChainService(this.dbService, this.eventService);
     this.subscanService = SubscanService.getInstance();
     this.settingService = new SettingService();
-    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService);
+    this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.transactionService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
     this.balanceService = new BalanceService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
@@ -173,9 +179,7 @@ export default class KoniState {
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
     this.buyService = new BuyService(this);
-    this.transactionService = new TransactionService(this);
     this.earningService = new EarningService(this);
-    this.feeService = new FeeService(this);
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
@@ -186,7 +190,9 @@ export default class KoniState {
 
     // Init state
     if (targetIsWeb) {
-      this.init().catch(console.error);
+      this.init().then(() => {
+        this.wakeup(true).catch(console.error);
+      }).catch(console.error);
     }
   }
 
@@ -306,7 +312,7 @@ export default class KoniState {
     await this.swapService.init();
     await this.inappNotificationService.init();
 
-    this.onReady();
+    // this.onReady();
     this.onAccountAdd();
     this.onAccountRemove();
 
@@ -319,6 +325,12 @@ export default class KoniState {
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
     });
+
+    // init sails
+    await sailsCache.init();
+
+    // Mark app is ready
+    this.eventService.emit('general.init', true);
   }
 
   public async initMantaPay (password: string) {
@@ -345,12 +357,6 @@ export default class KoniState {
     this.dbService.subscribeMantaPayConfig(_DEFAULT_MANTA_ZK_CHAIN, (data) => {
       this.mantaPayConfigSubject.next(data);
     });
-  }
-
-  public onReady () {
-    // Todo: Need optimize in the future to, only run important services onetime to save resources
-    // Todo: If optimize must check activity of web-runner of mobile
-    this._start().catch(console.error);
   }
 
   public updateKeyringState (isReady = true, callback?: () => void): void {
@@ -952,6 +958,10 @@ export default class KoniState {
     return this.chainService.getCardanoApi(networkKey);
   }
 
+  public getBitcoinApi (networkKey: string) {
+    return this.chainService.getBitcoinApi(networkKey);
+  }
+
   public getApiMap () {
     return {
       substrate: this.chainService.getSubstrateApiMap(),
@@ -1278,6 +1288,7 @@ export default class KoniState {
     });
   }
 
+  // Cardano
   public async cardanoGetBalance (id: string, url: string, address: string): Promise<CardanoWasm.Value> {
     const authInfoMap = await this.getAuthList();
     const authInfo = authInfoMap[stripUrl(url)];
@@ -1537,6 +1548,204 @@ export default class KoniState {
     return await cardanoApi.sendCardanoTxReturnHash(txHex);
   }
 
+  // Bitcoin
+  public async bitcoinSign (id: string, url: string, method: string, params: BitcoinSignMessageParams): Promise<BitcoinSignMessageResult> {
+    const { address, message } = params;
+
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'bitcoin',
+      payloadAfterValidated: message,
+      errors: [],
+      networkKey: ''
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinSignMessageMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    const errorsFormated = convertErrorFormat(result.errors);
+    const payloadAfterValidated: BitcoinSignatureRequest = {
+      ...result.payloadAfterValidated as BitcoinSignatureRequest,
+      errors: errorsFormated,
+      id
+    };
+
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignatureRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
+  public async bitcoinSignPspt (id: string, url: string, params: BitcoinSignPsbtParams): Promise<BitcoinSignPsbtResult> {
+    const { address, network, psbt } = params;
+    const payloadValidation: PayloadValidated = {
+      address,
+      type: 'bitcoin',
+      payloadAfterValidated: params,
+      errors: [],
+      networkKey: network === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet'
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinConnectMiddleware,
+        validationBitcoinSignPsbtMiddleware
+      ];
+
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+
+    const errorsFormated = convertErrorFormat(result.errors);
+
+    const payloadAfterValidated: BitcoinSignPsbtRequest = {
+      ...result.payloadAfterValidated as BitcoinSignPsbtRequest,
+      errors: errorsFormated
+    };
+    const network_ = network === 'mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
+    const psbtGenerate = bitcoin.Psbt.fromHex(psbt, {
+      network: network_
+    });
+
+    const isExistedInput = (inputs: PsbtTransactionArg[], address: string) => inputs.findIndex(({ address: address_ }) => isSameAddress(address, address_ || ''));
+    let to = '';
+    const tokenInfo = this.getNativeTokenInfo(result.networkKey);
+    let value = new BigN(0);
+    const totalBalance = await this.balanceService.getTotalBalance(address, result.networkKey, tokenInfo.slug);
+    let inputAmount = new BigN(0);
+    const psbtInputData = psbtGenerate.data.inputs.reduce((inputs, { nonWitnessUtxo, witnessUtxo }, inputIndex) => {
+      let inputData: PsbtTransactionArg | null = null;
+
+      if (witnessUtxo) {
+        inputData = {
+          address: bitcoin.address.fromOutputScript(witnessUtxo?.script, network_),
+          amount: witnessUtxo.value.toString()
+        };
+      } else if (nonWitnessUtxo) {
+        const txin = psbtGenerate.txInputs[inputIndex];
+        const txout = bitcoin.Transaction.fromBuffer(nonWitnessUtxo).outs[txin.index];
+
+        inputData = {
+          address: bitcoin.address.fromOutputScript(txout.script, network_),
+          amount: txout.value.toString()
+        };
+      }
+
+      if (inputData) {
+        inputs.push(inputData);
+
+        if (isSameAddress(address, inputData.address || '')) {
+          inputAmount = inputAmount.plus(new BigN(inputData.amount || '0'));
+        }
+      }
+
+      return inputs;
+    }, [] as PsbtTransactionArg[]);
+
+    if (new BigN(totalBalance.value).lt(inputAmount)) {
+      payloadAfterValidated.errors = [{ message: t('Insufficient balance'), name: t('Unable to sign transaction') }];
+    }
+
+    const psbtOutputData = psbtGenerate.txOutputs.map((output) => {
+      let address = '';
+
+      try {
+        address = output.address || bitcoin.address.fromOutputScript(output.script, network_);
+      } catch (e) {
+        if (output.script.includes(bitcoin.opcodes.OP_RETURN)) {
+          address = 'OP_RETURN';
+        } else {
+          address = 'Unknown';
+        }
+      }
+
+      if (isExistedInput(psbtInputData, address) === -1) {
+        to = address;
+        value = value.plus(new BigN(output.value));
+      }
+
+      return {
+        address,
+        amount: output.value.toString()
+      } as PsbtTransactionArg;
+    });
+
+    payloadAfterValidated.payload = {
+      ...payloadAfterValidated.payload,
+      psbt,
+      tokenSlug: tokenInfo.slug,
+      value: value.toString(),
+      to,
+      txInput: psbtInputData,
+      txOutput: psbtOutputData
+    };
+
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSignPsbtRequest', payloadAfterValidated, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
+  public async bitcoinSendTransaction (id: string, url: string, transactionParams: BitcoinSendTransactionParams): Promise<string | undefined> {
+    const payloadValidation: PayloadValidated = {
+      address: transactionParams.account,
+      type: 'bitcoin',
+      payloadAfterValidated: transactionParams,
+      errors: [],
+      networkKey: transactionParams.network === 'mainnet' ? 'bitcoin' : 'bitcoinTestnet'
+    };
+
+    const validationSteps: ValidateStepFunction[] =
+      [
+        validationAuthMiddleware,
+        validationBitcoinConnectMiddleware,
+        validationBitcoinSendTransactionMiddleware
+      ];
+    const result = await generateValidationProcess(this, url, payloadValidation, validationSteps);
+    const errorsFormated = convertErrorFormat(result.errors);
+    const requestPayload: BitcoinSendTransactionRequest = {
+      ...result.payloadAfterValidated as BitcoinSendTransactionRequest,
+      hashPayload: JSON.stringify(result.payloadAfterValidated),
+      from: transactionParams.account,
+      id,
+      errors: errorsFormated
+    };
+
+    // Custom handle this instead of general handler transaction
+    return this.requestService.addConfirmationBitcoin(id, url, 'bitcoinSendTransactionRequestAfterConfirmation', requestPayload, {})
+      .then(({ isApproved, payload }) => {
+        if (isApproved) {
+          if (payload) {
+            return payload;
+          } else {
+            throw new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, t('Not found signature'));
+          }
+        } else {
+          throw new BitcoinProviderError(BitcoinProviderErrorType.USER_REJECTED_REQUEST);
+        }
+      });
+  }
+
   public getConfirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {
     return this.requestService.confirmationsQueueSubject;
   }
@@ -1549,6 +1758,10 @@ export default class KoniState {
     return this.requestService.confirmationsQueueSubjectCardano;
   }
 
+  public getConfirmationsQueueSubjectBitcoin (): BehaviorSubject<ConfirmationsQueueBitcoin> {
+    return this.requestService.confirmationsQueueSubjectBitcoin;
+  }
+
   public async completeConfirmation (request: RequestConfirmationComplete) {
     return await this.requestService.completeConfirmation(request);
   }
@@ -1559,6 +1772,10 @@ export default class KoniState {
 
   public async completeConfirmationCardano (request: RequestConfirmationCompleteCardano) {
     return await this.requestService.completeConfirmationCardano(request);
+  }
+
+  public async completeConfirmationBitcoin (request: RequestConfirmationCompleteBitcoin) {
+    return await this.requestService.completeConfirmationBitcoin(request);
   }
 
   private async onMV3Update () {
@@ -1738,8 +1955,12 @@ export default class KoniState {
   }
 
   public async sleep () {
+    // Wait for app initialized before sleep
+    await this.eventService.waitAppInitialized;
+
     // Wait starting finish before sleep to avoid conflict
     this.generalStatus === ServiceStatus.STARTING && this.waitStarting && await this.waitStarting;
+    this.generalStatus === ServiceStatus.STARTING_FULL && this.waitStartingFull && await this.waitStartingFull;
     this.eventService.emit('general.sleep', true);
 
     // Avoid sleep multiple times
@@ -1772,6 +1993,9 @@ export default class KoniState {
   }
 
   private async _start () {
+    // Wait for app initialized before start
+    await this.eventService.waitAppInitialized;
+
     // Wait sleep finish before start to avoid conflict
     this.generalStatus === ServiceStatus.STOPPING && this.waitSleeping && await this.waitSleeping;
 
@@ -1800,16 +2024,44 @@ export default class KoniState {
     }
 
     // Start services
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start', true);
 
     // Complete starting
-    starting.resolve();
     this.waitStarting = null;
     this.generalStatus = ServiceStatus.STARTED;
+    starting.resolve();
   }
 
-  public async wakeup () {
+  private async _startFull () {
+    // Continue wait existed starting process
+    if (this.generalStatus === ServiceStatus.STARTING) {
+      await this.waitStarting;
+    }
+
+    // Always start full from start state
+    if (this.generalStatus !== ServiceStatus.STARTED) {
+      return;
+    }
+
+    this.generalStatus = ServiceStatus.STARTING_FULL;
+    const startingFull = createPromiseHandler<void>();
+
+    this.waitStartingFull = startingFull.promise;
+
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    this.eventService.emit('general.start_full', true);
+
+    this.waitStartingFull = null;
+    this.generalStatus = ServiceStatus.STARTED_FULL;
+    startingFull.resolve();
+  }
+
+  public async wakeup (fullWakeup = false) {
     await this._start();
+
+    if (fullWakeup) {
+      await this._startFull();
+    }
   }
 
   public cancelSubscription (id: string): boolean {

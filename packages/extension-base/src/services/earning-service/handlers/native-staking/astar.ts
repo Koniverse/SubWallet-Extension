@@ -47,13 +47,14 @@ export function getAstarWithdrawable (yieldPosition: YieldPositionInfo): Unstaki
 }
 
 export default class AstarNativeStakingPoolHandler extends BaseParaNativeStakingPoolHandler {
-  protected override readonly availableMethod: YieldPoolMethodInfo = {
+  override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
 
   /* Subscribe pool info */
@@ -344,6 +345,29 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
       cancel = true;
       unsub && unsub();
     };
+  }
+
+  async checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.dappsStaking?.ledger?.multi?.(useAddresses);
+
+    if (!ledgers) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const _ledger = ledgers[i];
+      const ledger = _ledger.toPrimitive() as unknown as PalletDappsStakingAccountLedger;
+
+      if (ledger && ledger.locked > 0) {
+        result.push(owner);
+      }
+    }
+
+    return result;
   }
 
   /* Subscribe pool position */

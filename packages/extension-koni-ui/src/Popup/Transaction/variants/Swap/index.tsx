@@ -8,7 +8,7 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
@@ -20,7 +20,7 @@ import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/compone
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useChainConnection, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useReformatAddress, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -28,7 +28,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getChainsByAccountAll, isAccountAll, isChainInfoAccordantAccountChainType, isTokenCompatibleWithAccountChainTypes, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -197,9 +197,26 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   }, [availableBalanceHookResult.isLoading, availableBalanceHookResult.nativeTokenBalance, availableBalanceHookResult.nativeTokenSlug, availableBalanceHookResult.tokenBalance, fromTokenSlugValue]);
 
   const { checkChainConnected, turnOnChain } = useChainConnection();
-  const onPreCheck = usePreCheckAction(fromValue);
+
+  const preCheckMessage = useMemo(() => {
+    if (!fromTokenSlugValue) {
+      return undefined;
+    }
+
+    const chainAsset = assetRegistryMap[fromTokenSlugValue];
+    const chainSlug = _getAssetOriginChain(chainAsset);
+    const chainName = _getChainName(chainInfoMap[chainSlug]);
+
+    return t('{{symbol}} on {{chainName}} is not supported for swapping. Select another token and try again', { replace: {
+      symbol: _getAssetSymbol(chainAsset),
+      chainName
+    } });
+  }, [assetRegistryMap, chainInfoMap, fromTokenSlugValue, t]);
+
+  const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
   const oneSign = useOneSignProcess(fromValue);
-  const getReformatAddress = useReformatAddress();
+  const getReformatAddress = useCoreCreateReformatAddress();
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -278,24 +295,28 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
 
-  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
-    const allowChainSlugs = isAccountAll(targetAccountProxy.id)
-      ? getChainsByAccountAll(targetAccountProxy, accountProxies, chainInfoMap)
-      : undefined;
+  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
+    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
+  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
 
+  const isTokenCompatibleWithTargetAccountProxy = useCallback((tokenSlug: string): boolean => {
+    if (!tokenSlug) {
+      return false;
+    }
+
+    const chainSlug = _getOriginChainOfAsset(tokenSlug);
+
+    const { allowedChains, excludedTokens } = allowedChainAndExcludedTokenForTargetAccountProxy;
+
+    return allowedChains.includes(chainSlug) && !excludedTokens.includes(tokenSlug);
+  }, [allowedChainAndExcludedTokenForTargetAccountProxy]);
+
+  const fromTokenItems = useMemo<TokenSelectorItemType[]>(() => {
     return tokenSelectorItems.filter((item) => {
       const slug = item.slug;
       const assetInfo = assetRegistryMap[slug];
 
-      if (!assetInfo) {
-        return false;
-      }
-
-      if (allowChainSlugs && !allowChainSlugs.includes(assetInfo.originChain)) {
-        return false;
-      }
-
-      if (!isTokenCompatibleWithAccountChainTypes(slug, targetAccountProxy.chainTypes, chainInfoMap)) {
+      if (!assetInfo || !isTokenCompatibleWithTargetAccountProxy(slug)) {
         return false;
       }
 
@@ -305,7 +326,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
       return defaultSlug === slug || _getMultiChainAsset(assetInfo) === defaultSlug;
     });
-  }, [accountProxies, assetRegistryMap, chainInfoMap, defaultSlug, targetAccountProxy, tokenSelectorItems]);
+  }, [assetRegistryMap, defaultSlug, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
 
   const toTokenItems = useMemo(() => {
     return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
@@ -322,8 +343,8 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
-    return isTokenCompatibleWithAccountChainTypes(toTokenSlugValue, targetAccountProxy.chainTypes, chainInfoMap);
-  }, [chainInfoMap, targetAccountProxy.chainTypes, toTokenSlugValue]);
+    return isTokenCompatibleWithTargetAccountProxy(toTokenSlugValue);
+  }, [isTokenCompatibleWithTargetAccountProxy, toTokenSlugValue]);
 
   // Unable to use useEffect due to infinity loop caused by conflict setCurrentSlippage and currentQuote
   const slippage = useMemo(() => {
@@ -370,7 +391,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return false;
     }
 
-    return !isChainInfoAccordantAccountChainType(chainInfoMap[destChainValue], fromAccountJson.chainType);
+    return !_isChainInfoCompatibleWithAccountInfo(chainInfoMap[destChainValue], fromAccountJson);
   }, [accounts, chainInfoMap, destChainValue, fromValue]);
 
   const recipientAddressValidator = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
@@ -386,12 +407,13 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return validateRecipientAddress({ srcChain: chain,
       destChainInfo,
       fromAddress: from,
+      assetInfo: toAssetInfo,
       toAddress: _recipientAddress,
       account,
       actionType: ActionType.SWAP,
       autoFormatValue,
       allowLedgerGenerics: ledgerGenericAllowNetworks });
-  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks]);
+  }, [accounts, assetRegistryMap, autoFormatValue, chainInfoMap, form, isRecipientFieldAllowed, ledgerGenericAllowNetworks, toAssetInfo]);
 
   const onSelectFromToken = useCallback((tokenSlug: string) => {
     form.setFieldValue('fromTokenSlug', tokenSlug);
@@ -761,7 +783,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((a) => isChainInfoAccordantAccountChainType(destChainInfo, a.chainType));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo));
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;
@@ -1232,6 +1254,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 statusHelpAsTooltip={true}
               >
                 <AddressInputNew
+                  actionType={ActionType.SWAP}
                   chainSlug={destChainValue}
                   dropdownHeight={isNotShowAccountSelector ? 227 : 167}
                   label={`${t('To')}:`}
@@ -1240,6 +1263,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   ref={addressInputRef}
                   showAddressBook={true}
                   showScanner={true}
+                  tokenSlug={toTokenSlugValue}
                 />
               </Form.Item>
 

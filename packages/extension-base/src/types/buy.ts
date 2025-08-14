@@ -11,7 +11,7 @@ export interface BuyService {
 
 export type SupportService = 'transak' | 'banxa' | 'coinbase' | 'moonpay' | 'onramper' | 'meld';
 
-export type OnrampAccountSupportType = 'ETHEREUM' | 'SUBSTRATE';
+export type OnrampAccountSupportType = 'ETHEREUM' | 'SUBSTRATE' | 'TON' | 'CARDANO' | 'BITCOIN';
 
 export interface BuyTokenInfo {
   network: string;

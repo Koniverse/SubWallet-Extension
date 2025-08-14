@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountProxySelectorAllItem, BaseModal, BasicInputWrapper, FilterModal, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import ExportAllSelectItem from '@subwallet/extension-web-ui/components/Layout/parts/SelectAccount/ExportAllSelectItem';
 import AccountExportPasswordModal from '@subwallet/extension-web-ui/components/Modal/Account/AccountExportPasswordModal';
 import { EXPORT_ACCOUNTS_PASSWORD_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useFilterModal, useGoBackSelectAccount, useSelectAccount } from '@subwallet/extension-web-ui/hooks';
-import { AccountSignMode, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { isAccountAll, searchAccountProxyFunction, shouldShowAccountAll } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Icon, InputRef, ModalContext, SwList, Tooltip } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -35,10 +35,6 @@ const filterOptions = [
   {
     label: 'QR signer account',
     value: AccountProxyType.QR
-  },
-  {
-    label: 'Ledger account',
-    value: AccountProxyType.LEDGER
   },
   {
     label: 'Watch-only account',
@@ -111,8 +107,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         } else if (filter === AccountProxyType.QR && accountType === AccountProxyType.QR) {
           return true;
         } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
-          return true;
-        } else if (filter === AccountProxyType.LEDGER && accountType === AccountProxyType.LEDGER) {
           return true;
         }
       }

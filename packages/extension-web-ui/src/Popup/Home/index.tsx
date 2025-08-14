@@ -8,8 +8,8 @@ import { CONFIRM_GENERAL_TERM, GENERAL_TERM_AND_CONDITION_MODAL } from '@subwall
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy } from '@subwallet/extension-web-ui/hooks';
 import useAccountBalance from '@subwallet/extension-web-ui/hooks/screen/home/useAccountBalance';
-import { useGetChainSlugsByAccount } from '@subwallet/extension-web-ui/hooks/screen/home/useGetChainSlugsByAccount';
 import useTokenGroup from '@subwallet/extension-web-ui/hooks/screen/home/useTokenGroup';
 import PortfolioPage from '@subwallet/extension-web-ui/Popup/Home/PortfolioPage';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -26,8 +26,8 @@ export const GlobalSearchTokenModalId = 'globalSearchToken';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const chainsByAccountType = useGetChainSlugsByAccount();
-  const tokenGroupStructure = useTokenGroup(chainsByAccountType);
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const tokenGroupStructure = useTokenGroup(allowedChains, excludedTokens);
   const accountBalance = useAccountBalance(tokenGroupStructure.tokenGroupMap);
   const [isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
   const { pathname } = useLocation();
@@ -86,8 +86,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <GlobalSearchTokenModal
         id={GlobalSearchTokenModalId}
         onCancel={onCloseGlobalSearchToken}
-        sortedTokenSlugs={tokenGroupStructure.sortedTokenSlugs}
         tokenBalanceMap={accountBalance.tokenBalanceMap}
+        tokenSlugs={tokenGroupStructure.tokenSlugs}
       />
     </>
   );

@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible } from '@subwallet/extension-web-ui/constants';
-// TODO: Use AccountSignMode from the background for consistency.
-import { AccountSignMode } from '@subwallet/extension-web-ui/types';
+import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-web-ui/constants';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';
@@ -22,6 +20,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return t('Ledger account');
       case AccountSignMode.ALL_ACCOUNT:
         return t('All account');
@@ -79,10 +78,13 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
               }
 
               break;
+            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+              accountTitle = t('Ledger - Polkadot (EVM) account');
+              break;
           }
         }
 
-        if (mode === AccountSignMode.LEGACY_LEDGER || mode === AccountSignMode.GENERIC_LEDGER) {
+        if (SubstrateLedgerSignModeSupport.includes(mode)) {
           if (!isLedgerCapable) {
             notify({
               message: t(ledgerIncompatible),

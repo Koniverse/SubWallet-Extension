@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType, AccountProxyType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
+import { AccountProxyType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag } from '@subwallet/extension-web-ui/components';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
@@ -153,7 +153,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
                 placeholder={t('Enter the account name')}
                 suffix={(
                   <AccountChainTypeLogos
-                    chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES as AccountChainType[]}
+                    chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES}
                     className={'__chain-type-logos'}
                   />
                 )}

@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   let symbol = amount?.symbol;
 
-  if (data.type === ExtrinsicType.STAKING_UNBOND) {
+  if (data.type === ExtrinsicType.STAKING_UNBOND || data.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
     const additionalInfo = data.additionalInfo as RequestClaimBridge;
 
     if (additionalInfo?.symbol) {

@@ -114,7 +114,11 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const types = currentAuth.accountAuthTypes || ['substrate'];
         const allowedMap = currentAuth.isAllowedMap;
 
-        const filterType = (address: string) => {
+        const filterType = (address: string, isSubstrateECDSA?: boolean) => {
+          if (isSubstrateECDSA && !currentAuth.canConnectSubstrateEcdsa) {
+            return false;
+          }
+
           return isAddressAllowedWithAuthType(address, types);
         };
 
@@ -127,11 +131,12 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         const idProxiesCanConnect = new Set<string>();
         const allowedIdProxies = new Set<string>();
 
-        accountToCheck.forEach(({ address, proxyId }) => {
-          if (filterType(address) && proxyId) {
+        accountToCheck.forEach(({ address, isSubstrateECDSA, proxyId }) => {
+          if (filterType(address, isSubstrateECDSA) && proxyId) {
             idProxiesCanConnect.add(proxyId);
           }
         });
+
         Object.entries(allowedMap)
           .forEach(([address, value]) => {
             if (filterType(address)) {

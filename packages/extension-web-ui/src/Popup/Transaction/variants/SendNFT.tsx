@@ -239,6 +239,7 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
             validateTrigger={false}
           >
             <AddressInputNew
+              actionType={ActionType.SEND_NFT}
               chainSlug={chain}
               dropdownHeight={227}
               label={t('Send to')}

@@ -1,12 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BaseSelectModal } from '@subwallet/extension-web-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components/Field/Base';
 import { RECOVERY_SLUG } from '@subwallet/extension-web-ui/constants';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-web-ui/hooks/form/useSelectModalInputHelper';
 import { ChainItemType, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Icon, InputRef, Logo, NetworkItem, SelectModal, Tooltip } from '@subwallet/react-ui';
+import { Icon, InputRef, Logo, NetworkItem, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useMemo } from 'react';
@@ -115,7 +116,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   }, [messageTooltip, t, token.colorSuccess]);
 
   return (
-    <SelectModal
+    <BaseSelectModal
       className={`${className} chain-selector-modal selector-${id}-modal`}
       disabled={disabled}
       id={id}

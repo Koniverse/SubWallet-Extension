@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountChainType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
+import { SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyAvatar } from '@subwallet/extension-web-ui/components';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import React from 'react';
@@ -32,7 +32,7 @@ function Component ({ accountName,
       </div>
 
       <AccountChainTypeLogos
-        chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES as AccountChainType[]}
+        chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES}
         className={'__item-chain-type-logos'}
       />
     </div>

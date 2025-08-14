@@ -1,12 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AuthRequestV2, ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ConfirmationsQueue, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationsQueueTon, ConfirmationType, ConfirmationTypeCardano, ConfirmationTypeTon, RequestConfirmationComplete, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon } from '@subwallet/extension-base/background/KoniTypes';
+import { AuthRequestV2, ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationsQueueTon, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ConfirmationTypeTon, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType, AuthorizeRequest, MetadataRequest, RequestAuthorizeTab, RequestSign, ResponseSigning, SigningRequest } from '@subwallet/extension-base/background/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
+import BitcoinRequestHandler from '@subwallet/extension-base/services/request-service/handler/BitcoinRequestHandler';
 import CardanoRequestHandler from '@subwallet/extension-base/services/request-service/handler/CardanoRequestHandler';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
+import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { BehaviorSubject } from 'rxjs';
@@ -27,13 +29,14 @@ export default class RequestService {
   readonly #authRequestHandler: AuthRequestHandler;
   readonly #substrateRequestHandler: SubstrateRequestHandler;
   readonly #evmRequestHandler: EvmRequestHandler;
+  readonly #bitcoinRequestHandler: BitcoinRequestHandler;
   readonly #tonRequestHandler: TonRequestHandler;
   readonly #cardanoRequestHandler: CardanoRequestHandler;
   readonly #connectWCRequestHandler: ConnectWCRequestHandler;
   readonly #notSupportWCRequestHandler: NotSupportWCRequestHandler;
 
   // Common
-  constructor (chainService: ChainService, settingService: SettingService, keyringService: KeyringService) {
+  constructor (chainService: ChainService, settingService: SettingService, keyringService: KeyringService, transactionService: TransactionService) {
     this.#chainService = chainService;
     this.settingService = settingService;
     this.keyringService = keyringService;
@@ -44,6 +47,7 @@ export default class RequestService {
     this.#evmRequestHandler = new EvmRequestHandler(this);
     this.#tonRequestHandler = new TonRequestHandler(this);
     this.#cardanoRequestHandler = new CardanoRequestHandler(this);
+    this.#bitcoinRequestHandler = new BitcoinRequestHandler(this, this.#chainService, transactionService);
     this.#connectWCRequestHandler = new ConnectWCRequestHandler(this);
     this.#notSupportWCRequestHandler = new NotSupportWCRequestHandler(this);
 
@@ -52,7 +56,7 @@ export default class RequestService {
   }
 
   public get numAllRequests () {
-    return this.allSubstrateRequests.length + this.numEvmRequests + this.numTonRequests + this.numCardanoRequests;
+    return this.allSubstrateRequests.length + this.numEvmRequests + this.numTonRequests + this.numCardanoRequests + this.numBitcoinRequests;
   }
 
   public updateIconV2 (shouldClose?: boolean): void {
@@ -185,6 +189,10 @@ export default class RequestService {
     return this.#cardanoRequestHandler.numCardanoRequests;
   }
 
+  public get numBitcoinRequests (): number {
+    return this.#bitcoinRequestHandler.numBitcoinRequests;
+  }
+
   public get confirmationsQueueSubject (): BehaviorSubject<ConfirmationsQueue> {
     return this.#evmRequestHandler.getConfirmationsQueueSubject();
   }
@@ -260,6 +268,37 @@ export default class RequestService {
     return this.#evmRequestHandler.updateConfirmation(id, type, payload, options, validator);
   }
 
+  // Bitcoin requests
+
+  public get confirmationsQueueSubjectBitcoin (): BehaviorSubject<ConfirmationsQueueBitcoin> {
+    return this.#bitcoinRequestHandler.getConfirmationsQueueSubjectBitcoin();
+  }
+
+  public addConfirmationBitcoin<CT extends ConfirmationTypeBitcoin> (
+    id: string,
+    url: string,
+    type: CT,
+    payload: ConfirmationDefinitionsBitcoin[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {},
+    validator?: (input: ConfirmationDefinitionsBitcoin[CT][1]) => Error | undefined
+  ): Promise<ConfirmationDefinitionsBitcoin[CT][1]> {
+    return this.#bitcoinRequestHandler.addConfirmationBitcoin(id, url, type, payload, options, validator);
+  }
+
+  public async completeConfirmationBitcoin (request: RequestConfirmationCompleteBitcoin): Promise<boolean> {
+    return await this.#bitcoinRequestHandler.completeConfirmationBitcoin(request);
+  }
+
+  public updateConfirmationBitcoin<CT extends ConfirmationTypeBitcoin> (
+    id: string,
+    type: CT,
+    payload: ConfirmationDefinitionsBitcoin[CT][0]['payload'],
+    options: ConfirmationsQueueItemOptions = {},
+    validator?: (input: ConfirmationDefinitionsBitcoin[CT][1]) => Error | undefined
+  ) {
+    return this.#bitcoinRequestHandler.updateConfirmationBitcoin(id, type, payload, options, validator);
+  }
+
   // WalletConnect Connect requests
   public getConnectWCRequest (id: string) {
     return this.#connectWCRequestHandler.getConnectWCRequest(id);
@@ -304,7 +343,7 @@ export default class RequestService {
 
   // General methods
   public get numRequests (): number {
-    return this.numMetaRequests + this.numAuthRequests + this.numSubstrateRequests + this.numEvmRequests + this.numConnectWCRequests + this.numNotSupportWCRequests + this.numTonRequests + this.numCardanoRequests;
+    return this.numMetaRequests + this.numAuthRequests + this.numSubstrateRequests + this.numEvmRequests + this.numConnectWCRequests + this.numNotSupportWCRequests + this.numTonRequests + this.numCardanoRequests + this.numBitcoinRequests;
   }
 
   public resetWallet (): void {
@@ -313,6 +352,7 @@ export default class RequestService {
     this.#evmRequestHandler.resetWallet();
     this.#tonRequestHandler.resetWallet();
     this.#cardanoRequestHandler.resetWallet();
+    this.#bitcoinRequestHandler.resetWallet();
     this.#metadataRequestHandler.resetWallet();
     this.#connectWCRequestHandler.resetWallet();
     this.#notSupportWCRequestHandler.resetWallet();

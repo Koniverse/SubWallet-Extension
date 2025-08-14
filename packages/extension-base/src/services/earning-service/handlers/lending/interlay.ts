@@ -21,13 +21,14 @@ export default class InterlayLendingPoolHandler extends BaseLendingPoolHandler {
   protected readonly inputAsset: string = 'interlay-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['interlay-LOCAL-DOT'];
   protected readonly feeAssets: string[] = ['interlay-NATIVE-INTR', 'interlay-LOCAL-DOT'];
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: false,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   protected readonly rateDecimals = 18;

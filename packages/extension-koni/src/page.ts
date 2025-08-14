@@ -16,8 +16,8 @@ function inject () {
     version: version
   });
   injectEvmExtension(initEvmProvider(version));
-
   injectCardanoExtension(initCardanoProvider());
+  // injectBitcoinExtension(initBitcoinProvider()); // Pending implementation => wait for documentation and UI improvement
 }
 
 // setup a response listener (events created by the loader for extension responses)

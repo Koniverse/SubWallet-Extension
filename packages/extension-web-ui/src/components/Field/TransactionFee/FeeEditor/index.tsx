@@ -56,7 +56,7 @@ type Props = ThemeProps & {
 // todo: will update dynamic later
 const modalId = 'FeeEditorModalId';
 
-const FEE_TYPES_CAN_SHOW: Array<FeeChainType | undefined> = ['substrate', 'evm'];
+const FEE_TYPES_CAN_SHOW: Array<FeeChainType | undefined> = ['substrate', 'evm', 'bitcoin'];
 
 const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoadingFee = false, isLoadingToken, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();

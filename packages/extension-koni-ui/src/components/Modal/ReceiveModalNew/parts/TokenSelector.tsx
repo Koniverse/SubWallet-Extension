@@ -41,25 +41,7 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
       return item.symbol.toLowerCase().includes(currentSearchText.toLowerCase()) || chainName.toLowerCase().includes(currentSearchText.toLowerCase());
     });
 
-    if (!currentSearchText) {
-      sortTokensByStandard(filteredList, priorityTokens);
-
-      return filteredList;
-    }
-
-    if (currentSearchText.toLowerCase() === 'ton') {
-      const tonItemIndex = filteredList.findIndex((item) => item.slug === 'ton-NATIVE-TON');
-
-      if (tonItemIndex !== -1) {
-        const [tonItem] = filteredList.splice(tonItemIndex, 1);
-
-        if (tonItem) {
-          filteredList.unshift(tonItem);
-        }
-      }
-
-      return filteredList;
-    }
+    sortTokensByStandard(filteredList, priorityTokens);
 
     return filteredList;
   }, [chainInfoMap, currentSearchText, items, priorityTokens]);

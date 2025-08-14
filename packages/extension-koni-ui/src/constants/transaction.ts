@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -17,6 +17,7 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_BOND]: detectTranslate('Add to stake'),
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('Unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('Unstake'),
+  [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('Change validator'),
   [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('Withdraw'),
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('Withdraw'),
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('Cancel unstake'),
@@ -70,7 +71,8 @@ export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.STAKING_CANCEL_UNSTAKE,
   ExtrinsicType.STAKING_CLAIM_REWARD,
   ExtrinsicType.STAKING_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_COMPOUNDING
+  ExtrinsicType.STAKING_CANCEL_COMPOUNDING,
+  ExtrinsicType.CHANGE_EARNING_VALIDATOR
 ];
 
 export const DEFAULT_TRANSACTION_PARAMS: TransactionFormBaseProps = {
@@ -107,6 +109,14 @@ export const DEFAULT_STAKE_PARAMS: StakeParams = {
 
 export const DEFAULT_EARN_PARAMS: EarnParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
+  slug: '',
+  target: '',
+  value: ''
+};
+
+export const DEFAULT_CHANGE_VALIDATOR_PARAMS: ChangeValidatorParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  originValidator: '',
   slug: '',
   target: '',
   value: ''

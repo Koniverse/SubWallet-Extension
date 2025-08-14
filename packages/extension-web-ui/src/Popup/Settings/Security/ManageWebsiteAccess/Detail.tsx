@@ -3,7 +3,7 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
-import { AccountChainType, AccountJson, AccountProxy } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-web-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-web-ui/hooks/router/useDefaultNavigate';
@@ -11,7 +11,7 @@ import { changeAuthorizationPerSite } from '@subwallet/extension-web-ui/messagin
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { ManageWebsiteAccessDetailParam } from '@subwallet/extension-web-ui/types/navigation';
-import { convertAuthorizeTypeToChainTypes } from '@subwallet/extension-web-ui/utils';
+import { convertAuthorizeTypeToChainTypes, getSignMode, getSignModeByAccountProxy } from '@subwallet/extension-web-ui/utils';
 import { Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
 import { GearSix, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -27,16 +27,25 @@ type Props = ThemeProps & ManageWebsiteAccessDetailParam & {
 
 type WrapperProps = ThemeProps;
 
-const checkAccountAddressValid = (chainType: AccountChainType, accountAuthTypes?: AccountAuthType[]): boolean => {
+interface AccountAddressValidationConditions {
+  accountAuthTypes: AccountAuthType[];
+  canConnectSubstrateEcdsa?: boolean;
+  accountSignMode?: AccountSignMode;
+}
+
+const isValidAccountChainType = (chainType: AccountChainType, conditions: AccountAddressValidationConditions): boolean => {
+  const { accountAuthTypes, accountSignMode, canConnectSubstrateEcdsa } = conditions;
+
   if (!accountAuthTypes) {
     return false;
   }
 
   switch (chainType) {
     case AccountChainType.SUBSTRATE: return accountAuthTypes.includes('substrate');
-    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm');
+    case AccountChainType.ETHEREUM: return accountAuthTypes.includes('evm') && (canConnectSubstrateEcdsa || accountSignMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER);
     case AccountChainType.TON: return accountAuthTypes.includes('ton');
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
+    case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
 
   return false;
@@ -50,8 +59,16 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
   const { activeModal } = useContext(ModalContext);
   const { t } = useTranslation();
   const accountProxyItems = useMemo(() => {
-    return accountProxies.filter((ap) => ap.id !== 'ALL' && ap.chainTypes.some((chainType) => checkAccountAddressValid(chainType, accountAuthTypes)));
-  }, [accountAuthTypes, accountProxies]);
+    return accountProxies.filter((ap) => {
+      const accountSignMode = getSignModeByAccountProxy(ap);
+
+      return ap.id !== 'ALL' && ap.chainTypes.some((chainType) => isValidAccountChainType(chainType, {
+        accountAuthTypes,
+        accountSignMode,
+        canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
+      }));
+    });
+  }, [accountAuthTypes, accountProxies, authInfo.canConnectSubstrateEcdsa]);
 
   const onOpenDAppConfigurationModal = useCallback(() => {
     activeModal(dAppConfigurationModalId);
@@ -70,7 +87,11 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
       const newAllowedMap = { ...authInfo.isAllowedMap };
 
       item.accounts.forEach((account) => {
-        if (checkAccountAddressValid(account.chainType, authInfo.accountAuthTypes)) {
+        if (isValidAccountChainType(account.chainType, {
+          accountAuthTypes: authInfo.accountAuthTypes,
+          accountSignMode: getSignMode(account),
+          canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
+        })) {
           newAllowedMap[account.address] = !isEnabled;
         }
       });
@@ -106,7 +127,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
         )}
       />
     );
-  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, pendingMap]);
+  }, [authInfo.accountAuthTypes, authInfo.id, authInfo.isAllowed, authInfo.isAllowedMap, authInfo.canConnectSubstrateEcdsa, pendingMap]);
 
   const searchFunc = useCallback((item: AccountJson, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();

@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { useGetAccountSignModeByAddress } from '@subwallet/extension-koni-ui/hooks';
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,7 @@ const useGetAccountTitleByAddress = (address?: string): string => {
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
         return t('Ledger account');
       case AccountSignMode.ALL_ACCOUNT:
         return t('All account');

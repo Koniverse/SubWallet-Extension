@@ -12,3 +12,7 @@ export { default as useGetChainInfoByGenesisHash } from './useGetChainInfoByGene
 export { default as useGetChainPrefixBySlug } from './useGetChainPrefixBySlug';
 export { default as useChainInfoData } from './useChainInfoData';
 export { default as useChainConnection } from './useChainConnection';
+
+export { default as useCoreCreateGetChainSlugsByAccountProxy } from './useCoreCreateGetChainSlugsByAccountProxy';
+export { default as useGetChainAndExcludedTokenByCurrentAccountProxy } from './useGetChainAndExcludedTokenByCurrentAccountProxy';
+export { default as useCreateGetChainAndExcludedTokenByAccountProxy } from './useCreateGetChainAndExcludedTokenByAccountProxy';
