@@ -39,7 +39,7 @@ export const APP_INSTRUCTION_DATA = 'static.instruction-data';
 export const EARNING_WARNING_ANNOUNCEMENT = 'announcement.earning-position';
 export const CREATE_RETURN = 'account.create-return';
 export const SELL_TOKEN_TAB = 'sell.token-tab';
-
+export const TIME_OUT_RECORD = 'general.time-out-record';
 export const CROWDLOAN_UNLOCK_TIME = 'event.crowdloan-unlock-time';
 
 export const LATEST_SESSION = 'general.latest-session';
