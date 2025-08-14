@@ -3,9 +3,10 @@
 
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Button } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk/types';
-import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -27,23 +28,36 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
     goReferendumDetail(`${item.referendumIndex}`);
   }, [goReferendumDetail]);
 
-  const { data } = useQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['subsquare', 'referendaList', chainSlug],
-    queryFn: async () => {
-      return await sdkInstant?.getReferenda();
+    queryFn: async ({ pageParam }) => {
+      return await sdkInstant?.getReferenda({ page: pageParam, page_size: 20 });
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage) {
+        return undefined;
+      }
+
+      const totalPages = Math.ceil(lastPage.total / lastPage.pageSize);
+
+      return lastPage.page < totalPages ? lastPage.page + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: 60 * 1000
   });
 
-  console.log('asca', data);
+  const handleLoadMore = useCallback(() => {
+    fetchNextPage().catch((err) => console.error('Failed to load more:', err));
+  }, [fetchNextPage]);
+
+  const items = (data?.pages.flatMap((page) => page?.items ?? []) || []);
+
+  console.log('items count:', items.length, items);
 
   return (
     <div className={className}>
-      <div className={'__header-area'}>
-        <div className={'__view-title'}>
-          {t('Governance')}
-        </div>
-
+      <div className='__header-area'>
+        <div className='__view-title'>{t('Governance')}</div>
         <ChainSelector
           onChangeChain={onChangeChain}
           selectedChain={chainSlug}
@@ -58,10 +72,21 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
       />
 
       <ReferendaList
-        items={data?.items}
+        items={items}
         onClickItem={onClickReferendumItem}
         selectedReferendaCategory={selectedReferendaCategory}
       />
+
+      {hasNextPage && (
+        <div style={{ textAlign: 'center', marginTop: '16px' }}>
+          <Button
+            disabled={isFetchingNextPage}
+            onClick={handleLoadMore}
+          >
+            {isFetchingNextPage ? t('Loading...') : t('Load more')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,15 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { SpendItem } from '@subwallet/subsquare-api-sdk/types';
 import React from 'react';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+type Props = ThemeProps & {
+  allSpend: SpendItem[];
+};
 
-const Component = ({ className }: Props): React.ReactElement<Props> => {
+const Component = ({ allSpend, className }: Props): React.ReactElement<Props> => {
   return (
     <div className={className}>
-
+      <div>Requested Amount</div>
+      <ul>
+        {allSpend.map((item, index) => (
+          <li key={index}>
+            {Number(item.amount) / 1_000_000} {item.assetKind.symbol}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

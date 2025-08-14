@@ -3,6 +3,7 @@
 
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ReferendumDetail } from '@subwallet/subsquare-api-sdk/types';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -11,7 +12,9 @@ import { DescriptionTab } from './DescriptionTab';
 import { DetailsTab } from './DetailsTab';
 import { TimelineTab } from './TimelineTab';
 
-type Props = ThemeProps;
+type Props = ThemeProps & {
+  referendumDetail: ReferendumDetail;
+};
 
 export enum Tab {
   DESCRIPTION= 'description',
@@ -19,7 +22,7 @@ export enum Tab {
   TIMELINE= 'timeline',
 }
 
-const Component = ({ className }: Props): React.ReactElement<Props> => {
+const Component = ({ className, referendumDetail }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(Tab.DESCRIPTION);
 
@@ -55,19 +58,19 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
       {
         selectedFilterTab === Tab.DESCRIPTION && (
-          <DescriptionTab />
+          <DescriptionTab content={referendumDetail.content || referendumDetail.polkassemblyContentHtml} />
         )
       }
 
       {
         selectedFilterTab === Tab.DETAILS && (
-          <DetailsTab />
+          <DetailsTab referendumDetail={referendumDetail} />
         )
       }
 
       {
         selectedFilterTab === Tab.TIMELINE && (
-          <TimelineTab />
+          <TimelineTab timeline={referendumDetail.onchainData.timeline} />
         )
       }
     </div>
