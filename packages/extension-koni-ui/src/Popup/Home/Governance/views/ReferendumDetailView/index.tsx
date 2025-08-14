@@ -38,6 +38,8 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
     return <></>;
   }
 
+  console.log('data', data);
+
   return (
     <div className={className}>
       <div onClick={onBack}>
@@ -49,9 +51,9 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
       </div>
 
       <MetaArea />
-      <VoteArea />
-      <RequestedAmount />
-      <TabsContainer />
+      <VoteArea referendumDetail={data} />
+      <RequestedAmount allSpend={data.allSpends} />
+      <TabsContainer referendumDetail={data} />
     </div>
   );
 };

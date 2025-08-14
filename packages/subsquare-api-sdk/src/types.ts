@@ -43,6 +43,20 @@ export interface Referendum {
   };
 }
 
+export interface TimelineItem {
+  _id: string;
+  referendumIndex: number;
+  indexer: {
+    blockHeight: number;
+    blockHash: string;
+    blockTime: number;
+    extrinsicIndex?: number;
+    eventIndex: number;
+  };
+  name: string; // "Submitted", "DecisionDepositPlaced", "DecisionStarted"
+  args: Record<string, any>;
+}
+
 export type ReferendumDetail = {
   _id: string;
   referendumIndex: number;
@@ -70,17 +84,61 @@ export type ReferendumDetail = {
   isFinal: boolean;
   isTreasuryProposal: boolean;
   isTreasuryV1: boolean;
-  onchainData: Record<string, any>;
+  onchainData: {
+    proposalHash: string;
+    timeline: TimelineItem[];
+    proposal: Proposal
+    info: {
+      decisionDeposit: {
+        amount: string;
+        who: string;
+      },
+      submissionDeposit: {
+        amount: string;
+        who: string;
+      }
+      enactment: {
+        after: string;
+      }
+    }
+  };
   refToPost: Record<string, any>;
   rootPost: Record<string, any>;
-  trackInfo: Record<string, any>;
+  trackInfo: {
+    confirmPeriod: number;
+    decisionPeriod: number;
+    name: string;
+  };
   author: Record<string, any>;
   commentsCount: number;
   authors: string[];
   reactions: any[];
 };
 
-type SpendItem = {
+interface ProposalArg {
+  name: string;
+  type: string;
+  value: any;
+}
+
+interface Proposal {
+  call: {
+    args: ProposalArg[];
+    callIndex: string;
+    method: string;
+    section: string;
+  };
+  indexer: {
+    blockHeight: number;
+    blockHash: string;
+    blockTime: number; // timestamp ms
+    extrinsicIndex?: number;
+    eventIndex: number;
+  };
+  shorten: boolean;
+}
+
+export type SpendItem = {
   isSpendLocal: boolean;
   assetKind: {
     chain: string;
@@ -107,11 +165,13 @@ type SpendItem = {
 export interface ReferendaResponse {
   items: Referendum[];
   total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface ReferendaQueryParams {
   page?: number;
-  pageSize?: number;
+  page_size?: number;
   is_treasury?: boolean;
   ongoing?: boolean;
   status?: string;

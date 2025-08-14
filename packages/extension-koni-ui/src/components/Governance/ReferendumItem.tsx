@@ -28,7 +28,7 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
     backgroundColor: token.colorBgSecondary,
     borderRadius: token.borderRadiusLG,
     minHeight: 80,
-    cursor: 'pointer',
+    cursor: 'pointer'
   };
 });
 
