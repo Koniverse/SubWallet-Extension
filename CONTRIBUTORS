@@ -1,20 +1,20 @@
-    3134	AnhMTV                        	Release version 1.3.52
+    3148	AnhMTV                        	Release version 1.3.53
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     920	bluezdot                      	[Issue-4465] chores (deps): bump sdk to v0.1.8
+     924	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
+     465	Frenkie Nguyen                	[Issue-4585] Reset to custom fee in case of editing fee and then switching to cross chain
      465	Jaco                          	0.42.5 (#969)
-     459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
-     359	tunghp2002                    	[Issue-4520] Revert mindbond dtao
+     366	tunghp2002                    	[Issue-4539] Feat: Change search margin bottom and rename sortedValidators
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      278	lw                            	[Issue-4512] refactor: Update swap submission content
-     210	PDTnhah                       	
+     218	PDTnhah                       	[Issue-4072] Update dependency
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
+     161	Thiendekaco                   	[Issue-4592] fix: handle error when disconnect transport
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     136	Thiendekaco                   	[Issue-3456] merge: dev into koni/dev/issue-4572
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	

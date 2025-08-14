@@ -1408,7 +1408,6 @@
   "Apply fee": "",
   "Edit fee": "",
   "High": "",
-  "Coming soon!": "",
   "Process": "",
   "Swap details": "",
   "Stake details": "",
@@ -1595,5 +1594,10 @@
   "DO NOT close the app!": "",
   "Unable to load data": "",
   "Something went wrong while loading data for this screen.": "",
-  "<highlight>Reload now</highlight> to get the new data": ""
+  "<highlight>Reload now</highlight> to get the new data": "",
+  "No valid accounts found to import": "",
+  "Max fee cannot be lower than priority fee": "",
+  "This fee can't be edited with the current RPC connection": "",
+  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app": "",
+  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app": ""
 }
