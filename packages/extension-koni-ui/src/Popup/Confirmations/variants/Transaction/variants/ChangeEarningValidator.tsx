@@ -66,7 +66,9 @@ const ValidatorAddress = ({ account, className, label, title }: ValidatorAddress
       className={CN('__validator-address', className)}
       label={label || title}
     >
-      {validator}
+      <span className='__selected-validator-address'>
+        {validator}
+      </span>
     </MetaInfo.Default>
   );
 };
@@ -149,10 +151,12 @@ const Component: React.FC<Props> = (props: Props) => {
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   const { deselectedValidatorAccounts, newValidatorAccounts, totalSelectedCount } = useMemo(() => {
-    const oldValidatorAccounts: ValidatorAccount[] = compound?.nominations?.map((item) => ({
-      address: item.validatorAddress,
-      identity: item.validatorIdentity
-    })) || [];
+    const oldValidatorAccounts: ValidatorAccount[] = compound?.nominations
+      ?.filter((item) => item.validatorAddress === data.originValidator)
+      .map((item) => ({
+        address: item.validatorAddress,
+        identity: item.validatorIdentity
+      })) || [];
 
     const newValidatorAccounts: ValidatorAccount[] = data.selectedValidators.map((v) => ({
       address: v.address,
@@ -171,12 +175,13 @@ const Component: React.FC<Props> = (props: Props) => {
       deselectedValidatorAccounts,
       totalSelectedCount
     };
-  }, [compound?.nominations, data.selectedValidators]);
+  }, [compound?.nominations, data.originValidator, data.selectedValidators]);
 
   const isBittensorChain = useMemo(() => {
     return transaction.chain === 'bittensor' || transaction.chain === 'bittensor_testnet';
   }, [transaction.chain]);
 
+  const stakingFee = data.subnetData?.stakingFee;
   const isShowAmount = useMemo(() => {
     return new BigN(data.amount).gt(0);
   }, [data.amount]);
@@ -243,12 +248,14 @@ const Component: React.FC<Props> = (props: Props) => {
               title='Newly selected validators'
             />
           </MetaInfo>
-          <AlertBox
-            className={'alert-box'}
-            description={t('A fee equivalent of 0.00005 TAO will be deducted from your stake amount on the new validator once the transaction is complete')}
-            title={t('Validator change fee')}
-            type='info'
-          />
+          {!!stakingFee && (
+            <AlertBox
+              className={'alert-box'}
+              description={t('A fee equivalent of {{fee}} TAO will be deducted from your stake amount on the new validator once the transaction is complete', { replace: { fee: stakingFee } })}
+              title={t('Validator change fee')}
+              type='info'
+            />
+          )}
         </>
       )}
     </div>
@@ -274,6 +281,15 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       alignItems: 'center',
       gap: token.sizeXXS,
       cursor: 'pointer'
+    },
+
+    '.__selected-validator-address': {
+      display: 'inline-block',
+      maxWidth: 166,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      verticalAlign: 'bottom'
     }
   };
 });

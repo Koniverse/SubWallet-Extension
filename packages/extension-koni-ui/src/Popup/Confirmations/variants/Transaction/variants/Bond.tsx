@@ -25,12 +25,9 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [transaction.chain]);
   const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
 
+  const stakingFee = data.subnetData?.stakingFee;
+
   const { t } = useTranslation();
-
-  const isBittensorChain = useMemo(() => {
-    return data.poolPosition?.chain === 'bittensor' || data.poolPosition?.chain === 'bittensor_testnet';
-  }, [data.poolPosition?.chain]);
-
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -64,10 +61,10 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      {isBittensorChain && (
+      {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
+          description={t('A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete', { replace: { fee: stakingFee } })}
           title={t('TAO staking fee')}
           type='info'
         />

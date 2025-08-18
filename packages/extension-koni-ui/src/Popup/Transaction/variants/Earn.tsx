@@ -20,7 +20,8 @@ import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } f
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
+import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -453,6 +454,16 @@ const Component = () => {
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
+  const { earningRate, earningSlippage, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    amountValue,
+    assetDecimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_BOND,
+    setSubmitLoading
+  );
+
+  console.log('Hmm', [earningRate, earningSlippage, submitLoading]);
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
@@ -483,7 +494,8 @@ const Component = () => {
               selectedValidators: targets,
               subnetData: {
                 netuid: netuid,
-                slippage: maxSlippage?.slippage.toNumber()
+                slippage: maxSlippage?.slippage.toNumber(),
+                stakingFee: stakingFee
               }
             } as SubmitJoinNativeStaking;
           }
@@ -619,7 +631,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, setSubmitLoading, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -646,9 +658,6 @@ const Component = () => {
   }, [poolInfo.metadata.subnetData?.netuid]);
 
   // For subnet staking
-
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
-  const [earningRate, setEarningRate] = useState<number>(0);
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const isDisabledSubnetContent = useMemo(
@@ -659,51 +668,8 @@ const Component = () => {
 
     [isSubnetStaking, amountValue, mustChooseTarget, poolTargetValue]
   );
-
   const alertBoxRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (isDisabledSubnetContent) {
-      return;
-    }
-
-    setSubmitLoading(true);
-
-    if (debounce.current) {
-      clearTimeout(debounce.current);
-    }
-
-    debounce.current = setTimeout(() => {
-      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-      const data = {
-        slug: poolInfo.slug,
-        value: amountValue,
-        netuid: netuid,
-        type: ExtrinsicType.STAKING_BOND
-      };
-
-      getEarningSlippage(data)
-        .then((result) => {
-          console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
-          setEarningRate(result.rate);
-        })
-        .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
-        })
-        .finally(() => {
-          setSubmitLoading(false);
-        });
-    }, 200);
-
-    return () => {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-    };
-  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -1383,7 +1349,10 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    description={t(
+                      'Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again',
+                      { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                    )}
                     title='Slippage too high!'
                     type='error'
                   />

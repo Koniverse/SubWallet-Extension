@@ -6,7 +6,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningSlippage, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -93,9 +93,10 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
-export interface EarningSlippageResult {
+export interface EarningImpactResult {
   slippage: number;
   rate: number;
+  stakingTaoFee?: string;
 }
 
 const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
@@ -147,7 +148,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     return slug.startsWith(`${this.slug}__`);
   }
 
-  public override async getEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+  public override async getEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
 
@@ -158,6 +159,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const value = new BigN(params.value);
     const rate = taoIn.dividedBy(alphaIn);
 
+    const feeRate = await this.bittensorCache.fetchSubnetFeeRate(params.netuid);
+
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
       const newAlphaIn = k.dividedBy(newTaoIn);
@@ -165,9 +168,12 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
       const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
 
+      const bnStakingTaoFee = value.multipliedBy(feeRate);
+
       return {
         slippage: slippage.plus(0.0001).toNumber(),
-        rate: rate.toNumber()
+        rate: rate.toNumber(),
+        stakingTaoFee: bnStakingTaoFee.toString()
       };
     } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
       const newAlphaIn = alphaIn.plus(value);
@@ -176,9 +182,13 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
       const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
 
+      const taoAmount = value.multipliedBy(rate);
+      const bnStakingTaoFee = taoAmount.multipliedBy(feeRate);
+
       return {
         slippage: slippage.plus(0.0001).toNumber(),
-        rate: rate.toNumber()
+        rate: rate.toNumber(),
+        stakingTaoFee: bnStakingTaoFee.toString()
       };
     }
 
