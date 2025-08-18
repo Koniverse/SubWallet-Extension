@@ -1780,6 +1780,7 @@ export interface BondingSubmitParams extends BaseRequestSign {
   },
   subnetData?: {
     netuid: number,
+    stakingFee?: string;
   }
 }
 
@@ -1803,6 +1804,7 @@ export interface UnbondingSubmitParams extends BaseRequestSign {
   poolInfo?: {
     metadata: SubnetYieldPositionInfo,
   },
+  stakingFee?: string;
 }
 
 export type RequestUnbondingSubmit = InternalRequestSign<UnbondingSubmitParams>;

@@ -1,12 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
+import { RequestUnbondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,20 +17,11 @@ type Props = BaseTransactionConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
-  const data = transaction.data as RequestBondingSubmit;
-  const poolInfo = data.poolInfo;
-
+  const data = transaction.data as RequestUnbondingSubmit;
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
-
-  const stakingFee = useTaoStakingFee(
-    poolInfo,
-    data.amount,
-    decimals,
-    data.poolInfo?.metadata.subnetData?.netuid || 0,
-    ExtrinsicType.STAKING_UNBOND
-  );
+  const stakingFee = data.stakingFee;
 
   return (
     <div className={CN(className)}>

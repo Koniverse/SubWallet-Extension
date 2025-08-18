@@ -31,6 +31,7 @@ export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
   subnetData?: {
     netuid: number,
     slippage: number
+    stakingFee?: string;
   }
 }
 
