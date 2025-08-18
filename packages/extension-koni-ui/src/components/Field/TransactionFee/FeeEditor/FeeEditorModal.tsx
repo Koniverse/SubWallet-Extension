@@ -92,7 +92,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       const baseGasFee = new BigN(feeOptionsInfo.baseGasFee);
       const priorityFee = new BigN(feeDefaultValue?.maxPriorityFeePerGas || 0);
 
-      return baseGasFee.multipliedBy(1.5).plus(priorityFee);
+      return baseGasFee.multipliedBy(1.5).plus(priorityFee).integerValue(BigN.ROUND_CEIL);
     }
 
     return undefined;
