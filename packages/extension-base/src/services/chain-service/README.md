@@ -25,11 +25,11 @@ graph LR
     CS --> CardanoHandler[CardanoChainHandler]
     CS --> MantaHandler[MantaPrivateHandler]
     
-    SubstrateHandler --> SubstrateApi[SubstrateApi]
-    EvmHandler --> EvmApi[EvmApi]
-    BitcoinHandler --> BitcoinApi[BitcoinApi]
-    TonHandler --> TonApi[TonApi]
-    CardanoHandler --> CardanoApi[CardanoApi]
+    SubstrateHandler --> SubstrateApi["SubstrateApi (WS RPC)"]
+    EvmHandler --> EvmApi["EvmApi (HTTPS RPC)"]
+    BitcoinHandler --> BitcoinApi["BitcoinApi (HTTPS API)"]
+    TonHandler --> TonApi["TonApi (HTTPS API)"]
+    CardanoHandler --> CardanoApi["CardanoApi (HTTPS API)"]
     
     CS --> DataMap{Data Management}
     DataMap --> ChainInfoMap[chainInfoMap]
