@@ -500,6 +500,7 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
     return chainApi.api.tx.dappsStaking.withdrawUnbonded();
   }
 
+  // @deprecated
   override async handleYieldClaimReward (address: string, bondReward?: boolean) {
     const apiPromise = await this.substrateApi.isReady;
 

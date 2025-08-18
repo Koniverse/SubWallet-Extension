@@ -31,6 +31,12 @@ import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
 
+// Q&A: Clarify more about multiple step swaps
+// Except uniswap in case of large amounts where liquidity cannot be found then use API, other providers use blockchain pallet
+// HydraDX, AssetHub have separate pallets to perform swaps
+// Uniswap: has separate swap contracts, KyberSwap has some aggregator contracts (Interact with smart contracts)
+// SimpleSwap and Chainflip: Use Centralized API system to perform swaps => but through on-chain transactions
+
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
   private eventService: EventService;

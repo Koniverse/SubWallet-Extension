@@ -127,6 +127,10 @@ export interface _SubstrateApiAdapter {
   subscribeDataWithMulti(params: _SubstrateAdapterSubscriptionArgs[], callback: (rs: Record<string, AnyJson[]>) => void): Subscription
 }
 
+// Q&A: Plan and roadmap for updating to web3.js v4
+// A: Interface connect + Use BigInt
+// Update to Ethers.js v6
+// Convert BigNumber to BigInt + related utils.
 export interface _EvmApi extends _ChainBaseApi {
   api: Web3;
 

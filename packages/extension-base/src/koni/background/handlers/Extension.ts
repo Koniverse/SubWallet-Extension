@@ -96,6 +96,9 @@ export function isJsonPayload (value: SignerPayloadJSON | SignerPayloadRaw): val
   return (value as SignerPayloadJSON).genesisHash !== undefined;
 }
 
+// Q&A: Why does KoniExtension contain too much logic?
+// A: Currently KoniExtension handles all requests from the extension, however this makes the app bulky and hard to maintain => needs to be updated in the future.
+
 export default class KoniExtension {
   #lockTimeOut: NodeJS.Timer | undefined = undefined;
   readonly #koniState: KoniState;

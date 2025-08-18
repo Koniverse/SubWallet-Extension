@@ -146,6 +146,7 @@ export const getEIP1559GasFee = (
   };
 };
 
+// Get fee online
 export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, useOnline = true, useInfura = true): Promise<EvmFeeInfo> => {
   if (useOnline) {
     try {

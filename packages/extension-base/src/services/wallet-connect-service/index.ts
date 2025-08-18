@@ -22,6 +22,11 @@ const storage = SWStorage.instance;
 const methodDOTRequire = [POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_MESSAGE, POLKADOT_SIGNING_METHODS.POLKADOT_SIGN_TRANSACTION];
 const methodEVMRequire = [EIP155_SIGNING_METHODS.PERSONAL_SIGN, EIP155_SIGNING_METHODS.ETH_SIGN, EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION];
 
+// Q&A: Recheck the supported chain types and Wallet Connect related questions that partners have asked like Mythical
+// A: Specific issue with Mythos => EVM addresses not displayed => Fix by manual handling on network through UI.
+// Consider Ton & Cardano in the near future.
+// Standardize Bitcoin integration documentation
+
 class WCStorage implements IKeyValueStorage {
   async getEntries<T = any> (): Promise<[string, T][]> {
     const datas = await storage.getEntries();

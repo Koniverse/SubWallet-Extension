@@ -8,6 +8,7 @@ import { Md5 } from 'ts-md5';
 import { ApiRequestContext } from '../api-request-strategy/types';
 import { ApiRequestStrategyV2, ApiRequestV2 } from './types';
 
+// Added cache and cancel request compared to version 1
 export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
   private nextId = 0;
   private groupId = 0;

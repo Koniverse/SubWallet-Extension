@@ -111,6 +111,9 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     }
 
     const multiChain = types.length > 1;
+    // Q&A: Is proxyId secure?
+    // A: Uses blake2b for hashing so it's relatively secure.
+    // A: proxyId is currently used as a replacement for address, in specific actions often need to convert from proxyId to specific address.
     const proxyId = multiChain ? createAccountProxyId(_suri) : '';
 
     const modifiedPairs = this.state.modifyPairs;
@@ -129,6 +132,11 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
 
     // Upsert account group first, to avoid combine latest have no account group data.
+    // Q&A: How will accounts with proxyId be stored and managed?
+    // A: Stored and managed in AccountProxyStoreSubject, Storage will be independent of KeyringPair and aggregated in view and other services.
+    // Information stored in AccountProxyStoreSubject only includes id and name
+    // ProxyId is being used as a replacement for address => then will search for specific address from proxyId according to a specific network
+    // Pair linking information is stored through modifiedPairs
     if (proxyId) {
       this.state.upsertAccountProxyByKey({ id: proxyId, name });
     }

@@ -7,8 +7,8 @@ import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 
 export interface BlockedActionsFeaturesMap {
-  blockedActionsMap: Record<ExtrinsicType, string[]>,
-  blockedFeaturesList: string[]
+  blockedActionsMap: Record<ExtrinsicType, string[]>, // Block for specific extrinsic type
+  blockedFeaturesList: string[] // Block for specific extension type of specific network
 }
 
 export const APP_ENV = process.env.TARGET_ENV as string;

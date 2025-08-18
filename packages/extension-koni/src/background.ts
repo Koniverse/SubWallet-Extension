@@ -15,6 +15,11 @@ import keyring from '@subwallet/ui-keyring';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 // Set handler
+// Q&A: Why do we need to set handler here?
+// A: So that ActionHandler can handle actions from UI, dApp.
+// Note: ActionHandler is different from SWHandler. SWHandler will have states and continue to route these states to Tabs, Extension, Mobile Handler and actions will be forwarded down to state.
+// SWHandler is the initialization point to ensure the application runs properly with different UI types
+// Currently this architecture might be a bit messy => In the future there should only be one Handler and minimize unnecessary intermediaries through state
 const actionHandler = ActionHandler.instance;
 
 actionHandler.setHandler(SWHandler.instance);
@@ -45,14 +50,20 @@ cryptoWaitReady()
     koniState.initEnvConfig(envConfig);
 
     // load all the keyring data
+    // Q&A: How do Account Store and Password Store differ?
+    /// A: Account Store will store accounts, while Password Store will store the keyring's master password.
     keyring.loadAll({ store: new AccountsStore(), type: 'sr25519', password_store: new KeyringStore() });
 
+    // Q&A: What does restoring Keyring Password mean?
+    // A: Restore the keyring's master password to be able to access accounts stored in the keyring.
     keyring.restoreKeyringPassword().finally(() => {
       koniState.updateKeyringState();
     });
     koniState.eventService.emit('crypto.ready', true);
 
     // Manual Init koniState
+    // Q&A: Why do we need to call init() here?
+    // A: Start state when receiving the first message from any source
     actionHandler.waitFirstActiveMessage.then(() => {
       koniState.init().catch(console.error);
     }).catch(console.error);

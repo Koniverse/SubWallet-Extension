@@ -433,6 +433,7 @@ export default class TransactionService {
     return { ...validatedTransaction };
   }
 
+  // Output signature => Store as extrinsicHash and use in later steps.
   public async handlePermitTransaction (transaction: SWPermitTransactionInput): Promise<SWTransactionResponse> {
     const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
     const validatedTransaction: SWTransactionResponse = {
@@ -493,6 +494,7 @@ export default class TransactionService {
     return validatedTransaction;
   }
 
+  // For swaps with very large transaction volumes. Use API to create centralized transactions.
   public async handleDutchTransaction (transaction: SWDutchTransactionInput): Promise<SWTransactionResponse> {
     const transactionId = getTransactionId(transaction.chainType, transaction.chain, true);
     const validatedTransaction: SWTransactionResponse = {
@@ -2020,6 +2022,7 @@ export default class TransactionService {
     return emitter;
   }
 
+  // Use this for bitcoin transactions only
   public emitterEventTransaction = (emitter: TransactionEmitter, eventData: TransactionEventResponse, chain: string, payload: string) => {
     // Emit signed event
     emitter.emit('signed', eventData);
@@ -2201,6 +2204,8 @@ export default class TransactionService {
     this.updateAliveProcess();
   }
 
+  // Q&A: Check more about process step status, if it related to one-signing?
+  // A: Aggregate multiple transactions into one process, each process has multiple steps, each step has its own status. When updating the status of a step, it will affect the status of the entire process.
   public updateProcessStepStatus (step: BriefProcessStep, data: Pick<ProcessStep, 'status' | 'transactionId' | 'extrinsicHash' | 'chain'>) {
     const { processId, stepId } = step;
     const process = this.aliveProcessMap.get(processId);

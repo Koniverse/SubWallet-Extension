@@ -23,6 +23,7 @@ export interface TransferBitcoinProps extends TransactionFee {
   network: Network
 }
 
+// Q&A: Recheck the logic for using UTXO when transferring Bitcoin
 export async function createBitcoinTransaction (params: TransferBitcoinProps): Promise<[Psbt, string, string|undefined]> {
   const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, from, network, to, transferAll, value } = params;
   const feeCustom = _feeCustom as BitcoinFeeRate;

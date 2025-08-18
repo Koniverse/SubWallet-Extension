@@ -37,7 +37,14 @@ export type CreateXcmExtrinsicProps = {
 
 export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig | undefined>;
 
-// SnowBridge
+// Q&A: Summary of XCM Bridge Extrinsic creation methods, which XCM chains are using APIs, at what level are APIs applied? Which are on-chain transactions.
+// XCM Polkadot: PolkadotXcm => ParaSpell (createXcmExtrinsicV2)
+// Avail Bridge: AVAIL on Ethereum (Contract) <=> AVAIL on Avail (pallet)
+// Polygon Bridge: Polygon, Ethereum, PolygonZk (ETH, WETH, POL)
+// Snow Bridge: Support for Mythos
+// Across Bridge: Similar to Chainflip swap sent to a vault
+// Some XCM types require manual claiming
+// XCM channel determination is updated at KoniExtension.makeCrossChainTransfer
 export const createSnowBridgeExtrinsic = async ({ destinationChain,
   evmApi,
   feeCustom,
