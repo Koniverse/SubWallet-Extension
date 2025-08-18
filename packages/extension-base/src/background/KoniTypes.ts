@@ -579,6 +579,10 @@ export enum ExtrinsicType {
 
   // SET_FEE_TOKEN = 'set_fee-token',
 
+  // OPEN GOV
+  VOTE = 'gov.vote',
+  UNVOTE= 'gov.unvote',
+
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
 }
@@ -635,6 +639,8 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
+  [ExtrinsicType.VOTE]: any,
+  [ExtrinsicType.UNVOTE]: any,
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }

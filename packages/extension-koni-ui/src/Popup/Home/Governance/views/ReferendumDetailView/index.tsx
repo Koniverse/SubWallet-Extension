@@ -38,7 +38,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
     return <></>;
   }
 
-  console.log('data', data);
+  const allSpends = data.allSpends;
 
   return (
     <div className={className}>
@@ -52,7 +52,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
 
       <MetaArea />
       <VoteArea referendumDetail={data} />
-      <RequestedAmount allSpend={data.allSpends} />
+      { allSpends && (<RequestedAmount allSpend={allSpends} />)}
       <TabsContainer referendumDetail={data} />
     </div>
   );

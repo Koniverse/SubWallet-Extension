@@ -238,11 +238,18 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
   ExtrinsicType.CLAIM_BRIDGE
 ];
 
+const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
+  ExtrinsicType.VOTE,
+  ExtrinsicType.UNVOTE
+];
+
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
   ExtrinsicType.SWAP,
-  ExtrinsicType.CROWDLOAN
+  ExtrinsicType.CROWDLOAN,
+  ExtrinsicType.VOTE,
+  ExtrinsicType.UNVOTE
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
@@ -259,6 +266,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -298,6 +306,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -335,6 +344,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_LDOT_ACTIONS,
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -360,7 +370,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     const result: ExtrinsicType[] = [];
     const specialNetwork = _specialNetwork || '';
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ...OPEN_GOV_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     // NFT
     if (!['astar', 'avail_mainnet'].includes(specialNetwork)) {
@@ -397,7 +407,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
   } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
     const result: ExtrinsicType[] = [];
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ...OPEN_GOV_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     return result;
   }

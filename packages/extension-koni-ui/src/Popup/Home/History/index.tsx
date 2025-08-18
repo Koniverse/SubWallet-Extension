@@ -330,6 +330,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve'),
     [ExtrinsicType.SWAP]: t('Swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
+    [ExtrinsicType.VOTE]: t('Vote'),
+    [ExtrinsicType.UNVOTE]: t('Unvote'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
@@ -376,6 +378,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve transaction'),
     [ExtrinsicType.SWAP]: t('Swap transaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
+    [ExtrinsicType.VOTE]: t('Vote transaction'),
+    [ExtrinsicType.UNVOTE]: t('Unvote transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 

@@ -79,7 +79,7 @@ export type ReferendumDetail = {
   dataSource: string;
   polkassemblyContentHtml: string;
   contentSummary: Record<string, any>;
-  allSpends: SpendItem[];
+  allSpends?: SpendItem[];
   isBoundDiscussion: boolean;
   isFinal: boolean;
   isTreasuryProposal: boolean;
