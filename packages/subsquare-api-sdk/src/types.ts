@@ -43,24 +43,10 @@ export interface Referendum {
   };
 }
 
-export interface TimelineItem {
+export interface ReferendumDetail {
   _id: string;
   referendumIndex: number;
-  indexer: {
-    blockHeight: number;
-    blockHash: string;
-    blockTime: number;
-    extrinsicIndex?: number;
-    eventIndex: number;
-  };
-  name: string; // "Submitted", "DecisionDepositPlaced", "DecisionStarted"
-  args: Record<string, any>;
-}
-
-export type ReferendumDetail = {
-  _id: string;
-  referendumIndex: number;
-  indexer: Record<string, any>;
+  indexer: Indexer;
   proposer: string;
   title: string;
   content: string;
@@ -70,7 +56,7 @@ export type ReferendumDetail = {
   updatedAt: string;
   lastActivityAt: string;
   edited: boolean;
-  state: Record<string, any>;
+  state: OnchainState;
   stateSort: number;
   polkassemblyCommentsCount: number;
   polkassemblyId: number;
@@ -78,64 +64,20 @@ export type ReferendumDetail = {
   contentHash: string;
   dataSource: string;
   polkassemblyContentHtml: string;
-  contentSummary: Record<string, any>;
+  contentSummary: Record<string, unknown>;
   allSpends?: SpendItem[];
   isBoundDiscussion: boolean;
   isFinal: boolean;
   isTreasuryProposal: boolean;
   isTreasuryV1: boolean;
-  onchainData: {
-    proposalHash: string;
-    timeline: TimelineItem[];
-    proposal: Proposal
-    info: {
-      decisionDeposit: {
-        amount: string;
-        who: string;
-      },
-      submissionDeposit: {
-        amount: string;
-        who: string;
-      }
-      enactment: {
-        after: string;
-      }
-    }
-  };
-  refToPost: Record<string, any>;
-  rootPost: Record<string, any>;
-  trackInfo: {
-    confirmPeriod: number;
-    decisionPeriod: number;
-    name: string;
-  };
-  author: Record<string, any>;
+  onchainData: OnchainData;
+  refToPost: Record<string, unknown>;
+  rootPost: Record<string, unknown>;
+  trackInfo: TrackInfo;
+  author: Record<string, unknown>;
   commentsCount: number;
   authors: string[];
-  reactions: any[];
-};
-
-interface ProposalArg {
-  name: string;
-  type: string;
-  value: any;
-}
-
-interface Proposal {
-  call: {
-    args: ProposalArg[];
-    callIndex: string;
-    method: string;
-    section: string;
-  };
-  indexer: {
-    blockHeight: number;
-    blockHash: string;
-    blockTime: number; // timestamp ms
-    extrinsicIndex?: number;
-    eventIndex: number;
-  };
-  shorten: boolean;
+  reactions: unknown[];
 }
 
 export type SpendItem = {
@@ -155,12 +97,122 @@ export type SpendItem = {
     name: string;
     type: string;
     value: {
-      v3: Record<string, any>;
+      v3: Record<string, unknown>;
     };
   };
   validFrom: number | null;
-  after: any;
+  after: unknown;
 };
+
+export interface TimelineItem {
+  _id: string;
+  referendumIndex: number;
+  indexer: {
+    blockHeight: number;
+    blockHash: string;
+    blockTime: number;
+    extrinsicIndex?: number;
+    eventIndex: number;
+  };
+  name: string; // "Submitted", "DecisionDepositPlaced", "DecisionStarted"
+  args: Record<string, unknown>;
+}
+
+export interface Tally {
+  ayes: string;
+  nays: string;
+  electorate: string;
+  support: string;
+}
+
+interface Proposal {
+  call: {
+    args: ProposalArg[];
+    callIndex: string;
+    method: string;
+    section: string;
+  };
+  indexer: {
+    blockHeight: number;
+    blockHash: string;
+    blockTime: number; // timestamp ms
+    extrinsicIndex?: number;
+    eventIndex: number;
+  };
+  shorten: boolean;
+}
+
+interface ProposalArg {
+  name: string;
+  type: string;
+  value: any;
+}
+
+interface Reciprocal {
+  factor: number;
+  xOffset: number;
+  yOffset: number;
+}
+
+interface LinearDecreasing {
+  ceil: number;
+  floor: number;
+  length: number;
+}
+
+interface MinApproval {
+  reciprocal?: Reciprocal;
+  linearDecreasing?: LinearDecreasing;
+}
+export interface TrackInfo {
+  confirmPeriod: number;
+  decisionPeriod: number;
+  name: string;
+  minApproval?: MinApproval;
+}
+
+interface OnchainInfo {
+  decisionDeposit: {
+    amount: string;
+    who: string;
+  };
+  submissionDeposit: {
+    amount: string;
+    who: string;
+  };
+  enactment: {
+    after: string;
+  };
+  deciding?: {
+    since: number;
+  };
+  state?: {
+    indexer?: {
+      blockHeight?: number;
+    };
+  };
+  alarm: number[]
+}
+
+interface Indexer {
+  blockHeight: number;
+  blockHash: string;
+  index: number;
+  blockTime: number;
+}
+interface OnchainState {
+  indexer: Indexer;
+  name: string;
+}
+
+interface OnchainData {
+  proposalHash: string;
+  timeline: TimelineItem[];
+  tally: Tally;
+  proposal: Proposal;
+  info: OnchainInfo;
+  state?: OnchainState;
+}
 
 export interface ReferendaResponse {
   items: Referendum[];

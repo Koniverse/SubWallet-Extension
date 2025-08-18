@@ -6,7 +6,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
