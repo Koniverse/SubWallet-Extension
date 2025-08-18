@@ -5,3 +5,5 @@ export enum GovernanceScreenView {
   OVERVIEW= 'overview',
   REFERENDUM_DETAIL= 'referendum-detail'
 }
+
+export type GovernanceVoteType = 'aye' | 'nay' | 'abstain' | 'split';
