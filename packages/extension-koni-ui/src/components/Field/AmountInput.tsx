@@ -14,9 +14,10 @@ import { BasicInputEvent, BasicInputWrapper } from './Base';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   decimals: number;
-  maxValue: string;
+  maxValue?: string;
   onSetMax?: (value: boolean) => void;
   prefix?: React.ReactNode
+  suffix?: React.ReactNode
   showMaxButton?: boolean;
   forceUpdateMaxValue?: object;
   defaultInvalidOutputValue?: string;
@@ -71,7 +72,7 @@ const isControlKey = (keycode: number) => {
 };
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, prefix, showMaxButton, statusHelp, tooltip, value } = props;
+  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue = '0', onChange, onSetMax, prefix, showMaxButton, statusHelp, suffix, tooltip, value } = props;
 
   const { t } = useTranslation();
 
@@ -102,21 +103,26 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return value.includes('.') ? decimals + 1 + value.split('.')[0].length : undefined;
   }, [decimals]);
 
-  const suffix = useMemo((): React.ReactNode => (
+  const suffixNode = useMemo((): React.ReactNode => (
     showMaxButton
       ? (
-        <Button
-          onClick={_onClickMaxBtn}
-          size='xs'
-          type='ghost'
-        >
-          <span className='max-btn-text'>{t('Max')}</span>
-        </Button>
+        <>
+          {suffix}
+          <Button
+            onClick={_onClickMaxBtn}
+            size='xs'
+            type='ghost'
+          >
+            <span className='max-btn-text'>{t('Max')}</span>
+          </Button>
+        </>
       )
       : (
-        <span />
+        <>
+          {suffix}
+        </>
       )
-  ), [showMaxButton, _onClickMaxBtn, t]);
+  ), [showMaxButton, suffix, _onClickMaxBtn, t]);
 
   const onChangeInput: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
     let value = event.target.value;
@@ -251,7 +257,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       readOnly={props.readOnly}
       ref={inputRef}
       statusHelp={statusHelp}
-      suffix={suffix}
+      suffix={suffixNode}
       tooltip={tooltip}
       value={inputValue}
     />

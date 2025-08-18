@@ -57,7 +57,7 @@ const Component = (props: Props): React.ReactElement<Props> => {
   );
 };
 
-const ConvictionSlider = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const GovVoteConvictionSlider = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
@@ -68,4 +68,4 @@ const ConvictionSlider = styled(Component)<Props>(({ theme: { token } }: Props) 
   };
 });
 
-export default ConvictionSlider;
+export default GovVoteConvictionSlider;
