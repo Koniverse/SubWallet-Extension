@@ -7,3 +7,10 @@ export enum GovernanceScreenView {
 }
 
 export type GovernanceVoteType = 'aye' | 'nay' | 'abstain' | 'split';
+
+export enum GovernanceVoteOptions {
+  Aye = 'aye',
+  Nay = 'nay',
+  Abstain = 'abstain',
+  Split = 'split'
+}
