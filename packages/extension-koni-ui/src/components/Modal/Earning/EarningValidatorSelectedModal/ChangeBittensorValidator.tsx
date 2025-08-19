@@ -10,7 +10,8 @@ import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
-import { changeEarningValidator, getEarningSlippage } from '@subwallet/extension-koni-ui/messaging';
+import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
+import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
@@ -47,7 +48,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const [isChangeData, setIsChangeData] = useState(false);
   const [isShowAmountChange, setIsShowAmountChange] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [earningRate, setEarningRate] = useState<number>(0);
 
   const { accounts } = useSelector((state) => state.accountState);
   const { poolInfoMap } = useSelector((state) => state.earning);
@@ -219,7 +219,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setIsChangeData(true);
       }
 
-      if (originValidator) {
+      if (originValidator && originValidator !== form.getFieldValue('originValidator')) {
         form.setFieldsValue({
           target: undefined
         });
@@ -233,7 +233,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setAmountChange(true);
       }
     },
-    [amountChange, form, defaultData.value]
+    [amountChange, defaultData.value, form]
   );
 
   const notifyTooHighAmount = useCallback(() => {
@@ -243,6 +243,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       duration: 5
     });
   }, [bondedValue, decimals, notify, symbol, t]);
+
+  const { earningRate, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    value || bondedValue,
+    decimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_UNBOND,
+    setSubmitLoading
+  );
 
   const onClickSubmit = useCallback(
     (values: ChangeValidatorParams) => {
@@ -269,7 +278,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
-            slippage: 0
+            slippage: 0,
+            stakingFee
           }
         })
       };
@@ -317,7 +327,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, symbol, t]
+    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, stakingFee, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
@@ -326,24 +336,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
     onCancel?.();
   }, [onCancelSelectValidator, onCancel]);
-
-  useEffect(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-    const data = {
-      slug: poolInfo.slug,
-      value: '0',
-      netuid: netuid,
-      type: ExtrinsicType.STAKING_BOND
-    };
-
-    getEarningSlippage(data)
-      .then((result) => {
-        setEarningRate(result.rate);
-      })
-      .catch((error) => {
-        console.error('Error fetching earning rate:', error);
-      });
-  });
 
   useEffect(() => {
     if (!isActive) {
