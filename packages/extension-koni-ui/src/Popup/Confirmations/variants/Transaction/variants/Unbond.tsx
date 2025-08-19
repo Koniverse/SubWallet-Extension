@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestBondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
+import { RequestUnbondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import CN from 'classnames';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -17,15 +17,11 @@ type Props = BaseTransactionConfirmationProps;
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
-  const data = transaction.data as RequestBondingSubmit;
-
+  const data = transaction.data as RequestUnbondingSubmit;
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
-
-  const isBittensorChain = useMemo(() => {
-    return data.poolInfo?.chain === 'bittensor' || data.poolInfo?.chain === 'bittensor_testnet';
-  }, [data.poolInfo?.chain]);
+  const stakingFee = data.stakingFee;
 
   return (
     <div className={CN(className)}>
@@ -51,10 +47,10 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      {isBittensorChain && (
+      {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('An unstaking fee of 0.00005 TAO will be deducted from your unstaked amount once the transaction is complete')}
+          description={t('An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete', { replace: { fee: stakingFee } })}
           title={t('TAO unstaking fee')}
           type='info'
         />
