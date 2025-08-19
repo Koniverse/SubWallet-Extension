@@ -340,7 +340,10 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
   public static getInstance () {
     if (!SubscanService._instance) {
-      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP);
+      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP, {
+        limitRate: 1,
+        intervalCheck: 1000
+      });
     }
 
     return SubscanService._instance;
