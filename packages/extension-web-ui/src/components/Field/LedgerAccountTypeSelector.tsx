@@ -23,7 +23,7 @@ interface Props extends ThemeProps, BasicInputWrapper{
   id?: string;
 }
 
-const CONNECT_LEDGER_USER_GUIDE_URL = 'https://docs.subwallet.app/main/extension-user-guide/cold-wallet-management/connect-ledger-devices/connect-via-the-polkadot-app#select-the-right-account-type-for-use-when-connecting-via-polkadot-app';
+const CONNECT_LEDGER_USER_GUIDE_URL = 'https://docs.subwallet.app/main/web-dashboard-user-guide/cold-wallet-management/connect-ledger-devices/connect-via-the-polkadot-app#select-the-right-account-type-for-use-when-connecting-via-polkadot-app';
 
 function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
   const { className, id = 'account-type', items, value } = props;
