@@ -11,7 +11,7 @@ import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
 
 // const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
-const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
+// const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
 // const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
 // const BTC_TESTNET_API_URL = 'https://btc-api-testnet.koni.studio';
 
@@ -44,20 +44,19 @@ export class BitcoinApi implements _BitcoinApi {
   }
 
   private createApiStrategy(apiUrl: string): BitcoinApiStrategy {
-    const _apiUrl = BLOCKSTREAM_TESTNET_API_URL
     const isTestnet = apiUrl.includes('testnet');
     const isBlockstream = apiUrl.includes('blockstream');
     const isMempool= apiUrl.includes('mempool.space');
 
     if (isTestnet && isBlockstream) {
-      return new BlockStreamTestnetRequestStrategy(_apiUrl);
+      return new BlockStreamTestnetRequestStrategy(apiUrl);
     }
 
     if (isTestnet && isMempool) {
-      return new MempoolTestnetRequestStrategy(_apiUrl);
+      return new MempoolTestnetRequestStrategy(apiUrl);
     }
 
-    return new SubWalletMainnetRequestStrategy(_apiUrl);
+    return new SubWalletMainnetRequestStrategy(apiUrl);
   }
 
   get connectionStatus (): _ChainConnectionStatus {
