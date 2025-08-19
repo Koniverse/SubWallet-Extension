@@ -10,7 +10,6 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
@@ -18,7 +17,7 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
@@ -79,6 +78,7 @@ const Component = () => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const poolTargetValue = useWatchTransaction('target', form, defaultData);
 
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
   const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
   const getReformatAddress = useCoreCreateReformatAddress();
@@ -650,12 +650,9 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   // For subnet staking
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
@@ -711,9 +708,10 @@ const Component = () => {
             <Logo
               className='__item-logo'
               isShowSubLogo={false}
-              network={networkKey}
+              network={poolChain}
               shape='circle'
               size={24}
+              token={subnetToken}
             />
             <span
               className='chain-name'
@@ -794,7 +792,7 @@ const Component = () => {
         </MetaInfo.Default>
       </>
     );
-  }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, networkKey, onOpenSlippageModal, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, t]);
+  }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, onOpenSlippageModal, poolChain, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, subnetToken, t]);
 
   // For subnet staking
 

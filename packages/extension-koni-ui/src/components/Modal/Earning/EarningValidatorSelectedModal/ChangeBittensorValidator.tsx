@@ -6,11 +6,10 @@ import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/exten
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
-import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -54,6 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { poolTargetsMap } = useSelector((state) => state.earning);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -177,11 +177,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   const renderSubnetStaking = useCallback(() => {
     return (
@@ -193,9 +191,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <Logo
             className='__item-logo'
             isShowSubLogo={false}
-            network={networkKey}
+            network={poolChain}
             shape='circle'
             size={24}
+            token={subnetToken}
           />
           <span
             className='chain-name'
@@ -206,7 +205,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         </div>
       </MetaInfo.Default>
     );
-  }, [networkKey, poolInfo.metadata.shortName, t]);
+  }, [poolChain, poolInfo.metadata.shortName, subnetToken, t]);
 
   const showAmountChangeInput = useCallback(() => {
     setIsShowAmountChange(!isShowAmountChange);
@@ -480,9 +479,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                 prefix={ <Logo
                   className='__item-logo'
                   isShowSubLogo={false}
-                  network={networkKey}
+                  network={poolChain}
                   shape='squircle'
                   size={28}
+                  token={subnetToken}
                 />}
                 showMaxButton={true}
               />

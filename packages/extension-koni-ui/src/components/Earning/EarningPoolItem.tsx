@@ -3,10 +3,9 @@
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainAssetInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Logo, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -30,7 +29,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const tvl = poolInfo.statistic?.tvl;
 
   const asset = useGetChainAssetInfo(inputAsset);
-
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
   const { currencyData, priceMap } = useSelector((state) => state.price);
 
   const apy = useMemo((): number | undefined => {
@@ -68,6 +67,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
   const isBittensor = useMemo(() => poolInfo.chain === 'bittensor', [poolInfo.chain]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   return (
     <div
@@ -75,7 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
       onClick={onClick}
     >
       <div className={'__item-upper-part'}>
-        {!isSubnetStaking || !DefaultLogosMap[`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`]
+        {!isSubnetStaking
           ? (
             <Logo
               className={'__item-logo'}
@@ -86,8 +88,9 @@ const Component: React.FC<Props> = (props: Props) => {
             <Logo
               className='__item-logo'
               isShowSubLogo={false}
-              network={`subnet-${poolInfo.metadata.subnetData?.netuid || 0}`}
+              network={logo || chain}
               size={40}
+              token={subnetToken}
             />
           )}
 
