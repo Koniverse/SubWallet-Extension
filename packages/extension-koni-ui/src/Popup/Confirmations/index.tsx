@@ -379,8 +379,8 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('Claim confirmation');
         case ExtrinsicType.CROWDLOAN:
-        case ExtrinsicType.VOTE:
-        case ExtrinsicType.UNVOTE:
+        case ExtrinsicType.GOV_VOTE:
+        case ExtrinsicType.GOV_UNVOTE:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('Transaction confirm');

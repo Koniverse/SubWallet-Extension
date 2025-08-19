@@ -1,9 +1,11 @@
 {
   "bugs": "https://github.com/Koniverse/Subwallet-V2/issues",
   "description": "Subsquare API SDK for Subwallet",
+  "homepage": "https://github.com/Koniverse/Subwallet-V2/tree/master/packages/subsquare-api-sdk#readme",
+  "license": "Apache-2.0",
   "name": "@subwallet/subsquare-api-sdk",
   "repository": {
-    "directory": "packages/subwallet-api-sdk",
+    "directory": "packages/subsquare-api-sdk",
     "type": "git",
     "url": "https://github.com/Koniverse/Subwallet-V2.git"
   },

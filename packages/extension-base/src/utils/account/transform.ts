@@ -239,17 +239,15 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
 ];
 
 const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
-  ExtrinsicType.VOTE,
-  ExtrinsicType.UNVOTE
+  ExtrinsicType.GOV_VOTE,
+  ExtrinsicType.GOV_UNVOTE
 ];
 
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
   ExtrinsicType.SWAP,
-  ExtrinsicType.CROWDLOAN,
-  ExtrinsicType.VOTE,
-  ExtrinsicType.UNVOTE
+  ExtrinsicType.CROWDLOAN
 ];
 
 export const getAccountTransactionActions = (signMode: AccountSignMode, networkType: AccountChainType, type?: KeypairType, _meta?: KeyringPair$Meta, _specialNetwork?: string): ExtrinsicType[] => {
