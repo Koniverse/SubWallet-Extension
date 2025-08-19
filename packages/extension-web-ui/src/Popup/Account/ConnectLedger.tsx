@@ -43,7 +43,6 @@ export const funcSortMigrationApp = (a: ChainItemType, b: ChainItemType) => {
 
 const LIMIT_PER_PAGE = 5;
 const CONNECT_LEDGER_USER_GUIDE_URL = `${USER_GUIDE_URL}/cold-wallet-management/connect-ledger-devices`;
-const CONNECT_LEDGER_POLKADOT_USER_GUIDE_URL = `${CONNECT_LEDGER_USER_GUIDE_URL}/connect-via-the-polkadot-app#select-the-right-account-type-for-use-when-connecting-via-polkadot-app`;
 
 const FooterIcon = (
   <Icon
@@ -348,7 +347,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className='sub-title'>
             {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
             <a
-              href={CONNECT_LEDGER_POLKADOT_USER_GUIDE_URL}
+              href={CONNECT_LEDGER_USER_GUIDE_URL}
               target='__blank'
             >
               {t('here')}
