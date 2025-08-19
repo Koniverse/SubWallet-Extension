@@ -31,7 +31,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   // @ts-ignore
   const { className = '', isAllAccount, targetAccountProxy } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -93,14 +93,20 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
     setIsDisable(empty || error);
-
-    console.log('values', values);
     persistData(values);
   }, [persistData]);
 
   const onSubmit: FormCallbacks<GovReferendumVoteParams>['onFinish'] = useCallback((values: GovReferendumVoteParams) => {
     setLoading(true);
   }, []);
+
+  useEffect(() => {
+    setCustomScreenTitle(t('Vote for'));
+
+    return () => {
+      setCustomScreenTitle(undefined);
+    };
+  }, [setCustomScreenTitle, t]);
 
   return (
     <>
