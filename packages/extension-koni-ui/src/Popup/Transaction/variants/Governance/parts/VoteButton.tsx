@@ -11,12 +11,15 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   onClick?: VoidFunction;
   type: GovernanceVoteType;
+  disabled?: boolean;
+  loading?: boolean;
 };
 
-const Component = ({ className, onClick, type }: Props): React.ReactElement<Props> => {
+const Component = ({ className, disabled, loading, onClick, type }: Props): React.ReactElement<Props> => {
   return (
     <Button
       className={CN(className, `-type-${type}`)}
+      disabled={loading || disabled}
       icon={(
         <Icon
           customSize={'28px'}
@@ -24,6 +27,7 @@ const Component = ({ className, onClick, type }: Props): React.ReactElement<Prop
           weight={'fill'}
         />
       )}
+      loading={loading}
       onClick={onClick}
       shape='circle'
     />

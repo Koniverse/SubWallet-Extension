@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -159,4 +159,15 @@ export const DEFAULT_SWAP_PARAMS: SwapParams = {
 export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   notificationId: ''
+};
+
+export const DEFAULT_GOV_REFERENDUM_VOTE_PARAMS: GovReferendumVoteParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  conviction: 0.1,
+  referendumId: ''
+};
+
+export const DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS: GovReferendumUnvoteParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  referendumId: ''
 };

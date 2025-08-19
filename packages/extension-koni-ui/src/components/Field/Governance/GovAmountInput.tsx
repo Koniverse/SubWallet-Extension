@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputEvent, BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
+import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Logo } from '@subwallet/react-ui';
-import React from 'react';
+import { InputRef, Logo } from '@subwallet/react-ui';
+import React, { ForwardedRef, forwardRef } from 'react';
 import styled from 'styled-components';
 
 import AmountInput from '../AmountInput';
@@ -18,14 +19,17 @@ type Props = ThemeProps & BasicInputWrapper & {
   onChange?: (event: BasicInputEvent<string>, isUserInput?: boolean) => void
 }
 
-const Component = (props: Props): React.ReactElement<Props> => {
+const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { className = '', decimals,
     defaultInvalidOutputValue,
     label,
     logoKey,
     onChange,
     tokenSymbol,
-    topRightPart } = props;
+    topRightPart,
+    value } = props;
+
+  const inputRef = useForwardInputRef(ref);
 
   return (
     <div className={className}>
@@ -52,17 +56,19 @@ const Component = (props: Props): React.ReactElement<Props> => {
             token={logoKey}
           />
         )}
+        ref={inputRef}
         suffix={ !!tokenSymbol && (
           <span className={'__symbol'}>
             {tokenSymbol}
           </span>
         )}
+        value={value}
       />
     </div>
   );
 };
 
-const GovAmountInput = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const GovAmountInput = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     position: 'relative',
 

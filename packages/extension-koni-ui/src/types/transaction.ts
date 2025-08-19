@@ -74,3 +74,16 @@ export interface SwapParams extends TransactionFormBaseProps {
 export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
 }
+
+export interface GovReferendumVoteParams extends TransactionFormBaseProps {
+  amount?: string;
+  abstainAmount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+  conviction: number;
+  referendumId: string;
+}
+
+export interface GovReferendumUnvoteParams extends TransactionFormBaseProps {
+  referendumId: string;
+}

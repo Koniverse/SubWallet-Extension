@@ -124,6 +124,11 @@ const CancelUnstake = new LazyLoader('CancelUnstake', () => import('@subwallet/e
 const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimReward'));
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
+const GovReferendumAbstainVote = new LazyLoader('GovReferendumAbstainVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumAbstainVote'));
+const GovReferendumSplitVote = new LazyLoader('GovReferendumSplitVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumSplitVote'));
+const GovReferendumUnvote = new LazyLoader('GovReferendumUnvote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumUnvote'));
+const GovReferendumStandardVote = new LazyLoader('GovReferendumStandardVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumStandardVote'));
+
 const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
 
 // Earning
@@ -212,6 +217,11 @@ export const router = createHashRouter([
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
           ClaimBridge.generateRouterObject('claim-bridge'),
+          GovReferendumStandardVote.generateRouterObject('gov-ref-standard-vote'),
+          GovReferendumAbstainVote.generateRouterObject('gov-ref-abstain-vote'),
+          GovReferendumSplitVote.generateRouterObject('gov-ref-split-vote'),
+          GovReferendumUnvote.generateRouterObject('gov-ref-unvote'),
+
           {
             path: 'compound',
             element: <Example />

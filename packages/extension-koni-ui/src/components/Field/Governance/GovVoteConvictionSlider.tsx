@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
+import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Slider } from '@subwallet/react-ui';
-import React, { useCallback, useEffect, useState } from 'react';
+import { InputRef, Slider } from '@subwallet/react-ui';
+import React, { ForwardedRef, forwardRef, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -23,10 +24,11 @@ const sanitizeValue = (value?: number): number => (
   value && options.includes(value) ? value : sliderMin
 );
 
-const Component = (props: Props): React.ReactElement<Props> => {
+const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { className = '', onChange, value: originValue } = props;
   const [value, setValue] = useState<number>(() => sanitizeValue(originValue));
+  const inputRef = useForwardInputRef(ref);
 
   const handleChange = useCallback((val: number) => {
     onChange?.({ target: { value: val } });
@@ -49,6 +51,7 @@ const Component = (props: Props): React.ReactElement<Props> => {
           max={sliderMax}
           min={sliderMin}
           onChange={handleChange}
+          ref={inputRef}
           step={null}
           value={value}
         />
@@ -57,7 +60,7 @@ const Component = (props: Props): React.ReactElement<Props> => {
   );
 };
 
-const GovVoteConvictionSlider = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const GovVoteConvictionSlider = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     backgroundColor: token.colorBgSecondary,
     borderRadius: 8,
