@@ -14,6 +14,7 @@ import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-ser
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
+import { OptimexHandler } from '@subwallet/extension-base/services/swap-service/handler/optimex-handler';
 import { getSwapAltToken, getTokenPairFromStep, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
@@ -307,32 +308,18 @@ export class SwapService implements StoppableServiceInterface {
       switch (providerId) {
         case SwapProviderId.CHAIN_FLIP_TESTNET:
           this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
-
           break;
         case SwapProviderId.CHAIN_FLIP_MAINNET:
           this.handlers[providerId] = new ChainflipSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
-
           break;
-
-        case SwapProviderId.HYDRADX_TESTNET:
-          this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService);
-          break;
-
         case SwapProviderId.HYDRADX_MAINNET:
           this.handlers[providerId] = new HydradxHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
           break;
-
         case SwapProviderId.POLKADOT_ASSET_HUB:
           this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemint');
           break;
         case SwapProviderId.KUSAMA_ASSET_HUB:
           this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'statemine');
-          break;
-        // case SwapProviderId.ROCOCO_ASSET_HUB:
-        //   this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'rococo_assethub');
-        //   break;
-        case SwapProviderId.WESTEND_ASSET_HUB:
-          this.handlers[providerId] = new AssetHubSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, 'westend_assethub');
           break;
         case SwapProviderId.SIMPLE_SWAP:
           this.handlers[providerId] = new SimpleSwapHandler(this.chainService, this.state.balanceService, this.state.feeService);
@@ -342,6 +329,12 @@ export class SwapService implements StoppableServiceInterface {
           break;
         case SwapProviderId.KYBER:
           this.handlers[providerId] = new KyberHandler(this.chainService, this.state.balanceService, this.state.transactionService, this.state.feeService);
+          break;
+        case SwapProviderId.OPTIMEX:
+          this.handlers[providerId] = new OptimexHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
+          break;
+        case SwapProviderId.OPTIMEX_TESTNET:
+          this.handlers[providerId] = new OptimexHandler(this.chainService, this.state.balanceService, this.state.feeService, true);
           break;
         default:
           throw new Error('Unsupported provider');
