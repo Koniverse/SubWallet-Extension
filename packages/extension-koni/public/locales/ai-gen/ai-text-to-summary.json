@@ -1438,5 +1438,18 @@
   "Your validators": "yourValidators",
   "Delegator": "delegator",
   "Nominator": "nominator",
-  "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>": "choosePolkadotAccountTypeReloadInfo"
+  "Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, <highlight>reload</highlight>": "choosePolkadotAccountTypeReloadInfo",
+  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app": "turnOffVpnAdBlocker",
+  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app": "turnOffNetworksOrPrivacyApps",
+  "All accounts found in this file are invalid. Import another JSON file and try again": "allAccountsInFileInvalid",
+  "Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again": "stakeSlippageExceeded",
+  "Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again": "unstakeSlippageExceeded",
+  "Unable to load data": "unableToLoadData",
+  "Something went wrong while loading data for this screen.": "errorLoadingScreenData",
+  "<highlight>Reload now</highlight> to get the new data": "reloadNowForNewData",
+  "Max fee cannot be lower than priority fee": "maxFeeLowerThanPriorityFee",
+  "This fee can't be edited with the current RPC connection": "feeNotEditableWithCurrentRpc",
+  "No valid accounts found to import": "noValidAccountsToImport",
+  "A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete": "taoStakingFeeDeductedInfo",
+  "An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete": "taoUnstakingFeeDeductedInfo"
 }

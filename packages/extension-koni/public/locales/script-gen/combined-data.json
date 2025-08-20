@@ -1,4 +1,319 @@
 {
+  "Connection unsuccessful. Review our user guide and try connecting again.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide"
+      }
+    ],
+    "translations": {
+      "en": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "ja": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "vi": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "zh": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "ru": "Connection unsuccessful. Review our user guide and try connecting again."
+    }
+  },
+  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker"
+      }
+    ],
+    "translations": {
+      "en": "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps"
+      }
+    ],
+    "translations": {
+      "en": "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "I understand": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/RemindDuplicateAccountNameModal.tsx",
+        "key": "ui.ACCOUNT.components.Modal.RemindDuplicateAccountName.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/hooks/transaction/useHandleSubmitTransaction.ts",
+        "key": "ui.TRANSACTION.hook.transaction.useHandleSubmit.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
+        "key": "ui.ACCOUNT.screen.Account.RestoreJson.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Settings/Notifications/Notification.tsx",
+        "key": "ui.SETTINGS.screen.Setting.Notifications.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Earn.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningInstructionModal.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Instruction.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Bitcoin.tsx",
+        "key": "ui.DAPP.Confirmations.Sign.Bitcoin.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Cardano.tsx",
+        "key": "ui.DAPP.Confirmations.Sign.Cardano.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Evm.tsx",
+        "key": "ui.DAPP.Confirmations.Sign.Evm.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Substrate.tsx",
+        "key": "ui.DAPP.Confirmations.Sign.Substrate.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Error/NetworkConnectionErrorConfirmation.tsx",
+        "key": "ui.NETWORK.Confirmations.Error.NetworkConnection.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart.tsx",
+        "key": "ui.EARNING.screen.EarningPositionDetail.RewardInfo.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Swap.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx",
+        "key": "ui.TRANSACTION.Confirmations.ClaimReward.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.iUnderstand"
+      }
+    ],
+    "translations": {
+      "en": "I understand",
+      "ja": "I understand",
+      "vi": "I understand",
+      "zh": "I understand",
+      "ru": "I understand"
+    }
+  },
+  "All accounts found in this file are invalid. Import another JSON file and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
+        "key": "ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid"
+      }
+    ],
+    "translations": {
+      "en": "All accounts found in this file are invalid. Import another JSON file and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Unable to import": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
+        "key": "ui.ACCOUNT.screen.Account.RestoreJson.unableToImport"
+      }
+    ],
+    "translations": {
+      "en": "Unable to import",
+      "ja": "Unable to import",
+      "vi": "Unable to import",
+      "zh": "Unable to import",
+      "ru": "Unable to import"
+    }
+  },
+  "Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Earn.stakeSlippageExceeded"
+      }
+    ],
+    "translations": {
+      "en": "Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Unbond.unstakeSlippageExceeded"
+      }
+    ],
+    "translations": {
+      "en": "Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Unable to load data": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/EmptySwapPairs.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.unableToLoadData"
+      }
+    ],
+    "translations": {
+      "en": "Unable to load data",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Something went wrong while loading data for this screen.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/EmptySwapPairs.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.errorLoadingScreenData"
+      }
+    ],
+    "translations": {
+      "en": "Something went wrong while loading data for this screen.",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "<highlight>Reload now</highlight> to get the new data": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/EmptySwapPairs.tsx",
+        "key": "ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.reloadNowForNewData"
+      }
+    ],
+    "translations": {
+      "en": "<highlight>Reload now</highlight> to get the new data",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Max fee cannot be lower than priority fee": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/FeeEditorModal.tsx",
+        "key": "ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeLowerThanPriorityFee"
+      }
+    ],
+    "translations": {
+      "en": "Max fee cannot be lower than priority fee",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "This fee can't be edited with the current RPC connection": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/index.tsx",
+        "key": "ui.TRANSACTION.components.Field.FeeEditor.feeNotEditableWithCurrentRpc"
+      }
+    ],
+    "translations": {
+      "en": "This fee can't be edited with the current RPC connection",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Search validator": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningPoolSelector.tsx",
+        "key": "ui.EARNING.components.Field.Earning.PoolSelector.searchValidator"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
+        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator"
+      }
+    ],
+    "translations": {
+      "en": "Search validator",
+      "ja": "バリデーターを検索",
+      "vi": "Tìm kiếm validator",
+      "zh": "搜索验证者",
+      "ru": "Поиск по валидатору"
+    }
+  },
+  "No valid accounts found to import": {
+    "locations": [
+      {
+        "filepath": "packages/extension-base/src/services/keyring-service/context/handlers/Json.ts",
+        "key": "bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport"
+      }
+    ],
+    "translations": {
+      "en": "No valid accounts found to import",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Bond.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Bond.taoStakingFeeDeductedInfo"
+      }
+    ],
+    "translations": {
+      "en": "A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Unbond.tsx",
+        "key": "ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFeeDeductedInfo"
+      }
+    ],
+    "translations": {
+      "en": "An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
   "Export {{getNumberAccount}} accounts": {
     "locations": [
       {
@@ -5720,21 +6035,6 @@
       "ru": "Connection unsuccessful"
     }
   },
-  "Connection unsuccessful. Review our user guide and try connecting again.": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
-        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide"
-      }
-    ],
-    "translations": {
-      "en": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "ja": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "vi": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "zh": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "ru": "Connection unsuccessful. Review our user guide and try connecting again."
-    }
-  },
   "Disconnect": {
     "locations": [
       {
@@ -8019,73 +8319,6 @@
       "vi": "Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>",
       "zh": "Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>",
       "ru": "Once your seed phrase is lost, there is no way to recover your account. Back up now to secure your funds or learn how to with <highlight>our user guide.</highlight>"
-    }
-  },
-  "I understand": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Modal/RemindDuplicateAccountNameModal.tsx",
-        "key": "ui.ACCOUNT.components.Modal.RemindDuplicateAccountName.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/hooks/transaction/useHandleSubmitTransaction.ts",
-        "key": "ui.TRANSACTION.hook.transaction.useHandleSubmit.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
-        "key": "ui.ACCOUNT.screen.Account.RestoreJson.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Settings/Notifications/Notification.tsx",
-        "key": "ui.SETTINGS.screen.Setting.Notifications.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
-        "key": "ui.TRANSACTION.screen.Transaction.Earn.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningInstructionModal.tsx",
-        "key": "ui.EARNING.components.Modal.Earning.Instruction.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Bitcoin.tsx",
-        "key": "ui.DAPP.Confirmations.Sign.Bitcoin.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Cardano.tsx",
-        "key": "ui.DAPP.Confirmations.Sign.Cardano.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Evm.tsx",
-        "key": "ui.DAPP.Confirmations.Sign.Evm.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/parts/Sign/Substrate.tsx",
-        "key": "ui.DAPP.Confirmations.Sign.Substrate.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Error/NetworkConnectionErrorConfirmation.tsx",
-        "key": "ui.NETWORK.Confirmations.Error.NetworkConnection.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Home/Earning/EarningPositionDetail/RewardInfoPart.tsx",
-        "key": "ui.EARNING.screen.EarningPositionDetail.RewardInfo.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx",
-        "key": "ui.TRANSACTION.screen.Transaction.Swap.iUnderstand"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/ClaimReward.tsx",
-        "key": "ui.TRANSACTION.Confirmations.ClaimReward.iUnderstand"
-      }
-    ],
-    "translations": {
-      "en": "I understand",
-      "ja": "I understand",
-      "vi": "I understand",
-      "zh": "I understand",
-      "ru": "I understand"
     }
   },
   "Duplicate account name": {
@@ -11879,21 +12112,6 @@
       "vi": "All accounts found in this file already exist in SubWallet",
       "zh": "All accounts found in this file already exist in SubWallet",
       "ru": "All accounts found in this file already exist in SubWallet"
-    }
-  },
-  "Unable to import": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
-        "key": "ui.ACCOUNT.screen.Account.RestoreJson.unableToImport"
-      }
-    ],
-    "translations": {
-      "en": "Unable to import",
-      "ja": "Unable to import",
-      "vi": "Unable to import",
-      "zh": "Unable to import",
-      "ru": "Unable to import"
     }
   },
   "Import by JSON file": {
@@ -17779,25 +17997,6 @@
       "vi": "Chọn pool",
       "zh": "选择矿池",
       "ru": "Выбрать пул"
-    }
-  },
-  "Search validator": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Field/Earning/EarningPoolSelector.tsx",
-        "key": "ui.EARNING.components.Field.Earning.PoolSelector.searchValidator"
-      },
-      {
-        "filepath": "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
-        "key": "ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator"
-      }
-    ],
-    "translations": {
-      "en": "Search validator",
-      "ja": "バリデーターを検索",
-      "vi": "Tìm kiếm validator",
-      "zh": "搜索验证者",
-      "ru": "Поиск по валидатору"
     }
   },
   "Lowest commission": {

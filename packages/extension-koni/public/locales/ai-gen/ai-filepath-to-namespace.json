@@ -397,6 +397,8 @@
   "packages/extension-koni-ui/src/Popup/Transaction/variants/SendNFT.tsx": "ui.TRANSACTION.screen.Transaction.SendNFT",
   "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/index.tsx": "ui.TRANSACTION.screen.Transaction.Swap",
   "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/QuoteInfoArea.tsx": "ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo",
+  "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/EmptySwapPairs.tsx": "ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs",
+
   "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx": "ui.TRANSACTION.screen.Transaction.Unbond",
   "packages/extension-koni-ui/src/Popup/Transaction/variants/Withdraw.tsx": "ui.TRANSACTION.screen.Transaction.Withdraw",
   "packages/extension-koni-ui/src/Popup/TransactionDone.tsx": "ui.TRANSACTION.screen.TransactionDone",
