@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useCoreCreateReformatAddress, useDefaultNavigate, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
-import { Form } from '@subwallet/react-ui';
+import { ButtonProps, Form } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,9 +35,10 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   // @ts-ignore
   const { className = '', isAllAccount, targetAccountProxy } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
+  const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -135,6 +136,23 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     navigate('/transaction/gov-ref-abstain-vote');
   }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
 
+  const subHeaderButtons: ButtonProps[] = useMemo(() => {
+    return [
+      {
+        children: t('Unvote'),
+        onClick: () => {
+          setGovRefUnvoteStorage({
+            ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
+            fromAccountProxy: defaultData.fromAccountProxy,
+            referendumId: defaultData.referendumId,
+            chain: defaultData.chain
+          });
+          navigate('/transaction/gov-ref-unvote');
+        }
+      }
+    ];
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefUnvoteStorage, t]);
+
   useEffect(() => {
     setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
 
@@ -142,6 +160,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       setCustomScreenTitle(undefined);
     };
   }, [defaultData.referendumId, setCustomScreenTitle, t]);
+
+  useEffect(() => {
+    setSubHeaderRightButtons(subHeaderButtons);
+
+    return () => {
+      setSubHeaderRightButtons(undefined);
+    };
+  }, [setSubHeaderRightButtons, subHeaderButtons]);
 
   useEffect(() => {
     const updateFromValue = () => {

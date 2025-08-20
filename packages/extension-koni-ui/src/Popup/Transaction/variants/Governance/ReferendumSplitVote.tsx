@@ -29,7 +29,7 @@ type ComponentProps = {
   isAllAccount?: boolean
 };
 
-const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'conviction'];
+const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'conviction', 'fromAccountProxy'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
