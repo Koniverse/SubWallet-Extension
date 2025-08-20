@@ -167,7 +167,7 @@ export class BittensorCache {
             }
           })
           .catch(console.error);
-      }, 60 * 2000);
+      }, 60 * 1000); // Cache 1 minute
 
       return data;
     } catch (error) {
