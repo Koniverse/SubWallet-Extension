@@ -35,14 +35,14 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Unstake amount')}
+          label={t('ui.TRANSACTION.Confirmations.Unbond.unstakeAmount')}
           suffix={subnetSymbol || symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.Unbond.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -50,8 +50,8 @@ const Component: React.FC<Props> = (props: Props) => {
       {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete', { replace: { fee: stakingFee } })}
-          title={t('TAO unstaking fee')}
+          description={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
+          title={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFee')}
           type='info'
         />
       )}

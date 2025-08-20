@@ -99,8 +99,8 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('Mainnet'), value: FilterOptionType.MAIN_NETWORK },
-    { label: t('Testnet'), value: FilterOptionType.TEST_NETWORK }
+    { label: t('ui.EARNING.screen.EarningOptions.mainnet'), value: FilterOptionType.MAIN_NETWORK },
+    { label: t('ui.EARNING.screen.EarningOptions.testnet'), value: FilterOptionType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -178,15 +178,15 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
     return () => {
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('Enter Astar portal'),
-          content: t('Navigate to Astar portal to view and manage your stake in Astar dApp staking v3'),
+          title: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
+          content: t('ui.EARNING.screen.EarningOptions.navigateToAstarPortal'),
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.EARNING.screen.EarningOptions.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('Enter Astar portal'),
+            text: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -318,8 +318,8 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
   const emptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No earning option found')}
-        emptyTitle={t('Change your search and try again')}
+        emptyMessage={t('ui.EARNING.screen.EarningOptions.noEarningOptionFound')}
+        emptyTitle={t('ui.EARNING.screen.EarningOptions.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -362,7 +362,7 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning options')}
+        title={t<string>('ui.EARNING.screen.EarningOptions.earningOptions')}
       >
         {!!banners.length && (
           <div className={'earning-banner-wrapper'}>
@@ -384,18 +384,18 @@ function Component ({ className, hasEarningPositions, setEntryView }: Props) {
           renderWhenEmpty={emptyList}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
           showActionBtn
         />
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningOptions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.EARNING.screen.EarningOptions.filter')}
         />
       </Layout.Base>
     </ChainConnectionWrapper>

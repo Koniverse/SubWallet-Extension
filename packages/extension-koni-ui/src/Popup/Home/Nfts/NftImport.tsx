@@ -150,24 +150,24 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           if (result.error === 'incompatibleNFT') {
             showNotification({
               type: 'error',
-              message: t('Failed to import. Incompatible NFT')
+              message: t('ui.NFT.screen.NftsImport.failedToImportIncompatibleNft')
             });
           } else if (result.success) {
             showNotification({
               type: 'success',
-              message: t('Imported NFT successfully')
+              message: t('ui.NFT.screen.NftsImport.importedNftSuccessfully')
             });
             goBack();
           } else {
             showNotification({
               type: 'error',
-              message: t('An error occurred, please try again')
+              message: t('ui.NFT.screen.NftsImport.anErrorOccurredPleaseTryAgain')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.NFT.screen.NftsImport.anErrorOccurredPleaseTryAgain')
           });
         })
         .finally(() => {
@@ -183,7 +183,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (parsedValue.length >= 3) {
         resolve();
       } else {
-        reject(new Error(t('Collection name must have at least 3 characters')));
+        reject(new Error(t('ui.NFT.screen.NftsImport.collectionNameMinLength')));
       }
     });
   }, [t]);
@@ -199,7 +199,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         validator: (_, contractAddress: string): Promise<void> => {
           return new Promise((resolve, reject) => {
             if (!isAddress(contractAddress)) {
-              reject(t('Invalid contract address'));
+              reject(t('ui.NFT.screen.NftsImport.invalidContractAddress'));
             } else {
               const selectedChain = getFieldValue('chain') as string;
               const selectedNftType = getFieldValue('type') as _AssetType;
@@ -218,11 +218,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     setLoading(false);
 
                     if (validationResult.isExist) {
-                      reject(t('Existed NFT'));
+                      reject(t('ui.NFT.screen.NftsImport.existedNft'));
                     }
 
                     if (validationResult.contractError) {
-                      reject(t('Invalid contract for the selected chain'));
+                      reject(t('ui.NFT.screen.NftsImport.invalidContractForChain'));
                     }
 
                     if (!validationResult.isExist && !validationResult.contractError) {
@@ -233,10 +233,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   })
                   .catch(() => {
                     setLoading(false);
-                    reject(t('Invalid contract for the selected chain'));
+                    reject(t('ui.NFT.screen.NftsImport.invalidContractForChain'));
                   });
               } else {
-                reject(t('Invalid contract address'));
+                reject(t('ui.NFT.screen.NftsImport.invalidContractAddress'));
               }
             }
           });
@@ -266,9 +266,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: form.submit,
-          children: t('Import')
+          children: t('ui.NFT.screen.NftsImport.import')
         }}
-        title={t<string>('Import NFT')}
+        title={t<string>('ui.NFT.screen.NftsImport.importNft')}
       >
         <div className={'nft_import__container'}>
           <Form
@@ -289,9 +289,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <ChainSelector
                 items={chains}
-                label={t<string>('Network')}
-                placeholder={t('Select network')}
-                title={t('Select network')}
+                label={t<string>('ui.NFT.screen.NftsImport.network')}
+                placeholder={t('ui.NFT.screen.NftsImport.selectNetwork')}
+                title={t('ui.NFT.screen.NftsImport.selectNetwork')}
               />
             </Form.Item>
 
@@ -302,9 +302,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 className={className}
                 disabled={!selectedChain}
                 items={nftTypeOptions}
-                label={t<string>('Type')}
-                placeholder={t('Select NFT type')}
-                title={t('Select NFT type')}
+                label={t<string>('ui.NFT.screen.NftsImport.type')}
+                placeholder={t('ui.NFT.screen.NftsImport.selectNftType')}
+                title={t('ui.NFT.screen.NftsImport.selectNftType')}
               />
             </Form.Item>
 
@@ -316,8 +316,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <AddressInput
                 addressPrefix={chainNetworkPrefix}
                 disabled={!selectedNftType}
-                label={t<string>('Contract address')}
-                placeholder={t('Enter or paste an address')}
+                label={t<string>('ui.NFT.screen.NftsImport.contractAddress')}
+                placeholder={t('ui.NFT.screen.NftsImport.enterOrPasteAddress')}
                 showScanner={true}
               />
             </Form.Item>
@@ -330,7 +330,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             >
               <Input
                 disabled={nameDisabled}
-                label={t<string>('NFT collection name')}
+                label={t<string>('ui.NFT.screen.NftsImport.nftCollectionName')}
               />
             </Form.Item>
           </Form>

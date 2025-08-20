@@ -185,7 +185,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return (
       <MetaInfo.Default
         className='__label-bottom'
-        label={t('Subnet')}
+        label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.subnet')}
       >
         <div className='__subnet-wrapper'>
           <Logo
@@ -298,17 +298,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             if (error.message.includes('remaining')) {
               openAlert({
                 type: NotificationType.WARNING,
-                title: t('Pay attention!'),
+                title: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.payAttentionExclamation'),
                 content: error.message,
                 okButton: {
-                  text: t('Move all'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.moveAll'),
                   onClick: () => {
                     closeAlert();
                     send(bondedValue);
                   }
                 },
                 cancelButton: {
-                  text: t('Cancel'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
                   onClick: () => {
                     closeAlert();
                     setSubmitLoading(false);
@@ -374,12 +374,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           loading={submitLoading}
           onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
         >
-          {t('Update validator')}
+          {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.updateValidator')}
         </Button>
       }
       id={modalId}
       onCancel={handleCancel}
-      title={t('Change validator')}
+      title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeValidator')}
     >
       <Form
         className={'form-container form-space-sm'}
@@ -397,7 +397,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           />
           <div className={'staked-balance__info'}>
             <span>
-              {t('Staked balance:')}
+              {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.stakedBalance')}
             </span>
             <span>
                   &nbsp;{formatBalance(bondedValue, decimals)}&nbsp;
@@ -412,7 +412,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             defaultValue={persistValidator}
             disabled={!from}
             isChangeValidator={true}
-            label={t('From')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.from')}
             networkPrefix={networkPrefix}
             nominators={nominations}
             poolInfo={poolInfo}
@@ -424,7 +424,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             chain={chain}
             disabled={!from}
             from={from}
-            label={t('Change to')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeTo')}
             originValidator={originValidator}
             setForceFetchValidator={setForceFetchValidator}
             slug={slug}
@@ -436,7 +436,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             ? (
               <MetaInfo.Chain
                 chain={chain}
-                label={t('Network')}
+                label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.network')}
               />
 
             )
@@ -447,9 +447,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         <div className='__amount-part'>
           <Tooltip
             placement={'topRight'}
-            title={t('Amount you want to move from the selected validator to the new validator')}
+            title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountToMoveDescription')}
           >
-            <div className='__item-left-part'>{t('Change staking amount')}
+            <div className='__item-left-part'>{t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeStakingAmount')}
               <Icon
                 className='__validator-info'
                 iconColor='white'
@@ -489,7 +489,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             </Form.Item>
             <div className={'minimum-stake__info'}>
               <div className={'minimum-stake__label'}>
-                {t('Minimum active stake')}
+                {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumActiveStake')}
               </div>
               <Number
                 className='minimum-stake__value'

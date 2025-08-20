@@ -123,7 +123,7 @@ const Component = (props: Props) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('Lowest commission'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -131,7 +131,7 @@ const Component = (props: Props) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('Highest annual return'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -139,14 +139,14 @@ const Component = (props: Props) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('Nomination'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('Lowest min active stake'),
+      label: t('ui.EARNING.components.Modal.Earning.Validator.Change.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -163,9 +163,9 @@ const Component = (props: Props) => {
 
   const applyLabel = useMemo(() => {
     if (!fewValidators) {
-      return detectTranslate('Apply {{number}} validator');
+      return detectTranslate('ui.EARNING.components.Modal.Earning.Validator.Change.applyOneValidator');
     } else {
-      return detectTranslate('Apply {{number}} validators');
+      return detectTranslate('ui.EARNING.components.Modal.Earning.Validator.Change.applyNumberValidators');
     }
   }, [fewValidators]);
 
@@ -316,17 +316,17 @@ const Component = (props: Props) => {
     if (isNoValidatorChanged) {
       openAlert({
         type: NotificationType.INFO,
-        content: t('Your new selections of validators is the same as the original selection. Do you still want to continue?'),
-        title: t('No changes detected!'),
+        content: t('ui.EARNING.components.Modal.Earning.Validator.Change.noValidatorChangesWarning'),
+        title: t('ui.EARNING.components.Modal.Earning.Validator.Change.noChangesDetected'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.EARNING.components.Modal.Earning.Validator.Change.continue'),
           onClick: () => {
             closeAlert();
             submit(target);
           }
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.EARNING.components.Modal.Earning.Validator.Change.cancel'),
           onClick: closeAlert
         }
       });
@@ -362,7 +362,7 @@ const Component = (props: Props) => {
       <EmptyValidator
         isDataEmpty={items.length === 0}
         onClickReload={setForceFetchValidator}
-        validatorTitle={t('Validators')}
+        validatorTitle={t('ui.EARNING.components.Modal.Earning.Validator.Change.validators')}
       />
     );
   }, [items.length, setForceFetchValidator, t]);
@@ -507,13 +507,13 @@ const Component = (props: Props) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select validators')}
+        title={t('ui.EARNING.components.Modal.Earning.Validator.Change.selectValidators')}
       >
         <Search
           autoFocus={true}
           className={'__search-box'}
           onSearch={handleSearch}
-          placeholder={t<string>('Search validator')}
+          placeholder={t<string>('ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator')}
           searchValue={searchValue}
         />
         <SwList.Section
