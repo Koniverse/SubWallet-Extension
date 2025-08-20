@@ -90,30 +90,21 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
   const minRequiredMaxFeePerGas = useMemo(() => {
     if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
       const baseGasFee = new BigN(feeOptionsInfo.baseGasFee);
-      const priorityFee = new BigN(feeDefaultValue?.maxPriorityFeePerGas || 0);
+      const priorityFee = feeOptionsInfo?.options?.slow?.maxPriorityFeePerGas || 0;
 
       return baseGasFee.multipliedBy(1.5).plus(priorityFee).integerValue(BigN.ROUND_CEIL);
     }
 
     return undefined;
-  }, [feeOptionsInfo, feeDefaultValue]);
+  }, [feeOptionsInfo]);
 
   const formDefault = useMemo((): FormProps => {
     return {
       customValue: '',
-      maxFeeValue: (() => {
-        if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
-          const maxFeeDefault = new BigN(feeDefaultValue?.maxFeePerGas || 0);
-          const minFeeRequired = new BigN(minRequiredMaxFeePerGas || 0);
-
-          return maxFeeDefault.gt(minFeeRequired) ? maxFeeDefault.toString() : minFeeRequired.toString();
-        }
-
-        return feeDefaultValue?.maxFeePerGas;
-      })(),
+      maxFeeValue: feeDefaultValue?.maxFeePerGas,
       priorityFeeValue: feeDefaultValue?.maxPriorityFeePerGas
     };
-  }, [feeDefaultValue?.maxFeePerGas, feeDefaultValue?.maxPriorityFeePerGas, feeOptionsInfo, minRequiredMaxFeePerGas]);
+  }, [feeDefaultValue?.maxFeePerGas, feeDefaultValue?.maxPriorityFeePerGas]);
 
   const maxFeePerGas = Form.useWatch('maxFeeValue', form);
 
