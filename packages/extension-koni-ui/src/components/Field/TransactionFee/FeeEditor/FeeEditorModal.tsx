@@ -211,6 +211,12 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.amountIsRequired'));
     }
 
+    const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
+
+    if (priorityFeeValue && value && new BigN(value).lt(new BigN(priorityFeeValue))) {
+      return Promise.reject(t('Max fee cannot be lower than priority fee'));
+    }
+
     if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo) {
       const baseGasFee = feeOptionsInfo.baseGasFee;
       const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5);
@@ -225,13 +231,19 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     return Promise.resolve();
-  }, [feeOptionsInfo, t]);
+  }, [feeOptionsInfo, form, t]);
 
   const onValuesChange: FormCallbacks<FormProps>['onValuesChange'] = useCallback(
     (part: Partial<FormProps>, values: FormProps) => {
       if (part.customValue) {
         form.setFieldsValue({
           customValue: part.customValue
+        });
+      }
+
+      if (part.priorityFeeValue) {
+        form.validateFields(['maxFeeValue']).catch((e) => {
+          console.log(e);
         });
       }
     },

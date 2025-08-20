@@ -117,6 +117,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [password, setPassword] = useState('');
   const [stepState, setStepState] = useState<StepState>(StepState.UPLOAD_JSON_FILE);
+  const [showAllAccountsExistAlert, setShowAllAccountsExistAlert] = useState(false);
   const [showNoValidAccountAlert, setShowNoValidAccountAlert] = useState(false);
   const [jsonFile, setJsonFile] = useState<KeyringPair$Json | KeyringPairs$Json | undefined>(undefined);
   const { alertModal } = useContext(WalletModalContext);
@@ -130,8 +131,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return true;
     }
 
-    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password;
-  }, [fileValidateState.status, password, passwordValidateState.status, requirePassword, stepState, accountProxiesSelected]);
+    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password || showNoValidAccountAlert;
+  }, [stepState, accountProxiesSelected.length, fileValidateState.status, requirePassword, passwordValidateState.status, password, showNoValidAccountAlert]);
 
   const onBack_ = useCallback(() => {
     if (stepState === StepState.SELECT_ACCOUNT_IMPORT) {
@@ -163,7 +164,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     });
 
     if (accountProxies.length > 0) {
-      setShowNoValidAccountAlert(exitedAccount.length === accountProxies.length);
+      setShowAllAccountsExistAlert(exitedAccount.length === accountProxies.length);
     }
 
     if (exitedAccount.length) {
@@ -203,6 +204,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setAccountProxies([]);
           setPassword('');
           setJsonFile(json);
+          setShowNoValidAccountAlert(false);
           setPasswordValidateState({});
         }
       })
@@ -225,11 +227,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     setPasswordValidating(true);
 
     const onFail = (e: Error) => {
-      setPasswordValidateState({
-        status: 'error',
-        message: e.message
-      });
-      selectPassword();
+      if (e.message.toLowerCase().includes('incorrect password')) {
+        setPasswordValidateState({
+          status: 'error',
+          message: e.message
+        });
+        selectPassword();
+      } else {
+        setShowNoValidAccountAlert(true);
+      }
     };
 
     if (isKeyringPairs$Json(jsonFile)) {
@@ -501,7 +507,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           </div>
 
           {
-            stepState === StepState.SELECT_ACCOUNT_IMPORT && showNoValidAccountAlert && <AlertBox
+            stepState === StepState.SELECT_ACCOUNT_IMPORT && showAllAccountsExistAlert && <AlertBox
               className={'waning-alert-box'}
               description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileExist')}
               title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
@@ -534,7 +540,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
 
             {
-              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && (
+              showNoValidAccountAlert && (<AlertBox
+                className={'alert-warning-name-duplicate'}
+                description={t('All accounts found in this file are invalid. Import another JSON file and try again')}
+                title={t('Unable to import')}
+                type='error'
+              />)
+            }
+
+            {
+              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && !showNoValidAccountAlert && (
                 <Form.Item
                   validateStatus={passwordValidateState.status}
                 >

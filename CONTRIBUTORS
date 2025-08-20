@@ -1,20 +1,20 @@
-    3111	AnhMTV                        	Release version 1.3.48
+    3148	AnhMTV                        	Release version 1.3.53
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     872	bluezdot                      	chores: update content
+     924	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
+     465	Frenkie Nguyen                	[Issue-4585] Reset to custom fee in case of editing fee and then switching to cross chain
      465	Jaco                          	0.42.5 (#969)
-     459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
+     366	tunghp2002                    	[Issue-4539] Feat: Change search margin bottom and rename sortedValidators
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     344	tunghp2002                    	[Issue-4214] Fix some UI bugs
-     276	lw                            	[Issue-4512] refactor: Update swap submission content
-     197	PDTnhah                       	[Issue-4521] Extension - Update chainlist stable v0.2.110
+     278	lw                            	[Issue-4512] refactor: Update swap submission content
+     218	PDTnhah                       	[Issue-4072] Update dependency
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
+     161	Thiendekaco                   	[Issue-4592] fix: handle error when disconnect transport
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     117	Thiendekaco                   	
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	
@@ -30,9 +30,9 @@
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
+       6	thiendekaco                   	
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
-       5	thiendekaco                   	[Issue-4100] fix: throw success target error code to Dapp #
        4	Amaury Martiny                	PostMessageProvider with on('connected' | 'disconnected') (#279)
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
@@ -40,6 +40,7 @@
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
        2	Bartłomiej Rutkowski          	Allow account creation by derivation from existing one (#296)
+       2	bluezdot                      	[Issue-4468] chores: add todos
        2	carumusan                     	Support ipfs and ipns urls (#667)
        2	ccris02                       	Adding Polish Language Option to the Extension (#761)
        2	joe petrowski                 	add plasm (#462)

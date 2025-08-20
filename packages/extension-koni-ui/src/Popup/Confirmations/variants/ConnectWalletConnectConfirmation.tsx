@@ -118,6 +118,12 @@ function Component ({ className, request }: Props) {
 
     return needConnectedNetwork;
   }, [isUnSupportCase, namespaceAccounts]);
+
+  const hasNoNamespaceAccounts = useMemo(
+    () => Object.values(namespaceAccounts).length === 0,
+    [namespaceAccounts]
+  );
+
   const [loading, setLoading] = useState(false);
 
   const _onSelectAccount = useCallback((namespace: string): ((address: string, applyImmediately?: boolean) => VoidFunction) => {
@@ -175,7 +181,7 @@ function Component ({ className, request }: Props) {
     };
   }, [onCancelSelectAccounts]);
 
-  const isSupportCase = !isUnSupportCase && !isExpired && !noNetwork;
+  const isSupportCase = !isUnSupportCase && !isExpired && !noNetwork && !hasNoNamespaceAccounts;
 
   useEffect(() => {
     if (checkNetworksConnected.length > 0 && !blockAddNetwork && !isExitedAnotherUnsupportedNamespace) {
@@ -197,7 +203,7 @@ function Component ({ className, request }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         {
-          (isUnSupportCase || blockAddNetwork) && (
+          (isUnSupportCase || blockAddNetwork || hasNoNamespaceAccounts) && (
             <>
               <AlertBox
                 description={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.atLeastOneNetworkUnavailable')}

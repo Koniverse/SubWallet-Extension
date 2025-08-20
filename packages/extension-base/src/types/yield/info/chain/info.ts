@@ -122,6 +122,8 @@ export interface BaseYieldPoolMetadata {
     netuid: number;
     subnetSymbol: string;
   };
+
+  minValidate?: string; // Avoid logic bittensor change
 }
 
 /**

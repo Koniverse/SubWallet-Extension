@@ -16,7 +16,6 @@ import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
-import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO, hexToString, isHex, noop } from '@polkadot/util';
 
@@ -195,7 +194,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
   /* Subscribe pool position */
 
-  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, _deriveSessionProgress: DeriveSessionProgress, address: string): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, address: string): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chainInfo = this.chainInfo;
     const unlimitedNominatorRewarded = substrateApi.api.consts.staking.maxExposurePageSize !== undefined;
     const _maxNominatorRewardedPerValidator = (substrateApi.api.consts.staking.maxNominatorRewardedPerValidator || 0).toString();
@@ -319,10 +318,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
       }
 
       if (ledgers) {
-        const [_currentEra, _deriveSessionProgress] = await Promise.all([
-          substrateApi.api.query.staking.currentEra(),
-          substrateApi.api.derive?.session?.progress()
-        ]);
+        const _currentEra = await substrateApi.api.query.staking.currentEra();
 
         const currentEra = _currentEra.toString();
 
@@ -331,7 +327,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
           const owner = reformatAddress(useAddresses[i], 42);
 
           if (poolMemberInfo) {
-            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, _deriveSessionProgress, owner);
+            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, owner);
 
             resultCallback({
               ...defaultInfo,
@@ -686,7 +682,14 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-      const slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
+      let slashingSpanCount: string | number;
+
+      if (chainApi.api.call?.nominationPoolsApi?.memberPendingSlash) {
+        slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
+      } else {
+        // Incase api call not exists
+        slashingSpanCount = chainApi.api.consts.staking.historyDepth.toPrimitive();
+      }
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {

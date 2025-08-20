@@ -1,5 +1,69 @@
 # CHANGELOG
 
+## 1.3.53
+Build date: Aug 12, 2025.
+
+Features & Update:
+- Update UX/UI when support Swap for Bitcoin on Chainflip (#4581)
+- Update some UI for Change validator feature (#4539)
+- Improve UI for case connection unsuccessfully when connect WalletConnect (#3456)
+- Update logic for rpc that don't support custom fee on EVM system (#4559)
+- Hide icon Edit fee with some networks not supported (#4585)
+
+Bug fixed:
+- Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect (#2917)
+- Fixed bug Can not import Json Account from Polkadot{.js} extension (#4565)
+- Fixed bug Can't import JSON file(from Migrate account) on store version (#4031)
+- Fixed bug when custom priority fee for EVM (#4461)
+- Fixed bug Unable to detect domains name when transfer (#4072)
+- Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592)
+
+
+## 1.3.52
+Build date: Aug 07, 2025.
+
+Features & Update:
+- Refactor TAO earning position logic (#4520)
+- Update coinbase on-ramp feature (#4572)
+- Apply sw version when request to Backend (#4465)
+- Update chain-list stable v0.2.111 (#4546)
+  - Update block explorer for Polkadex, Moonbeam, Autonomys Mainnet
+  - Update logo for the NEURO token & the network for NeuroWeb Mainnet
+  - Exclude INACTIVE networks from destination chain display
+  - ...
+
+Bug fixed:
+- Fixed bug when withdraw (#4575)
+- Fixed bug no network support when connecting to the WalletConnect (#3025)
+
+
+## 1.3.51
+Build date: Jul 31, 2025.
+
+Features & Update:
+- Support for Bitcoin swap on ChainFlip (#4573)
+
+
+## 1.3.50
+Build date: Jul 30, 2025.
+
+Features & Update:
+- Support for New Swap Pairs on Chainflip (#4495)
+
+
+## 1.3.49
+Build date: Jul 28, 2025.
+
+Features & Update:
+- Display On-Chain Identity for Validators (#4449)
+- Re-check and update block action when stake with ledger account (#4464)
+- Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531)
+- Filter "To token" Based on Selected "From token" - Round 1 (#4468)
+
+Bug fixed:
+- Fixed bug import NFT (#3837) (#3818)
+
+
 ## 1.3.48
 Build date: Jul 21, 2025.
 

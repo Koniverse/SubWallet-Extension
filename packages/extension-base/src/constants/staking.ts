@@ -19,3 +19,5 @@ export type ChainRecommendValidator = {
   maxCount: number;
   preSelectValidators: string;
 };
+
+export const CRON_REFRESH_EARNING_TARGETS = 10 * 60 * 1000; // 10 minutes depends on cron run time on server
