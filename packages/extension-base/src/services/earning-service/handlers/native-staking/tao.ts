@@ -13,6 +13,7 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -140,20 +141,15 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, '/dtao/validator/latest/v1?limit=100', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const fetchData = await fetchStaticCache<{ data: Record<string, Validator> }>(
+        'earning/dtao/validator.json',
+        { data: {} }
+      );
 
-      if (!resp.ok) {
-        console.error('Fetch bittensor delegates fail:', resp.status);
+      const validators = Object.values(fetchData.data);
 
-        return this.cache || { data: [] };
-      }
-
-      const rawData = await resp.json() as ValidatorResponse;
       const data = {
-        data: rawData.data.filter((validator) => parseFloat(validator.root_stake) > 0)
+        data: validators.filter((validator) => parseFloat(validator.root_stake) > 0)
       };
 
       this.cache = data;
@@ -164,12 +160,14 @@ export class BittensorCache {
       }
 
       this.cacheTimeout = setTimeout(() => {
-        this.fetchData().then((newData) => {
-          if (newData.data.length > 0) {
-            this.cache = newData;
-          }
-        }).catch(console.error);
-      }, 60 * 2000);
+        this.fetchData()
+          .then((newData) => {
+            if (newData.data.length > 0) {
+              this.cache = newData;
+            }
+          })
+          .catch(console.error);
+      }, 60 * 1000); // Cache 1 minute
 
       return data;
     } catch (error) {
