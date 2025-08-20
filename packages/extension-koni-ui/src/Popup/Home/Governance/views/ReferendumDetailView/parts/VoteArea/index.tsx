@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Button } from '@subwallet/react-ui';
 import { ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk/types';
 import BigNumber from 'bignumber.js';
 import React from 'react';
@@ -9,6 +11,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   referendumDetail: ReferendumDetail,
+  onClickVote: VoidFunction;
 };
 
 export function toPercentage (value = 0, decimals = 0) {
@@ -136,7 +139,8 @@ const getTimeLeft = (data: ReferendumDetail): string => {
   ).timeLeft;
 };
 
-const Component = ({ className, referendumDetail }: Props): React.ReactElement<Props> => {
+const Component = ({ className, onClickVote, referendumDetail }: Props): React.ReactElement<Props> => {
+  const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
 
   const thresholdPercent = getMinApprovalThreshold(referendumDetail);
@@ -150,6 +154,13 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
       <div>Aye: {ayesPercent}%</div>
       <div>Nay: {naysPercent}%</div>
       <div>Threshold: {thresholdPercent}%</div>
+
+      <Button
+        block={true}
+        onClick={onClickVote}
+      >
+        {t('Vote')}
+      </Button>
     </div>
   );
 };

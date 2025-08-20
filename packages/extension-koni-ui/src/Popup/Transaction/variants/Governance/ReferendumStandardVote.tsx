@@ -1,19 +1,23 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput } from '@subwallet/extension-koni-ui/components';
+import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useCoreCreateReformatAddress, useDefaultNavigate, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
 import { Form } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { TransactionContent, TransactionFooter } from '../../parts';
 
@@ -25,7 +29,7 @@ type ComponentProps = {
   isAllAccount?: boolean
 };
 
-const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId'];
+const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
@@ -33,10 +37,15 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const { t } = useTranslation();
   const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
+  const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
+  const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const [loading, setLoading] = useState(false);
+  // @ts-ignore
   const [isDisable, setIsDisable] = useState(false);
-  const chainValue = useWatchTransaction('chain', form, defaultData);
+  const navigate = useNavigate();
+  const fromValue = useWatchTransaction('from', form, defaultData);
+  const chainValue = useWatchTransaction('chain', form, defaultData) || 'polkadot';
   const getReformatAddress = useCoreCreateReformatAddress();
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
@@ -86,13 +95,19 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return result;
   }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
 
+  const assetInfo = useMemo(() => {
+    const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
+
+    return assetRegistry[assetSlug];
+  }, [assetRegistry, chainInfoMap, defaultData.chain]);
+
   const onFieldsChange: FormCallbacks<GovReferendumVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
-    const { empty, error } = simpleCheckForm(allFields, ['--asset']);
+    // const { empty, error } = simpleCheckForm(allFields, ['--asset']);
 
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    setIsDisable(empty || error);
+    // setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
 
@@ -100,13 +115,53 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     setLoading(true);
   }, []);
 
+  const goRefSplitVote = useCallback(() => {
+    setGovRefVoteStorage({
+      ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+      fromAccountProxy: defaultData.fromAccountProxy,
+      referendumId: defaultData.referendumId,
+      chain: defaultData.chain
+    });
+    navigate('/transaction/gov-ref-split-vote');
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+
+  const goRefAbstainVote = useCallback(() => {
+    setGovRefVoteStorage({
+      ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+      fromAccountProxy: defaultData.fromAccountProxy,
+      referendumId: defaultData.referendumId,
+      chain: defaultData.chain
+    });
+    navigate('/transaction/gov-ref-abstain-vote');
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+
   useEffect(() => {
-    setCustomScreenTitle(t('Vote for'));
+    setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
     };
-  }, [setCustomScreenTitle, t]);
+  }, [defaultData.referendumId, setCustomScreenTitle, t]);
+
+  useEffect(() => {
+    const updateFromValue = () => {
+      if (!accountAddressItems.length) {
+        return;
+      }
+
+      if (accountAddressItems.length === 1) {
+        if (!fromValue || accountAddressItems[0].address !== fromValue) {
+          form.setFieldValue('from', accountAddressItems[0].address);
+        }
+      } else {
+        if (fromValue && !accountAddressItems.some((i) => i.address === fromValue)) {
+          form.setFieldValue('from', '');
+        }
+      }
+    };
+
+    updateFromValue();
+  }, [accountAddressItems, form, fromValue]);
 
   return (
     <>
@@ -134,10 +189,10 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             name={'amount'}
           >
             <GovAmountInput
-              decimals={10}
+              decimals={_getAssetDecimals(assetInfo)}
               label={t('Amount')}
-              logoKey={'polkadot'}
-              tokenSymbol={'DOT'}
+              logoKey={assetInfo.slug.toLowerCase()}
+              tokenSymbol={_getAssetSymbol(assetInfo)}
               topRightPart={'1231231'}
             />
           </Form.Item>
@@ -161,11 +216,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           <VoteButton
             disabled={isDisable}
             loading={loading}
+            onClick={goRefAbstainVote}
             type={'abstain'}
           />
           <VoteButton
             disabled={isDisable}
             loading={loading}
+            onClick={goRefSplitVote}
             type={'split'}
           />
           <VoteButton
@@ -195,7 +252,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     });
   }, [accountProxies, defaultData.fromAccountProxy]);
 
-  const isNotAllowed = !targetAccountProxy;
+  const isNotAllowed = !targetAccountProxy || !defaultData.referendumId || !defaultData.chain;
 
   useEffect(() => {
     if (isNotAllowed) {

@@ -1,9 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GovAmountInput } from '@subwallet/extension-koni-ui/components';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
-import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk/types';
@@ -65,19 +63,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
           selectedChain={chainSlug}
         />
       </div>
-
-      <VoteButton type={'aye'} />
-      <VoteButton type={'nay'} />
-      <VoteButton type={'abstain'} />
-      <VoteButton type={'split'} />
-
-      <GovAmountInput
-        decimals={10}
-        label={t('Amount')}
-        logoKey={'polkadot'}
-        tokenSymbol={'DOT'}
-        topRightPart={'1231231'}
-      />
 
       <QuickActionsContainer />
 
