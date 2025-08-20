@@ -93,11 +93,11 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           size={20}
         />
         <div className={'__selected-item-name common-text'}>
-          {selectedItem.name}
+          {t(selectedItem.name)}
         </div>
       </div>
     );
-  }, [selectedItem]);
+  }, [selectedItem, t]);
 
   const fieldSuffix = useMemo(() => {
     return (
