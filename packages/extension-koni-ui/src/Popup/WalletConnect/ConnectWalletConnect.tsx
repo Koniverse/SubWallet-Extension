@@ -41,7 +41,7 @@ const showScanner = true;
 const keyRecords = 'unsuccessful_connect_wc_modal';
 let idTimeOut: NodeJS.Timeout;
 const connectionErrorDefault: ConnectionError = {
-  message: t('Connection unsuccessful. Review our user guide and try connecting again.')
+  message: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide')
 };
 
 const getTimeOutRecords = () => {
@@ -99,16 +99,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const convertWCErrorMessage = useCallback((e: Error): ConnectionError => {
     const message = e.message.toLowerCase();
-    let newStandardMessage = t('Connection unsuccessful. Review our user guide and try connecting again.');
+    let newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide');
     let isConnectionBlockedError = false;
 
     if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
-      newStandardMessage = t('Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app');
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker');
       isConnectionBlockedError = true;
     }
 
     if (message.includes('failed for host')) {
-      newStandardMessage = t('Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app');
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps');
       isConnectionBlockedError = true;
     }
 
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Button
             block={true}
             onClick={onClickToFAQ(true)}
-          >{t('I understand')}</Button>
+          >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.iUnderstand')}</Button>
         </div>
       );
     }

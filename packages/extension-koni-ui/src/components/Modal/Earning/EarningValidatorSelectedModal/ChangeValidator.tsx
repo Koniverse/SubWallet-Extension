@@ -513,7 +513,7 @@ const Component = (props: Props) => {
           autoFocus={true}
           className={'__search-box'}
           onSearch={handleSearch}
-          placeholder={t<string>('Search validator')}
+          placeholder={t<string>('ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator')}
           searchValue={searchValue}
         />
         <SwList.Section

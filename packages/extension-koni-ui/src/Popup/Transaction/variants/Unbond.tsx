@@ -593,10 +593,7 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={t(
-                              'Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again',
-                              { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
-                            )}
+                            description={t('ui.TRANSACTION.screen.Transaction.Unbond.unstakeSlippageExceeded', { replace: { slippage: (earningSlippage * 100).toFixed(2) } })}
                             title='Slippage too high!'
                             type='error'
                           />

@@ -161,7 +161,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         }, []);
 
         if (!pairs?.length) {
-          throw new Error(t('No valid accounts found to import'));
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
         }
 
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
@@ -220,7 +220,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         }, []);
 
         if (!pairs?.length) {
-          throw new Error(t('No valid accounts found to import'));
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
         }
 
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);

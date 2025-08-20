@@ -542,8 +542,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             {
               showNoValidAccountAlert && (<AlertBox
                 className={'alert-warning-name-duplicate'}
-                description={t('All accounts found in this file are invalid. Import another JSON file and try again')}
-                title={t('Unable to import')}
+                description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid')}
+                title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
                 type='error'
               />)
             }

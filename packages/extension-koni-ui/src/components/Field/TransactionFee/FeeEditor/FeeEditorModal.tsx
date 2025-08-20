@@ -214,7 +214,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
 
     if (priorityFeeValue && value && new BigN(value).lt(new BigN(priorityFeeValue))) {
-      return Promise.reject(t('Max fee cannot be lower than priority fee'));
+      return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeLowerThanPriorityFee'));
     }
 
     if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo) {

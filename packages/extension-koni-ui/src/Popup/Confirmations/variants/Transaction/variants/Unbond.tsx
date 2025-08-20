@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete', { replace: { fee: stakingFee } })}
+          description={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
           title={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFee')}
           type='info'
         />
