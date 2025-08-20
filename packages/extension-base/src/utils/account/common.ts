@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _chainInfoToChainType, _getChainSubstrateAddressPrefix, _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _chainInfoToAccountChainType, _getChainSubstrateAddressPrefix, _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountJson } from '@subwallet/extension-base/types';
 import { getAccountChainTypeFromKeypairType, pairToAccount } from '@subwallet/extension-base/utils';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isAddress, isBitcoinAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
@@ -57,7 +57,7 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
 }
 
 export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo): string => { // todo: check for cardano
-  const chainType = _chainInfoToChainType(chainInfo);
+  const chainType = _chainInfoToAccountChainType(chainInfo);
 
   if (chainType === AccountChainType.SUBSTRATE) {
     return reformatAddress(address, _getChainSubstrateAddressPrefix(chainInfo));
