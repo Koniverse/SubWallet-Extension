@@ -1,8 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRefPath } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
@@ -10,17 +8,17 @@ import { fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPas
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetOriginChain, _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { AssetHubSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/asset-hub';
 import { SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-service/handler/chainflip-handler';
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
-import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportedSwapChains, getSwapAltToken, getSwapStep, getTokenPairFromStep, isChainsHasSameProvider, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { getSwapAltToken, getTokenPairFromStep, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
+import { BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, ProcessedQuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
-import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { SwapPath } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
@@ -194,127 +192,6 @@ export class SwapService implements StoppableServiceInterface {
       process: optimalProcess,
       quote: swapQuoteResponse
     };
-  }
-
-  // todo: rewrite this function
-  public getAvailablePath (request: SwapRequestV2): [DynamicSwapAction[], SwapRequestV2 | undefined] {
-    const { address, pair } = request;
-    // todo: control provider tighter
-    const supportSwapChains = getSupportedSwapChains();
-    const fromToken = this.chainService.getAssetBySlug(pair.from);
-    const toToken = this.chainService.getAssetBySlug(pair.to);
-    const fromChain = _getAssetOriginChain(fromToken);
-    const toChain = _getAssetOriginChain(toToken);
-    const toChainInfo = this.chainService.getChainInfoByKey(toChain);
-    const assetRefMap = this.chainService.getAssetRefMap();
-    let process: DynamicSwapAction[] = [];
-
-    if (!fromToken || !toToken) {
-      throw Error('Token not found');
-    }
-
-    if (!fromChain || !toChain) {
-      throw Error('Token metadata error');
-    }
-
-    const directXcmRef = Object.values(assetRefMap).find((assetRef) => assetRef.path === _AssetRefPath.XCM && assetRef.srcAsset === fromToken.slug && assetRef.destAsset === toToken.slug);
-
-    if (directXcmRef) {
-      return [[], undefined];
-    }
-
-    // SWAP: 2 tokens in the same chain and chain has dex
-    if (isChainsHasSameProvider(fromChain, toChain)) { // there's a dex that can support direct swapping
-      process.push(getSwapStep(fromToken.slug, toToken.slug));
-
-      return [process, request];
-    }
-
-    // ------------------------
-    // BRIDGE -> SWAP: Try to find a token in dest chain that can bridge from fromToken
-    const bridgeTransit = findBridgeTransitDestination(assetRefMap, fromToken, toToken);
-
-    if (bridgeTransit && supportSwapChains.includes(toChain)) {
-      const swapStep = getSwapStep(bridgeTransit, toToken.slug);
-
-      process.push(getBridgeStep(fromToken.slug, bridgeTransit));
-      process.push(swapStep);
-
-      return [process, {
-        ...request,
-        address: reformatAddress(address, _getChainSubstrateAddressPrefix(toChainInfo)),
-        pair: swapStep.pair
-      }];
-    }
-
-    // ------------------------
-    // SWAP -> BRIDGE: Try to find a token in from chain that can bridge to toToken
-    const swapTransit = findSwapTransitDestination(assetRefMap, fromToken, toToken);
-
-    if (swapTransit && supportSwapChains.includes(fromChain)) {
-      const swapStep = getSwapStep(fromToken.slug, swapTransit);
-
-      process.push(swapStep);
-      process.push(getBridgeStep(swapTransit, toToken.slug));
-
-      return [process, {
-        ...request,
-        pair: swapStep.pair
-      }];
-    }
-
-    // ------------------------
-    // BRIDGE -> SWAP -> BRIDGE: Try to find a tri-step path to swap
-    const processList: DynamicSwapAction[][] = [];
-    const swapPairList: ActionPair[] = [];
-    const allBridgeDestinations = findAllBridgeDestinations(assetRefMap, fromToken);
-
-    // currently find first path. Todo: return all paths or best path.
-    for (const bridgeTransit of allBridgeDestinations) {
-      process = [];
-      const bridgeDestinationInfo = this.chainService.getAssetBySlug(bridgeTransit);
-      const swapTransit = findSwapTransitDestination(assetRefMap, bridgeDestinationInfo, toToken);
-
-      if (bridgeTransit === swapTransit) {
-        continue;
-      }
-
-      if (swapTransit && supportSwapChains.includes(bridgeDestinationInfo.originChain)) {
-        const swapStep = getSwapStep(bridgeTransit, swapTransit);
-
-        process.push(getBridgeStep(fromToken.slug, bridgeTransit));
-        process.push(swapStep);
-        process.push(getBridgeStep(swapTransit, toToken.slug));
-
-        // set the highest priority to hydration provider
-        if (bridgeDestinationInfo.originChain === COMMON_CHAIN_SLUGS.HYDRADX) {
-          return [process, {
-            ...request,
-            address: _reformatAddressWithChain(address, this.chainService.getChainInfoByKey(COMMON_CHAIN_SLUGS.HYDRADX)),
-            pair: swapStep.pair
-          }];
-        }
-
-        processList.push(process);
-        swapPairList.push(swapStep.pair);
-      }
-    }
-
-    // get first process
-    if (processList.length && swapPairList.length) {
-      const [firstProcess, firstSwapPair] = [processList[0], swapPairList[0]];
-      const chainSwap = this.chainService.getAssetBySlug(firstSwapPair.from).originChain;
-
-      return [firstProcess, {
-        ...request,
-        address: _reformatAddressWithChain(address, this.chainService.getChainInfoByKey(chainSwap)),
-        pair: firstSwapPair
-      }];
-    }
-
-    // todo: encapsulate each route type to function
-
-    return [[], undefined];
   }
 
   public async getLatestQuoteFromSwapRequest (request: SwapRequestV2): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
@@ -530,6 +407,7 @@ export class SwapService implements StoppableServiceInterface {
     return this.stopPromiseHandler.promise;
   }
 
+  // todo: deprecated
   public getSwapPairs (): SwapPair[] {
     return Object.entries(this.chainService.swapRefMap).map(([slug, assetRef]) => {
       const fromAsset = this.chainService.getAssetBySlug(assetRef.srcAsset);
@@ -596,6 +474,7 @@ export class SwapService implements StoppableServiceInterface {
     }
   }
 
+  // todo: deprecated
   public subscribeSwapPairs (callback: (pairs: SwapPair[]) => void) {
     return this.chainService.subscribeSwapRefMap().subscribe((refMap) => {
       const latestData = Object.entries(refMap).map(([slug, assetRef]) => {

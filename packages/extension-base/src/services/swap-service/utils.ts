@@ -1,9 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
-import { _AssetRef, _AssetRefPath, _ChainAsset } from '@subwallet/chain-list/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType, SwapStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
 import BigN from 'bignumber.js';
@@ -13,15 +12,6 @@ export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
 
 export const SIMPLE_SWAP_EXPLORER = 'https://simpleswap.io';
 
-// Deprecated
-export const SIMPLE_SWAP_SUPPORTED_TESTNET_ASSET_MAPPING: Record<string, string> = {
-  'bittensor-NATIVE-TAO': 'tao',
-  [COMMON_ASSETS.ETH]: 'eth',
-  [COMMON_ASSETS.DOT]: 'dot',
-  [COMMON_ASSETS.USDC_ETHEREUM]: 'usdc',
-  [COMMON_ASSETS.USDT_ETHEREUM]: 'usdterc20'
-};
-
 export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in milliseconds
   default: 90000,
   [SwapProviderId.CHAIN_FLIP_TESTNET]: 30000,
@@ -29,31 +19,11 @@ export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = { // in millisecon
   error: 10000
 };
 
-// deprecated
-export const _PROVIDER_TO_SUPPORTED_PAIR_MAP: Record<string, string[]> = {
-  [SwapProviderId.HYDRADX_MAINNET]: [COMMON_CHAIN_SLUGS.HYDRADX],
-  [SwapProviderId.CHAIN_FLIP_MAINNET]: [COMMON_CHAIN_SLUGS.POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
-  [SwapProviderId.POLKADOT_ASSET_HUB]: [COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB],
-  [SwapProviderId.KUSAMA_ASSET_HUB]: [COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB],
-  [SwapProviderId.SIMPLE_SWAP]: ['bittensor', COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.POLKADOT],
-  [SwapProviderId.UNISWAP]: [COMMON_CHAIN_SLUGS.ETHEREUM, COMMON_CHAIN_SLUGS.ARBITRUM],
-
-  // testnet
-  [SwapProviderId.CHAIN_FLIP_TESTNET]: [COMMON_CHAIN_SLUGS.CHAINFLIP_POLKADOT, COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA],
-  [SwapProviderId.HYDRADX_TESTNET]: [COMMON_CHAIN_SLUGS.HYDRADX_TESTNET],
-  [SwapProviderId.ROCOCO_ASSET_HUB]: [COMMON_CHAIN_SLUGS.ROCOCO_ASSET_HUB],
-  [SwapProviderId.WESTEND_ASSET_HUB]: ['westend_assethub']
-};
-
 export const FEE_RATE_MULTIPLIER: Record<string, number> = {
   default: 1,
   medium: 1.2,
   high: 2
 };
-
-export function getSupportedSwapChains (): string[] {
-  return [...new Set<string>(Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP).flat())];
-}
 
 export function getSwapAlternativeAsset (swapPair: SwapPair): string | undefined {
   return swapPair?.metadata?.alternativeAsset as string;
@@ -63,140 +33,8 @@ export function getSwapAltToken (chainAsset: _ChainAsset): string | undefined {
   return chainAsset.metadata?.alternativeSwapAsset as string;
 }
 
-export function calculateSwapRate (fromAmount: string, toAmount: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
-  const bnFromAmount = BigN(fromAmount);
-  const bnToAmount = BigN(toAmount);
-
-  const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
-  const bnRate = bnFromAmount.div(bnToAmount);
-
-  return 1 / bnRate.times(10 ** decimalDiff).toNumber();
-}
-
-export function convertSwapRate (rate: string, fromAsset: _ChainAsset, toAsset: _ChainAsset) {
-  const decimalDiff = _getAssetDecimals(toAsset) - _getAssetDecimals(fromAsset);
-  const bnRate = BigN(rate);
-
-  return bnRate.times(10 ** decimalDiff).pow(-1).toNumber();
-}
-
-// export function getChainflipOptions (isTestnet: boolean) {
-//   if (isTestnet) {
-//     return {
-//       network: getChainflipNetwork(isTestnet)
-//     };
-//   }
-
-//   return {
-//     network: getChainflipNetwork(isTestnet),
-//     broker: getChainflipBroker(isTestnet)
-//   };
-// }
-
-// function getChainflipNetwork (isTestnet: boolean) {
-//   return isTestnet ? 'perseverance' : 'mainnet';
-// }
-
-// export function getChainflipBroker (isTestnet: boolean) { // noted: currently not use testnet broker
-//   if (isTestnet) {
-//     return {
-//       url: `https://perseverance.chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
-//     };
-//   } else {
-//     return {
-//       url: `https://chainflip-broker.io/rpc/${CHAINFLIP_BROKER_API}`
-//     };
-//   }
-// }
-
-// export function getChainflipSwap (isTestnet: boolean) {
-//   if (isTestnet) {
-//     return `https://perseverance.chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
-//   } else {
-//     return `https://chainflip-broker.io/swap?apikey=${CHAINFLIP_BROKER_API}`;
-//   }
-// }
-
-// export function getAssetsUrl (isTestnet: boolean) {
-//   if (isTestnet) {
-//     return 'https://perseverance.chainflip-broker.io/assets';
-//   } else {
-//     return 'https://chainflip-broker.io/assets';
-//   }
-// }
-
-export function getBridgeStep (from: string, to: string): DynamicSwapAction {
-  return {
-    action: DynamicSwapType.BRIDGE,
-    pair: {
-      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
-      from,
-      to
-    }
-  };
-}
-
-export function getSwapStep (from: string, to: string): DynamicSwapAction {
-  return {
-    action: DynamicSwapType.SWAP,
-    pair: {
-      slug: `${from}___${to}`, // todo: recheck with assetRef format from chain list
-      from,
-      to
-    }
-  };
-}
-
-export function findBridgeTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset): string | undefined {
-  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
-    assetRef.srcAsset === fromToken.slug &&
-    assetRef.destChain === _getAssetOriginChain(toToken) &&
-    assetRef.path === _AssetRefPath.XCM
-  );
-
-  if (foundAssetRef) {
-    return foundAssetRef.destAsset;
-  }
-
-  return undefined;
-}
-
-export function findSwapTransitDestination (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset, toToken: _ChainAsset): string | undefined {
-  const foundAssetRef = Object.values(assetRefMap).find((assetRef) =>
-    assetRef.destAsset === toToken.slug &&
-    assetRef.srcChain === _getAssetOriginChain(fromToken) &&
-    assetRef.path === _AssetRefPath.XCM
-  );
-
-  if (foundAssetRef) {
-    return foundAssetRef.srcAsset;
-  }
-
-  return undefined;
-}
-
-export function findAllBridgeDestinations (assetRefMap: Record<string, _AssetRef>, fromToken: _ChainAsset): string[] {
-  const foundAssetRefs = Object.values(assetRefMap).filter((assetRef) =>
-    assetRef.srcAsset === fromToken.slug &&
-    assetRef.path === _AssetRefPath.XCM
-  );
-
-  return foundAssetRefs.map((assetRef) => assetRef.destAsset);
-}
-
 export function getAmountAfterSlippage (amount: string, slippage: number): string {
   return BigN(amount).multipliedBy(BigN(1).minus(BigN(slippage))).integerValue(BigN.ROUND_DOWN).toString();
-}
-
-export function isChainsHasSameProvider (fromChain: string, toChain: string): boolean {
-  // todo: a provider may support multiple chains but not cross-chain swaps
-  for (const group of Object.values(_PROVIDER_TO_SUPPORTED_PAIR_MAP)) {
-    if (group.includes(fromChain) && group.includes(toChain)) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 export function getLastAmountFromSteps (steps: CommonStepDetail[]): string | undefined {
