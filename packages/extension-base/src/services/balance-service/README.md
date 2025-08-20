@@ -323,6 +323,347 @@ sequenceDiagram
     Note over BS,CS: Chains and tokens activated
 ```
 
+## XCM Cross-Chain Transfer Actions
+
+### Overview
+
+The Balance Service includes comprehensive XCM (Cross-Consensus Message Format) support for cross-chain transfers across multiple blockchain ecosystems. XCM enables asset transfers between different blockchains including Polkadot/Kusama parachains, Ethereum bridges, and specialized bridge protocols.
+
+### Supported XCM Bridge Types
+
+#### 1. Legacy Polkadot XCM (Deprecated)
+
+##### 1.1. **Standard Polkadot XCM**
+- **Purpose**: Native XCM transfers within Polkadot/Kusama ecosystem
+- **Supported Chains**: Statemine, Statemint, Equilibrium, Mythos, AssetHubs
+- **Implementation**: Uses `polkadotXcm` pallet with ParaSpell API integration
+- **Methods**: `limitedReserveTransferAssets`, `limitedTeleportAssets`, `transferAssets`
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/polkadotXcm.ts`](./transfer/xcm/polkadotXcm.ts)
+
+##### 1.2. **XCM Pallet Transfers**
+- **Purpose**: Direct XCM transfers from relay chains
+- **Supported Chains**: Polkadot, Kusama, Rococo, Westend
+- **Implementation**: Uses `xcmPallet` for relay-to-parachain transfers
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/xcmPallet.ts`](./transfer/xcm/xcmPallet.ts)
+
+##### 1.3. **xTokens Pallet**
+- **Purpose**: Default XCM implementation for most parachains
+- **Implementation**: Fallback XCM method for chains not using polkadotXcm or xcmPallet
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/xTokens.ts`](./transfer/xcm/xTokens.ts)
+
+#### 2. **Polkadot XCM via ParaSpell (Current Implementation)**
+- **Purpose**: Modern XCM implementation using ParaSpell API for enhanced cross-chain transfers
+- **Features**:
+  - Automatic chain mapping and asset identification
+  - Optimized XCM routing across Polkadot/Kusama ecosystem
+  - Support for complex multi-hop transfers
+  - Enhanced error handling and validation
+- **Supported Chains**: All Polkadot/Kusama parachains supported by ParaSpell
+- **Implementation Details**:
+  - Uses external ParaSpell API service via proxy
+  - Requires `paraSpellAssetType` and `paraSpellValue` in token metadata
+  - Converts API response hex to `SubmittableExtrinsic`
+  - Supports dry-run validation before execution
+- **API Endpoints**:
+  - Build XCM: `/v1/x-transfer` (POST)
+  - Dry Run: `/v1/xcm-fee` (POST)
+- **Chain Mapping**: Dynamic chain slug to ParaSpell ID mapping via `fetchParaSpellChainMap()`
+- **Currency Formats**: Supports native tokens, foreign assets, and custom asset types
+- **Error Handling**: Comprehensive error messages for unsupported tokens/chains
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/utils.ts#L143`](./transfer/xcm/utils.ts#L143)
+- **Function**: `createXcmExtrinsicV2()` and `buildXcm()`
+
+#### 3. **Snow Bridge (Ethereum ↔ Polkadot)**
+- **Purpose**: Bridge between Ethereum ecosystem and Polkadot Asset Hub
+- **Supported Routes**: Ethereum ↔ Polkadot Asset Hub, Mythos integration
+- **Features**: 
+  - High fees (~$5-70 depending on direction)
+  - Long completion time (~1 hour)
+  - Beta status with risk warnings
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/snowBridge.ts`](./transfer/xcm/snowBridge.ts)
+
+#### 4. **Avail Bridge**
+- **Purpose**: Bridge between Ethereum and Avail blockchain
+- **Supported Routes**: Ethereum ↔ Avail
+- **Implementation**: 
+  - Ethereum side: Smart contract interactions
+  - Avail side: Native pallet calls
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/availBridge.ts`](./transfer/xcm/availBridge.ts)
+
+#### 5. **Polygon Bridge**
+- **Purpose**: Bridge for Polygon ecosystem transfers
+- **Supported Routes**: 
+  - Ethereum ↔ Polygon zkEVM
+  - Ethereum Sepolia ↔ Polygon zkEVM Cardona (testnet)
+- **Supported Tokens**: ETH, WETH, POL
+- **Manual Claiming**: Some transfers require manual claiming
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/polygonBridge.ts`](./transfer/xcm/polygonBridge.ts)
+
+#### 6. **PoS Bridge**
+- **Purpose**: Polygon Proof-of-Stake bridge for legacy Polygon transfers
+- **Supported Routes**:
+  - Ethereum ↔ Polygon
+  - Ethereum Sepolia ↔ Polygon Amoy (testnet)
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/posBridge.ts`](./transfer/xcm/posBridge.ts)
+
+#### 7. **Across Bridge**
+- **Purpose**: Cross-chain transfers using Across Protocol
+- **Supported Routes**: Ethereum, Optimism, Base, Arbitrum One
+- **Implementation**: Similar to Chainflip, uses vault-based transfers
+- **External API**: Integrates with SubWallet API SDK for transfer data
+- **Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/acrossBridge/index.ts`](./transfer/xcm/acrossBridge/index.ts)
+
+### XCM Transfer Architecture
+
+```mermaid
+graph TB
+    subgraph "[[Balance Service XCM]]"
+        XCMI[XCM Index]
+        XCMU[XCM Utils]
+        XP[XCM Parser]
+        CMV2[createXcmExtrinsicV2]
+    end
+    
+    subgraph "Modern XCM Implementation"
+        PS[ParaSpell API]
+        PSProxy[ParaSpell Proxy Service]
+        PSChainMap[ParaSpell Chain Mapping]
+    end
+    
+    subgraph "Legacy XCM Methods (Deprecated)"
+        PXcm[polkadotXcm Pallet]
+        XcmP[xcmPallet]
+        XTokens[xTokens Pallet]
+    end
+    
+    subgraph "Bridge Protocols"
+        SB[Snow Bridge]
+        AB[Avail Bridge]
+        PB[Polygon Bridge]
+        PoSB[PoS Bridge]
+        AcB[Across Bridge]
+    end
+    
+    subgraph "External Services"
+        SWAPI[SubWallet API SDK]
+        SC[Smart Contracts]
+        PSAPI[ParaSpell External API]
+    end
+    
+    subgraph "Blockchain Networks"
+        DOT[Polkadot Ecosystem]
+        ETH[Ethereum]
+        POLY[Polygon]
+        OPT[Optimism/Base/Arbitrum]
+        AVAIL[Avail]
+    end
+    
+    %% Core XCM Service connections
+    XCMI --> XCMU
+    XCMI --> XP
+    XCMI --> CMV2
+    
+    %% Modern XCM routing (Primary Path)
+    CMV2 --> PS
+    PS --> PSProxy
+    PS --> PSChainMap
+    PSProxy --> PSAPI
+    
+    %% Legacy XCM routing (Fallback)
+    XCMI -.-> PXcm
+    XCMI -.-> XcmP
+    XCMI -.-> XTokens
+    
+    %% Bridge routing
+    XCMI --> SB
+    XCMI --> AB
+    XCMI --> PB
+    XCMI --> PoSB
+    XCMI --> AcB
+    
+    %% External API connections
+    AcB --> SWAPI
+    SB --> SC
+    AB --> SC
+    PB --> SC
+    PoSB --> SC
+    
+    %% Network connections
+    PS --> DOT
+    PXcm -.-> DOT
+    XcmP -.-> DOT
+    XTokens -.-> DOT
+    SB --> ETH
+    SB --> DOT
+    AB --> ETH
+    AB --> AVAIL
+    PB --> ETH
+    PB --> POLY
+    PoSB --> ETH
+    PoSB --> POLY
+    AcB --> ETH
+    AcB --> OPT
+    
+    %% ParaSpell API flow
+    PSAPI --> DOT
+    PSChainMap --> DOT
+    
+    classDef serviceClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef modernClass fill:#e8f5e8,stroke:#1b5e20,stroke-width:3px,color:#000
+    classDef legacyClass fill:#fff3e0,stroke:#e65100,stroke-width:1px,stroke-dasharray: 5 5,color:#666
+    classDef bridgeClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    classDef externalClass fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    classDef networkClass fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000
+    
+    class XCMI,XCMU,XP,CMV2 serviceClass
+    class PS,PSProxy,PSChainMap,PSAPI modernClass
+    class PXcm,XcmP,XTokens legacyClass
+    class SB,AB,PB,PoSB,AcB bridgeClass
+    class SWAPI,SC externalClass
+    class DOT,ETH,POLY,OPT,AVAIL networkClass
+```
+
+### XCM Method Implementations
+
+#### Core XCM Functions
+
+##### `createXcmExtrinsicV2(request)`
+
+**Purpose**: Creates XCM extrinsics using ParaSpell API integration for enhanced compatibility.
+
+**Input Parameters**:
+- `request: CreateXcmExtrinsicProps` - Complete XCM transfer configuration
+
+**Output Response**: `Promise<SubmittableExtrinsic<'promise'> | undefined>` - Substrate extrinsic or undefined on error
+
+**Implementation**: Uses ParaSpell API to build optimized XCM transactions with proper asset identification and routing
+
+**Code Reference**: [`/packages/extension-base/src/services/balance-service/transfer/xcm/utils.ts#L143`](./transfer/xcm/utils.ts#L143)
+
+##### `dryRunXcmExtrinsicV2(request)`
+
+**Purpose**: Validates XCM transfers before execution using dry-run simulation.
+
+**Input Parameters**: 
+- `request: CreateXcmExtrinsicProps` - XCM transfer parameters
+
+**Output Response**: `Promise<boolean>` - Success/failure validation result
+
+**Error Handling**: Gracefully handles chains that don't support dry-run or Polkadot API
+
+**Implementation Details**:
+- Tests origin, asset hub, bridge hub, and destination execution
+- Provides fallback for unsupported chains
+- Returns detailed failure reasons for debugging
+
+##### Bridge-Specific Methods
+
+##### `createSnowBridgeExtrinsic(props)`
+
+**Purpose**: Creates Snow Bridge transfers between Ethereum and Polkadot Asset Hub.
+
+**Features**:
+- EVM transaction configuration
+- High fee estimation ($5-70)
+- Beta status warnings
+- Long completion times (~1 hour)
+
+##### `createAvailBridgeExtrinsicFromAvail(props)` / `createAvailBridgeTxFromEth(props)`
+
+**Purpose**: Bidirectional Avail bridge transfers.
+
+**Implementation**:
+- Avail → Ethereum: Uses Avail pallet calls
+- Ethereum → Avail: Uses Ethereum smart contract interactions
+
+##### `createPolygonBridgeExtrinsic(props)`
+
+**Purpose**: Polygon zkEVM bridge transfers with automatic L1/L2 direction detection.
+
+**Smart Routing**:
+- Auto-detects L1 to L2 vs L2 to L1 transfers
+- Supports both Polygon Bridge and PoS Bridge protocols
+- Handles mainnet and testnet configurations
+
+##### `createAcrossBridgeExtrinsic(props)`
+
+**Purpose**: Across Protocol transfers for Ethereum L2 ecosystem.
+
+**Features**:
+- Dynamic fee estimation
+- Vault-based transfer mechanism
+- Integration with SubWallet API SDK for transfer data
+- Support for Ethereum, Optimism, Base, Arbitrum One
+
+### XCM Transfer Flow
+
+```mermaid
+sequenceDiagram
+    participant User as User Interface
+    participant Ext as KoniExtension
+    participant XCM as XCM Service
+    participant Parser as XCM Parser
+    participant Bridge as Bridge Handler
+    participant API as Blockchain API
+    
+    User->>Ext: makeCrossChainTransfer()
+    Ext->>Parser: Detect transfer type
+    Parser->>Parser: Check bridge compatibility
+    Parser-->>Ext: Transfer type identified
+    
+    alt Standard XCM
+        Ext->>XCM: createXcmExtrinsicV2()
+        XCM->>API: ParaSpell API call
+        API-->>XCM: Extrinsic hex
+        XCM->>XCM: Convert to SubmittableExtrinsic
+    else Bridge Transfer
+        Ext->>Bridge: createBridgeExtrinsic()
+        Bridge->>API: Smart contract interaction
+        API-->>Bridge: Transaction config
+    end
+    
+    XCM-->>Ext: Transfer ready
+    Ext->>Ext: Fee calculation
+    Ext->>API: Execute transaction
+    API-->>User: Transaction result
+```
+
+### XCM Chain Groups
+
+The service categorizes chains into specific XCM groups for proper routing:
+
+**Code Reference**: [`/packages/extension-base/src/services/chain-service/constants.ts#L261`](../../chain-service/constants.ts#L261)
+
+- **polkadotXcm**: `['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos', 'westend_assethub']`
+- **polkadotXcmSpecialCases**: `['astar', 'shiden']` - Special routing for native tokens
+- **xcmPallet**: `['polkadot', 'kusama', 'rococo', 'westend']` - Relay chain routing
+
+### XCM Validation and Error Handling
+
+#### Transfer Validation
+
+- **Bridge Compatibility**: Automatic detection of supported bridge types
+- **Chain Support**: Validates origin and destination chain compatibility  
+- **Asset Support**: Checks token availability on target chains
+- **Fee Estimation**: Pre-calculates transfer fees including bridge costs
+
+#### Error Recovery
+
+- **Dry-Run Fallback**: Graceful handling of chains without dry-run support
+- **API Timeouts**: Robust timeout handling for external API calls
+- **Bridge Failures**: Specific error messages for bridge-related issues
+- **Manual Claiming**: Clear notifications for transfers requiring manual claim
+
+#### Risk Warnings
+
+The service provides automatic risk warnings for:
+- **Beta Bridges**: High-fee, experimental bridge protocols
+- **High Fees**: Transfers with significant cost implications  
+- **Long Delays**: Bridges with extended completion times
+- **Manual Claims**: Transfers requiring additional user action
+
+**Implementation**: [`/packages/extension-base/src/core/substrate/xcm-parser.ts#L71-116`](../../core/substrate/xcm-parser.ts#L71-116)
+
 ## Notes
 
 ### Known Issues
