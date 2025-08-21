@@ -8,4 +8,4 @@ import { getSubsquareApi } from './bundle';
 export * from './bundle';
 
 export default getSubsquareApi;
-export type { ReferendaResponse } from './types';
+export type { ReferendaResponse } from './interface';

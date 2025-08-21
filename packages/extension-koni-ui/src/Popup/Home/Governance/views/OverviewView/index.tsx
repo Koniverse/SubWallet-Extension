@@ -1,10 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
-import { Referendum } from '@subwallet/subsquare-api-sdk/types';
+import { Referendum } from '@subwallet/subsquare-api-sdk/interface';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +25,7 @@ type Props = ThemeProps & ViewBaseType & {
 const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sdkInstant }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
+  const { accounts: _accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
 
   const onClickReferendumItem = useCallback((item: Referendum) => {
     goReferendumDetail(`${item.referendumIndex}`);

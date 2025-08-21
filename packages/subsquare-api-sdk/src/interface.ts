@@ -80,7 +80,7 @@ export interface ReferendumDetail {
   reactions: unknown[];
 }
 
-export type SpendItem = {
+export interface SpendItem {
   isSpendLocal: boolean;
   symbol?: string;
   assetKind?: {
@@ -103,7 +103,7 @@ export type SpendItem = {
   };
   validFrom: number | null;
   after: unknown;
-};
+}
 
 export interface TimelineItem {
   _id: string;
@@ -230,3 +230,25 @@ export interface ReferendaQueryParams {
   status?: string;
   simple?: boolean;
 }
+
+/* ReferendumVote */
+
+export interface ReferendumVote {
+  referendumIndex: number;
+  account: string;
+  isDelegating: boolean;
+  isStandard: boolean;
+  isSplit: boolean;
+  isSplitAbstain: boolean;
+  balance: string;
+  aye: boolean;
+  conviction: number;
+  votes: string;
+  delegations: {
+    votes: string;
+    capital: string;
+  };
+  queryAt: number;
+}
+
+/* ReferendumVote */

@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaResponse, ReferendumDetail } from './types';
+import { ReferendaQueryParams, ReferendaResponse, ReferendumDetail, ReferendumVote } from './interface';
 import { gov2ReferendumsApi } from './url';
 
 export class SubsquareApiSdk {
@@ -39,5 +39,13 @@ export class SubsquareApiSdk {
     );
 
     return referendaRes.data;
+  }
+
+  async getReferendaVotes (id: string): Promise<ReferendumVote[]> {
+    const referendaVoteRes = await this.client.get<ReferendumVote[]>(
+      gov2ReferendumsApi + `/${id}/votes`
+    );
+
+    return referendaVoteRes.data;
   }
 }

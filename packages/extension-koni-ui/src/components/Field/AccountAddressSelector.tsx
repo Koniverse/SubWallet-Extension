@@ -4,6 +4,7 @@
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { useSelectModalInputHelper, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Field, Icon, InputRef, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -12,17 +13,29 @@ import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } fro
 import styled from 'styled-components';
 
 import { AccountSelectorModal } from '../Modal';
+import GovAccountSelectoModal from '../Modal/Governance/GovAccountSelector';
 
-interface Props extends ThemeProps, BasicInputWrapper {
-  items: AccountAddressItemType[];
+interface BaseProps extends ThemeProps, BasicInputWrapper {
   labelStyle?: 'horizontal' | 'vertical';
   autoSelectFirstItem?: boolean;
 }
 
+interface RegularProps extends BaseProps {
+  items: AccountAddressItemType[];
+  isGovModal?: false;
+}
+
+interface GovProps extends BaseProps {
+  items: GovAccountAddressItemType[];
+  isGovModal: true;
+}
+
+type Props = RegularProps | GovProps;
+
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { autoSelectFirstItem, className = '', disabled, id = 'account-selector'
-    , items, label, labelStyle
-    , placeholder, readOnly, statusHelp, tooltip, value } = props;
+    , isGovModal, items, label
+    , labelStyle, placeholder, readOnly, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -102,14 +115,27 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           tooltip={tooltip}
         />
       </div>
-      <AccountSelectorModal
-        autoSelectFirstItem={autoSelectFirstItem}
-        items={items}
-        modalId={id}
-        onCancel={onCancelModal}
-        onSelectItem={onSelectItem}
-        selectedValue={value}
-      />
+      {isGovModal
+        ? (
+          <GovAccountSelectoModal
+            autoSelectFirstItem={autoSelectFirstItem}
+            items={items}
+            modalId={id}
+            onCancel={onCancelModal}
+            onSelectItem={onSelectItem}
+            selectedValue={value}
+          />
+        )
+        : (
+          <AccountSelectorModal
+            autoSelectFirstItem={autoSelectFirstItem}
+            items={items}
+            modalId={id}
+            onCancel={onCancelModal}
+            onSelectItem={onSelectItem}
+            selectedValue={value}
+          />
+        )}
     </>
   );
 };

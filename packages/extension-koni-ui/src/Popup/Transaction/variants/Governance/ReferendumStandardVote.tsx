@@ -10,11 +10,16 @@ import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, Hidden
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
+import { chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form } from '@subwallet/react-ui';
+import getSubsquareApi, { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { ReferendumVote } from '@subwallet/subsquare-api-sdk/interface';
+import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +55,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [voteType, setVoteType] = useState<GovVoteType | null>(null);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
-  const chainValue = useWatchTransaction('chain', form, defaultData) || 'polkadot';
+  const chainValue = useWatchTransaction('chain', form, defaultData);
+  const referendumId = defaultData.referendumId;
 
   const getReformatAddress = useCoreCreateReformatAddress();
   const onPreCheck = usePreCheckAction(fromValue);
@@ -60,6 +66,36 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
 
+  const sdkInstant: SubsquareApiSdk = useMemo(() => {
+    return getSubsquareApi(chainSlugToSubsquareNetwork[chainValue]);
+  }, [chainValue]);
+
+  const { data: voteData } = useQuery({
+    queryKey: ['subsquare', 'referendumDetail', 'votes', chainValue, referendumId],
+    queryFn: async () => {
+      if (!referendumId) {
+        return undefined;
+      }
+
+      return await sdkInstant?.getReferendaVotes(`${referendumId}`);
+    },
+    staleTime: 60 * 1000
+  });
+
+  const voteMap = useMemo(() => {
+    if (!voteData) {
+      return new Map<string, ReferendumVote>();
+    }
+
+    const map = new Map<string, ReferendumVote>();
+
+    voteData.forEach((vote: ReferendumVote) => {
+      map.set(vote.account.toLowerCase(), vote);
+    });
+
+    return map;
+  }, [voteData]);
+
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
 
@@ -67,19 +103,26 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       return [];
     }
 
-    const result: AccountAddressItemType[] = [];
+    const result: GovAccountAddressItemType[] = [];
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
         const address = getReformatAddress(a, chainInfo);
 
         if (address) {
+          const voteInfo = voteMap.get(address.toLowerCase());
+
+          const govVoteStatus = voteInfo
+            ? (voteInfo.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED)
+            : GovVoteStatus.NOT_VOTED;
+
           result.push({
             accountName: ap.name,
             accountProxyId: ap.id,
             accountProxyType: ap.accountType,
             accountType: a.type,
-            address
+            address,
+            govVoteStatus
           });
         }
       });
@@ -102,8 +145,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
+  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy, voteMap]);
 
+  console.log('accountAddressItems', accountAddressItems);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
 
@@ -140,7 +184,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       const voteRequest: StandardVoteRequest = {
         chain: chainValue,
         address: values.from,
-        referendumIndex: defaultData.referendumId,
+        referendumIndex: referendumId,
         trackId: defaultData.track,
         type: voteType,
         amount: values.amount || '0',
@@ -154,29 +198,29 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         .catch(onError)
         .finally(() => setLoading(false));
     }
-  }, [chainValue, defaultData.conviction, defaultData.referendumId, defaultData.track, onError, onSuccess, voteType]);
+  }, [chainValue, defaultData.conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       fromAccountProxy: defaultData.fromAccountProxy,
-      referendumId: defaultData.referendumId,
+      referendumId: referendumId,
       track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-split-vote');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const goRefAbstainVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       fromAccountProxy: defaultData.fromAccountProxy,
-      referendumId: defaultData.referendumId,
+      referendumId: referendumId,
       track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-abstain-vote');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
     return [
@@ -186,7 +230,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           setGovRefUnvoteStorage({
             ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
             fromAccountProxy: defaultData.fromAccountProxy,
-            referendumId: defaultData.referendumId,
+            referendumId: referendumId,
             track: defaultData.track,
             chain: defaultData.chain
           });
@@ -194,15 +238,15 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         }
       }
     ];
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefUnvoteStorage, t]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefUnvoteStorage, t]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
+    setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
     };
-  }, [defaultData.referendumId, setCustomScreenTitle, t]);
+  }, [referendumId, setCustomScreenTitle, t]);
 
   useEffect(() => {
     setSubHeaderRightButtons(subHeaderButtons);
@@ -248,6 +292,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             name={'from'}
           >
             <AccountAddressSelector
+              isGovModal={true}
               items={accountAddressItems}
               label={`${t('From')}:`}
               labelStyle={'horizontal'}

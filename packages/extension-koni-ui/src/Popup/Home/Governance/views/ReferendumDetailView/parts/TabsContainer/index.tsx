@@ -3,7 +3,7 @@
 
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ReferendumDetail } from '@subwallet/subsquare-api-sdk/types';
+import { ReferendumDetail } from '@subwallet/subsquare-api-sdk/interface';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

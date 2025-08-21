@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { SpendItem } from '@subwallet/subsquare-api-sdk/types';
+import { SpendItem } from '@subwallet/subsquare-api-sdk/interface';
 import React from 'react';
 import styled from 'styled-components';
 

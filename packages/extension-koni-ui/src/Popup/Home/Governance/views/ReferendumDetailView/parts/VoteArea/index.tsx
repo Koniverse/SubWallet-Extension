@@ -4,7 +4,7 @@
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button } from '@subwallet/react-ui';
-import { ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk/types';
+import { ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk/interface';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import styled from 'styled-components';

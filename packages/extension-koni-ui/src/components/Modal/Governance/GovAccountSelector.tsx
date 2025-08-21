@@ -5,7 +5,8 @@ import { AddressSelectorItem, CloseIcon } from '@subwallet/extension-koni-ui/com
 import GeneralEmptyList from '@subwallet/extension-koni-ui/components/EmptyList/GeneralEmptyList';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft } from 'phosphor-react';
@@ -15,22 +16,34 @@ import styled from 'styled-components';
 type ListItemGroupLabel = {
   id: string;
   groupLabel: string;
+  listCount: string;
 }
 
-type ListItem = AccountAddressItemType | ListItemGroupLabel;
+type ListItem = GovAccountAddressItemType | ListItemGroupLabel;
+
+type GroupedItems = {
+  notVoted: GovAccountAddressItemType[];
+  voted: GovAccountAddressItemType[];
+  delegated: GovAccountAddressItemType[];
+};
 
 interface Props extends ThemeProps {
   modalId: string;
-  onSelectItem?: (item: AccountAddressItemType) => void,
-  items: AccountAddressItemType[];
+  onSelectItem?: (item: GovAccountAddressItemType) => void,
+  items: GovAccountAddressItemType[];
   onCancel?: VoidFunction;
   onBack?: VoidFunction;
   selectedValue?: string;
+  autoSelectFirstItem?: boolean;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
-function Component ({ className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function isAccountAddressItem (item: ListItem): item is GovAccountAddressItemType {
+  return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
+}
+
+function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -38,14 +51,14 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
 
   const isActive = checkActive(modalId);
 
-  const searchFunction = useCallback((item: AccountAddressItemType, searchText: string) => {
+  const searchFunction = useCallback((item: GovAccountAddressItemType, searchText: string) => {
     const lowerCaseSearchText = searchText.toLowerCase();
 
     return item.accountName.toLowerCase().includes(lowerCaseSearchText) ||
       (item.displayAddress || item.address).toLowerCase().includes(lowerCaseSearchText);
   }, []);
 
-  const onSelect = useCallback((item: AccountAddressItemType) => {
+  const onSelect = useCallback((item: GovAccountAddressItemType) => {
     return () => {
       onSelectItem?.(item);
     };
@@ -53,72 +66,85 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
 
   const renderItem = useCallback((item: ListItem) => {
     if ((item as ListItemGroupLabel).groupLabel) {
+      const groupItem = item as ListItemGroupLabel;
+
       return (
         <div
           className={'list-item-group-label'}
-          key={(item as ListItemGroupLabel).id}
+          key={groupItem.id}
         >
-          {(item as ListItemGroupLabel).groupLabel}
+          <span>
+            {t(groupItem.groupLabel)}
+          </span>
+          <span className={'list-item-group-label-count'}>
+          ({groupItem.listCount})
+          </span>
         </div>
       );
     }
 
     return (
       <AddressSelectorItem
-        address={(item as AccountAddressItemType).displayAddress || (item as AccountAddressItemType).address}
-        avatarValue={(item as AccountAddressItemType).accountProxyId}
+        address={(item as GovAccountAddressItemType).displayAddress || (item as GovAccountAddressItemType).address}
+        avatarValue={(item as GovAccountAddressItemType).accountProxyId}
         className={'account-selector-item'}
-        isSelected={selectedValue === (item as AccountAddressItemType).address}
-        key={(item as AccountAddressItemType).address}
-        name={(item as AccountAddressItemType).accountName}
-        onClick={onSelect(item as AccountAddressItemType)}
+        isSelected={selectedValue === (item as GovAccountAddressItemType).address}
+        key={(item as GovAccountAddressItemType).address}
+        name={(item as GovAccountAddressItemType).accountName}
+        onClick={onSelect(item as GovAccountAddressItemType)}
       />
     );
-  }, [onSelect, selectedValue]);
+  }, [onSelect, selectedValue, t]);
+
+  const groupedItemMap = useMemo<GroupedItems>(() => {
+    const result: GroupedItems = {
+      notVoted: [],
+      voted: [],
+      delegated: []
+    };
+
+    items.forEach((item) => {
+      switch (item.govVoteStatus) {
+        case GovVoteStatus.NOT_VOTED:
+          result.notVoted.push(item);
+          break;
+        case GovVoteStatus.VOTED:
+          result.voted.push(item);
+          break;
+        case GovVoteStatus.DELEGATED:
+          result.delegated.push(item);
+          break;
+      }
+    });
+
+    return result;
+  }, [items]);
 
   const listItems = useMemo<ListItem[]>(() => {
     const result: ListItem[] = [];
-    const notVotedAccounts: ListItem[] = [];
-    const votedAccounts: ListItem[] = [];
-    const delegatedAccounts: ListItem[] = [];
 
-    items.forEach((item) => {
-      if (searchValue && !searchFunction(item, searchValue)) {
+    const addGroup = (group: GovAccountAddressItemType[], label?: string, id?: string) => {
+      const filtered = group.filter((item) =>
+        !searchValue || searchFunction(item, searchValue)
+      );
 
+      if (filtered.length) {
+        if (label && id) {
+          const count = filtered.length.toString().padStart(2, '0');
+
+          result.push({ id, groupLabel: label, listCount: count });
+        }
+
+        result.push(...filtered);
       }
+    };
 
-      // logic to add item for notVotedAccounts, votedAccounts, delegatedAccounts
-    });
-
-    if (notVotedAccounts.length) {
-      notVotedAccounts.unshift({
-        id: 'notVoted',
-        groupLabel: t('Not voted')
-      });
-
-      result.push(...notVotedAccounts);
-    }
-
-    if (votedAccounts.length) {
-      votedAccounts.unshift({
-        id: 'voted',
-        groupLabel: t('Voted')
-      });
-
-      result.push(...votedAccounts);
-    }
-
-    if (delegatedAccounts.length) {
-      delegatedAccounts.unshift({
-        id: 'delegated',
-        groupLabel: t('Delegated')
-      });
-
-      result.push(...delegatedAccounts);
-    }
+    addGroup(groupedItemMap.notVoted, 'NOT VOTED', 'not voted');
+    addGroup(groupedItemMap.voted, 'VOTED', 'voted');
+    addGroup(groupedItemMap.delegated, 'DELEGATED', 'delegated');
 
     return result;
-  }, [items, searchFunction, searchValue, t]);
+  }, [groupedItemMap, searchFunction, searchValue]);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -131,6 +157,40 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
       }, 100);
     }
   }, [isActive]);
+
+  useEffect(() => {
+    const doFunction = () => {
+      const _items = [
+        ...groupedItemMap.notVoted,
+        ...groupedItemMap.voted,
+        ...groupedItemMap.delegated
+      ];
+
+      if (!_items.length) {
+        return;
+      }
+
+      const firstItem = _items[0];
+
+      if (!firstItem) {
+        return;
+      }
+
+      if (!selectedValue) {
+        onSelectItem?.(firstItem);
+
+        return;
+      }
+
+      if (!_items.some((i) => isAccountAddressItem(i) && i.address === selectedValue)) {
+        onSelectItem?.(firstItem);
+      }
+    };
+
+    if (autoSelectFirstItem) {
+      doFunction();
+    }
+  }, [autoSelectFirstItem, groupedItemMap, onSelectItem, selectedValue]);
 
   return (
     <SwModal
@@ -173,7 +233,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
   );
 }
 
-export const GovAccountSelector = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const GovAccountSelectoModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-content': {
       height: '100vh'
@@ -191,6 +251,10 @@ export const GovAccountSelector = styled(Component)<Props>(({ theme: { token } }
       fontSize: 11,
       lineHeight: '18px',
       fontWeight: token.headingFontWeight,
+      color: token.colorWhite
+    },
+
+    '.list-item-group-label-count': {
       color: token.colorTextLight3
     },
 
@@ -213,4 +277,4 @@ export const GovAccountSelector = styled(Component)<Props>(({ theme: { token } }
   });
 });
 
-export default GovAccountSelector;
+export default GovAccountSelectoModal;
