@@ -99,6 +99,197 @@ All handlers implement the `SwapBaseInterface` defined in [`/packages/extension-
 - **AssetHubHandler**: Polkadot/Kusama asset hub native swaps with router integration
 - **ChainflipHandler**: Cross-chain atomic swaps with testnet/mainnet configurations
 
+## Swap Provider Details
+
+### Provider Categories & Implementation Types
+
+Based on implementation analysis from [`index.ts:30`](./index.ts#L30), swap providers fall into three categories:
+
+1. **On-Chain Pallet-Based**: HydraDX and AssetHub have dedicated blockchain pallets for native swap execution
+2. **Smart Contract-Based**: Uniswap and Kyber interact with DEX smart contracts on EVM chains  
+3. **Centralized API-Based**: SimpleSwap and Chainflip use centralized API systems but execute through on-chain transactions
+
+### UniswapHandler - EVM DEX Protocol
+
+**Location**: [`./handler/uniswap-handler.ts`](./handler/uniswap-handler.ts)  
+**Provider ID**: `SwapProviderId.UNISWAP` from [`types/swap/index.ts:84`](../../types/swap/index.ts#L84)  
+**Supported Chains**: Ethereum, Arbitrum as defined in [`utils.ts:40`](./utils.ts#L40)
+
+#### How Uniswap Swaps Work
+1. **Quote Fetching**: Requests optimal swap routes from Uniswap API with slippage protection
+2. **Token Approval**: For ERC20 tokens, generates approval transactions via `getApprovalStep()` at [`uniswap-handler.ts:550`](./handler/uniswap-handler.ts#L550)
+3. **Permit Support**: Implements gasless permit signatures through `getPermitStep()` for supported tokens
+4. **Swap Execution**: Builds and submits swap transactions using Uniswap router contracts
+5. **Cross-Chain Bridging**: Integrates with Across Protocol for multi-chain swaps via `getBridgeStep()`
+
+#### Unique Features
+- **Permit Functionality**: Gasless token approvals using EIP-2612 permit signatures
+- **Smart Routing**: Automatic path optimization across Uniswap V2/V3 pools
+- **MEV Protection**: Dutch auction orders for better execution prices
+- **Cross-Chain Integration**: Native Across bridge integration for L2 connectivity
+
+### KyberHandler - DEX Aggregator
+
+**Location**: [`./handler/kyber-handler.ts`](./handler/kyber-handler.ts)  
+**Provider ID**: `SwapProviderId.KYBER` from [`types/swap/index.ts:84`](../../types/swap/index.ts#L84)  
+**Supported Chains**: Multiple EVM chains with aggregated liquidity
+
+#### How Kyber Swaps Work
+1. **Route Aggregation**: Queries multiple DEX sources for optimal pricing via Kyber API
+2. **Gas Optimization**: Calculates and optimizes transaction gas costs at [`kyber-handler.ts:279`](./handler/kyber-handler.ts#L279)
+3. **Smart Contract Interaction**: Uses KyberSwap aggregator contracts for execution
+4. **Slippage Management**: Implements configurable slippage tolerance (slippage * 10000) at [`kyber-handler.ts:384`](./handler/kyber-handler.ts#L384)
+5. **Fee Integration**: Integrates with `FeeService` for accurate gas estimation
+
+#### Technical Implementation
+- **Approval Management**: ERC20 allowance checking and approval transactions via `getApprovalStep()`
+- **Route Building**: Constructs optimal swap paths using `buildTxForKyberSwap()` function
+- **Error Handling**: Comprehensive error management for failed swaps and insufficient liquidity
+- **Multi-Step Process**: Handles approval → swap process flow at [`kyber-handler.ts:329`](./handler/kyber-handler.ts#L329)
+
+### HydradxHandler - Substrate AMM
+
+**Location**: [`./handler/hydradx-handler.ts`](./handler/hydradx-handler.ts)  
+**Provider ID**: `SwapProviderId.HYDRADX_MAINNET` or `SwapProviderId.HYDRADX_TESTNET`  
+**Supported Chains**: HydraDX (Mainnet/Testnet)
+
+#### How HydraDX Swaps Work
+1. **Native Pallet Integration**: Uses HydraDX's built-in swap pallet for direct on-chain execution
+2. **Multi-Asset Pool**: Leverages Omnipool for seamless asset swapping without traditional trading pairs
+3. **Fee Token Selection**: Supports multiple fee payment options via `getFeeOptionStep()` implementation
+4. **Referral System**: Integrates SubWallet referral codes for fee sharing:
+   - **Mainnet**: `HYDRADX_SUBWALLET_REFERRAL_CODE = 'WALLET'` at [`hydradx-handler.ts:25`](./handler/hydradx-handler.ts#L25)
+   - **Testnet**: `HYDRADX_TESTNET_SUBWALLET_REFERRAL_CODE = 'ASSETHUB'` at [`hydradx-handler.ts:28`](./handler/hydradx-handler.ts#L28)
+
+#### Technical Architecture
+- **Substrate Extrinsic**: Creates native Substrate transactions for swap execution
+- **Dynamic Fee Management**: Allows users to select preferred fee payment tokens
+- **SDK Integration**: Uses `@subwallet-monorepos/subwallet-services-sdk` for quote generation
+- **Weight Calculation**: Implements `DEFAULT_EXCESS_AMOUNT_WEIGHT` for transaction weight estimation
+
+### ChainflipHandler - Cross-Chain Atomic Swaps
+
+**Location**: [`./handler/chainflip-handler.ts`](./handler/chainflip-handler.ts)  
+**Provider ID**: `SwapProviderId.CHAIN_FLIP_MAINNET` or `SwapProviderId.CHAIN_FLIP_TESTNET`  
+**Supported Chains**: Polkadot, Ethereum, Arbitrum (Mainnet); Chainflip Polkadot, Ethereum Sepolia (Testnet)
+
+#### How Chainflip Swaps Work
+1. **Deposit Channel Creation**: Generates unique deposit addresses for each swap via Chainflip API
+2. **Cross-Chain Monitoring**: Tracks deposits across different blockchain networks
+3. **Atomic Execution**: Ensures swap completion or full refund through Chainflip's consensus mechanism
+4. **Multi-Chain Support**: Handles Bitcoin, Ethereum, and Polkadot ecosystems natively
+5. **Intermediary Assets**: Uses USDC as intermediary for complex swap routes:
+   - **Mainnet**: `INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM` at [`chainflip-handler.ts:24`](./handler/chainflip-handler.ts#L24)
+   - **Testnet**: `INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA` at [`chainflip-handler.ts:25`](./handler/chainflip-handler.ts#L25)
+
+#### Technical Implementation
+- **Deposit Address Management**: Generates time-limited deposit channels with expiry blocks
+- **Multi-Chain Transaction Building**: Supports Bitcoin, EVM, and Substrate transaction formats
+- **Channel Fee Integration**: Includes channel opening fees in cost calculations
+- **State Machine Integration**: Tracks swap states through Chainflip's state machine
+
+### AssetHubHandler - Polkadot/Kusama Native Swaps
+
+**Location**: [`./handler/asset-hub/handler.ts`](./handler/asset-hub/handler.ts)  
+**Provider IDs**: `POLKADOT_ASSET_HUB`, `KUSAMA_ASSET_HUB`, `WESTEND_ASSET_HUB`, `ROCOCO_ASSET_HUB`  
+**Supported Chains**: Respective Asset Hub chains (Statemint, Statemine, Westend AssetHub)
+
+#### How Asset Hub Swaps Work
+1. **Native Pool Integration**: Uses Asset Hub's built-in asset conversion pallet
+2. **Router Implementation**: Utilizes `AssetHubRouter` for path finding and execution at [`asset-hub/router.ts`](./handler/asset-hub/router.ts)
+3. **DOT/KSM Pool Access**: Direct access to native DOT/KSM liquidity pools
+4. **Low Fee Structure**: Benefits from Polkadot/Kusama's low transaction fees
+5. **XCM Integration**: Seamless cross-parachain transfers via XCM
+
+#### Chain-Specific Configuration
+- **Polkadot**: `'statemint'` → `SwapProviderId.POLKADOT_ASSET_HUB` at [`asset-hub/handler.ts:30`](./handler/asset-hub/handler.ts#L30)
+- **Kusama**: `'statemine'` → `SwapProviderId.KUSAMA_ASSET_HUB` at [`asset-hub/handler.ts:32`](./handler/asset-hub/handler.ts#L32)
+- **Westend**: `'westend_assethub'` → `SwapProviderId.WESTEND_ASSET_HUB` at [`asset-hub/handler.ts:34`](./handler/asset-hub/handler.ts#L34)
+
+### SimpleSwapHandler - Centralized Cross-Chain Bridge
+
+**Location**: [`./handler/simpleswap-handler.ts`](./handler/simpleswap-handler.ts)  
+**Provider ID**: `SwapProviderId.SIMPLE_SWAP`  
+**Supported Chains**: Bittensor, Ethereum, Polkadot as defined in [`utils.ts:37`](./utils.ts#L37)
+
+#### How SimpleSwap Works
+1. **Centralized Exchange**: Uses SimpleSwap's centralized service for cross-chain asset conversion
+2. **Fixed-Rate Quotes**: Provides guaranteed exchange rates with time-limited validity
+3. **Multi-Chain Support**: Handles diverse blockchain ecosystems through centralized infrastructure
+4. **KYC-Free Operation**: Processes swaps without identity verification for smaller amounts
+5. **Rate Validation**: Implements rate checking to ensure quote accuracy at [`simpleswap-handler.ts:247`](./handler/simpleswap-handler.ts#L247)
+
+#### Technical Process
+- **Exchange ID Generation**: Creates unique exchange IDs for tracking
+- **Transaction Building**: Constructs blockchain-specific transactions for deposit
+- **Status Monitoring**: Tracks swap progress through SimpleSwap API
+- **Amount Validation**: Verifies output amounts match quoted rates within tolerance
+
+### Provider Selection Logic
+
+The service prioritizes providers based on implementation at [`index.ts:433`](./index.ts#L433):
+
+1. **Amount Optimization**: Selects provider offering highest output amount
+2. **Provider Preference**: ChainFlip and Uniswap receive slight priority for equal amounts
+3. **User Override**: `preferredProvider` parameter allows manual selection at [`index.ts:445`](./index.ts#L445)
+4. **Chain Compatibility**: Filters providers based on supported chain combinations
+
+### Quote Timeout Management
+
+Different providers have varying quote validity periods defined in [`utils.ts:25`](./utils.ts#L25):
+
+```typescript
+export const SWAP_QUOTE_TIMEOUT_MAP: Record<string, number> = {
+  default: 90000, // 90 seconds
+  [SwapProviderId.CHAIN_FLIP_TESTNET]: 30000, // 30 seconds
+  [SwapProviderId.CHAIN_FLIP_MAINNET]: 30000, // 30 seconds
+  error: 10000 // 10 seconds for error recovery
+};
+```
+
+**Timeout Rationale**:
+- **Chainflip**: Shorter timeout (30s) due to volatile cross-chain rates and channel expiry
+- **Other Providers**: Longer timeout (90s) for stable on-chain pool pricing
+- **Error Handling**: Quick recovery (10s) for failed quote requests
+
+### Provider Implementation Architecture
+
+#### EVM-Based Providers (Uniswap, Kyber)
+- **Smart Contract Integration**: Direct interaction with DEX router contracts
+- **Gas Optimization**: Advanced gas estimation using `calculateGasFeeParams()` from [`fee-service/utils`](../fee-service/utils)
+- **Approval Management**: ERC20 token approval with allowance checking
+- **Transaction Service Integration**: Required dependency for transaction submission
+
+#### Substrate-Based Providers (HydraDX, AssetHub)
+- **Pallet Integration**: Native blockchain pallet usage for optimal performance
+- **Extrinsic Building**: Substrate transaction construction with proper weights
+- **Multi-Token Fees**: Support for paying fees in different tokens
+- **XCM Compatibility**: Cross-consensus messaging for parachain swaps
+
+#### Centralized API Providers (SimpleSwap, Chainflip)
+- **External API Integration**: RESTful API calls for quote generation and swap initiation
+- **State Tracking**: Transaction monitoring across multiple blockchain networks
+- **Rate Validation**: Comprehensive rate checking to prevent sandwich attacks
+- **Fallback Mechanisms**: Error handling for API unavailability
+
+### Error Handling Patterns
+
+#### Common Error Types
+From [`types/swap/index.ts:54`](../../types/swap/index.ts#L54):
+- `ASSET_NOT_SUPPORTED`: Token not available on selected provider
+- `NOT_ENOUGH_LIQUIDITY`: Insufficient pool depth for large swaps
+- `SWAP_EXCEED_ALLOWANCE`: ERC20 allowance insufficient for swap amount
+- `QUOTE_TIMEOUT`: Quote expired before execution
+- `NOT_MEET_MIN_EXPECTED`: Slippage exceeded acceptable limits
+
+#### Provider-Specific Error Recovery
+- **Uniswap**: MEV protection through Dutch auction orders
+- **Kyber**: Multi-DEX fallback for failed routes
+- **HydraDX**: Dynamic fee token switching on failure
+- **Chainflip**: Channel recreation for expired deposits
+- **AssetHub**: XCM retry mechanisms for cross-parachain failures
+- **SimpleSwap**: Rate re-negotiation for market volatility
+
 #### SwapBaseHandler (Shared Logic)
 - **Location**: [`/packages/extension-base/src/services/swap-service/handler/base-handler.ts`](./handler/base-handler.ts)
 - **Purpose**: Provides common functionality for all handlers
@@ -336,6 +527,192 @@ sequenceDiagram
     B2->>B1: Deliver final tokens
 ```
 
+## Provider-Specific Swap Flows
+
+### Uniswap Swap Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UH as UniswapHandler
+    participant UA as UniswapAPI
+    participant EC as EvmChain
+    participant UR as UniswapRouter
+    
+    Note over UH: EVM-Based DEX Swap
+    
+    U->>UH: Request swap quote
+    UH->>UA: Get optimal route & pricing
+    UA-->>UH: Route data & permit info
+    
+    alt ERC20 Token Swap
+        UH->>UH: Generate approval step
+        UH->>EC: Submit ERC20 approval tx
+        EC-->>UH: Approval confirmed
+    else Native Token with Permit
+        UH->>UH: Generate permit signature
+        U->>UH: Sign permit (gasless)
+    end
+    
+    UH->>UR: Submit swap transaction
+    UR->>EC: Execute swap on Uniswap pools
+    EC-->>UH: Swap completed
+    UH-->>U: Transaction result
+```
+
+### Kyber Aggregator Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant KH as KyberHandler
+    participant KA as KyberAPI
+    participant AG as Aggregator
+    participant DEX as MultiDEX
+    
+    Note over KH: DEX Aggregator Swap
+    
+    U->>KH: Request swap quote
+    KH->>KA: Query multiple DEX sources
+    KA->>DEX: Check liquidity across DEXs
+    DEX-->>KA: Aggregated pricing
+    KA-->>KH: Optimal route summary
+    
+    KH->>KH: Calculate gas optimization
+    
+    alt Requires Token Approval
+        KH->>AG: Submit approval transaction
+        AG-->>KH: Approval confirmed
+    end
+    
+    KH->>AG: Submit aggregated swap
+    AG->>DEX: Execute across optimal DEXs
+    DEX-->>AG: Swap results
+    AG-->>KH: Final output
+    KH-->>U: Transaction completed
+```
+
+### HydraDX Native Pallet Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant HH as HydradxHandler
+    participant SDK as SubwalletSDK
+    participant HP as HydraDXPallet
+    participant OP as Omnipool
+    
+    Note over HH: Substrate Native Swap
+    
+    U->>HH: Request swap quote
+    HH->>SDK: Query Omnipool pricing
+    SDK->>OP: Get asset prices & liquidity
+    OP-->>SDK: Pool state & rates
+    SDK-->>HH: Quote with referral fee
+    
+    alt Multi-Fee Token Support
+        HH->>HH: Generate fee option step
+        U->>HH: Select preferred fee token
+    end
+    
+    HH->>HP: Build substrate extrinsic
+    Note over HH: Include referral code: WALLET
+    HH->>OP: Submit swap to Omnipool
+    OP->>OP: Execute atomic swap
+    OP-->>HH: Swap completed
+    HH-->>U: Transaction result
+```
+
+### Chainflip Atomic Swap Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant CH as ChainflipHandler
+    participant CA as ChainflipAPI
+    participant SC1 as SourceChain
+    participant CF as ChainflipVault
+    participant SC2 as DestChain
+    
+    Note over CH: Cross-Chain Atomic Swap
+    
+    U->>CH: Request cross-chain swap
+    CH->>CA: Request deposit channel
+    CA->>CF: Create time-limited channel
+    CF-->>CA: Deposit address & expiry
+    CA-->>CH: Channel details
+    
+    CH->>SC1: Build deposit transaction
+    U->>SC1: Send tokens to deposit address
+    SC1->>CF: Tokens received
+    
+    CF->>CF: Validate & execute swap
+    Note over CF: Atomic execution or refund
+    
+    CF->>SC2: Send swapped tokens
+    SC2-->>U: Receive final tokens
+    CH-->>U: Swap completed
+```
+
+### Asset Hub Native Pool Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant AH as AssetHubHandler
+    participant AR as AssetHubRouter
+    participant AP as AssetPallet
+    participant NP as NativePools
+    
+    Note over AH: Polkadot/Kusama Native Swap
+    
+    U->>AH: Request native asset swap
+    AH->>AR: Query available pools
+    AR->>NP: Check DOT/KSM pool liquidity
+    NP-->>AR: Pool states & pricing
+    AR-->>AH: Optimal path found
+    
+    AH->>AP: Build asset conversion extrinsic
+    AH->>NP: Execute swap in native pools
+    NP->>NP: Atomic pool operation
+    NP-->>AH: Swap completed
+    AH-->>U: Transaction result
+    
+    Note over AH: Low fees via native integration
+```
+
+### SimpleSwap Centralized Bridge Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant SH as SimpleSwapHandler
+    participant SA as SimpleSwapAPI
+    participant SC1 as SourceChain
+    participant SS as SimpleSwapService
+    participant SC2 as DestChain
+    
+    Note over SH: Centralized Cross-Chain Bridge
+    
+    U->>SH: Request cross-chain swap
+    SH->>SA: Get fixed-rate quote
+    SA-->>SH: Rate & exchange ID
+    
+    SH->>SH: Validate rate accuracy
+    SH->>SC1: Build deposit transaction
+    U->>SC1: Send tokens to SimpleSwap
+    SC1->>SS: Tokens received
+    
+    SS->>SS: Internal exchange processing
+    Note over SS: KYC-free for smaller amounts
+    
+    SS->>SC2: Send converted tokens
+    SC2-->>U: Receive final tokens
+    SH-->>U: Exchange completed
+    
+    Note over SH: Track via exchange ID
+```
+
 ### Fee Calculation Flow
 
 ```mermaid
@@ -364,6 +741,33 @@ sequenceDiagram
 
 ## Notes
 
+### Supported Chain Matrix
+
+Provider chain support as defined in [`utils.ts:30-45`](./utils.ts#L30-45):
+
+| Provider | Mainnet Chains | Testnet Chains |
+|----------|---------------|----------------|
+| **Uniswap** | Ethereum, Arbitrum | - |
+| **Kyber** | Multiple EVM chains | - |
+| **HydraDX** | HydraDX | HydraDX Testnet |
+| **Chainflip** | Polkadot, Ethereum, Arbitrum | Chainflip Polkadot, Ethereum Sepolia |
+| **AssetHub** | Polkadot AssetHub, Kusama AssetHub | Westend AssetHub, Rococo AssetHub |
+| **SimpleSwap** | Bittensor, Ethereum, Polkadot | - |
+
+### Provider Capability Matrix
+
+| Feature | Uniswap | Kyber | HydraDX | Chainflip | AssetHub | SimpleSwap |
+|---------|---------|-------|---------|-----------|----------|------------|
+| **Same-Chain Swaps** | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| **Cross-Chain Swaps** | ✅* | ❌ | ❌ | ✅ | ❌ | ✅ |
+| **Gasless Permits** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Multi-Fee Tokens** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **Referral System** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **Atomic Guarantees** | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
+| **KYC Required** | ❌ | ❌ | ❌ | ❌ | ❌ | Partial |
+
+*Via Across Protocol integration
+
 ### Known Issues
 
 1. **Quote Timeout Handling**: Quotes have limited validity periods defined in [`SWAP_QUOTE_TIMEOUT_MAP`](./utils.ts#L25), requiring refresh for expired quotes
@@ -373,6 +777,12 @@ sequenceDiagram
 3. **Fee Estimation Accuracy**: EVM fee estimation may be inaccurate during network congestion, potentially causing transaction failures
 
 4. **Service Lifecycle Dependencies**: SwapService depends on proper initialization order as defined in [`State.ts:396`](../../koni/background/handlers/State.ts#L396)
+
+5. **Provider-Specific Limitations**:
+   - **Chainflip**: Deposit channel expiry can cause failed swaps if not executed promptly
+   - **SimpleSwap**: Centralized nature creates single point of failure risk
+   - **Uniswap**: MEV vulnerability during high-value swaps without proper protection
+   - **HydraDX**: Limited to Substrate ecosystem for native operations
 
 ### Future Improvements
 
@@ -385,6 +795,13 @@ sequenceDiagram
 4. **Quote Caching**: Implement intelligent quote caching to reduce API calls while maintaining accuracy
 
 5. **Service Isolation**: Better separation between swap service lifecycle and main application state
+
+6. **Provider Enhancements**:
+   - **Multi-Provider Aggregation**: Combine quotes from multiple providers for optimal pricing
+   - **Smart Route Optimization**: AI-powered route selection based on historical performance
+   - **Dynamic Provider Weighting**: Adjust provider selection based on success rates and user preferences
+   - **Cross-Chain MEV Protection** : Implement MEV protection for cross-chain swaps
+   - **Gas Price Optimization**: Dynamic gas price adjustment based on network conditions
 
 ### Provider Priority Logic
 
