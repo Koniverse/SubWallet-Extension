@@ -853,10 +853,15 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setTransferInfo(transferInfo);
 
         if (isTransferAll && !!transferInfo?.maxTransferable) {
-          setForceUpdateMaxValue({});
-          const value = transferInfo.maxTransferable;
+          const bnMaxTransfer = new BN(transferInfo.maxTransferable);
+          const currentFormValue = form.getFieldValue('value') as string;
+          const isNeedUpdateMax = !bnMaxTransfer.eq(new BN(currentFormValue));
 
-          form.setFieldsValue({ value: value });
+          if (isNeedUpdateMax) {
+            setForceUpdateMaxValue({});
+
+            form.setFieldsValue({ value: bnMaxTransfer.toString() });
+          }
         }
 
         id = transferInfo.id;
