@@ -163,11 +163,13 @@ export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
 
 export const DEFAULT_GOV_REFERENDUM_VOTE_PARAMS: GovReferendumVoteParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
-  conviction: 0.1,
-  referendumId: ''
+  conviction: 0,
+  referendumId: '',
+  track: -1
 };
 
 export const DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS: GovReferendumUnvoteParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
-  referendumId: ''
+  referendumId: '',
+  track: -1
 };

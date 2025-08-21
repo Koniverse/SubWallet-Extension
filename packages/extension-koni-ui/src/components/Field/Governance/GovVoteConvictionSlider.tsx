@@ -11,17 +11,28 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & BasicInputWrapper<number>;
 
-const options = [0.1, 1, 2, 3, 4, 5, 6];
-const sliderMax = Math.max(...options);
-const sliderMin = Math.min(...options);
-const marks = options.reduce((result, val, idx) => {
-  result[val] = `${options[idx]}x`;
+const options = [
+  { value: 0, label: '0.1x' },
+  { value: 1, label: '1x' },
+  { value: 2, label: '2x' },
+  { value: 3, label: '3x' },
+  { value: 4, label: '4x' },
+  { value: 5, label: '5x' },
+  { value: 6, label: '6x' }
+];
 
-  return result;
+const sliderMax = Math.max(...options.map((o) => o.value));
+const sliderMin = Math.min(...options.map((o) => o.value));
+const marks = options.reduce((acc, opts) => {
+  acc[opts.value] = opts.label;
+
+  return acc;
 }, {} as Record<number, string>);
 
 const sanitizeValue = (value?: number): number => (
-  value && options.includes(value) ? value : sliderMin
+  value && options.some((o) => o.value === value)
+    ? value
+    : sliderMin
 );
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
@@ -42,7 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
 
   return (
     <div className={className}>
-      <div className={'__label-wrapper'}>
+      <div className='__label-wrapper'>
         <div className='__label'>{t('Conviction')}</div>
       </div>
       <div className='__input-container'>

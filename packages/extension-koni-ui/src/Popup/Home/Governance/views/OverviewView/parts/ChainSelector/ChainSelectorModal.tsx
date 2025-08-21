@@ -56,7 +56,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
     return {
       polkadot: getItems(_GOVERNANCE_CHAIN_GROUP.polkadot),
       kusama: getItems(_GOVERNANCE_CHAIN_GROUP.kusama),
-      westend: getItems(_GOVERNANCE_CHAIN_GROUP.westend),
+      westend: getItems(_GOVERNANCE_CHAIN_GROUP.westend_assethub),
       paseo: getItems(_GOVERNANCE_CHAIN_GROUP.paseo),
       solo: getItems(_GOVERNANCE_CHAIN_GROUP.solo),
       testnet: getItems(_GOVERNANCE_CHAIN_GROUP.testnet)
@@ -82,7 +82,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
 
     addGroup(itemGroupMap.polkadot, t('Polkadot & Parachains'), 'polkadot');
     addGroup(itemGroupMap.kusama, t('Kusama & Parachains'), 'kusama');
-    addGroup(itemGroupMap.westend, t('Westend and Parachains'), 'westend');
+    addGroup(itemGroupMap.westend, t('Westend and Parachains'), 'westend_assethub');
     addGroup(itemGroupMap.paseo, t('Paseo'), 'paseo');
     addGroup(itemGroupMap.solo, t('Solochains'), 'solo');
     addGroup(itemGroupMap.testnet, t('Testnets'), 'testnet');

@@ -34,8 +34,8 @@ export const _GOVERNANCE_CHAIN_GROUP = {
   kusama: [
     'kusama'
   ],
-  westend: [
-    'westend'
+  westend_assethub: [
+    'westend_assethub'
   ],
   paseo: [
 

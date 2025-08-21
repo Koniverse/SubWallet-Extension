@@ -33,6 +33,7 @@ import MigrationService from '@subwallet/extension-base/services/migration-servi
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
+import OpenGovService from '@subwallet/extension-base/services/open-gov';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
@@ -141,6 +142,7 @@ export default class KoniState {
   readonly swapService: SwapService;
   readonly inappNotificationService: InappNotificationService;
   readonly chainOnlineService: ChainOnlineService;
+  readonly openGovService: OpenGovService;
 
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
@@ -179,6 +181,7 @@ export default class KoniState {
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
+    this.openGovService = new OpenGovService(this);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);
@@ -307,6 +310,7 @@ export default class KoniState {
     await this.earningService.init();
     await this.swapService.init();
     await this.inappNotificationService.init();
+    await this.openGovService.init();
 
     // this.onReady();
     this.onAccountAdd();

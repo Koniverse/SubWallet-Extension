@@ -39,6 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningSlippageResult } from '../services/earning-service/handlers/native-staking/dtao';
+import { GovVoteRequest, RemoveVoteRequest } from '../services/open-gov/interface';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2751,6 +2752,10 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+
+  /* Gov */
+  'pri(openGov.vote)': [GovVoteRequest, SWTransactionResponse];
+  'pri(openGov.unvote)': [RemoveVoteRequest, SWTransactionResponse]
 }
 
 export interface ApplicationMetadataType {
