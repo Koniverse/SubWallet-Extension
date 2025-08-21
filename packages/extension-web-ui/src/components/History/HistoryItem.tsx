@@ -77,7 +77,7 @@ function Component (
   const chainAssetMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const { currencyData } = useSelector((state: RootState) => state.price);
 
-  const time = customFormatDate(item.time, '#hhhh#:#mm#');
+  const time = customFormatDate(item.blockTime || item.time, '#hhhh#:#mm#');
   const link = getLink(item, chainInfoMap);
 
   const showAmount = useMemo(() => item.type !== ExtrinsicType.TOKEN_SPENDING_APPROVAL, [item.type]);
