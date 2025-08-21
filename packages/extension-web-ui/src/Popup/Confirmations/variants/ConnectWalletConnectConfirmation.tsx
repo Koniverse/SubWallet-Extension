@@ -38,6 +38,7 @@ async function handleCancel ({ id }: WalletConnectSessionRequest) {
   });
 }
 
+const confirmConnectModalId = WALLET_CONNECT_CREATE_MODAL;
 const createMissingAccountModalId = 'createMissingAccountModalId';
 const timeOutWCMissingKey = 'unsuccessful_connect_wc_modal';
 const wcMissingModalId = 'WALLET_CONNECT_CONFIRM_MODAL';
@@ -131,20 +132,23 @@ function Component ({ className, request }: Props) {
 
   const onCancel = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     handleCancel(request).finally(() => {
       setLoading(false);
     });
-  }, [request]);
+  }, [inactiveModal, request]);
 
   const onCancelForAddNetworkModal = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     handleCancel(request).finally(() => {
       setLoading(false);
       activeModal(WALLET_CONNECT_CREATE_MODAL);
     });
-  }, [activeModal, request]);
+  }, [activeModal, inactiveModal, request]);
   const onConfirm = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     const selectedAccounts = Object.values(namespaceAccounts)
       .flatMap(({ appliedAccounts, networks }) => {
         return networks.flatMap(({ wcChain }) => appliedAccounts.map((address) => `${wcChain}:${address}`));
@@ -161,7 +165,7 @@ function Component ({ className, request }: Props) {
       .finally(() => {
         setLoading(false);
       });
-  }, [namespaceAccounts, notification, request]);
+  }, [inactiveModal, namespaceAccounts, notification, request]);
 
   const onAddAccount = useCallback(() => {
     setMissingAccountTypes(convertKeyTypes(missingType));
