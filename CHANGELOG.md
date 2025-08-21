@@ -17,9 +17,9 @@ Features & Updates:
   - Testnet networks: Westend, Vara Testnet, Aleph Zero Testnet, Avail Turing
 - Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593)
 - Update for patch chain (#4013)
-- Update logo for subnet on Earning features (#4551)
+- Update logo for subnet on Earning features (#4551, #4626)
 - Update TAO staking fee (#4604)
-- Update chain-list stable v0.2.112 (#4626)
+- Update chain-list stable v0.2.112 (#4517)
   - Update information for some tokens for Fraxtal Mainnet L2
   - Update token symbol (ticker) of some tokens for Bifrost testnet, Autonomys Taurus Testnet, Polkadot Chainflip Testnet, Energy Web X Rococo/Energy Web X Paseo
   - Update block explorer for some networks: Polkadot Collectives, Polkadot People, ....
@@ -27,8 +27,8 @@ Features & Updates:
   - ...
 
 Bug fixes:
-- Handle case connecting with network systems that do not support WalletConnect connection (#4579)
-- Fixed bug getting too many requests from Earning feature of Bittensor (#4598)
+- Handle case connecting with network systems that do not support WalletConnect connection (#4598)
+- Fixed bug getting too many requests from Earning feature of Bittensor (#4623)
 
 
 ## 1.3.53
