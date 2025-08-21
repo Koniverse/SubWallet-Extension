@@ -131,13 +131,13 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
       destroyOnClose={true}
       id={modalId}
       onCancel={_onCancel}
-      title={t('Select token')}
+      title={t('Select network')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter token name or network name')}
+        placeholder={t<string>('Enter network')}
         searchValue={searchValue}
       />
       <SwList

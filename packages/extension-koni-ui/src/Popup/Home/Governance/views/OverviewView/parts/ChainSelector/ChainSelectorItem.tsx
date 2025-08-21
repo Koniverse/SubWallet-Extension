@@ -25,6 +25,12 @@ const Component = ({ chainName,
 
 export const ChainSelectorItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-
+    minHeight: 52,
+    borderRadius: token.borderRadius,
+    backgroundColor: token.colorBgSecondary,
+    display: 'flex',
+    alignItems: 'center',
+    paddingInline: token.padding,
+    cursor: 'pointer'
   };
 });
