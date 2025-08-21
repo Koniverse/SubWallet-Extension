@@ -37,7 +37,7 @@ import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
@@ -469,6 +469,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setForceUpdateMaxValue(isTransferAll ? {} : undefined);
       }
 
+      if (part.value && isTransferAll) {
+        setForceUpdateMaxValue(undefined);
+      }
+
       if (part.to) {
         form.setFields([
           {
@@ -825,7 +829,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accountAddressItems, disabledToAddressInput, form, fromValue]);
 
   // Get max transfer value
-  useEffect(() => {
+  useLayoutEffect(() => {
     let cancel = false;
 
     // setIsFetchingMaxValue(false);
@@ -847,6 +851,13 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     const callback = (transferInfo: ResponseSubscribeTransfer) => {
       if (!cancel) {
         setTransferInfo(transferInfo);
+
+        if (isTransferAll && !!transferInfo?.maxTransferable) {
+          setForceUpdateMaxValue({});
+          const value = transferInfo.maxTransferable;
+
+          form.setFieldsValue({ value: value });
+        }
 
         id = transferInfo.id;
 
@@ -884,7 +895,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
