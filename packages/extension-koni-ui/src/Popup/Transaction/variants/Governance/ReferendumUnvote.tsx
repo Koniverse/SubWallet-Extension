@@ -141,7 +141,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       referendumId: defaultData.referendumId,
       chain: defaultData.chain
     });
-    navigate('/transaction/gov-ref-standard-vote');
+    navigate('/transaction/gov-ref-vote/standard');
   }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
 
   useEffect(() => {

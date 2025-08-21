@@ -54,7 +54,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
       chain: chainSlug,
       fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
-    navigate('/transaction/gov-ref-standard-vote');
+    navigate('/transaction/gov-ref-vote/standard');
   }, [chainSlug, currentAccountProxy, data?.track, navigate, referendumId, setGovRefVoteStorage]);
 
   if (!data) {

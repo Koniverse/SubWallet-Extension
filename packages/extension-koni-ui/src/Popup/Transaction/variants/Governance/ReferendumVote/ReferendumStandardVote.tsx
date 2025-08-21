@@ -11,7 +11,6 @@ import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAM
 import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
-import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
@@ -27,7 +26,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../parts';
+import { TransactionContent, TransactionFooter } from '../../../parts';
+import { VoteButton } from './parts/VoteButton';
 
 type WrapperProps = ThemeProps;
 
@@ -208,7 +208,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       track: defaultData.track,
       chain: defaultData.chain
     });
-    navigate('/transaction/gov-ref-split-vote');
+    navigate('/transaction/gov-ref-vote/split');
   }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const goRefAbstainVote = useCallback(() => {
@@ -219,7 +219,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       track: defaultData.track,
       chain: defaultData.chain
     });
-    navigate('/transaction/gov-ref-abstain-vote');
+    navigate('/transaction/gov-ref-vote/abstain');
   }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
@@ -370,9 +370,11 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   const isNotAllowed = !targetAccountProxy || !defaultData.referendumId || !defaultData.chain;
 
+  console.log('defaultData-----', defaultData);
+
   useEffect(() => {
     if (isNotAllowed) {
-      goHome();
+      // goHome();
     }
   }, [goHome, isNotAllowed]);
 

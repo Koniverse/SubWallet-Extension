@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { GovVoteType, SplitAbstainVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { GovVoteType, SplitVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, HiddenInput } from '@subwallet/extension-koni-ui/components';
@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../parts';
+import { TransactionContent, TransactionFooter } from '../../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -52,7 +52,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
-
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
@@ -118,13 +117,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const onSubmit: FormCallbacks<GovReferendumVoteParams>['onFinish'] = useCallback((values: GovReferendumVoteParams) => {
     setLoading(true);
-    const voteRequest: SplitAbstainVoteRequest = {
+    const voteRequest: SplitVoteRequest = {
       chain: chainValue,
       address: values.from,
       referendumIndex: defaultData.referendumId,
       trackId: defaultData.track,
-      type: GovVoteType.ABSTAIN,
-      abstainAmount: values.abstainAmount || '0',
+      type: GovVoteType.SPLIT,
       ayeAmount: values.ayeAmount || '0',
       nayAmount: values.nayAmount || '0'
     };
@@ -144,11 +142,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       referendumId: defaultData.referendumId,
       chain: defaultData.chain
     });
-    navigate('/transaction/gov-ref-standard-vote');
+    navigate('/transaction/gov-ref-vote/standard');
   }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Abstain for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
+    setCustomScreenTitle(t('Split for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
@@ -208,18 +206,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               items={accountAddressItems}
               label={`${t('From')}:`}
               labelStyle={'horizontal'}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name={'abstainAmount'}
-          >
-            <GovAmountInput
-              decimals={_getAssetDecimals(assetInfo)}
-              label={t('Abstain amount')}
-              logoKey={assetInfo.slug.toLowerCase()}
-              tokenSymbol={_getAssetSymbol(assetInfo)}
-              topRightPart={'1231231'}
             />
           </Form.Item>
 
@@ -321,10 +307,10 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   );
 };
 
-const ReferendumAbstainVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
+const ReferendumSplitVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
 
   };
 });
 
-export default ReferendumAbstainVote;
+export default ReferendumSplitVote;

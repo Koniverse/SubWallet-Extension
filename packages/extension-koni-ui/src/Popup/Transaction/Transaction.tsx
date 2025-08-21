@@ -70,9 +70,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return ExtrinsicType.SWAP;
       case 'claim-bridge':
         return ExtrinsicType.CLAIM_BRIDGE;
-      case 'gov-ref-standard-vote':
-      case 'gov-ref-abstain-vote':
-      case 'gov-ref-split-vote':
+      case 'gov-ref-vote':
         return ExtrinsicType.GOV_VOTE;
       case 'gov-ref-unvote':
         return ExtrinsicType.GOV_UNVOTE;
