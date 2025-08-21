@@ -43,18 +43,19 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
   });
 
   const onClickVote = useCallback(() => {
-    if (!referendumId) {
+    if (!referendumId || !data?.track) {
       return;
     }
 
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       referendumId,
+      track: data.track,
       chain: chainSlug,
       fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
     navigate('/transaction/gov-ref-standard-vote');
-  }, [chainSlug, currentAccountProxy, navigate, referendumId, setGovRefVoteStorage]);
+  }, [chainSlug, currentAccountProxy, data?.track, navigate, referendumId, setGovRefVoteStorage]);
 
   if (!data) {
     return <></>;

@@ -82,7 +82,8 @@ export interface ReferendumDetail {
 
 export type SpendItem = {
   isSpendLocal: boolean;
-  assetKind: {
+  symbol?: string;
+  assetKind?: {
     chain: string;
     type: string;
     symbol: string;

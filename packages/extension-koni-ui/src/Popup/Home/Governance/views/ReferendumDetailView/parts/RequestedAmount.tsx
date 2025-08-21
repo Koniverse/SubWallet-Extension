@@ -17,7 +17,7 @@ const Component = ({ allSpend, className }: Props): React.ReactElement<Props> =>
       <ul>
         {allSpend.map((item, index) => (
           <li key={index}>
-            {Number(item.amount) / 1_000_000} {item.assetKind.symbol}
+            {Number(item.amount) / 1_000_000} {item.assetKind?.symbol || item.symbol}
           </li>
         ))}
       </ul>

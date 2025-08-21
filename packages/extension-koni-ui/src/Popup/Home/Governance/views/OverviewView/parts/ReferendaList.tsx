@@ -30,11 +30,15 @@ const Component = ({ className, items, onClickItem, selectedReferendaCategory }:
       const stateName = item.state.name;
 
       if (selectedReferendaCategory === ReferendaCategory.ONGOING) {
-        return ['Deciding', 'Confirming'].includes(stateName);
+        return ['Preparing', 'Submitted', 'Queueing', 'Deciding', 'Confirming'].includes(stateName);
       }
 
       if (selectedReferendaCategory === ReferendaCategory.COMPLETED) {
-        return ['Approved', 'Rejected', 'Cancelled', 'TimedOut', 'Killed', 'Executed', 'Enacted'].includes(stateName);
+        return ['Approved', 'Rejected', 'Cancelled', 'TimedOut', 'Killed'].includes(stateName);
+      }
+
+      if (selectedReferendaCategory === ReferendaCategory.VOTED) {
+        return false;
       }
 
       return false;

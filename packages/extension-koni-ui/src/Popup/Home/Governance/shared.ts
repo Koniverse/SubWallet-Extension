@@ -4,6 +4,6 @@
 export const chainSlugToSubsquareNetwork: Record<string, string> = {
   polkadot: 'polkadot',
   kusama: 'kusama',
-  westend: 'westend',
+  westend_assethub: 'westend',
   vara_network: 'vara'
 };

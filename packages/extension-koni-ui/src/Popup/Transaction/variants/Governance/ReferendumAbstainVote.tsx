@@ -1,12 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { GovVoteType, SplitAbstainVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, HiddenInput } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useCoreCreateReformatAddress, useDefaultNavigate, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
@@ -49,6 +52,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
+
+  const onPreCheck = usePreCheckAction(fromValue);
+  const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
@@ -112,7 +118,24 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const onSubmit: FormCallbacks<GovReferendumVoteParams>['onFinish'] = useCallback((values: GovReferendumVoteParams) => {
     setLoading(true);
-  }, []);
+    const voteRequest: SplitAbstainVoteRequest = {
+      chain: chainValue,
+      address: values.from,
+      referendumIndex: defaultData.referendumId,
+      trackId: defaultData.track,
+      type: GovVoteType.ABSTAIN,
+      abstainAmount: values.abstainAmount || '0',
+      ayeAmount: values.ayeAmount || '0',
+      nayAmount: values.nayAmount || '0'
+    };
+
+    handleVote(voteRequest)
+      .then((tx) => {
+        onSuccess(tx);
+      })
+      .catch(onError)
+      .finally(() => setLoading(false));
+  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     setGovRefVoteStorage({
@@ -250,6 +273,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             />
           )}
           loading={loading}
+          onClick={onPreCheck(form.submit, ExtrinsicType.GOV_VOTE)}
         >
           {t('Vote')}
         </Button>

@@ -1,16 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useCoreCreateReformatAddress, useDefaultNavigate, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -33,7 +36,7 @@ const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
-  const { className = '', isAllAccount, targetAccountProxy } = props;
+  const { className = '', targetAccountProxy } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
@@ -43,11 +46,16 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-  const [isDisable, setIsDisable] = useState(false);
+  const [isDisable, setIsDisable] = useState(true);
+  const [voteType, setVoteType] = useState<GovVoteType | null>(null);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData) || 'polkadot';
+
   const getReformatAddress = useCoreCreateReformatAddress();
+  const onPreCheck = usePreCheckAction(fromValue);
+  const { onError, onSuccess } = useHandleSubmitTransaction();
+
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
@@ -102,39 +110,73 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return assetRegistry[assetSlug];
   }, [assetRegistry, chainInfoMap, defaultData.chain]);
 
+  const handleVoteClick = useCallback((type: GovVoteType) => {
+    setVoteType(type);
+
+    form.submit();
+  }, [form]);
+
+  const handleClickNay = useCallback(() => handleVoteClick(GovVoteType.NAY), [handleVoteClick]);
+  const handleClickAye = useCallback(() => handleVoteClick(GovVoteType.AYE), [handleVoteClick]);
+
   const onFieldsChange: FormCallbacks<GovReferendumVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
-    // // TODO: field change
-    // const { empty, error } = simpleCheckForm(allFields, ['--asset']);
+    // TODO: field change
+    const { empty, error } = simpleCheckForm(allFields, ['--asset', '--conviction']);
 
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    // setIsDisable(empty || error);
+    setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
 
   const onSubmit: FormCallbacks<GovReferendumVoteParams>['onFinish'] = useCallback((values: GovReferendumVoteParams) => {
+    if (!voteType) {
+      return;
+    }
+
     setLoading(true);
-  }, []);
+
+    if (voteType === GovVoteType.AYE || voteType === GovVoteType.NAY) {
+      const voteRequest: StandardVoteRequest = {
+        chain: chainValue,
+        address: values.from,
+        referendumIndex: defaultData.referendumId,
+        trackId: defaultData.track,
+        type: voteType,
+        amount: values.amount || '0',
+        conviction: defaultData.conviction
+      };
+
+      handleVote(voteRequest)
+        .then((tx) => {
+          onSuccess(tx);
+        })
+        .catch(onError)
+        .finally(() => setLoading(false));
+    }
+  }, [chainValue, defaultData.conviction, defaultData.referendumId, defaultData.track, onError, onSuccess, voteType]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       fromAccountProxy: defaultData.fromAccountProxy,
       referendumId: defaultData.referendumId,
+      track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-split-vote');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const goRefAbstainVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       fromAccountProxy: defaultData.fromAccountProxy,
       referendumId: defaultData.referendumId,
+      track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-abstain-vote');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
     return [
@@ -145,13 +187,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
             fromAccountProxy: defaultData.fromAccountProxy,
             referendumId: defaultData.referendumId,
+            track: defaultData.track,
             chain: defaultData.chain
           });
           navigate('/transaction/gov-ref-unvote');
         }
       }
     ];
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefUnvoteStorage, t]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, defaultData.track, navigate, setGovRefUnvoteStorage, t]);
 
   useEffect(() => {
     setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
@@ -237,6 +280,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           <VoteButton
             disabled={isDisable}
             loading={loading}
+            onClick={onPreCheck(handleClickNay, ExtrinsicType.GOV_VOTE)}
             type={'nay'}
           />
           <VoteButton
@@ -254,6 +298,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           <VoteButton
             disabled={isDisable}
             loading={loading}
+            onClick={onPreCheck(handleClickAye, ExtrinsicType.GOV_VOTE)}
             type={'aye'}
           />
         </div>
