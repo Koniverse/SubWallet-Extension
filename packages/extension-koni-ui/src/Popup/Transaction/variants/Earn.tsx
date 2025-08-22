@@ -328,9 +328,15 @@ const Component = () => {
 
     const values = convertFieldToObject<EarnParams>(allFields);
 
+    const isFromChanged = changedFields.some((field) => field.name.toString() === 'from');
+
+    if (isFromChanged) {
+      form.resetFields(['target']);
+    }
+
     setIsFormInvalid(empty || error);
     persistData(values);
-  }, [persistData]);
+  }, [form, persistData]);
 
   const handleDataForInsufficientAlert = useCallback(() => {
     const _assetDecimals = nativeAsset?.decimals || 0;
