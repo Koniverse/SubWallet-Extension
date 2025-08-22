@@ -15,20 +15,20 @@ graph LR
     A --> DB[[Database Service]]
     A --> ES[[Event Service]]
     A --> KS[Koni State]
-    
+
     %% Handler Inheritance Hierarchy
     B --> BLS[BaseLiquidStakingPoolHandler]
     B --> NSH[Native Staking Handlers]
     B --> NPH[Nomination Pool Handlers]
     B --> LH[Lending Handlers]
-    
+
     %% Liquid Staking Implementations
     BLS --> BLSH[BifrostLiquidStakingPoolHandler]
     BLS --> BMLS[BifrostMantaLiquidStakingPoolHandler]
     BLS --> ALSH[AcalaLiquidStakingPoolHandler]
     BLS --> PLSH[ParallelLiquidStakingPoolHandler]
     BLS --> SSLS[StellaSwapLiquidStakingPoolHandler]
-    
+
     %% Native Staking Implementations
     NSH --> RNSH[RelayNativeStakingPoolHandler]
     NSH --> TNSH[TaoNativeStakingPoolHandler]
@@ -37,53 +37,53 @@ graph LR
     NSH --> AMNS[AmplitudeNativeStakingPoolHandler]
     NSH --> PNSH[ParaNativeStakingPoolHandler]
     NSH --> MNSH[MythosNativeStakingPoolHandler]
-    
+
     %% Other Handler Types
     NPH --> NPH1[NominationPoolHandler]
     LH --> ILH[InterlayLendingPoolHandler]
-    
+
     %% Data Flow and Management
     A --> C[Pool Info Management]
     A --> D[Position Tracking]
     A --> E[Reward Management]
-    
+
     C --> C1[Pool Information Subscription]
     C --> C2[Pool Statistics & Metadata]
     C --> C3[Online/Offline Data Sync]
-    
+
     D --> D1[Position Subscription]
     D --> D2[Balance Tracking]
     D3[Unstaking Management] --> D
-    
+
     E --> E1[Reward Calculation]
     E --> E2[Reward History]
     E --> E3[APY/APR Tracking]
-    
+
     %% External Dependencies
     CHAIN[Blockchain Networks] --> BLSH
     CHAIN --> ALSH
     CHAIN --> PLSH
     CHAIN --> RNSH
     CHAIN --> NPH1
-    
+
     API[External APIs] --> E1
     API --> E3
     API --> C2
-    
+
     %% Data Persistence
     DB --> D
     DB --> E
     DB --> C
-    
+
     %% Event System
     ES --> A
     ES --> D1
     ES --> E1
-    
+
     %% State Management
     KS --> A
     KS --> CHAIN
-    
+
     class A service
     class B,BLS,NSH,NPH,LH handler
     class BLSH,BMLS,ALSH,PLSH,SSLS liquidStaking
@@ -110,7 +110,7 @@ graph LR
 
 ##### Base Handler (`BasePoolHandler`)
 - **Role**: Abstract base class providing common interface and shared functionality
-- **Relationships**: 
+- **Relationships**:
   - Extended by all specialized handlers
   - Defines contract for pool operations
   - Provides common utilities and validation logic
@@ -184,13 +184,13 @@ graph LR
         CS[ChainService]
         TS[TransactionService]
         NS[NotificationService]
-        
+
         ES --> DB
         ES --> EV
         ES -.-> CS
         ES -.-> TS
         ES -.-> NS
-        
+
         %% State provides these services
         KS --> DB
         KS --> EV
@@ -202,46 +202,46 @@ graph LR
     %% Handler Architecture
     subgraph "Pool Handler System"
         BPH[BasePoolHandler]
-        
+
         %% Handler Types
         LSH[Liquid Staking Handlers]
         NSH[Native Staking Handlers]
         NPH[Nomination Pool Handlers]
         LH[Lending Handlers]
-        
+
         %% Concrete Implementations
         ALS[AcalaLiquidStakingPoolHandler]
         BLS[BifrostLiquidStakingPoolHandler]
         PLS[ParallelLiquidStakingPoolHandler]
         SSL[StellaSwapLiquidStakingPoolHandler]
-        
+
         RNS[RelayNativeStakingPoolHandler]
         TNS[TaoNativeStakingPoolHandler]
         ANS[AstarNativeStakingPoolHandler]
-        
+
         NP[NominationPoolHandler]
         IL[InterlayLendingPoolHandler]
-        
+
         %% Handler Dependencies
         ES --> BPH
-        
+
         BPH --> LSH
         BPH --> NSH
         BPH --> NPH
         BPH --> LH
-        
+
         LSH --> ALS
         LSH --> BLS
         LSH --> PLS
         LSH --> SSL
-        
+
         NSH --> RNS
         NSH --> TNS
         NSH --> ANS
-        
+
         NPH --> NP
         LH --> IL
-        
+
         %% Handlers access state through base
         BPH --> KS
     end
@@ -255,7 +255,7 @@ graph LR
         ERS[earningRewardSubject]
         ERH[earningRewardHistorySubject]
         MAP[minAmountPercentSubject]
-        
+
         ES --> YPI
         ES --> YPS
         ES --> YPL
@@ -271,17 +271,17 @@ graph LR
         SAPI[Substrate APIs]
         EAPI[EVM APIs]
         OAPI[Other Chain APIs]
-        
+
         %% External Services
         EXTAPI[External APIs]
         VALIDAPI[Validator APIs]
         YIELDAPI[Yield Data APIs]
-        
+
         %% Chain Service provides blockchain access
         CS --> SAPI
         CS --> EAPI
         CS --> OAPI
-        
+
         %% Handlers access blockchain through chain service
         BPH -.-> BC
         BPH -.-> EXTAPI
@@ -295,7 +295,7 @@ graph LR
         YPD[(Yield Position Data)]
         YPH[(Yield Pool History)]
         YRM[(Yield Reward Metadata)]
-        
+
         DB --> YPD
         DB --> YPH
         DB --> YRM
@@ -307,7 +307,7 @@ graph LR
         ESE[earning.ready]
         ESU[earning.updated]
         ESR[earning.reward]
-        
+
         EV --> ESE
         EV --> ESU
         EV --> ESR
@@ -319,12 +319,12 @@ graph LR
         BS[BalanceService]
         PS[PriceService]
         HS[HistoryService]
-        
+
         %% Indirect relationships through KoniState
         KS --> BS
         KS --> PS
         KS --> HS
-        
+
         %% Data coordination
         ES -.-> BS
         ES -.-> PS
@@ -385,6 +385,53 @@ interface BasePoolHandler {
 - `PARACHAIN_STAKING`: Parachain-specific staking mechanisms
 - `SUBNET_STAKING`: Subnet staking (e.g., Bittensor)
 
+#### ⚠️ dApp Redirection and Maintenance Status
+
+**Important Note**: Some earning pools require users to interact with external dApps rather than being handled directly within the extension. Additionally, certain pool types are no longer actively maintained in the extension logic.
+
+##### Pools Requiring dApp Interaction
+**Astar dApp Staking**:
+- Users must use the Astar dApp portal for staking operations
+- Extension provides basic support but advanced features require dApp access
+- Comment from codebase: _"With Astar handled through dApp"_
+
+##### Unmaintained Pool Types
+**Interlay Lending**:
+- **Status**: Removed and blocked in UI
+- **Reason**: No longer supported through extension
+- **Alternative**: Use Interlay dApp directly
+- **Comment from codebase**: _"Currently interlay lending has been removed and blocked on UI"_
+
+**Parallel Liquid Staking**:
+- **Status**: Hidden from UI components
+- **Implementation**: Automatically filtered out in `EarningPools` component
+- **Alternative**: Use Parallel dApp for liquid staking
+
+##### Impact on Extension Functionality
+When pools redirect to dApps or are unmaintained:
+- **Limited Transaction Support**: Complex operations may not be available
+- **Outdated Information**: Pool statistics and rates may be stale
+- **UI Hiding**: Pools may be automatically hidden from user interfaces
+- **Reduced Maintenance**: Bug fixes and feature updates are not prioritized
+- **Data Inconsistency**: Pool data may not reflect current dApp state
+
+##### Developer Considerations
+```typescript
+// Example: Pools that require special handling
+if (poolInfo.chain === 'astar' && poolInfo.type === YieldPoolType.NATIVE_STAKING) {
+  // Consider redirecting to Astar dApp portal
+  redirectToAstarDApp(poolInfo);
+}
+
+if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+  // Hidden from UI
+}
+
+if (poolInfo.chain === 'interlay' && poolInfo.type === YieldPoolType.LENDING) {
+  // Hidden from UI
+}
+```
+
 #### Available Methods
 ```typescript
 interface YieldPoolMethodInfo {
@@ -397,6 +444,39 @@ interface YieldPoolMethodInfo {
   changeValidator: boolean;   // Can change validator selection
 }
 ```
+
+**Note on Claim Reward Action**: The `claimReward` method availability varies by pool type:
+- **Nomination Pools**: ✅ Supported - Users can claim accumulated rewards directly
+  - **Implementation**: Uses `nominationPools.claimPayout()` extrinsic
+  - **Reward Source**: Validator rewards distributed to pool members
+  - **Frequency**: Claims can be made at any time when rewards are available
+  - **Auto-bond Option**: Some implementations support automatic restaking of claimed rewards
+- **Native Staking (Astar)**: ✅ Supported - Direct reward claiming from dApp staking
+  - **Implementation**: Uses `dappsStaking.claimStakerRewards()` and `dappsStaking.claimBonusReward()`
+  - **Reward Types**: Both staker rewards and bonus rewards (if applicable)
+  - **Era-based**: Rewards accumulate per era and can be claimed retroactively
+- **Native Staking (Mythos)**: ✅ Supported - Collator staking rewards
+  - **Implementation**: Uses `collatorStaking.claimRewards()` extrinsic
+  - **Reward Source**: Collator performance and delegation rewards
+  - **Integration**: Automatically included in join/leave operations when beneficial
+- **Native Staking (Amplitude)**: ✅ Supported - Parachain staking rewards
+  - **Implementation**: Uses `parachainStaking.claimRewards()` extrinsic
+  - **Delegation-based**: Rewards from delegated collators
+- **Liquid Staking Protocols**: ❌ Not supported - Rewards are auto-compounded
+  - **Reason**: Derivative tokens (vDOT, sDOT, LDOT) appreciate in value automatically
+  - **Alternative**: Users benefit from token appreciation rather than direct reward claims
+  - **Examples**: Bifrost, Acala, Parallel, StellaSwap handlers
+- **Lending Protocols**: ❌ Not supported - Interest accrues automatically
+  - **Reason**: Supplied assets automatically earn interest over time
+  - **Implementation**: Interest is added to the supplied balance continuously
+  - **Examples**: Interlay lending handler
+
+**Technical Implementation Notes**:
+- All claim reward implementations must handle gas estimation and fee calculation
+- Error cases include insufficient claimable rewards, network connectivity issues, and account permission problems
+- Successful claims trigger automatic notification creation via `createClaimNotification()`
+- Some handlers support batch claiming for multiple eras or periods
+- The `bondReward` parameter allows automatic restaking but is not supported by all chains
 
 ### Default Values
 
@@ -467,6 +547,176 @@ interface YieldPoolMethodInfo {
 - **Input Parameters**: Step execution parameters
 - **Output**: Transaction data for execution
 - **Error Handling**: Throws TransactionError for invalid operations
+
+#### 🔄 Multi-Step Pool Join Operations
+
+**Important Note**: Some earning pools require multiple sequential transactions to complete the join process. These multi-step operations are designed to handle complex scenarios involving cross-chain transfers, token approvals, and multi-stage staking processes.
+
+##### Multi-Step Handler Architecture
+
+**Base Multi-Step Support**:
+- All handlers inherit multi-step capabilities from `BasePoolHandler`
+- Step generation through `generateOptimalPath()` method
+- Step-by-step execution via `handleYieldJoin()` with `currentStep` parameter
+- Validation for each step through `validateYieldJoin()`
+
+**Step Types Available**:
+```typescript
+enum YieldStepType {
+  DEFAULT = 'DEFAULT',           // Initial setup step
+  XCM = 'XCM',                  // Cross-chain transfer
+  TOKEN_APPROVAL = 'TOKEN_APPROVAL', // EVM token approval
+  NOMINATE = 'NOMINATE',        // Validator nomination
+  JOIN_NOMINATION_POOL = 'JOIN_NOMINATION_POOL', // Pool joining
+  // ... other step types
+}
+```
+
+##### Handlers with Multi-Step Operations
+
+**1. Liquid Staking Handlers (Special Multi-Step)**
+- **File**: `/packages/extension-base/src/services/earning-service/handlers/special.ts`
+- **Multi-Step Process**:
+  1. **XCM Transfer**: Move tokens from origin chain to staking chain
+  2. **Token Approval**: Approve EVM contracts (if needed)
+  3. **Staking**: Execute the actual staking operation
+
+```typescript
+// Example multi-step generation
+protected async generateOptimalPath(params: OptimalYieldPathParams): Promise<OptimalYieldPath> {
+  const stepFunctions: GenStepFunction[] = [
+    this.getTokenApproveStep,    // Step 1: Token approval (if needed)
+    this.getXcmStep,            // Step 2: XCM transfer (if needed)
+    this.getSubmitStep          // Step 3: Final staking operation
+  ];
+
+  // Generate steps sequentially
+  for (const stepFunction of stepFunctions) {
+    const step = await stepFunction.bind(this, params)();
+    if (step) {
+      result.steps.push(step);
+    }
+  }
+}
+```
+
+**2. StellaSwap Liquid Staking (Moonbeam)**
+- **Chain**: Moonbeam (EVM)
+- **Multi-Step Process**:
+  1. **XCM Transfer**: Transfer xcDOT from relay chain to Moonbeam
+  2. **Token Approval**: Approve StellaSwap contract to spend xcDOT
+  3. **Staking**: Mint stDOT through StellaSwap protocol
+
+**3. Cross-Chain Staking Scenarios**
+From handler comments: _"Multiple step farming - XCM"_
+- **XCM substrate => XCM transfer => Perform staking**
+- **EVM Contract Approval**: For EVM-based staking protocols
+
+##### Multi-Step Execution Flow
+
+**Step Validation**:
+```typescript
+// Each step is validated independently
+async validateYieldJoin(params: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
+  for (const step of path.steps) {
+    switch (step.type) {
+      case YieldStepType.XCM:
+        return this.validateXcmStep(params, path, bnInputTokenBalance);
+      case YieldStepType.TOKEN_APPROVAL:
+        return this.validateTokenApproveStep(params, path);
+      default:
+        return this.validateJoinStep(step.id, params, path);
+    }
+  }
+}
+```
+
+**Step Execution**:
+```typescript
+// Steps are executed one by one based on currentStep
+override handleYieldJoin(data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
+  const type = path.steps[currentStep].type;
+
+  switch (type) {
+    case YieldStepType.DEFAULT:
+      return Promise.resolve(); // First step completion
+    case YieldStepType.TOKEN_APPROVAL:
+      return this.handleTokenApproveStep(data, path);
+    case YieldStepType.XCM:
+      return this.handleXcmStep(data, path);
+    case YieldStepType.NOMINATE:
+      return this.handleSubmitStep(data, path);
+    default:
+      return this.handleSubmitStep(data, path);
+  }
+}
+```
+
+##### When Multi-Step is Required
+
+**Cross-Chain Token Requirements**:
+- User has tokens on Chain A but needs to stake on Chain B
+- Automatic XCM transfer is generated as intermediate step
+- Example: DOT on Polkadot → DOT on Bifrost → vDOT staking
+
+**EVM Contract Interactions**:
+- ERC20 token approval required before staking
+- Two-step process: approve → stake
+- Gas fees calculated for both transactions
+
+**Alternative Input Assets**:
+- Pool accepts multiple input tokens
+- User balance insufficient in primary token
+- Automatic conversion through alternative asset path
+
+##### Multi-Step User Experience
+
+**Progress Tracking**:
+- Each step shows individual progress
+- Users can see which step is currently executing
+- Clear indication of total steps required
+
+**Error Handling**:
+- If any step fails, entire process can be retried
+- Each step validates independently
+- Clear error messages for each step type
+
+**Gas Fee Estimation**:
+```typescript
+// Total fees calculated across all steps
+interface OptimalYieldPath {
+  totalFee: YieldTokenBaseInfo[];  // Fee for each step
+  steps: YieldStepDetail[];        // Step details
+  connectionError?: string;        // Network issues
+}
+```
+
+##### Developer Implementation Notes
+
+**Adding Multi-Step Support**:
+1. **Override step generation methods**:
+   - `getTokenApproveStep()` - for EVM approvals
+   - `getXcmStep()` - for cross-chain transfers
+   - `getSubmitStep()` - for final staking operation
+
+2. **Implement step handlers**:
+   - `handleTokenApproveStep()` - execute approval
+   - `handleXcmStep()` - execute XCM transfer
+   - `handleSubmitStep()` - execute staking
+
+3. **Add validation logic**:
+   - Validate each step independently
+   - Check balances and requirements per step
+   - Return appropriate error messages
+
+**Best Practices**:
+- Always validate the complete path before execution
+- Provide clear progress indicators to users
+- Handle partial failures gracefully
+- Calculate accurate gas fees for all steps
+- Test cross-chain scenarios thoroughly
+
+This multi-step architecture ensures that complex staking operations involving cross-chain transfers and contract approvals can be handled seamlessly while maintaining transparency and control for users.
 
 ##### `handleYieldLeave(request: RequestYieldLeave): Promise<TransactionData>`
 **Description**: Executes yield pool leave operation
@@ -581,12 +831,12 @@ sequenceDiagram
     participant ES as EarningService
     participant PH as PoolHandler
     participant Chain as Blockchain
-        
+
     UI->>ES: getOptimalYieldPath(params)
     ES->>PH: calculateOptimalPath()
     PH-->>ES: Optimal path with steps
     ES-->>UI: Execution path
-    
+
     UI->>ES: validateYieldJoin(params)
     ES->>PH: validateYieldJoin(amount, address)
     PH->>Chain: Check balance & requirements
@@ -610,10 +860,10 @@ sequenceDiagram
     participant PH as PoolHandler
     participant Chain as Blockchain
     participant DB as Database
-    
+
     ES->>PH: subscribePoolPosition(addresses)
     PH->>Chain: Subscribe to staking balance changes
-    
+
     loop Position Updates
         Chain->>PH: Staking balance change
         PH->>PH: Calculate position info
@@ -621,7 +871,7 @@ sequenceDiagram
         ES->>DB: Persist position (lazy)
         ES->>ES: Emit position update
     end
-    
+
     Note over ES: Filters inactive pools/chains
     ES->>UI: Position list update
 ```
@@ -634,9 +884,9 @@ sequenceDiagram
     participant PH as PoolHandler
     participant API as External API
     participant Chain as Blockchain
-    
+
     ES->>PH: getPoolReward(addresses)
-    
+
     par Pool Statistics
         PH->>API: Fetch APY/APR data
         API-->>PH: Current rates
@@ -644,7 +894,7 @@ sequenceDiagram
         PH->>Chain: Query staking rewards
         Chain-->>PH: Reward amounts
     end
-    
+
     PH->>PH: Calculate total rewards
     PH->>ES: updateEarningReward(rewardData)
     ES->>ES: Update reward subject
@@ -663,16 +913,16 @@ stateDiagram-v2
    STARTED --> STOPPING: stop()
    STOPPING --> STOPPED: cleanup complete
    STOPPED --> STARTING: restart
-    
-   note right of STARTING 
+
+   note right of STARTING
       Note:
       - Subscribe pool positions
       - Subscribe pool rewards
       - Start reward history tracking
       - Cache validator identities
    end note
-    
-   note right of STOPPING 
+
+   note right of STOPPING
       Note:
       - Unsubscribe all streams
       - Persist pending data
@@ -757,3 +1007,225 @@ stateDiagram-v2
    - Include parameter validation information
    - Describe error conditions and handling
    - Provide usage examples for complex operations
+
+## Pool Hiding Strategies
+
+### Overview
+
+There are two distinct approaches to hide earning pools in the SubWallet Extension, each serving different purposes and implemented at different layers of the application architecture:
+
+1. **Data-Level Hiding**: Implemented in the `EarningService` using `inactivePoolSlug`
+2. **UI-Level Hiding**: Implemented in React components with conditional rendering logic
+
+### Option 1: Data-Level Hiding (`inactivePoolSlug`)
+
+This approach hides pools at the service level, preventing them from appearing in any data streams throughout the application.
+
+#### Implementation Location
+**File**: `/packages/extension-base/src/services/earning-service/service.ts`
+
+#### Core Mechanism
+```typescript
+// In EarningService class
+private inactivePoolSlug: Set<string> = new Set<string>();
+```
+
+#### How It Works
+
+##### 1. Pool Registration for Hiding
+Pools are added to the inactive set during service initialization:
+```typescript
+// Automatic hiding during handler initialization
+if (ahChain) {
+  handlers.push(new RelayNativeStakingPoolHandler(this.state, ahChain));
+  const relaySlug = RelayNativeStakingPoolHandler.generateSlug(symbol, chain);
+  this.inactivePoolSlug.add(relaySlug); // Hide the relay chain pool
+}
+```
+
+##### 2. Database Filtering
+```typescript
+// In getYieldPoolInfoFromDB() method
+private async getYieldPoolInfoFromDB() {
+  const yieldPoolInfo = {} as Record<string, YieldPoolInfo>;
+  const existedYieldPoolInfo = await this.dbService.getYieldPools();
+
+  existedYieldPoolInfo.forEach((info) => {
+    if (!this.inactivePoolSlug.has(info.slug)) {
+      yieldPoolInfo[info.slug] = info;
+    }
+  });
+
+  this.yieldPoolInfoSubject.next(yieldPoolInfo);
+}
+```
+
+##### 3. Online Data Filtering
+```typescript
+// In fetchingPoolsInfoOnline() method
+private async fetchingPoolsInfoOnline() {
+  const onlineData = await fetchPoolsData();
+
+  for (const inactiveSlug of this.inactivePoolSlug) {
+    delete onlineData[inactiveSlug];
+  }
+  // ... rest of the method
+}
+```
+
+#### When to Use Data-Level Hiding
+- **Permanent Pool Deprecation**: When pools should no longer be available system-wide
+- **Chain Conflicts**: When Asset Hub chains replace relay chain functionality
+- **Service-Level Decisions**: When business logic determines pool availability
+- **Cross-Application Consistency**: When pools should be hidden in all UI components
+
+#### Programmatic Control
+```typescript
+// Hide a pool
+this.inactivePoolSlug.add(poolSlug);
+```
+
+#### Impact of Data-Level Hiding
+- **Complete Removal**: Pool disappears from all data streams
+- **No API Access**: Pool won't appear in any service method responses
+- **Consistent Behavior**: All UI components automatically respect the hiding
+- **Existing Positions**: Users can still manage existing positions through direct handler access
+
+---
+
+### Option 2: UI-Level Hiding (Component Logic)
+
+This approach hides pools in specific UI components while keeping them available in the data layer.
+
+#### Implementation Location
+**File**: `/packages/extension-koni-ui/src/Popup/Home/Earning/EarningPools/index.tsx`
+
+#### Core Mechanism
+Conditional filtering in React components before rendering:
+
+```typescript
+const items: YieldPoolInfo[] = useMemo(() => {
+  if (!pools.length) {
+    return [];
+  }
+
+  const result: YieldPoolInfo[] = [];
+
+  pools.forEach((poolInfo) => {
+    // Specific pool exclusions
+    if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+      return; // Hide Parallel liquid staking
+    }
+
+    if (poolInfo.chain === 'interlay' && poolInfo.type === YieldPoolType.LENDING) {
+      return; // Hide Interlay lending
+    }
+
+    // Balance-based hiding for native staking
+    if (poolInfo.type === YieldPoolType.NATIVE_STAKING &&
+        _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain)) {
+
+      let minJoinPool: string;
+      if (poolInfo.statistic && !positionSlugs.includes(poolInfo.slug)) {
+        minJoinPool = poolInfo.statistic.earningThreshold.join;
+      } else {
+        minJoinPool = '0';
+      }
+
+      const nativeAsset = poolInfo?.statistic?.assetEarning
+        .find((item) => item.slug.toLowerCase().includes('native'));
+      const nativeSlug = nativeAsset?.slug;
+      const assetInfo = nativeSlug && assetRegistry[nativeSlug];
+      const minJoinPoolBalanceValue = (assetInfo &&
+        getBalanceValue(minJoinPool, _getAssetDecimals(assetInfo))) || BN_ZERO;
+      const availableBalance = (nativeSlug && tokenBalanceMap[nativeSlug] &&
+        tokenBalanceMap[nativeSlug].free.value) || BN_ZERO;
+
+      // Only show if user has sufficient balance
+      if (availableBalance.isGreaterThanOrEqualTo(minJoinPoolBalanceValue)) {
+        result.push(poolInfo);
+      }
+    } else {
+      result.push(poolInfo);
+    }
+  });
+
+  return result;
+}, [assetRegistry, pools, positionSlugs, tokenBalanceMap]);
+```
+
+#### UI-Level Hiding Patterns
+
+##### 1. **Hard-Coded Exclusions**
+```typescript
+// Exclude specific chain-type combinations
+if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+  return; // Don't include in UI list
+}
+```
+
+##### 2. **Balance-Based Filtering**
+```typescript
+// Hide pools when user lacks sufficient funds
+if (availableBalance.isLessThan(minimumRequiredBalance)) {
+  return; // Don't show to user
+}
+```
+
+##### 3. **Filter-Based Hiding**
+```typescript
+// Component filter functions
+const filterFunction = useMemo<(item: YieldPoolInfo) => boolean>(() => {
+  return (item) => {
+    if (!selectedFilters.length) {
+      return true;
+    }
+
+    for (const filter of selectedFilters) {
+      if (filter === YieldPoolType.NOMINATION_POOL && item.type === YieldPoolType.NOMINATION_POOL) {
+        return true;
+      }
+      // ... other filter conditions
+    }
+
+    return false;
+  };
+}, [selectedFilters]);
+```
+
+#### When to Use UI-Level Hiding
+- **User Experience Optimization**: Hide options that users can't actually use
+- **Balance Requirements**: Don't show pools users can't afford to join
+- **Component-Specific Logic**: Different components may need different pool sets
+- **Dynamic Conditions**: Hiding based on real-time user state
+- **A/B Testing**: Test different pool presentations to different users
+- **Temporary Exclusions**: Short-term hiding without affecting data layer
+
+### Comparison: Data-Level vs UI-Level Hiding
+
+| Aspect | Data-Level (`inactivePoolSlug`) | UI-Level (Component) |
+|--------|--------------------------------|---------------------|
+| **Scope** | Application-wide | Component-specific |
+| **Performance** | Better (filtered early) | Moderate (filtered at render) |
+| **Consistency** | Guaranteed across all UIs | Requires manual implementation |
+| **Flexibility** | Less flexible | Highly flexible |
+| **Data Availability** | Completely unavailable | Available in data layer |
+| **User Context** | Ignores user state | Responsive to user state |
+| **Maintenance** | Central control | Distributed control |
+| **Reversibility** | Requires service restart | Immediate |
+
+### Recommendations
+
+#### Use Data-Level Hiding When:
+- Pool is permanently deprecated
+- Business logic requires global exclusion
+- Pool conflicts with other functionality
+- Consistency across all interfaces is critical
+
+#### Use UI-Level Hiding When:
+- User-specific conditions apply
+- Component has special requirements
+- Temporary or conditional hiding needed
+- User experience optimization is the goal
+
+This dual approach provides maximum flexibility while maintaining clear separation of concerns between business logic (service) and user experience (UI).
