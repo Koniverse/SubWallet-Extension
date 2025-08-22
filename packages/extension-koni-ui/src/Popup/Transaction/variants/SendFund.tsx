@@ -37,7 +37,7 @@ import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
@@ -829,7 +829,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accountAddressItems, disabledToAddressInput, form, fromValue]);
 
   // Get max transfer value
-  useLayoutEffect(() => {
+  useEffect(() => {
     let cancel = false;
 
     // setIsFetchingMaxValue(false);
@@ -884,7 +884,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee
       }, callback)
-        .then((callback))
         .catch((e) => {
           console.error('Error in subscribeMaxTransfer:', e);
 
