@@ -4,21 +4,23 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { GovVoteType, SplitVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, HiddenInput } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon } from '@subwallet/react-ui';
+import { balanceFormatter, Button, Form, formatNumber, Icon } from '@subwallet/react-ui';
+import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -36,69 +38,50 @@ const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
-  const { className = '', isAllAccount, targetAccountProxy } = props;
+  const { className = '' } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
+  const splitRenderKey = 'split_vote_amount';
+  const [splitAmountRenderKey, setSplitAmountRenderKey] = useState<string>(splitRenderKey);
+
   const [loading, setLoading] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
-  const getReformatAddress = useCoreCreateReformatAddress();
-  const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
-  const accountAddressItems = useMemo(() => {
-    const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
+  const { voteMap = new Map<string, ReferendumVoteDetail>(),
+    accountAddressItems = [] }: {
+    voteMap: Map<string, ReferendumVoteDetail>,
+    accountAddressItems: GovAccountAddressItemType[]
+  } = useOutletContext();
 
-    if (!chainInfo) {
-      return [];
+  const voteInfo = useMemo(() => {
+    if (!fromValue) {
+      return undefined;
     }
 
-    const result: AccountAddressItemType[] = [];
+    return voteMap.get(fromValue.toLowerCase());
+  }, [voteMap, fromValue]);
 
-    const updateResult = (ap: AccountProxy) => {
-      ap.accounts.forEach((a) => {
-        const address = getReformatAddress(a, chainInfo);
-
-        if (address) {
-          result.push({
-            accountName: ap.name,
-            accountProxyId: ap.id,
-            accountProxyType: ap.accountType,
-            accountType: a.type,
-            address
-          });
-        }
+  useEffect(() => {
+    if (voteInfo?.isSplit) {
+      form.setFieldsValue({
+        ayeAmount: voteInfo.ayeBalance,
+        nayAmount: voteInfo.nayBalance
       });
-    };
 
-    if (isAccountAll(targetAccountProxy.id)) {
-      accountProxies.forEach((ap) => {
-        if (isAccountAll(ap.id)) {
-          return;
-        }
-
-        if ([AccountProxyType.READ_ONLY].includes(ap.accountType)) {
-          return;
-        }
-
-        updateResult(ap);
-      });
-    } else {
-      updateResult(targetAccountProxy);
+      setSplitAmountRenderKey(`${splitAmountRenderKey}_${Date.now()}`);
     }
-
-    return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
-
+  }, [voteInfo, form, splitAmountRenderKey]);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
 
@@ -203,6 +186,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             name={'from'}
           >
             <AccountAddressSelector
+              isGovModal={true}
               items={accountAddressItems}
               label={`${t('From')}:`}
               labelStyle={'horizontal'}
@@ -214,6 +198,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           >
             <GovAmountInput
               decimals={_getAssetDecimals(assetInfo)}
+              key={splitAmountRenderKey}
               label={t('Aye amount')}
               logoKey={assetInfo.slug.toLowerCase()}
               tokenSymbol={_getAssetSymbol(assetInfo)}
@@ -226,6 +211,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           >
             <GovAmountInput
               decimals={_getAssetDecimals(assetInfo)}
+              key={splitAmountRenderKey}
               label={t('Nay amount')}
               logoKey={assetInfo.slug.toLowerCase()}
               tokenSymbol={_getAssetSymbol(assetInfo)}
@@ -233,6 +219,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             />
           </Form.Item>
         </Form>
+        {voteInfo?.isSplit && (
+          <div className='mt-2 text-sm text-gray-500'>
+            {t('Already voted')}:
+            ({t('Aye')}: {formatNumber(voteInfo.ayeBalance || '0', _getAssetDecimals(assetInfo), balanceFormatter)} {assetInfo.symbol})
+            ({t('Nay')}:{formatNumber(voteInfo.nayBalance || '0', _getAssetDecimals(assetInfo), balanceFormatter)} {assetInfo.symbol})
+          </div>
+        )}
       </TransactionContent>
 
       <TransactionFooter className={`${className} -transaction-footer`}>

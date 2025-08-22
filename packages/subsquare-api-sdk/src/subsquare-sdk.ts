@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaResponse, ReferendumDetail, ReferendumVote } from './interface';
+import { ReferendaQueryParams, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, UserVotesParams } from './interface';
 import { gov2ReferendumsApi } from './url';
 
 export class SubsquareApiSdk {
@@ -12,7 +12,7 @@ export class SubsquareApiSdk {
 
   private constructor (chain: string) {
     this.client = axios.create({
-      baseURL: `https://${chain}-api.subsquare.io/` || 'https://polkadot-api.subsquare.io/'
+      baseURL: `https://${chain}-api.subsquare.io` || 'https://polkadot-api.subsquare.io'
     });
   }
 
@@ -41,11 +41,20 @@ export class SubsquareApiSdk {
     return referendaRes.data;
   }
 
-  async getReferendaVotes (id: string): Promise<ReferendumVote[]> {
-    const referendaVoteRes = await this.client.get<ReferendumVote[]>(
+  async getReferendaVotes (id: string): Promise<ReferendumVoteDetail[]> {
+    const referendaVoteRes = await this.client.get<ReferendumVoteDetail[]>(
       gov2ReferendumsApi + `/${id}/votes`
     );
 
     return referendaVoteRes.data;
+  }
+
+  async getUserVotes (address: string, params: UserVotesParams): Promise<ReferendumVoteDetail[]> {
+    const userVoteRes = await this.client.get<ReferendumVoteDetail[]>(
+      `/users/${address}/votes`,
+      { params }
+    );
+
+    return userVoteRes.data;
   }
 }

@@ -231,9 +231,15 @@ export interface ReferendaQueryParams {
   simple?: boolean;
 }
 
+export interface UserVotesParams {
+  page?: number;
+  page_size?: number;
+  includes_title?: number;
+}
+
 /* ReferendumVote */
 
-export interface ReferendumVote {
+export interface ReferendumVoteDetail {
   referendumIndex: number;
   account: string;
   isDelegating: boolean;
@@ -241,10 +247,16 @@ export interface ReferendumVote {
   isSplit: boolean;
   isSplitAbstain: boolean;
   balance: string;
-  aye: boolean;
+  aye?: boolean;
   conviction: number;
   votes: string;
-  delegations: {
+  abstainBalance?: string,
+  abstainVotes?: string,
+  ayeBalance?: string,
+  ayeVotes?: string,
+  nayBalance?: string,
+  nayVotes?: string,
+  delegations?: {
     votes: string;
     capital: string;
   };
