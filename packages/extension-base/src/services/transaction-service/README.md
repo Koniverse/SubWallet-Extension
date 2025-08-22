@@ -384,6 +384,8 @@ sequenceDiagram
 
 4. **Memory Management**: Long-running processes may accumulate in memory without proper cleanup mechanisms.
 
+5. **One-Sign Process Limitations**: The one-sign feature for multi-step processes requires PASSWORD account authentication mode and must be enabled in settings at [`Extension.ts:4976`](../../koni/background/handlers/Extension.ts#L4976). It only works with processes having 3 or more steps (because first step is empty) to optimize user experience for complex multi-step operations like cross-chain swapping and yield farming.
+
 ### Future Improvements
 
 1. **Dynamic Timeout Management**: Implement network-aware timeout adjustments based on historical confirmation times.
@@ -412,6 +414,35 @@ The service supports these extrinsic types:
 - **Universal Fee Payment**: Multi-asset fee payment on supported chains
 - **Network Switching**: Automatic network detection and switching
 - **Address Formatting**: Chain-specific address format handling
+
+### One-Sign Multi-Step Process
+
+The transaction service supports automatic signing for multi-step processes through the **One-Sign** feature, designed to streamline complex operations without requiring manual confirmation for each transaction step.
+
+#### Requirements
+- **Account Type**: Only available for PASSWORD authentication mode accounts (checked at [`Extension.ts:4969`](../../koni/background/handlers/Extension.ts#L4969))
+- **Setting Enabled**: User must enable "Allow One Sign" in security settings (default: `true` from [`constants.ts`](../setting-service/constants.ts))
+- **Minimum Steps**: Process must have 3 or more steps (because first step is empty) to qualify for one-sign automation (validated at [`Extension.ts:5053`](../../koni/background/handlers/Extension.ts#L5053))
+
+#### Supported Process Types
+- **SWAP**: Multi-step token swapping with automatic XCM transfers and approvals
+- **EARNING**: Cross-chain yield farming operations requiring token transfers and staking
+
+#### Process Flow
+1. **Initial Validation**: Verify account compatibility and settings at [`Extension.ts:4960-4978`](../../koni/background/handlers/Extension.ts#L4960-4978)
+2. **Automatic Step Execution**: Sequential transaction submission without user prompts
+3. **XCM Wait Logic**: Automatic waiting for cross-chain transfers to complete before next step (60-second timeout or balance confirmation)
+4. **Error Propagation**: Any step failure stops the entire process and returns errors
+
+#### Technical Implementation
+- **Entry Point**: `handleSubmitProcessTransaction()` method at [`Extension.ts:4959`](../../koni/background/handlers/Extension.ts#L4959)
+- **Loop Logic**: Recursive step execution with balance monitoring for XCM operations
+- **Process Management**: Integration with [`TransactionService.createProcessIfNeed()`](./index.ts#L1367) for state tracking
+
+#### User Experience Benefits
+- **Reduced Friction**: Eliminates repetitive signing for complex operations
+- **Time Efficiency**: Automatic execution with intelligent waiting for cross-chain confirmations
+- **Transparent Progress**: Real-time step status updates through process subscription
 
 ### Integration Points
 
