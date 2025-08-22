@@ -12,7 +12,7 @@ import { useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useS
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { balanceFormatter, ButtonProps, Form, formatNumber } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
@@ -37,7 +37,6 @@ type ComponentProps = {
 const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  // @ts-ignore
   const { className = '' } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
@@ -53,6 +52,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [loading, setLoading] = useState(false);
   const [isDisable, setIsDisable] = useState(true);
   const [voteType, setVoteType] = useState<GovVoteType | null>(null);
+
+  const [initialAccountType, setInitialAccountType] = useState<GovVoteStatus | null>(null);
+
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -92,7 +94,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    console.log('Hmm', [values, empty, error]);
     setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
@@ -146,7 +147,58 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     navigate('/transaction/gov-ref-vote/abstain');
   }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
 
+  const getAccountVoteStatus = useCallback((address: string): GovVoteStatus => {
+    const voteDetail = voteMap.get(address.toLowerCase());
+
+    if (!voteDetail) {
+      return GovVoteStatus.NOT_VOTED;
+    }
+
+    return voteDetail.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED;
+  }, [voteMap]);
+
+  // Filter accounts based on initial account type
+  const filteredAccountItems = useMemo(() => {
+    if (!initialAccountType || !accountAddressItems.length) {
+      return accountAddressItems;
+    }
+
+    return accountAddressItems.filter((item) => {
+      const status = getAccountVoteStatus(item.address);
+
+      return status === initialAccountType;
+    });
+  }, [accountAddressItems, initialAccountType, getAccountVoteStatus]);
+
+  // Determine current vote status for title
+  const currentVoteStatus = useMemo(() => {
+    if (!fromValue) {
+      return null;
+    }
+
+    return getAccountVoteStatus(fromValue);
+  }, [fromValue, getAccountVoteStatus]);
+
+  const screenTitle = useMemo(() => {
+    let action = 'Vote';
+
+    if (currentVoteStatus === GovVoteStatus.VOTED) {
+      action = 'Revote';
+    }
+
+    return t('{{action}} for #{{referendumId}}', {
+      replace: {
+        action,
+        referendumId: referendumId
+      }
+    });
+  }, [currentVoteStatus, referendumId, t]);
+
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
+    if (currentVoteStatus !== GovVoteStatus.VOTED) {
+      return [];
+    }
+
     return [
       {
         children: t('Unvote'),
@@ -162,7 +214,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         }
       }
     ];
-  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefUnvoteStorage, t]);
+  }, [currentVoteStatus, t, setGovRefUnvoteStorage, defaultData.fromAccountProxy, defaultData.track, defaultData.chain, referendumId, navigate]);
 
   const voteInfo = useMemo(() => {
     if (!fromValue) {
@@ -184,12 +236,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [voteInfo, form]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Vote for #{{referendumId}}', { replace: { referendumId: referendumId } }));
+    setCustomScreenTitle(screenTitle);
 
     return () => {
       setCustomScreenTitle(undefined);
     };
-  }, [referendumId, setCustomScreenTitle, t]);
+  }, [screenTitle, setCustomScreenTitle]);
 
   useEffect(() => {
     setSubHeaderRightButtons(subHeaderButtons);
@@ -206,18 +258,29 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       }
 
       if (accountAddressItems.length === 1) {
-        if (!fromValue || accountAddressItems[0].address !== fromValue) {
-          form.setFieldValue('from', accountAddressItems[0].address);
+        const singleAccount = accountAddressItems[0];
+
+        if (!fromValue || singleAccount.address !== fromValue) {
+          form.setFieldValue('from', singleAccount.address);
+
+          const status = getAccountVoteStatus(singleAccount.address);
+
+          setInitialAccountType(status);
         }
       } else {
         if (fromValue && !accountAddressItems.some((i) => i.address === fromValue)) {
           form.setFieldValue('from', '');
+          setInitialAccountType(null);
+        } else if (fromValue && !initialAccountType) {
+          const status = getAccountVoteStatus(fromValue);
+
+          setInitialAccountType(status);
         }
       }
     };
 
     updateFromValue();
-  }, [accountAddressItems, form, fromValue]);
+  }, [accountAddressItems, form, fromValue, getAccountVoteStatus, initialAccountType]);
 
   return (
     <>
@@ -236,7 +299,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           >
             <AccountAddressSelector
               isGovModal={true}
-              items={accountAddressItems}
+              items={filteredAccountItems}
               label={`${t('From')}:`}
               labelStyle={'horizontal'}
             />

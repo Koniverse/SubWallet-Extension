@@ -6,6 +6,7 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
+import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
   }, [goOverview]);
 
   const { data } = useQuery({
-    queryKey: ['subsquare', 'referendumDetail', chainSlug, referendumId],
+    queryKey: GOV_QUERY_KEYS.referendumDetail(chainSlug, referendumId),
     queryFn: async () => {
       if (!referendumId) {
         return undefined;

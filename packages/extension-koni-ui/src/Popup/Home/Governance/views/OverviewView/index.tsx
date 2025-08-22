@@ -5,6 +5,7 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk/interface';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -32,7 +33,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
   }, [goReferendumDetail]);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['subsquare', 'referendaList', chainSlug],
+    queryKey: GOV_QUERY_KEYS.referendaList(chainSlug),
     queryFn: async ({ pageParam }) => {
       return await sdkInstant?.getReferenda({ page: pageParam, page_size: 20 });
     },
@@ -80,7 +81,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
         selectedReferendaCategory={selectedReferendaCategory}
       />
 
-      {hasNextPage && (
+      {hasNextPage && selectedReferendaCategory !== ReferendaCategory.VOTED && (
         <div style={{ textAlign: 'center', marginTop: '16px' }}>
           <Button
             disabled={isFetchingNextPage}

@@ -1,15 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelectModalInputHelper, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Field, Icon, InputRef, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
+import React, { ForwardedRef, forwardRef, useCallback, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { AccountSelectorModal } from '../Modal';
@@ -40,6 +42,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
 
   const onOpenModal = useCallback(() => {
     if (disabled || readOnly) {
@@ -53,7 +56,29 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     inactiveModal(id);
   }, [id, inactiveModal]);
 
-  const onSelectItem = useCallback((item: AccountAddressItemType) => {
+  const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
+    if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
+      openAlert({
+        title: t('Unable to vote'),
+        type: NotificationType.ERROR,
+        content: t(
+          'You\'re delegating votes for the referendum\'s track with account named "{{name}}". Ask your delegatee to vote or remove your delegated votes, then try again',
+          { name: item.accountName }
+        ),
+        okButton: {
+          text: t('I understand'),
+          onClick: closeAlert
+        }
+      });
+
+      return;
+    }
+
+    onSelect(item.address);
+    onCancelModal();
+  }, [closeAlert, onCancelModal, onSelect, openAlert, t]);
+
+  const onSelectRegularItem = useCallback((item: AccountAddressItemType) => {
     onSelect(item.address);
     onCancelModal();
   }, [onCancelModal, onSelect]);
@@ -94,6 +119,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     );
   }, []);
 
+  useEffect(() => {
+    if (isGovModal && !value && items.length > 0 && !disabled && !readOnly) {
+      activeModal(id);
+    }
+  }, [isGovModal, value, items.length, disabled, readOnly, activeModal, id]);
+
   return (
     <>
       <div
@@ -122,7 +153,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
             items={items}
             modalId={id}
             onCancel={onCancelModal}
-            onSelectItem={onSelectItem}
+            onSelectItem={onSelectGovItem}
             selectedValue={value}
           />
         )
@@ -132,7 +163,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
             items={items}
             modalId={id}
             onCancel={onCancelModal}
-            onSelectItem={onSelectItem}
+            onSelectItem={onSelectRegularItem}
             selectedValue={value}
           />
         )}

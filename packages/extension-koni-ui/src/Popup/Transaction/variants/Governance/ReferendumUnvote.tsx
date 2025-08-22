@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
@@ -10,10 +9,16 @@ import { AccountAddressSelector, HiddenInput } from '@subwallet/extension-koni-u
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
+import { chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button, Form, Icon } from '@subwallet/react-ui';
+import getSubsquareApi, { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
+import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,6 +26,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+import { chain } from '@polkadot/types/interfaces/definitions';
 
 import { TransactionContent, TransactionFooter } from '../../parts';
 
@@ -35,19 +42,19 @@ type ComponentProps = {
 const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendumId'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  // @ts-ignore
-  const { className = '', isAllAccount, targetAccountProxy } = props;
+  const { className = '', targetAccountProxy } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumUnvoteParams => ({ ...defaultData }), [defaultData]);
-  const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumUnvoteParams>();
   const [loading, setLoading] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
+  const referendumId = defaultData.referendumId;
+
   const getReformatAddress = useCoreCreateReformatAddress();
   const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
@@ -56,27 +63,67 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
+  const sdkInstant: SubsquareApiSdk = useMemo(() => {
+    return getSubsquareApi(chainSlugToSubsquareNetwork[chainValue]);
+  }, [chainValue]);
+
+  const { data: voteData } = useQuery({
+    queryKey: GOV_QUERY_KEYS.referendumVotes(chainValue, referendumId),
+    queryFn: async () => {
+      if (!referendumId) {
+        return undefined;
+      }
+
+      return await sdkInstant?.getReferendaVotes(`${referendumId}`);
+    },
+    enabled: !!referendumId && !!chain,
+    staleTime: 60 * 1000
+  });
+
+  const voteMap = useMemo(() => {
+    if (!voteData) {
+      return new Map<string, ReferendumVoteDetail>();
+    }
+
+    const map = new Map<string, ReferendumVoteDetail>();
+
+    voteData.forEach((vote: ReferendumVoteDetail) => {
+      map.set(vote.account.toLowerCase(), vote);
+    });
+
+    return map;
+  }, [voteData]);
+
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
 
-    if (!chainInfo) {
+    if (!chainInfo || !targetAccountProxy) {
       return [];
     }
 
-    const result: AccountAddressItemType[] = [];
+    const result: GovAccountAddressItemType[] = [];
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
         const address = getReformatAddress(a, chainInfo);
 
         if (address) {
-          result.push({
-            accountName: ap.name,
-            accountProxyId: ap.id,
-            accountProxyType: ap.accountType,
-            accountType: a.type,
-            address
-          });
+          const voteInfo = voteMap.get(address.toLowerCase());
+
+          const govVoteStatus = voteInfo
+            ? (voteInfo.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED)
+            : GovVoteStatus.NOT_VOTED;
+
+          if (govVoteStatus === GovVoteStatus.VOTED) {
+            result.push({
+              accountName: ap.name,
+              accountProxyId: ap.id,
+              accountProxyType: ap.accountType,
+              accountType: a.type,
+              address,
+              govVoteStatus
+            });
+          }
         }
       });
     };
@@ -98,14 +145,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     }
 
     return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
-
-  // @ts-ignore
-  const assetInfo = useMemo(() => {
-    const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
-
-    return assetRegistry[assetSlug];
-  }, [assetRegistry, chainInfoMap, defaultData.chain]);
+  }, [chainValue, chainInfoMap, targetAccountProxy, getReformatAddress, voteMap, accountProxies]);
 
   const onFieldsChange: FormCallbacks<GovReferendumUnvoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
@@ -122,7 +162,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     const voteRequest: RemoveVoteRequest = {
       chain: chainValue,
       address: values.from,
-      referendumIndex: defaultData.referendumId,
+      referendumIndex: referendumId,
       trackId: defaultData.track
     };
 
@@ -132,25 +172,25 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       })
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess]);
+  }, [chainValue, referendumId, defaultData.track, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
       fromAccountProxy: defaultData.fromAccountProxy,
-      referendumId: defaultData.referendumId,
+      referendumId: referendumId,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-vote/standard');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, navigate, setGovRefVoteStorage]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Unvote for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
+    setCustomScreenTitle(t('Unvote for #{{referendumId}}', { replace: { referendumId: referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
     };
-  }, [defaultData.referendumId, setCustomScreenTitle, t]);
+  }, [referendumId, setCustomScreenTitle, t]);
 
   useEffect(() => {
     setBackProps((prev) => ({

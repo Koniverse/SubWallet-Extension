@@ -8,6 +8,7 @@ import { chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
+import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import getSubsquareApi, { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
 import { useQuery } from '@tanstack/react-query';
@@ -47,7 +48,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [chain]);
 
   const { data: voteData } = useQuery({
-    queryKey: ['subsquare', 'referendumDetail', 'votes', chain, referendumId],
+    queryKey: GOV_QUERY_KEYS.referendumVotes(chain, referendumId),
     queryFn: async () => {
       if (!referendumId) {
         return undefined;
