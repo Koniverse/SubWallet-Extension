@@ -13,6 +13,7 @@ export interface RequestSubscribeTransfer extends TransactionFee {
   value: string;
   token: string;
   destChain: string;
+  transferAll?: boolean;
 }
 
 export interface ResponseSubscribeTransfer {

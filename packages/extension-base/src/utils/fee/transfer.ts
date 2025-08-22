@@ -23,7 +23,7 @@ import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } 
 import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
-import { EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
+import { EvmEIP1559FeeDetail, EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
@@ -54,6 +54,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   isTransferLocalTokenAndPayThatTokenAsFee: boolean;
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
+  transferAll?: boolean;
 }
 
 export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo, destChain: _ChainInfo): FeeChainType => {
@@ -106,7 +107,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, value } = request;
+  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, transferAll, value } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
@@ -190,7 +191,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       });
     } else {
       [transaction] = await createSubstrateExtrinsic({
-        transferAll: false,
+        transferAll: !!transferAll,
         value,
         from: address,
         networkKey: srcChain.slug,
@@ -554,4 +555,19 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     id: id,
     error
   };
+};
+
+export const isEvmEIP1559FeeDetail = (
+  fee: FeeDetail | undefined
+): fee is EvmEIP1559FeeDetail => {
+  return (
+    !!fee &&
+    fee.type === 'evm' &&
+    'baseGasFee' in fee &&
+    typeof fee.baseGasFee === 'string' &&
+    'options' in fee &&
+    !!fee.options &&
+    typeof fee.options === 'object' &&
+    fee.gasPrice === undefined
+  );
 };
