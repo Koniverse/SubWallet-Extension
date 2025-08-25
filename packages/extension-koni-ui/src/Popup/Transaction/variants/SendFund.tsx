@@ -94,6 +94,7 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
 const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug'];
 const alertModalId = 'confirmation-alert-modal';
 const defaultAddressInputRenderKey = 'address-input-render-key';
+const defaultAmountInputRenderKey = 'amount-input-render-key';
 
 const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
 
@@ -170,10 +171,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   // use this to reinit AddressInput component
   const [addressInputRenderKey, setAddressInputRenderKey] = useState<string>(defaultAddressInputRenderKey);
+  const [amountInputRenderKey, setAmountInputRenderKey] = useState<string>(defaultAmountInputRenderKey);
 
   const [, update] = useState({});
   const [isBalanceReady, setIsBalanceReady] = useState(true);
-  const [forceUpdateMaxValue, setForceUpdateMaxValue] = useState<object|undefined>(undefined);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
@@ -184,7 +185,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const handleWarning = useCallback((warnings: TransactionWarning[]) => {
     if (warnings.some((w) => w.warningType === BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT)) {
-      setForceUpdateMaxValue({});
       setIsTransferAll(true);
     }
   }, []);
@@ -440,7 +440,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
         setIsTransferAll(false);
-        setForceUpdateMaxValue(undefined);
         setSelectedTransactionFee(undefined);
         setCurrentTokenPayFee(values.chain === chain ? defaultTokenPayFee : undefined);
         setTransferInfo(undefined);
@@ -465,14 +464,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setSelectedTransactionFee(undefined);
       }
 
-      if (part.from || part.destChain) {
-        setForceUpdateMaxValue(isTransferAll ? {} : undefined);
-      }
-
-      if (part.value && isTransferAll) {
-        setForceUpdateMaxValue(undefined);
-      }
-
       if (part.to) {
         form.setFields([
           {
@@ -488,7 +479,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [defaultTokenPayFee, persistData, form, assetRegistry, isTransferAll]
+    [defaultTokenPayFee, persistData, form, assetRegistry]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -852,18 +843,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       if (!cancel) {
         setTransferInfo(transferInfo);
 
-        if (isTransferAll && !!transferInfo?.maxTransferable) {
-          const bnMaxTransfer = new BN(transferInfo.maxTransferable);
-          const currentFormValue = form.getFieldValue('value') as string;
-          const isNeedUpdateMax = !bnMaxTransfer.eq(new BN(currentFormValue));
-
-          if (isNeedUpdateMax) {
-            setForceUpdateMaxValue({});
-
-            form.setFieldsValue({ value: bnMaxTransfer.toString() });
-          }
-        }
-
         id = transferInfo.id;
 
         validate();
@@ -884,6 +863,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee
       }, callback)
+        // .then((callback))
         .catch((e) => {
           console.error('Error in subscribeMaxTransfer:', e);
 
@@ -899,7 +879,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
+
+  useEffect(() => {
+    if (isTransferAll && transferInfo?.maxTransferable) {
+      form.setFieldsValue({
+        value: transferInfo?.maxTransferable
+      });
+      setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+    }
+  }, [form, isTransferAll, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1100,7 +1089,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             <AmountInput
               decimals={decimals}
               disabled={decimals === 0}
-              forceUpdateMaxValue={forceUpdateMaxValue}
+              key={amountInputRenderKey}
               maxValue={transferInfo?.maxTransferable || '0'}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
