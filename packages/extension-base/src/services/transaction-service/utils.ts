@@ -22,6 +22,26 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('edgscan.ink')) {
+    return 'accounts';
+  }
+
+  if (explorerLink.includes('devnet-explorer.mosaicchain.io')) {
+    return 'accounts';
+  }
+
+  if (explorerLink.includes('statescan.io')) {
+    return '#/accounts';
+  }
+
+  if (explorerLink.includes('explorer.joystream.org')) {
+    return '#/accounts';
+  }
+
+  if (explorerLink.includes('explorer.gen6.app')) {
+    return '#/accounts';
+  }
+
   if (explorerLink.includes('deeperscan.io')) {
     return 'account';
   }
@@ -34,28 +54,20 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'account';
   }
 
-  if (explorerLink.includes('statescan.io')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('explorer.gen6.app')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('astral.autonomys')) {
-    return 'accounts';
+  if (explorerLink.includes('main.dentnet.io')) {
+    return 'account';
   }
 
   if (explorerLink.includes('taostats.io')) {
     return 'account';
   }
 
-  if (explorerLink.includes('tonviewer.com')) {
-    return '';
+  if (explorerLink.includes('uniquescan.io')) {
+    return 'account';
   }
 
-  if (explorerLink.includes('devnet-explorer.mosaicchain.io')) {
-    return 'accounts';
+  if (explorerLink.includes('tonviewer.com')) {
+    return '';
   }
 
   if (explorerLink.includes('pdexmon.com')) {
@@ -70,7 +82,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'tx';
   }
 
-  if (['moonbeam'].includes(chainInfo.slug)) {
+  if (['moonbeam', 'crabParachain'].includes(chainInfo.slug)) {
     return 'tx';
   }
 
@@ -82,16 +94,16 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['gen6_public'].includes(chainInfo.slug)) {
+  if (['gen6_public', 'joystream'].includes(chainInfo.slug)) {
     return '#/extrinsics';
+  }
+
+  if (['edgeware'].includes(chainInfo.slug)) {
+    return 'extrinsics';
   }
 
   if (['mosaicTest', 'polkadex'].includes(chainInfo.slug)) {
     return 'transactions';
-  }
-
-  if (['autonomys'].includes(chainInfo.slug)) {
-    return 'extrinsics';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
