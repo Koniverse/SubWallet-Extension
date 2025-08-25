@@ -863,7 +863,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee
       }, callback)
-        // .then((callback))
+        .then((callback))
         .catch((e) => {
           console.error('Error in subscribeMaxTransfer:', e);
 
