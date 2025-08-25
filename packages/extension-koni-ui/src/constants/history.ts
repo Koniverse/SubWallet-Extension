@@ -22,6 +22,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.MINT_STDOT]: detectTranslate('Mint stDOT'),
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('Unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('Unstake'),
+  [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('Nominate'),
   [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('Join pool'),
   [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('Unstake vDOT'),
   [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('Unstake vMANTA'),
@@ -54,6 +55,7 @@ export const StakingTypeNameMap: Record<string, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('Unstake'),
   [ExtrinsicType.STAKING_BOND]: detectTranslate('Stake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('Unstake'),
+  [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('Nominate'),
   [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('Withdraw'),
   [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('Compounding')
 };

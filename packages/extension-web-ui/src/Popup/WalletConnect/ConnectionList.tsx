@@ -4,16 +4,16 @@
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { ConnectionItem, EmptyList, Layout, PageWrapper, WalletConnect } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
-import { WALLET_CONNECT_LIST_MODAL } from '@subwallet/extension-web-ui/constants';
+import { TIME_OUT_RECORD, WALLET_CONNECT_LIST_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon, SwList } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import { SwModalProps } from '@subwallet/react-ui/es/sw-modal/SwModal';
 import { SessionTypes } from '@walletconnect/types';
 import CN from 'classnames';
 import { GlobeHemisphereWest } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -28,6 +28,9 @@ type Props = ThemeProps & {
   onAdd?: () => void
 };
 
+const timeOutWCMissingKey = 'unsuccessful_connect_wc_modal';
+const wcMissingModalId = 'WALLET_CONNECT_CONFIRM_MODAL';
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, isModal,
     modalProps,
@@ -39,7 +42,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const dataContext = useContext(DataContext);
 
   const { sessions } = useSelector((state) => state.walletConnect);
-
+  const { inactiveModal } = useContext(ModalContext);
   const items = useMemo(() => Object.values(sessions), [sessions]);
 
   const goBack = useCallback(() => {
@@ -96,6 +99,15 @@ const Component: React.FC<Props> = (props: Props) => {
       name.toLowerCase().includes(searchTextLowerCase)
     );
   }, []);
+
+  useEffect(() => {
+    const timeOut = JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
+
+    inactiveModal(wcMissingModalId);
+    clearTimeout(timeOut[timeOutWCMissingKey]);
+    delete timeOut[timeOutWCMissingKey];
+    localStorage.setItem(TIME_OUT_RECORD, JSON.stringify(timeOut));
+  }, [inactiveModal]);
 
   if (isModal) {
     return (

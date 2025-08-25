@@ -22,7 +22,7 @@ export const HomeContext = React.createContext<HomeContextType>({
   },
   tokenGroupStructure: {
     tokenGroupMap: {},
-    sortedTokenGroups: [],
-    sortedTokenSlugs: []
+    tokenGroups: [],
+    tokenSlugs: []
   }
 });

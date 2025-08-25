@@ -7,7 +7,7 @@ import { AccountChainType } from '@subwallet/extension-base/types';
 import { AddNetworkWCModal, AlertBox, ConfirmationGeneralInfo, WCAccountSelect, WCNetworkSelected } from '@subwallet/extension-web-ui/components';
 import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Account/SeedPhraseModal';
 import WCNetworkSupported from '@subwallet/extension-web-ui/components/WalletConnect/Network/WCNetworkSupported';
-import { ADD_NETWORK_WALLET_CONNECT_MODAL, DEFAULT_ACCOUNT_TYPES, SELECTED_ACCOUNT_TYPE, WALLET_CONNECT_CREATE_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ADD_NETWORK_WALLET_CONNECT_MODAL, DEFAULT_ACCOUNT_TYPES, SELECTED_ACCOUNT_TYPE, TIME_OUT_RECORD, WALLET_CONNECT_CREATE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useNotification, useSelectWalletConnectAccount } from '@subwallet/extension-web-ui/hooks';
 import { approveWalletConnectSession, rejectWalletConnectSession } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -38,14 +38,17 @@ async function handleCancel ({ id }: WalletConnectSessionRequest) {
   });
 }
 
+const confirmConnectModalId = WALLET_CONNECT_CREATE_MODAL;
 const createMissingAccountModalId = 'createMissingAccountModalId';
+const timeOutWCMissingKey = 'unsuccessful_connect_wc_modal';
+const wcMissingModalId = 'WALLET_CONNECT_CONFIRM_MODAL';
 
 function Component ({ className, request }: Props) {
   const { params } = request.request;
 
   const { t } = useTranslation();
   const notification = useNotification();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const [, setMissingAccountTypes] = useLocalStorage(SELECTED_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES);
   const [blockAddNetwork, setBlockAddNetwork] = useState(false);
   const [networkNeedToImport, setNetworkNeedToImport] = useState<string[]>([]);
@@ -54,6 +57,15 @@ function Component ({ className, request }: Props) {
     [AccountChainType.ETHEREUM]: t('EVM accounts'),
     [AccountChainType.SUBSTRATE]: t('Substrate accounts')
   }), [t]);
+
+  useEffect(() => {
+    const timeOut = JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
+
+    inactiveModal(wcMissingModalId);
+    clearTimeout(timeOut[timeOutWCMissingKey]);
+    delete timeOut[timeOutWCMissingKey];
+    localStorage.setItem(TIME_OUT_RECORD, JSON.stringify(timeOut));
+  }, [inactiveModal]);
 
   const { isExitedAnotherUnsupportedNamespace,
     isExpired,
@@ -120,20 +132,23 @@ function Component ({ className, request }: Props) {
 
   const onCancel = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     handleCancel(request).finally(() => {
       setLoading(false);
     });
-  }, [request]);
+  }, [inactiveModal, request]);
 
   const onCancelForAddNetworkModal = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     handleCancel(request).finally(() => {
       setLoading(false);
       activeModal(WALLET_CONNECT_CREATE_MODAL);
     });
-  }, [activeModal, request]);
+  }, [activeModal, inactiveModal, request]);
   const onConfirm = useCallback(() => {
     setLoading(true);
+    inactiveModal(confirmConnectModalId);
     const selectedAccounts = Object.values(namespaceAccounts)
       .flatMap(({ appliedAccounts, networks }) => {
         return networks.flatMap(({ wcChain }) => appliedAccounts.map((address) => `${wcChain}:${address}`));
@@ -150,7 +165,7 @@ function Component ({ className, request }: Props) {
       .finally(() => {
         setLoading(false);
       });
-  }, [namespaceAccounts, notification, request]);
+  }, [inactiveModal, namespaceAccounts, notification, request]);
 
   const onAddAccount = useCallback(() => {
     setMissingAccountTypes(convertKeyTypes(missingType));

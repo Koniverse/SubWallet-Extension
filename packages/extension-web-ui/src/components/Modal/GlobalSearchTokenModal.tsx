@@ -4,8 +4,9 @@
 import { BaseModal, TokenBalanceSelectionItem, TokenEmptyList } from '@subwallet/extension-web-ui/components';
 import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-web-ui/hooks/assets';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountBalanceHookType, ThemeProps, TokenBalanceItemType, TokenGroupHookType } from '@subwallet/extension-web-ui/types';
-import { sortTokenByValue } from '@subwallet/extension-web-ui/utils';
+import { sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import { SwList } from '@subwallet/react-ui';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,15 +16,15 @@ type Props = ThemeProps & {
   id: string,
   onCancel: () => void,
   tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  sortedTokenSlugs: TokenGroupHookType['sortedTokenSlugs'],
+  tokenSlugs: TokenGroupHookType['tokenSlugs'],
 }
 
 function getTokenBalances (
   tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  sortedTokenSlugs: TokenGroupHookType['sortedTokenSlugs']): TokenBalanceItemType[] {
+  tokenSlugs: TokenGroupHookType['tokenSlugs']): TokenBalanceItemType[] {
   const result: TokenBalanceItemType[] = [];
 
-  sortedTokenSlugs.forEach((tokenSlug) => {
+  tokenSlugs.forEach((tokenSlug) => {
     if (tokenBalanceMap[tokenSlug]) {
       result.push(tokenBalanceMap[tokenSlug]);
     }
@@ -32,17 +33,22 @@ function getTokenBalances (
   return result;
 }
 
-function Component ({ className = '', id, onCancel, sortedTokenSlugs, tokenBalanceMap }: Props): React.ReactElement<Props> {
+function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const assetRegistry = useChainAssets({ isActive: true }).chainAssetRegistry;
+  const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
 
   const tokenBalances = useMemo<TokenBalanceItemType[]>(() => {
-    return getTokenBalances(tokenBalanceMap, sortedTokenSlugs).sort(sortTokenByValue);
-  }, [tokenBalanceMap, sortedTokenSlugs]);
+    const result = getTokenBalances(tokenBalanceMap, tokenSlugs);
+
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
+    return result;
+  }, [tokenBalanceMap, tokenSlugs, priorityTokens]);
 
   const onClickItem = useCallback((item: TokenBalanceItemType) => {
     return () => {

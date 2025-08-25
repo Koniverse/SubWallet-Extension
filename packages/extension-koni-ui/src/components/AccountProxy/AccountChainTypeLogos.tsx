@@ -24,7 +24,7 @@ function Component ({ chainTypes, className }: Props): React.ReactElement<Props>
 
     result.sort((a, b) => ACCOUNT_CHAIN_TYPE_ORDINAL_MAP[a] - ACCOUNT_CHAIN_TYPE_ORDINAL_MAP[b]);
 
-    return result;
+    return Array.from(new Set(result));
   }, [chainTypes]);
 
   return (
@@ -57,7 +57,7 @@ const AccountChainTypeLogos = styled(Component)<Props>(({ theme: { token } }: Pr
     },
 
     '.__chain-type-logo + .__chain-type-logo': {
-      marginLeft: -token.marginXXS
+      marginLeft: -6
     }
   };
 });

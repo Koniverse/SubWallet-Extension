@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-web-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_CLAIM_BRIDGE, TRANSACTION_TITLE_MAP, TRANSACTION_TRANSFER_MODAL, TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL, TRANSACTION_YIELD_CLAIM_MODAL, TRANSACTION_YIELD_FAST_WITHDRAW_MODAL, TRANSACTION_YIELD_UNSTAKE_MODAL, TRANSACTION_YIELD_WITHDRAW_MODAL, TRANSFER_NFT_MODAL, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-web-ui/contexts/TransactionContext';
@@ -22,8 +22,8 @@ import { useLocalStorage } from 'usehooks-ts';
 
 interface Props extends ThemeProps {
   title?: string;
-  children?: React.ReactElement;
-  transactionType?: string;
+  transactionType?: ExtrinsicType;
+  children?: React.ReactNode;
   modalContent?: boolean;
   modalId?: string;
   onDoneCallback?: VoidFunction;
@@ -32,7 +32,7 @@ interface Props extends ThemeProps {
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ children, className, modalContent, modalId, onDoneCallback }: Props) {
+function Component ({ children, className, modalContent, modalId, onDoneCallback, transactionType: transactionTypeProps }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,6 +49,10 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
   const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
 
   const transactionType = useMemo((): ExtrinsicType => {
+    if (transactionTypeProps) {
+      return transactionTypeProps;
+    }
+
     const pathName = location.pathname;
     const action = pathName.split('/')[2] || '';
 
@@ -93,7 +97,7 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
     }
-  }, [checkActive, location.pathname]);
+  }, [checkActive, location.pathname, transactionTypeProps]);
 
   const storageKey = useMemo((): string => detectTransactionPersistKey(transactionType), [transactionType]);
 
@@ -167,6 +171,13 @@ function Component ({ children, className, modalContent, modalId, onDoneCallback
     if (storageKey === CLAIM_BRIDGE_TRANSACTION) {
       return {
         ...DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CHANGE_VALIDATOR_TRANSACTION) {
+      return {
+        ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
         fromAccountProxy
       };
     }

@@ -1,7 +1,6 @@
-// [object Object]
+// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// eslint-disable-next-line header/header
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { CONFIRM_TERM_SEED_PHRASE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -85,6 +84,7 @@ const Component = ({ className }: Props) => {
     return (
       <Web3Block
         className={'term-box'}
+        key={term}
         leftItem={_leftItem}
         middleItem={_middleItem}
         onClick={onCheckedTerm(term)}
@@ -102,7 +102,9 @@ const Component = ({ className }: Props) => {
   }, [inactiveModal, isCheckDontShow, setConfirmTermSeedPhrase]);
 
   const subTitle = useMemo(() => {
-    return useDefaultContent ? t('Tap on all checkboxes to confirm you understand the importance of your seed phrase') : t('This seed phrase creates a unified account that can be used for Polkadot, Ethereum, Bitcoin and TON ecosystem. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.');
+    return useDefaultContent
+      ? t('Tap on all checkboxes to confirm you understand the importance of your seed phrase')
+      : t('This seed phrase creates a unified account that can be used for Polkadot, Ethereum, TON, Cardano & Bitcoin ecosystems. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.');
   }, [useDefaultContent, t]);
 
   return (

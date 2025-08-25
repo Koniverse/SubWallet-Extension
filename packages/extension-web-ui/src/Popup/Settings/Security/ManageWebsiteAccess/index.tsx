@@ -9,7 +9,7 @@ import { changeAuthorizationAll, forgetAllSite } from '@subwallet/extension-web-
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-web-ui/stores/utils';
 import { ManageWebsiteAccessDetailParam, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { isBitcoinAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { FadersHorizontal, GearSix, GlobeHemisphereWest, Plugs, PlugsConnected, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -36,7 +36,9 @@ function getAccountCount (item: AuthUrlInfo, accountProxies: AccountProxy[]): nu
   return accountProxies.filter((ap) => {
     return ap.accounts.some((account) => {
       if (isEthereumAddress(account.address)) {
-        return authType.includes('evm') && item.isAllowedMap[account.address];
+        const supportECDSASubstrateAddress = account.isSubstrateECDSA && authType.includes('substrate');
+
+        return item.isAllowedMap[account.address] && (authType.includes('evm') || supportECDSASubstrateAddress);
       }
 
       if (isSubstrateAddress(account.address)) {
@@ -49,6 +51,10 @@ function getAccountCount (item: AuthUrlInfo, accountProxies: AccountProxy[]): nu
 
       if (isCardanoAddress(account.address)) {
         return authType.includes('cardano') && item.isAllowedMap[account.address];
+      }
+
+      if (isBitcoinAddress(account.address)) {
+        return authType.includes('bitcoin') && item.isAllowedMap[account.address];
       }
 
       return false;

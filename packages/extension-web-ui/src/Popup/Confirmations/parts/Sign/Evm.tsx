@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationDefinitions, ConfirmationResult, EvmSendTransactionRequest, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { AlertBox } from '@subwallet/extension-web-ui/components';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { InjectContext } from '@subwallet/extension-web-ui/contexts/InjectContext';
@@ -9,7 +10,6 @@ import { useGetAccountByAddress, useGetChainInfoByChainId, useLedger, useNotific
 import useUnlockChecker from '@subwallet/extension-web-ui/hooks/common/useUnlockChecker';
 import { completeConfirmation } from '@subwallet/extension-web-ui/messaging';
 import { PhosphorIcon, SigData, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { AccountSignMode } from '@subwallet/extension-web-ui/types/account';
 import { EvmSignatureSupportType } from '@subwallet/extension-web-ui/types/confirmation';
 import { convertErrorMessage, getSignMode, isEvmMessage, removeTransactionPersist } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';

@@ -1,14 +1,15 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountMigrationInProgressWarningModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
+import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
+import { AccountTokenAddressModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
 import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-koni-ui/components/Modal/Swap/SwapFeesModal';
 import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-koni-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
-import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL, ADDRESS_GROUP_MODAL, ADDRESS_QR_MODAL, DERIVE_ACCOUNT_ACTION_MODAL, EARNING_INSTRUCTION_MODAL, GLOBAL_ALERT_MODAL, SELECT_ADDRESS_FORMAT_MODAL, SWAP_FEES_MODAL, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL, TRANSACTION_PROCESS_DETAIL_MODAL, TRANSACTION_STEPS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAlert, useExtensionDisplayModes, useGetConfig, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import Confirmations from '@subwallet/extension-koni-ui/Popup/Confirmations';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -71,6 +72,10 @@ export interface WalletModalContextType {
     open: (props: SelectAddressFormatModalProps) => void,
     close: VoidFunction
   },
+  accountTokenAddressModal: {
+    open: (props: AccountTokenAddressModalProps) => void,
+    close: VoidFunction
+  },
   alertModal: {
     open: (props: AlertDialogProps) => void,
     close: VoidFunction
@@ -107,6 +112,12 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
     close: () => {}
   },
   selectAddressFormatModal: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    open: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    close: () => {}
+  },
+  accountTokenAddressModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     open: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -167,6 +178,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   /* Address QR Modal */
   const [addressQrModalProps, setAddressQrModalProps] = useState<AddressQrModalProps | undefined>();
   const [selectAddressFormatModalProps, setSelectAddressFormatModalProps] = useState<SelectAddressFormatModalProps | undefined>();
+  const [accountTokenAddressModalProps, setAccountTokenAddressModalProps] = useState<AccountTokenAddressModalProps | undefined>();
   const [deriveActionModalProps, setDeriveActionModalProps] = useState<AccountDeriveActionProps | undefined>();
   const [transactionProcessId, setTransactionProcessId] = useState('');
   const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
@@ -183,6 +195,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     activeModal(SELECT_ADDRESS_FORMAT_MODAL);
   }, [activeModal]);
 
+  const openAccountTokenAddressModal = useCallback((props: AccountTokenAddressModalProps) => {
+    setAccountTokenAddressModalProps(props);
+    activeModal(ADDRESS_GROUP_MODAL);
+  }, [activeModal]);
+
   const checkAddressQrModalActive = useCallback(() => {
     return checkActive(ADDRESS_QR_MODAL);
   }, [checkActive]);
@@ -197,6 +214,11 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     setSelectAddressFormatModalProps(undefined);
   }, [inactiveModal]);
 
+  const closeAccountTokenAddressModal = useCallback(() => {
+    inactiveModal(ADDRESS_GROUP_MODAL);
+    setAccountTokenAddressModalProps(undefined);
+  }, [inactiveModal]);
+
   const onCancelAddressQrModal = useCallback(() => {
     addressQrModalProps?.onCancel?.() || closeAddressQrModal();
   }, [addressQrModalProps, closeAddressQrModal]);
@@ -204,6 +226,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const onCancelSelectAddressFormatModal = useCallback(() => {
     selectAddressFormatModalProps?.onCancel?.() || closeSelectAddressFormatModal();
   }, [closeSelectAddressFormatModal, selectAddressFormatModalProps]);
+
+  const onCancelAccountTokenAddressModal = useCallback(() => {
+    accountTokenAddressModalProps?.onCancel?.() || closeAccountTokenAddressModal();
+  }, [accountTokenAddressModalProps, closeAccountTokenAddressModal]);
 
   /* Address QR Modal */
 
@@ -274,6 +300,10 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       open: openSelectAddressFormatModal,
       close: closeSelectAddressFormatModal
     },
+    accountTokenAddressModal: {
+      open: openAccountTokenAddressModal,
+      close: closeAccountTokenAddressModal
+    },
     alertModal: {
       open: openAlert,
       close: closeAlert
@@ -295,7 +325,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       checkActive: checkSwapFeesModalActive,
       update: setSwapFeesModalProps
     }
-  }), [checkAddressQrModalActive, checkSwapFeesModalActive, closeAddressQrModal, closeAlert, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openSwitchNetworkAuthorizeModal, openTransactionStepsModal]);
+  }), [checkAddressQrModalActive, closeAccountTokenAddressModal, checkSwapFeesModalActive, closeAddressQrModal, closeAlert, openAccountTokenAddressModal, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openSwitchNetworkAuthorizeModal, openTransactionStepsModal]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {
@@ -376,6 +406,15 @@ export const WalletModalContextProvider = ({ children }: Props) => {
         <SelectAddressFormatModal
           {...selectAddressFormatModalProps}
           onCancel={onCancelSelectAddressFormatModal}
+        />
+      )
+    }
+
+    {
+      !!accountTokenAddressModalProps && (
+        <AccountTokenAddressModal
+          {...accountTokenAddressModalProps}
+          onCancel={onCancelAccountTokenAddressModal}
         />
       )
     }

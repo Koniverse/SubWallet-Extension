@@ -89,6 +89,8 @@ export const findUnifiedNextDerive = (proxyId: string, accounts: AccountProxyMap
       index++;
     } else if (currentDepth === 0 && deriveIndex === 0 && index > deriveIndex) {
       // Special case for the first account on the root
+    } else if (deriveIndex === index - 1) {
+      // Special case, increased index before that, ex: 1/0, 1/1, 1/2
     } else {
       break;
     }

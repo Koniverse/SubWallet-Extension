@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfirmationDefinitions, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ConfirmationType, ConfirmationTypeCardano, ConfirmationTypeTon, RequestSigningApprovePasswordV2 } from '@subwallet/extension-base/background/KoniTypes';
+import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ConfirmationType, ConfirmationTypeBitcoin, ConfirmationTypeCardano, ConfirmationTypeTon, RequestSigningApprovePasswordV2 } from '@subwallet/extension-base/background/KoniTypes';
 import { ResponseSigningIsLocked } from '@subwallet/extension-base/background/types';
 
 import { HexString } from '@polkadot/util/types';
@@ -38,4 +38,8 @@ export async function completeConfirmationTon<CT extends ConfirmationTypeTon> (t
 
 export async function completeConfirmationCardano<CT extends ConfirmationTypeCardano> (type: CT, payload: ConfirmationDefinitionsCardano[CT][1]): Promise<boolean> {
   return sendMessage('pri(confirmationsCardano.complete)', { [type]: payload });
+}
+
+export async function completeConfirmationBitcoin<CT extends ConfirmationTypeBitcoin> (type: CT, payload: ConfirmationDefinitionsBitcoin[CT][1]): Promise<boolean> {
+  return sendMessage('pri(confirmationsBitcoin.complete)', { [type]: payload });
 }

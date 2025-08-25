@@ -17,7 +17,8 @@ export default class FeeService {
     evm: {},
     substrate: {},
     ton: {},
-    cardano: {}
+    cardano: {},
+    bitcoin: {}
   };
 
   constructor (state: KoniState) {
@@ -103,14 +104,26 @@ export default class FeeService {
 
       if (feeSubscription) {
         const observer = feeSubscription.observer;
+        const currentValue = observer.getValue();
 
-        _callback(observer.getValue());
-
-        // If have callback, just subscribe
-        if (callback) {
-          const subscription = observer.subscribe({
-            next: _callback
+        if (currentValue) {
+          // Call immediately
+          _callback(currentValue);
+        } else if (!callback) {
+          // Subscribe once to get first value then unsubscribe
+          const tempSub = observer.subscribe({
+            next: (value) => {
+              if (value) {
+                tempSub.unsubscribe();
+                _callback(value);
+              }
+            }
           });
+        }
+
+        if (callback) {
+          // Maintain original subscription if user provided a callback
+          const subscription = observer.subscribe({ next: _callback });
 
           this.chainFeeSubscriptionMap[type][chain].subscription[id] = () => {
             if (!subscription.closed) {
@@ -132,10 +145,10 @@ export default class FeeService {
           if (cancel) {
             clearInterval(interval);
           } else {
-            const api = this.state.getEvmApi(chain);
-
             // TODO: Handle case type === evm and not have api
             if (type === 'evm') {
+              const api = this.state.getEvmApi(chain);
+
               if (api) {
                 calculateGasFeeParams(api, chain)
                   .then((info) => {
@@ -160,6 +173,14 @@ export default class FeeService {
                   options: undefined
                 } as EvmFeeInfo);
               }
+            } else if (type === 'bitcoin') {
+              const api = this.state.getBitcoinApi(chain);
+
+              api.api.getRecommendedFeeRate()
+                .then((info) => {
+                  observer.next(info);
+                })
+                .catch(console.error);
             } else {
               observer.next({
                 type,

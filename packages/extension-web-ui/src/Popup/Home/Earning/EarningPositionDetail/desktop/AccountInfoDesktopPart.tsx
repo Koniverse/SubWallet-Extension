@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { SpecialYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, EarningNominationModal, EmptyList, MetaInfo } from '@subwallet/extension-web-ui/components';
+import EarningValidatorSelectedModal from '@subwallet/extension-web-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import Table from '@subwallet/extension-web-ui/components/Table/Table';
-import { EARNING_NOMINATION_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
+import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
 import { useGetAccountByAddress, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { findNetworkJsonByGenesisHash, reformatAddress, toShort } from '@subwallet/extension-web-ui/utils';
@@ -21,6 +22,7 @@ interface Props extends ThemeProps {
   positionItems: YieldPositionInfo[];
   inputAsset: _ChainAsset;
   compound: YieldPositionInfo;
+  poolInfo: YieldPoolInfo;
 }
 
 type RowAccountComponentProp = {
@@ -64,7 +66,7 @@ const RowAccountComponent = ({ address }: RowAccountComponentProp) => {
 };
 
 const Component: React.FC<Props> = ({ className, compound,
-  inputAsset,
+  inputAsset, poolInfo,
   positionItems }: Props) => {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
@@ -102,6 +104,17 @@ const Component: React.FC<Props> = ({ className, compound,
       activeModal(EARNING_NOMINATION_MODAL);
     };
   }, [activeModal]);
+
+  const createOpenChangeValidatorModal = useCallback((item: YieldPositionInfo) => {
+    return () => {
+      setSelectedAddress(item.address);
+      activeModal(EARNING_SELECTED_VALIDATOR_MODAL);
+    };
+  }, [activeModal]);
+
+  const canChangeValidator = useMemo(() => {
+    return poolInfo.metadata.availableMethod.changeValidator;
+  }, [poolInfo]);
 
   const columns = useMemo(() => {
     const accountCol = {
@@ -265,7 +278,7 @@ const Component: React.FC<Props> = ({ className, compound,
                   phosphorIcon={ArrowSquareOut}
                 />
               }
-              onClick={createOpenNomination(row)}
+              onClick={canChangeValidator ? createOpenChangeValidatorModal(row) : createOpenNomination(row)}
               size={'xs'}
               type={'ghost'}
             />
@@ -289,7 +302,7 @@ const Component: React.FC<Props> = ({ className, compound,
     }
 
     return result;
-  }, [createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isSpecial, isSubnetStaking, t, type]);
+  }, [canChangeValidator, createOpenChangeValidatorModal, createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isSpecial, isSubnetStaking, t, type]);
 
   const getRowKey = useCallback((item: YieldPositionInfo) => {
     return item.address;
@@ -324,6 +337,18 @@ const Component: React.FC<Props> = ({ className, compound,
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
+
+      {selectedItem && (
+        <EarningValidatorSelectedModal
+          chain={compound.chain}
+          compound={compound}
+          disabled={false}
+          displayType={'nomination'}
+          from={selectedAddress}
+          modalId={EARNING_SELECTED_VALIDATOR_MODAL}
+          nominations={selectedItem?.nominations}
+          slug={compound.slug}
+        />)}
     </>
   );
 };

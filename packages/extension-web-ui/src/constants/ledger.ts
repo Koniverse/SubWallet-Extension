@@ -3,6 +3,7 @@
 
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
@@ -511,7 +512,6 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
   //   ss58_addr_type: 7391
   // }
 ];
-
 export const isLedgerCapable = !!(window as unknown as { USB?: unknown }).USB;
 
 export const PolkadotDerivationPathGens: string[] = [POLKADOT_KEY].map((slug) => ChainInfoMap[slug].substrateInfo?.genesisHash || '');
@@ -522,3 +522,4 @@ export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedg
   .map(({ genesisHash }) => genesisHash);
 
 export const NotNeedMigrationGens: string[] = [...PolkadotDerivationPathGens, ...StandardDerivationPathGens];
+export const SubstrateLedgerSignModeSupport: AccountSignMode[] = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];

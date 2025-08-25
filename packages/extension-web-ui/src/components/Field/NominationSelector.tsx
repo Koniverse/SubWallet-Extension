@@ -11,9 +11,10 @@ import { BaseSelectModal } from '@subwallet/extension-web-ui/components/Modal/Ba
 import { useSelectModalInputHelper } from '@subwallet/extension-web-ui/hooks/form/useSelectModalInputHelper';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { toShort } from '@subwallet/extension-web-ui/utils';
-import { InputRef } from '@subwallet/react-ui';
+import { Icon, InputRef } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
+import { Book } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -23,14 +24,16 @@ import { GeneralEmptyList } from '../EmptyList';
 interface Props extends ThemeProps, BasicInputWrapper {
   nominators: NominationInfo[];
   chain: string,
-  poolInfo: YieldPoolInfo
+  poolInfo: YieldPoolInfo;
+  networkPrefix?: number;
+  isChangeValidator?: boolean
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
 // todo: update filter for this component, after updating filter for SelectModal
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', label, nominators, placeholder, poolInfo, statusHelp, value } = props;
+  const { chain = '', className, defaultValue, disabled, id = 'nomination-selector', isChangeValidator, label, networkPrefix, nominators, placeholder, poolInfo, statusHelp, value } = props;
 
   const filteredItems = useMemo(() => {
     return nominators.filter((item) => new BigN(item.activeStake).gt(0));
@@ -67,13 +70,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     (item: NominationInfo, isSelected: boolean) => {
       return (
         <StakingNominationItem
+          isChangeValidator={isChangeValidator}
           isSelected={isSelected}
           nominationInfo={item}
           poolInfo={poolInfo}
         />
       );
     },
-    [poolInfo]
+    [isChangeValidator, poolInfo]
   );
 
   const handleValidatorLabel = useMemo(() => {
@@ -110,6 +114,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         placeholder={placeholder || label}
         prefix={
           <Avatar
+            identPrefix={networkPrefix}
             size={20}
             value={value}
           />
@@ -122,7 +127,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={label || placeholder || t('Select validator')}
+        suffix={
+          isChangeValidator
+            ? (
+              <Icon
+                phosphorIcon={Book}
+                size='sm'
+              />
+            )
+            : undefined
+        }
+        title={t('Select a') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
       />
     </>
   );
@@ -148,6 +163,10 @@ const NominationSelector = styled(forwardRef(Component))<Props>(({ theme: { toke
         color: token.colorTextLight4,
         paddingLeft: token.sizeXXS
       }
+    },
+
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingSM
     },
 
     '.ant-select-modal-input-wrapper': {

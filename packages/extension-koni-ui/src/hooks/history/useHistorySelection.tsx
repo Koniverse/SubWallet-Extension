@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { useChainInfoWithState, useGetChainSlugsByAccount, useReformatAddress, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useChainInfoWithState, useCoreCreateReformatAddress, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ChainItemType } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,8 +12,8 @@ export default function useHistorySelection () {
   const { address: propAddress, chain: propChain } = useParams<{address: string, chain: string}>();
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const chainInfoList = useChainInfoWithState();
-  const allowedChains = useGetChainSlugsByAccount();
-  const getReformatAddress = useReformatAddress();
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const getReformatAddress = useCoreCreateReformatAddress();
   const { accountProxies, currentAccountProxy } = useSelector((root) => root.accountState);
 
   const [selectedAddress, setSelectedAddress] = useState<string>(propAddress || '');
@@ -49,17 +49,16 @@ export default function useHistorySelection () {
 
     const updateResult = (ap: AccountProxy) => {
       ap.accounts.forEach((a) => {
-        // TODO: This is a temporary validation method.
-        //  Find a more efficient way to get isValid.
-        const isValid = getReformatAddress(a, chainInfo);
+        const formatedAddress = getReformatAddress(a, chainInfo);
 
-        if (isValid) {
+        if (formatedAddress) {
           result.push({
             accountName: ap.name,
             accountProxyId: ap.id,
             accountProxyType: ap.accountType,
             accountType: a.type,
-            address: a.address
+            address: a.address,
+            displayAddress: formatedAddress
           });
         }
       });
@@ -98,21 +97,10 @@ export default function useHistorySelection () {
     }
   }, [chainInfoMap, chainItems]);
 
-  useEffect(() => {
-    setSelectedAddress((prevResult) => {
-      if (accountAddressItems.length) {
-        if (!prevResult) {
-          return accountAddressItems[0].address;
-        }
-
-        if (!accountAddressItems.some((a) => a.address === prevResult)) {
-          return accountAddressItems[0].address;
-        }
-      }
-
-      return prevResult;
-    });
-  }, [accountAddressItems, propAddress]);
+  // NOTE: This hook doesn't handle selected address manually,
+  // because it's now controlled via the `autoSelectFirstItem` prop
+  // in the AccountAddressSelector component. This is the best approach for now;
+  // can be revised if a better solution arises in the future.
 
   return {
     chainItems,

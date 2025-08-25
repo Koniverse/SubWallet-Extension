@@ -6,13 +6,14 @@ import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-v
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';
 import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { Psbt } from 'bitcoinjs-lib';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee {
+export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee, SWTransactionEmitter {
   id: string;
   url?: string;
   isInternal: boolean,
@@ -37,7 +38,7 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
 }
 
 export interface SWTransaction extends SWTransactionBase {
-  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig;
+  transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
 }
 
 export interface SWPermitTransaction extends SWTransactionBase {
@@ -55,6 +56,10 @@ export interface SWTransactionResult extends Omit<SWTransactionBase, 'transactio
   process?: ProcessTransactionData;
 }
 
+export interface SWTransactionEmitter {
+  emitterTransaction?: TransactionEmitter
+}
+
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
@@ -68,6 +73,7 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   isTransferLocalTokenAndPayThatTokenAsFee?: boolean;
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
+  skipFeeRecalculation?: boolean;
 }
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
@@ -80,6 +86,12 @@ export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'trans
 
 export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
   processId?: string;
+}
+
+export type BitcoinTransactionData = {
+  data: Psbt,
+  dataBase64: string,
+  dataToHex: string,
 }
 
 export type ValidateTransactionResponseInput = SWTransactionInput;
@@ -95,6 +107,7 @@ export interface TransactionEventResponse extends ValidateTransactionResponse {
   eventLogs?: EventRecord[],
   nonce?: number,
   startBlock?: number,
+  blockTime?: number,
 }
 export interface TransactionEventMap {
   send: (response: TransactionEventResponse) => void;

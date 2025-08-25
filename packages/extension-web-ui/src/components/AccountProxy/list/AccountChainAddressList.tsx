@@ -1,15 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
-import { useGetAccountChainAddresses, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
-import { AccountChainAddress, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { useGetAccountChainAddresses, useGetBitcoinAccounts, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { AccountChainAddress, AccountInfoType, AccountTokenAddress, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { copyToClipboard } from '@subwallet/extension-web-ui/utils';
+import { isBitcoinAddress } from '@subwallet/keyring';
+import { BitcoinAddressType } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
 import { SwList } from '@subwallet/react-ui';
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -20,14 +24,92 @@ type Props = ThemeProps & {
   }
 };
 
+interface BitcoinAccountsByNetwork {
+  mainnet: AccountInfoType[];
+  testnet: AccountInfoType[];
+}
+
 function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
   const { t } = useTranslation();
   const items: AccountChainAddress[] = useGetAccountChainAddresses(accountProxy);
+  const getBitcoinAccounts = useGetBitcoinAccounts();
   const notify = useNotification();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
-  const { addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
+  const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+
+  const bitcoinAccountList: AccountInfoType[] = useMemo(() => {
+    if (!items) {
+      return [];
+    }
+
+    return items
+      .filter((item) => isBitcoinAddress(item.address))
+      .map((item) => ({
+        address: item.address,
+        type: item.accountType
+      }));
+  }, [items]);
+
+  const soloBitcoinAccount = useMemo((): BitcoinAccountsByNetwork => {
+    if (!bitcoinAccountList || bitcoinAccountList.length === 0) {
+      return { mainnet: [], testnet: [] };
+    }
+
+    const mainnet: AccountInfoType[] = [];
+    const testnet: AccountInfoType[] = [];
+
+    bitcoinAccountList.forEach((account) => {
+      const bitcoinAddressInfo = getBitcoinAddressInfo(account.address);
+
+      if (bitcoinAddressInfo.network === 'mainnet') {
+        mainnet.push(account);
+      } else {
+        testnet.push(account);
+      }
+    });
+
+    return { mainnet, testnet };
+  }, [bitcoinAccountList]);
+
+  const filteredItems = useMemo(() => {
+    if (!items) {
+      return [];
+    }
+
+    return items.filter((item) => {
+      if (isBitcoinAddress(item.address)) {
+        const addressInfo = getBitcoinAddressInfo(item.address);
+
+        if (addressInfo.network === 'mainnet' && soloBitcoinAccount.mainnet.length > 1) {
+          return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+        } else if (addressInfo.network === 'testnet' && soloBitcoinAccount.testnet.length > 1) {
+          return [BitcoinAddressType.p2wpkh, BitcoinAddressType.p2wsh].includes(addressInfo.type);
+        }
+
+        return true;
+      }
+
+      return true;
+    });
+  }, [items, soloBitcoinAccount.mainnet.length, soloBitcoinAccount.testnet.length]);
+
+  const getBitcoinTokenAddresses = useCallback(
+    (slug: string, bitcoinAccounts: AccountInfoType[]): AccountTokenAddress[] => {
+      const chainInfo = chainInfoMap[slug];
+
+      if (!chainInfo) {
+        return [];
+      }
+
+      const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+
+      return getBitcoinAccounts(slug, nativeTokenSlug, chainInfo, bitcoinAccounts);
+    },
+    [chainInfoMap, getBitcoinAccounts]
+  );
 
   const openSelectAddressFormatModal = useCallback((item: AccountChainAddress) => {
     selectAddressFormatModal.open({
@@ -45,9 +127,25 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
     });
   }, [isInModal, modalProps, selectAddressFormatModal]);
 
+  const openAccountTokenAddressModal = useCallback((accounts: AccountTokenAddress[], closeCallback?: VoidCallback) => {
+    const processFunction = () => {
+      accountTokenAddressModal.open({
+        items: accounts,
+        onBack: accountTokenAddressModal.close,
+        onCancel: () => {
+          accountTokenAddressModal.close();
+          closeCallback?.();
+        }
+      });
+    };
+
+    processFunction();
+  }, [accountTokenAddressModal]);
+
   const onShowQr = useCallback((item: AccountChainAddress) => {
     return () => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
 
       const processFunction = () => {
         addressQrModal.open({
@@ -66,20 +164,34 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
-      } else {
-        onHandleTonAccountWarning(item.accountType, () => {
-          onHandleLedgerGenericAccountWarning({
-            accountProxy: accountProxy,
-            chainSlug: item.slug
-          }, processFunction);
-        });
+
+        return;
       }
+
+      if (isBitcoinChain) {
+        // TODO: Currently, only supports Bitcoin native token.
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
+
+          return;
+        }
+      }
+
+      onHandleTonAccountWarning(item.accountType, () => {
+        onHandleLedgerGenericAccountWarning({
+          accountProxy: accountProxy,
+          chainSlug: item.slug
+        }, processFunction);
+      });
     };
-  }, [accountProxy, addressQrModal, checkIsPolkadotUnifiedChain, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal]);
+  }, [accountProxy, addressQrModal, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, isInModal, modalProps, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const onCopyAddress = useCallback((item: AccountChainAddress) => {
     return () => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
 
       const processFunction = () => {
         copyToClipboard(item.address || '');
@@ -90,33 +202,77 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
 
       if (isPolkadotUnifiedChain) {
         openSelectAddressFormatModal(item);
-      } else {
-        onHandleTonAccountWarning(item.accountType, () => {
-          onHandleLedgerGenericAccountWarning({
-            accountProxy: accountProxy,
-            chainSlug: item.slug
-          }, processFunction);
-        });
+
+        return;
       }
+
+      if (isBitcoinChain) {
+        // TODO: Currently, only supports Bitcoin native token.
+
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
+
+          return;
+        }
+      }
+
+      onHandleTonAccountWarning(item.accountType, () => {
+        onHandleLedgerGenericAccountWarning({
+          accountProxy: accountProxy,
+          chainSlug: item.slug
+        }, processFunction);
+      });
     };
-  }, [accountProxy, checkIsPolkadotUnifiedChain, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openSelectAddressFormatModal, t]);
+  }, [accountProxy, bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, notify, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning, openAccountTokenAddressModal, openSelectAddressFormatModal, t]);
 
   const onClickInfoButton = useCallback((item: AccountChainAddress) => {
     return () => {
+      const isBitcoinChain = isBitcoinAddress(item.address);
+
+      if (isBitcoinChain) {
+        // TODO: Currently, only supports Bitcoin native token.
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList);
+
+          return;
+        }
+      }
+
       openSelectAddressFormatModal(item);
     };
-  }, [openSelectAddressFormatModal]);
+  }, [bitcoinAccountList, getBitcoinTokenAddresses, openAccountTokenAddressModal, openSelectAddressFormatModal]);
 
   const renderItem = useCallback(
     (item: AccountChainAddress) => {
       const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(item.slug);
+      const isBitcoinChain = isBitcoinAddress(item.address);
+      let tooltip = '';
+
+      if (isPolkadotUnifiedChain) {
+        tooltip = 'This network has two address formats';
+      } else if (isBitcoinChain) {
+        tooltip = 'This network has three address types';
+      }
+
+      let isShowBitcoinInfoButton = false;
+
+      if (isBitcoinChain) {
+        const accountTokenAddressList = getBitcoinTokenAddresses(item.slug, bitcoinAccountList);
+
+        isShowBitcoinInfoButton = accountTokenAddressList.length > 1;
+      }
 
       return (
         <AccountChainAddressItem
           className={'address-item'}
-          isShowInfoButton={isPolkadotUnifiedChain}
+          infoButtonTooltip={tooltip}
+          isShowInfoButton={isPolkadotUnifiedChain || isShowBitcoinInfoButton}
           item={item}
-          key={item.slug}
+          key={`${item.slug}_${item.address}`}
           onClick={onShowQr(item)}
           onClickCopyButton={onCopyAddress(item)}
           onClickInfoButton={onClickInfoButton(item)}
@@ -124,7 +280,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         />
       );
     },
-    [checkIsPolkadotUnifiedChain, onClickInfoButton, onCopyAddress, onShowQr]
+    [bitcoinAccountList, checkIsPolkadotUnifiedChain, getBitcoinTokenAddresses, onClickInfoButton, onCopyAddress, onShowQr]
   );
 
   const emptyList = useCallback(() => {
@@ -145,7 +301,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
           return prev;
         }
 
-        const targetAddress = items.find((i) => i.slug === prev.chainSlug)?.address;
+        const targetAddress = filteredItems.find((i) => i.slug === prev.chainSlug)?.address;
 
         if (!targetAddress) {
           return prev;
@@ -157,13 +313,13 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         };
       });
     }
-  }, [addressQrModal, items]);
+  }, [addressQrModal, filteredItems]);
 
   return (
     <SwList.Section
       className={className}
       enableSearchInput
-      list={items}
+      list={filteredItems}
       renderItem={renderItem}
       renderWhenEmpty={emptyList}
       searchFunction={searchFunction}

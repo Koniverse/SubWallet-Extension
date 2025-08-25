@@ -4,9 +4,9 @@
 import { AmountData, RequestMaxTransferable } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers';
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
-import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { BitcoinTransactionData, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { CommonOptimalTransferPath, RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
-import { RequestSubmitTransfer, RequestSubscribeTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 
 import { sendMessage } from '../base';
 
@@ -14,8 +14,20 @@ export async function makeTransfer (request: RequestSubmitTransfer): Promise<SWT
   return sendMessage('pri(accounts.transfer)', request);
 }
 
+export async function makeBitcoinDappTransferConfirmation (request: RequestSubmitTransferWithId): Promise<SWTransactionResponse> {
+  return sendMessage('pri(accounts.bitcoin.dapp.transfer.confirmation)', request);
+}
+
+export async function makePSBTTransferAfterConfirmation (request: RequestSubmitSignPsbtTransfer): Promise<SWTransactionResponse> {
+  return sendMessage('pri(accounts.psbt.transfer.confirmation)', request);
+}
+
 export async function makeCrossChainTransfer (request: RequestCrossChainTransfer): Promise<SWTransactionResponse> {
   return sendMessage('pri(accounts.crossChainTransfer)', request);
+}
+
+export async function getBitcoinTransactionData (request: RequestSubmitTransfer): Promise<BitcoinTransactionData> {
+  return sendMessage('pri(accounts.getBitcoinTransactionData)', request);
 }
 
 export async function approveSpending (request: TokenSpendingApprovalParams): Promise<SWTransactionResponse> {
@@ -36,6 +48,10 @@ export async function getOptimalTransferProcess (request: RequestOptimalTransfer
 
 export async function getTokensCanPayFee (request: RequestGetTokensCanPayFee): Promise<TokenPayFeeInfo> { // can set a default fee to ED of native token
   return sendMessage('pri(customFee.getTokensCanPayFee)', request);
+}
+
+export async function subscribeTransferWhenConfirmation (request: RequestSubscribeTransfer, callback: (data: ResponseSubscribeTransferConfirmation) => void): Promise<ResponseSubscribeTransferConfirmation> {
+  return sendMessage('pri(transfer.confirmation.subscribe)', request, callback);
 }
 
 export async function getAmountForPair (request: RequestGetAmountForPair): Promise<string> {

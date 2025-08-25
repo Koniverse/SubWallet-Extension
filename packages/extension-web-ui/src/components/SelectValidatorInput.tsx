@@ -48,9 +48,21 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const validatorLabel = useMemo(() => `${getValidatorLabel(chain).charAt(0).toLowerCase() + getValidatorLabel(chain).substr(1)}${addressList.length > 1 ? 's' : ''}`, [addressList, chain]);
 
+  const isBittensorChain = useMemo(() => {
+    return chain === 'bittensor';
+  }, [chain]);
+
   const renderContent = () => {
     if (!value) {
       return placeholder || (t('Select') + ' ' + t(validatorLabel));
+    }
+
+    // Hot fix for validator have ',' in name (Bittensor only)
+    // ToDo: Need better logic to handle validator have comma in name
+    if (isBittensorChain) {
+      const [address, name] = value.split('___');
+
+      return name || toShort(address);
     }
 
     const valueList = value.split(',');
@@ -76,10 +88,11 @@ const Component: React.FC<Props> = (props: Props) => {
     >
       <div className={'select-validator-input__label'}>{label}</div>
       <div className={'select-validator-input__content-wrapper'}>
-        {!!addressList.length && <AvatarGroup
-          accounts={addressList}
+        {!!addressList.length && (<AvatarGroup
+          accounts={isBittensorChain ? [addressList[0]] : addressList}
           className={'select-validator-input__avatar-gr'}
-        />}
+          size={20}
+        />)}
         <div className={'select-validator-input__content'}>{renderContent()}</div>
         <div className={'select-validator-input__button-wrapper'}>
           {
@@ -91,17 +104,15 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
               : (
-                <>
-                  <Button
-                    disabled={disabled}
-                    icon={<Icon
-                      phosphorIcon={Book}
-                      size={'sm'}
-                    />}
-                    size={'xs'}
-                    type={'ghost'}
-                  />
-                </>
+                <Button
+                  disabled={disabled}
+                  icon={<Icon
+                    phosphorIcon={Book}
+                    size={'sm'}
+                  />}
+                  size={'xs'}
+                  type={'ghost'}
+                />
               )
           }
         </div>
@@ -176,7 +187,9 @@ const SelectValidatorInput = styled(Component)<Props>(({ theme: { token } }: Pro
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
-      zIndex: 0
+      zIndex: 0,
+      color: token.colorWhite,
+      fontWeight: '600'
     },
 
     '.select-validator-input__button-wrapper': {

@@ -5,14 +5,14 @@ import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning
 import { EarningRewardItem, YieldPoolType } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
-import { useGetChainSlugsByAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
+import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-web-ui/hooks';
 import { findAccountByAddress } from '@subwallet/extension-web-ui/utils';
 import { useMemo } from 'react';
 
 const useYieldRewardTotal = (slug: string): string | undefined => {
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
-  const chainsByAccountType = useGetChainSlugsByAccount();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   return useMemo(() => {
     const checkAddress = (item: EarningRewardItem) => {
@@ -35,7 +35,7 @@ const useYieldRewardTotal = (slug: string): string | undefined => {
           let result = BN_ZERO;
 
           for (const reward of earningRewards) {
-            if (reward.slug === slug && chainsByAccountType.includes(reward.chain) && poolInfoMap[slug]) {
+            if (reward.slug === slug && allowedChains.includes(reward.chain) && !excludedTokens.includes(poolInfo.metadata?.inputAsset || '')) {
               const isValid = checkAddress(reward);
 
               if (isValid) {
@@ -52,7 +52,7 @@ const useYieldRewardTotal = (slug: string): string | undefined => {
     } else {
       return undefined;
     }
-  }, [accounts, chainsByAccountType, currentAccountProxy?.accounts, earningRewards, isAllAccount, poolInfoMap, slug]);
+  }, [accounts, allowedChains, currentAccountProxy?.accounts, earningRewards, excludedTokens, isAllAccount, poolInfoMap, slug]);
 };
 
 export default useYieldRewardTotal;
