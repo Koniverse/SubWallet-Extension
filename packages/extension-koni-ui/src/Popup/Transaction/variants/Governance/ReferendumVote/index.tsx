@@ -43,7 +43,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     });
   }, [accountProxies, defaultData.fromAccountProxy]);
 
-  const sdkInstant: SubsquareApiSdk = useMemo(() => {
+  const sdkInstance: SubsquareApiSdk = useMemo(() => {
     return getSubsquareApi(chainSlugToSubsquareNetwork[chain]);
   }, [chain]);
 
@@ -54,7 +54,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         return undefined;
       }
 
-      return await sdkInstant?.getReferendaVotes(`${referendumId}`);
+      return await sdkInstance?.getReferendaVotes(`${referendumId}`);
     },
     enabled: !!referendumId && !!chain,
     staleTime: 60 * 1000

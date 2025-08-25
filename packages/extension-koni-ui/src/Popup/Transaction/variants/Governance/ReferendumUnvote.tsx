@@ -63,7 +63,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
-  const sdkInstant: SubsquareApiSdk = useMemo(() => {
+  const sdkInstance: SubsquareApiSdk = useMemo(() => {
     return getSubsquareApi(chainSlugToSubsquareNetwork[chainValue]);
   }, [chainValue]);
 
@@ -74,7 +74,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         return undefined;
       }
 
-      return await sdkInstant?.getReferendaVotes(`${referendumId}`);
+      return await sdkInstance?.getReferendaVotes(`${referendumId}`);
     },
     enabled: !!referendumId && !!chain,
     staleTime: 60 * 1000

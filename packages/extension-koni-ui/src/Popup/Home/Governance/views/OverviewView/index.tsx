@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
+import { ALL_TRACK_ID } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovTrackSelector';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -23,19 +25,51 @@ type Props = ThemeProps & ViewBaseType & {
   goReferendumDetail: (id: string) => void;
 };
 
-const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sdkInstant }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
-  const { accounts: _accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
+  // const { accounts: _accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
 
   const onClickReferendumItem = useCallback((item: Referendum) => {
     goReferendumDetail(`${item.referendumIndex}`);
   }, [goReferendumDetail]);
 
+  const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
+  const [statusSelected, setStatusSelected] = useState<GovStatusKey>(GovStatusKey.ALL);
+  const [trackSelected, setTrackSelected] = useState<string>(ALL_TRACK_ID);
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: GOV_QUERY_KEYS.referendaList(chainSlug),
-    queryFn: async ({ pageParam }) => {
-      return await sdkInstant?.getReferenda({ page: pageParam, page_size: 20 });
+    queryKey: [
+      GOV_QUERY_KEYS.referendaList(chainSlug),
+      {
+        is_treasury: isEnableTreasuryFilter,
+        status: statusSelected !== GovStatusKey.ALL ? statusSelected : undefined,
+        track: trackSelected !== ALL_TRACK_ID ? trackSelected : undefined
+      }
+    ],
+    queryFn: async ({ pageParam, queryKey }) => {
+      const [, filters] = queryKey as [string, {
+        is_treasury?: boolean;
+        status?: string;
+        track?: string;
+      }];
+
+      if (filters.track) {
+        return await sdkInstance?.getReferendaWithTrack(Number(filters.track), {
+          page: pageParam,
+          page_size: 20,
+          status: filters.status,
+          simple: true
+        });
+      }
+
+      return await sdkInstance?.getReferenda({
+        page: pageParam,
+        page_size: 20,
+        is_treasury: filters.is_treasury,
+        status: filters.status,
+        simple: true
+      });
     },
     getNextPageParam: (lastPage) => {
       if (!lastPage) {
@@ -71,8 +105,16 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
       <QuickActionsContainer />
 
       <Toolbar
+        chain={chainSlug}
+        isEnableTreasuryFilter={isEnableTreasuryFilter}
         onChangeCategory={setSelectedReferendaCategory}
+        sdkInstance={sdkInstance}
         selectedReferendaCategory={selectedReferendaCategory}
+        setIsEnableTreasuryFilter={setIsEnableTreasuryFilter}
+        setStatusSelected={setStatusSelected}
+        setTrackSelected={setTrackSelected}
+        statusSelected={statusSelected}
+        trackSelected={trackSelected}
       />
 
       <ReferendaList

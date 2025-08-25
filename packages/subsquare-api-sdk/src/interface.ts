@@ -231,6 +231,13 @@ export interface ReferendaQueryParams {
   simple?: boolean;
 }
 
+export interface ReferendaQueryParamsWithTrack {
+  page?: number;
+  page_size?: number;
+  status?: string;
+  simple?: boolean;
+}
+
 export interface UserVotesParams {
   page?: number;
   page_size?: number;
@@ -264,3 +271,8 @@ export interface ReferendumVoteDetail {
 }
 
 /* ReferendumVote */
+
+export interface Track {
+  id: string;
+  name: string;
+}

@@ -23,7 +23,7 @@ type Props = ThemeProps & ViewBaseType & {
   goOverview: VoidFunction;
 };
 
-const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
   const { currentAccountProxy } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
@@ -38,7 +38,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstant 
         return undefined;
       }
 
-      return await sdkInstant?.getReferendaDetails(`${referendumId}`);
+      return await sdkInstance?.getReferendaDetails(`${referendumId}`);
     },
     staleTime: 60 * 1000
   });

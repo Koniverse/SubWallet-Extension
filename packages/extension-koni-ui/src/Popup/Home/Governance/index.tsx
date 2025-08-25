@@ -17,7 +17,7 @@ const Component = () => {
     view: currentScreenView } = useGovernanceView();
 
   const viewProps: ViewBaseType = useMemo(() => ({
-    sdkInstant: chainSlugToSubsquareNetwork[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareNetwork[currentChainSlug]) : undefined,
+    sdkInstance: chainSlugToSubsquareNetwork[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareNetwork[currentChainSlug]) : undefined,
     chainSlug: currentChainSlug
   }), [currentChainSlug]);
 

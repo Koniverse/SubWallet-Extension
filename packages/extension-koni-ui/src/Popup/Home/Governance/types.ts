@@ -5,7 +5,7 @@ import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 
 export type ViewBaseType = {
-  sdkInstant: SubsquareApiSdk | undefined;
+  sdkInstance: SubsquareApiSdk | undefined;
   chainSlug: string;
 }
 

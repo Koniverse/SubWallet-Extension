@@ -2,21 +2,37 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
+import { GovFilterModal } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal';
+import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext } from '@subwallet/react-ui';
+import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
   onChangeCategory: (category: ReferendaCategory) => void;
-  selectedReferendaCategory: ReferendaCategory
+  selectedReferendaCategory: ReferendaCategory;
+  isEnableTreasuryFilter: boolean;
+  setIsEnableTreasuryFilter: (value: boolean) => void;
+  statusSelected: GovStatusKey;
+  setStatusSelected: (value: GovStatusKey) => void;
+  trackSelected: string;
+  setTrackSelected: (value: string) => void;
+  sdkInstance?: SubsquareApiSdk
+  chain: string;
 };
 
-const Component = ({ className, onChangeCategory, selectedReferendaCategory }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, isEnableTreasuryFilter, onChangeCategory,
+  sdkInstance, selectedReferendaCategory, setIsEnableTreasuryFilter, setStatusSelected,
+  setTrackSelected, statusSelected, trackSelected }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+
+  const govFilterModalId = 'gov-filter-modal';
 
   const filterTabItems = useMemo(() => {
     return [
@@ -35,9 +51,21 @@ const Component = ({ className, onChangeCategory, selectedReferendaCategory }: P
     ];
   }, [t]);
 
+  const onOpenFilter = useCallback(() => {
+    activeModal(govFilterModalId);
+  }, [activeModal]);
+
+  const onCancelFilter = useCallback(() => {
+    inactiveModal(govFilterModalId);
+  }, [inactiveModal]);
+
   const onSelectFilterTab = useCallback((value: string) => {
     onChangeCategory(value as ReferendaCategory);
   }, [onChangeCategory]);
+
+  const onApplyFilter = useCallback(() => {
+    inactiveModal(govFilterModalId);
+  }, [inactiveModal]);
 
   return (
     <div className={className}>
@@ -61,17 +89,32 @@ const Component = ({ className, onChangeCategory, selectedReferendaCategory }: P
         />
 
         <Button
-          icon={(
+          icon={
             <Icon
-              customSize={'20px'}
+              customSize='20px'
               phosphorIcon={FadersHorizontal}
             />
-          )}
-          size={'xs'}
-          type={'ghost'}
+          }
+          onClick={onOpenFilter}
+          size='xs'
+          type='ghost'
+        />
+
+        <GovFilterModal
+          chain={chain}
+          id={govFilterModalId}
+          isEnableTreasuryFilter={isEnableTreasuryFilter}
+          onApplyFilter={onApplyFilter}
+          onCancel={onCancelFilter}
+          sdkInstance={sdkInstance}
+          setIsEnableTreasuryFilter={setIsEnableTreasuryFilter}
+          setStatusSelected={setStatusSelected}
+          setTrackSelected={setTrackSelected}
+          statusSelected={statusSelected}
+          title={t('Filter')}
+          trackSelected={trackSelected}
         />
       </div>
-
     </div>
   );
 };

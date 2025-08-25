@@ -3,8 +3,8 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, UserVotesParams } from './interface';
-import { gov2ReferendumsApi } from './url';
+import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, Track, UserVotesParams } from './interface';
+import { gov2ReferendumsApi, gov2TracksApi } from './url';
 
 export class SubsquareApiSdk {
   private client: AxiosInstance;
@@ -36,6 +36,23 @@ export class SubsquareApiSdk {
   async getReferendaDetails (id: string): Promise<ReferendumDetail> {
     const referendaRes = await this.client.get<ReferendumDetail>(
       gov2ReferendumsApi + `/${id}`
+    );
+
+    return referendaRes.data;
+  }
+
+  async getTracks (): Promise<Track[]> {
+    const tracksRes = await this.client.get<Track[]>(
+      gov2TracksApi
+    );
+
+    return tracksRes.data;
+  }
+
+  async getReferendaWithTrack (trackId: number, params?: ReferendaQueryParamsWithTrack): Promise<ReferendaResponse> {
+    const referendaRes = await this.client.get<ReferendaResponse>(
+      gov2TracksApi + `/${trackId}/referendums`,
+      { params }
     );
 
     return referendaRes.data;
