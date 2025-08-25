@@ -13,6 +13,7 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -94,6 +95,15 @@ export interface RateSubnetData {
   alphaOut: string;
 }
 
+interface SubnetRateFeeResponse {
+  data: SubnetFeeRate[];
+}
+
+interface SubnetFeeRate {
+  netuid: number;
+  fee_rate: string;
+}
+
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 export const DEFAULT_DTAO_MINBOND = '21000000';
@@ -131,20 +141,15 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, '/dtao/validator/latest/v1?limit=100', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const fetchData = await fetchStaticCache<{ data: Record<string, Validator> }>(
+        'earning/dtao/validator.json',
+        { data: {} }
+      );
 
-      if (!resp.ok) {
-        console.error('Fetch bittensor delegates fail:', resp.status);
+      const validators = Object.values(fetchData.data);
 
-        return this.cache || { data: [] };
-      }
-
-      const rawData = await resp.json() as ValidatorResponse;
       const data = {
-        data: rawData.data.filter((validator) => parseFloat(validator.root_stake) > 0)
+        data: validators.filter((validator) => parseFloat(validator.root_stake) > 0)
       };
 
       this.cache = data;
@@ -155,12 +160,14 @@ export class BittensorCache {
       }
 
       this.cacheTimeout = setTimeout(() => {
-        this.fetchData().then((newData) => {
-          if (newData.data.length > 0) {
-            this.cache = newData;
-          }
-        }).catch(console.error);
-      }, 60 * 2000);
+        this.fetchData()
+          .then((newData) => {
+            if (newData.data.length > 0) {
+              this.cache = newData;
+            }
+          })
+          .catch(console.error);
+      }, 60 * 1000); // Cache 1 minute
 
       return data;
     } catch (error) {
@@ -186,6 +193,29 @@ export class BittensorCache {
       console.error(error);
 
       return { data: [] };
+    }
+  }
+
+  public async fetchSubnetFeeRate (netuid: number): Promise<string> {
+    try {
+      const resp = await fetchFromProxyService(
+        ProxyServiceRoute.BITTENSOR,
+        '/subnet/latest/v1',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+
+      const rawData = await resp.json() as SubnetRateFeeResponse;
+
+      const subnet = rawData.data.find((item) => item.netuid === netuid);
+
+      return subnet?.fee_rate ?? '0.0005';
+    } catch (error) {
+      console.error(error);
+
+      return '0.0005'; // Default fee rate if fetch fails
     }
   }
 }

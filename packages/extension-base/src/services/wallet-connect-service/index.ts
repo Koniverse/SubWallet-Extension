@@ -6,6 +6,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import RequestService from '@subwallet/extension-base/services/request-service';
 import Eip155RequestHandler from '@subwallet/extension-base/services/wallet-connect-service/handler/Eip155RequestHandler';
 import { SWStorage } from '@subwallet/extension-base/storage';
+import { wait } from '@subwallet/extension-base/utils';
 import { IKeyValueStorage } from '@walletconnect/keyvaluestorage';
 import SignClient from '@walletconnect/sign-client';
 import { EngineTypes, SessionTypes, SignClientTypes } from '@walletconnect/types';
@@ -13,7 +14,7 @@ import { getInternalError, getSdkError } from '@walletconnect/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
-import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
+import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SESSION_TIMEOUT, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
 
@@ -85,7 +86,17 @@ export default class WalletConnectService {
     this.#removeListener();
 
     if (force || await this.haveData()) {
-      this.#client = await SignClient.init(this.#option);
+      try {
+        this.#client = await SignClient.init(this.#option);
+      } catch (e) {
+        if (this.#option.relayUrl === RELAY_URL) {
+          this.#option = { ...this.#option, relayUrl: RELAY_FALLBACK_URL };
+
+          this.#client = await SignClient.init(this.#option);
+        } else {
+          throw e;
+        }
+      }
     }
 
     this.#updateSessions();
@@ -231,13 +242,19 @@ export default class WalletConnectService {
   }
 
   public async connect (uri: string) {
-    if (!(await this.haveData())) {
+    if (!(await this.haveData()) || !this.#client?.core.relayer.connected) {
       await this.initClient(true);
     }
 
     this.#checkClient();
 
-    await this.#client?.pair({ uri });
+    // The purpose of designing a timeout for pairing is to prevent the promise from not being resolved if there are issues during the pairing process.
+    await Promise.race([
+      this.#client?.pair({ uri }),
+      wait(WALLET_CONNECT_SESSION_TIMEOUT).then(() => {
+        throw new Error(getInternalError('EXPIRED').message);
+      })
+    ]);
   }
 
   public async approveSession (result: ResultApproveWalletConnectSession) {

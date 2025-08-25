@@ -118,6 +118,7 @@ export interface SubnetYieldPositionInfo extends AbstractYieldPositionInfo {
     subnetSymbol: string;
     subnetShortName: string;
     originalTotalStake: string;
+    netuid?: number;
   };
 }
 
