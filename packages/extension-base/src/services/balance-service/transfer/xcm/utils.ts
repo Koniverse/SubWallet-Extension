@@ -68,7 +68,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v3';
+const version = '/v4';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
@@ -159,7 +159,10 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     address: recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue),
+    options: {
+      abstractDecimals: false
+    }
   };
 
   const response = await fetchFromProxyService(
@@ -202,7 +205,10 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     address: recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue)
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue),
+    options: {
+      abstractDecimals: false
+    }
   };
 
   const response = await fetchFromProxyService(
@@ -249,7 +255,10 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     address: recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, value)
+    currency: createParaSpellCurrency(psAssetType, psAssetValue, value),
+    options: {
+      abstractDecimals: false
+    }
   };
 
   const response = await fetchFromProxyService(
