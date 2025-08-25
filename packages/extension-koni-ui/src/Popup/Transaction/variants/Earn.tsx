@@ -330,13 +330,13 @@ const Component = () => {
 
     const isFromChanged = changedFields.some((field) => field.name.toString() === 'from');
 
-    if (isFromChanged) {
+    if (isFromChanged && poolType === YieldPoolType.NOMINATION_POOL) {
       form.resetFields(['target']);
     }
 
     setIsFormInvalid(empty || error);
     persistData(values);
-  }, [form, persistData]);
+  }, [form, persistData, poolType]);
 
   const handleDataForInsufficientAlert = useCallback(() => {
     const _assetDecimals = nativeAsset?.decimals || 0;
@@ -469,7 +469,6 @@ const Component = () => {
     setSubmitLoading
   );
 
-  console.log('Hmm', [earningRate, earningSlippage, submitLoading]);
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
