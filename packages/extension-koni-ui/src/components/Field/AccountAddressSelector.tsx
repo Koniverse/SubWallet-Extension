@@ -120,7 +120,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
   }, []);
 
   useEffect(() => {
-    if (isGovModal && !value && items.length > 0 && !disabled && !readOnly) {
+    if (isGovModal && !value && items.length > 1 && !disabled && !readOnly) {
       activeModal(id);
     }
   }, [isGovModal, value, items.length, disabled, readOnly, activeModal, id]);

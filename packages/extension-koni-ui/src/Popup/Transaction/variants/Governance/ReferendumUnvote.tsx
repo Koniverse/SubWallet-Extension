@@ -39,7 +39,7 @@ type ComponentProps = {
   isAllAccount?: boolean
 };
 
-const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendumId'];
+const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendumId', 'track'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', targetAccountProxy } = props;

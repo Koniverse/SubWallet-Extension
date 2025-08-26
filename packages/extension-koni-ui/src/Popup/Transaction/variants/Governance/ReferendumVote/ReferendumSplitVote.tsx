@@ -16,6 +16,7 @@ import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/go
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { balanceFormatter, Button, Form, formatNumber, Icon } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
+import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,22 +35,22 @@ type ComponentProps = {
   isAllAccount?: boolean
 };
 
-const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'conviction', 'fromAccountProxy'];
+const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'conviction', 'fromAccountProxy', 'track'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
   const { className = '' } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
-  const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
-  const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
+  const [govRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
+  const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const splitRenderKey = 'split_vote_amount';
   const [splitAmountRenderKey, setSplitAmountRenderKey] = useState<string>(splitRenderKey);
 
   const [loading, setLoading] = useState(false);
-  const [isDisable, setIsDisable] = useState(false);
+  const [isDisable, setIsDisable] = useState(true);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -81,7 +82,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
       setSplitAmountRenderKey(`${splitAmountRenderKey}_${Date.now()}`);
     }
-  }, [voteInfo, form, splitAmountRenderKey]);
+  }, [voteInfo, form, splitAmountRenderKey, govRefVoteStorage.from]);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
 
@@ -90,11 +91,19 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const onFieldsChange: FormCallbacks<GovReferendumVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
-    const { empty, error } = simpleCheckForm(allFields, ['--asset']);
+    const fieldsToCheck = allFields.filter(
+      (field) => ['chain', 'referendumId', 'from'].includes(String(Array.isArray(field.name) ? field.name[0] : field.name))
+    );
+
+    const { empty, error } = simpleCheckForm(fieldsToCheck);
 
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    setIsDisable(empty || error);
+    const hasAmount =
+  (values.ayeAmount && new BigNumber(values.ayeAmount).gt(0)) ||
+  (values.nayAmount && new BigNumber(values.nayAmount).gt(0));
+
+    setIsDisable(empty || error || !hasAmount);
     persistData(values);
   }, [persistData]);
 
@@ -119,14 +128,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
-    setGovRefVoteStorage({
-      ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
-      fromAccountProxy: defaultData.fromAccountProxy,
-      referendumId: defaultData.referendumId,
-      chain: defaultData.chain
-    });
     navigate('/transaction/gov-ref-vote/standard');
-  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.referendumId, navigate, setGovRefVoteStorage]);
+  }, [navigate]);
 
   useEffect(() => {
     setCustomScreenTitle(t('Split for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
@@ -148,7 +151,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         onClick: null
       }));
     };
-  }, [goRefStandardVote, setBackProps, setGovRefVoteStorage]);
+  }, [goRefStandardVote, setBackProps]);
 
   useEffect(() => {
     const updateFromValue = () => {

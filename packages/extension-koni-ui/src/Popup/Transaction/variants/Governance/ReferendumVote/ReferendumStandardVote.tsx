@@ -34,14 +34,14 @@ type ComponentProps = {
   isAllAccount?: boolean
 };
 
-const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy'];
+const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy', 'track'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '' } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
-  const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData }), [defaultData]);
-  const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
+  const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
+  const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
@@ -66,13 +66,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     accountAddressItems: GovAccountAddressItemType[]
   } = useOutletContext();
 
-  console.log('voteMap2', voteMap);
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
 
-  console.log('accountAddressItems', accountAddressItems);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
 
@@ -128,24 +126,26 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+      from: fromValue,
       fromAccountProxy: defaultData.fromAccountProxy,
       referendumId: referendumId,
       track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-vote/split');
-  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.track, fromValue, navigate, referendumId, setGovRefVoteStorage]);
 
   const goRefAbstainVote = useCallback(() => {
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+      from: fromValue,
       fromAccountProxy: defaultData.fromAccountProxy,
       referendumId: referendumId,
       track: defaultData.track,
       chain: defaultData.chain
     });
     navigate('/transaction/gov-ref-vote/abstain');
-  }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, defaultData.track, navigate, setGovRefVoteStorage]);
+  }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.track, fromValue, navigate, referendumId, setGovRefVoteStorage]);
 
   const getAccountVoteStatus = useCallback((address: string): GovVoteStatus => {
     const voteDetail = voteMap.get(address.toLowerCase());
