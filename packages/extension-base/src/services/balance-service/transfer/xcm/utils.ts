@@ -58,7 +58,7 @@ export type GetXcmFeeResult = {
 }
 
 interface ParaSpellCurrency {
-  [p: string]: string,
+  [p: string]: any,
   amount: string
 }
 
@@ -146,10 +146,9 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw new Error('Substrate API is not available');
   }
 
-  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
-  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
 
-  if (!psAssetType || !psAssetValue) {
+  if (!paraSpellIdentifyV4) {
     throw new Error('Token is not support XCM at this time');
   }
 
@@ -159,7 +158,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     address: recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue),
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
     options: {
       abstractDecimals: false
     }
@@ -193,10 +192,9 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
-  const psAssetType = originTokenInfo.metadata?.paraSpellAssetType;
-  const psAssetValue = originTokenInfo.metadata?.paraSpellValue;
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
 
-  if (!psAssetType || !psAssetValue) {
+  if (!paraSpellIdentifyV4) {
     throw new Error('Token is not support XCM at this time');
   }
 
@@ -205,7 +203,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
     address: recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, sendingValue),
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
     options: {
       abstractDecimals: false
     }
@@ -241,10 +239,9 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
-  const psAssetType = fromTokenInfo.metadata?.paraSpellAssetType;
-  const psAssetValue = fromTokenInfo.metadata?.paraSpellValue;
+  const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
 
-  if (!psAssetType || !psAssetValue) {
+  if (!paraSpellIdentifyV4) {
     console.error('Lack of paraspell metadata');
 
     return undefined;
@@ -255,7 +252,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     address: recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
-    currency: createParaSpellCurrency(psAssetType, psAssetValue, value),
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, value),
     options: {
       abstractDecimals: false
     }
@@ -283,11 +280,11 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   return await response.json() as GetXcmFeeResult;
 }
 
-function createParaSpellCurrency (assetType: string, assetValue: string, amount: string): ParaSpellCurrency {
+function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
   // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
   // todo: or update all asset to use multi-location
   return {
-    [assetType]: assetValue,
+    ...paraSpellIdentifyV4,
     amount
   };
 }
