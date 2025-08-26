@@ -6242,13 +6242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.113-beta.5-pr-554-7753013e":
-  version: 0.2.113-beta.5-pr-554-7753013e
-  resolution: "@subwallet/chain-list@npm:0.2.113-beta.5-pr-554-7753013e"
+"@subwallet/chain-list@npm:0.2.113-beta.8-pr-555-e603d95b":
+  version: 0.2.113-beta.8-pr-555-e603d95b
+  resolution: "@subwallet/chain-list@npm:0.2.113-beta.8-pr-555-e603d95b"
   dependencies:
     "@polkadot/util": ^13.5.5
     ts-md5: ^2.0.1
-  checksum: 7b96abf1344e3f9dba8ea85bdeb079062167547f2096e78d0939ee8d996d48f92a76d16e8b00ca4dbd3e4fd01525d17c7cbb27ea374fa805c42d527bbce7d6fe
+  checksum: 4057b0b818587cb9fe5d870a8cdc3a9025e9750df345fd6fbaa618ff529055cd5443c7758f768945e9868f154091b058c66c8f8f011133acaad3acec4faed805
   languageName: node
   linkType: hard
 
@@ -6293,7 +6293,7 @@ __metadata:
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
     "@subwallet-monorepos/subwallet-services-sdk": ^0.1.8
-    "@subwallet/chain-list": 0.2.113-beta.5-pr-554-7753013e
+    "@subwallet/chain-list": 0.2.113-beta.8-pr-555-e603d95b
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6434,7 +6434,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.113-beta.5-pr-554-7753013e
+    "@subwallet/chain-list": 0.2.113-beta.8-pr-555-e603d95b
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6576,7 +6576,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.113-beta.5-pr-554-7753013e
+    "@subwallet/chain-list": 0.2.113-beta.8-pr-555-e603d95b
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
