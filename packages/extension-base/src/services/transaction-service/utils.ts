@@ -22,11 +22,11 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
-  if (explorerLink.includes('edgscan.ink')) {
+  if (explorerLink.includes('explorer.comstats.org')) {
     return 'accounts';
   }
 
-  if (explorerLink.includes('explorer.comstats.org')) {
+  if (explorerLink.includes('edgscan.ink')) {
     return 'accounts';
   }
 
