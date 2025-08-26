@@ -5,11 +5,10 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { calculateAlephZeroValidatorReturn, calculateChainStakedReturnV2, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getAvgValidatorEraReward, getCommission, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getRelayBlockedValidatorList, getRelayEraRewardMap, getRelayMaxNominations, getRelayTopValidatorByPoints, getRelayValidatorPointsMap, getRelayWaitingValidatorList, getSupportedDaysByHistoryDepth } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, _SUPPORT_CHANGE_VALIDATOR_CHAIN, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
 import { applyDecimal, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
 import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
@@ -18,7 +17,6 @@ import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
-import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 
@@ -32,19 +30,8 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     cancelUnstake: true,
     withdraw: true,
     claimReward: false,
-    changeValidator: false
+    changeValidator: true
   };
-
-  constructor (state: KoniState, chain: string) {
-    super(state, chain);
-
-    if (_SUPPORT_CHANGE_VALIDATOR_CHAIN.includes(chain)) {
-      this.availableMethod = {
-        ...this.availableMethod,
-        changeValidator: true
-      };
-    }
-  }
   /* Subscribe pool info */
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
@@ -181,7 +168,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
   /* Subscribe pool position */
 
-  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN, _deriveSessionProgress: DeriveSessionProgress): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parseNominatorMetadata (chainInfo: _ChainInfo, address: string, substrateApi: _SubstrateApi, ledger: PalletStakingStakingLedger, currentEra: string, minStake: BN): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chain = chainInfo.slug;
 
     const [_nominations, _bonded, _activeEra] = await Promise.all([
@@ -333,7 +320,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
       }
 
       if (ledgers) {
-        const [_currentEra, _minimumActiveStake, _minNominatorBond, _deriveSessionProgress] = await Promise.all([
+        const [_currentEra, _minimumActiveStake, _minNominatorBond] = await Promise.all([
           substrateApi.api.query?.staking?.currentEra(),
           substrateApi.api.query?.staking?.minimumActiveStake && substrateApi.api.query?.staking?.minimumActiveStake(),
           substrateApi.api.query?.staking?.minNominatorBond(),
@@ -352,7 +339,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
           const ledger = _ledger.toPrimitive() as unknown as PalletStakingStakingLedger;
 
           if (ledger) {
-            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake, _deriveSessionProgress);
+            const nominatorMetadata = await this.parseNominatorMetadata(chainInfo, owner, substrateApi, ledger, currentEra, minStake);
 
             resultCallback({
               ...defaultInfo,
@@ -396,7 +383,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
         const address = useAddresses[i];
         const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
 
-        if (_ledger.total > 0) {
+        if (_ledger && _ledger.total > 0) {
           result.push(address);
         }
       }

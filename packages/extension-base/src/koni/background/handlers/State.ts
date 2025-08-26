@@ -11,7 +11,7 @@ import { withErrorLog } from '@subwallet/extension-base/background/handlers/help
 import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
 import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtRequest, BitcoinSignPsbtResult, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
-import { BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL, EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
+import { EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
 import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
@@ -47,11 +47,10 @@ import { TransactionEventResponse } from '@subwallet/extension-base/services/tra
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { BalanceItem, BasicTxErrorType, CurrentAccountInfo, EvmFeeInfo, RequestCheckPublicAndSecretKey, ResponseCheckPublicAndSecretKey, StorageDataInterface } from '@subwallet/extension-base/types';
-import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
+import { addLazy, isManifestV3, isSameAddress, reformatAddress, sailsCache, setupApiSDK, stripUrl, targetIsWeb } from '@subwallet/extension-base/utils';
 import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
@@ -151,10 +150,7 @@ export default class KoniState {
 
   constructor (providers: Providers = {}) {
     // Init subwallet api sdk
-    subwalletApiSdk.init({
-      url: BACKEND_API_URL,
-      priceHistoryUrl: BACKEND_PRICE_HISTORY_URL
-    });
+    setupApiSDK();
 
     this.providers = providers;
 
@@ -615,6 +611,13 @@ export default class KoniState {
         } else {
           throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
         }
+      });
+  }
+
+  public async showUnsupportedNetworkSwitchConfirm (id: string, url: string, networkData: _NetworkUpsertParams) {
+    return this.requestService.addConfirmation(id, url, 'addNetworkRequest', networkData)
+      .then(() => {
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
       });
   }
 
@@ -2199,6 +2202,7 @@ export default class KoniState {
     await this.walletConnectService.resetWallet(resetAll);
 
     await this.chainService.init();
+    this.chainOnlineService.resetFirstApplied();
     this.chainOnlineService.checkLatestData();
     this.chainService.checkLatestData();
     this.chainService.subscribeChainInfoMap().subscribe(() => {

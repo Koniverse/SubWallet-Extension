@@ -8,6 +8,7 @@ import { SignClientTypes } from '@walletconnect/types';
 export const PROJECT_ID_EXTENSION = '6da34c0b48164d27681924dd9a46d6be';
 export const PROJECT_ID_MOBILE = '6da34c0b48164d27681924dd9a46d6be';
 export const RELAY_URL = 'wss://relay.walletconnect.com';
+export const RELAY_FALLBACK_URL = 'wss://relay.walletconnect.org';
 
 export const DEFAULT_WALLET_CONNECT_OPTIONS: SignClientTypes.Options = {
   logger: 'error',
@@ -39,3 +40,5 @@ export const WALLET_CONNECT_EIP155_NAMESPACE = 'eip155';
 export const WALLET_CONNECT_POLKADOT_NAMESPACE = 'polkadot';
 
 export const WALLET_CONNECT_SUPPORT_NAMESPACES: string[] = [WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_POLKADOT_NAMESPACE];
+
+export const WALLET_CONNECT_SESSION_TIMEOUT = 20000; // 20 seconds

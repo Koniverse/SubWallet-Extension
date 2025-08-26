@@ -23,6 +23,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   ) {
     return {
       status: 'warning',
+      needCloseLedger: true,
       message: t('Please unlock your Ledger')
     };
   }
@@ -31,6 +32,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     message.includes('App does not seem to be open') || // App not open
     message.includes('Unknown Status Code: 28161') || // Substrate stay in dashboard
     message.includes('Unknown Status Code: 28160') || // Substrate stay in dashboard
+    message.includes('Unknown Return Code: 0x6987') || // TX_NOT_INITIALIZED
     message.includes('CLA_NOT_SUPPORTED') || // Evm wrong app
     message.includes('Wrong Length') // Attach account Polkadot ECDSA in Polkadot Migration App
   ) {
