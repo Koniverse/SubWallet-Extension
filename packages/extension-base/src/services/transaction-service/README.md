@@ -232,6 +232,102 @@ graph LR
   - Sequence number management
   - External message handling
 
+### Account-Specific Signing Methods
+
+#### PASSWORD Accounts
+- **Signing Method**: `keyring.unlockPair(address)` → `request.sign(registry, pair)`
+- **Process**: Local keyring signing with encrypted private key
+- **Timing**: Immediate (< 1 second)
+
+#### LEDGER Accounts  
+- **Signing Method**: Hardware device communication via USB/Bluetooth
+- **Special Steps**:
+  1. Device connection verification
+  2. Transaction data display on Ledger screen
+  3. Physical confirmation button press required
+  4. Signature retrieval from secure element
+- **Process**: External hardware signing with manual confirmation
+- **Timing**: 5-30 seconds (user interaction required)
+
+#### QR Accounts
+- **Signing Method**: Air-gapped QR code workflow
+- **Process**: 
+  1. Generate QR code with transaction data
+  2. External device scans and signs
+  3. Signature returned via QR code scan
+- **Timing**: Variable (depends on external device)
+
+#### INJECTED Accounts
+- **Signing Method**: External wallet extension communication
+- **Process**: Request forwarded to connected browser wallet
+- **Timing**: Depends on external wallet response
+
+**Key Point**: All account types receive identical transaction requests. Only the signing implementation differs.
+
+### Substrate Ledger Request Customization
+
+Substrate transactions require specific transformations for Ledger devices based on runtime state.
+
+#### Runtime-Based Enhancement
+
+```typescript
+// Base request (same for all account types)
+const basePayload: SignerPayloadJSON = {
+  address: account.address,
+  method: extrinsic.method.toHex(),
+  nonce: transaction.nonce,
+  genesisHash: chain.genesisHash,
+  // ... other standard fields
+};
+
+// Ledger enhancement based on runtime
+const isRuntimeUpdated = _isRuntimeUpdated(basePayload.signedExtensions);
+
+const ledgerPayload = isRuntimeUpdated ? {
+  ...basePayload,
+  mode: 1,                           // Ledger signing mode
+  withSignedTransaction: true,       // Enable transaction reconstruction
+  metadataHash: calculateMetadataHash(chain.metadata)
+} : basePayload;
+```
+
+#### Metadata Processing
+
+Modern runtimes require metadata compression for Ledger:
+
+```typescript
+const payloadU8a = payload.toU8a(true);
+
+if (isRuntimeUpdated) {
+  // Compress metadata for Ledger display
+  const blob = u8aToHex(payloadU8a);
+  const { txMetadata: shortener } = await shortenMetadata(chainSlug, blob);
+  const metadata = hexToU8a(shortener);
+} else {
+  // No metadata needed for legacy runtime
+  const metadata = new Uint8Array(0);
+}
+
+// Sign with processed metadata
+const { signature } = await ledgerSignTransaction(payloadU8a, metadata, ...accountInfo);
+```
+
+#### Transaction Reconstruction
+
+For modern runtime with `withSignedTransaction: true`:
+
+```typescript
+if (addExtraData) {
+  // Build complete signed extrinsic
+  const extrinsic = payload.registry.createType('Extrinsic', { method: payload.method }, { version: 4 });
+  extrinsic.addSignature(account.address, signature, payload.toHex());
+  
+  return { signature, signedTransaction: extrinsic.toHex() };
+} else {
+  return { signature };
+}
+```
+
 ### Process Management Methods
 
 #### `createProcessIfNeed(process: ProcessTransactionData): Promise<void>`
