@@ -7,7 +7,7 @@ import { Button, Icon, Switch, SwModal, Tooltip } from '@subwallet/react-ui';
 import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { FadersHorizontal, Info } from 'phosphor-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

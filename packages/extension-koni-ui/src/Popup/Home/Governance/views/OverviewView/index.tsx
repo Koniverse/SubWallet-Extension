@@ -3,9 +3,7 @@
 
 import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
 import { ALL_TRACK_ID } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovTrackSelector';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button } from '@subwallet/react-ui';
@@ -28,8 +26,6 @@ type Props = ThemeProps & ViewBaseType & {
 const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
-  // const { accounts: _accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
-
   const onClickReferendumItem = useCallback((item: Referendum) => {
     goReferendumDetail(`${item.referendumIndex}`);
   }, [goReferendumDetail]);
@@ -89,8 +85,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
   }, [fetchNextPage]);
 
   const items = (data?.pages.flatMap((page) => page?.items ?? []) || []);
-
-  console.log('items count:', items.length, items);
 
   return (
     <div className={className}>

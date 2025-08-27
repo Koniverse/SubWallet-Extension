@@ -1,18 +1,24 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import GovAccountSelectoModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
+import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
+import { ModalContext } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { useGovReferendumVotes } from '../../hooks/useGovernanceView/useGovReferendumVotes';
 import { MetaArea } from './parts/MetaArea';
 import { RequestedAmount } from './parts/RequestedAmount';
 import { TabsContainer } from './parts/TabsContainer';
@@ -26,6 +32,20 @@ type Props = ThemeProps & ViewBaseType & {
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
   const { currentAccountProxy } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
+  const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
+
+  const { accountAddressItems } = useGovReferendumVotes({
+    chain: chainSlug,
+    referendumId: referendumId,
+    fromAccountProxy
+  });
+
+  const modalId = 'account-selector';
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
+
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const onBack = useCallback(() => {
     goOverview();
@@ -43,20 +63,50 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     staleTime: 60 * 1000
   });
 
-  const onClickVote = useCallback(() => {
+  const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
+    if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
+      openAlert({
+        title: t('Unable to vote'),
+        type: NotificationType.ERROR,
+        content: t(
+          'You\'re delegating votes for the referendum\'s track with account named "{{name}}". Ask your delegatee to vote or remove your delegated votes, then try again',
+          { name: item.accountName }
+        ),
+        okButton: {
+          text: t('I understand'),
+          onClick: closeAlert
+        }
+      });
+
+      return;
+    }
+
     if (!referendumId || !data?.track) {
       return;
     }
 
     setGovRefVoteStorage({
       ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+      from: item.address,
       referendumId,
       track: data.track,
       chain: chainSlug,
-      fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
+      fromAccountProxy
     });
     navigate('/transaction/gov-ref-vote/standard');
-  }, [chainSlug, currentAccountProxy, data?.track, navigate, referendumId, setGovRefVoteStorage]);
+  }, [chainSlug, closeAlert, data?.track, fromAccountProxy, navigate, openAlert, referendumId, setGovRefVoteStorage, t]);
+
+  const onClickVote = useCallback(() => {
+    if (accountAddressItems.length > 1) {
+      activeModal(modalId);
+    } else if (accountAddressItems.length === 1) {
+      onSelectGovItem(accountAddressItems[0]);
+    }
+  }, [accountAddressItems, activeModal, modalId, onSelectGovItem]);
+
+  const onCancel = useCallback(() => {
+    inactiveModal(modalId);
+  }, [inactiveModal]);
 
   if (!data) {
     return <></>;
@@ -84,6 +134,13 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       { allSpends && (<RequestedAmount allSpend={allSpends} />)}
 
       <TabsContainer referendumDetail={data} />
+
+      <GovAccountSelectoModal
+        items={accountAddressItems}
+        modalId={modalId}
+        onCancel={onCancel}
+        onSelectItem={onSelectGovItem}
+      />
     </div>
   );
 };

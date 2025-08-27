@@ -159,7 +159,7 @@ export default abstract class BaseOpenGovHandler {
   }
 
   private async validateConvictionAndBalance (address: string, balance: string, conviction: number): Promise<TransactionError | null> {
-    const transferableBalance = await this.state.balanceService.getTransferableBalance(address, this.chain);
+    const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
 
     if (!balance) {
       return new TransactionError(BasicTxErrorType.INVALID_PARAMS, ('Amount is required'));
@@ -171,9 +171,9 @@ export default abstract class BaseOpenGovHandler {
       return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0');
     }
 
-    if (bnBalance.gt(transferableBalance.value)) {
+    if (bnBalance.gt(totalBalance.value)) {
       const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
-      const maxString = formatNumber(transferableBalance.value, _getAssetDecimals(chainAsset));
+      const maxString = formatNumber(totalBalance.value, _getAssetDecimals(chainAsset));
 
       const msg = maxString !== '0'
         ? `Amount must be equal or less than ${maxString}`
