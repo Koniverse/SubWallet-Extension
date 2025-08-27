@@ -463,7 +463,6 @@ const Component = () => {
     setSubmitLoading
   );
 
-  console.log('Hmm', [earningRate, earningSlippage, submitLoading]);
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
