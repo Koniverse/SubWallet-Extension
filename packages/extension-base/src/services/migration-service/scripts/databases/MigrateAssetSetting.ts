@@ -8,12 +8,7 @@ export default class MigrateAssetSetting extends BaseMigrationJob {
   public override async run (): Promise<void> {
     try {
       const changeSlugsMap: Record<string, string> = {
-        'bifrost_testnet-NATIVE-BNC': 'bifrost_testnet-NATIVE-BFC',
-        'energy_web_x_rococo-NATIVE-VT': 'energy_web_x_rococo-NATIVE-EWT',
-        'chainflip_dot-NATIVE-DOT': 'chainflip_dot-NATIVE-Unit',
-        'autonomys_taurus-NATIVE-AI3': 'autonomys_taurus-NATIVE-tAI3',
-        'fraxtal-NATIVE-frxETH': 'fraxtal-ERC20-frxETH-0xFC00000000000000000000000000000000000006',
-        'arbitrum_one-ERC20-USDT-0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9': 'arbitrum_one-ERC20-USD₮0-0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'
+        'polygon-ERC20-USDT-0xc2132D05D31c914a87C6611C10748AEb04B58e8F': 'polygon-ERC20-USD₮0-0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
       };
 
       const assetSetting = await this.state.chainService.getAssetSettings();
