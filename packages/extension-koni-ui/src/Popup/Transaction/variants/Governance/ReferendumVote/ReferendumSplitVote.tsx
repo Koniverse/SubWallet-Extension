@@ -110,6 +110,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const onSubmit: FormCallbacks<GovReferendumVoteParams>['onFinish'] = useCallback((values: GovReferendumVoteParams) => {
     setLoading(true);
     const voteRequest: SplitVoteRequest = {
+      conviction: 0,
       chain: chainValue,
       address: values.from,
       referendumIndex: defaultData.referendumId,

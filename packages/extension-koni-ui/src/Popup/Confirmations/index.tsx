@@ -4,6 +4,7 @@
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { GovVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountSignMode, ProcessType, SubmitBittensorChangeValidatorStaking } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
@@ -378,9 +379,11 @@ const Component = function ({ className }: Props) {
           return t('Swap confirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('Claim confirmation');
-        case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.GOV_VOTE:
+          return t('Vote for #{{id}}', { id: (transaction.data as GovVoteRequest).referendumIndex });
         case ExtrinsicType.GOV_UNVOTE:
+          return t('Unvote confirmation');
+        case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('Transaction confirm');

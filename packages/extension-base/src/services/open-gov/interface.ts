@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export enum GovVoteType {
-  AYE = 'aye',
-  NAY = 'nay',
-  SPLIT = 'split',
-  ABSTAIN = 'abstain',
+  AYE = 'Aye',
+  NAY = 'Nay',
+  SPLIT = 'Split',
+  ABSTAIN = 'Abstain',
 }
 
 interface BaseVoteRequest {
@@ -13,12 +13,12 @@ interface BaseVoteRequest {
   address: string;
   referendumIndex: string;
   trackId: number;
+  conviction: number;
 }
 
 export interface StandardVoteRequest extends BaseVoteRequest {
   type: GovVoteType.AYE | GovVoteType.NAY;
   amount: string;
-  conviction: number;
 }
 
 export interface SplitVoteRequest extends BaseVoteRequest {
@@ -35,6 +35,16 @@ export interface SplitAbstainVoteRequest extends BaseVoteRequest {
 }
 
 export type GovVoteRequest = StandardVoteRequest | SplitVoteRequest | SplitAbstainVoteRequest;
+
+export const govConvictionOptions = [
+  { value: 0, label: '0.1x', description: 'No lockup' },
+  { value: 1, label: '1x', description: '~7d' },
+  { value: 2, label: '2x', description: '~14d' },
+  { value: 3, label: '3x', description: '~21d' },
+  { value: 4, label: '4x', description: '~28d' },
+  { value: 5, label: '5x', description: '~35d' },
+  { value: 6, label: '6x', description: '~42d' }
+];
 
 export enum Conviction {
   None = 'None',
@@ -61,6 +71,12 @@ export interface RemoveVoteRequest {
   chain: string;
   trackId: number;
   referendumIndex: string;
+  amount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+  abstainAmount?: string;
+  totalAmount: string;
+  type?: GovVoteType
 }
 
 export interface VotingFor {

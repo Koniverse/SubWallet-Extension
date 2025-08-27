@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
 import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -11,26 +12,16 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & BasicInputWrapper<number>;
 
-const options = [
-  { value: 0, label: '0.1x' },
-  { value: 1, label: '1x' },
-  { value: 2, label: '2x' },
-  { value: 3, label: '3x' },
-  { value: 4, label: '4x' },
-  { value: 5, label: '5x' },
-  { value: 6, label: '6x' }
-];
-
-const sliderMax = Math.max(...options.map((o) => o.value));
-const sliderMin = Math.min(...options.map((o) => o.value));
-const marks = options.reduce((acc, opts) => {
+const sliderMax = Math.max(...govConvictionOptions.map((o) => o.value));
+const sliderMin = Math.min(...govConvictionOptions.map((o) => o.value));
+const marks = govConvictionOptions.reduce((acc, opts) => {
   acc[opts.value] = opts.label;
 
   return acc;
 }, {} as Record<number, string>);
 
 const sanitizeValue = (value?: number): number => (
-  value && options.some((o) => o.value === value)
+  value && govConvictionOptions.some((o) => o.value === value)
     ? value
     : sliderMin
 );

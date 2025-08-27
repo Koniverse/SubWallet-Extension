@@ -58,6 +58,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
+  const conviction = useWatchTransaction('conviction', form, defaultData);
+
   const referendumId = defaultData.referendumId;
 
   const { voteMap = new Map<string, ReferendumVoteDetail>(),
@@ -111,7 +113,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         trackId: defaultData.track,
         type: voteType,
         amount: values.amount || '0',
-        conviction: defaultData.conviction
+        conviction: conviction
       };
 
       handleVote(voteRequest)
@@ -121,7 +123,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         .catch(onError)
         .finally(() => setLoading(false));
     }
-  }, [chainValue, defaultData.conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
+  }, [chainValue, conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({

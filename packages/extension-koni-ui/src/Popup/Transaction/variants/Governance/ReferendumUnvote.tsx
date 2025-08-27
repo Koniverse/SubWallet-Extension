@@ -2,23 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { GovVoteType, RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, HiddenInput } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useCoreCreateReformatAddress, useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
-import { chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
 import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { Button, Form, Icon } from '@subwallet/react-ui';
-import getSubsquareApi, { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
-import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
-import { useQuery } from '@tanstack/react-query';
+import { Button, Form, Icon, Number } from '@subwallet/react-ui';
+import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -26,8 +21,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
-
-import { chain } from '@polkadot/types/interfaces/definitions';
 
 import { TransactionContent, TransactionFooter } from '../../parts';
 
@@ -42,7 +35,7 @@ type ComponentProps = {
 const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendumId', 'track'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  const { className = '', targetAccountProxy } = props;
+  const { className = '' } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
@@ -55,97 +48,62 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const referendumId = defaultData.referendumId;
 
-  const getReformatAddress = useCoreCreateReformatAddress();
-  const { accountProxies } = useSelector((state: RootState) => state.accountState);
-
-  const { chainInfoMap } = useSelector((root) => root.chainStore);
-
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
-  const sdkInstance: SubsquareApiSdk = useMemo(() => {
-    return getSubsquareApi(chainSlugToSubsquareNetwork[chainValue]);
-  }, [chainValue]);
+  const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
 
-  const { data: voteData } = useQuery({
-    queryKey: GOV_QUERY_KEYS.referendumVotes(chainValue, referendumId),
-    queryFn: async () => {
-      if (!referendumId) {
-        return undefined;
-      }
-
-      return await sdkInstance?.getReferendaVotes(`${referendumId}`);
-    },
-    enabled: !!referendumId && !!chain,
-    staleTime: 60 * 1000
+  const { accountAddressItems, voteMap } = useGovReferendumVotes({
+    chain: chainValue,
+    referendumId: referendumId,
+    fromAccountProxy: defaultData.fromAccountProxy
   });
 
-  const voteMap = useMemo(() => {
-    if (!voteData) {
-      return new Map<string, ReferendumVoteDetail>();
+  const fromVoteDetail = useMemo(() => {
+    if (!fromValue) {
+      return undefined;
     }
 
-    const map = new Map<string, ReferendumVoteDetail>();
-
-    voteData.forEach((vote: ReferendumVoteDetail) => {
-      map.set(vote.account.toLowerCase(), vote);
-    });
-
-    return map;
-  }, [voteData]);
-
-  const accountAddressItems = useMemo(() => {
-    const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
-
-    if (!chainInfo || !targetAccountProxy) {
-      return [];
+    return voteMap.get(fromValue.toLowerCase());
+  }, [fromValue, voteMap]);
+  const totalAmount = useMemo(() => {
+    if (!fromVoteDetail) {
+      return new BigNumber(0);
     }
 
-    const result: GovAccountAddressItemType[] = [];
-
-    const updateResult = (ap: AccountProxy) => {
-      ap.accounts.forEach((a) => {
-        const address = getReformatAddress(a, chainInfo);
-
-        if (address) {
-          const voteInfo = voteMap.get(address.toLowerCase());
-
-          const govVoteStatus = voteInfo
-            ? (voteInfo.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED)
-            : GovVoteStatus.NOT_VOTED;
-
-          if (govVoteStatus === GovVoteStatus.VOTED) {
-            result.push({
-              accountName: ap.name,
-              accountProxyId: ap.id,
-              accountProxyType: ap.accountType,
-              accountType: a.type,
-              address,
-              govVoteStatus
-            });
-          }
-        }
-      });
-    };
-
-    if (isAccountAll(targetAccountProxy.id)) {
-      accountProxies.forEach((ap) => {
-        if (isAccountAll(ap.id)) {
-          return;
-        }
-
-        if ([AccountProxyType.READ_ONLY].includes(ap.accountType)) {
-          return;
-        }
-
-        updateResult(ap);
-      });
-    } else {
-      updateResult(targetAccountProxy);
+    if (fromVoteDetail.isSplitAbstain) {
+      return new BigNumber(fromVoteDetail.ayeBalance ?? 0)
+        .plus(fromVoteDetail.nayBalance ?? 0)
+        .plus(fromVoteDetail.abstainBalance ?? 0);
     }
 
-    return result;
-  }, [chainValue, chainInfoMap, targetAccountProxy, getReformatAddress, voteMap, accountProxies]);
+    if (fromVoteDetail.isSplit) {
+      return new BigNumber(fromVoteDetail.ayeBalance ?? 0)
+        .plus(fromVoteDetail.nayBalance ?? 0);
+    }
+
+    return new BigNumber(fromVoteDetail.balance ?? 0);
+  }, [fromVoteDetail]);
+
+  const fromVoteType = useMemo<GovVoteType | undefined>(() => {
+    if (!fromVoteDetail) {
+      return undefined;
+    }
+
+    if (fromVoteDetail.isSplitAbstain) {
+      return GovVoteType.ABSTAIN;
+    }
+
+    if (fromVoteDetail.isSplit) {
+      return GovVoteType.SPLIT;
+    }
+
+    if (fromVoteDetail.isStandard) {
+      return fromVoteDetail.aye ? GovVoteType.AYE : GovVoteType.NAY;
+    }
+
+    return undefined;
+  }, [fromVoteDetail]);
 
   const onFieldsChange: FormCallbacks<GovReferendumUnvoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
@@ -163,7 +121,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       chain: chainValue,
       address: values.from,
       referendumIndex: referendumId,
-      trackId: defaultData.track
+      trackId: defaultData.track,
+      amount: fromVoteDetail?.balance,
+      nayAmount: fromVoteDetail?.nayBalance,
+      ayeAmount: fromVoteDetail?.ayeBalance,
+      abstainAmount: fromVoteDetail?.abstainBalance,
+      totalAmount: totalAmount.toString(),
+      type: fromVoteType
     };
 
     handleRemoveVote(voteRequest)
@@ -172,7 +136,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       })
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, referendumId, defaultData.track, onError, onSuccess]);
+  }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     setGovRefVoteStorage({
@@ -248,6 +212,17 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             />
           </Form.Item>
         </Form>
+        <div className='__total-amount-part'>
+          <div>{t('Amount')}
+          </div>
+          <div>
+            <Number
+              decimal={decimals}
+              suffix={symbol}
+              value={totalAmount}
+            />
+          </div>
+        </div>
       </TransactionContent>
 
       <TransactionFooter className={`${className} -transaction-footer`}>
@@ -324,7 +299,16 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const ReferendumUnvote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
-
+    '.__total-amount-part': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '0px 12px',
+      borderRadius: token.borderRadiusLG,
+      backgroundColor: token.colorBgSecondary,
+      marginTop: token.sizeSM,
+      fontSize: token.fontSizeHeading6
+    }
   };
 });
 
