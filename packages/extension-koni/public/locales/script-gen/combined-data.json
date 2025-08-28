@@ -1,4 +1,34 @@
 {
+  "Priority fee is higher than necessary. You may pay more than needed": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/FeeEditorModal.tsx",
+        "key": "ui.TRANSACTION.components.Field.FeeEditor.Modal.highPriorityFeeWarning"
+      }
+    ],
+    "translations": {
+      "en": "Priority fee is higher than necessary. You may pay more than needed",
+      "ja": "Priority fee is higher than necessary. You may pay more than needed",
+      "vi": "Priority fee is higher than necessary. You may pay more than needed",
+      "zh": "Priority fee is higher than necessary. You may pay more than needed",
+      "ru": "Priority fee is higher than necessary. You may pay more than needed"
+    }
+  },
+  "Max fee is higher than necessary": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/FeeEditorModal.tsx",
+        "key": "ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeHigherThanNecessary"
+      }
+    ],
+    "translations": {
+      "en": "Max fee is higher than necessary",
+      "ja": "Max fee is higher than necessary",
+      "vi": "Max fee is higher than necessary",
+      "zh": "Max fee is higher than necessary",
+      "ru": "Max fee is higher than necessary"
+    }
+  },
   "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again": {
     "locations": [
       {

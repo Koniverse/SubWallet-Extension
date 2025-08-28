@@ -1452,5 +1452,7 @@
   "No valid accounts found to import": "noValidAccountsToImport",
   "A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete": "taoStakingFeeDeductedInfo",
   "An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete": "taoUnstakingFeeDeductedInfo",
-  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again": "networkNotSupportedImport"
+  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again": "networkNotSupportedImport",
+  "Max fee is higher than necessary": "maxFeeHigherThanNecessary",
+  "Priority fee is higher than necessary. You may pay more than needed": "highPriorityFeeWarning"
 }

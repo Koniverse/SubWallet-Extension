@@ -1,3 +1,4 @@
 [
-  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again"
+  "Priority fee is higher than necessary. You may pay more than needed",
+  "Max fee is higher than necessary"
 ]

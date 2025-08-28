@@ -230,7 +230,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         const fastPriorityMax = new BigN(fastOption.maxPriorityFeePerGas).multipliedBy(2);
 
         if (new BigN(value).gt(fastPriorityMax)) {
-          return Promise.reject(t('Priority fee is higher than necessary. You may pay more than needed'));
+          return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.highPriorityFeeWarning'));
         }
       }
     }
@@ -244,7 +244,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     if ((new BigN(value)).lte(BN_ZERO)) {
-      return Promise.reject(t('The maximum fee must be greater than 0'));
+      return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeGreaterThanZero'));
     }
 
     const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
@@ -255,7 +255,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
 
     if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
       if (minRequiredMaxFeePerGas && value && new BigN(value).lt(minRequiredMaxFeePerGas)) {
-        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
+        return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeePerGasMinGwei', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
       }
 
       const fastOption = feeOptionsInfo?.options?.fast;
@@ -264,7 +264,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
 
         if (new BigN(value).gt(fastMax) && fastMax.gt(minRequiredMaxFeePerGas)) {
-          return Promise.reject(t('Max fee is higher than necessary'));
+          return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeHigherThanNecessary'));
         }
       }
     }
