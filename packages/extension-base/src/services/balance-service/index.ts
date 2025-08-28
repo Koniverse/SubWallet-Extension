@@ -632,7 +632,7 @@ export class BalanceService implements StoppableServiceInterface {
             const chainState = this.state.chainService.getChainStateByKey(chain);
 
             if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
-              currentAssetSettings[tokenSlug] = {visible: false};
+              currentAssetSettings[tokenSlug] = { visible: false };
             }
           }
         });
