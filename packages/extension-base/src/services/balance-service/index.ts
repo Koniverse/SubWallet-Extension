@@ -553,9 +553,13 @@ export class BalanceService implements StoppableServiceInterface {
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
+    const popularTokenList = this.state.chainService.value.priorityTokens.token;
+    const popularTokenSlugs = Object.keys(popularTokenList);
 
     for (const balanceData of balanceDataList) {
       if (balanceData) {
+        const tokensWithZeroBalance: string[] = [];
+
         for (const balanceDatum of balanceData) {
           const { balance, bonded, category, locked, network, symbol } = balanceDatum;
           const chain = detectBalanceChainSlugMap[network];
@@ -572,6 +576,7 @@ export class BalanceService implements StoppableServiceInterface {
 
           // Cancel is balance is 0
           if (balanceIsEmpty) {
+            tokensWithZeroBalance.push(tokenKey);
             continue;
           }
 
@@ -588,6 +593,17 @@ export class BalanceService implements StoppableServiceInterface {
             currentAssetSettings[existedKey] = { visible: true };
           }
         }
+
+        Object.keys(currentAssetSettings).forEach((tokenSlug) => {
+          if (tokensWithZeroBalance.includes(tokenSlug)) {
+            const chain = tokenSlug.split('-')[0];
+            const chainState = this.state.chainService.getChainStateByKey(chain);
+
+            if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
+              currentAssetSettings[tokenSlug] = { visible: false };
+            }
+          }
+        });
       }
     }
 
@@ -598,7 +614,7 @@ export class BalanceService implements StoppableServiceInterface {
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
 
-          // Cancel is chain is turned off by user
+          // Cancel if chain is turned off by user
           if (chainState && chainState.manualTurnOff) {
             continue;
           }
@@ -609,6 +625,17 @@ export class BalanceService implements StoppableServiceInterface {
             currentAssetSettings[existedKey] = { visible: true };
           }
         }
+
+        Object.keys(currentAssetSettings).forEach((tokenSlug) => {
+          if (!balanceData.includes(tokenSlug)) {
+            const chain = tokenSlug.split('-')[0];
+            const chainState = this.state.chainService.getChainStateByKey(chain);
+
+            if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
+              currentAssetSettings[tokenSlug] = {visible: false};
+            }
+          }
+        });
       }
     }
 
