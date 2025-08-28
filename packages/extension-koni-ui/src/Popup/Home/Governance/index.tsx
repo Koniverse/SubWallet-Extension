@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
+import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
 import React, { useMemo } from 'react';
@@ -10,11 +11,10 @@ import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
 import { chainSlugToSubsquareNetwork } from './shared';
 import { ViewBaseType } from './types';
-import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 
 const Component = () => {
   const { chainSlug: currentChainSlug,
-    goOverview, goReferendumDetail, referendumId, setChain,
+    goOverview, goReferendumDetail, goUnlockToken, referendumId, setChain,
     view: currentScreenView } = useGovernanceView();
 
   const viewProps: ViewBaseType = useMemo(() => ({
@@ -29,6 +29,7 @@ const Component = () => {
           <OverviewView
             {...viewProps}
             goReferendumDetail={goReferendumDetail}
+            goUnlockToken={goUnlockToken}
             onChangeChain={setChain}
           />
         )
@@ -48,6 +49,7 @@ const Component = () => {
         currentScreenView === GovernanceScreenView.UNLOCK_TOKEN && (
           <UnlockTokenView
             {...viewProps}
+            goOverview={goOverview}
           />
         )
       }
