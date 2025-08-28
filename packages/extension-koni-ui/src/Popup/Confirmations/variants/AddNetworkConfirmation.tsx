@@ -3,14 +3,15 @@
 
 import { ConfirmationDefinitions, ConfirmationResult } from '@subwallet/extension-base/background/KoniTypes';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
-import { ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
+import { detectTranslate } from '@subwallet/extension-base/utils';
+import { AlertBox, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
 import { completeConfirmation } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Col, Field, Icon, Row } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Globe, ShareNetwork, WifiHigh, WifiSlash, XCircle } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -25,6 +26,8 @@ const handleCancel = async ({ id }: ConfirmationDefinitions['addNetworkRequest']
   return await completeConfirmation('addNetworkRequest', { id, isApproved: false } as ConfirmationResult<null>);
 };
 
+const IMPORTED_NETWORK_GUIDE_URL = 'https://docs.subwallet.app/main/extension-user-guide/network-management/customize-your-networks/import-custom-networks';
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, request } = props;
   const { payload: { chainEditInfo, chainSpec, mode, providerError, unconfirmed } } = request;
@@ -34,6 +37,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { token } = useTheme() as Theme;
 
   const [loading, setLoading] = useState(false);
+
+  const isUnsupportedChain = useMemo(() => {
+    return providerError === _CHAIN_VALIDATION_ERROR.UNSUPPORTED_CHAIN_CANNOT_ADD;
+  }, [providerError]);
 
   const handleErrorMessage = useCallback((errorCode?: _CHAIN_VALIDATION_ERROR) => {
     if (!errorCode) {
@@ -186,20 +193,56 @@ const Component: React.FC<Props> = (props: Props) => {
         {mode === 'update' && (<div className={'warning-message'}>
           {t('ui.DAPP.Confirmations.AddNetwork.networkAlreadyExists')}
         </div>)}
-        <Button
-          disabled={loading}
-          icon={(
-            <Icon
-              phosphorIcon={XCircle}
-              weight='fill'
+        {
+          isUnsupportedChain && (
+            <AlertBox
+              className={'alert-box'}
+              description={(
+                <Trans
+                  components={{
+                    highlight: (
+                      <a
+                        className='link'
+                        href={IMPORTED_NETWORK_GUIDE_URL}
+                        target='__blank'
+                      />
+                    )
+                  }}
+                  i18nKey={detectTranslate('This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again')}
+                />
+              )
+
+              }
+              title={t('Network not supported')}
+              type={'error'}
             />
-          )}
-          onClick={onCancel}
-          schema={'secondary'}
-        >
-          {t('ui.DAPP.Confirmations.AddNetwork.cancel')}
-        </Button>
-        <Button
+          )
+        }
+        {
+          isUnsupportedChain
+            ? <Button
+              disabled={loading}
+              onClick={onCancel}
+              schema={'primary'}
+            >
+              {t('I understand')}
+            </Button>
+            : <Button
+              disabled={loading}
+              icon={(
+                <Icon
+                  phosphorIcon={XCircle}
+                  weight='fill'
+                />
+              )}
+              onClick={onCancel}
+              schema={'secondary'}
+            >
+              {t('ui.DAPP.Confirmations.AddNetwork.cancel')}
+            </Button>
+        }
+
+        {!isUnsupportedChain && <Button
           disabled={mode === 'update' || unconfirmed || !!providerError}
           icon={(
             <Icon
@@ -211,7 +254,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onApprove}
         >
           {t('ui.DAPP.Confirmations.AddNetwork.approve')}
-        </Button>
+        </Button>}
       </div>
     </>
   );
