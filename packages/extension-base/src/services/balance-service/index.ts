@@ -556,8 +556,12 @@ export class BalanceService implements StoppableServiceInterface {
     const popularTokenList = this.state.chainService.value.priorityTokens.token;
     const popularTokenSlugs = Object.keys(popularTokenList);
 
+    console.log('popularTokenSlugs', popularTokenSlugs);
+
     for (const balanceData of balanceDataList) {
       if (balanceData) {
+        console.log('balanceData sub', balanceData);
+
         const tokensWithZeroBalance: string[] = [];
 
         for (const balanceDatum of balanceData) {
@@ -594,10 +598,14 @@ export class BalanceService implements StoppableServiceInterface {
           }
         }
 
+        console.log('currentAssetSettings sub', currentAssetSettings);
+
         Object.keys(currentAssetSettings).forEach((tokenSlug) => {
           if (tokensWithZeroBalance.includes(tokenSlug)) {
             const chain = tokenSlug.split('-')[0];
             const chainState = this.state.chainService.getChainStateByKey(chain);
+
+            console.log('chainState sub', chainState);
 
             if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
               currentAssetSettings[tokenSlug] = { visible: false };
@@ -609,6 +617,8 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
+        console.log('balanceData', balanceData);
+
         for (const slug of balanceData) {
           const chainSlug = slug.split('-')[0];
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
@@ -626,12 +636,18 @@ export class BalanceService implements StoppableServiceInterface {
           }
         }
 
+        console.log('currentAssetSettings', currentAssetSettings);
+
         Object.keys(currentAssetSettings).forEach((tokenSlug) => {
           if (!balanceData.includes(tokenSlug)) {
             const chain = tokenSlug.split('-')[0];
             const chainState = this.state.chainService.getChainStateByKey(chain);
 
+            console.log('chainState', chainState);
+
             if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
+              console.log('slug', tokenSlug);
+
               currentAssetSettings[tokenSlug] = { visible: false };
             }
           }
