@@ -8,4 +8,5 @@ import { getSubsquareApi } from './bundle';
 export * from './bundle';
 
 export default getSubsquareApi;
-export type { ReferendaResponse } from './interface';
+export * from './interface';
+export { ALL_TRACK_ID } from './utils';

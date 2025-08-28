@@ -15,7 +15,7 @@ import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } fro
 import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { balanceFormatter, Button, Form, formatNumber, Icon } from '@subwallet/react-ui';
-import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
+import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';

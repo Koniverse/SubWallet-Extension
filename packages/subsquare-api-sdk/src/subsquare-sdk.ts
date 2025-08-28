@@ -5,6 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 
 import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, Track, UserVotesParams } from './interface';
 import { gov2ReferendumsApi, gov2TracksApi } from './url';
+import { ALL_TRACK, reformatTrackName } from './utils';
 
 export class SubsquareApiSdk {
   private client: AxiosInstance;
@@ -42,11 +43,14 @@ export class SubsquareApiSdk {
   }
 
   async getTracks (): Promise<Track[]> {
-    const tracksRes = await this.client.get<Track[]>(
-      gov2TracksApi
-    );
+    const tracksRes = await this.client.get<Track[]>(gov2TracksApi);
 
-    return tracksRes.data;
+    const formattedTracks = tracksRes.data.map((track) => ({
+      ...track,
+      name: reformatTrackName(track.name)
+    }));
+
+    return [ALL_TRACK, ...formattedTracks];
   }
 
   async getReferendaWithTrack (trackId: number, params?: ReferendaQueryParamsWithTrack): Promise<ReferendaResponse> {

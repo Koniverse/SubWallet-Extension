@@ -4,10 +4,9 @@
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GOV_QUERY_KEYS, reformatTrackName } from '@subwallet/extension-koni-ui/utils/gov';
+import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
-import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
-import { Track } from '@subwallet/subsquare-api-sdk/interface';
+import { ALL_TRACK_ID, SubsquareApiSdk, Track } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
@@ -20,15 +19,13 @@ interface Props extends ThemeProps, BasicInputWrapper {
   sdkInstance?: SubsquareApiSdk
 }
 
-export const ALL_TRACK_ID = 'All';
-
 function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
   const { chain, className = '', disabled, id = 'gov-track-input', label, loading, placeholder, sdkInstance, statusHelp, title, tooltip, value } = props;
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);
 
-  const { data: trackData } = useQuery({
+  const { data: items } = useQuery({
     queryKey: GOV_QUERY_KEYS.tracks(chain),
     queryFn: async () => {
       return await sdkInstance?.getTracks();
@@ -37,16 +34,12 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     staleTime: 60 * 1000
   });
 
-  const ALL_TRACK: Track = { id: ALL_TRACK_ID, name: 'all_tracks' };
-
-  const items: Track[] = [ALL_TRACK, ...(trackData ?? [])];
-
   const renderSelected = useCallback((item: Track) => {
     if (loading) {
       return <div className='__loading-text'>{t('Loading ...')}</div>;
     }
 
-    return <div className='__selected-item'>{reformatTrackName(item.name)}</div>;
+    return <div className='__selected-item'>{item.name}</div>;
   }, [loading, t]);
 
   const searchFunction = useCallback((item: Track, searchText: string) => {
@@ -56,7 +49,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
     const keyword = searchText.toLowerCase();
     const name = item.name?.toLowerCase() ?? '';
-    const formatted = reformatTrackName(item.name).toLowerCase();
+    const formatted = item.name.toLowerCase();
 
     return name.includes(keyword) || formatted.includes(keyword);
   }, []);
@@ -65,7 +58,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return (
       <div className='__status-item'>
         <div className='__status-left'>
-          {reformatTrackName(item.name)}
+          {item.name}
         </div>
         {selected && (
           <div className='__check-icon'>
@@ -89,7 +82,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       id={id}
       inputClassName={`${className} gov-track-selector-input`}
       itemKey={'id'}
-      items={items}
+      items={items || []}
       label={label}
       loading={loading}
       onSelect={onSelect}
@@ -99,7 +92,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
       searchPlaceholder={t<string>('Search track')}
-      selected={value || ALL_TRACK_ID}
+      selected={value ?? ALL_TRACK_ID}
       statusHelp={statusHelp}
       suffix={
         <Icon

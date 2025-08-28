@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
-import { ALL_TRACK_ID } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovTrackSelector';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button } from '@subwallet/react-ui';
-import { Referendum } from '@subwallet/subsquare-api-sdk/interface';
+import { ALL_TRACK_ID, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +49,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, onChangeChain, sd
         track?: string;
       }];
 
-      if (filters.track) {
+      if (filters.track !== undefined) {
         return await sdkInstance?.getReferendaWithTrack(Number(filters.track), {
           page: pageParam,
           page_size: 20,

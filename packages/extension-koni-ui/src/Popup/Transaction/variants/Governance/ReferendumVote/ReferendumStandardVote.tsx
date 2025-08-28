@@ -15,7 +15,7 @@ import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } fro
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { balanceFormatter, ButtonProps, Form, formatNumber } from '@subwallet/react-ui';
-import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
+import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

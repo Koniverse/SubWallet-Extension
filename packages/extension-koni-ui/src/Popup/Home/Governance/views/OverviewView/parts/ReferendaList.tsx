@@ -4,7 +4,7 @@
 import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governance';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Referendum } from '@subwallet/subsquare-api-sdk/interface';
+import { Referendum } from '@subwallet/subsquare-api-sdk';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
