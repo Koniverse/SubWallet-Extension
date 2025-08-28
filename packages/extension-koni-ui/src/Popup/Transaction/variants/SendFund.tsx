@@ -1148,7 +1148,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         className={`${className} -transaction-footer`}
       >
         <Button
-          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false) || !isDataReady}
+          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false) || !isDataReady || !!transferInfo?.error}
           icon={(
             <Icon
               phosphorIcon={PaperPlaneTilt}
