@@ -1,19 +1,3 @@
 [
-  "Connection unsuccessful. Review our user guide and try connecting again.",
-  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app",
-  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app",
-  "I understand",
-  "All accounts found in this file are invalid. Import another JSON file and try again",
-  "Unable to import",
-  "Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again",
-  "Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again",
-  "Unable to load data",
-  "Something went wrong while loading data for this screen.",
-  "<highlight>Reload now</highlight> to get the new data",
-  "Max fee cannot be lower than priority fee",
-  "This fee can't be edited with the current RPC connection",
-  "Search validator",
-  "No valid accounts found to import",
-  "A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete",
-  "An unstaking fee of {{fee}} TAO will be deducted from your unstaked amount once the transaction is complete"
+  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again"
 ]

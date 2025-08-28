@@ -208,12 +208,12 @@ const Component: React.FC<Props> = (props: Props) => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again')}
+                  i18nKey={detectTranslate('ui.DAPP.Confirmations.AddNetwork.networkNotSupportedImport')}
                 />
               )
 
               }
-              title={t('Network not supported')}
+              title={t('ui.DAPP.Confirmations.AddNetwork.networkNotSupported')}
               type={'error'}
             />
           )
@@ -225,7 +225,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onCancel}
               schema={'primary'}
             >
-              {t('I understand')}
+              {t('ui.DAPP.Confirmations.AddNetwork.iUnderstand')}
             </Button>
             : <Button
               disabled={loading}

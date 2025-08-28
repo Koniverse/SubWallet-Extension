@@ -1,13 +1,3 @@
 [
-  "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
-  "packages/extension-koni-ui/src/Popup/Account/RestoreJson/index.tsx",
-  "packages/extension-koni-ui/src/Popup/Transaction/variants/Earn.tsx",
-  "packages/extension-koni-ui/src/Popup/Transaction/variants/Unbond.tsx",
-  "packages/extension-koni-ui/src/Popup/Transaction/variants/Swap/EmptySwapPairs.tsx",
-  "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/FeeEditorModal.tsx",
-  "packages/extension-koni-ui/src/components/Field/TransactionFee/FeeEditor/index.tsx",
-  "packages/extension-koni-ui/src/components/Modal/Earning/EarningValidatorSelectedModal/ChangeValidator.tsx",
-  "packages/extension-base/src/services/keyring-service/context/handlers/Json.ts",
-  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Bond.tsx",
-  "packages/extension-koni-ui/src/Popup/Confirmations/variants/Transaction/variants/Unbond.tsx"
+  "packages/extension-koni-ui/src/Popup/Confirmations/variants/AddNetworkConfirmation.tsx"
 ]

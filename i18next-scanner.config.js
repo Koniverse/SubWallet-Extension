@@ -136,7 +136,7 @@ module.exports = {
       jsonIndent: 2,
       lineEnding: '\n',
       loadPath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
-      savePath: 'packages/extension-koni/public/locales-to-compare/{{lng}}/{{ns}}.json',
+      savePath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
     },
     trans: {
       component: 'Trans'

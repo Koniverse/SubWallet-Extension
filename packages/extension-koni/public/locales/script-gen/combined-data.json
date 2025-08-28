@@ -1,47 +1,36 @@
 {
-  "Connection unsuccessful. Review our user guide and try connecting again.": {
+  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again": {
     "locations": [
       {
-        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
-        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide"
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/AddNetworkConfirmation.tsx",
+        "key": "ui.DAPP.Confirmations.AddNetwork.networkNotSupportedImport"
       }
     ],
     "translations": {
-      "en": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "ja": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "vi": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "zh": "Connection unsuccessful. Review our user guide and try connecting again.",
-      "ru": "Connection unsuccessful. Review our user guide and try connecting again."
+      "en": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "ja": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "vi": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "zh": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "ru": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again"
     }
   },
-  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app": {
+  "Network not supported": {
     "locations": [
       {
-        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
-        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker"
+        "filepath": "packages/extension-base/src/core/logic-validation/request.ts",
+        "key": "bg.TRANSACTION.core.validation.request.networkNotSupported"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/AddNetworkConfirmation.tsx",
+        "key": "ui.DAPP.Confirmations.AddNetwork.networkNotSupported"
       }
     ],
     "translations": {
-      "en": "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app",
-      "ja": "",
-      "vi": "",
-      "zh": "",
-      "ru": ""
-    }
-  },
-  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app": {
-    "locations": [
-      {
-        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
-        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps"
-      }
-    ],
-    "translations": {
-      "en": "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app",
-      "ja": "",
-      "vi": "",
-      "zh": "",
-      "ru": ""
+      "en": "Network not supported",
+      "ja": "Network not supported",
+      "vi": "Network not supported",
+      "zh": "Network not supported",
+      "ru": "Network not supported"
     }
   },
   "I understand": {
@@ -105,6 +94,10 @@
       {
         "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
         "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.iUnderstand"
+      },
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/Confirmations/variants/AddNetworkConfirmation.tsx",
+        "key": "ui.DAPP.Confirmations.AddNetwork.iUnderstand"
       }
     ],
     "translations": {
@@ -113,6 +106,51 @@
       "vi": "I understand",
       "zh": "I understand",
       "ru": "I understand"
+    }
+  },
+  "Connection unsuccessful. Review our user guide and try connecting again.": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide"
+      }
+    ],
+    "translations": {
+      "en": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "ja": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "vi": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "zh": "Connection unsuccessful. Review our user guide and try connecting again.",
+      "ru": "Connection unsuccessful. Review our user guide and try connecting again."
+    }
+  },
+  "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker"
+      }
+    ],
+    "translations": {
+      "en": "Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
+    }
+  },
+  "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app": {
+    "locations": [
+      {
+        "filepath": "packages/extension-koni-ui/src/Popup/WalletConnect/ConnectWalletConnect.tsx",
+        "key": "ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps"
+      }
+    ],
+    "translations": {
+      "en": "Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app",
+      "ja": "",
+      "vi": "",
+      "zh": "",
+      "ru": ""
     }
   },
   "All accounts found in this file are invalid. Import another JSON file and try again": {
@@ -11023,21 +11061,6 @@
       "vi": "This network is not yet supported on SubWallet. (Import the network)[https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks] on SubWallet and try again",
       "zh": "This network is not yet supported on SubWallet. (Import the network)[https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks] on SubWallet and try again",
       "ru": "This network is not yet supported on SubWallet. (Import the network)[https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks] on SubWallet and try again"
-    }
-  },
-  "Network not supported": {
-    "locations": [
-      {
-        "filepath": "packages/extension-base/src/core/logic-validation/request.ts",
-        "key": "bg.TRANSACTION.core.validation.request.networkNotSupported"
-      }
-    ],
-    "translations": {
-      "en": "Network not supported",
-      "ja": "Network not supported",
-      "vi": "Network not supported",
-      "zh": "Network not supported",
-      "ru": "Network not supported"
     }
   },
   "Enter recipient address and try again": {
