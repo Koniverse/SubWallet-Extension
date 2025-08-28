@@ -49,6 +49,7 @@ export const useGovernanceView = () => {
       referendumId: state.referendumId || undefined,
 
       goOverview: () => send({ type: 'GO_OVERVIEW' }),
+      goUnlockToken: () => send({ type: 'GO_UNLOCK_TOKEN' }),
       goReferendumDetail: (referendumId: string) =>
         send({ type: 'GO_REFERENDUM_DETAIL', referendumId }),
 

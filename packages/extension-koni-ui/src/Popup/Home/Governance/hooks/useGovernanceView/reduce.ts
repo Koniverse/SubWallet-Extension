@@ -32,6 +32,9 @@ export function transition (state: GovernanceViewContext, event: GovernanceViewE
         referendumId: event.referendumId || state.referendumId
       };
 
+    case 'GO_UNLOCK_TOKEN':
+      return { ...state, view: GovernanceScreenView.UNLOCK_TOKEN };
+
     default:
       return state;
   }

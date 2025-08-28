@@ -12,7 +12,8 @@ export type ViewBaseType = {
 export enum ReferendaCategory {
   ONGOING= 'ongoing',
   COMPLETED= 'completed',
-  VOTED='voted'
+  VOTED='voted',
+  UNLOCK_TOKEN='unlock-token'
 }
 
 export type GovernanceChainSelectorItemType = {
@@ -31,6 +32,7 @@ export interface GovernanceViewContext {
 export type GovernanceViewEvent =
   | { type: 'GO_OVERVIEW' }
   | { type: 'GO_REFERENDUM_DETAIL'; referendumId: string }
+  | { type: 'GO_UNLOCK_TOKEN' }
   | { type: 'SET_CHAIN'; chainSlug: string }
   | { type: 'SET_REFERENDUM'; referendumId: string | null }
 

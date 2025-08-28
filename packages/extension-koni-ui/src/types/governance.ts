@@ -3,7 +3,8 @@
 
 export enum GovernanceScreenView {
   OVERVIEW= 'overview',
-  REFERENDUM_DETAIL= 'referendum-detail'
+  REFERENDUM_DETAIL= 'referendum-detail',
+  UNLOCK_TOKEN= 'unlock-token'
 }
 
 export type GovernanceVoteType = 'aye' | 'nay' | 'abstain' | 'split';
