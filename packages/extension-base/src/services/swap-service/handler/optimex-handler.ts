@@ -17,26 +17,9 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 
-interface OptimexMetadata {
-  solver_address: string;
+interface OptimexQuoteMetadata {
   session_id: string;
-
-  from_token: {
-    token_id: string
-  };
-
-  to_token: {
-    token_id: string
-  };
-
-  amount_after_fees: string,
-  amount_before_fees: string,
-
   best_quote: string,
-  best_quote_after_fees: string,
-  best_quote_after_fees_after_bridge: string,
-
-  protocol_fee: number
 }
 
 interface OptimexTradeRequest {
@@ -128,93 +111,6 @@ export class OptimexHandler implements SwapBaseInterface {
       this.getSubmitStep.bind(this)
     ]);
   }
-
-  // todo: try initiating from backend side, keep this logic to discuss more
-  // async getInitTradeStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-  //   const { request: { address: sender, recipient }, selectedQuote } = params;
-  //
-  //   if (!selectedQuote) {
-  //     return Promise.resolve(undefined);
-  //   }
-  //
-  //   const metadata = selectedQuote.metadata as OptimexMetadata;
-  //
-  //   if (!metadata) {
-  //     return Promise.resolve(undefined);
-  //   }
-  //
-  //   const swAffiliate = { // todo:
-  //     provider: 'SubWallet',
-  //     rate: '25',
-  //     receiver: '0xdd718f9Ecaf8f144a3140b79361b5D713D3A6b19',
-  //     network: 'ethereum'
-  //   };
-  //
-  //   const body: OptimexTradeRequest = {
-  //     session_id: metadata.session_id,
-  //     amount_in: metadata.amount_before_fees,
-  //     from_user_address: sender,
-  //     to_user_address: recipient || '', // todo: need find account correspond to ecosystem
-  //     userRefundAddress: sender,
-  //     user_refund_pubkey: sender,
-  //     creator_public_key: sender,
-  //     from_wallet_address: sender,
-  //     min_amount_out: metadata.best_quote,
-  //     affiliate_info: [swAffiliate]
-  //   };
-  //
-  //   let tradeInfo: OptimexTradeMetadata;
-  //
-  //   try {
-  //     const res = await fetch(`${this.baseUrl}/v1/trades/initiate`, {
-  //       method: 'POST',
-  //       body: JSON.stringify(body),
-  //       headers: { 'Content-Type': 'application/json' }
-  //     });
-  //
-  //     if (!res.ok) {
-  //       console.log('Error while init quote');
-  //     }
-  //
-  //     const rawResponse = await res.json() as unknown as { data: OptimexTradeMetadata };
-  //
-  //     tradeInfo = rawResponse.data;
-  //   } catch (e) {
-  //     const errMsg = (e as Error).message;
-  //
-  //     console.error('Error while init quote', errMsg);
-  //
-  //     throw Error(errMsg);
-  //   }
-  //
-  //   const depositAddress = tradeInfo.deposit_address;
-  //   const tradeId = tradeInfo.trade_id;
-  //   const payload = tradeInfo.payload;
-  //
-  //   const submitStep: BaseStepDetail = {
-  //     name: 'Init Trade',
-  //     type: OptimexStepType.INIT_TRADE,
-  //     // @ts-ignore
-  //     metadata: {
-  //       depositAddress,
-  //       tradeId,
-  //       payload
-  //     } as unknown as OptimexTradeMetadata
-  //   };
-  //
-  //   const stepFee: CommonStepFeeInfo = {
-  //     feeComponent: [{
-  //       feeType: SwapFeeType.NETWORK_FEE,
-  //       amount: '0',
-  //       tokenSlug: params.request.pair.from
-  //     }],
-  //     selectedFeeToken: params.request.pair.from,
-  //     defaultFeeToken: params.request.pair.from,
-  //     feeOptions: [params.request.pair.from]
-  //   };
-  //
-  //   return Promise.resolve([submitStep, stepFee]);
-  // }
 
   async initTrade (request: OptimalSwapPathParamsV2) {
     const metadata = request.selectedQuote?.metadata as OptimexMetadata;

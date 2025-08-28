@@ -56,7 +56,7 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
   }
 }
 
-export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo): string => { // todo: check for cardano
+export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo): string => {
   const chainType = _chainInfoToAccountChainType(chainInfo);
 
   if (chainType === AccountChainType.SUBSTRATE) {
