@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, Track, UserVotesParams } from './interface';
+import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
@@ -31,19 +31,38 @@ export class SubsquareApiSdk {
       { params }
     );
 
-    return referendaRes.data;
+    const formattedData = {
+      ...referendaRes.data,
+      items: referendaRes.data.items.map((ref) => ({
+        ...ref,
+        trackInfo: {
+          ...ref.trackInfo,
+          name: reformatTrackName(ref.trackInfo.name)
+        }
+      }))
+    };
+
+    return formattedData;
   }
 
   async getReferendaDetails (id: string): Promise<ReferendumDetail> {
     const referendaRes = await this.client.get<ReferendumDetail>(
-      gov2ReferendumsApi + `/${id}`
+      `${gov2ReferendumsApi}/${id}`
     );
 
-    return referendaRes.data;
+    const ref = referendaRes.data;
+
+    return {
+      ...ref,
+      trackInfo: {
+        ...ref.trackInfo,
+        name: reformatTrackName(ref.trackInfo.name)
+      }
+    };
   }
 
-  async getTracks (): Promise<Track[]> {
-    const tracksRes = await this.client.get<Track[]>(gov2TracksApi);
+  async getTracks (): Promise<TrackInfo[]> {
+    const tracksRes = await this.client.get<TrackInfo[]>(gov2TracksApi);
 
     const formattedTracks = tracksRes.data.map((track) => ({
       ...track,
@@ -59,7 +78,18 @@ export class SubsquareApiSdk {
       { params }
     );
 
-    return referendaRes.data;
+    const formattedData = {
+      ...referendaRes.data,
+      items: referendaRes.data.items.map((ref) => ({
+        ...ref,
+        trackInfo: {
+          ...ref.trackInfo,
+          name: reformatTrackName(ref.trackInfo.name)
+        }
+      }))
+    };
+
+    return formattedData;
   }
 
   async getReferendaVotes (id: string): Promise<ReferendumVoteDetail[]> {

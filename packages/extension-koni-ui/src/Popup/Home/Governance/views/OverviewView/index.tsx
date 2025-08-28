@@ -1,12 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, Referendum } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';

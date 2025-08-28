@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field';
+import { GovStatusItem, govStatusItems } from '@subwallet/extension-koni-ui/constants';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
-import { CaretRight, CheckCircle, ClipboardText, ClockAfternoon, HourglassHigh, IconProps, Prohibit, RocketLaunch, Scales, Skull, Stack, XCircle } from 'phosphor-react';
+import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -13,41 +14,6 @@ import styled, { useTheme } from 'styled-components';
 interface Props extends ThemeProps, BasicInputWrapper {
   loading?: boolean;
 }
-
-export enum GovStatusKey {
-  ALL = 'All',
-  PREPARING = 'Preparing',
-  DECIDING = 'Deciding',
-  CONFIRMING = 'Confirming',
-  APPROVED = 'Approved',
-  QUEUEING = 'Queueing',
-  EXECUTED = 'Executed',
-  REJECTED = 'Rejected',
-  TIMEDOUT = 'Timedout',
-  CANCELLED = 'Cancelled',
-  KILLED = 'Killed',
-}
-
-export interface GovStatusItem {
-  key: GovStatusKey;
-  label: string;
-  icon?: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<SVGSVGElement>>;
-  colorToken?: keyof Theme['token'];
-}
-
-export const govStatusItems: GovStatusItem[] = [
-  { key: GovStatusKey.ALL, label: 'All status' },
-  { key: GovStatusKey.PREPARING, label: 'Preparing', icon: HourglassHigh, colorToken: 'gold-6' },
-  { key: GovStatusKey.DECIDING, label: 'Deciding', icon: Scales, colorToken: 'blue-7' },
-  { key: GovStatusKey.CONFIRMING, label: 'Confirming', icon: ClipboardText, colorToken: 'geekblue-7' },
-  { key: GovStatusKey.APPROVED, label: 'Approved', icon: CheckCircle, colorToken: 'lime-7' },
-  { key: GovStatusKey.QUEUEING, label: 'Queueing', icon: Stack, colorToken: 'green-6' },
-  { key: GovStatusKey.EXECUTED, label: 'Executed', icon: RocketLaunch, colorToken: 'colorSecondaryText' },
-  { key: GovStatusKey.REJECTED, label: 'Rejected', icon: Prohibit, colorToken: 'magenta-6' },
-  { key: GovStatusKey.TIMEDOUT, label: 'TimedOut', icon: ClockAfternoon, colorToken: 'gray-6' },
-  { key: GovStatusKey.CANCELLED, label: 'Cancelled', icon: XCircle, colorToken: 'orange-6' },
-  { key: GovStatusKey.KILLED, label: 'Killed', icon: Skull, colorToken: 'red-6' }
-];
 
 function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
   const { className = '', disabled, id = 'gov-status-input', label, loading, placeholder, statusHelp, title, tooltip, value } = props;

@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/subsquare-api-sdk authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Track } from './interface';
+import { TrackInfo } from './interface';
 
 export const ALL_TRACK_ID = 'All';
 
-export const ALL_TRACK: Track = { id: ALL_TRACK_ID, name: 'All tracks' };
+export const ALL_TRACK: TrackInfo = { id: ALL_TRACK_ID, name: 'All tracks', decisionPeriod: 0, confirmPeriod: 0 };
 
 export function reformatTrackName (input: string): string {
   if (!input) {

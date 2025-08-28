@@ -6,7 +6,7 @@ import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, SubsquareApiSdk, Track } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, SubsquareApiSdk, TrackInfo } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
@@ -34,7 +34,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     staleTime: 60 * 1000
   });
 
-  const renderSelected = useCallback((item: Track) => {
+  const renderSelected = useCallback((item: TrackInfo) => {
     if (loading) {
       return <div className='__loading-text'>{t('Loading ...')}</div>;
     }
@@ -42,7 +42,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return <div className='__selected-item'>{item.name}</div>;
   }, [loading, t]);
 
-  const searchFunction = useCallback((item: Track, searchText: string) => {
+  const searchFunction = useCallback((item: TrackInfo, searchText: string) => {
     if (!searchText) {
       return true;
     }
@@ -54,7 +54,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return name.includes(keyword) || formatted.includes(keyword);
   }, []);
 
-  const renderItem = useCallback((item: Track, selected: boolean) => {
+  const renderItem = useCallback((item: TrackInfo, selected: boolean) => {
     return (
       <div className='__status-item'>
         <div className='__status-left'>
