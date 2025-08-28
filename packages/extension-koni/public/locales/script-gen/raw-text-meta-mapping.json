@@ -1,0 +1,14 @@
+{
+  "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again": {
+    "locations": [
+      "packages/extension-koni-ui/src/Popup/Confirmations/variants/AddNetworkConfirmation.tsx"
+    ],
+    "translations": {
+      "en": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "ja": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "vi": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "zh": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again",
+      "ru": "This network is not yet supported on SubWallet. Import the network using this <highlight>guide</highlight> and try again"
+    }
+  }
+}

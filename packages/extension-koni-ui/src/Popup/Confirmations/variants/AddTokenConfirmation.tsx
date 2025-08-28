@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainInfoMap[originChain].name}
-          label={t<string>('Network')}
+          label={t<string>('ui.DAPP.Confirmations.AddToken.network')}
           prefix={(
             <Image
               height={token.fontSizeXL}
@@ -101,11 +101,11 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <Field
           content={type}
-          tooltip={t<string>('Token type')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddToken.tokenType')}
         />
         <Field
           content={toShort(contractAddress)}
-          label={t<string>('Contract address')}
+          label={t<string>('ui.DAPP.Confirmations.AddToken.contractAddress')}
           prefix={
             <SwAvatar
               identPrefix={42}
@@ -115,14 +115,14 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           }
           status={contractError ? 'error' : slug ? 'warning' : ''}
-          statusHelp={contractError ? t('The token contract is invalid.') : slug ? t('The token already exists.') : ''}
+          statusHelp={contractError ? t('ui.DAPP.Confirmations.AddToken.tokenContractInvalid') : slug ? t('ui.DAPP.Confirmations.AddToken.tokenAlreadyExists') : ''}
           suffix={contractSuffix}
         />
         <Row gutter={token.margin}>
           <Col span={12}>
             <Field
               content={symbol}
-              placeholder={t<string>('Symbol')}
+              placeholder={t<string>('ui.DAPP.Confirmations.AddToken.symbol')}
               prefix={
                 <SwAvatar
                   identPrefix={42}
@@ -131,22 +131,22 @@ const Component: React.FC<Props> = (props: Props) => {
                   value={contractAddress}
                 />
               }
-              tooltip={t<string>('Symbol')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddToken.symbol')}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={decimals === -1 ? '' : decimals}
-              placeholder={t<string>('Decimals')}
-              tooltip={t<string>('Decimals')}
+              placeholder={t<string>('ui.DAPP.Confirmations.AddToken.decimals')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddToken.decimals')}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={name}
-          tooltip={t<string>('Token name')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddToken.tokenName')}
         />
       </div>
       <div className='confirmation-footer'>
@@ -161,7 +161,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.DAPP.Confirmations.AddToken.cancel')}
         </Button>
         <Button
           disabled={!!slug || !validated || contractError}
@@ -174,7 +174,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('Approve')}
+          {t('ui.DAPP.Confirmations.AddToken.approve')}
         </Button>
       </div>
     </>

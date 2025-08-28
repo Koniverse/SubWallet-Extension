@@ -43,7 +43,7 @@ const Component: React.FC<Props> = (props: Props) => {
       leftItem={isAll ? <AvatarGroup accounts={accounts} /> : props.leftItem}
       middleItem={(
         <div className={CN('account-item-content-wrapper', `direction-${direction}`)}>
-          <div className={'account-item-name'}>{isAll ? t('All accounts') : (accountName || toShort(address, addressPreLength, addressSufLength))}</div>
+          <div className={'account-item-name'}>{isAll ? t('ui.ACCOUNT.components.Account.Item.WithName.allAccounts') : (accountName || toShort(address, addressPreLength, addressSufLength))}</div>
           {showFallback && <div className={'account-item-address-wrapper'}>{toShort(address, addressPreLength, addressSufLength)}</div>}
         </div>
       )}
