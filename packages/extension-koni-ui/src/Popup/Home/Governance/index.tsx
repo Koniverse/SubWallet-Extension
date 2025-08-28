@@ -10,6 +10,7 @@ import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
 import { chainSlugToSubsquareNetwork } from './shared';
 import { ViewBaseType } from './types';
+import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 
 const Component = () => {
   const { chainSlug: currentChainSlug,
@@ -39,6 +40,14 @@ const Component = () => {
             {...viewProps}
             goOverview={goOverview}
             referendumId={referendumId}
+          />
+        )
+      }
+
+      {
+        currentScreenView === GovernanceScreenView.UNLOCK_TOKEN && (
+          <UnlockTokenView
+            {...viewProps}
           />
         )
       }
