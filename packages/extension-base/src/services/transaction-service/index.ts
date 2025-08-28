@@ -122,7 +122,7 @@ export default class TransactionService {
     checkSupportForTransaction(validationResponse, transaction);
 
     if (!chainInfo) {
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Cannot find network')));
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION_SERVICE.services.service.transaction.cannotFindNetwork')));
     }
 
     const substrateApi = this.state.chainService.getSubstrateApi(chainInfo.slug);
@@ -1273,8 +1273,8 @@ export default class TransactionService {
 
     this.state.notificationService.notify({
       type: NotificationType.SUCCESS,
-      title: t('Transaction completed'),
-      message: t('Transaction {{info}} completed', { replace: { info } }),
+      title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
+      message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
       action: { url: this.getTransactionLink(id) },
       notifyViaBrowser: true
     });
@@ -1301,8 +1301,8 @@ export default class TransactionService {
 
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
-        title: t('Transaction failed'),
-        message: t('Transaction {{info}} failed', { replace: { info } }),
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });
@@ -1329,8 +1329,8 @@ export default class TransactionService {
 
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
-        title: t('Transaction timed out'),
-        message: t('Transaction {{info}} timed out', { replace: { info } }),
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });
@@ -1547,7 +1547,7 @@ export default class TransactionService {
             let signedTransaction: string | undefined;
 
             if (!payload) {
-              throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+              throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
             }
 
             const web3Api = this.state.chainService.getEvmApi(chain).api;
@@ -1560,7 +1560,7 @@ export default class TransactionService {
               const recover = web3Api.eth.accounts.recoverTransaction(signed);
 
               if (recover.toLowerCase() !== account.address.toLowerCase()) {
-                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Wrong signature. Please sign with the account you use in dApp'));
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.wrongSignatureSignWithDappAccount'));
               }
 
               signedTransaction = signed;
@@ -1643,7 +1643,7 @@ export default class TransactionService {
           emitter.emit('send', eventData); // This event is needed after sending transaction with queue
 
           if (!signature) {
-            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
           }
 
           eventData.extrinsicHash = signature;
@@ -1696,7 +1696,7 @@ export default class TransactionService {
           transaction.submitSwapOrder()
             .then((isSendSuccess) => {
               if (!isSendSuccess) {
-                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
               }
 
               this.handleTransactionTimeout(emitter, eventData);
@@ -2130,7 +2130,7 @@ export default class TransactionService {
       const transaction = this.getTransaction(eventData.id);
 
       if (transaction.status !== ExtrinsicStatus.SUCCESS && transaction.status !== ExtrinsicStatus.FAIL) {
-        eventData.errors.push(new TransactionError(BasicTxErrorType.TIMEOUT, t('Transaction timeout')));
+        eventData.errors.push(new TransactionError(BasicTxErrorType.TIMEOUT, t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimeout')));
         emitter.emit('timeout', eventData);
         clearTimeout(timeout);
       }

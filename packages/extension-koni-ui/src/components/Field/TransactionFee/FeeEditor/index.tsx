@@ -179,7 +179,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('Estimated fee')}
+                {t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}:
               </div>
               {FEE_TYPES_CAN_SHOW.includes(feeType) && (
                 <div
@@ -197,7 +197,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     <Tooltip
                       className={'__not-editable'}
                       placement='topLeft'
-                      title={isEvmButNoCustomFeeSupport ? t("This fee can't be edited with the current RPC connection") : undefined}
+                      title={isEvmButNoCustomFeeSupport ? t('ui.TRANSACTION.components.Field.FeeEditor.feeNotEditableWithCurrentRpc') : undefined}
                     >
                       <div>
                         <Button

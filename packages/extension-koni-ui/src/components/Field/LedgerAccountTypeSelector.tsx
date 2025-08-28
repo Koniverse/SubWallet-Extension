@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
@@ -10,6 +11,7 @@ import { Field, Icon, InputRef, Logo, ModalContext, SwModal, Web3Block } from '@
 import CN from 'classnames';
 import { CaretDown } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import styled from 'styled-components';
 
 export interface LedgerPolkadotAccountItemType extends ChainItemType {
@@ -91,11 +93,11 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           size={20}
         />
         <div className={'__selected-item-name common-text'}>
-          {selectedItem.name}
+          {t(selectedItem.name)}
         </div>
       </div>
     );
-  }, [selectedItem]);
+  }, [selectedItem, t]);
 
   const fieldSuffix = useMemo(() => {
     return (
@@ -116,8 +118,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         <Field
           className={CN('is-selectable')}
           content={fieldContent}
-          label={t('Select account type')}
-          placeholder={t('Select account type')}
+          label={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+          placeholder={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
           suffix={fieldSuffix}
         />
       </div>
@@ -126,16 +128,20 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         closable={true}
         id={id}
         onCancel={onCancelModal}
-        title={t('Select account type')}
+        title={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
       >
         <div className={'modal-description'}>
-          {t('Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ')}
-          <a
-            href={CONNECT_LEDGER_USER_GUIDE_URL}
-            target='__blank'
-          >
-            {t('click here')}
-          </a>
+          <Trans
+            components={{
+              highlight: (
+                <a
+                  href={CONNECT_LEDGER_USER_GUIDE_URL}
+                  target='__blank'
+                />
+              )
+            }}
+            i18nKey={detectTranslate('ui.components.Field.LedgerAccountTypeSelector.choosePolkadotAccountTypeReloadInfo')}
+          />
         </div>
 
         <div className={'modal-content'}>
