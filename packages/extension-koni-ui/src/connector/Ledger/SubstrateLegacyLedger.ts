@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BIP32_HARDENED_OFFSET } from '@subwallet/extension-koni-ui/constants';
 import { newSubstrateApp, SubstrateApp } from '@zondax/ledger-substrate';
 import { ResponseSign } from '@zondax/ledger-substrate/dist/common';
 
@@ -142,9 +143,9 @@ export class SubstrateLegacyLedger extends BaseLedger<SubstrateApp> {
   }
 
   private serializeParameters (accountOffset = 0, addressOffset = 0, accountOptions?: Partial<AccountOptions>) {
-    const account = (accountOptions?.account || 0) + (accountOffset || 0);
-    const addressIndex = (accountOptions?.addressIndex || 0) + (addressOffset || 0);
-    const change = accountOptions?.change || 0;
+    const account = (accountOptions?.account || 0) + (accountOffset || 0) + BIP32_HARDENED_OFFSET;
+    const addressIndex = (accountOptions?.addressIndex || 0) + (addressOffset || 0) + BIP32_HARDENED_OFFSET;
+    const change = (accountOptions?.change || 0) + BIP32_HARDENED_OFFSET;
 
     return {
       account,
