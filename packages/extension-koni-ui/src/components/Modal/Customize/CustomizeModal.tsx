@@ -36,9 +36,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       destroyOnClose={true}
       id={CUSTOMIZE_MODAL}
       onCancel={onCancel}
-      title={t('Customize asset display')}
+      title={t('ui.BALANCE.components.Modal.Customize.Modal.customizeAssetDisplay')}
     >
-      <div className={'__group-label'}>{t('Balance')}</div>
+      <div className={'__group-label'}>{t('ui.BALANCE.components.Modal.Customize.Modal.balance')}</div>
       <div className={'__group-content'}>
         <SettingItem
           className={'__setting-item'}
@@ -52,7 +52,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               weight='fill'
             />
           }
-          name={t('Show zero balance')}
+          name={t('ui.BALANCE.components.Modal.Customize.Modal.showZeroBalance')}
           rightItem={
             <Switch
               checked={isShowZeroBalance}
@@ -62,7 +62,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />
       </div>
 
-      <div className={'__group-label'}>{t('Networks')}</div>
+      <div className={'__group-label'}>{t('ui.BALANCE.components.Modal.Customize.Modal.networks')}</div>
 
       <CustomizeModalContent />
     </SwModal>

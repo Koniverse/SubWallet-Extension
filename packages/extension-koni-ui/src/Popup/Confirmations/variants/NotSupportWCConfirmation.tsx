@@ -39,12 +39,12 @@ const Component: React.FC<Props> = (props: Props) => {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Signature required')}
+          {t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.signatureRequired')}
         </div>
         <div className='description'>
           <AlertBox
-            description={t('SubWallet has not supported this request for WalletConnect yet')}
-            title={t('Request not supported')}
+            description={t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.wcRequestNotSupported')}
+            title={t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.requestNotSupported')}
             type='warning'
           />
         </div>
@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={handleCancel}
         >
-          {t('Back to home')}
+          {t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.backToHome')}
         </Button>
       </div>
     </>

@@ -35,13 +35,13 @@ interface FeeItem {
 }
 
 const defaultTooltipMap: Record<SwapFeeType, (percentage?: number) => string> = {
-  [SwapFeeType.PLATFORM_FEE]: () => detectTranslate('Fee paid to third-party providers to facilitate the swap. It is not paid to SubWallet'),
-  [SwapFeeType.NETWORK_FEE]: () => detectTranslate('Fee paid to process your transaction on the blockchain. It is not paid to SubWallet'),
+  [SwapFeeType.PLATFORM_FEE]: () => detectTranslate('ui.SWAP.components.Modal.Swap.Fees.thirdPartyFee'),
+  [SwapFeeType.NETWORK_FEE]: () => detectTranslate('ui.SWAP.components.Modal.Swap.Fees.transactionFee'),
   [SwapFeeType.WALLET_FEE]: (percentage?: number) => {
     if (!percentage) {
-      return detectTranslate('Fee charged by SubWallet, which is automatically factored into this quote');
+      return detectTranslate('ui.SWAP.components.Modal.Swap.Fees.subWalletFee');
     } else {
-      const message = detectTranslate('A fee of {{percentage}}% is automatically factored into this quote');
+      const message = detectTranslate('ui.SWAP.components.Modal.Swap.Fees.percentageFee');
 
       return t(message, { replace: { percentage: percentage } });
     }
@@ -74,9 +74,9 @@ const Component: FC<Props> = (props: Props) => {
     const result: FeeItem[] = [];
 
     const feeConfigs = [
-      { type: SwapFeeType.NETWORK_FEE, label: t('Network fee'), getTooltip: () => defaultTooltipMap[SwapFeeType.NETWORK_FEE]() },
-      { type: SwapFeeType.PLATFORM_FEE, label: t('Provider fee'), getTooltip: () => defaultTooltipMap[SwapFeeType.PLATFORM_FEE]() },
-      { type: SwapFeeType.WALLET_FEE, label: t('SubWallet fee'), getTooltip: (percentage?: number) => defaultTooltipMap[SwapFeeType.WALLET_FEE](percentage) }
+      { type: SwapFeeType.NETWORK_FEE, label: t('ui.SWAP.components.Modal.Swap.Fees.networkFee'), getTooltip: () => defaultTooltipMap[SwapFeeType.NETWORK_FEE]() },
+      { type: SwapFeeType.PLATFORM_FEE, label: t('ui.SWAP.components.Modal.Swap.Fees.providerFee'), getTooltip: () => defaultTooltipMap[SwapFeeType.PLATFORM_FEE]() },
+      { type: SwapFeeType.WALLET_FEE, label: t('ui.SWAP.components.Modal.Swap.Fees.subWalletFeeTitle'), getTooltip: (percentage?: number) => defaultTooltipMap[SwapFeeType.WALLET_FEE](percentage) }
     ];
 
     const createFeeItem = (
@@ -130,12 +130,12 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('Close')}
+          {t('ui.SWAP.components.Modal.Swap.Fees.close')}
         </Button>
       )}
       id={modalId}
       onCancel={onCancel}
-      title={t('Swap fees')}
+      title={t('ui.SWAP.components.Modal.Swap.Fees.swapFees')}
     >
       <MetaInfo
         className={'__quote-info-block'}
@@ -180,7 +180,7 @@ const Component: FC<Props> = (props: Props) => {
           <MetaInfo.Number
             className={'__total-fee-value'}
             decimals={0}
-            label={t('Estimated total fee')}
+            label={t('ui.SWAP.components.Modal.Swap.Fees.estimatedTotalFee')}
             prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
             useNumberDisplay={true}
