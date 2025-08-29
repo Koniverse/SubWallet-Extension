@@ -977,8 +977,8 @@ export class SwapBaseHandler {
     const bnTransitFromTokenBalance = new BigN(transitFromTokenBalance.value).plus(bnSwapReceivingAmount);
     const bnTransitFeeTokenBalance = new BigN(transitFeeTokenBalance.value);
     const transitStepValidation = await this.validateBridgeStep({
-      fromChain,
-      toChain,
+      fromChain: fromTransitChain,
+      toChain: toTransitChain,
       sender: transitSender,
       receiver: transitReceiver,
       fromToken: transitFromToken,
