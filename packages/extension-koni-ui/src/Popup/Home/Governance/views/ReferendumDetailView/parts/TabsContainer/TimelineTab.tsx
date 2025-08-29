@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { TimelineItem } from '@subwallet/subsquare-api-sdk/interface';
+import { TimelineItem } from '@subwallet/subsquare-api-sdk';
 import React from 'react';
 import styled from 'styled-components';
 

@@ -4,7 +4,7 @@
 import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governance';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Referendum } from '@subwallet/subsquare-api-sdk/interface';
+import { GOV_COMPLETED_STATES, GOV_ONGOING_STATES, Referendum } from '@subwallet/subsquare-api-sdk';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -30,11 +30,11 @@ const Component = ({ className, items, onClickItem, selectedReferendaCategory }:
       const stateName = item.state.name;
 
       if (selectedReferendaCategory === ReferendaCategory.ONGOING) {
-        return ['Preparing', 'Submitted', 'Queueing', 'Deciding', 'Confirming'].includes(stateName);
+        return GOV_ONGOING_STATES.includes(stateName);
       }
 
       if (selectedReferendaCategory === ReferendaCategory.COMPLETED) {
-        return ['Approved', 'Rejected', 'Cancelled', 'TimedOut', 'Killed'].includes(stateName);
+        return GOV_COMPLETED_STATES.includes(stateName);
       }
 
       if (selectedReferendaCategory === ReferendaCategory.VOTED) {

@@ -7,8 +7,7 @@ import { useCoreCreateReformatAddress } from '@subwallet/extension-koni-ui/hooks
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import getSubsquareApi, { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
-import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk/interface';
+import getSubsquareApi, { ReferendumVoteDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';

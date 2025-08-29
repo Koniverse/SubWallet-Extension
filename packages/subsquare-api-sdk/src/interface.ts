@@ -11,12 +11,7 @@ export interface Referendum {
     who: string;
   };
 
-  trackInfo: {
-    id: number;
-    name: string;
-    decisionPeriod: string; // block -> need convert to day
-    confirmPeriod: string; // block -> need convert to day
-  }
+  trackInfo: TrackInfo;
 
   enactment: {
     after: string; // block
@@ -29,7 +24,7 @@ export interface Referendum {
   };
 
   state: {
-    name: string;
+    name: GovStatusKey;
     indexer: {
       blockTime: number;
       blockHeight: number;
@@ -166,10 +161,11 @@ interface MinApproval {
   linearDecreasing?: LinearDecreasing;
 }
 export interface TrackInfo {
-  confirmPeriod: number;
-  decisionPeriod: number;
+  decisionPeriod: number; // block -> need convert to day
+  confirmPeriod: number; // block -> need convert to day
   name: string;
   minApproval?: MinApproval;
+  id: string;
 }
 
 interface OnchainInfo {
@@ -272,7 +268,36 @@ export interface ReferendumVoteDetail {
 
 /* ReferendumVote */
 
-export interface Track {
-  id: string;
-  name: string;
+/* Gov Status */
+
+export enum GovStatusKey {
+  ALL = 'All',
+  PREPARING = 'Preparing',
+  DECIDING = 'Deciding',
+  CONFIRMING = 'Confirming',
+  QUEUEING = 'Queueing',
+  APPROVED = 'Approved',
+  EXECUTED = 'Executed',
+  REJECTED = 'Rejected',
+  TIMEDOUT = 'Timedout',
+  CANCELLED = 'Cancelled',
+  KILLED = 'Killed',
 }
+
+export const GOV_ONGOING_STATES: GovStatusKey[] = [
+  GovStatusKey.PREPARING,
+  GovStatusKey.DECIDING,
+  GovStatusKey.CONFIRMING,
+  GovStatusKey.QUEUEING
+];
+
+export const GOV_COMPLETED_STATES: GovStatusKey[] = [
+  GovStatusKey.APPROVED,
+  GovStatusKey.EXECUTED,
+  GovStatusKey.REJECTED,
+  GovStatusKey.TIMEDOUT,
+  GovStatusKey.CANCELLED,
+  GovStatusKey.KILLED
+];
+
+/* Gov Status */

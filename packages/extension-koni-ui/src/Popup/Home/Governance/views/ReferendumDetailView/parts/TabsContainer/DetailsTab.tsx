@@ -6,7 +6,7 @@ import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
-import { ReferendumDetail } from '@subwallet/subsquare-api-sdk/interface';
+import { ReferendumDetail } from '@subwallet/subsquare-api-sdk';
 import { Copy } from 'phosphor-react';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';

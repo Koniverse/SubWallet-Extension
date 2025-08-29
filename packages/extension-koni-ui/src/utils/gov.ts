@@ -14,19 +14,3 @@ export const GOV_QUERY_KEYS = {
   tracks: (chain: string) =>
     ['subsquare', 'referendumDetail', 'votes', chain] as const
 };
-
-export function reformatTrackName (input: string): string {
-  if (!input) {
-    return '';
-  }
-
-  let str = input.replace(/[_-]/g, ' ');
-
-  str = str.replace(/([a-z])([A-Z])/g, '$1 $2');
-
-  return str
-    .split(' ')
-    .filter(Boolean)
-    .map((word) => word[0].toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-}
