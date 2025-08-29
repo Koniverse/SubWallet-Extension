@@ -221,7 +221,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
               )}
             </div>
 
-            <div className={CN('__field-line-2', { '-is-edit-button': !isEditButton })}>
+            <div className={CN('__field-line-2', { '-is-edit-button': isEditButton })}>
               {!isDataReady
                 ? (
                   <ActivityIndicator size={20} />
@@ -311,7 +311,6 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.__field-line-2': {
-      paddingRight: '28px',
       width: '100%',
       justifyContent: 'flex-end',
       display: 'flex',
@@ -319,10 +318,11 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
         fontSize: `${token.fontSizeSM}px !important`,
         lineHeight: '20px !important',
         color: `${token.colorTextTertiary} !important`
-      },
-      '.-is-edit-button': {
-        paddingRight: 0
       }
+    },
+
+    '.-is-edit-button': {
+      paddingRight: '28px'
     },
 
     '.__fee-editor-area': {
