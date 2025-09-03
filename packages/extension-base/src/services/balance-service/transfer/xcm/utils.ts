@@ -30,6 +30,8 @@ export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
+  assetHub?: DryRunNodeResult
+  bridgeHub?: DryRunNodeResult
 }
 
 interface GetXcmFeeRequest {
