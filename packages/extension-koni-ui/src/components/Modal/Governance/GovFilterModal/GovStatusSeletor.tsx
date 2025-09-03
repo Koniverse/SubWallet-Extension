@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field';
-import { GovStatusItem, govStatusItems } from '@subwallet/extension-koni-ui/constants';
+import { govStatusItems } from '@subwallet/extension-koni-ui/constants';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
-import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovStatusItem, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
 import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
