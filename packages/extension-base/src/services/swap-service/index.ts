@@ -571,7 +571,7 @@ export class SwapService implements StoppableServiceInterface {
       const { blockedActionsMap } = blockedActionsFeaturesMap;
 
       if (blockedActionsMap.swap.includes(currentAction)) {
-        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature under maintenance. Try again later'))];
+        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.SWAP.services.service.swap.featureUnderMaintenance'))];
       }
     }
 
