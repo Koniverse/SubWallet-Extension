@@ -84,8 +84,11 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 export const ReferendaList = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
+    paddingLeft: token.padding,
+    paddingRight: token.padding,
+
     '.__referendum-item + .__referendum-item': {
-      marginTop: token.marginXS
+      marginTop: token.marginSM
     }
   };
 });

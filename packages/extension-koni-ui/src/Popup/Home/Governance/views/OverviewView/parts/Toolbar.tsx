@@ -3,11 +3,10 @@
 
 import { FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { GovFilterModal } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal';
-import { GovStatusKey } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal/GovStatusSeletor';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
-import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -122,10 +121,20 @@ const Component = ({ chain, className, isEnableTreasuryFilter, onChangeCategory,
 export const Toolbar = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     display: 'flex',
+    alignItems: 'center',
+    paddingInline: token.padding,
+    paddingTop: token.paddingSM,
+    paddingBottom: token.paddingXS,
 
     '.__filter-tabs-bar': {
-      flex: 1
-    }
+      flex: 1,
 
+      '.__tab-item-label': {
+        paddingTop: 0,
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        paddingBottom: token.paddingXXS
+      }
+    }
   };
 });
