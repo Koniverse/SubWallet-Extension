@@ -67,6 +67,7 @@ interface ValidateBridgeStepRequest {
   bnBridgeFeeAmount: BigN;
   bnFeeTokenBalance: BigN;
   bnBridgeDeliveryFee: BigN;
+  isFirstBridge: boolean;
 }
 
 export class SwapBaseHandler {
@@ -406,7 +407,7 @@ export class SwapBaseHandler {
   }
 
   private async validateBridgeStep (request: ValidateBridgeStepRequest): Promise<TransactionError[]> {
-    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, fromChain, fromToken, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
+    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
 
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
@@ -460,7 +461,8 @@ export class SwapBaseHandler {
 
       const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest);
 
-      if (!isDryRunSuccess) {
+      // temp skip dry-run for later step todo: wait for dry-run-predict
+      if (isFirstBridge && !isDryRunSuccess) {
         return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
       }
     }
@@ -601,7 +603,8 @@ export class SwapBaseHandler {
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
-      bnBridgeDeliveryFee
+      bnBridgeDeliveryFee,
+      isFirstBridge: true
     });
 
     if (bridgeStepValidation.length > 0) {
@@ -803,7 +806,8 @@ export class SwapBaseHandler {
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
-      bnBridgeDeliveryFee
+      bnBridgeDeliveryFee,
+      isFirstBridge: false
     });
 
     if (bridgeStepValidation.length > 0) {
@@ -869,7 +873,8 @@ export class SwapBaseHandler {
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
-      bnBridgeDeliveryFee
+      bnBridgeDeliveryFee,
+      isFirstBridge: true
     });
 
     if (bridgeStepValidation.length > 0) {
@@ -1001,7 +1006,8 @@ export class SwapBaseHandler {
       bnFromTokenBalance: bnTransitFromTokenBalance,
       bnBridgeFeeAmount: bnTransitFeeAmount,
       bnFeeTokenBalance: bnTransitFeeTokenBalance,
-      bnBridgeDeliveryFee: bnTransitDeliveryFee
+      bnBridgeDeliveryFee: bnTransitDeliveryFee,
+      isFirstBridge: false
     });
 
     if (transitStepValidation.length > 0) {
