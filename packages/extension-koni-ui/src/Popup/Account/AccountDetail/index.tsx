@@ -99,21 +99,21 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
       {
-        label: t('Account address'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.accountAddress'),
         value: FilterTabType.ACCOUNT_ADDRESS
       }
     ];
 
     if (showDerivedAccounts) {
       result.push({
-        label: t('Derived account'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.derivedAccount'),
         value: FilterTabType.DERIVED_ACCOUNT
       });
     }
 
     if (showDerivationInfoTab) {
       result.push({
-        label: t('Derivation info'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.derivationInfo'),
         value: FilterTabType.DERIVATION_INFO
       });
     }
@@ -144,11 +144,11 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
 
   const onDelete = useCallback(() => {
     alertModal.open({
-      title: t('Confirmation'),
+      title: t('ui.ACCOUNT.screen.Account.Detail.confirmation'),
       type: NotificationType.WARNING,
-      content: t('You will no longer be able to access this account via this extension'),
+      content: t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning'),
       okButton: {
-        text: t('Remove'),
+        text: t('ui.ACCOUNT.screen.Account.Detail.remove'),
         onClick: () => {
           doDelete();
           alertModal.close();
@@ -175,7 +175,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   // @ts-ignore
   const onCopyAddress = useCallback(() => {
     notify({
-      message: t('Copied to clipboard')
+      message: t('ui.ACCOUNT.screen.Account.Detail.copiedToClipboard')
     });
   }, [notify, t]);
 
@@ -195,10 +195,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         const { isValid } = await validateAccountName({ name: value, proxyId: accountProxyId });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.Detail.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.Detail.accountNameInvalid'));
       }
     }
 
@@ -258,7 +258,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           onClick={onDelete}
           schema='error'
         >
-          {t('Delete account')}
+          {t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
         </Button>
       );
     }
@@ -291,7 +291,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         onClick={onDerive}
         schema='secondary'
       >
-        {t('Derive')}
+        {t('ui.ACCOUNT.screen.Account.Detail.derive')}
       </Button>
       <Button
         block={true}
@@ -305,7 +305,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         onClick={onExport}
         schema='secondary'
       >
-        {t('Export')}
+        {t('ui.ACCOUNT.screen.Account.Detail.export')}
       </Button>
     </>;
   }, [accountProxy, deleting, deriving, onDelete, onDerive, onExport, t]);
@@ -345,8 +345,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           >
             <Input
               disabled={true}
-              label={t('Derivation path')}
-              placeholder={t('Derivation path')}
+              label={t('ui.ACCOUNT.screen.Account.Detail.derivationPath')}
+              placeholder={t('ui.ACCOUNT.screen.Account.Detail.derivationPath')}
             />
           </Form.Item>
           {!!parentDerivedAccountProxy && <Form.Item
@@ -355,8 +355,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           >
             <Input
               disabled={true}
-              label={t('Parent account')}
-              placeholder={t('Parent account')}
+              label={t('ui.ACCOUNT.screen.Account.Detail.parentAccount')}
+              placeholder={t('ui.ACCOUNT.screen.Account.Detail.parentAccount')}
             />
           </Form.Item>}
         </Form>
@@ -375,7 +375,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           disabled: false
         }
       ]}
-      title={t('Account details')}
+      title={t('ui.ACCOUNT.screen.Account.Detail.accountDetails')}
     >
       <Form
         className={'account-detail-form'}
@@ -399,7 +399,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
             name={FormFieldName.NAME}
             rules={[
               {
-                message: t('Account name is required'),
+                message: t('ui.ACCOUNT.screen.Account.Detail.accountNameRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -412,9 +412,9 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
             <Input
               className='account-name-input'
               disabled={false}
-              label={t('Account name')}
+              label={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
               onBlur={form.submit}
-              placeholder={t('Account name')}
+              placeholder={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
               suffix={(
                 <AccountChainTypeLogos
                   chainTypes={accountProxy.chainTypes}

@@ -48,7 +48,7 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
   return (
     <CollapsiblePanel
       className={CN(className)}
-      title={t('Earning info')}
+      title={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.earningInfo')}
     >
       <MetaInfo
         labelColorScheme='gray'
@@ -60,12 +60,12 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
           ? (
             <MetaInfo.Chain
               chain={poolInfo.chain}
-              label={t('Network')}
+              label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.network')}
             />
           )
           : (
             <MetaInfo.Default
-              label={t('Subnet')}
+              label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.subnet')}
             >
               <div className='__subnet-wrapper'>
                 <Logo
@@ -81,8 +81,8 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
           )}
         {totalApy !== undefined && (
           <MetaInfo.Number
-            label={t('Estimated earnings')}
-            suffix={'% ' + t('per year')}
+            label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}
+            suffix={'% ' + t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.perYear')}
             value={totalApy}
             valueColorSchema='even-odd'
           />
@@ -90,15 +90,15 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
 
         <MetaInfo.Number
           decimals={inputAsset?.decimals || 0}
-          label={t('Minimum active stake')}
+          label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.minimumActiveStake')}
           suffix={inputAsset?.symbol}
           value={poolInfo.statistic?.earningThreshold.join || '0'}
           valueColorSchema='even-odd'
         />
         {unstakePeriod !== undefined && (
-          <MetaInfo.Default label={t('Unstaking period')}>
+          <MetaInfo.Default label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod')}>
             {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING) && <span className={'__label'}>Up to</span>}
-            {getEarningTimeText(unstakePeriod)}
+            {getEarningTimeText(t, unstakePeriod)}
           </MetaInfo.Default>
         )}
       </MetaInfo>

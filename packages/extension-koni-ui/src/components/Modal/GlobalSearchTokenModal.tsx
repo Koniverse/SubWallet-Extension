@@ -109,13 +109,13 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
       destroyOnClose={true}
       id={id}
       onCancel={onPressCancel}
-      title={t('Select token')}
+      title={t('ui.BALANCE.components.Modal.GlobalSearchToken.selectToken')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Token name')}
+        placeholder={t<string>('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
         searchValue={currentSearchText}
       />
       <SwList

@@ -122,7 +122,14 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
       const parsedMinJoinPool = formatNumber(missingAmount.toString(), inputAssetInfo.decimals || 0);
       const formatparsedMinJoinPool = isTheSame ? parsedMinJoinPool : Number(parsedMinJoinPool) + 0.01;
-      const parsedMinAltJoinPool = formatNumber((missingAmount.add(existentialDeposit)).toString(), inputAssetInfo.decimals || 0);
+
+      // If balance can not cover ED, add ED to the missing amount
+      const needExtraED = bnInputAssetBalance.eq(BN_ZERO) && bnAltInputAssetBalance.eq(BN_ZERO);
+      const totalMissingAlt = needExtraED
+        ? missingAmount.add(existentialDeposit)
+        : missingAmount;
+
+      const parsedMinAltJoinPool = formatNumber(totalMissingAlt.toString(), inputAssetInfo.decimals || 0);
       const formatParsedMinAltJoinPool = isTheSame ? parsedMinAltJoinPool : Number(parsedMinAltJoinPool) + 0.01;
 
       return {
@@ -372,20 +379,18 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const altInputTokenBalance = await this.state.balanceService.getTransferableBalance(params.address, altInputTokenInfo.originChain, altInputTokenSlug);
 
     const missingAmount = bnAmount.sub(bnInputTokenBalance); // TODO: what if input token is not LOCAL ??
-    const xcmFee = new BN(path.totalFee[1].amount || '0');
-
-    const xcmAmount = missingAmount.add(xcmFee);
+    const xcmFeeValidate = new BN(path.totalFee[1].amount || '0').mul(new BN(XCM_FEE_RATIO));
 
     const bnAltInputTokenBalance = new BN(altInputTokenBalance.value || '0');
 
-    if (!bnAltInputTokenBalance.sub(xcmAmount).sub(xcmFee).gt(BN_ZERO)) {
+    if (!bnAltInputTokenBalance.sub(missingAmount).sub(xcmFeeValidate).gt(BN_ZERO)) {
       processValidation.failedStep = path.steps[1];
       processValidation.ok = false;
       processValidation.status = YieldValidationStatus.NOT_ENOUGH_BALANCE;
 
-      const bnMaxXCM = new BN(altInputTokenBalance.value).sub(xcmFee.mul(new BN(XCM_FEE_RATIO)));
+      const bnMaxXCM = new BN(altInputTokenBalance.value).sub(xcmFeeValidate);
       const inputTokenDecimal = _getAssetDecimals(inputTokenInfo);
-      const maxBn = bnInputTokenBalance.add(new BN(altInputTokenBalance.value)).sub(xcmFee).sub(xcmFee);
+      const maxBn = bnInputTokenBalance.add(bnAltInputTokenBalance.sub(xcmFeeValidate));
       const maxValue = formatNumber(maxBn.toString(), inputTokenInfo.decimals || 0);
       const maxXCMValue = formatNumber(bnMaxXCM.toString(), inputTokenDecimal);
 
@@ -395,18 +400,16 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const altNetworkName = _getAssetName(altInputTokenInfo);
       const currentValue = formatNumber(bnInputTokenBalance.toString(), inputTokenDecimal);
 
-      processValidation.message = t(
-        'You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.',
-        {
-          replace: {
-            symbol,
-            maxValue,
-            inputNetworkName,
-            altNetworkName,
-            currentValue,
-            maxXCMValue
-          }
+      processValidation.message = t('bg.EARNING.services.service.earning.specialHandler.maximumInputExceeded', {
+        replace: {
+          symbol,
+          maxValue,
+          inputNetworkName,
+          altNetworkName,
+          currentValue,
+          maxXCMValue
         }
+      }
       );
 
       return [new TransactionError(YieldValidationStatus.NOT_ENOUGH_BALANCE, processValidation.message, processValidation)];
@@ -468,9 +471,9 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const maxString = formatNumber(bnInputTokenBalance.toString(), inputTokenInfo.decimals || 0);
 
       if (maxString !== '0') {
-        processValidation.message = t('Amount must be equal or less than {{number}}', { replace: { number: maxString } });
+        processValidation.message = t('bg.EARNING.services.service.earning.specialHandler.amountMaxError', { replace: { number: maxString } });
       } else {
-        processValidation.message = t('You need balance greater than 0 to continue');
+        processValidation.message = t('bg.EARNING.services.service.earning.specialHandler.balanceGreaterThanZeroRequired');
       }
 
       return [new TransactionError(YieldValidationStatus.NOT_ENOUGH_BALANCE, processValidation.message, processValidation)];

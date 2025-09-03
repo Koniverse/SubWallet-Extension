@@ -10,6 +10,7 @@ import { AccountsStore } from '@subwallet/extension-base/stores';
 import KeyringStore from '@subwallet/extension-base/stores/Keyring';
 import { browserName, browserVersion, osName, osVersion } from '@subwallet/extension-base/utils';
 import { ActionHandler } from '@subwallet/extension-koni/helper/ActionHandler';
+import { isProductionMode } from '@subwallet/extension-koni-ui/constants/environment';
 import keyring from '@subwallet/ui-keyring';
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
@@ -60,3 +61,17 @@ cryptoWaitReady()
   .catch((error): void => {
     console.error('Initialization fail', error);
   });
+
+// Publish global variables for debugging purposes
+declare global {
+  // eslint-disable-next-line no-var
+  var KoniState: typeof SWHandler.instance.state;
+
+  // eslint-disable-next-line no-var
+  var KoniHandler: typeof SWHandler.instance;
+}
+
+if (!isProductionMode) {
+  globalThis.KoniState = SWHandler.instance.state;
+  globalThis.KoniHandler = SWHandler.instance;
+}
