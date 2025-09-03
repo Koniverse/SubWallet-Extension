@@ -14,8 +14,11 @@ import { SWTransaction } from '@subwallet/extension-base/services/transaction-se
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import keyring from '@subwallet/ui-keyring';
 import BigNumber from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
+
+import { hexStripPrefix, u8aToHex } from '@polkadot/util';
 
 interface OptimexQuoteMetadata {
   session_id: string;
@@ -27,7 +30,7 @@ interface OptimexTradeRequest {
   amount_in: string;
   from_user_address: string;
   to_user_address: string;
-  userRefundAddress: string;
+  user_refund_address: string;
   user_refund_pubkey: string;
   creator_public_key: string;
   from_wallet_address: string;
@@ -113,43 +116,79 @@ export class OptimexHandler implements SwapBaseInterface {
   }
 
   async initTrade (request: OptimalSwapPathParamsV2) {
-    const metadata = request.selectedQuote?.metadata as OptimexMetadata;
+    const pair = request.request.pair;
+    const fromAsset = this.chainService.getAssetBySlug(pair.from);
+    const fromChain = this.chainService.getChainInfoByKey(fromAsset.originChain);
+    const fromChainType = _chainInfoToChainType(fromChain);
+    const sender = request.request.address;
+    const receiver = request.request.recipient;
+    const sendingValue = request.request.fromAmount;
+
+    if (!fromChainType) {
+      return undefined;
+    }
+
+    const metadata = request.selectedQuote?.metadata as OptimexQuoteMetadata;
 
     if (!metadata) {
       return undefined;
     }
 
-    const swAffiliate = {
-      provider: 'SubWallet',
-      rate: '25',
-      receiver: '0xdd718f9Ecaf8f144a3140b79361b5D713D3A6b19',
-      network: 'ethereum'
-    };
+    let initTradeRequest: OptimexTradeRequest;
+    let swAffiliate: AffiliateInfo;
 
-    const sender = request.request.address;
-    const receiver = request.request.recipient;
-    const sendingValue = request.request.fromAmount;
+    if (fromChainType === ChainType.EVM) {
+      swAffiliate = { // todo
+        provider: 'SubWallet',
+        rate: '25',
+        receiver: '0xdd718f9Ecaf8f144a3140b79361b5D713D3A6b19',
+        network: 'ethereum'
+      };
 
-    // todo: btc -> eth
-    const body: OptimexTradeRequest = {
-      session_id: metadata.session_id,
-      amount_in: sendingValue,
-      from_user_address: sender,
-      to_user_address: receiver || '', // todo
-      userRefundAddress: sender,
-      user_refund_pubkey: sender,
-      creator_public_key: sender,
-      from_wallet_address: sender,
-      min_amount_out: metadata.best_quote,
-      affiliate_info: [swAffiliate]
-    };
+      initTradeRequest = {
+        session_id: metadata.session_id,
+        amount_in: sendingValue,
+        from_user_address: sender, // compressPublicKey for BTC and SOLANA, address for EVM
+        to_user_address: receiver || '', // Receiving address // todo
+        user_refund_address: sender, // Refund address if trade fails
+        user_refund_pubkey: sender, // Refund pubkey if trade fails, in btc is pubkey and in evm is address
+        creator_public_key: sender, // Compressed public key, in btc is pubkey and in evm is address
+        from_wallet_address: sender, // Creator address
+        min_amount_out: metadata.best_quote,
+        affiliate_info: [swAffiliate]
+      };
+    } else if (fromChainType === ChainType.BITCOIN) {
+      const fromPublicKey = hexStripPrefix(u8aToHex(keyring.getPair(sender).publicKey));
+
+      swAffiliate = { // todo
+        provider: 'SubWallet',
+        rate: '25',
+        receiver: fromChain.slug === 'bitcoinTest' ? 'tb1q4vgvwexhn745qn404thq6a8mua3un899n2rhrl' : 'bc1q4g4l5drmt2a80m4rfva8cpj9czlwtvshu0nxef',
+        network: 'bitcoin'
+      };
+
+      initTradeRequest = {
+        session_id: metadata.session_id,
+        amount_in: sendingValue,
+        from_user_address: fromPublicKey,
+        to_user_address: receiver || '', // todo
+        user_refund_address: sender,
+        user_refund_pubkey: fromPublicKey,
+        creator_public_key: fromPublicKey,
+        from_wallet_address: sender,
+        min_amount_out: metadata.best_quote,
+        affiliate_info: [swAffiliate]
+      };
+    } else {
+      return undefined;
+    }
 
     let tradeInfo: OptimexTradeMetadata;
 
     try {
       const rawResponse = await fetch(`${this.baseUrl}/v1/trades/initiate`, {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify(initTradeRequest),
         headers: {
           'Content-Type': 'application/json'
         }
