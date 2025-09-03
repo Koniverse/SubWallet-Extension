@@ -91,17 +91,20 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
   return (
     <div className={className}>
-      <div className='__header-area'>
-        <div className='__view-title'>{t('Governance')}</div>
-        <ChainSelector
-          onChangeChain={onChangeChain}
-          selectedChain={chainSlug}
+      <div className='__view-header-area'>
+        <div className='__view-title-area'>
+          <div className='__view-title'>{t('Governance')}</div>
+          <ChainSelector
+            onChangeChain={onChangeChain}
+            selectedChain={chainSlug}
+          />
+        </div>
+
+        <QuickActionsContainer
+          className={className}
+          onGoUnlockToken={onGoUnlockToken}
         />
       </div>
-
-      <QuickActionsContainer
-        onGoUnlockToken={onGoUnlockToken}
-      />
 
       <Toolbar
         chain={chainSlug}
@@ -138,12 +141,30 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
 export const OverviewView = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.__header-area': {
+    '.__view-header-area': {
+      backgroundColor: token.colorBgDefault,
+      borderBottomLeftRadius: 16,
+      borderBottomRightRadius: 16,
+      padding: token.padding,
+      paddingTop: token.paddingXS
+    },
+
+    '.__view-title-area': {
       display: 'flex',
-      minHeight: 40
+      height: 40,
+      alignItems: 'center',
+      marginBottom: token.marginSM
     },
 
     '.__view-title': {
+      fontSize: token.fontSizeHeading4,
+      lineHeight: token.lineHeightHeading4,
+      color: token.colorTextLight1,
+      fontWeight: token.headingFontWeight,
+      gap: token.sizeSM,
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      'white-space': 'nowrap',
       flex: 1
     }
   };

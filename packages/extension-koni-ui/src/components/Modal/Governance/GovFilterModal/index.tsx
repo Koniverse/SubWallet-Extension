@@ -4,14 +4,14 @@
 import { BasicInputEvent } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, Switch, SwModal, Tooltip } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { FadersHorizontal, Info } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { GovStatusKey, GovStatusSelector } from './GovStatusSeletor';
+import { GovStatusSelector } from './GovStatusSeletor';
 import { GovTrackSelector } from './GovTrackSelector';
 
 interface Props extends ThemeProps {
