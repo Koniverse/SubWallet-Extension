@@ -1505,6 +1505,7 @@
   "ui.SETTINGS.screen.Setting.Security.changeWalletPassword": "ウォレットパスワードを変更",
   "ui.SETTINGS.screen.Setting.Security.extensionAutoLock": "Extension auto lock",
   "ui.SETTINGS.screen.Setting.Security.authenticateWithPassword": "Authenticate with password",
+  "ui.SETTINGS.screen.Setting.Security.phishingProtection": "",
   "ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection": "高度なフィッシング検出",
   "ui.SETTINGS.screen.Setting.Security.cameraAccessForQr": "QRのカメラアクセス",
   "ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions": "Sign for multiple transactions",
