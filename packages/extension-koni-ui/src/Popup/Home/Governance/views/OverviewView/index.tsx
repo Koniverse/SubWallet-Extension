@@ -4,10 +4,9 @@
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { Button, Icon } from '@subwallet/react-ui';
+import { Button } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { CaretRight, LockKey } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -99,20 +98,10 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
           selectedChain={chainSlug}
         />
       </div>
-      <div
-        className='panel__nav'
-        onClick={onGoUnlockToken}
-      >
-        <div className='panel__title'>
-          <Icon
-            phosphorIcon={LockKey}
-            size='sm'
-          />
-          {t('Locked')}
-        </div>
-      </div>
 
-      <QuickActionsContainer />
+      <QuickActionsContainer
+        onGoUnlockToken={onGoUnlockToken}
+      />
 
       <Toolbar
         chain={chainSlug}
