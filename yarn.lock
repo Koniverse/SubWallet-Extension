@@ -6237,13 +6237,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.113-beta.11-pr-555-0a43fb3c":
-  version: 0.2.113-beta.11-pr-555-0a43fb3c
-  resolution: "@subwallet/chain-list@npm:0.2.113-beta.11-pr-555-0a43fb3c"
+"@subwallet/chain-list@npm:0.2.113-beta.12":
+  version: 0.2.113-beta.12
+  resolution: "@subwallet/chain-list@npm:0.2.113-beta.12"
   dependencies:
     "@polkadot/util": ^13.5.5
-    ts-md5: ^2.0.1
-  checksum: 220f109b8e6aa152fa0eb69b676c5135d898f7c03ef21b87e5c80405c47316c2f51de8540e01c663661f8de1ce52e05f425b565a052c7857e2deddb71e22a5e8
+    ts-md5: ^1.3.1
+  checksum: ce0b1ec7a904d248ecd8332c77ff49e0bdda53db98deae555a87e8068375c60670f763b694d80e7ab9cde1d66bded323442fb02358317a64a6c34f40c188d426
   languageName: node
   linkType: hard
 
@@ -6288,7 +6288,7 @@ __metadata:
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
     "@subwallet-monorepos/subwallet-services-sdk": ^0.1.8
-    "@subwallet/chain-list": 0.2.113-beta.11-pr-555-0a43fb3c
+    "@subwallet/chain-list": 0.2.113-beta.12
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6429,7 +6429,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.113-beta.11-pr-555-0a43fb3c
+    "@subwallet/chain-list": 0.2.113-beta.12
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6571,7 +6571,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.113-beta.11-pr-555-0a43fb3c
+    "@subwallet/chain-list": 0.2.113-beta.12
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -26890,13 +26890,6 @@ __metadata:
   version: 1.3.1
   resolution: "ts-md5@npm:1.3.1"
   checksum: 88fc4df837e17949fef92a8e71a0691b20e2f8b02a002876a162a102e7c9d364f1eb00cbd217f9578fec5fa07bb66ffa14ed054cdfe164486fab2173c8e9ea23
-  languageName: node
-  linkType: hard
-
-"ts-md5@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "ts-md5@npm:2.0.1"
-  checksum: b32803cc2a3134624fadc23e31030f1b11cda75ad8097acf9d5c1680e6e48101e1d55ecd486ab6268cc7b1afe7486833ba8ccd292ee8bb98df4fd6f47d953638
   languageName: node
   linkType: hard
 
