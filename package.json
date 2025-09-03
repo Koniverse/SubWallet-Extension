@@ -119,7 +119,7 @@
     "@polkadot/util": "^13.5.3",
     "@polkadot/util-crypto": "^13.5.3",
     "@polkadot/x-global": "^13.5.3",
-    "@subwallet/chain-list": "0.2.112",
+    "@subwallet/chain-list": "0.2.113-beta.11-pr-555-0a43fb3c",
     "@subwallet/keyring": "^0.1.13",
     "@subwallet/react-ui": "5.1.2-b79",
     "@subwallet/ui-keyring": "^0.1.13",
