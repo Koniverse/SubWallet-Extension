@@ -4,11 +4,14 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler } from '@subwallet/extension-base/utils';
+import { BehaviorSubject } from 'rxjs';
 
 import { ServiceStatus } from '../base/types';
 import { EventService } from '../event-service';
+import DatabaseService from '../storage-service/DatabaseService';
 import BaseOpenGovHandler from './handler';
-import { GovVoteRequest, RemoveVoteRequest } from './interface';
+import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from './interface';
 import { govChainSupportItems } from './utils';
 
 class OpenGovChainHandler extends BaseOpenGovHandler {
@@ -22,22 +25,58 @@ class OpenGovChainHandler extends BaseOpenGovHandler {
 
 export default class OpenGovService {
   protected readonly state: KoniState;
-  private eventService: EventService;
+  private dbService: DatabaseService;
+  private readonly eventService: EventService;
   protected readonly handlers: Record<string, OpenGovChainHandler> = {};
+
+  // subjects
+  public readonly govLockedInfoSubject = new BehaviorSubject<Record<string, GovVotingInfo>>({});
+  public readonly govLockedInfoListSubject = new BehaviorSubject<GovVotingInfo[]>([]);
+  private govLockedInfoPersistQueue: GovVotingInfo[] = [];
+  private govLockedInfoUnsub: VoidFunction | undefined;
+  status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
+
+  private startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
+  private stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
 
   constructor (state: KoniState) {
     this.state = state;
     this.eventService = state.eventService;
+    this.dbService = state.dbService;
   }
-
-  status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
     this.eventService.emit('open-gov.ready', true);
     await this.initHandlers();
+    await this.getGovLockedInfoFromDB();
 
     this.status = ServiceStatus.INITIALIZED;
+    this.govLockedInfoListSubject.next(Object.values(this.govLockedInfoSubject.getValue()));
+
+    this.handleActions();
+  }
+
+  handleActions () {
+    this.eventService.onLazy((events, eventTypes) => {
+      let needReload = false;
+
+      (async () => {
+        for (const event of events) {
+          if (event.type === 'account.add' || event.type === 'account.remove' || event.type === 'account.updateCurrent') {
+            needReload = true;
+          }
+
+          if (event.type === 'chain.updateState') {
+            needReload = true;
+          }
+        }
+
+        if (needReload) {
+          await this.runSubscribeGovLockedInfo();
+        }
+      })().catch(console.error);
+    });
   }
 
   private async initHandlers (): Promise<void> {
@@ -74,4 +113,143 @@ export default class OpenGovService {
 
     return handler.handleRemoveVote(request);
   }
+
+  /* Gov Locked Info */
+
+  public async runSubscribeGovLockedInfo () {
+    await this.eventService.waitKeyringReady;
+    this.runUnsubscribeGovLockedInfo();
+
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
+
+    this.subscribeGovLockedInfos(addresses, (data) => {
+      this.updateGovLockedInfo(data);
+    }).then((rs) => {
+      this.govLockedInfoUnsub = rs;
+    }).catch(console.error);
+  }
+
+  private runUnsubscribeGovLockedInfo () {
+    this.govLockedInfoUnsub?.();
+    this.govLockedInfoUnsub = undefined;
+    this.govLockedInfoPersistQueue = [];
+  }
+
+  public async subscribeGovLockedInfos (
+    addresses: string[],
+    cb: (info: GovVotingInfo) => void
+  ): Promise<VoidFunction> {
+    let cancel = false;
+
+    await this.eventService.waitChainReady;
+    const activeChains = this.state.activeChainSlugs;
+    const unsubList: Array<VoidFunction> = [];
+
+    for (const handler of Object.values(this.handlers)) {
+      if (activeChains.includes(handler.chain)) {
+        const [useAddresses] = filterAddressByChainInfo(addresses, handler.chainInfo);
+
+        handler.subscribeGovLockedInfo(useAddresses, cb)
+          .then((unsub) => {
+            if (cancel) {
+              unsub();
+            } else {
+              unsubList.push(unsub);
+            }
+          })
+          .catch(console.error);
+      }
+    }
+
+    return () => {
+      cancel = true;
+      unsubList.forEach((unsub) => unsub?.());
+    };
+  }
+
+  public updateGovLockedInfo (data: GovVotingInfo) {
+    this.govLockedInfoPersistQueue.push(data);
+
+    addLazy('persistGovLockedInfo', () => {
+      const govInfo = this.govLockedInfoSubject.getValue();
+      const queue = [...this.govLockedInfoPersistQueue];
+
+      this.govLockedInfoPersistQueue = [];
+
+      // Update info in memory
+      queue.forEach((item) => {
+        const key = `${item.chain}---${item.address}`;
+
+        govInfo[key] = item;
+      });
+      this.govLockedInfoSubject.next(govInfo);
+
+      // Persist data
+      this.dbService.updateGovLockedInfos(queue).catch(console.warn);
+    }, 300, 900);
+  }
+
+  private async getGovLockedInfoFromDB () {
+    await this.eventService.waitChainReady;
+    await this.eventService.waitKeyringReady;
+
+    const existedInfos = await this.dbService.getGovLockedInfos();
+
+    const govInfo = this.govLockedInfoSubject.getValue();
+
+    existedInfos.forEach((item) => {
+      govInfo[`${item.chain}---${item.address}`] = item;
+    });
+
+    this.govLockedInfoSubject.next(govInfo);
+  }
+
+  public subscribeGovLockedInfoSubject () {
+    return this.govLockedInfoListSubject;
+  }
+
+  public async getGovLockedInfoInfo () {
+    await this.eventService.waitEarningReady;
+
+    return Promise.resolve(this.govLockedInfoListSubject.getValue());
+  }
+
+  /* --------- Start/Stop ---------- */
+  async start (): Promise<void> {
+    if (this.status === ServiceStatus.STARTING || this.status === ServiceStatus.STARTED) {
+      return this.waitForStarted();
+    }
+
+    this.status = ServiceStatus.STARTING;
+
+    this.startPromiseHandler.resolve();
+    this.stopPromiseHandler = createPromiseHandler();
+
+    this.status = ServiceStatus.STARTED;
+  }
+
+  async stop (): Promise<void> {
+    if (this.status === ServiceStatus.STOPPING || this.status === ServiceStatus.STOPPED) {
+      return this.waitForStopped();
+    }
+
+    this.status = ServiceStatus.STOPPING;
+
+    this.runUnsubscribeGovLockedInfo();
+
+    this.stopPromiseHandler.resolve();
+    this.startPromiseHandler = createPromiseHandler();
+
+    this.status = ServiceStatus.STOPPED;
+  }
+
+  waitForStarted (): Promise<void> {
+    return this.startPromiseHandler.promise;
+  }
+
+  waitForStopped (): Promise<void> {
+    return this.stopPromiseHandler.promise;
+  }
+
+  /* Gov Locked Info */
 }

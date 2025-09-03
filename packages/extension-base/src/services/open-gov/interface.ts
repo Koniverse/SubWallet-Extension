@@ -79,15 +79,63 @@ export interface RemoveVoteRequest {
   type?: GovVoteType
 }
 
-export interface VotingFor {
-  casting?: {
-    prior: [string, string];
-    votes?: [string, unknown][];
-  };
-  delegating?: {
-    prior: [string, string];
-    target: string;
+/* Lock inteface */
+
+export interface StandardVote {
+  standard: {
+    vote: {
+      conviction: Conviction;
+      aye: boolean;
+    };
     balance: string;
-    conviction: Conviction
   };
+}
+
+export interface SplitVote {
+  split: {
+    aye: string;
+    nay: string;
+  };
+}
+
+export interface SplitAbstainVote {
+  splitAbstain: {
+    aye: string;
+    nay: string;
+    abstain: string;
+  };
+}
+
+export type Vote = StandardVote | SplitVote | SplitAbstainVote;
+
+// ----- Casting -----
+export interface Casting {
+  prior: [string, string];
+  votes: [string, Vote][];
+  delegations: {
+    votes: string;
+    capital: string;
+  };
+}
+
+// ----- Delegating -----
+export interface Delegating {
+  prior: [string, string];
+  target: string;
+  balance: string;
+  conviction: Conviction;
+}
+
+// ----- VotingFor -----
+export interface VotingFor {
+  casting?: Casting;
+  delegating?: Delegating;
+}
+export interface GovVotingInfo {
+  chain: string;
+  address: string;
+  delegated: string;
+  voted: string;
+  unlocking: string;
+  unlockable: string;
 }

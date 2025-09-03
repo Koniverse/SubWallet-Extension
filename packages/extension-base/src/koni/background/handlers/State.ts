@@ -1990,7 +1990,7 @@ export default class KoniState {
     this.campaignService.stop();
     await Promise.all([this.cron.stop(), this.subscription.stop()]);
     await this.pauseAllNetworks(undefined, 'IDLE mode');
-    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop()]);
+    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop()]);
 
     // Complete sleeping
     sleeping.resolve();
@@ -2054,7 +2054,7 @@ export default class KoniState {
 
     this.waitStartingFull = startingFull.promise;
 
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start(), this.openGovService.start()]);
     this.eventService.emit('general.start_full', true);
 
     this.waitStartingFull = null;

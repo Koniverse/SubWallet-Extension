@@ -5231,6 +5231,25 @@ export default class KoniExtension {
     });
   }
 
+  private async subscribeGovLockedInfo (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(openGov.subscribeGovLockedInfo)'>(id, port);
+
+    await this.#koniState.earningService.waitForStarted();
+    const govLockedInfoSubscription = this.#koniState.openGovService.subscribeGovLockedInfoSubject().subscribe({
+      next: (rs) => {
+        cb(rs);
+      }
+    });
+
+    this.createUnsubscriptionHandle(id, govLockedInfoSubscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return await this.#koniState.openGovService.getGovLockedInfoInfo();
+  }
+
   /* Open Gov */
 
   // --------------------------------------------------------------
@@ -5910,7 +5929,8 @@ export default class KoniExtension {
         return this.handleVote(request as GovVoteRequest);
       case 'pri(openGov.unvote)':
         return this.handleRemoveVote(request as RemoveVoteRequest);
-
+      case 'pri(openGov.subscribeGovLockedInfo)':
+        return this.subscribeGovLockedInfo(id, port);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

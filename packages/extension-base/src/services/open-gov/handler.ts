@@ -1,19 +1,21 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { formatNumber } from '@subwallet/extension-base/utils/number';
 import BigN from 'bignumber.js';
+import { combineLatest, map, merge } from 'rxjs';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { GovVoteRequest, GovVoteType, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, VotingFor } from './interface';
+import { GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, VotingFor } from './interface';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
-  protected readonly chain: string;
+  public readonly chain: string;
 
   constructor (state: KoniState, chain: string) {
     this.state = state;
@@ -24,6 +26,9 @@ export default abstract class BaseOpenGovHandler {
     return this.state.getSubstrateApi(this.chain);
   }
 
+  public get chainInfo (): _ChainInfo {
+    return this.state.getChainInfo(this.chain);
+  }
   /* Referendum related actions */
 
   public async handleVote (request: GovVoteRequest): Promise<TransactionData> {
@@ -221,5 +226,72 @@ export default abstract class BaseOpenGovHandler {
     }
 
     return null;
+  }
+
+  /* Lock info */
+  public async subscribeGovLockedInfo (
+    addresses: string[],
+    cb: (info: GovVotingInfo) => void
+  ) {
+    const substrateApi = await this.substrateApi.isReady;
+
+    const streams = addresses.map((addr) => {
+      return combineLatest([
+        substrateApi.api.query.convictionVoting.votingFor.entries(addr)
+      ]).pipe(
+        map(([votingEntries]): GovVotingInfo => {
+          let delegated = new BigN(0);
+          let voted = new BigN(0);
+          const prior = new BigN(0);
+
+          for (const [key, voting] of votingEntries) {
+            const v = voting.toPrimitive() as VotingFor;
+
+            if (v.delegating) {
+              delegated = delegated.plus(v.delegating.balance);
+            } else if (v.casting?.votes) {
+              for (const [, vote] of v.casting.votes) {
+                if ('standard' in vote) {
+                  voted = voted.plus(vote.standard.balance);
+                } else if ('split' in vote) {
+                  voted = voted.plus(vote.split.aye).plus(vote.split.nay);
+                } else if ('splitAbstain' in vote) {
+                  voted = voted
+                    .plus(vote.splitAbstain.aye)
+                    .plus(vote.splitAbstain.nay)
+                    .plus(vote.splitAbstain.abstain);
+                }
+              }
+            }
+
+            if (v.casting?.prior) {
+            // prior = [balance locked, block unlock]
+              const [locked, until] = v.casting.prior;
+
+              voted = voted.plus(locked);
+            }
+
+            if (v.delegating?.prior) {
+              const [locked, until] = v.delegating.prior;
+
+              delegated = delegated.plus(locked);
+            }
+          }
+
+          return {
+            chain: this.chain,
+            address: addr,
+            delegated: delegated.toString(),
+            voted: voted.toString(),
+            unlocking: prior.toString(),
+            unlockable: '0'
+          };
+        })
+      );
+    });
+
+    const sub = merge(...streams).subscribe(cb);
+
+    return () => sub.unsubscribe();
   }
 }
